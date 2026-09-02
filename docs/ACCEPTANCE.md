@@ -73,3 +73,13 @@ The glass now keeps its resting height during pointer magnification. Icons remai
 A focused `xcodebuild` Debug `build-for-testing` for the DeeDock scheme succeeded with derived data at `/tmp/DeeDock-magnification-build`; Xcode MCP was unavailable because its transport was closed. The log is `/tmp/DeeDock-magnification-build.log`. The only build warnings reported skipped App Intents metadata extraction because these targets do not depend on AppIntents. The new geometry regression test compiled but was not executed, and the magnified-state preview was not rendered.
 
 Hands-on acceptance still needs to confirm constant glass height while moving between icons, labels above enlarged icons, clicking the exposed icon area, and click passthrough in empty space above the glass, including during horizontal scrolling. No runtime or automated visual acceptance was performed for this change.
+
+## Position and appearance settings slice
+
+Native Settings now exposes icon size, maximum magnification, alignment, horizontal offset, bottom distance, and usable-desktop/screen-edge positioning. Usable desktop remains the default. Valid edits save immediately, display fitting preserves requested preferences, and Restore Defaults leaves pins untouched. Invalid saved settings use defaults without overwriting the saved bytes until an explicit reset.
+
+The focused Debug app and test-target compilation succeeded using `xcodebuild ... build-for-testing`, with derived data at `/tmp/DeeDock-settings-build` and log `/tmp/DeeDock-settings-build.log`. Xcode MCP remained unavailable (transport closed), so the command-line build was used. Only skipped App Intents metadata extraction warnings were reported. No tests were executed, no previews were rendered, and no automated visual checks were run.
+
+New tests cover settings defaults, numeric validation/normalization, persistence and reset without changing pins, unreadable settings preservation, both placement references with negative origins, alignment/offset clamping, overflow, and the maximum magnification envelope with fixed glass height. Settings and maximum-size dock previews use isolated state and do not read or write real preferences.
+
+Runtime acceptance remains unexercised for this slice: opening/reopening the same Settings window through both menus and the ⌘, shortcut, live sliders and numeric entry (including locale decimal separators), reset while editing, persistence after restart, focus preservation, screen-edge placement, labels and click targets at maximum size, Reduce Motion/Transparency, keyboard/VoiceOver use, and display changes/wake. Build success does not establish native feel or runtime acceptance. Implementation stops here for review; multiple docks have not been started.

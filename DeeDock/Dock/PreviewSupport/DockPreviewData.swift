@@ -29,7 +29,7 @@ struct DockPreviewContent: View {
     @State private var interaction: DockInteraction
 
     init(items: [DockItem]? = nil, errorMessage: LocalizedStringResource? = nil,
-         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false) {
+         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, settings: DockSettings = .defaults) {
         let items = items ?? DockPreviewData.items
         self.items = items
         self.errorMessage = errorMessage
@@ -37,9 +37,9 @@ struct DockPreviewContent: View {
         self.reduceTransparency = reduceTransparency
         let interaction = DockInteraction()
         interaction.layout = DockGeometry.layout(count: items.count, favoriteCount: items.filter(\.isFavorite).count,
-                                                  availableWidth: 800)
+                                                  availableWidth: 800, settings: settings)
         if magnified, let x = interaction.layout.restingCenters.first {
-            interaction.pointer = CGPoint(x: x, y: DockGeometry.panelHeight - 36)
+            interaction.pointer = CGPoint(x: x, y: interaction.layout.panelHeight - 36)
         }
         _interaction = State(initialValue: interaction)
     }

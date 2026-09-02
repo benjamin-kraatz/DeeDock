@@ -27,7 +27,7 @@ struct DockContentView: View {
     }
     private var surface: CGRect { layout.surfaceFrame(sizes: sizes) }
     private var viewport: CGRect {
-        CGRect(x: 0, y: 0, width: layout.viewportWidth, height: DockGeometry.panelHeight)
+        CGRect(x: 0, y: 0, width: layout.viewportWidth, height: layout.panelHeight)
     }
     private var viewportSurface: CGRect {
         surface.offsetBy(dx: scrollOffset, dy: 0).intersection(
@@ -41,7 +41,8 @@ struct DockContentView: View {
                     DockSurfaceView(
                         items: items, launchingIDs: launchingIDs, selectedID: selectedID,
                         keyboardFocus: keyboardFocus, showsLabel: errorMessage == nil,
-                        layout: layout, sizes: sizes, surface: surface, hoveredID: $hoveredID,
+                        layout: layout, sizes: sizes, surface: surface,
+                        viewport: viewport.offsetBy(dx: -scrollOffset, dy: 0), hoveredID: $hoveredID,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
                         openApp: openApp, togglePin: togglePin,
                         iconFrameChanged: { id, rect in
@@ -72,7 +73,7 @@ struct DockContentView: View {
                     .onDisappear { interaction.errorRect = .zero }
             }
         }
-        .frame(width: layout.viewportWidth, height: DockGeometry.panelHeight)
+        .frame(width: layout.viewportWidth, height: layout.panelHeight)
         .coordinateSpace(name: "dockRoot")
         .clipped()
         // Report only painted interactive regions. Transparent panel margins must pass clicks through.
@@ -97,6 +98,10 @@ struct DockContentView: View {
 
 #Preview("Magnified icons above fixed glass") {
     DockPreviewContent(magnified: true)
+}
+
+#Preview("Maximum icon size and magnification") {
+    DockPreviewContent(magnified: true, settings: DockSettings(iconSize: 96, magnification: 2))
 }
 
 #Preview("Empty") {

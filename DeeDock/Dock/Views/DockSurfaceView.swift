@@ -13,6 +13,8 @@ struct DockSurfaceView: View {
     let layout: DockGeometry.Layout
     let sizes: [CGFloat]
     let surface: CGRect
+    /// Visible viewport expressed in the scrollable canvas coordinate space.
+    let viewport: CGRect
     @Binding var hoveredID: String?
     let reduceMotion: Bool
     let reduceTransparency: Bool
@@ -38,12 +40,12 @@ struct DockSurfaceView: View {
                 Rectangle().fill(.primary.opacity(0.18))
                     .frame(width: 1, height: layout.iconSize * 0.65)
                     .position(x: centers[index] - sizes[index] / 2 - 12,
-                              y: DockGeometry.panelHeight - DockGeometry.bottomMargin - 36)
+                              y: layout.panelHeight - DockGeometry.bottomMargin - 36)
                     .accessibilityHidden(true)
             }
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                 if index < sizes.count {
-                    let frame = DockGeometry.buttonFrame(centerX: centers[index], size: sizes[index])
+                    let frame = layout.buttonFrame(centerX: centers[index], size: sizes[index])
                     DockAppButton(item: item, size: sizes[index], isLaunching: launchingIDs.contains(item.id),
                                   isSelected: keyboardFocus && selectedID == item.id,
                                   open: { openApp(item) }, togglePin: { togglePin(item) })
@@ -61,18 +63,13 @@ struct DockSurfaceView: View {
             }
             if let id = hoveredID ?? (keyboardFocus ? selectedID : nil),
                let index = items.firstIndex(where: { $0.id == id }), index < centers.count, showsLabel {
-                Text(verbatim: items[index].reference.name)
-                    .font(.system(size: 12, weight: .medium))
-                    .lineLimit(1).padding(.horizontal, 10).padding(.vertical, 6)
-                    .background(.regularMaterial, in: .rect(cornerRadius: 7))
-                    .fixedSize()
-                    .position(x: min(max(centers[index], 90), layout.canvasWidth - 90), y: min(surface.minY,
-                                           DockGeometry.buttonFrame(centerX: centers[index], size: sizes[index]).minY - 12) - 20)
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)
+                DockHoverLabel(name: items[index].reference.name,
+                               anchor: CGPoint(x: centers[index], y: min(surface.minY,
+                                   layout.buttonFrame(centerX: centers[index], size: sizes[index]).minY - 12) - 20),
+                               viewport: viewport)
             }
         }
-        .frame(width: layout.canvasWidth, height: DockGeometry.panelHeight)
+        .frame(width: layout.canvasWidth, height: layout.panelHeight)
         .animation(reduceMotion ? nil : .interpolatingSpring(stiffness: 300, damping: 30), value: sizes)
     }
 }

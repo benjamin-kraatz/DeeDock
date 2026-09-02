@@ -5,8 +5,6 @@ import CoreGraphics
 enum DockGeometry {
     static let spacing: CGFloat = 8
     static let padding: CGFloat = 12
-    /// Fixed envelope includes magnification and labels, avoiding pointer-driven window resizing.
-    static let panelHeight: CGFloat = 168
     /// Inset of the glass surface from the panel bottom, in points.
     static let bottomMargin: CGFloat = 8
     static let separatorWidth: CGFloat = 16
@@ -15,6 +13,10 @@ enum DockGeometry {
     struct Layout {
         /// Base icon size before pointer magnification.
         let iconSize: CGFloat
+        /// Maximum configured scale; Reduce Motion overrides it only at presentation time.
+        let magnification: CGFloat
+        /// Stable envelope accommodates the largest icon, running indicator, and hover label.
+        var panelHeight: CGFloat { max(168, ceil(iconSize * magnification) + 96) }
         /// Visible width, capped to the available display area.
         let viewportWidth: CGFloat
         /// Scrollable width, including the reserved magnification envelope.
@@ -33,7 +35,7 @@ enum DockGeometry {
                 let distance = abs(pointerX - center)
                 let radius = (iconSize + DockGeometry.spacing) * 2.5
                 let influence = max(0, 1 - distance / radius)
-                return iconSize * (1 + 0.4 * influence * influence)
+                return iconSize * (1 + (magnification - 1) * influence * influence)
             }
         }
 
@@ -55,8 +57,17 @@ enum DockGeometry {
             let width = contentWidth(sizes: sizes)
             let height = iconSize + 36
             return CGRect(x: (canvasWidth - width) / 2,
-                          y: DockGeometry.panelHeight - DockGeometry.bottomMargin - height,
+                          y: panelHeight - DockGeometry.bottomMargin - height,
                           width: width, height: height)
+        }
+
+        /// App-button bounds, including the running indicator, anchored to a fixed bottom baseline.
+        /// These bounds may extend above the glass while remaining inside the panel envelope.
+        func buttonFrame(centerX: CGFloat, size: CGFloat) -> CGRect {
+            let height = size + 12
+            return CGRect(x: centerX - size / 2,
+                          y: panelHeight - DockGeometry.bottomMargin - 12 - height,
+                          width: size, height: height)
         }
 
         /// Width of the painted surface, including padding, spacing, and any section gap.
@@ -66,41 +77,29 @@ enum DockGeometry {
         }
     }
 
-    /// App-button bounds, including the running indicator, anchored to a fixed bottom baseline.
-    /// These bounds may extend above the glass while remaining inside the panel envelope.
-    static func buttonFrame(centerX: CGFloat, size: CGFloat) -> CGRect {
-        let height = size + 12
-        return CGRect(x: centerX - size / 2,
-                      y: panelHeight - bottomMargin - 12 - height,
-                      width: size, height: height)
-    }
-
     /// Builds a resting layout, reducing icons to 32 points before allowing horizontal overflow.
     /// - Parameters:
     ///   - count: Total item count.
     ///   - favoriteCount: Number of leading pinned items, between zero and `count`.
-    ///   - availableWidth: Display usable width in logical points.
-    static func layout(count: Int, favoriteCount: Int, availableWidth: CGFloat) -> Layout {
+    ///   - availableWidth: Chosen reference frame width in logical points.
+    ///   - settings: Requested appearance; invalid values fall back to defaults.
+    static func layout(count: Int, favoriteCount: Int, availableWidth: CGFloat, settings: DockSettings = .defaults) -> Layout {
+        let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableWidth - 16)
         let separator: Int? = favoriteCount > 0 && favoriteCount < count ? favoriteCount : nil
         let extra = padding * 2 + CGFloat(max(0, count - 1)) * spacing
             + (separator == nil ? 0 : separatorWidth)
         // Reserve the magnification envelope, rather than resizing the window on every mouse move.
-        let size = min(48, max(32, (viewportLimit - extra) / CGFloat(max(1, count) + 2)))
+        let size = min(CGFloat(settings.iconSize), max(32, (viewportLimit - extra) / CGFloat(max(1, count) + 2)))
         let restingWidth = max(64, CGFloat(count) * size + extra)
+        // The quadratic falloff spans 2.5 resting spacings. Its summed influence is at most 1.8,
+        // so two extra icon widths cover the supported maximum 2× scale, including the spring.
         let canvas = restingWidth + size * 2
         let viewport = min(viewportLimit, canvas)
-        let initial = Layout(iconSize: size, viewportWidth: viewport, canvasWidth: canvas,
+        let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), viewportWidth: viewport, canvasWidth: canvas,
                              restingCenters: [], separatorIndex: separator)
         let centers = initial.centers(sizes: Array(repeating: size, count: count))
-        return Layout(iconSize: size, viewportWidth: viewport, canvasWidth: canvas,
+        return Layout(iconSize: size, magnification: CGFloat(settings.magnification), viewportWidth: viewport, canvasWidth: canvas,
                       restingCenters: centers, separatorIndex: separator)
-    }
-
-    /// Centers a panel within a display’s usable frame without assuming a zero screen origin.
-    static func panelFrame(visibleFrame: CGRect, width: CGFloat) -> CGRect {
-        // The glass starts bottomMargin above the panel bottom, at visibleFrame.minY + 8.
-        CGRect(x: visibleFrame.midX - width / 2, y: visibleFrame.minY,
-               width: width, height: panelHeight)
     }
 }

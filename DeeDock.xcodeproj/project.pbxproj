@@ -11,6 +11,9 @@
 		DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */; };
 		DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */; };
 		DD1000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift */; };
+		DD4000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift */; };
+		DD4000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift */; };
+		DD4000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +23,9 @@
 		DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockOrdering.swift; sourceTree = SOURCE_ROOT; };
 		DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Persistence/FavoritesRepository.swift; sourceTree = SOURCE_ROOT; };
 		DD2000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Layout/DockGeometry.swift; sourceTree = SOURCE_ROOT; };
+		DD5000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Models/DockSettings.swift; sourceTree = SOURCE_ROOT; };
+		DD5000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Persistence/DockSettingsRepository.swift; sourceTree = SOURCE_ROOT; };
+		DD5000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Layout/DockPlacement.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -71,6 +77,9 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DD5000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift */,
+				DD5000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift */,
+				DD5000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift */,
 				DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */,
 				DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */,
 				DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */,
@@ -111,7 +120,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				DD0000000000000000000004 /* DeeDockTests */,
-				DD3000000000000000000000 /* Test Model Sources */,
 			);
 			name = DeeDockTests;
 			productName = DeeDockTests;
@@ -171,6 +179,9 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				DD4000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift in Sources */,
+				DD4000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift in Sources */,
+				DD4000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift in Sources */,
 				DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */,
 				DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */,
 				DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */,

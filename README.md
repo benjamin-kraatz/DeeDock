@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The first native dock slice is implemented for macOS 27: one dock on the primary display, native Liquid Glass, pointer magnification, favorites, and running applications. Fine-grained configuration and multiple docks remain planned. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The first native dock slice is implemented for macOS 27: one dock on the primary display, native Liquid Glass, pointer magnification, favorites, and running applications. Position and appearance settings are implemented; multiple docks and auto-hide remain planned. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -69,7 +69,7 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 ## Using the first slice
 
-DeeDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. Its dock is centered above the primary display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DeeDock; dedicated coexistence controls are future work.
+DeeDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, its dock is centered above the primary display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DeeDock; dedicated coexistence controls are future work.
 
 - Click an icon to open or activate its application.
 - Hover to magnify nearby icons and see an app-name label. Running applications have a dot beneath them.
@@ -80,7 +80,26 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 8-point spacing and 12-point padding. Crowded docks reduce icon size to 32 points before scrolling horizontally. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-This slice is always visible. Auto-hide, activation-zone controls, multiple docks, drag reordering, stacks/Trash, window previews, custom appearance controls, and launch-at-login are not implemented.
+This slice is always visible. Auto-hide, activation-zone controls, multiple docks, drag reordering, stacks/Trash, window previews, opacity/fade controls, and launch-at-login are not implemented.
+
+## Position and appearance settings
+
+Choose **Settings…** from the menu-bar item or app menu (⌘, while DeeDock is active). The single native Settings window applies valid edits immediately and saves them automatically.
+
+| Control | Range / options | Default |
+| --- | --- | --- |
+| Icon size | 32–96 points | 48 |
+| Maximum magnification | 1.0×–2.0×, in 0.05 steps | 1.4× |
+| Horizontal alignment | Left / Center / Right | Center |
+| Horizontal offset | −1,000 to +1,000 points | 0 |
+| Bottom distance | 0–300 points | 8 |
+| Position relative to | Usable desktop / Screen edge | Usable desktop |
+
+Numeric controls support sliders and locale-aware typed values. Invalid drafts never enter layout calculations; leaving the field restores the last accepted value. **Restore Defaults** resets configuration only and preserves pinned apps. Unreadable saved settings are left intact and reported in Settings; Restore Defaults explicitly replaces them.
+
+Positive horizontal offsets move right. Bottom distance measures to the glass's bottom edge. Placement is constrained to keep the magnification envelope on the display, so left/right alignment or large offsets can be adjusted near an edge. Requested values remain saved across geometry changes. Crowded docks may use smaller icons than requested before scrolling; the requested size returns when space is available.
+
+A 1.0× maximum disables magnification; Reduce Motion also disables it without changing the saved preference. Glass height stays fixed during hover, with icons and labels using a separate envelope above it. Screen-edge positioning can overlap the system Dock; neither mode changes macOS preferences. Settings apply to the one dock on the primary display. Multiple docks are the next proposed slice, pending review of this one.
 
 ## Implementation and validation
 
@@ -98,6 +117,7 @@ The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing t
 - `DeeDock/Dock/Windowing` owns the AppKit panel, focus, and event-monitor lifecycle.
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
+- `DeeDock/Settings` groups configuration models, persistence, observable state, and focused native controls.
 - `DeeDockTests` contains the focused model tests. The Xcode **Test Model Sources** group references the app's source files for the unhosted test target; it does not contain copies.
 
 Useful previews live beside their views: pinned/running/unavailable apps, launch progress, empty content, error text, and dark appearance with reduced motion/transparency. Open the canvas for `DockContentView`, `DockAppButton`, `DockBackgroundView`, or `DockErrorBanner`. Previews do not construct a live store, read saved pins, or launch applications. Production accessibility values are read from SwiftUI's environment and passed into the same presentation components used by previews.

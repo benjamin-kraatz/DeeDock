@@ -61,6 +61,18 @@
         }
       }
     },
+    "actionSettings": {
+      "comment": "Menu command opening the native settings window.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings…"
+          }
+        }
+      }
+    },
     "actionUnpin": {
       "comment": "Context-menu and accessibility action. Stop keeping this app pinned; a running app remains in the running section.",
       "extractionState": "manual",
@@ -189,6 +201,414 @@
           "stringUnit": {
             "state": "translated",
             "value": "Couldn’t save pinned apps: %1$(details)@"
+          }
+        }
+      }
+    },
+    "settingsAlignCenter": {
+      "comment": "Horizontal center alignment.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Center"
+          }
+        }
+      }
+    },
+    "settingsAlignLeft": {
+      "comment": "Physical left alignment, not text reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left"
+          }
+        }
+      }
+    },
+    "settingsAlignRight": {
+      "comment": "Physical right alignment, not text reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right"
+          }
+        }
+      }
+    },
+    "settingsAlignment": {
+      "comment": "Label for the horizontal dock anchor.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horizontal alignment"
+          }
+        }
+      }
+    },
+    "settingsAllowedRange": {
+      "comment": "Numeric field help. lower and upper are locale-formatted numeric limits. Units appear next to the field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowed range: %1$(lower)@ to %2$(upper)@."
+          }
+        }
+      }
+    },
+    "settingsAppearance": {
+      "comment": "Settings section heading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance"
+          }
+        }
+      }
+    },
+    "settingsAppearanceHelp": {
+      "comment": "Explains effective versus requested size and accessibility behavior.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crowded docks use smaller icons before scrolling. Reduce Motion disables magnification without changing your preference."
+          }
+        }
+      }
+    },
+    "settingsAppearanceKeywords": {
+      "comment": "Space-separated search synonyms for the Appearance pane; translate to words a user would type, not literally.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "icon size magnification zoom scale hover"
+          }
+        }
+      }
+    },
+    "settingsBottomDistance": {
+      "comment": "Distance from the chosen bottom edge to the glass bottom, in points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom distance"
+          }
+        }
+      }
+    },
+    "settingsCardAnchor": {
+      "comment": "Heading for the group choosing the reference frame and horizontal alignment.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anchor"
+          }
+        }
+      }
+    },
+    "settingsCardFineTuning": {
+      "comment": "Heading for the group with the offset and bottom distance sliders.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fine-tuning"
+          }
+        }
+      }
+    },
+    "settingsCardIcons": {
+      "comment": "Heading for the icon size and magnification group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icons"
+          }
+        }
+      }
+    },
+    "settingsDockOverlapHelp": {
+      "comment": "Coexistence note; no system preferences are changed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen-edge positioning can overlap the system Dock. An automatically hidden system Dock may overlap either mode."
+          }
+        }
+      }
+    },
+    "settingsGroupDock": {
+      "comment": "Sidebar group heading collecting the dock configuration panes.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock"
+          }
+        }
+      }
+    },
+    "settingsHorizontalOffset": {
+      "comment": "Signed offset in points; positive is right.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horizontal offset"
+          }
+        }
+      }
+    },
+    "settingsIconSize": {
+      "comment": "Requested resting app icon size in logical points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icon size"
+          }
+        }
+      }
+    },
+    "settingsInvalidNumber": {
+      "comment": "Inline feedback for incomplete, invalid, or out-of-range numeric input.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a number within the allowed range."
+          }
+        }
+      }
+    },
+    "settingsLoadError": {
+      "comment": "Corrupt saved settings are preserved until the user explicitly resets.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t read saved settings. Defaults are being used. Choose Restore Defaults to replace the unreadable settings; your pinned apps will be kept."
+          }
+        }
+      }
+    },
+    "settingsMagnification": {
+      "comment": "Maximum hover scale; 1 means no magnification.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maximum magnification"
+          }
+        }
+      }
+    },
+    "settingsMultiplier": {
+      "comment": "Unit symbol for magnification scale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "×"
+          }
+        }
+      }
+    },
+    "settingsNoMatches": {
+      "comment": "Shown in the settings sidebar when a search filters out every pane.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No settings match your search."
+          }
+        }
+      }
+    },
+    "settingsPoints": {
+      "comment": "Abbreviation for logical points in numeric settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pt"
+          }
+        }
+      }
+    },
+    "settingsPosition": {
+      "comment": "Settings section heading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Position"
+          }
+        }
+      }
+    },
+    "settingsPositionHelp": {
+      "comment": "Explains direction and display clamping.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Positive offsets move right; negative offsets move left. Placement stays within the display while your requested values are remembered."
+          }
+        }
+      }
+    },
+    "settingsPositionKeywords": {
+      "comment": "Space-separated search synonyms for the Position pane; translate to words a user would type, not literally.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "position placement alignment offset bottom edge screen display margin"
+          }
+        }
+      }
+    },
+    "settingsPositionReference": {
+      "comment": "Label for the frame used to measure dock placement.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Position relative to"
+          }
+        }
+      }
+    },
+    "settingsPreview": {
+      "comment": "Heading for the illustrated, non-interactive preview of the current settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preview"
+          }
+        }
+      }
+    },
+    "settingsPreviewDisclaimer": {
+      "comment": "Clarifies that the preview uses sample icons and a stand-in display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An illustration of your settings, not a live view of your dock."
+          }
+        }
+      }
+    },
+    "settingsRestoreDefaults": {
+      "comment": "Resets configuration only; pinned apps are preserved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore Defaults"
+          }
+        }
+      }
+    },
+    "settingsSaveError": {
+      "comment": "A failed edit was not published; user can retry.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t save settings. Your previous settings are still in use."
+          }
+        }
+      }
+    },
+    "settingsScreenEdge": {
+      "comment": "Physical display frame, including areas occupied by the system Dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen edge"
+          }
+        }
+      }
+    },
+    "settingsSearchPrompt": {
+      "comment": "Placeholder in the settings sidebar search field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        }
+      }
+    },
+    "settingsSelectCategory": {
+      "comment": "Placeholder shown when no settings pane is selected.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a settings category"
+          }
+        }
+      }
+    },
+    "settingsUsableDesktop": {
+      "comment": "Frame excluding space reserved by macOS, including the system Dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usable desktop"
           }
         }
       }

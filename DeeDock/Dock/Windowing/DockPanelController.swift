@@ -5,6 +5,7 @@ import AppKit
 @MainActor
 final class DockPanelController {
     private let store: DockStore
+    private let settings: DockSettingsStore
     private let interaction = DockInteraction()
     private let panel: DockPanel
     private var displayID: CGDirectDisplayID?
@@ -15,8 +16,9 @@ final class DockPanelController {
     private var lastExternalApplication: NSRunningApplication?
 
     /// Connects the live store and SwiftUI host without installing global event monitors.
-    init(store: DockStore) {
+    init(store: DockStore, settings: DockSettingsStore) {
         self.store = store
+        self.settings = settings
         panel = DockPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
                           backing: .buffered, defer: false)
         panel.title = String(localized: .appName)
@@ -33,6 +35,7 @@ final class DockPanelController {
         interaction.geometryDidChange = { [weak self] in self?.updatePointer() }
         panel.keyboardHandler = { [weak self] event in self?.handleKey(event) ?? false }
         panel.resignedKey = { [weak self] in self?.endKeyboardFocus(restore: false) }
+        settings.settingsDidChange = { [weak self] in self?.placePanel() }
         store.itemsDidChange = { [weak self] in self?.placePanel() }
         store.applicationOpened = { [weak self] in self?.endKeyboardFocus(restore: false) }
     }
@@ -90,11 +93,14 @@ final class DockPanelController {
         }
         if displayID != primaryID { interaction.pointer = nil }
         displayID = primaryID
+        let configuration = settings.value
+        let reference = DockGeometry.referenceFrame(screenFrame: screen.frame, visibleFrame: screen.visibleFrame,
+                                                     settings: configuration)
         interaction.layout = DockGeometry.layout(count: store.items.count,
                                                   favoriteCount: store.items.filter(\.isFavorite).count,
-                                                  availableWidth: screen.visibleFrame.width)
-        panel.setFrame(DockGeometry.panelFrame(visibleFrame: screen.visibleFrame,
-                                               width: interaction.layout.viewportWidth), display: true)
+                                                  availableWidth: reference.width, settings: configuration)
+        panel.setFrame(DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout,
+                                               settings: configuration), display: true)
         if !panel.isVisible { panel.orderFrontRegardless() }
         updatePointer()
     }
@@ -155,6 +161,7 @@ final class DockPanelController {
         workspaceObservers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
         appObservers.removeAll()
         workspaceObservers.removeAll()
+        settings.settingsDidChange = nil
         interaction.geometryDidChange = nil
         panel.resignedKey = nil
         panel.keyboardHandler = nil
