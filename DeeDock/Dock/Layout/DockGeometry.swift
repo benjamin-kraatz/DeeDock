@@ -50,11 +50,29 @@ enum DockGeometry {
             }
         }
 
+        /// Glass bounds in top-left canvas coordinates. Hover affects width, never height.
+        func surfaceFrame(sizes: [CGFloat]) -> CGRect {
+            let width = contentWidth(sizes: sizes)
+            let height = iconSize + 36
+            return CGRect(x: (canvasWidth - width) / 2,
+                          y: DockGeometry.panelHeight - DockGeometry.bottomMargin - height,
+                          width: width, height: height)
+        }
+
         /// Width of the painted surface, including padding, spacing, and any section gap.
         func contentWidth(sizes: [CGFloat]) -> CGFloat {
             max(64, sizes.reduce(0, +) + CGFloat(max(0, sizes.count - 1)) * DockGeometry.spacing
                 + DockGeometry.padding * 2 + (separatorIndex == nil ? 0 : DockGeometry.separatorWidth))
         }
+    }
+
+    /// App-button bounds, including the running indicator, anchored to a fixed bottom baseline.
+    /// These bounds may extend above the glass while remaining inside the panel envelope.
+    static func buttonFrame(centerX: CGFloat, size: CGFloat) -> CGRect {
+        let height = size + 12
+        return CGRect(x: centerX - size / 2,
+                      y: panelHeight - bottomMargin - 12 - height,
+                      width: size, height: height)
     }
 
     /// Builds a resting layout, reducing icons to 32 points before allowing horizontal overflow.

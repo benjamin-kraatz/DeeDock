@@ -18,6 +18,8 @@ struct DockSurfaceView: View {
     let reduceTransparency: Bool
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
+    /// Reports actual button geometry, including during animation, for native click passthrough.
+    let iconFrameChanged: (String, CGRect?) -> Void
 
     private var centers: [CGFloat] { layout.centers(sizes: sizes) }
 
@@ -41,6 +43,7 @@ struct DockSurfaceView: View {
             }
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                 if index < sizes.count {
+                    let frame = DockGeometry.buttonFrame(centerX: centers[index], size: sizes[index])
                     DockAppButton(item: item, size: sizes[index], isLaunching: launchingIDs.contains(item.id),
                                   isSelected: keyboardFocus && selectedID == item.id,
                                   open: { openApp(item) }, togglePin: { togglePin(item) })
@@ -48,8 +51,12 @@ struct DockSurfaceView: View {
                             if inside { hoveredID = item.id }
                             else if hoveredID == item.id { hoveredID = nil }
                         }
+                        .onGeometryChange(for: CGRect.self) { $0.frame(in: .named("dockRoot")) } action: {
+                            iconFrameChanged(item.id, $0)
+                        }
+                        .onDisappear { iconFrameChanged(item.id, nil) }
                         .id(item.id)
-                        .position(x: centers[index], y: DockGeometry.panelHeight - DockGeometry.bottomMargin - 12 - (sizes[index] + 12) / 2)
+                        .position(x: frame.midX, y: frame.midY)
                 }
             }
             if let id = hoveredID ?? (keyboardFocus ? selectedID : nil),
@@ -59,7 +66,8 @@ struct DockSurfaceView: View {
                     .lineLimit(1).padding(.horizontal, 10).padding(.vertical, 6)
                     .background(.regularMaterial, in: .rect(cornerRadius: 7))
                     .fixedSize()
-                    .position(x: min(max(centers[index], 90), layout.canvasWidth - 90), y: surface.minY - 20)
+                    .position(x: min(max(centers[index], 90), layout.canvasWidth - 90), y: min(surface.minY,
+                                           DockGeometry.buttonFrame(centerX: centers[index], size: sizes[index]).minY - 12) - 20)
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
             }

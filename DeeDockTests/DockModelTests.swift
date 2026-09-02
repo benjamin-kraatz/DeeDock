@@ -35,6 +35,29 @@ struct DockModelTests {
         #expect(layout.sizes(pointerX: nil, reduceMotion: false).allSatisfy { $0 == layout.iconSize })
     }
 
+    @Test("Magnification keeps the glass fixed while buttons grow above it from the same baseline")
+    func fixedSurfaceHeight() {
+        for width: CGFloat in [560, 1400] {
+            let layout = DockGeometry.layout(count: 10, favoriteCount: 3, availableWidth: width)
+            let resting = layout.sizes(pointerX: nil, reduceMotion: false)
+            let magnified = layout.sizes(pointerX: layout.restingCenters[4], reduceMotion: false)
+            let glass = layout.surfaceFrame(sizes: resting)
+            let hoveredGlass = layout.surfaceFrame(sizes: magnified)
+            #expect(glass.minY == hoveredGlass.minY)
+            #expect(glass.height == hoveredGlass.height)
+            #expect(glass.maxY == hoveredGlass.maxY)
+            #expect(hoveredGlass.width > glass.width)
+            let restingButton = DockGeometry.buttonFrame(centerX: layout.restingCenters[4], size: resting[4])
+            let hoveredButton = DockGeometry.buttonFrame(centerX: layout.centers(sizes: magnified)[4], size: magnified[4])
+            #expect(restingButton.maxY == hoveredButton.maxY)
+            #expect(hoveredButton.minY < hoveredGlass.minY)
+            #expect(hoveredButton.minY > 0)
+            let exposedPoint = CGPoint(x: hoveredButton.midX, y: hoveredButton.minY + 0.1)
+            #expect(hoveredButton.contains(exposedPoint))
+            #expect(!hoveredGlass.contains(exposedPoint))
+        }
+    }
+
     @Test("Crowded docks shrink to 32 points, then provide a wider scrollable canvas")
     func overflow() {
         let normal = DockGeometry.layout(count: 5, favoriteCount: 3, availableWidth: 1400)

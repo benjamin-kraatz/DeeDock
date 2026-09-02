@@ -103,7 +103,7 @@ final class DockPanelController {
         let point = panel.convertPoint(fromScreen: NSEvent.mouseLocation)
         // AppKit is bottom-left-origin; SwiftUI reports top-left-origin geometry in logical points.
         let flipped = CGPoint(x: point.x, y: panel.frame.height - point.y)
-        let inside = interaction.surfaceRect.contains(flipped)
+        let inside = interaction.containsDockPoint(flipped)
         let inError = interaction.errorRect.contains(flipped)
         // Transparent window margins must pass through to the app beneath the dock.
         panel.ignoresMouseEvents = !inside && !inError

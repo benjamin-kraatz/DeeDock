@@ -25,16 +25,13 @@ struct DockContentView: View {
         // Convert viewport coordinates to the resting canvas, not the animated icon positions.
         layout.sizes(pointerX: interaction.pointer.map { $0.x - scrollOffset }, reduceMotion: reduceMotion)
     }
-    private var surface: CGRect {
-        let width = layout.contentWidth(sizes: sizes)
-        let height = (sizes.max() ?? layout.iconSize) + 36
-        return CGRect(x: (layout.canvasWidth - width) / 2,
-                      y: DockGeometry.panelHeight - DockGeometry.bottomMargin - height,
-                      width: width, height: height)
+    private var surface: CGRect { layout.surfaceFrame(sizes: sizes) }
+    private var viewport: CGRect {
+        CGRect(x: 0, y: 0, width: layout.viewportWidth, height: DockGeometry.panelHeight)
     }
     private var viewportSurface: CGRect {
         surface.offsetBy(dx: scrollOffset, dy: 0).intersection(
-            CGRect(x: 0, y: 0, width: layout.viewportWidth, height: DockGeometry.panelHeight))
+            viewport)
     }
 
     var body: some View {
@@ -46,7 +43,10 @@ struct DockContentView: View {
                         keyboardFocus: keyboardFocus, showsLabel: errorMessage == nil,
                         layout: layout, sizes: sizes, surface: surface, hoveredID: $hoveredID,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
-                        openApp: openApp, togglePin: togglePin
+                        openApp: openApp, togglePin: togglePin,
+                        iconFrameChanged: { id, rect in
+                            interaction.setIconRect(rect?.intersection(viewport), for: id)
+                        }
                     )
                     .onGeometryChange(for: CGFloat.self) { geometry in
                         geometry.frame(in: .named("dockViewport")).minX
@@ -93,6 +93,10 @@ struct DockContentView: View {
 #Preview("Dark, reduced transparency and motion") {
     DockPreviewContent(reduceMotion: true, reduceTransparency: true)
         .preferredColorScheme(.dark)
+}
+
+#Preview("Magnified icons above fixed glass") {
+    DockPreviewContent(magnified: true)
 }
 
 #Preview("Empty") {
