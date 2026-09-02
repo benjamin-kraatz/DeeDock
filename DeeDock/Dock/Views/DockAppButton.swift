@@ -20,7 +20,7 @@ struct DockAppButton: View {
                     .opacity(item.isAvailable ? 1 : 0.4)
                     .overlay {
                         if isLaunching {
-                            Circle().fill(.black.opacity(0.42))
+                            Circle().fill(.black.opacity(0.14))
                         }
                         if isSelected {
                             RoundedRectangle(cornerRadius: 12)
@@ -48,7 +48,9 @@ struct DockAppButton: View {
         .buttonStyle(.plain)
         .disabled(isLaunching)
         .contextMenu {
-            Button(.actionOpen, systemImage: "arrow.up.forward.app", action: open)
+            if item.isAvailable {
+                Button(.actionOpen, systemImage: "arrow.up.forward.app", action: open)
+            }
             Divider()
             Button(
                 item.isFavorite ? .actionUnpin : .actionPin,

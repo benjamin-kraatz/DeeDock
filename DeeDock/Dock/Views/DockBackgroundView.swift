@@ -6,22 +6,29 @@ struct DockBackgroundView: View {
 
     var body: some View {
         if reduceTransparency {
-            RoundedRectangle(cornerRadius: 22).fill(Color(nsColor: .windowBackgroundColor))
-                .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(.primary.opacity(0.14), lineWidth: 0.5))
+            RoundedRectangle(cornerRadius: 22).fill(
+                Color(nsColor: .windowBackgroundColor)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22).strokeBorder(
+                    .primary.opacity(0.14),
+                    lineWidth: 0.5
+                )
+            )
         } else {
             RoundedRectangle(cornerRadius: 22).fill(.clear)
-                .glassEffect(.regular, in: .rect(cornerRadius: 22))
+                .glassEffect(.clear, in: .rect(cornerRadius: 22))
         }
     }
 }
 
 #if DEBUG
-#Preview("Glass and opaque material") {
-    VStack(spacing: 20) {
-        DockBackgroundView(reduceTransparency: false)
-        DockBackgroundView(reduceTransparency: true)
+    #Preview("Glass and opaque material") {
+        VStack(spacing: 20) {
+            DockBackgroundView(reduceTransparency: false)
+            DockBackgroundView(reduceTransparency: true)
+        }
+        .frame(width: 300, height: 180)
+        .padding(20)
     }
-    .frame(width: 300, height: 180)
-    .padding(20)
-}
 #endif

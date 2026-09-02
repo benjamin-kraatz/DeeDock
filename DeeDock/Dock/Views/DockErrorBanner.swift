@@ -16,7 +16,7 @@ struct DockErrorBanner: View {
         }
         .padding(10)
         .frame(maxWidth: maximumWidth)
-        .background(.regularMaterial, in: .rect(cornerRadius: 12))
+        .glassEffect(.regular, in: .rect(cornerRadius: 12))
         .accessibilityElement(children: .contain)
     }
 }
