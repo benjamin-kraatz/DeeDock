@@ -6,8 +6,20 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */; };
+		DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */; };
+		DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */; };
+		DD1000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationReference.swift; sourceTree = SOURCE_ROOT; };
+		DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockOrdering.swift; sourceTree = SOURCE_ROOT; };
+		DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Persistence/FavoritesRepository.swift; sourceTree = SOURCE_ROOT; };
+		DD2000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Layout/DockGeometry.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +28,20 @@
 			path = DeeDock;
 			sourceTree = "<group>";
 		};
+		DD0000000000000000000004 /* DeeDockTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DeeDockTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		000000000000000130000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		DD0000000000000000000005 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -31,6 +53,8 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000010 /* DeeDock */,
+				DD0000000000000000000004 /* DeeDockTests */,
+				DD3000000000000000000000 /* Test Model Sources */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,8 +63,20 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000120 /* DeeDock.app */,
+				DD0000000000000000000003 /* DeeDockTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DD3000000000000000000000 /* Test Model Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */,
+				DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */,
+				DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */,
+				DD2000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift */,
+			);
+			name = "Test Model Sources";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -64,6 +100,24 @@
 			productReference = 000000000000000000000120 /* DeeDock.app */;
 			productType = "com.apple.product-type.application";
 		};
+		DD0000000000000000000006 /* DeeDockTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD0000000000000000000007 /* Build configuration list for PBXNativeTarget "DeeDockTests" */;
+			buildPhases = (
+				DD0000000000000000000008 /* Sources */,
+				DD0000000000000000000005 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				DD0000000000000000000004 /* DeeDockTests */,
+				DD3000000000000000000000 /* Test Model Sources */,
+			);
+			name = DeeDockTests;
+			productName = DeeDockTests;
+			productReference = DD0000000000000000000003 /* DeeDockTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -85,6 +139,7 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
@@ -94,6 +149,7 @@
 			projectRoot = "";
 			targets = (
 				000000000000000100000000 /* DeeDock */,
+				DD0000000000000000000006 /* DeeDockTests */,
 			);
 		};
 /* End PBXProject section */
@@ -110,6 +166,15 @@
 		000000000000000120000000 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+			);
+		};
+		DD0000000000000000000008 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */,
+				DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */,
+				DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */,
+				DD1000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
@@ -179,6 +244,7 @@
 				PROJECT_UNIQUE_VALUE = WQHC2WXA;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WATCHOS_DEPLOYMENT_TARGET = 27.0;
 				XROS_DEPLOYMENT_TARGET = 27.0;
@@ -242,6 +308,7 @@
 				PROJECT_UNIQUE_VALUE = WQHC2WXA;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				WATCHOS_DEPLOYMENT_TARGET = 27.0;
 				XROS_DEPLOYMENT_TARGET = 27.0;
 			};
@@ -270,6 +337,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -321,6 +389,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -349,6 +418,50 @@
 			};
 			name = Release;
 		};
+		DD0000000000000000000009 /* Debug configuration for PBXNativeTarget "DeeDockTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDockTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DD000000000000000000000A /* Release configuration for PBXNativeTarget "DeeDockTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDockTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -365,6 +478,14 @@
 			buildConfigurations = (
 				000000000000000111000000 /* Debug configuration for PBXNativeTarget "DeeDock" */,
 				000000000000000112000000 /* Release configuration for PBXNativeTarget "DeeDock" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		DD0000000000000000000007 /* Build configuration list for PBXNativeTarget "DeeDockTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD0000000000000000000009 /* Debug configuration for PBXNativeTarget "DeeDockTests" */,
+				DD000000000000000000000A /* Release configuration for PBXNativeTarget "DeeDockTests" */,
 			);
 			defaultConfigurationName = Release;
 		};

@@ -1,0 +1,198 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "actionDismissError": {
+      "comment": "Accessibility label for the close button on an error message.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss error"
+          }
+        }
+      }
+    },
+    "actionFocusDock": {
+      "comment": "Menu command that enables keyboard navigation through dock icons.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus Dock"
+          }
+        }
+      }
+    },
+    "actionOpen": {
+      "comment": "Context-menu action that opens or activates the selected application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        }
+      }
+    },
+    "actionPin": {
+      "comment": "Context-menu and accessibility action. Keep this app in the pinned section even when it is not running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin"
+          }
+        }
+      }
+    },
+    "actionQuit": {
+      "comment": "Menu command that exits DeeDock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit DeeDock"
+          }
+        }
+      }
+    },
+    "actionUnpin": {
+      "comment": "Context-menu and accessibility action. Stop keeping this app pinned; a running app remains in the running section.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unpin"
+          }
+        }
+      }
+    },
+    "appName": {
+      "comment": "Product name, used by the menu-bar item and dock panel. Keep the brand name unchanged.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DeeDock"
+          }
+        }
+      }
+    },
+    "appOpenHint": {
+      "comment": "Accessibility hint for an application icon button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open or switch to this app"
+          }
+        }
+      }
+    },
+    "appStatusNotRunning": {
+      "comment": "Accessibility value indicating that the pinned application is not running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not running"
+          }
+        }
+      }
+    },
+    "appStatusRunning": {
+      "comment": "Accessibility value indicating that the application is running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running"
+          }
+        }
+      }
+    },
+    "appStatusUnavailable": {
+      "comment": "Accessibility value indicating that a pinned application cannot be found.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unavailable"
+          }
+        }
+      }
+    },
+    "dockEmptyState": {
+      "comment": "Empty dock guidance. Opening an app makes it appear temporarily; pinning keeps it in the dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open an app to see it in DeeDock. Pin it to keep it here."
+          }
+        }
+      }
+    },
+    "errorAppNotFound": {
+      "comment": "Missing-application error. appName is the name of the pinned application. Unpinning does not delete the application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(appName)@ couldn’t be found. You can unpin it, then pin it again after opening the app."
+          }
+        }
+      }
+    },
+    "errorLoadPins": {
+      "comment": "Error banner when reading saved pins fails. details is the localized underlying error description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t load pinned apps: %1$(details)@"
+          }
+        }
+      }
+    },
+    "errorOpenApp": {
+      "comment": "Error banner for a failed launch. appName is the application name; details is the localized underlying error description. Placeholders may be reordered.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t open %1$(appName)@: %2$(details)@"
+          }
+        }
+      }
+    },
+    "errorSavePins": {
+      "comment": "Error banner when saving pins fails. details is the localized underlying error description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t save pinned apps: %1$(details)@"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.3"
+}

@@ -8,7 +8,7 @@ Treat look, behavior, and feel as separate acceptance criteria. A visually simil
 
 ## Current scope
 
-The repository is at the setup stage. Do not begin the proposed first slice until the user asks to start implementation. Once a slice is authorized, carry it through without asking for repeated approval of routine, reversible implementation choices.
+The first native dock slice is implemented. Read `docs/ACCEPTANCE.md` for its validation status and limitations. Work on the user’s requested slice; do not automatically begin the remaining customization roadmap. Once a slice is authorized, carry it through without asking for repeated approval of routine, reversible implementation choices.
 
 Keep future features clearly labeled as planned. Do not silently substitute simpler behavior for an agreed requirement or expand a small slice into the entire settings system.
 
@@ -20,7 +20,28 @@ Keep future features clearly labeled as planned. Do not silently substitute simp
 - Inspect actual Xcode build settings before giving language-mode or concurrency advice. Do not assume a new Xcode project uses Swift 6 mode.
 - Keep UI and AppKit mutations on the main actor. Keep expensive work out of pointer and rendering paths, and make task ownership and cancellation explicit.
 - Prefer system notifications and scoped event handling over continuous polling. Remove observers, event monitors, timers, and tasks when their owner or display goes away.
+- Keep all app-owned UI copy in `DeeDock/Resources/Localizable.xcstrings`, with stable keys, generated Swift symbols, and translator comments. Use Pin/Unpin terminology. Preserve localization for conditional accessibility text and interpolated errors; do not translate app names supplied by macOS.
 - Prefer public Apple APIs. Record an API limitation or permission requirement when discovered; do not claim complete system Dock parity without evidence.
+
+## File and component organization
+
+- Keep each file focused on one coherent responsibility. Split large files when they combine independently understandable views, models, services, or lifecycle logic; do not keep growing an all-in-one file.
+- Split SwiftUI views into the smallest useful components with clear names, inputs, and responsibilities. Prefer dedicated view types for independently meaningful UI pieces over a large `body` or a collection of substantial view-building methods in one file. Do not extract trivial wrappers that add no clarity.
+- Group files into real filesystem folders by feature or responsibility. Keep feature-specific views, models, and supporting code together; move genuinely shared code into clearly named shared folders. Avoid a flat source directory, vague catch-all folders, and empty speculative hierarchies.
+- When moving or splitting files, update references and Xcode target membership so the project remains coherent. Keep unrelated reorganizations outside the requested change.
+
+## SwiftUI previews
+
+- Add `#Preview` declarations when they help inspect a view's appearance, states, or interaction. Include useful states such as pinned/running/unavailable apps, empty content, and errors where relevant; avoid redundant previews for trivial wrappers.
+- Keep previews near the view they demonstrate. Use deterministic sample data and lightweight injected dependencies. Previews must not launch applications, modify real preferences, request permissions, or depend on live workspace state.
+- Use preview variants for meaningful layout and accessibility differences, such as longer translated text, light/dark appearance, and Reduce Motion or Reduce Transparency, when the view is affected.
+
+## Swift documentation and comments
+
+- Add Swift documentation comments (`///`, compatible with DocC) to exported and public types, initializers, properties, and methods. Document internal interfaces used across components when their contract is not obvious. Do not widen access control solely to document a member.
+- Explain purpose and observable behavior, including parameters, return values, thrown errors, side effects, and actor or lifecycle requirements where relevant. Document constraints and invariants instead of repeating the declaration in prose.
+- Comment critical or non-obvious logic where it lives, especially coordinate conversions, stable animation geometry, focus handling, event-monitor ownership, cancellation, and persistence behavior. Explain why the approach is needed and what must remain true.
+- Keep documentation and comments accurate when behavior changes. Remove stale explanations and avoid narrating self-evident code.
 
 ## Dock-specific engineering
 
