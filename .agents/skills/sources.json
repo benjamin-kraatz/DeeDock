@@ -1,0 +1,26 @@
+[
+  {
+    "name": "swiftui-expert-skill",
+    "repository": "https://github.com/AvdLee/SwiftUI-Agent-Skill",
+    "revision": "4c6a97d15aa5e023538c3cb06b5192f241dd451d",
+    "path": "skills/swiftui-expert-skill",
+    "license": "MIT",
+    "installedOn": "2026-09-02"
+  },
+  {
+    "name": "swift-concurrency",
+    "repository": "https://github.com/AvdLee/Swift-Concurrency-Agent-Skill",
+    "revision": "45fa49e4e0b2af4d43b1cb458903f8030ac993bd",
+    "path": "skills/swift-concurrency",
+    "license": "MIT",
+    "installedOn": "2026-09-02"
+  },
+  {
+    "name": "swift-testing-expert",
+    "repository": "https://github.com/AvdLee/Swift-Testing-Agent-Skill",
+    "revision": "798e9b1a2bcac164d4f0c781908199e754f0bab6",
+    "path": "swift-testing-expert",
+    "license": "MIT",
+    "installedOn": "2026-09-02"
+  }
+]

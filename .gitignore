@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# Local Xcode state
+xcuserdata/
+*.xcuserstate
+
+# Generated build and profiling output
+DerivedData/
+build/
+.build/
+*.xcresult
+*.xcarchive
+*.trace
+
+# Local scripting caches
+__pycache__/
+*.pyc
