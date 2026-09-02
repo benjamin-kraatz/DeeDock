@@ -16,7 +16,8 @@ struct DockBackgroundView: View {
                 )
             )
         } else {
-            RoundedRectangle(cornerRadius: 22).fill(.clear)
+            RoundedRectangle(cornerRadius: 22)
+                .fill(.clear)
                 .glassEffect(.clear, in: .rect(cornerRadius: 22))
         }
     }
