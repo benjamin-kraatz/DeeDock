@@ -21,7 +21,7 @@ struct DockBehaviorSettings: Codable, Equatable {
     }
 
     var isValid: Bool {
-        (32...8192).contains(customLength) && (1...64).contains(zoneDepth)
+        (32...8192).contains(customLength) && (1...90).contains(zoneDepth)
             && (-4096...4096).contains(zoneOffset) && (0...2).contains(revealDelay)
             && (0...5).contains(hideDelay) && (0...1).contains(animationDuration)
             && [customLength, zoneDepth, zoneOffset, revealDelay, hideDelay, animationDuration].allSatisfy(\.isFinite)

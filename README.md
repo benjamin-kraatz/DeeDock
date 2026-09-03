@@ -213,7 +213,7 @@ Choose **Behavior** under Defaults or a display to configure automatic hiding. E
 | Activation location | Dock position / Screen edge | Dock position |
 | Activation length | Dock length / Custom length | Dock length |
 | Custom length | 32–8,192 points | 320 |
-| Activation depth | 1–64 points | 8 |
+| Activation depth | 1–90 points | 8 |
 | Along-edge offset | −4,096 to +4,096 points | 0 |
 | Reveal delay | 0–2 seconds | 0.10 |
 | Hide delay | 0–5 seconds | 0.40 |

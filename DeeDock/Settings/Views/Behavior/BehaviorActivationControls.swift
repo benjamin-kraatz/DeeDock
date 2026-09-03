@@ -18,7 +18,7 @@ struct BehaviorActivationControls: View {
             SettingsSliderRow(title: .behaviorCustomLength, unit: .settingsPoints, value: source.binding(\.behavior.customLength), range: 32...8192, step: 1)
                 .settingsOverride(source.context, field: .customLength)
         }
-        SettingsSliderRow(title: .behaviorZoneDepth, unit: .settingsPoints, value: source.binding(\.behavior.zoneDepth), range: 1...64, step: 1)
+        SettingsSliderRow(title: .behaviorZoneDepth, unit: .settingsPoints, value: source.binding(\.behavior.zoneDepth), range: 1...90, step: 1)
             .settingsOverride(source.context, field: .zoneDepth)
         SettingsSliderRow(title: .behaviorZoneOffset, unit: .settingsPoints, value: source.binding(\.behavior.zoneOffset), range: -4096...4096, step: 1)
             .settingsOverride(source.context, field: .zoneOffset)
