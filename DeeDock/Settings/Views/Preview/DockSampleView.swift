@@ -4,6 +4,9 @@ import SwiftUI
 struct DockSampleView: View {
     let layout: DockGeometry.Layout
     var magnified = false
+    /// Explicit pointer position along the dock, for animated demonstrations such as the
+    /// first-launch tour. Takes precedence over `magnified`, which picks a fixed icon.
+    var pointerAlong: CGFloat? = nil
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
     var appearanceSettings = DockSettings.defaults
     var idleFraction: Double = 0
@@ -18,7 +21,7 @@ struct DockSampleView: View {
 
     var body: some View {
         let opacity = DockAppearanceOpacity(settings: appearanceSettings, idleFraction: idleFraction, reduceTransparency: reduceTransparency)
-        let pointer = magnified && layout.restingCenters.count > 2 ? layout.restingCenters[2] : nil
+        let pointer = pointerAlong ?? (magnified && layout.restingCenters.count > 2 ? layout.restingCenters[2] : nil)
         let sizes = layout.sizes(pointerAlong: pointer, reduceMotion: reduceMotion)
         let centers = layout.centers(sizes: sizes)
         let glass = layout.surfaceFrame(sizes: sizes)

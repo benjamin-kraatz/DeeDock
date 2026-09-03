@@ -492,3 +492,45 @@ Static review checked the separate General navigation path, initial Appearance s
 - With user control of logout, verify automatic startup after signing out and back in. Confirm configured docks and the menu-bar item return without Settings opening or deliberate focus transfer. Disable registration and repeat. Quit DeeDock before each logout or otherwise exclude macOS session restoration so it cannot be mistaken for login-item startup.
 
 No real registration changes, logout/login cycles, or machine-setting changes were performed during implementation. The existing panel retention change, recovered-reference group, and concurrent Xcode build-number change are retained in the requested clean-tree delivery.
+
+## First-launch onboarding
+
+Adds a seven-page tour shown once on first launch, reopenable from the menu-bar item and the app menu. Sources live in `DeeDock/Onboarding`, split into `Models`, `Persistence`, `State`, `Windowing`, and `Views`. `OnboardingStep` and `SystemDockReservation` stay free of SwiftUI so the unhosted test target does not need the settings view layer; step artwork lives in `Views/OnboardingStepPresentation.swift`.
+
+The tour is presented after `coordinator.start()`, so the real docks exist behind it. `OnboardingRepository` stores `{ completedVersion }` under `onboarding.v1`. Reaching the end, opening Settings from the last page, and closing the window all record completion; reopening from a menu never rewrites the record. Unlike the settings repositories, an unreadable record is treated as already completed rather than surfaced as an error, so a stray byte cannot make the tour reappear on every launch. Reading never rewrites the stored bytes.
+
+Two pages write shared defaults through the existing `DockSettingsStore.update`: placement sets `edge`, and the running-indicator gallery sets `runningIndicatorStyle`. Neither touches per-display overrides, and both go through the same validation and save path as Settings. The remaining pages change nothing. Pages that write carry a prompt line and pointer affordances; pages that do not carry neither, which is the tour's only signal of which is which.
+
+Illustrations reuse production code rather than re-creating it: `DockGeometry`/`DockPlacement` for placement, `DockIconIndicator` plus `DockRunningIndicator` for the indicator gallery, `DockSampleView` for the magnification sweep, `DockDisplayDiagram` for the display page, and `DockVisibilityController` with `DockAnimationGeometry` and `DockPresentationModifier` for the auto-hide page. `DockSampleView` gained an optional `pointerAlong`, which defaults to its previous behavior. The macOS Dock page is drawn separately because it depicts the system Dock, where reusing the DeeDock diagram would be misleading.
+
+Each page runs at most one ambient task, started by `.task` and cancelled by SwiftUI when the page leaves, so a page a person has moved past animates nothing. `SystemDockMonitor` observes `NSApplication.didChangeScreenParametersNotification` and removes its observer when the view disappears and when the window controller stops; nothing polls.
+
+### System Dock detection
+
+`SystemDockReservation` compares each screen's `frame` and `visibleFrame` and reports the non-top edge whose inset exceeds one point. The top inset is excluded because the menu bar and notch always reserve it. This is a deliberate limitation, not a shortcut: an App Sandbox cannot read `com.apple.dock`, so the switch itself is unreadable, and `AGENTS.md` forbids writing it. The status is therefore worded as reserved space rather than as the state of a preference. Turning on automatic hiding releases the band and clears the status; moving the Dock to another edge does not, which is correct.
+
+### API limitation
+
+`SettingsWindowOpener` reaches the SwiftUI `Settings` scene through `NSApp.sendAction(Selector(("showSettingsWindow:")))`. `@Environment(\.openSettings)` is delivered only to views inside the `App` scene graph, and the tour is an AppKit-hosted window, so that action is unavailable to it. No public symbol exposes the selector. The call reports whether it was accepted and nothing depends on it: the menu-bar item and ⌘, remain the documented routes to Settings, and the tour's final page says so.
+
+### Validation status
+
+`xcodebuild build` and `build-for-testing` both succeeded for the Debug app and the unhosted `DeeDockTests` target, using the same commands recorded in the Compilation section. The suite was executed once at the user's implicit request during implementation and passed: 132 tests across 25 suites, including the two new suites. The user then asked that tests not be run again, and none were run after that point; later source changes to the placement and indicator pickers are compiled but not re-tested.
+
+New tests cover reserved-edge detection for each edge, menu-bar-only insets, released space, sub-point rounding, negative screen origins, empty frames, and multi-display aggregation; and tour navigation ordering, clamping at both ends, skip applying only to the macOS Dock page, direction tracking, first-launch presentation, completion, an older completed version, unreadable data, and a value of the wrong type. Four onboarding sources were added to the Xcode **Test Model Sources** group and the test target's Sources phase.
+
+Previews cover every page, both system-Dock states, the placement picker on all four edges, an indicator style outside the curated gallery, dark appearance, Reduce Motion, Reduce Transparency, and accessibility text sizes. Previews use scratch `UserDefaults` suites and a stub login service, so none of them registers a login item or writes the real completion record. Previews were not run.
+
+Layout was inspected by the user at several points during implementation and corrected in response: the window height was reduced and its content made scrollable, the placement handles were moved outside the screen diagram after they were found to cover the dock, and the indicator gallery was corrected after four of six options rendered as nothing because only `DockRunningIndicator` was applied and not `DockIconIndicator`.
+
+### Remaining hands-on acceptance
+
+- Delete `onboarding.v1` and launch. Confirm the window is centered and focused, the docks are already visible behind it, and every page animates.
+- Walk forward and back through all seven pages. Confirm the slide direction reverses, only the visible page animates, and closing part-way through does not re-present the tour on the next launch.
+- On the macOS Dock page, confirm the status reads as reserving space, open Desktop & Dock from the button, turn on automatic hiding, and confirm the status clears without returning to DeeDock. Turn it off and confirm it returns. Confirm Skip works and that nothing in `com.apple.dock` changed.
+- Click each placement handle and confirm the real docks move to that edge; click each indicator and confirm running apps take that marker. Confirm a display with an existing override of either control keeps its own value.
+- Open Settings from the last page and confirm the tour closes and Settings opens. Reopen the tour from the menu-bar item and the app menu, and confirm a second window is never created.
+- Enable Launch at Login from the last page and confirm the state matches Settings → General afterwards, including a pending approval.
+- Exercise Reduce Motion, Reduce Transparency, increased contrast, and larger text sizes on every page. Confirm the login card's approval and error states scroll rather than clip.
+- Use VoiceOver on the placement and indicator pages: confirm the handles and icons are reported as selectable buttons with the selected one marked, the illustrations are silent, and the page indicator reads its position.
+- Run with several displays, including a display whose Dock reserves a side edge, and with all docks disabled.

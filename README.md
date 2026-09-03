@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -91,6 +91,25 @@ The toggle reflects macOS’s registration status. It stays off until approval i
 Turning off Launch at Login prevents future automatic launches and leaves DeeDock running. Login startup follows normal startup: configured docks and the menu-bar item appear without opening Settings or deliberately taking foreground focus. General remains usable if display settings have a storage error, and Restore Defaults does not change login registration.
 
 The implementation uses `SMAppService.mainApp`; it stores no duplicate preference and installs no helper or launch-agent plist. Registration is opt-in. Real registration and logout/login acceptance require a consistently signed installed copy; see [acceptance notes](docs/ACCEPTANCE.md#launch-at-login).
+
+## First launch
+
+The first time DeeDock runs, a tour opens over the desktop. The docks are already live behind it, so every page describes something you can see. Seven pages: what DeeDock is, a guide to hiding the macOS Dock, placement, running indicators, auto-hide, one dock per display, and a closing page with the launch-at-login toggle.
+
+Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DeeDock** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
+
+Two pages change a setting; the rest only demonstrate. A page you can operate carries a prompt line under its illustration, and its controls respond to the pointer — that prompt is the only signal, and pages without one do nothing when clicked.
+
+| Page | Changes |
+| --- | --- |
+| Put it where you want it | Click a screen edge to set **Edge** in shared defaults. Docks move immediately. |
+| Make it look right | Click an app to set **Running indicators** in shared defaults. |
+
+Both write shared defaults only and leave per-display overrides alone, so a display already overriding that control keeps its own value. Everything is reversible in Settings.
+
+The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DeeDock never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames, because an App Sandbox cannot read another application's preferences: turning on *Automatically hide and show the Dock* releases the space and clears the status, while moving the Dock to another edge does not. The page can be skipped.
+
+The illustrations use production code, not artwork. Placement runs the same `DockPlacement` calculation as a real dock, the running indicators are drawn by `DockIconIndicator` and `DockRunningIndicator`, and the auto-hide page is driven by the real `DockVisibilityController`. Reduce Motion holds a single frame on every page and cross-fades between them instead of sliding; Reduce Transparency uses opaque backgrounds. Only the visible page animates.
 
 ## Arrange applications with drag-and-drop
 
@@ -295,6 +314,7 @@ The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing t
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
 - `DeeDock/Settings` groups shared settings, display profiles and persistence, sidebar navigation, and focused native controls. `General` contains the app-owned login-item controller, service boundary, and presentation.
+- `DeeDock/Onboarding` holds the first-launch tour: step and reservation models, the completion record, navigation and screen-observation state, its AppKit window, and views. The models stay free of SwiftUI so the test target does not pull in the settings view layer.
 - `DeeDockTests` contains the focused model tests. The Xcode **Test Model Sources** group references the app's source files for the unhosted test target; it does not contain copies.
 
 Useful previews live beside their views: pinned/running/unavailable apps, launch progress, empty content, error text, and dark appearance with reduced motion/transparency. Open the canvas for `DockContentView`, `DockAppButton`, `DockBackgroundView`, or `DockErrorBanner`. Settings previews include multiple displays, per-setting overrides, and a disconnected display using isolated in-memory stores. Previews do not construct live workspace services, read saved pins, or launch applications. Production accessibility values are read from SwiftUI's environment and passed into the same presentation components used by previews.
