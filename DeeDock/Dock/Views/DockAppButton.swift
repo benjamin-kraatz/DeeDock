@@ -20,7 +20,7 @@ struct DockAppButton: View {
 
     var body: some View {
         Button(action: open) {
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 Image(nsImage: item.icon).resizable().interpolation(.high)
                     .frame(width: size, height: size)
                     .opacity(item.isAvailable ? 1 : 0.4)
@@ -96,9 +96,11 @@ struct DockAppButton: View {
 }
 
 #if DEBUG
-#Preview("Running, launching, unavailable") {
+#Preview("Selected, running, launching, unavailable") {
     HStack(spacing: 20) {
         DockAppButton(item: DockPreviewData.items[0], size: 48, isLaunching: false, isSelected: true,
+                      open: {}, togglePin: {})
+        DockAppButton(item: DockPreviewData.items[3], size: 48, isLaunching: false, isSelected: false,
                       open: {}, togglePin: {})
         DockAppButton(item: DockPreviewData.items[1], size: 48, isLaunching: true, isSelected: false,
                       open: {}, togglePin: {})
