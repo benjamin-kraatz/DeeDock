@@ -64,6 +64,12 @@ Read only the relevant installed skill and references for the task:
 | SwiftUI Expert | `.agents/skills/swiftui-expert-skill/SKILL.md` | State, composition, native views, animation, accessibility, rendering performance |
 | Swift Concurrency | `.agents/skills/swift-concurrency/SKILL.md` | Actor isolation, tasks, cancellation, event streams, Sendable diagnostics |
 | Swift Testing | `.agents/skills/swift-testing-expert/SKILL.md` | Meaningful model/geometry/state tests and async test design |
+| How | `.agents/skills/how/SKILL.md` | Architecture walkthroughs and placement questions |
+| Why | `.agents/skills/why/SKILL.md` | Design rationale and historical evidence |
+| Interrogate | `.agents/skills/interrogate/SKILL.md` | Multi-model adversarial review of a diff |
+| Unslop | `.agents/skills/unslop/SKILL.md` | Cutting AI tells from writing |
+| Technical writing | `.agents/skills/technical-writing/SKILL.md` | Docs, RFCs, READMEs, PRs, and commit messages |
+| Writing for agents | `.agents/skills/writing-for-agents/SKILL.md` | Skills, `AGENTS.md`, and other agent-consumed docs |
 
 Project instructions and explicit user requests take precedence over third-party skill advice. In particular, a skill's suggested build/test loop does not authorize running tests. Check API availability against the project's actual SDK and deployment target; a skill is not authoritative SDK documentation.
 

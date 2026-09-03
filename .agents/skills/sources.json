@@ -22,5 +22,53 @@
     "path": "swift-testing-expert",
     "license": "MIT",
     "installedOn": "2026-09-02"
+  },
+  {
+    "name": "how",
+    "repository": "https://github.com/backnotprop/pstack",
+    "revision": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
+    "path": "skills/how",
+    "license": "MIT",
+    "installedOn": "2026-09-03"
+  },
+  {
+    "name": "why",
+    "repository": "https://github.com/backnotprop/pstack",
+    "revision": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
+    "path": "skills/why",
+    "license": "MIT",
+    "installedOn": "2026-09-03"
+  },
+  {
+    "name": "interrogate",
+    "repository": "https://github.com/backnotprop/pstack",
+    "revision": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
+    "path": "skills/interrogate",
+    "license": "MIT",
+    "installedOn": "2026-09-03"
+  },
+  {
+    "name": "unslop",
+    "repository": "https://github.com/backnotprop/pstack",
+    "revision": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
+    "path": "skills/unslop",
+    "license": "MIT",
+    "installedOn": "2026-09-03"
+  },
+  {
+    "name": "technical-writing",
+    "repository": "https://github.com/backnotprop/pstack",
+    "revision": "18e0e908a13553b0e58d065ab26dbc9a972ec8ba",
+    "path": "skills/technical-writing",
+    "license": "MIT",
+    "installedOn": "2026-09-03"
+  },
+  {
+    "name": "writing-for-agents",
+    "repository": "https://github.com/mattpocock/skills",
+    "revision": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "path": "skills/productivity/writing-for-agents",
+    "license": "MIT",
+    "installedOn": "2026-09-03"
   }
 ]

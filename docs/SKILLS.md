@@ -7,8 +7,14 @@ These skills are installed in `.agents/skills` so they travel with DeeDock. Code
 | `swiftui-expert-skill` | SwiftUI state, views, animation, accessibility, macOS-specific scenes, and performance | [AvdLee/SwiftUI-Agent-Skill](https://github.com/AvdLee/SwiftUI-Agent-Skill) |
 | `swift-concurrency` | Actor isolation, task lifetime, cancellation, async events, and Swift concurrency diagnostics | [AvdLee/Swift-Concurrency-Agent-Skill](https://github.com/AvdLee/Swift-Concurrency-Agent-Skill) |
 | `swift-testing-expert` | Focused Swift Testing coverage for geometry, configuration, and behavior models | [AvdLee/Swift-Testing-Agent-Skill](https://github.com/AvdLee/Swift-Testing-Agent-Skill) |
+| `how` | Architecture walkthroughs: how a subsystem works, where something should live | [backnotprop/pstack](https://github.com/backnotprop/pstack) |
+| `why` | Design rationale from history, tickets, docs, and other evidence | [backnotprop/pstack](https://github.com/backnotprop/pstack) |
+| `interrogate` | Multi-model adversarial review of a diff | [backnotprop/pstack](https://github.com/backnotprop/pstack) |
+| `unslop` | Cut AI tells from writing | [backnotprop/pstack](https://github.com/backnotprop/pstack) |
+| `technical-writing` | Docs, RFCs, READMEs, PR descriptions, and commit messages | [backnotprop/pstack](https://github.com/backnotprop/pstack) |
+| `writing-for-agents` | Writing skills, `AGENTS.md`, and other documents agents consume | [mattpocock/skills](https://github.com/mattpocock/skills) |
 
-Installed on 2026-09-02 from pinned commit revisions. The exact repository, revision, upstream folder, and license are recorded in [sources.json](../.agents/skills/sources.json). Each skill includes its upstream MIT license. These licenses apply to the vendored skill material; they do not select a license for DeeDock.
+Swift skills were installed on 2026-09-02; pstack and `writing-for-agents` on 2026-09-03. All are pinned to commit revisions. The exact repository, revision, upstream folder, and license are recorded in [sources.json](../.agents/skills/sources.json). Each skill includes its upstream MIT license. These licenses apply to the vendored skill material; they do not select a license for DeeDock.
 
 Use a skill when its scope matches the task, and load only relevant references. The SwiftUI skill includes macOS guidance, but AppKit windowing and Dock integration still require direct Apple API research and runtime evidence. The testing skill is guidance for test design, not permission to run tests; follow `AGENTS.md`.
 
