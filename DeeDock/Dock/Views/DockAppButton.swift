@@ -12,6 +12,11 @@ struct DockAppButton: View {
     let open: () -> Void
     let togglePin: () -> Void
 
+    var menuTracking: (Bool) -> Void = { _ in }
+    var accessibilityFocus: (Bool) -> Void = { _ in }
+    @Environment(\.openSettings) private var openSettings
+    @AccessibilityFocusState private var accessibilityFocused: Bool
+
     var body: some View {
         Button(action: open) {
             VStack(spacing: 6) {
@@ -47,19 +52,23 @@ struct DockAppButton: View {
         }
         .buttonStyle(.plain)
         .disabled(isLaunching)
-        .contextMenu {
-            if item.isAvailable {
-                Button(.actionOpen, systemImage: "arrow.up.forward.app", action: open)
-            }
-            Divider()
-            Button(
-                item.isFavorite ? .actionUnpin : .actionPin,
-                systemImage: item.isFavorite ? "pin.slash" : "pin",
-                action: togglePin
+        .overlay {
+            DockContextMenuBridge(
+                item: item,
+                open: open,
+                togglePin: togglePin,
+                openSettings: {
+                    NSApp.activate()
+                    openSettings()
+                },
+                tracking: menuTracking
             )
         }
+        .accessibilityFocused($accessibilityFocused)
+        .onChange(of: accessibilityFocused) { _, focused in accessibilityFocus(focused) }
+        .onDisappear { accessibilityFocus(false) }
         .accessibilityLabel(Text(verbatim: item.reference.name))
-        .accessibilityValue(Text(item.isAvailable ? (item.isRunning ? .appStatusRunning : .appStatusNotRunning) : .appStatusUnavailable))
+        .accessibilityValue(Text(item.isAvailable ? (item.isRunning ? .appStatusRunning : .appStatusUnavailable) : .appStatusUnavailable))
         .accessibilityHint(Text(.appOpenHint))
         .accessibilityAction(named: Text(item.isFavorite ? .actionUnpin : .actionPin), togglePin)
     }

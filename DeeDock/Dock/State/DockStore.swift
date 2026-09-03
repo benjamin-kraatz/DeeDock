@@ -8,7 +8,8 @@ final class DockStore {
     /// Ordered render snapshots: this display's pins, followed by shared running applications.
     private(set) var items: [DockItem] = []
     /// A localized failure belonging only to this panel session.
-    var errorMessage: LocalizedStringResource?
+    var errorMessage: LocalizedStringResource? { didSet { errorDidChange?() } }
+    @ObservationIgnored var errorDidChange: (() -> Void)?
     /// Stable application identity, retained across changes to item ordering.
     var selectedID: String?
     /// Enabled by Focus Dock only; hover never enables keyboard handling.
@@ -67,5 +68,5 @@ final class DockStore {
     func openSelection() { if let item = items.first(where: { $0.id == selectedID }) { open(item) } }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { session.stop(); applicationOpened = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

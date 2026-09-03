@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first two customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, position/appearance settings, and one dock per connected desktop display. Each display has independent pins and optional overrides of shared defaults. Auto-hide remains planned. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, position/appearance settings, and one dock per connected desktop display. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -16,9 +16,9 @@ The product roadmap includes:
 
 - **A dock per monitor (implemented):** independent pins, shared defaults, per-setting overrides, and remembered disconnected displays.
 - **Precise placement:** edge, alignment, offset, and distance from the screen edge, with fine-grained controls.
-- **Activation zones:** control where pointer entry reveals a dock, the zone's dimensions, and reveal timing.
+- **Activation zones (implemented):** choose dock-position or screen-edge triggering, dimensions, horizontal offset, and reveal timing.
 - **Size and appearance:** icon size, spacing, dock size, magnification, opacity, and fade controls.
-- **Behavior:** reveal and hide delays, animation timing, auto-hide, and interaction preferences.
+- **Behavior:** auto-hide, reveal/hide delays, and ten animation styles are implemented; broader interaction preferences remain planned.
 
 These are product goals, not a finished feature specification. Exact options, ranges, defaults, and delivery order will be decided slice by slice.
 
@@ -80,7 +80,7 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 8-point spacing and 12-point padding. Crowded docks reduce icon size to 32 points before scrolling horizontally. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks are always visible. Auto-hide, activation-zone controls, drag reordering, stacks/Trash, window previews, opacity/fade controls, and launch-at-login are not implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Drag reordering, stacks/Trash, window previews, opacity/fade controls, and launch-at-login are not implemented.
 
 ## Position and appearance settings
 
@@ -99,11 +99,11 @@ Numeric controls support sliders and locale-aware typed values. Invalid drafts n
 
 Positive horizontal offsets move right. Bottom distance measures to the glass's bottom edge. Placement is constrained to keep the magnification envelope on the display, so left/right alignment or large offsets can be adjusted near an edge. Requested values remain saved across geometry changes. Crowded docks may use smaller icons than requested before scrolling; the requested size returns when space is available.
 
-A 1.0× maximum disables magnification; Reduce Motion also disables it without changing the saved preference. Glass height stays fixed during hover, with icons and labels using a separate envelope above it. Screen-edge positioning can overlap the system Dock; neither mode changes macOS preferences. Settings resolve separately for each display. This slice stops at multiple docks; auto-hide requires a subsequent review and authorization.
+A 1.0× maximum disables magnification; Reduce Motion also disables it without changing the saved preference. Glass height stays fixed during hover, with icons and labels using a separate envelope above it. Screen-edge positioning can overlap the system Dock; neither mode changes macOS preferences. Settings resolve separately for each display. Auto-hide and activation behavior can be configured separately in the Behavior pane.
 
 ## Displays and inheritance
 
-The Settings sidebar retains the appearance/position panes, search, cards, and live previews, and adds connected and remembered displays. **Defaults** changes the shared values. Selecting a display exposes **Show Dock** and the same controls. Editing a control creates an explicit override; **Use Default** restores inheritance for that control. **Use Defaults** clears all appearance/position overrides on that display while preserving its pins and visibility.
+The Settings sidebar retains the appearance/position panes, search, cards, and live previews, and adds connected and remembered displays. **Defaults** changes the shared values. Selecting a display exposes **Show Dock** and the same controls. Editing a control creates an explicit override; **Use Default** restores inheritance for that control. **Use Defaults** clears all appearance, position, and behavior overrides on that display while preserving its pins and visibility.
 
 New displays start enabled and copy the primary display’s current pins once, including an empty list. Later pin changes remain local. Disconnected displays remain editable and recover their settings on reconnect. You can disable every dock and reopen Settings from the menu-bar item to recover.
 
@@ -111,11 +111,54 @@ Display profiles use public ColorSync UUIDs, independent of screen order, names,
 
 Existing settings remain shared defaults under their original preferences key. Legacy pins are retained and migrated to the initial primary profile; each display’s pins are stored separately. Malformed data is reported without silently replacing saved bytes. Unreadable display metadata blocks profile edits; unreadable pins block pin writes for that display. This slice adds no profile deletion or repair screen.
 
+## Auto-hide and activation zones
+
+Choose **Behavior** under Defaults or a display to configure automatic hiding. Every control supports an independent per-display override. Existing installations remain always visible until you turn auto-hide on.
+
+| Control | Range / options | Default |
+| --- | --- | --- |
+| Automatically hide | On / Off | Off |
+| Activation location | Dock position / Screen edge | Dock position |
+| Activation width | Dock width / Custom | Dock width |
+| Custom width | 32–8,192 points | 320 |
+| Activation height | 1–64 points | 8 |
+| Activation horizontal offset | −4,096 to +4,096 points | 0 |
+| Reveal delay | 0–2 seconds | 0.10 |
+| Hide delay | 0–5 seconds | 0.40 |
+| Animation duration | 0–1 second | 0.20 |
+
+A dock-position zone starts at the resting glass bottom; a screen-edge zone starts at the physical display bottom. Dock width follows the resting glass, independently of hover magnification. Geometry fits to the current display without rewriting requested dimensions. The Settings diagram illustrates the zone and the safe approach area. **Show Zone** draws a click-through outline for 10 seconds on the selected connected, enabled desktop display. It updates during edits and closes with Settings or a changed selection.
+
+Resting the pointer in the zone starts the reveal delay; leaving cancels it. The revealed dock stays visible while the pointer is over it or in the connecting approach area, and while you use a mouse button, its context menu, keyboard focus, or VoiceOver focus. After interaction ends and the pointer leaves, the hide delay begins. Re-entering cancels the delay or reverses an ongoing hide. Trigger and approach areas never capture clicks.
+
+**Focus Dock** reveals its target immediately and preserves existing keyboard navigation. Hidden docks have no invisible click targets or accessibility elements. A launch error reveals only its initiating dock and holds it until dismissed; pending launches alone do not prevent hiding.
+
+### Animation styles
+
+All ten are available immediately, grouped in Settings with a descriptive subtitle:
+
+| Group | Name | Effect |
+| --- | --- | --- |
+| Smooth Operators | **Glide & Seek** (default) | Slide down and fade |
+| Smooth Operators | Slip Away | Slide down |
+| Smooth Operators | Ghost Mode | Fade |
+| Taking the Scenic Route | Up, Up & Away | Lift and fade |
+| Taking the Scenic Route | Exit Stage Left | Slide left and fade |
+| Taking the Scenic Route | Right on Cue | Slide right and fade |
+| A Little Drama | Mini Me | Scale and fade |
+| A Little Drama | Curtain Call | Vertical wipe |
+| A Little Drama | Squeeze Play | Horizontal wipe |
+| A Little Drama | Boing Voyage | Bounce and fade |
+
+Reveal reverses the selected hiding sequence. **Play Preview** runs an inert sample; selecting a style does not repeatedly trigger live docks. A zero duration makes transitions instant. Reduce Motion replaces movement, scaling, and wipes with a fade lasting at most 0.10 seconds, including in previews. Glass remains fixed-height during hover, and visibility effects use a separate presentation transform and clipping envelope.
+
+Auto-hide does not inspect overlapping app windows, use pressure gestures, modify the system Dock, or request permissions. Screen-edge triggering may also reveal the system Dock. Runtime acceptance for these interactions is still pending.
+
 ## Implementation and validation
 
-One application catalog owns workspace observation, running order, icon caching, and duplicate-suppressed launches. A coordinator reconciles display snapshots and owns global pointer monitoring and exclusive keyboard focus. Each panel keeps its own pins, selection, hover, scroll state, geometry, and error feedback. Removing a dock invalidates its launch callbacks without cancelling shared work; quitting cancels pending tasks and removes observers, monitors, and panels. Geometry, identity resolution, ordering, and focus routing policies are independent of native windows.
+One application catalog owns workspace observation, running order, icon caching, and duplicate-suppressed launches. A coordinator reconciles display snapshots and owns global pointer monitoring and exclusive keyboard focus. Each panel keeps its own pins, selection, hover, scroll state, geometry, and error feedback. Removing a dock invalidates its launch callbacks without cancelling shared work; quitting cancels pending tasks and removes observers, monitors, and panels. Geometry, identity resolution, ordering, focus routing, and visibility policy are independent of native windows. Each panel owns a cancellable visibility controller with monotonic deadlines and finite animation ticks; idle settled docks schedule no visibility work. Drawing and native click passthrough share the same animation sample, while context-menu tracking is scoped to the owning dock.
 
-The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing target compiling the same model, ordering, persistence, and geometry sources used by the app. Its tests cover geometry, magnification, overflow, ordering, favorites persistence, display identity and focus policy, migration, empty-pin seeding, per-setting inheritance, and stale launch/cancellation behavior without launching DeeDock. Tests have been compiled, but not executed. Follow `AGENTS.md` before running them.
+The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing target compiling the same model, ordering, persistence, and geometry sources used by the app. Its tests cover geometry, magnification, overflow, ordering, favorites persistence, display identity and focus policy, migration, empty-pin seeding, per-setting inheritance, stale launch/cancellation behavior, auto-hide deadlines and reversals, ten animation styles and masks, behavior migration, and temporary preview lifetimes without launching DeeDock. Tests have been compiled, but not executed. Follow `AGENTS.md` before running them.
 
 ## Source organization
 
@@ -126,7 +169,8 @@ The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing t
 - `DeeDock/Displays` supplies display snapshots, persistent identity resolution, and selection policies.
 - `DeeDock/Dock/Coordination` owns panel reconciliation and application-wide event/focus routing.
 - `DeeDock/Dock/State` holds the shared application catalog and per-panel stores and interaction geometry.
-- `DeeDock/Dock/Windowing` owns each AppKit panel and its local focus and handler lifecycle.
+- `DeeDock/Dock/Windowing` owns each AppKit panel, native context menu, and local focus/handler lifecycle.
+- `DeeDock/Dock/Visibility` separates activation geometry, animation samples, visibility state, scheduling, and temporary zone outlines.
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
 - `DeeDock/Settings` groups shared settings, display profiles and persistence, sidebar navigation, and focused native controls.

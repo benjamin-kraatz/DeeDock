@@ -47,7 +47,9 @@ struct DockContentView: View {
                         openApp: openApp, togglePin: togglePin,
                         iconFrameChanged: { id, rect in
                             interaction.setIconRect(rect?.intersection(viewport), for: id)
-                        }
+                        },
+                        menuTracking: { interaction.menuTrackingChanged?($0) },
+                        accessibilityFocus: { interaction.accessibilityFocusChanged?($0, $1) }
                     )
                     .onGeometryChange(for: CGFloat.self) { geometry in
                         geometry.frame(in: .named("dockViewport")).minX

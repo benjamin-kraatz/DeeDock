@@ -7,12 +7,14 @@ import SwiftUI
 enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
     case appearance
     case position
+    case behavior
 
     var id: Self { self }
 
     var title: LocalizedStringResource {
         switch self {
         case .appearance: .settingsAppearance
+        case .behavior: .settingsBehavior
         case .position: .settingsPosition
         }
     }
@@ -21,6 +23,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
     var glyph: SettingsGlyph {
         switch self {
         case .appearance: .symbol("paintbrush.pointed.fill")
+        case .behavior: .symbol("sparkles")
         case .position: .dock
         }
     }
@@ -29,6 +32,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
     var tint: Color {
         switch self {
         case .appearance: Color(red: 0.52, green: 0.38, blue: 0.98)
+        case .behavior: Color(red: 0.12, green: 0.62, blue: 0.47)
         case .position: Color(red: 0.16, green: 0.55, blue: 0.98)
         }
     }
@@ -37,6 +41,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
     var tileColors: [Color] {
         switch self {
         case .appearance: [Color(red: 0.85, green: 0.42, blue: 0.98), Color(red: 0.42, green: 0.30, blue: 0.96)]
+        case .behavior: [.mint, .teal]
         case .position: [Color(red: 0.32, green: 0.78, blue: 1.0), Color(red: 0.06, green: 0.42, blue: 0.94)]
         }
     }
@@ -46,6 +51,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
     private var keywords: LocalizedStringResource {
         switch self {
         case .appearance: .settingsAppearanceKeywords
+        case .behavior: .settingsBehaviorKeywords
         case .position: .settingsPositionKeywords
         }
     }

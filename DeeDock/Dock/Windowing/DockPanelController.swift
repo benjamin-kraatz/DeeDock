@@ -1,64 +1,106 @@
 import AppKit
 
-/// Owns one native panel and its local geometry/keyboard handlers. The coordinator owns global events.
+/// Owns one panel, its visibility deadlines, and scoped interaction holds. Global events belong to the coordinator.
 @MainActor
 final class DockPanelController {
     let store: DockStore
+    let visibility: DockVisibilityController
     private let interaction = DockInteraction()
     private let panel: DockPanel
+    private(set) var geometry: DockPresentationGeometry?
+    private var mouseHeld = false
+    private var menuHeld = false
+    private var accessibilityIDs: Set<String> = []
+    private var stopped = false
     var resignedFocus: (() -> Void)?
     var escape: (() -> Void)?
 
-    init(store: DockStore) {
+    init(store: DockStore, settings: DockSettings) {
         self.store = store
+        visibility = DockVisibilityController(settings: settings.behavior, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
         panel = DockPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.title = String(localized: .appName)
-        panel.isOpaque = false
-        panel.backgroundColor = .clear
-        panel.hasShadow = false
-        panel.isReleasedWhenClosed = false
-        panel.hidesOnDeactivate = false
-        panel.level = .floating
+        panel.isOpaque = false; panel.backgroundColor = .clear; panel.hasShadow = false
+        panel.isReleasedWhenClosed = false; panel.hidesOnDeactivate = false; panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
-        panel.acceptsMouseMovedEvents = true
-        panel.becomesKeyOnlyIfNeeded = true
-        panel.contentView = DockHostingView(rootView: DockView(store: store, interaction: interaction))
+        panel.acceptsMouseMovedEvents = true; panel.becomesKeyOnlyIfNeeded = true
+        panel.contentView = DockHostingView(rootView: DockView(store: store, interaction: interaction, visibility: visibility))
         interaction.geometryDidChange = { [weak self] in self?.updatePointer() }
+        interaction.menuTrackingChanged = { [weak self] tracking in
+            self?.menuHeld = tracking
+            if !tracking { self?.mouseHeld = false }
+            self?.updatePointer()
+        }
+        interaction.accessibilityFocusChanged = { [weak self] id, focused in
+            if focused { self?.accessibilityIDs.insert(id) } else { self?.accessibilityIDs.remove(id) }
+            self?.updatePointer()
+        }
         panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
         panel.resignedKey = { [weak self] in self?.resignedFocus?() }
+        visibility.refreshInput = { [weak self] in self?.updatePointer() }
+        visibility.didChange = { [weak self] in self?.present() }
+        store.errorDidChange = { [weak self] in self?.updatePointer() }
     }
 
-    /// Reuses the panel and SwiftUI state across arrangement, settings, and application changes.
-    func update(display: DisplaySnapshot, settings: DockSettings) {
+    /// Reuses content and scrolling. Geometry/Space refreshes settle stale motion, never force a hidden dock frontmost.
+    func update(display: DisplaySnapshot, settings: DockSettings, resetVisibility: Bool = false) {
+        guard !stopped else { return }
+        // A mouse-up can occur while asleep or during display reconfiguration; do not retain a stale hold.
+        if resetVisibility && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
         let reference = DockGeometry.referenceFrame(screenFrame: display.frame, visibleFrame: display.visibleFrame, settings: settings)
         interaction.layout = DockGeometry.layout(count: store.items.count, favoriteCount: store.items.filter(\.isFavorite).count,
-                                                  availableWidth: reference.width, settings: settings)
-        panel.setFrame(DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings), display: true)
-        if !panel.isVisible { panel.orderFrontRegardless() }
+                                                 availableWidth: reference.width, settings: settings)
+        let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
+        let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
+        let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
+        geometry = updated
+        interaction.contentOrigin = updated.contentOrigin; interaction.windowSize = updated.windowFrame.size
+        panel.setFrame(updated.windowFrame, display: true)
+        visibility.configure(settings.behavior, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
+                             geometryChanged: changed || resetVisibility)
+        updatePointer(); present()
+    }
+
+    /// Native events and animation samples share top-left content coordinates after inverse transformation.
+    func updatePointer(eventType: NSEvent.EventType? = nil) {
+        guard !stopped, let geometry else { return }
+        let local = panel.convertPoint(fromScreen: NSEvent.mouseLocation)
+        let point = CGPoint(x: local.x - geometry.contentOrigin.x,
+                            y: panel.frame.height - local.y - geometry.contentOrigin.y)
+        let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
+                                                  size: geometry.contentSize, reduceMotion: visibility.reduceMotion)
+        let rects = [interaction.surfaceRect, interaction.errorRect] + Array(interaction.iconRects.values)
+        let inside = visibility.exposesContent && panel.frame.contains(NSEvent.mouseLocation) && rects.contains { sample.paintedRect($0).contains(point) }
+        panel.ignoresMouseEvents = !inside
+        interaction.pointer = inside ? sample.inverse(point) : nil
+        if let eventType {
+            if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
+            if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
+        }
+        visibility.update(activation: geometry.activation.zone.contains(NSEvent.mouseLocation),
+                          retained: geometry.activation.retention.contains(NSEvent.mouseLocation),
+                          held: mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil)
+    }
+
+    private func present() {
+        guard !stopped else { return }
+        if !visibility.exposesContent {
+            panel.ignoresMouseEvents = true; interaction.pointer = nil
+            if panel.isVisible { panel.orderOut(nil) }
+        } else {
+            if !panel.isVisible { panel.orderFrontRegardless() }
+            updatePointer()
+        }
+    }
+    func owns(_ window: NSWindow?) -> Bool { window === panel }
+    func focus() {
+        store.keyboardFocus = true
+        visibility.showImmediately()
+        panel.acceptsKeyboardFocus = true
+        store.selectedID = store.selectedID ?? store.items.first?.id
+        NSApp.activate(); panel.makeKeyAndOrderFront(nil); panel.makeFirstResponder(panel)
         updatePointer()
     }
-
-    func updatePointer() {
-        let point = panel.convertPoint(fromScreen: NSEvent.mouseLocation)
-        // AppKit screen points are bottom-left-origin; SwiftUI reports top-left panel coordinates.
-        let flipped = CGPoint(x: point.x, y: panel.frame.height - point.y)
-        let inside = interaction.containsDockPoint(flipped)
-        panel.ignoresMouseEvents = !inside && !interaction.errorRect.contains(flipped)
-        let pointer = inside ? flipped : nil
-        if interaction.pointer != pointer { interaction.pointer = pointer }
-    }
-
-    func owns(_ window: NSWindow?) -> Bool { window === panel }
-
-    func focus() {
-        panel.acceptsKeyboardFocus = true
-        store.keyboardFocus = true
-        store.selectedID = store.selectedID ?? store.items.first?.id
-        NSApp.activate()
-        panel.makeKeyAndOrderFront(nil)
-        panel.makeFirstResponder(panel)
-    }
-
     func handleKey(_ event: NSEvent) -> Bool {
         guard store.keyboardFocus else { return false }
         switch event.keyCode {
@@ -70,23 +112,16 @@ final class DockPanelController {
         }
         return true
     }
-
     /// The coordinator clears its focus owner before this potentially reentrant resign operation.
     func endFocus() {
-        store.keyboardFocus = false
-        store.selectedID = nil
-        panel.acceptsKeyboardFocus = false
-        panel.resignKey()
+        store.keyboardFocus = false; store.selectedID = nil; panel.acceptsKeyboardFocus = false
+        panel.resignKey(); updatePointer()
     }
-
     func stop() {
-        interaction.geometryDidChange = nil
-        panel.resignedKey = nil
-        panel.keyboardHandler = nil
-        resignedFocus = nil
-        escape = nil
-        store.stop()
-        panel.close()
-        panel.contentView = nil
+        stopped = true; visibility.stop()
+        interaction.geometryDidChange = nil; interaction.menuTrackingChanged = nil; interaction.accessibilityFocusChanged = nil
+        panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil
+        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false
+        store.stop(); panel.close(); panel.contentView = nil
     }
 }

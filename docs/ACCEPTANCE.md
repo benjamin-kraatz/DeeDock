@@ -1,6 +1,6 @@
 # DeeDock acceptance record
 
-Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current multi-display slice.
+Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current auto-hide slice.
 
 ## Compilation
 
@@ -130,3 +130,45 @@ Added tests cover legacy migration, preserved empty lists, primary-first/one-tim
 Public display UUIDs can be unavailable or ambiguous for some hardware/virtual-display configurations; this is reported rather than guessed from a name or screen position. DeeDock does not reserve desktop work area or modify the system Dock. Screen-edge positioning or a transient system-Dock reveal may overlap it. Actual mirroring/Spaces behavior remains subject to macOS and hardware acceptance.
 
 Changes are left uncommitted for review. Slice 2 stops here; auto-hide, activation zones, pin-management screens, profile deletion, and release work remain outside scope.
+
+
+## Slice 3: auto-hide, activation zones, and ten animation styles
+
+Implemented on 2026-09-03, preserving the existing Settings design and display-profile behavior. Automatically hide defaults to off. Shared defaults and individual display overrides now include activation location/width/height/offset, reveal and hide delays, animation style, and duration. Numeric controls preserve whole-point and 0.05-second precision. Missing behavior data in older settings receives defaults; malformed present data still reports an error without replacing saved bytes.
+
+### Implemented behavior and ownership
+
+- Each panel owns a visibility state machine, monotonic scheduling, and cancellable animation/deadline tokens. Pointer movement does not restart dwell deadlines. Native deadlines resample the actual pointer before applying a delayed action, and fresh input can cancel an expired but undelivered deadline. Settled idle docks schedule no visibility work.
+- Activation can follow the resting glass bottom or the physical screen bottom. Dock-width or custom zones are centered on the resting dock with an independent horizontal offset and clamped to the display. A click-through connecting area retains the revealed dock while the pointer travels upward to it.
+- Mouse interaction, the owning context menu, explicit keyboard focus, accessibility focus, and a visible error hold the dock open. Context menus use a scoped AppKit bridge with native open/close callbacks. Pending application launches do not hold visibility; errors appear and hold only on the initiating dock.
+- Focus Dock reveals immediately. Fully hidden content is excluded from hit testing and accessibility. Scroll/application state persists across hiding, while pointer magnification resets. Disabling, disconnecting, wake/Spaces/display changes, and quitting invalidate stale work as appropriate; shared launch ownership remains unchanged.
+- Ten styles use semantic storage identifiers: Glide & Seek, Slip Away, Ghost Mode, Up, Up & Away, Exit Stage Left, Right on Cue, Mini Me, Curtain Call, Squeeze Play, and Boing Voyage. They are grouped into Smooth Operators, Taking the Scenic Route, and A Little Drama. Style selection is static; explicit Play Preview animates an inert sample.
+- Animation samples provide scale, translation, opacity, and masks to both SwiftUI presentation and native hit handling. A fixed native window envelope accommodates movement, clips at display boundaries, and preserves fixed glass height during magnification. Reversal begins at current progress. Reduce Motion uses a fade capped at 0.10 seconds; duration zero is instant.
+- The deterministic diagram and ten-second Show Zone outline share production activation geometry. The outline is nonactivating and click-through, follows valid edits, and closes on selection/category change, actual Settings-window close, disappearance of its display, expiration, or shutdown. Preview leases reject stale expirations after replacement.
+- All new production labels, group names, style names/subtitles, units, and help text are in Localizable.xcstrings. SwiftUI previews use in-memory settings and an explicit Reduce Motion fixture without changing system settings.
+
+### Compilation and authored tests
+
+Xcode MCP `BuildProject(buildForTesting: true, tabIdentifier: "windowtab-a2fQL021MS")` succeeded. The app and unhosted test target compiled; the test bundle was linked and signed. The final successful build log is:
+
+`/var/folders/q5/16skxm0d1rlgnyf53r13c1rm0000gn/T/ActionArtifacts/default/BuildProject/BuildProject-Log-20260903-093540.txt`
+
+The preceding full test compilation log is `BuildProject-Log-20260903-093155.txt` in the same temporary directory. New Swift actor-isolation diagnostics found during implementation were resolved. The remaining warnings only report skipped App Intents metadata extraction because the targets do not depend on AppIntents. Swift language mode, deployment target, signing, sandbox, and dependencies are unchanged.
+
+New tests cover legacy decoding and corrupt-byte preservation; individual behavior inheritance and resets; all ten semantic style round trips; dimension/timing validation; screen/dock zone anchors; negative origins, clamping, overflow and magnification-independent zones; all animation endpoints, inverse transforms and masks; two-stage bounce; independent docks; dwell/hide cancellation; reversal continuity; interaction holds; immediate focus reveal; hidden content eligibility; zero-duration and Reduce Motion behavior; stale deadlines after geometry changes/teardown; and bounded preview leases. Scheduling tests use a manually advanced clock, not sleeping or live windows.
+
+**No tests were executed. No app was launched for acceptance, no previews were rendered, and no automated visual checks were run.** Successful compilation does not establish passing assertions, native menu/focus behavior, animation smoothness, or Dock-like feel.
+
+### Remaining hands-on acceptance
+
+- Compare every style against its described motion at zero, default, and maximum duration. Exercise rapid pointer exits/returns during dwell, reveal, hide delay, and hiding, including interrupted bounce/wipe transitions. Check for jumps, clipping, input lag, and unintended clicks.
+- Use both activation anchors with elevated docks, large offsets, custom widths/heights, overflow, different scaling, and negative screen origins. Confirm the invisible trigger and connecting area remain click-through, magnification stays stable, and transformed/masked click targets match visible content.
+- Exercise right-click and Control-click menus from another active app. Keep a menu open beyond the hide delay, move outside the dock, select/cancel actions, and confirm the originating dock remains visible and does not activate DeeDock merely from hover.
+- Exercise Focus Dock, arrows, Return, Escape, mouse-down holds, VoiceOver focus/actions, failed launches, and error dismissal. Confirm hiding removes accessibility elements and focus restoration still works when a dock is disabled or unplugged.
+- Configure different displays independently; change Defaults and individual overrides, including controls matching the current default. Confirm resets preserve pins and visibility and hidden docks do not appear just because running apps or geometry refresh.
+- Play Settings previews repeatedly, change styles during playback, close/reopen Settings, and use Show Zone while editing/switching displays or categories. Confirm the outline expires after ten seconds without capturing clicks or stealing focus.
+- Exercise light/dark appearance, Reduce Motion/Transparency, multiple monitors, mirroring/unmirroring, primary-display changes, normal Spaces, full-screen apps, Mission Control, sleep/wake, and clean quitting during a transition/menu/preview/launch.
+
+These native scenarios remain unexercised for this build. Display-edge activation can also reveal the system Dock; DeeDock neither changes its preferences nor reserves desktop work area. Window-overlap detection, pressure gestures, broader drag behavior, and performance guarantees are outside this slice. No new permissions or machine settings were requested or changed.
+
+Implementation changes are left uncommitted for review. Pause after slice 3; further roadmap work requires a new request.

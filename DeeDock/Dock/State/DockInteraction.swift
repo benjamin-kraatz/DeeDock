@@ -5,6 +5,11 @@ import Observation
 /// Per-panel geometry shared between SwiftUI presentation and AppKit pointer handling.
 @MainActor @Observable
 final class DockInteraction {
+    var contentOrigin = CGPoint.zero
+    var windowSize = CGSize(width: 800, height: 248)
+    @ObservationIgnored var menuTrackingChanged: ((Bool) -> Void)?
+    @ObservationIgnored var accessibilityFocusChanged: ((String, Bool) -> Void)?
+
     /// Current resting layout for this panel’s ordered items and display width.
     var layout = DockGeometry.layout(count: 0, favoriteCount: 0, availableWidth: 800)
     /// Pointer in panel-local, top-left-origin points; nil outside the surface and exposed app buttons.

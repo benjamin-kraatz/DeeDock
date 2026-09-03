@@ -10,25 +10,23 @@ struct SettingsDetailView: View {
     let category: SettingsCategory?
     var context: SettingsOverrideContext? = nil
     var profileError: LocalizedStringResource? = nil
+    var showZone: (() -> Void)?
     @Binding var displayCategory: SettingsCategory
 
     init(store: DockSettingsStore, category: SettingsCategory?, context: SettingsOverrideContext? = nil,
-         profileError: LocalizedStringResource? = nil,
+         profileError: LocalizedStringResource? = nil, showZone: (() -> Void)? = nil,
          displayCategory: Binding<SettingsCategory> = .constant(.appearance)) {
         self.store = store
         self.category = category
         self.context = context
         self.profileError = profileError
+        self.showZone = showZone
         _displayCategory = displayCategory
     }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private func binding<Value>(_ keyPath: WritableKeyPath<DockSettings, Value>) -> Binding<Value> {
-        Binding(get: { (context.map { $0.profiles.effectiveSettings(for: $0.id) } ?? store.value)[keyPath: keyPath] },
-                set: { value in
-                    if let context { context.profiles.update(context.id, keyPath: keyPath, to: value) }
-                    else { store.update(keyPath, to: value) }
-                })
+        SettingsValueSource(store: store, context: context).binding(keyPath)
     }
 
     var body: some View {
@@ -73,6 +71,8 @@ struct SettingsDetailView: View {
 
     @ViewBuilder private func pane(for category: SettingsCategory) -> some View {
         switch category {
+        case .behavior:
+            BehaviorSettingsPane(source: SettingsValueSource(store: store, context: context), showZone: showZone)
         case .appearance:
             AppearanceSettingsPane(iconSize: binding(\.iconSize),
                                    magnification: binding(\.magnification), overrideContext: context)

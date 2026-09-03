@@ -6,6 +6,8 @@ import Observation
 final class DockCoordinator {
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
+    let zonePreview = DockZonePreviewController()
+    @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
     var canFocus: Bool { !enabledDisplays.isEmpty }
     @ObservationIgnored private let catalog: ApplicationCatalog
@@ -37,25 +39,30 @@ final class DockCoordinator {
         }
         profiles.didChange = { [weak self] in
             guard let self else { return }
-            reconcile(profiles.displays)
+            reconcile(profiles.displays, resetVisibility: false)
         }
         settings.settingsDidChange = { [weak self] in self?.refreshPanels() }
         displayService.didChange = { [weak self] in self?.reconcile($0) }
         catalog.start()
         displayService.start()
-        let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .scrollWheel]
-        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] _ in self?.updatePointers() }) {
+        accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in MainActor.assumeIsolated { self?.refreshPanels(resetVisibility: true) } }
+        let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
+                                         .scrollWheel, .leftMouseDown, .rightMouseDown, .otherMouseDown,
+                                         .leftMouseUp, .rightMouseUp, .otherMouseUp]
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] event in self?.updatePointers(eventType: event.type) }) {
             monitors.append(monitor)
         }
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: mask.union(.keyDown), handler: { [weak self] event in
             guard let self else { return event }
             if event.type == .keyDown, let id = focusedID, let panel = panels[id], panel.owns(event.window), panel.handleKey(event) { return nil }
-            updatePointers()
+            updatePointers(eventType: event.type)
             return event
         }) { monitors.append(monitor) }
     }
 
-    private func reconcile(_ displays: [DisplaySnapshot]) {
+    private func reconcile(_ displays: [DisplaySnapshot], resetVisibility: Bool = true) {
         guard started, !reconciling else { return }
         reconciling = true
         defer { reconciling = false }
@@ -68,7 +75,7 @@ final class DockCoordinator {
         }
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles)
-            let panel = DockPanelController(store: store)
+            let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.resignedFocus = { [weak self] in
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
             }
@@ -78,19 +85,29 @@ final class DockCoordinator {
             }
             panels[display.id] = panel
         }
-        refreshPanels()
+        refreshPanels(resetVisibility: resetVisibility)
     }
 
-    private func refreshPanels() {
+    private func refreshPanels(resetVisibility: Bool = false) {
         guard started else { return }
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
             panel.store.refresh()
-            panel.update(display: display, settings: profiles.effectiveSettings(for: display.id))
+            panel.update(display: display, settings: profiles.effectiveSettings(for: display.id), resetVisibility: resetVisibility)
+        }
+        if let id = zonePreview.displayID {
+            if let geometry = panels[id]?.geometry { zonePreview.update(geometry) }
+            else { zonePreview.stop() }
         }
         catalog.pruneIcons(items: panels.values.flatMap { $0.store.items })
     }
-    private func updatePointers() { panels.values.forEach { $0.updatePointer() } }
+    private func updatePointers(eventType: NSEvent.EventType) { panels.values.forEach { $0.updatePointer(eventType: eventType) } }
+
+    /// Only connected enabled desktop surfaces have a live zone to outline.
+    func showZone(for id: String) {
+        guard let geometry = panels[id]?.geometry else { return }
+        zonePreview.show(displayID: id, geometry: geometry)
+    }
     private func rememberExternal(_ app: NSRunningApplication?) {
         if let app, app.processIdentifier != ProcessInfo.processInfo.processIdentifier { lastExternalApplication = app }
     }
@@ -118,6 +135,9 @@ final class DockCoordinator {
         endFocus(restore: true)
         monitors.forEach { NSEvent.removeMonitor($0) }
         monitors.removeAll()
+        zonePreview.stop()
+        if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
+        accessibilityObserver = nil
         displayService.stop()
         profiles.didChange = nil
         settings.settingsDidChange = nil

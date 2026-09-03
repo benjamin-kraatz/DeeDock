@@ -4,6 +4,7 @@ import SwiftUI
 struct DockSettingsView: View {
     let store: DockSettingsStore
     let profiles: DisplayProfilesStore
+    var coordinator: DockCoordinator? = nil
     @State private var selection: SettingsSelection? = .defaults(.appearance)
     @State private var searchText = ""
     @State private var displayCategory: SettingsCategory = .appearance
@@ -19,17 +20,25 @@ struct DockSettingsView: View {
             case .display(let id):
                 SettingsDetailView(store: store, category: displayCategory,
                                    context: SettingsOverrideContext(profiles: profiles, id: id),
-                                   profileError: profiles.errorMessage ?? profiles.pinErrors[id], displayCategory: $displayCategory)
+                                   profileError: profiles.errorMessage ?? profiles.pinErrors[id], showZone: zoneAction(for: id), displayCategory: $displayCategory)
                     .id(id)
             case nil:
                 SettingsDetailView(store: store, category: nil)
             }
         }
+        .background { SettingsWindowLifecycle { coordinator?.zonePreview.stop() } }
+        .onChange(of: displayCategory) { _, _ in coordinator?.zonePreview.stop() }
+        .onChange(of: selection) { _, _ in coordinator?.zonePreview.stop() }
+        .onDisappear { coordinator?.zonePreview.stop() }
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 740, idealWidth: 820, minHeight: 540, idealHeight: 650)
         .onChange(of: profiles.document.profiles.keys.sorted()) { _, ids in
             if case .display(let id) = selection, !ids.contains(id) { selection = .defaults(.appearance) }
         }
+    }
+    private func zoneAction(for id: String) -> (() -> Void)? {
+        guard let coordinator, coordinator.enabledDisplays.contains(where: { $0.id == id }) else { return nil }
+        return { coordinator.showZone(for: id) }
     }
 }
 

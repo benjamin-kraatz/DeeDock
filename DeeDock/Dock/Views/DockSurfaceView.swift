@@ -23,6 +23,9 @@ struct DockSurfaceView: View {
     /// Reports actual button geometry, including during animation, for native click passthrough.
     let iconFrameChanged: (String, CGRect?) -> Void
 
+    var menuTracking: (Bool) -> Void = { _ in }
+    var accessibilityFocus: (String, Bool) -> Void = { _, _ in }
+
     private var centers: [CGFloat] { layout.centers(sizes: sizes) }
 
     var body: some View {
@@ -48,7 +51,8 @@ struct DockSurfaceView: View {
                     let frame = layout.buttonFrame(centerX: centers[index], size: sizes[index])
                     DockAppButton(item: item, size: sizes[index], isLaunching: launchingIDs.contains(item.id),
                                   isSelected: keyboardFocus && selectedID == item.id,
-                                  open: { openApp(item) }, togglePin: { togglePin(item) })
+                                  open: { openApp(item) }, togglePin: { togglePin(item) },
+                                  menuTracking: menuTracking, accessibilityFocus: { accessibilityFocus(item.id, $0) })
                         .onHover { inside in
                             if inside { hoveredID = item.id }
                             else if hoveredID == item.id { hoveredID = nil }

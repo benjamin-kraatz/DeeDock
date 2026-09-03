@@ -1,0 +1,47 @@
+import SwiftUI
+
+/// Behavior controls share the existing Settings design and save through individual field bindings.
+struct BehaviorSettingsPane: View {
+    let source: SettingsValueSource
+    var previewReduceMotion: Bool? = nil
+    var showZone: (() -> Void)? = nil
+    var body: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
+                Toggle(isOn: source.binding(\.behavior.autoHide)) { Text(.behaviorAutoHide) }
+                    .padding(14).settingsOverride(source.context, field: .autoHide)
+            }
+            SettingsCard(title: .behaviorActivationZone, footnote: .behaviorZoneHelp) {
+                DockZoneDiagram(settings: source.value).padding(14)
+                if let showZone {
+                    Button(.behaviorShowZone, systemImage: "viewfinder", action: showZone).padding(14)
+                }
+                BehaviorActivationControls(source: source)
+            }
+            SettingsCard(title: .behaviorTiming, footnote: .behaviorTimingHelp) {
+                BehaviorTimingControls(source: source)
+            }
+            SettingsCard(title: .behaviorAnimation, footnote: .behaviorAnimationHelp) {
+                DockAnimationPreview(style: source.value.behavior.animationStyle, duration: source.value.behavior.animationDuration, reduceMotionOverride: previewReduceMotion)
+                BehaviorAnimationPicker(selection: source.binding(\.behavior.animationStyle))
+                    .settingsOverride(source.context, field: .animationStyle)
+                SettingsSliderRow(title: .behaviorDuration, unit: .settingsSeconds,
+                                  value: source.binding(\.behavior.animationDuration), range: 0...1, step: 0.05)
+                    .settingsOverride(source.context, field: .animationDuration)
+            }
+        }
+    }
+}
+
+#if DEBUG
+#Preview("Behavior defaults") {
+    ScrollView { BehaviorSettingsPane(source: SettingsValueSource(store: DockSettingsStore(repository: nil), context: nil)).padding(24) }
+        .frame(width: 620, height: 750)
+}
+#Preview("Behavior overrides — reduced motion") {
+    let profiles = DisplaySettingsPreview.make()
+    ScrollView { BehaviorSettingsPane(source: SettingsValueSource(store: profiles.defaults,
+        context: SettingsOverrideContext(profiles: profiles, id: "display.preview2")), previewReduceMotion: true).padding(24) }
+        .preferredColorScheme(.dark).frame(width: 620, height: 750)
+}
+#endif

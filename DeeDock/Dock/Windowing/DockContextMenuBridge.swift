@@ -1,0 +1,101 @@
+import AppKit
+import SwiftUI
+
+/// Native menu ownership gives each dock a reliable tracking hold without observing unrelated menus.
+struct DockContextMenuBridge: NSViewRepresentable {
+    let item: DockItem
+    let open: () -> Void
+    let togglePin: () -> Void
+    let openSettings: () -> Void
+    let tracking: (Bool) -> Void
+
+    func makeNSView(context: Context) -> MenuView { MenuView() }
+
+    func updateNSView(_ view: MenuView, context: Context) {
+        view.item = item
+        view.open = open
+        view.togglePin = togglePin
+        view.openSettings = openSettings
+        view.tracking = tracking
+    }
+
+    static func dismantleNSView(_ view: MenuView, coordinator: ()) { view.stop() }
+
+    /// Only context-clicks reach this overlay; ordinary left-clicks remain SwiftUI button actions.
+    final class MenuView: NSView, NSMenuDelegate {
+        var item: DockItem?
+        var open: (() -> Void)?
+        var togglePin: (() -> Void)?
+        var openSettings: (() -> Void)?
+        var tracking: ((Bool) -> Void)?
+        private var trackedMenu: NSMenu?
+
+        override func hitTest(_ point: NSPoint) -> NSView? {
+            guard let event = NSApp.currentEvent,
+                  event.type == .rightMouseDown || (event.type == .leftMouseDown && event.modifierFlags.contains(.control)) else { return nil }
+            return super.hitTest(point)
+        }
+
+        override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+        override func isAccessibilityElement() -> Bool { false }
+
+        override func rightMouseDown(with event: NSEvent) { show(event) }
+
+        override func mouseDown(with event: NSEvent) { show(event) }
+
+        private func show(_ event: NSEvent) {
+            guard let item else { return }
+
+            let menu = NSMenu()
+            menu.delegate = self
+
+            if item.isAvailable {
+                let entry = NSMenuItem(title: String(localized: .actionOpen), action: #selector(openApplication), keyEquivalent: "")
+                entry.image = NSImage(systemSymbolName: "arrow.up.forward.app", accessibilityDescription: nil)
+                entry.target = self
+                menu.addItem(entry)
+                menu.addItem(.separator())
+            }
+
+            let pin = NSMenuItem(title: String(localized: item.isFavorite ? .actionUnpin : .actionPin), action: #selector(changePin), keyEquivalent: "")
+            pin.image = NSImage(systemSymbolName: item.isFavorite ? "pin.slash" : "pin", accessibilityDescription: nil)
+            pin.target = self
+            menu.addItem(pin)
+
+            menu.addItem(.separator())
+
+            let settings = NSMenuItem(title: String(localized: .actionSettings), action: #selector(showSettings), keyEquivalent: "")
+            settings.image = NSImage(systemSymbolName: "gear", accessibilityDescription: nil)
+            settings.target = self
+            menu.addItem(settings)
+
+            trackedMenu = menu
+            NSMenu.popUpContextMenu(menu, with: event, for: self)
+            // Menu callbacks normally close the hold; this is also safe if tracking was cancelled.
+            tracking?(false)
+            trackedMenu = nil
+        }
+
+        func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
+
+        func menuDidClose(_ menu: NSMenu) { tracking?(false) }
+
+        @objc private func openApplication() { open?() }
+
+        @objc private func changePin() { togglePin?() }
+
+        @objc private func showSettings() { openSettings?() }
+
+        func stop() {
+            trackedMenu?.cancelTracking()
+            trackedMenu?.delegate = nil
+            trackedMenu = nil
+            tracking?(false)
+            tracking = nil
+            open = nil
+            togglePin = nil
+            openSettings = nil
+        }
+    }
+}

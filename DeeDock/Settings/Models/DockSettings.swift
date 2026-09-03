@@ -18,11 +18,13 @@ struct DockSettings: Codable, Equatable {
     var bottomDistance: Double = 8
     var positionReference: PositionReference = .usableDesktop
 
+    var behavior = DockBehaviorSettings()
+
     static let defaults = DockSettings()
 
     /// Rejects malformed persisted or transient input before it can enter geometry calculations.
     var isValid: Bool {
-        (32...96).contains(iconSize) && (1...2).contains(magnification)
+        behavior.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
             && (-1000...1000).contains(horizontalOffset) && (0...300).contains(bottomDistance)
             && [iconSize, magnification, horizontalOffset, bottomDistance].allSatisfy(\.isFinite)
     }
@@ -31,10 +33,30 @@ struct DockSettings: Codable, Equatable {
     var normalized: DockSettings? {
         guard isValid else { return nil }
         var result = self
+        result.behavior = behavior.normalized!
         result.iconSize = iconSize.rounded()
         result.magnification = (magnification * 20).rounded() / 20
         result.horizontalOffset = horizontalOffset.rounded()
         result.bottomDistance = bottomDistance.rounded()
         return result
+    }
+}
+
+
+extension DockSettings {
+    private enum CodingKeys: String, CodingKey {
+        case iconSize, magnification, alignment, horizontalOffset, bottomDistance, positionReference, behavior
+    }
+
+    /// Only an absent new key receives defaults. Existing required keys and malformed values still throw.
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        iconSize = try values.decode(Double.self, forKey: .iconSize)
+        magnification = try values.decode(Double.self, forKey: .magnification)
+        alignment = try values.decode(Alignment.self, forKey: .alignment)
+        horizontalOffset = try values.decode(Double.self, forKey: .horizontalOffset)
+        bottomDistance = try values.decode(Double.self, forKey: .bottomDistance)
+        positionReference = try values.decode(PositionReference.self, forKey: .positionReference)
+        behavior = values.contains(.behavior) ? try values.decode(DockBehaviorSettings.self, forKey: .behavior) : DockBehaviorSettings()
     }
 }

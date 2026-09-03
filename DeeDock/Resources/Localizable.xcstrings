@@ -840,6 +840,582 @@
           }
         }
       }
+    },
+    "settingsBehavior": {
+      "comment": "Settings navigation category for auto-hide and activation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behavior"
+          }
+        }
+      }
+    },
+    "settingsBehaviorKeywords": {
+      "comment": "Search synonyms for the Behavior Settings pane.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hide reveal activation zone animation timing delay fade slide"
+          }
+        }
+      }
+    },
+    "settingsSeconds": {
+      "comment": "Unit abbreviation for seconds.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "s"
+          }
+        }
+      }
+    },
+    "behaviorHelp": {
+      "comment": "Auto-hide explanation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide each dock when you’re not using it. Your system Dock settings stay unchanged."
+          }
+        }
+      }
+    },
+    "behaviorAutoHide": {
+      "comment": "Toggle for pointer-triggered dock visibility.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatically hide"
+          }
+        }
+      }
+    },
+    "behaviorActivationZone": {
+      "comment": "Settings card heading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activation Zone"
+          }
+        }
+      }
+    },
+    "behaviorZoneHelp": {
+      "comment": "Explains triggering and system Dock coexistence.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rest the pointer in this area to reveal the dock. Screen-edge activation may also reveal the system Dock."
+          }
+        }
+      }
+    },
+    "behaviorShowZone": {
+      "comment": "Show the selected display’s activation outline for ten seconds.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Zone"
+          }
+        }
+      }
+    },
+    "behaviorLocation": {
+      "comment": "Zone vertical anchor choice.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activation location"
+          }
+        }
+      }
+    },
+    "behaviorDockPosition": {
+      "comment": "Anchor activation at the resting glass bottom.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock position"
+          }
+        }
+      }
+    },
+    "behaviorScreenEdge": {
+      "comment": "Anchor activation at the physical screen bottom.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen edge"
+          }
+        }
+      }
+    },
+    "behaviorWidthMode": {
+      "comment": "Zone width mode label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activation width"
+          }
+        }
+      }
+    },
+    "behaviorDockWidth": {
+      "comment": "Follow the resting dock width.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock width"
+          }
+        }
+      }
+    },
+    "behaviorCustomWidth": {
+      "comment": "Exact activation width in points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom width"
+          }
+        }
+      }
+    },
+    "behaviorZoneHeight": {
+      "comment": "Height of the trigger band in points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activation height"
+          }
+        }
+      }
+    },
+    "behaviorZoneOffset": {
+      "comment": "Offset of trigger relative to dock center in points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activation horizontal offset"
+          }
+        }
+      }
+    },
+    "behaviorTiming": {
+      "comment": "Delay controls card heading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timing"
+          }
+        }
+      }
+    },
+    "behaviorTimingHelp": {
+      "comment": "Explains independent dwell and retention timers.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entering the zone starts the reveal delay. Leaving the dock and its approach area starts the hide delay."
+          }
+        }
+      }
+    },
+    "behaviorRevealDelay": {
+      "comment": "Pointer dwell before revealing.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reveal delay"
+          }
+        }
+      }
+    },
+    "behaviorHideDelay": {
+      "comment": "Delay after ending interaction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide delay"
+          }
+        }
+      }
+    },
+    "behaviorAnimation": {
+      "comment": "Animation styles card heading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Animation"
+          }
+        }
+      }
+    },
+    "behaviorAnimationHelp": {
+      "comment": "Animation and accessibility explanation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preview plays a sample dock. Zero duration is instant. Reduce Motion uses a brief fade for every style."
+          }
+        }
+      }
+    },
+    "behaviorDuration": {
+      "comment": "Reveal and hide duration, before reversal scaling.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Animation duration"
+          }
+        }
+      }
+    },
+    "behaviorPlayPreview": {
+      "comment": "Play one hide-and-reveal cycle using an inert sample.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play Preview"
+          }
+        }
+      }
+    },
+    "behaviorDiagramLegend": {
+      "comment": "Legend for the deterministic Settings zone diagram.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cyan: activation zone. Dashed outline: the area that keeps the dock visible while you approach it."
+          }
+        }
+      }
+    },
+    "animationGroupSmooth": {
+      "comment": "Playful animation group name: simple slide and fade styles.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smooth Operators"
+          }
+        }
+      }
+    },
+    "animationGroupScenic": {
+      "comment": "Playful group name: directional departures.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taking the Scenic Route"
+          }
+        }
+      }
+    },
+    "animationGroupDramatic": {
+      "comment": "Playful group name: scale, wipe, and bounce effects.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Little Drama"
+          }
+        }
+      }
+    },
+    "animationSlideFadeTitle": {
+      "comment": "Playful name for the Slide & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glide & Seek"
+          }
+        }
+      }
+    },
+    "animationSlideFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slide & Fade"
+          }
+        }
+      }
+    },
+    "animationSlideTitle": {
+      "comment": "Playful name for the Slide auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slip Away"
+          }
+        }
+      }
+    },
+    "animationSlideSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slide"
+          }
+        }
+      }
+    },
+    "animationFadeTitle": {
+      "comment": "Playful name for the Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghost Mode"
+          }
+        }
+      }
+    },
+    "animationFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fade"
+          }
+        }
+      }
+    },
+    "animationLiftFadeTitle": {
+      "comment": "Playful name for the Lift & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up, Up & Away"
+          }
+        }
+      }
+    },
+    "animationLiftFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lift & Fade"
+          }
+        }
+      }
+    },
+    "animationLeftFadeTitle": {
+      "comment": "Playful name for the Left & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exit Stage Left"
+          }
+        }
+      }
+    },
+    "animationLeftFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left & Fade"
+          }
+        }
+      }
+    },
+    "animationRightFadeTitle": {
+      "comment": "Playful name for the Right & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right on Cue"
+          }
+        }
+      }
+    },
+    "animationRightFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right & Fade"
+          }
+        }
+      }
+    },
+    "animationScaleFadeTitle": {
+      "comment": "Playful name for the Scale & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mini Me"
+          }
+        }
+      }
+    },
+    "animationScaleFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scale & Fade"
+          }
+        }
+      }
+    },
+    "animationVerticalWipeTitle": {
+      "comment": "Playful name for the Vertical Wipe auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Curtain Call"
+          }
+        }
+      }
+    },
+    "animationVerticalWipeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertical Wipe"
+          }
+        }
+      }
+    },
+    "animationHorizontalWipeTitle": {
+      "comment": "Playful name for the Horizontal Wipe auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squeeze Play"
+          }
+        }
+      }
+    },
+    "animationHorizontalWipeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horizontal Wipe"
+          }
+        }
+      }
+    },
+    "animationBounceFadeTitle": {
+      "comment": "Playful name for the Bounce & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boing Voyage"
+          }
+        }
+      }
+    },
+    "animationBounceFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bounce & Fade"
+          }
+        }
+      }
     }
   },
   "version": "1.3"
