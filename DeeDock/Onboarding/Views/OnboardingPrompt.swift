@@ -24,11 +24,8 @@ struct OnboardingPrompt: View {
 }
 
 #if DEBUG
-#Preview("Prompts") {
-    VStack(alignment: .leading, spacing: 10) {
-        OnboardingPrompt(text: .onboardingPlacementPrompt, tint: OnboardingStep.placement.tint)
-        OnboardingPrompt(text: .onboardingAppearancePrompt, tint: OnboardingStep.appearance.tint)
-    }
-    .padding(24)
+#Preview("Prompt") {
+    OnboardingPrompt(text: .onboardingPlacementPrompt, tint: OnboardingStep.placement.tint)
+        .padding(24)
 }
 #endif

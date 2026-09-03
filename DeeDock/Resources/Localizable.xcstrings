@@ -1897,38 +1897,14 @@
         }
       }
     },
-    "onboardingAppearancePickerLabel": {
-      "comment": "Accessibility label for the interactive dock on tour page 4, whose icons choose the running indicator style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Running indicator"
-          }
-        }
-      }
-    },
-    "onboardingAppearancePrompt": {
-      "comment": "Prompt under the interactive dock on tour page 4, where each icon wears a different running indicator.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Click an app to use its running indicator."
-          }
-        }
-      }
-    },
     "onboardingAppearanceSummary": {
-      "comment": "Body of tour page 4, which lets a person choose a running-indicator style and applies it immediately.",
+      "comment": "Body of tour page 4, which demonstrates the appearance settings.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Every icon here wears a different marker for running apps. Pick one now — icon size, magnification, spacing, and app names are in Settings."
+            "value": "Icon size, magnification, spacing, how running apps are marked, and how their names appear — set each one for every display or just one."
           }
         }
       }

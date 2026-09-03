@@ -9,8 +9,8 @@ struct OnboardingView: View {
     let store: OnboardingStore
     let systemDock: SystemDockMonitor
     let loginItems: LoginItemController
-    /// Shared dock defaults. The tour reads them so its previews start from what a person
-    /// already has, and writes only the one choice the placement page offers.
+    /// Shared dock defaults. The tour reads the current edge so the placement page opens on
+    /// what a person already has, and that page is the only thing in the tour that writes.
     let settings: DockSettingsStore
     /// Opens the Settings window; the tour itself never edits dock configuration.
     var openSettings: () -> Void = {}
@@ -101,11 +101,7 @@ struct OnboardingView: View {
                                           reduceMotionOverride: reduceMotionOverride)
             }
         case .appearance:
-            standard(step, prompt: .onboardingAppearancePrompt) {
-                OnboardingAppearancePicker(style: settings.value.runningIndicatorStyle,
-                                           select: { settings.update(\.runningIndicatorStyle, to: $0) },
-                                           reduceMotionOverride: reduceMotionOverride)
-            }
+            standard(step) { OnboardingAppearanceStage(reduceMotionOverride: reduceMotionOverride) }
         case .hiding:
             standard(step) { OnboardingHidingStage(reduceMotionOverride: reduceMotionOverride) }
         case .displays:

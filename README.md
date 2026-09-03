@@ -98,14 +98,9 @@ The first time DeeDock runs, a tour opens over the desktop. The docks are alread
 
 Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DeeDock** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
 
-Two pages change a setting; the rest only demonstrate. A page you can operate carries a prompt line under its illustration, and its controls respond to the pointer — that prompt is the only signal, and pages without one do nothing when clicked.
+One page changes a setting; the rest only demonstrate. **Put it where you want it** lets you click a screen edge, which sets **Edge** in shared defaults and moves the docks immediately. It writes shared defaults only and leaves per-display overrides alone, so a display already overriding that control keeps its own value, and the change is reversible in Settings.
 
-| Page | Changes |
-| --- | --- |
-| Put it where you want it | Click a screen edge to set **Edge** in shared defaults. Docks move immediately. |
-| Make it look right | Click an app to set **Running indicators** in shared defaults. |
-
-Both write shared defaults only and leave per-display overrides alone, so a display already overriding that control keeps its own value. Everything is reversible in Settings.
+That page carries a prompt line under its illustration and its handles respond to the pointer. The prompt is the only signal that a page is interactive; pages without one do nothing when clicked.
 
 The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DeeDock never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames, because an App Sandbox cannot read another application's preferences: turning on *Automatically hide and show the Dock* releases the space and clears the status, while moving the Dock to another edge does not. The page can be skipped.
 
