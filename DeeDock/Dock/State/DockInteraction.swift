@@ -5,6 +5,8 @@ import Observation
 /// Per-panel geometry shared between SwiftUI presentation and AppKit pointer handling.
 @MainActor @Observable
 final class DockInteraction {
+    /// Owns this panel's idle deadline and artwork opacity.
+    let idleFade = DockIdleFadeController()
     var dragProposal: DockDragProposal?
     var dragActive = false
     var dragSourceID: String?

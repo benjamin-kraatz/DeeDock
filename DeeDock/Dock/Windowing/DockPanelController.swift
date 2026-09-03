@@ -17,6 +17,7 @@ final class DockPanelController {
     private var menuHeld = false
     private var accessibilityIDs: Set<String> = []
     private var stopped = false
+    private var idleSuspended = false
     private var updatingGeometry = false
     var resignedFocus: (() -> Void)?
     var escape: (() -> Void)?
@@ -46,6 +47,7 @@ final class DockPanelController {
         }
         panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
         panel.resignedKey = { [weak self] in self?.resignedFocus?() }
+        interaction.idleFade.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.didChange = { [weak self] in self?.present() }
         store.errorDidChange = { [weak self] in self?.updatePointer() }
@@ -62,6 +64,11 @@ final class DockPanelController {
         if edgeChanged { interaction.resetGeometry() }
         if axisChanged { interaction.scrollOffset = 0; interaction.scrollRequest = 0 }
         lastDisplay = display; lastSettings = settings
+        interaction.idleFade.configure(settings,
+            reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
+            reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
+        if resetVisibility { idleSuspended = false }
+        if resetVisibility || edgeChanged { interaction.idleFade.reset() }
         interaction.pinDestinations = store.pinDestinations
         // A mouse-up can occur while asleep or during display reconfiguration; do not retain a stale hold.
         if resetVisibility && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
@@ -99,9 +106,13 @@ final class DockPanelController {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
+        let held = dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
         visibility.update(activation: geometry.activation.zone.contains(NSEvent.mouseLocation),
                           retained: geometry.activation.retention.contains(NSEvent.mouseLocation),
-                          held: dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil)
+                          held: held)
+        // Idle fading retains these hit regions even when their artwork is fully transparent.
+        interaction.idleFade.update(interacting: inside || held,
+            fullyVisible: !idleSuspended && (visibility.phase == .visible || visibility.phase == .hideDelay))
     }
 
     private func present() {
@@ -223,9 +234,15 @@ final class DockPanelController {
         store.keyboardFocus = false; store.selectedID = nil; panel.acceptsKeyboardFocus = false
         panel.resignKey(); updatePointer()
     }
+    /// Sleep cancels the idle deadline; the next display refresh resumes normal input handling.
+    func suspendIdleFading() {
+        idleSuspended = true
+        interaction.idleFade.reset()
+    }
+
     func stop() {
         invalidateDrag?(); invalidateDrag = nil
-        stopped = true; visibility.stop()
+        stopped = true; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.prepareSettings = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil

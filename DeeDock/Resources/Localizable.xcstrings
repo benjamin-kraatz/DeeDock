@@ -296,7 +296,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "icon size magnification zoom scale hover"
+            "value": "icon size magnification zoom scale hover background opacity transparency floating icons idle fading dimming delay restore"
           }
         }
       }
@@ -1965,6 +1965,246 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bounces down, then retreats upward while fading."
+          }
+        }
+      }
+    },
+    "appearanceAccessibilityHelp": {
+      "comment": "Accessibility overrides and timing explanation for an inert preview.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reduce Motion restores visibility instantly and limits idle fades to 0.1 seconds. Reduce Transparency suppresses idle fading and keeps an enabled background opaque. Saved preferences are preserved. Play Preview includes the configured idle delay."
+          }
+        }
+      }
+    },
+    "appearanceBackground": {
+      "comment": "Settings card title for the dock material.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Background"
+          }
+        }
+      }
+    },
+    "appearanceBackgroundHelp": {
+      "comment": "Help for background appearance controls.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide the background for floating icons. Background opacity includes the glass, border, shadow, and separator; icon positions stay the same."
+          }
+        }
+      }
+    },
+    "appearanceBackgroundOpacity": {
+      "comment": "Opacity of the background as a percentage of its normal appearance.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Background opacity"
+          }
+        }
+      }
+    },
+    "appearanceFadeBackground": {
+      "comment": "Fade target: dock material and separator.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Background only"
+          }
+        }
+      }
+    },
+    "appearanceFadeEntireDock": {
+      "comment": "Fade target: background and app artwork.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entire dock"
+          }
+        }
+      }
+    },
+    "appearanceFadeIcons": {
+      "comment": "Fade target: application icons and running indicators.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icons and indicators only"
+          }
+        }
+      }
+    },
+    "appearanceFadeOutDuration": {
+      "comment": "Duration of the transition into the idle appearance, in seconds.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fade-out duration"
+          }
+        }
+      }
+    },
+    "appearanceFadeTarget": {
+      "comment": "Picker label for which dock artwork dims when idle.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fade target"
+          }
+        }
+      }
+    },
+    "appearanceFadeWhenIdle": {
+      "comment": "Toggle for dimming a dock after interaction ends.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fade when idle"
+          }
+        }
+      }
+    },
+    "appearanceIdle": {
+      "comment": "Caption for the idle dock appearance sample.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle"
+          }
+        }
+      }
+    },
+    "appearanceIdleDelay": {
+      "comment": "Delay after interaction ends before dimming begins, in seconds.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle delay"
+          }
+        }
+      }
+    },
+    "appearanceIdleFading": {
+      "comment": "Settings card title for optional idle dimming.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle fading"
+          }
+        }
+      }
+    },
+    "appearanceIdleHelp": {
+      "comment": "Help explaining idle detection, opacity composition, and invisible dock interaction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each display fades independently after you stop interacting with its dock. Idle opacity is a percentage of normal appearance. Hover, keyboard focus, VoiceOver, dragging, menus, and errors restore visibility. Auto-hide takes precedence. At 0% opacity, the dock remains interactive and pointer entry restores it."
+          }
+        }
+      }
+    },
+    "appearanceIdleOpacity": {
+      "comment": "Percentage of normal appearance retained while idle.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle opacity"
+          }
+        }
+      }
+    },
+    "appearanceNormal": {
+      "comment": "Caption for the normal dock appearance sample.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normal"
+          }
+        }
+      }
+    },
+    "appearancePlayback": {
+      "comment": "Caption for the animated sample of idle timing.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preview playback"
+          }
+        }
+      }
+    },
+    "appearanceRestoreDuration": {
+      "comment": "Duration of the transition back to the normal appearance, in seconds.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore duration"
+          }
+        }
+      }
+    },
+    "appearanceShowBackground": {
+      "comment": "Toggle for showing the dock material, border and shadow.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show background"
+          }
+        }
+      }
+    },
+    "settingsPercent": {
+      "comment": "Unit for opacity controls, whose values range from zero to one hundred.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%"
           }
         }
       }

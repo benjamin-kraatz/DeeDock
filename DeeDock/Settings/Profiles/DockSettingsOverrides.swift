@@ -2,6 +2,7 @@ import Foundation
 
 /// The independently inheritable settings; visibility and pins are always display-specific.
 enum DockSettingField: String, CaseIterable, Codable {
+    case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
     case iconSize, magnification, itemSpacing, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
@@ -11,6 +12,14 @@ enum DockSettingField: String, CaseIterable, Codable {
 
     var keyPath: PartialKeyPath<DockSettings> {
         switch self {
+        case .showBackground: \.showBackground
+        case .backgroundOpacity: \.backgroundOpacity
+        case .fadeWhenIdle: \.fadeWhenIdle
+        case .fadeTarget: \.fadeTarget
+        case .idleOpacity: \.idleOpacity
+        case .idleDelay: \.idleDelay
+        case .fadeOutDuration: \.fadeOutDuration
+        case .restoreDuration: \.restoreDuration
         case .iconSize: \.iconSize
         case .magnification: \.magnification
         case .itemSpacing: \.itemSpacing
@@ -35,6 +44,14 @@ enum DockSettingField: String, CaseIterable, Codable {
 
 /// Nil means inherit, even when an explicit override would equal the current default.
 struct DockSettingsOverrides: Codable, Equatable {
+    var showBackground: Bool?
+    var backgroundOpacity: Double?
+    var fadeWhenIdle: Bool?
+    var fadeTarget: DockSettings.FadeTarget?
+    var idleOpacity: Double?
+    var idleDelay: Double?
+    var fadeOutDuration: Double?
+    var restoreDuration: Double?
     var iconSize: Double?
     var magnification: Double?
     var itemSpacing: Double?
@@ -56,6 +73,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     var animationDuration: Double?
 
     private enum CodingKeys: String, CodingKey {
+        case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case iconSize, magnification, itemSpacing, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
@@ -67,6 +85,14 @@ struct DockSettingsOverrides: Codable, Equatable {
                      itemSpacing: itemSpacing ?? defaults.itemSpacing,
                      edge: edge ?? defaults.edge, alignment: alignment ?? defaults.alignment, alongEdgeOffset: alongEdgeOffset ?? defaults.alongEdgeOffset,
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
+        result.showBackground = showBackground ?? defaults.showBackground
+        result.backgroundOpacity = backgroundOpacity ?? defaults.backgroundOpacity
+        result.fadeWhenIdle = fadeWhenIdle ?? defaults.fadeWhenIdle
+        result.fadeTarget = fadeTarget ?? defaults.fadeTarget
+        result.idleOpacity = idleOpacity ?? defaults.idleOpacity
+        result.idleDelay = idleDelay ?? defaults.idleDelay
+        result.fadeOutDuration = fadeOutDuration ?? defaults.fadeOutDuration
+        result.restoreDuration = restoreDuration ?? defaults.restoreDuration
         result.behavior.autoHide = autoHide ?? defaults.behavior.autoHide
         result.behavior.activationLocation = activationLocation ?? defaults.behavior.activationLocation
         result.behavior.lengthMode = lengthMode ?? defaults.behavior.lengthMode
@@ -82,6 +108,14 @@ struct DockSettingsOverrides: Codable, Equatable {
 
     func contains(_ field: DockSettingField) -> Bool {
         switch field {
+        case .showBackground: showBackground != nil
+        case .backgroundOpacity: backgroundOpacity != nil
+        case .fadeWhenIdle: fadeWhenIdle != nil
+        case .fadeTarget: fadeTarget != nil
+        case .idleOpacity: idleOpacity != nil
+        case .idleDelay: idleDelay != nil
+        case .fadeOutDuration: fadeOutDuration != nil
+        case .restoreDuration: restoreDuration != nil
         case .iconSize: iconSize != nil
         case .magnification: magnification != nil
         case .itemSpacing: itemSpacing != nil
@@ -105,6 +139,14 @@ struct DockSettingsOverrides: Codable, Equatable {
 
     mutating func set(_ field: DockSettingField, from value: DockSettings?) {
         switch field {
+        case .showBackground: showBackground = value?.showBackground
+        case .backgroundOpacity: backgroundOpacity = value?.backgroundOpacity
+        case .fadeWhenIdle: fadeWhenIdle = value?.fadeWhenIdle
+        case .fadeTarget: fadeTarget = value?.fadeTarget
+        case .idleOpacity: idleOpacity = value?.idleOpacity
+        case .idleDelay: idleDelay = value?.idleDelay
+        case .fadeOutDuration: fadeOutDuration = value?.fadeOutDuration
+        case .restoreDuration: restoreDuration = value?.restoreDuration
         case .iconSize: iconSize = value?.iconSize
         case .magnification: magnification = value?.magnification
         case .itemSpacing: itemSpacing = value?.itemSpacing
@@ -146,6 +188,14 @@ extension DockSettingsOverrides {
     /// Existing nullable overrides retain their decoding rules. A present edge must be a known value.
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
+        showBackground = try values.decodeIfPresent(Bool.self, forKey: .showBackground)
+        backgroundOpacity = try values.decodeIfPresent(Double.self, forKey: .backgroundOpacity)
+        fadeWhenIdle = try values.decodeIfPresent(Bool.self, forKey: .fadeWhenIdle)
+        fadeTarget = try values.decodeIfPresent(DockSettings.FadeTarget.self, forKey: .fadeTarget)
+        idleOpacity = try values.decodeIfPresent(Double.self, forKey: .idleOpacity)
+        idleDelay = try values.decodeIfPresent(Double.self, forKey: .idleDelay)
+        fadeOutDuration = try values.decodeIfPresent(Double.self, forKey: .fadeOutDuration)
+        restoreDuration = try values.decodeIfPresent(Double.self, forKey: .restoreDuration)
         iconSize = try values.decodeIfPresent(Double.self, forKey: .iconSize)
         magnification = try values.decodeIfPresent(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing)

@@ -302,3 +302,40 @@ xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
 Results: **TEST BUILD SUCCEEDED** and **BUILD SUCCEEDED**. Logs are `/tmp/DeeDock-top-test-build.log` and `/tmp/DeeDock-top-app-build.log`. Both reported only skipped App Intents metadata extraction. The string catalog parses and the diff passes whitespace checks. No signing, sandbox, language-mode, deployment-target, or dependency settings changed.
 
 No tests were executed, app launched, or automated visual checks performed. Runtime acceptance remains pending for the disabled picker and subtitle, defaults and override restoration, menu-bar auto-hide, notched and unnotched displays, mixed-edge monitors, negative origins, display rearrangement, scrolling and drag destinations, native menus and focus, VoiceOver, all animations and activation zones, Spaces/full-screen behavior, and sleep/wake. The placement restriction uses the existing display visible frame supplied by macOS; compilation does not establish behavior when reserved system UI changes. Stop for review before committing this addition.
+
+
+## Background controls and idle fading
+
+Added on 2026-09-03 after the running-indicator work. Appearance now provides Show background, Background opacity, Fade when idle, Fade target, Idle opacity, Idle delay, Fade-out duration, and Restore duration. Every control supports independent display inheritance and reset. Background opacity snaps to 10% steps and idle opacity to 5% steps; idle delay snaps to 1-second steps and defaults to 3 seconds. Duration controls use 0.05-second steps. Existing saved settings receive the new defaults only when their keys are absent; malformed shared values and unknown targets retain the existing load-error handling. Explicit false and zero overrides remain distinct from inheritance.
+
+Background visibility affects material, border, shadow, and separator without changing geometry. Idle fading can target all artwork, only the background, or only icons and running indicators. Opacity multiplies normal appearance. Labels, keyboard outlines, launch progress, and error feedback remain at full opacity. Native hit regions and accessibility availability do not depend on idle opacity, including at zero.
+
+Each panel owns a cancellable idle deadline through the existing monotonic scheduler. Repeated pointer updates preserve the deadline. A fresh pointer sample and generation check precede fading. Pointer interaction, menus, dragging, keyboard focus, accessibility focus, and errors restore the dock. Only fully revealed docks schedule idle work; auto-hide transitions restore the idle multiplier immediately. Sleep suspends idle timing, display and Space refreshes reset it, and panel teardown cancels callbacks. Opacity animations have their own scope so magnification springs cannot override fade timing. There is no idle polling or continuous animation loop.
+
+Reduce Motion makes restoration immediate and caps fade-out at 0.1 seconds. Reduce Transparency suppresses idle fading and makes an enabled background opaque. Both preserve stored preferences. Settings contains Normal and Idle samples plus cancellable playback using the configured delay and durations. Inert previews cover floating icons at zero opacity, side placement with background-only fading, dark appearance, reduced accessibility settings, and display overrides. Preview accessibility values are injected because the SDK environment properties are read-only.
+
+### Validation
+
+The focused Debug app build succeeded with the existing project and scheme:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-idle-build build
+```
+
+Result: **BUILD SUCCEEDED**, recorded in `/tmp/DeeDock-idle-build.log`. The initial sandboxed attempt could not access the installed Metal toolchain; the successful build ran outside the sandbox. The final build reported only skipped App Intents metadata extraction because there is no AppIntents dependency. The string catalog parses and the diff passes whitespace checks. No dependencies, entitlements, signing settings, language mode, deployment target, or system Dock preferences changed.
+
+After the final default and step adjustments, the feature-only snapshot also passed the focused Debug app build. It used `/tmp/DeeDock-fade-delivery` as its source and `/tmp/DeeDock-fade-delivery-build` for derived data; `/tmp/DeeDock-fade-delivery-build.log` records **BUILD SUCCEEDED**. This confirms compilation without the separate uncommitted indicator and layout work.
+
+No tests were authored or executed for this feature. No app was launched, previews rendered, or automated visual checks performed. Compilation does not establish native appearance or interaction acceptance.
+
+Remaining hands-on acceptance:
+
+- Check background off, zero opacity, and partial opacity on light and dark desktops, on all four edges and at different display scales. Confirm the glass shadow and separator disappear together and geometry stays stable.
+- Check each fade target, percentage composition, every slider's steps and typed input, shared defaults, individual overrides, resets, and saved values after restart.
+- Exercise zero and maximum delays and durations, pointer restoration at zero opacity, entering during a fade, rapid leave/re-enter, native context menus, mouse holds, dragging, keyboard focus, VoiceOver, and error dismissal. Confirm the first click still activates its app and hover does not steal focus.
+- Combine fading with auto-hide and each reveal animation. Verify fresh full-opacity reveals, no stale deadlines after settings changes, independent displays, unplug/reconnect, sleep/wake, Spaces, full-screen apps, and quitting during a delay.
+- Toggle Reduce Motion and Reduce Transparency while fading and during preview playback. Verify immediate restoration, opaque enabled backgrounds, hidden backgrounds staying hidden, preserved preferences, and preview cancellation on Settings navigation or closure.
+
+The background and idle-fading feature is ready for delivery.

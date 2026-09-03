@@ -17,7 +17,7 @@ The product roadmap includes:
 - **A dock per monitor (implemented):** independent pins, shared defaults, per-setting overrides, and remembered disconnected displays.
 - **Precise placement, implemented:** bottom, top, left, or right edge; alignment, along-edge offset, and distance from the chosen reference edge.
 - **Activation zones (implemented):** choose dock-position or screen-edge triggering, length, depth, along-edge offset, and reveal timing.
-- **Size and appearance:** icon size, spacing, dock size, magnification, opacity, and fade controls.
+- **Size and appearance (implemented):** icon size, spacing, magnification, running indicators, background visibility and opacity, and configurable idle fading.
 - **Behavior:** auto-hide, reveal/hide delays, and ten animation styles are implemented; broader interaction preferences remain planned.
 
 These are product goals, not a finished feature specification. Exact options, ranges, defaults, and delivery order will be decided slice by slice.
@@ -80,7 +80,7 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Stacks/Trash, window previews, opacity/fade controls, and launch-at-login are not implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Stacks/Trash, window previews, and launch-at-login are not implemented.
 
 ## Arrange applications with drag-and-drop
 
@@ -121,6 +121,31 @@ Top placement always uses **Usable desktop**. Its **Position relative to** picke
 A 1.0× maximum disables magnification; Reduce Motion also disables it without changing the saved preference. Glass thickness stays fixed during hover. Icons magnify inward and labels remain upright in a separate inward area. Screen-edge positioning can overlap the system Dock; neither mode changes macOS preferences. Settings resolve separately for each display. Auto-hide and activation behavior can be configured separately in the Behavior pane.
 
 Changing edges reuses the same alignment, offset, edge distance, and activation dimensions. Both side docks order pins and running apps from top to bottom. Pin order and keyboard selection survive edge changes. Switching between horizontal and vertical layout resets scrolling to the start unless keyboard focus requires revealing the selected app; switching between edges on the same axis preserves scrolling. Edge changes apply immediately and cancel obsolete drag and visibility work. Old settings load as bottom placement.
+
+## Background and idle fading
+
+Appearance includes background and idle controls in shared defaults and per-display overrides. Existing installations keep their visible background and do not fade until **Fade when idle** is enabled.
+
+| Control | Range / options | Default |
+| --- | --- | --- |
+| Show background | On / Off | On |
+| Background opacity | 0–100%, in 10% steps | 100% |
+| Fade when idle | On / Off | Off |
+| Fade target | Entire dock / Background only / Icons and indicators only | Entire dock |
+| Idle opacity | 0–100% of normal appearance, in 5% steps | 40% |
+| Idle delay | 0–30 seconds, in 1-second steps | 3 seconds |
+| Fade-out duration | 0–2 seconds, in 0.05-second steps | 0.3 seconds |
+| Restore duration | 0–0.5 seconds, in 0.05-second steps | 0.1 seconds |
+
+Turning off the background leaves floating icons with the same geometry and hit regions. Background opacity affects the native material, its border and shadow, and the pinned-section separator. The saved opacity returns when the background is enabled again.
+
+Idle means no interaction with that display's dock. Working elsewhere allows it to fade. Idle opacity multiplies normal appearance: a 60% background at 50% idle opacity becomes 30%, while icons become 50%, when Entire dock is selected. Labels, keyboard outlines, launch progress, and error feedback retain full opacity.
+
+Pointer entry, keyboard focus, VoiceOver focus, dragging, menus, mouse-button interaction, and errors restore visibility and prevent further fading during interaction. Even at 0% idle opacity, the dock retains its hit regions and restores on pointer entry. Auto-hide takes precedence; hidden docks do not schedule idle fading, and every reveal starts at normal opacity. Sleep, display refreshes, and teardown cancel stale deadlines. Each dock owns its own idle timing.
+
+Reduce Motion restores instantly and caps fade-out at 0.1 seconds. Reduce Transparency suppresses idle fading and uses an opaque background when enabled, while preserving saved preferences. A hidden background stays hidden. The Normal and Idle samples show the effective appearance; **Play Preview** includes the configured idle delay and cancels when settings change or the view closes.
+
+Compilation is verified; hands-on acceptance for material opacity, restoration timing, and native interaction remains pending in the [acceptance record](docs/ACCEPTANCE.md).
 
 ## Displays and inheritance
 

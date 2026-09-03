@@ -56,7 +56,10 @@ final class DockCoordinator {
         ) { [weak self] _ in MainActor.assumeIsolated { self?.refreshPanels(resetVisibility: true) } }
         suspensionObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.willSleepNotification, object: nil, queue: .main
-        ) { [weak self] _ in MainActor.assumeIsolated { self?.dragging.cancel() } }
+        ) { [weak self] _ in MainActor.assumeIsolated {
+            self?.dragging.cancel()
+            self?.panels.values.forEach { $0.suspendIdleFading() }
+        } }
         let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
                                          .scrollWheel, .leftMouseDown, .rightMouseDown, .otherMouseDown,
                                          .leftMouseUp, .rightMouseUp, .otherMouseUp]

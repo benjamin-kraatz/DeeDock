@@ -28,11 +28,17 @@ struct DockSurfaceView: View {
     var menuTracking: (Bool) -> Void = { _ in }
     var accessibilityFocus: (String, Bool) -> Void = { _, _ in }
 
+    private var opacity: DockAppearanceOpacity {
+        DockAppearanceOpacity(settings: interaction.idleFade.settings,
+            idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency)
+    }
+
     private var centers: [CGFloat] { layout.centers(sizes: sizes) }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             DockBackgroundView(reduceTransparency: reduceTransparency)
+                .animation(interaction.idleFade.animation) { $0.opacity(opacity.background) }
                 .frame(width: surface.width, height: surface.height)
                 .position(x: surface.midX, y: surface.midY)
             if slots.isEmpty {
@@ -46,6 +52,7 @@ struct DockSurfaceView: View {
                 let icon = layout.iconFrame(centerAlong: centers[index], size: layout.iconSize)
                 let position = centers[index] - sizes[index] / 2 - 12
                 Rectangle().fill(.primary.opacity(0.18))
+                    .animation(interaction.idleFade.animation) { $0.opacity(opacity.background) }
                     .frame(width: layout.edge.isVertical ? layout.iconSize * 0.65 : 1,
                            height: layout.edge.isVertical ? 1 : layout.iconSize * 0.65)
                     .position(x: layout.edge.isVertical ? icon.midX : position,

@@ -12,6 +12,11 @@ struct DockSettings: Codable, Equatable {
         func resolved(for edge: DockEdge) -> Self { edge == .top ? .usableDesktop : self }
     }
 
+    /// Layers affected by idle dimming. Labels and interaction feedback remain fully readable.
+    enum FadeTarget: String, Codable, CaseIterable {
+        case entireDock, backgroundOnly, iconsOnly
+    }
+
     /// Requested resting size in points; the display may require a smaller effective size.
     var iconSize: Double = 48
     /// Maximum hover scale; 1 disables magnification.
@@ -26,13 +31,30 @@ struct DockSettings: Codable, Equatable {
     var edgeDistance: Double = 8
     var positionReference: PositionReference = .usableDesktop
 
+    /// Hiding the material retains its opacity preference and the dock geometry.
+    var showBackground: Bool = true
+    /// Percentage of the native material's normal appearance, snapped to ten-percent steps.
+    var backgroundOpacity: Double = 100
+    var fadeWhenIdle: Bool = false
+    var fadeTarget: DockSettings.FadeTarget = .entireDock
+    /// Percentage of normal artwork opacity retained after the idle delay.
+    var idleOpacity: Double = 40
+    /// Seconds without dock interaction, snapped to one-second steps.
+    var idleDelay: Double = 3
+    var fadeOutDuration: Double = 0.3
+    var restoreDuration: Double = 0.1
+
     var behavior = DockBehaviorSettings()
 
     static let defaults = DockSettings()
 
     /// Rejects malformed persisted or transient input before it can enter geometry calculations.
     var isValid: Bool {
-        behavior.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
+        (0...100).contains(backgroundOpacity) && (0...100).contains(idleOpacity)
+            && (0...30).contains(idleDelay) && (0...2).contains(fadeOutDuration)
+            && (0...0.5).contains(restoreDuration)
+            && [backgroundOpacity, idleOpacity, idleDelay, fadeOutDuration, restoreDuration].allSatisfy(\.isFinite)
+            && behavior.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
             && (0...24).contains(itemSpacing)
             && (-1000...1000).contains(alongEdgeOffset) && (0...300).contains(edgeDistance)
             && [iconSize, magnification, itemSpacing, alongEdgeOffset, edgeDistance].allSatisfy(\.isFinite)
@@ -42,6 +64,11 @@ struct DockSettings: Codable, Equatable {
     var normalized: DockSettings? {
         guard isValid else { return nil }
         var result = self
+        result.backgroundOpacity = (backgroundOpacity / 10).rounded() * 10
+        result.idleOpacity = (idleOpacity / 5).rounded() * 5
+        result.idleDelay = idleDelay.rounded()
+        result.fadeOutDuration = (fadeOutDuration * 20).rounded() / 20
+        result.restoreDuration = (restoreDuration * 20).rounded() / 20
         result.behavior = behavior.normalized!
         result.iconSize = iconSize.rounded()
         result.magnification = (magnification * 20).rounded() / 20
@@ -55,6 +82,7 @@ struct DockSettings: Codable, Equatable {
 
 extension DockSettings {
     private enum CodingKeys: String, CodingKey {
+        case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case iconSize, magnification, itemSpacing, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
@@ -63,6 +91,14 @@ extension DockSettings {
     /// Only an absent new key receives defaults. Existing required keys and malformed values still throw.
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
+        showBackground = values.contains(.showBackground) ? try values.decode(Bool.self, forKey: .showBackground) : true
+        backgroundOpacity = values.contains(.backgroundOpacity) ? try values.decode(Double.self, forKey: .backgroundOpacity) : 100
+        fadeWhenIdle = values.contains(.fadeWhenIdle) ? try values.decode(Bool.self, forKey: .fadeWhenIdle) : false
+        fadeTarget = values.contains(.fadeTarget) ? try values.decode(DockSettings.FadeTarget.self, forKey: .fadeTarget) : .entireDock
+        idleOpacity = values.contains(.idleOpacity) ? try values.decode(Double.self, forKey: .idleOpacity) : 40
+        idleDelay = values.contains(.idleDelay) ? try values.decode(Double.self, forKey: .idleDelay) : 3
+        fadeOutDuration = values.contains(.fadeOutDuration) ? try values.decode(Double.self, forKey: .fadeOutDuration) : 0.3
+        restoreDuration = values.contains(.restoreDuration) ? try values.decode(Double.self, forKey: .restoreDuration) : 0.1
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing) ?? 4

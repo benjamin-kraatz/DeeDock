@@ -7,12 +7,14 @@ struct AppearanceSettingsPane: View {
     @Binding var magnification: Double
     @Binding var itemSpacing: Double
 
+    var appearanceSettings = DockSettings.defaults
     var overrideContext: SettingsOverrideContext? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
-                DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing)
+                DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing,
+                                      appearanceSettings: appearanceSettings)
             }
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,

@@ -10,6 +10,10 @@ struct DockIconPresentation: View {
     let launching: Bool
     let selected: Bool
 
+    /// Applied only to artwork, preserving focus/launch feedback and the button hit region.
+    var artworkOpacity: Double = 1
+    var artworkAnimation: Animation? = nil
+
     var body: some View {
         let depth = size + DockGeometry.indicatorAreaDepth
         let bounds = edge.size(length: size, depth: depth)
@@ -20,6 +24,7 @@ struct DockIconPresentation: View {
             Image(nsImage: icon).resizable().interpolation(.high)
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
+                .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                 .overlay {
                     if selected {
                         RoundedRectangle(cornerRadius: 12).strokeBorder(Color.accentColor, lineWidth: 2)
@@ -37,6 +42,7 @@ struct DockIconPresentation: View {
                     .position(marker)
             } else {
                 Circle().fill(.primary.opacity(running ? 0.8 : 0))
+                    .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                     .frame(width: DockGeometry.indicatorSize, height: DockGeometry.indicatorSize)
                     .position(marker)
             }

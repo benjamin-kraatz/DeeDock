@@ -15,6 +15,12 @@ struct DockAppButton: View {
     var interaction: DockInteraction? = nil
     var menuTracking: (Bool) -> Void = { _ in }
     var accessibilityFocus: (Bool) -> Void = { _ in }
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    private var artworkOpacity: Double {
+        guard let fade = interaction?.idleFade else { return 1 }
+        return DockAppearanceOpacity(settings: fade.settings, idleFraction: fade.fraction,
+                                     reduceTransparency: reduceTransparency).icons
+    }
     @Environment(\.openSettings) private var openSettings
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
@@ -22,7 +28,8 @@ struct DockAppButton: View {
         Button(action: open) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
                                  available: item.isAvailable, running: item.isRunning,
-                                 launching: isLaunching, selected: isSelected)
+                                 launching: isLaunching, selected: isSelected,
+                                 artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
