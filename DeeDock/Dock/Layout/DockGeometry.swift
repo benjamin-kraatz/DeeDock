@@ -3,8 +3,6 @@ import CoreGraphics
 
 /// All geometry uses logical points; screen frames may have negative origins.
 enum DockGeometry {
-    /// Spacing between the items in the Dock, including the separator.
-    static let spacing: CGFloat = 4
     /// Horizontal inset from the glass edge to the first and last icon squares.
     static let padding: CGFloat = 6
     /// Inset above the resting icon square and below its running indicator. Use nonnegative points.
@@ -25,6 +23,8 @@ enum DockGeometry {
         let iconSize: CGFloat
         /// Maximum configured scale; Reduce Motion overrides it only at presentation time.
         let magnification: CGFloat
+        /// Requested gap between adjacent items, in logical points.
+        let itemSpacing: CGFloat
         /// Stable envelope accommodates the largest icon, running indicator, and hover label.
         var panelHeight: CGFloat {
             // The 48 points reserve room for the hover label above either the glass or a raised icon.
@@ -53,7 +53,7 @@ enum DockGeometry {
                 guard let pointerX, !reduceMotion else { return iconSize }
                 // Measure against resting centers so moving icons do not chase the pointer.
                 let distance = abs(pointerX - center)
-                let radius = (iconSize + DockGeometry.spacing) * 2.5
+                let radius = (iconSize + itemSpacing) * 2.5
                 let influence = max(0, 1 - distance / radius)
                 return iconSize * (1 + (magnification - 1) * influence * influence)
             }
@@ -67,7 +67,7 @@ enum DockGeometry {
             return sizes.enumerated().map { index, size in
                 if index == separatorIndex { x += DockGeometry.separatorWidth }
                 let center = x + size / 2
-                x += size + DockGeometry.spacing
+                x += size + itemSpacing
                 return center
             }
         }
@@ -99,7 +99,7 @@ enum DockGeometry {
 
         /// Width of the painted surface, including padding, spacing, and any section gap.
         func contentWidth(sizes: [CGFloat]) -> CGFloat {
-            max(64, sizes.reduce(0, +) + CGFloat(max(0, sizes.count - 1)) * DockGeometry.spacing
+            max(64, sizes.reduce(0, +) + CGFloat(max(0, sizes.count - 1)) * itemSpacing
                 + DockGeometry.padding * 2 + (separatorIndex == nil ? 0 : DockGeometry.separatorWidth))
         }
     }
@@ -114,7 +114,8 @@ enum DockGeometry {
         let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableWidth - 16)
         let separator: Int? = favoriteCount > 0 && favoriteCount < count ? favoriteCount : nil
-        let extra = padding * 2 + CGFloat(max(0, count - 1)) * spacing
+        let itemSpacing = CGFloat(settings.itemSpacing)
+        let extra = padding * 2 + CGFloat(max(0, count - 1)) * itemSpacing
             + (separator == nil ? 0 : separatorWidth)
         // Reserve the magnification envelope, rather than resizing the window on every mouse move.
         let size = min(CGFloat(settings.iconSize), max(32, (viewportLimit - extra) / CGFloat(max(1, count) + 2)))
@@ -123,10 +124,10 @@ enum DockGeometry {
         // so two extra icon widths cover the supported maximum 2× scale, including the spring.
         let canvas = restingWidth + size * 2
         let viewport = min(viewportLimit, canvas)
-        let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), viewportWidth: viewport, canvasWidth: canvas,
+        let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, viewportWidth: viewport, canvasWidth: canvas,
                              restingCenters: [], separatorIndex: separator)
         let centers = initial.centers(sizes: Array(repeating: size, count: count))
-        return Layout(iconSize: size, magnification: CGFloat(settings.magnification), viewportWidth: viewport, canvasWidth: canvas,
+        return Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, viewportWidth: viewport, canvasWidth: canvas,
                       restingCenters: centers, separatorIndex: separator)
     }
 }

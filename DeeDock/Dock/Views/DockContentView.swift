@@ -195,7 +195,7 @@ struct DockContentView: View {
     #Preview("Maximum icon size and magnification") {
         DockPreviewContent(
             magnified: true,
-            settings: DockSettings(iconSize: 96, magnification: 2)
+            settings: DockSettings(iconSize: 96, magnification: 2, itemSpacing: 4)
         )
     }
 

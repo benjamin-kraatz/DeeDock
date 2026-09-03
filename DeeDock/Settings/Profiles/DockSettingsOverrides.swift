@@ -2,7 +2,7 @@ import Foundation
 
 /// The independently inheritable settings; visibility and pins are always display-specific.
 enum DockSettingField: String, CaseIterable, Codable {
-    case iconSize, magnification, alignment, horizontalOffset, bottomDistance, positionReference
+    case iconSize, magnification, itemSpacing, alignment, horizontalOffset, bottomDistance, positionReference
 
     case autoHide, activationLocation, widthMode, customWidth, zoneHeight, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
 
@@ -10,6 +10,7 @@ enum DockSettingField: String, CaseIterable, Codable {
         switch self {
         case .iconSize: \.iconSize
         case .magnification: \.magnification
+        case .itemSpacing: \.itemSpacing
         case .alignment: \.alignment
         case .horizontalOffset: \.horizontalOffset
         case .bottomDistance: \.bottomDistance
@@ -32,6 +33,7 @@ enum DockSettingField: String, CaseIterable, Codable {
 struct DockSettingsOverrides: Codable, Equatable {
     var iconSize: Double?
     var magnification: Double?
+    var itemSpacing: Double?
     var alignment: DockSettings.Alignment?
     var horizontalOffset: Double?
     var bottomDistance: Double?
@@ -50,6 +52,7 @@ struct DockSettingsOverrides: Codable, Equatable {
 
     func resolving(_ defaults: DockSettings) -> DockSettings {
         var result = DockSettings(iconSize: iconSize ?? defaults.iconSize, magnification: magnification ?? defaults.magnification,
+                     itemSpacing: itemSpacing ?? defaults.itemSpacing,
                      alignment: alignment ?? defaults.alignment, horizontalOffset: horizontalOffset ?? defaults.horizontalOffset,
                      bottomDistance: bottomDistance ?? defaults.bottomDistance, positionReference: positionReference ?? defaults.positionReference)
         result.behavior.autoHide = autoHide ?? defaults.behavior.autoHide
@@ -69,6 +72,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         switch field {
         case .iconSize: iconSize != nil
         case .magnification: magnification != nil
+        case .itemSpacing: itemSpacing != nil
         case .alignment: alignment != nil
         case .horizontalOffset: horizontalOffset != nil
         case .bottomDistance: bottomDistance != nil
@@ -90,6 +94,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         switch field {
         case .iconSize: iconSize = value?.iconSize
         case .magnification: magnification = value?.magnification
+        case .itemSpacing: itemSpacing = value?.itemSpacing
         case .alignment: alignment = value?.alignment
         case .horizontalOffset: horizontalOffset = value?.horizontalOffset
         case .bottomDistance: bottomDistance = value?.bottomDistance

@@ -11,6 +11,8 @@ struct DockSettings: Codable, Equatable {
     var iconSize: Double = 48
     /// Maximum hover scale; 1 disables magnification.
     var magnification: Double = 1.4
+    /// Gap between adjacent Dock items in logical points.
+    var itemSpacing: Double = 4
     var alignment: Alignment = .center
     /// Signed displacement from the alignment anchor, in points; positive moves right.
     var horizontalOffset: Double = 0
@@ -25,8 +27,9 @@ struct DockSettings: Codable, Equatable {
     /// Rejects malformed persisted or transient input before it can enter geometry calculations.
     var isValid: Bool {
         behavior.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
+            && (0...24).contains(itemSpacing)
             && (-1000...1000).contains(horizontalOffset) && (0...300).contains(bottomDistance)
-            && [iconSize, magnification, horizontalOffset, bottomDistance].allSatisfy(\.isFinite)
+            && [iconSize, magnification, itemSpacing, horizontalOffset, bottomDistance].allSatisfy(\.isFinite)
     }
 
     /// Snaps valid values to the controls' precision. Invalid values have no normalized result.
@@ -36,6 +39,7 @@ struct DockSettings: Codable, Equatable {
         result.behavior = behavior.normalized!
         result.iconSize = iconSize.rounded()
         result.magnification = (magnification * 20).rounded() / 20
+        result.itemSpacing = itemSpacing.rounded()
         result.horizontalOffset = horizontalOffset.rounded()
         result.bottomDistance = bottomDistance.rounded()
         return result
@@ -45,7 +49,7 @@ struct DockSettings: Codable, Equatable {
 
 extension DockSettings {
     private enum CodingKeys: String, CodingKey {
-        case iconSize, magnification, alignment, horizontalOffset, bottomDistance, positionReference, behavior
+        case iconSize, magnification, itemSpacing, alignment, horizontalOffset, bottomDistance, positionReference, behavior
     }
 
     /// Only an absent new key receives defaults. Existing required keys and malformed values still throw.
@@ -53,6 +57,7 @@ extension DockSettings {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)
+        itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing) ?? 4
         alignment = try values.decode(Alignment.self, forKey: .alignment)
         horizontalOffset = try values.decode(Double.self, forKey: .horizontalOffset)
         bottomDistance = try values.decode(Double.self, forKey: .bottomDistance)

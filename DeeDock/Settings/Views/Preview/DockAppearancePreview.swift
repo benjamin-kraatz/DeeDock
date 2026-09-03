@@ -8,6 +8,7 @@ import SwiftUI
 struct DockAppearancePreview: View {
     let iconSize: Double
     let magnification: Double
+    let itemSpacing: Double
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Preview points per configured point; keeps the largest supported icon inside the envelope.
@@ -25,7 +26,7 @@ struct DockAppearancePreview: View {
     }
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 6) {
+        HStack(alignment: .bottom, spacing: itemSpacing * Self.scale) {
             ForEach(Self.symbols.indices, id: \.self) { index in
                 tile(index: index, size: size(at: index))
             }
@@ -39,6 +40,7 @@ struct DockAppearancePreview: View {
         .padding(.vertical, 6)
         .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.78), value: iconSize)
         .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.78), value: magnification)
+        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.78), value: itemSpacing)
         .accessibilityHidden(true)
     }
 
@@ -58,9 +60,9 @@ struct DockAppearancePreview: View {
 #if DEBUG
 #Preview("Appearance preview") {
     VStack(spacing: 12) {
-        DockAppearancePreview(iconSize: 32, magnification: 1)
-        DockAppearancePreview(iconSize: 48, magnification: 1.4)
-        DockAppearancePreview(iconSize: 96, magnification: 2)
+        DockAppearancePreview(iconSize: 32, magnification: 1, itemSpacing: 4)
+        DockAppearancePreview(iconSize: 48, magnification: 1.4, itemSpacing: 4)
+        DockAppearancePreview(iconSize: 96, magnification: 2, itemSpacing: 4)
     }
     .padding()
     .frame(width: 460)

@@ -13,7 +13,7 @@ struct DockAnimationPreview: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            DockAppearancePreview(iconSize: 48, magnification: 1)
+            DockAppearancePreview(iconSize: 48, magnification: 1, itemSpacing: 4)
                 .frame(width: size.width, height: size.height)
                 .modifier(DockPresentationModifier(sample: DockAnimationGeometry.sample(style: style, progress: controller.progress,
                                                                                        size: size, reduceMotion: reduceMotion), size: size))

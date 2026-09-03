@@ -75,7 +75,8 @@ struct SettingsDetailView: View {
             BehaviorSettingsPane(source: SettingsValueSource(store: store, context: context), showZone: showZone)
         case .appearance:
             AppearanceSettingsPane(iconSize: binding(\.iconSize),
-                                   magnification: binding(\.magnification), overrideContext: context)
+                                   magnification: binding(\.magnification), itemSpacing: binding(\.itemSpacing),
+                                   overrideContext: context)
         case .position:
             PositionSettingsPane(reference: binding(\.positionReference),
                                  alignment: binding(\.alignment),
