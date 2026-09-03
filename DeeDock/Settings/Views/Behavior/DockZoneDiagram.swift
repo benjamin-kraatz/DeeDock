@@ -12,7 +12,7 @@ struct DockZoneDiagram: View {
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: layout, settings: settings)
         let geometry = DockPresentationGeometry(screen: screen, restingFrame: frame, layout: layout, settings: settings.behavior)
         let width = min(layout.viewportWidth, layout.contentWidth(sizes: Array(repeating: layout.iconSize, count: 6)))
-        let glass = CGRect(x: frame.midX - width / 2, y: frame.minY + DockGeometry.bottomMargin, width: width, height: layout.iconSize + 36)
+        let glass = CGRect(x: frame.midX - width / 2, y: frame.minY + DockGeometry.bottomMargin, width: width, height: layout.surfaceHeight)
         VStack(alignment: .leading, spacing: 8) {
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 12).fill(.indigo.gradient)

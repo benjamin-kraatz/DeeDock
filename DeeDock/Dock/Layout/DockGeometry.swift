@@ -3,8 +3,18 @@ import CoreGraphics
 
 /// All geometry uses logical points; screen frames may have negative origins.
 enum DockGeometry {
-    static let spacing: CGFloat = 8
-    static let padding: CGFloat = 12
+    /// Spacing between the items in the Dock, including the separator.
+    static let spacing: CGFloat = 4
+    /// Horizontal inset from the glass edge to the first and last icon squares.
+    static let padding: CGFloat = 6
+    /// Inset above the resting icon square and below its running indicator. Use nonnegative points.
+    /// Lower this to make the glass shorter.
+    static let verticalPadding: CGFloat = 6
+    /// Gap between the image square and its running or selection indicator.
+    static let indicatorSpacing: CGFloat = 0
+    static let indicatorSize: CGFloat = 4
+    /// Reserved even for apps that are not running, so their icons share the same baseline.
+    static var indicatorAreaHeight: CGFloat { indicatorSpacing + indicatorSize }
     /// Inset of the glass surface from the panel bottom, in points.
     static let bottomMargin: CGFloat = 8
     static let separatorWidth: CGFloat = 16
@@ -16,7 +26,17 @@ enum DockGeometry {
         /// Maximum configured scale; Reduce Motion overrides it only at presentation time.
         let magnification: CGFloat
         /// Stable envelope accommodates the largest icon, running indicator, and hover label.
-        var panelHeight: CGFloat { max(168, ceil(iconSize * magnification) + 96) }
+        var panelHeight: CGFloat {
+            // The 48 points reserve room for the hover label above either the glass or a raised icon.
+            // Increasing the inner padding must not clip either in the transparent panel envelope.
+            let contentHeight = max(surfaceHeight, ceil(iconSize * magnification)
+                                    + DockGeometry.verticalPadding + DockGeometry.indicatorAreaHeight)
+            return max(128, contentHeight + DockGeometry.bottomMargin + 48)
+        }
+        /// Resting glass height. Magnification never changes it.
+        var surfaceHeight: CGFloat {
+            iconSize + DockGeometry.indicatorAreaHeight + 2 * DockGeometry.verticalPadding
+        }
         /// Visible width, capped to the available display area.
         let viewportWidth: CGFloat
         /// Scrollable width, including the reserved magnification envelope.
@@ -55,7 +75,7 @@ enum DockGeometry {
         /// Glass bounds in top-left canvas coordinates. Hover affects width, never height.
         func surfaceFrame(sizes: [CGFloat]) -> CGRect {
             let width = contentWidth(sizes: sizes)
-            let height = iconSize + 36
+            let height = surfaceHeight
             return CGRect(x: (canvasWidth - width) / 2,
                           y: panelHeight - DockGeometry.bottomMargin - height,
                           width: width, height: height)
@@ -64,10 +84,17 @@ enum DockGeometry {
         /// App-button bounds, including the running indicator, anchored to a fixed bottom baseline.
         /// These bounds may extend above the glass while remaining inside the panel envelope.
         func buttonFrame(centerX: CGFloat, size: CGFloat) -> CGRect {
-            let height = size + 12
+            let height = size + DockGeometry.indicatorAreaHeight
             return CGRect(x: centerX - size / 2,
-                          y: panelHeight - DockGeometry.bottomMargin - 12 - height,
+                          y: panelHeight - DockGeometry.bottomMargin - DockGeometry.verticalPadding - height,
                           width: size, height: height)
+        }
+
+        /// Bounds of the image square within its button, excluding the indicator row and any
+        /// transparency supplied by the app's icon artwork. Shared by separators and drag gaps.
+        func iconFrame(centerX: CGFloat, size: CGFloat) -> CGRect {
+            let button = buttonFrame(centerX: centerX, size: size)
+            return CGRect(x: button.minX, y: button.minY, width: size, height: size)
         }
 
         /// Width of the painted surface, including padding, spacing, and any section gap.

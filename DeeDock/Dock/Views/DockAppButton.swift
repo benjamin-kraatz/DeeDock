@@ -20,7 +20,7 @@ struct DockAppButton: View {
 
     var body: some View {
         Button(action: open) {
-            VStack(spacing: 4) {
+            VStack(spacing: DockGeometry.indicatorSpacing) {
                 Image(nsImage: item.icon).resizable().interpolation(.high)
                     .frame(width: size, height: size)
                     .opacity(item.isAvailable ? 1 : 0.4)
@@ -42,21 +42,26 @@ struct DockAppButton: View {
                     }
                 if !isSelected {
                     Circle().fill(.primary.opacity(item.isRunning ? 0.8 : 0))
-                        .frame(width: 4, height: 4)
+                        .frame(width: DockGeometry.indicatorSize, height: DockGeometry.indicatorSize)
                 } else {
                     RoundedRectangle(cornerRadius: 2).fill(.primary)
-                        .frame(width: 16, height: 4)
+                        .frame(width: 16, height: DockGeometry.indicatorSize)
                 }
             }
-            .frame(width: size, height: size + 12)
+            .frame(width: size, height: size + DockGeometry.indicatorAreaHeight)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .disabled(isLaunching)
         .overlay {
             if let interaction, let begin = interaction.beginDrag {
-                DockDragSourceView(item: item, enabled: !isLaunching, open: open, begin: begin,
-                                   tracking: { interaction.sourceTrackingChanged?($0) })
+                DockDragSourceView(
+                    item: item,
+                    enabled: !isLaunching,
+                    open: open,
+                    begin: begin,
+                    tracking: { interaction.sourceTrackingChanged?($0) }
+                )
             }
         }
         .overlay {
@@ -73,21 +78,43 @@ struct DockAppButton: View {
             )
         }
         .accessibilityFocused($accessibilityFocused)
-        .onChange(of: accessibilityFocused) { _, focused in accessibilityFocus(focused) }
+        .onChange(of: accessibilityFocused) { _, focused in
+            accessibilityFocus(focused)
+        }
         .onDisappear { accessibilityFocus(false) }
         .accessibilityLabel(Text(verbatim: item.reference.name))
-        .accessibilityValue(Text(item.isAvailable ? (item.isRunning ? .appStatusRunning : .appStatusUnavailable) : .appStatusUnavailable))
+        .accessibilityValue(
+            Text(
+                item.isAvailable
+                    ? (item.isRunning
+                        ? .appStatusRunning : .appStatusUnavailable)
+                    : .appStatusUnavailable
+            )
+        )
         .accessibilityHint(Text(.appOpenHint))
-        .accessibilityAction(named: Text(item.isFavorite ? .actionUnpin : .actionPin), togglePin)
+        .accessibilityAction(
+            named: Text(item.isFavorite ? .actionUnpin : .actionPin),
+            togglePin
+        )
         .accessibilityActions {
             if item.isFavorite {
-                Button { interaction?.movePin?(item.id, -1) } label: { Text(.actionMoveLeft) }
-                    .disabled(interaction?.canMovePin?(item.id, -1) != true)
-                Button { interaction?.movePin?(item.id, 1) } label: { Text(.actionMoveRight) }
-                    .disabled(interaction?.canMovePin?(item.id, 1) != true)
+                Button {
+                    interaction?.movePin?(item.id, -1)
+                } label: {
+                    Text(.actionMoveLeft)
+                }
+                .disabled(interaction?.canMovePin?(item.id, -1) != true)
+                Button {
+                    interaction?.movePin?(item.id, 1)
+                } label: {
+                    Text(.actionMoveRight)
+                }
+                .disabled(interaction?.canMovePin?(item.id, 1) != true)
             }
             ForEach(interaction?.pinDestinations ?? []) { destination in
-                Button { interaction?.copyPin?(item.reference, destination.id) } label: {
+                Button {
+                    interaction?.copyPin?(item.reference, destination.id)
+                } label: {
                     Text(.actionPinOnDisplayName(display: destination.name))
                 }
             }
@@ -96,17 +123,41 @@ struct DockAppButton: View {
 }
 
 #if DEBUG
-#Preview("Selected, running, launching, unavailable") {
-    HStack(spacing: 20) {
-        DockAppButton(item: DockPreviewData.items[0], size: 48, isLaunching: false, isSelected: true,
-                      open: {}, togglePin: {})
-        DockAppButton(item: DockPreviewData.items[3], size: 48, isLaunching: false, isSelected: false,
-                      open: {}, togglePin: {})
-        DockAppButton(item: DockPreviewData.items[1], size: 48, isLaunching: true, isSelected: false,
-                      open: {}, togglePin: {})
-        DockAppButton(item: DockPreviewData.items[2], size: 48, isLaunching: false, isSelected: false,
-                      open: {}, togglePin: {})
+    #Preview("Selected, running, launching, unavailable") {
+        HStack(spacing: 20) {
+            DockAppButton(
+                item: DockPreviewData.items[0],
+                size: 48,
+                isLaunching: false,
+                isSelected: true,
+                open: {},
+                togglePin: {}
+            )
+            DockAppButton(
+                item: DockPreviewData.items[3],
+                size: 48,
+                isLaunching: false,
+                isSelected: false,
+                open: {},
+                togglePin: {}
+            )
+            DockAppButton(
+                item: DockPreviewData.items[1],
+                size: 48,
+                isLaunching: true,
+                isSelected: false,
+                open: {},
+                togglePin: {}
+            )
+            DockAppButton(
+                item: DockPreviewData.items[2],
+                size: 48,
+                isLaunching: false,
+                isSelected: false,
+                open: {},
+                togglePin: {}
+            )
+        }
+        .padding(20)
     }
-    .padding(20)
-}
 #endif

@@ -29,7 +29,7 @@ struct DockPresentationGeometry {
         contentSize = restingFrame.size
         let width = min(layout.viewportWidth, layout.contentWidth(sizes: Array(repeating: layout.iconSize, count: layout.restingCenters.count)))
         let glass = CGRect(x: restingFrame.midX - width / 2, y: restingFrame.minY + DockGeometry.bottomMargin,
-                           width: width, height: layout.iconSize + 36)
+                           width: width, height: layout.surfaceHeight)
         activation = DockActivationGeometry(screen: screen, restingGlass: glass, envelope: restingFrame, settings: settings)
     }
 }
