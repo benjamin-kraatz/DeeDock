@@ -145,8 +145,11 @@ final class DockPanelController {
             if suppress { interaction.tooltips.clear() }
         }
         let held = pickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
+        // The stable envelope provides a safe pointer route, but rendered content can extend
+        // beyond it during layout or magnification. Never hide under a clickable dock region.
+        // Tooltips are absent from `rects`, so their transparent reservation stays excluded.
         visibility.update(activation: geometry.activation.zone.contains(NSEvent.mouseLocation),
-                          retained: geometry.activation.retention.contains(NSEvent.mouseLocation),
+                          retained: inside || geometry.activation.retention.contains(NSEvent.mouseLocation),
                           held: held)
         // Idle fading retains these hit regions even when their artwork is fully transparent.
         interaction.idleFade.update(interacting: inside || held,

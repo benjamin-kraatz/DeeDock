@@ -80,7 +80,17 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Stacks/Trash, window previews, and launch-at-login are not implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Stacks/Trash and window previews are not implemented.
+
+## Launch at login
+
+Open **Settings → General → Launch at Login** to start DeeDock automatically when you sign in. General sits above Shared Defaults and applies to the whole app. Appearance remains the initial Settings pane. Search for login, startup, or automatic launch to find General.
+
+The toggle reflects macOS’s registration status. It stays off until approval is granted. If approval is required, use **Open System Settings…** to open Login Items, or **Cancel Request** to withdraw the registration. Returning to the Settings window refreshes the status, including changes made outside DeeDock. An unavailable status provides Refresh and the System Settings link. Errors appear in General without automatic retries.
+
+Turning off Launch at Login prevents future automatic launches and leaves DeeDock running. Login startup follows normal startup: configured docks and the menu-bar item appear without opening Settings or deliberately taking foreground focus. General remains usable if display settings have a storage error, and Restore Defaults does not change login registration.
+
+The implementation uses `SMAppService.mainApp`; it stores no duplicate preference and installs no helper or launch-agent plist. Registration is opt-in. Real registration and logout/login acceptance require a consistently signed installed copy; see [acceptance notes](docs/ACCEPTANCE.md#launch-at-login).
 
 ## Arrange applications with drag-and-drop
 
@@ -284,7 +294,7 @@ The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing t
 - `DeeDock/Dock/Visibility` separates activation geometry, animation samples, visibility state, scheduling, and temporary zone outlines.
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
-- `DeeDock/Settings` groups shared settings, display profiles and persistence, sidebar navigation, and focused native controls.
+- `DeeDock/Settings` groups shared settings, display profiles and persistence, sidebar navigation, and focused native controls. `General` contains the app-owned login-item controller, service boundary, and presentation.
 - `DeeDockTests` contains the focused model tests. The Xcode **Test Model Sources** group references the app's source files for the unhosted test target; it does not contain copies.
 
 Useful previews live beside their views: pinned/running/unavailable apps, launch progress, empty content, error text, and dark appearance with reduced motion/transparency. Open the canvas for `DockContentView`, `DockAppButton`, `DockBackgroundView`, or `DockErrorBanner`. Settings previews include multiple displays, per-setting overrides, and a disconnected display using isolated in-memory stores. Previews do not construct live workspace services, read saved pins, or launch applications. Production accessibility values are read from SwiftUI's environment and passed into the same presentation components used by previews.

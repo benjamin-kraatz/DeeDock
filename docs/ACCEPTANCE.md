@@ -466,3 +466,29 @@ On the user's subsequent request to run tests, Xcode RunAllTests initially repor
 - Repeat on multiple displays and Spaces, remove the initiating display during a picker and accepted request, and exercise sleep/wake. Confirm ordinary application activation preserves the ongoing external drag. Recheck application-bundle pinning, internal reorder, and dragging out to unpin.
 
 The pre-existing panel-controller retention change and Xcode recovered-reference group edits remain outside this feature commit.
+
+## Launch at login
+
+General is an app-wide Settings pane above Shared Defaults. Appearance remains the initial selection; localized search terms include login, startup, and automatic launch. General has no display overrides or Restore Defaults action and remains independent of configuration storage errors.
+
+The toggle reads `SMAppService.mainApp.status`. Only enabled registration turns it on. Pending approval keeps it off and disabled, with Open System Settings… and Cancel Request. Missing or unknown status provides Refresh and the System Settings link. Registration controls are disabled during a request, and both successful and failed operations reread macOS status. Errors appear inline without automatic retries or opening System Settings.
+
+The application delegate owns the injectable controller. Settings appearance and the existing window-activity bridge refresh status without polling. Closing Settings does not cancel accepted requests; shutdown cancels owned work and suppresses late callbacks. Already-submitted system operations cannot be rolled back. Normal startup still restores docks and the menu-bar item without explicitly opening Settings or taking foreground focus. No helper, launch-agent plist, or mirrored preference was added.
+
+### Validation status
+
+The narrow DeeDock Debug build was attempted through Xcode MCP. It identified missing generated-string argument labels and unsupported preview environment overrides; both were corrected. The next build was cancelled by an interaction in Xcode. No successful build of the final source state is recorded. The user then requested committing and pushing the current work without further validation.
+
+Swift Testing cases were authored for status mapping, approval gating, registration, unregistration and approval cancellation, external changes, failure followed by status refresh, explicit retry, overlapping and repeated commands, and shutdown before submission or after submission with late success/failure. The service fixtures do not access real login-item registration. These new tests have not been compiled or executed. Inert previews cover all statuses, each pending operation, and long error text in a narrow dark presentation. Previews and automated visual checks were not run.
+
+Static review checked the separate General navigation path, initial Appearance selection, localized search matching, storage-error independence, and window-activation refresh wiring. The string catalog parses and retains all prior entries. Native controls provide keyboard and accessibility semantics, while feedback uses opaque cards and static text; their hands-on behavior remains unverified.
+
+### Remaining hands-on acceptance
+
+- Use one consistently signed installed copy. Enable Launch at Login, inspect Login Items in System Settings, and verify the toggle is on only after approval. Disable it externally, return to DeeDock Settings, and verify the status refreshes.
+- Where pending approval is available, cancel the request and verify it is withdrawn. Disable an enabled registration and verify DeeDock keeps running. Close Settings during unregistration and reopen it to inspect the final status.
+- Search for login, startup, and automatic launch. Navigate between General, Shared Defaults, and displays. Verify General has no overrides or reset action and works with an unreadable dock configuration fixture.
+- Check keyboard navigation, VoiceOver labels and feedback, long translated text, light/dark appearance, Reduce Motion, Reduce Transparency, and increased contrast.
+- With user control of logout, verify automatic startup after signing out and back in. Confirm configured docks and the menu-bar item return without Settings opening or deliberate focus transfer. Disable registration and repeat. Quit DeeDock before each logout or otherwise exclude macOS session restoration so it cannot be mistaken for login-item startup.
+
+No real registration changes, logout/login cycles, or machine-setting changes were performed during implementation. The existing panel retention change, recovered-reference group, and concurrent Xcode build-number change are retained in the requested clean-tree delivery.

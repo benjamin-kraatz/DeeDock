@@ -3168,6 +3168,234 @@
           }
         }
       }
+    },
+    "loginCancelRequest": {
+      "comment": "Button withdrawing a login-item registration that is awaiting approval.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel Request"
+          }
+        }
+      }
+    },
+    "loginCancellationError": {
+      "comment": "Failed withdrawal of pending approval. reason is a localized error description provided by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t cancel the login request. %1$(reason)@"
+          }
+        }
+      }
+    },
+    "loginCancelling": {
+      "comment": "Progress text while withdrawing a login registration awaiting approval.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelling the request…"
+          }
+        }
+      }
+    },
+    "loginLaunchAtLogin": {
+      "comment": "Toggle for starting DeeDock automatically when the current user signs in. On only when macOS approval is granted.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launch at Login"
+          }
+        }
+      }
+    },
+    "loginOpenSystemSettings": {
+      "comment": "Button opening the macOS Login Items settings page. Never opens automatically.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open System Settings…"
+          }
+        }
+      }
+    },
+    "loginPreviewLongError": {
+      "comment": "Preview-only sample error to inspect wrapping with long localized text. This is not an actual diagnosis.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t enable Launch at Login. macOS couldn’t complete the request because the installed application could not be verified. Check Login Items in System Settings and try again after resolving the problem."
+          }
+        }
+      }
+    },
+    "loginRefresh": {
+      "comment": "Button rereading macOS login-item status without changing registration.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh"
+          }
+        }
+      }
+    },
+    "loginRegistering": {
+      "comment": "Progress text while registering the main app as a login item.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requesting automatic launch…"
+          }
+        }
+      }
+    },
+    "loginRegistrationError": {
+      "comment": "Registration failure. reason is a localized error description provided by macOS; status is checked again after failure.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t enable Launch at Login. %1$(reason)@"
+          }
+        }
+      }
+    },
+    "loginStatusEnabled": {
+      "comment": "Status when macOS reports that registration and approval are enabled.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DeeDock launches automatically when you sign in, restoring your docks and menu-bar item."
+          }
+        }
+      }
+    },
+    "loginStatusNotFound": {
+      "comment": "Unavailable status when Service Management cannot find the main app service.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS couldn’t find DeeDock’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
+          }
+        }
+      }
+    },
+    "loginStatusOff": {
+      "comment": "Status when the main app is not registered as a login item.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DeeDock won’t launch automatically when you sign in."
+          }
+        }
+      }
+    },
+    "loginStatusRequiresApproval": {
+      "comment": "Status when macOS requires approval, including when the user has revoked consent externally. The toggle stays off.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic launch is inactive. Allow DeeDock in Login Items in System Settings, or cancel the request."
+          }
+        }
+      }
+    },
+    "loginStatusUnknown": {
+      "comment": "Fallback for future or unknown Service Management status values. Do not imply automatic launch is enabled.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS reported an unrecognized login-item status. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
+          }
+        }
+      }
+    },
+    "loginToggleHint": {
+      "comment": "Accessibility hint for the Launch at Login toggle. Turning off unregisters future startup without quitting the current app.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start DeeDock automatically when you sign in. Turning this off keeps DeeDock running now."
+          }
+        }
+      }
+    },
+    "loginUnregistering": {
+      "comment": "Progress text while unregistering an enabled main app login item.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turning off automatic launch…"
+          }
+        }
+      }
+    },
+    "loginUnregistrationError": {
+      "comment": "Unregistration failure. reason is a localized error description provided by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t turn off Launch at Login. %1$(reason)@"
+          }
+        }
+      }
+    },
+    "settingsGeneral": {
+      "comment": "Sidebar title for app-wide settings, separate from display defaults and overrides.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        }
+      }
+    },
+    "settingsGeneralKeywords": {
+      "comment": "Search synonyms for General. Translate as a space-separated set of useful search terms.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "general login startup automatic launch launch at login"
+          }
+        }
+      }
     }
   },
   "version": "1.3"

@@ -4,11 +4,16 @@ import AppKit
 @MainActor
 final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let coordinator = DockCoordinator()
+    let loginItems = LoginItemController(service: SystemLoginItemService())
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        loginItems.refresh()
         coordinator.start()
     }
 
-    func applicationWillTerminate(_ notification: Notification) { coordinator.stop() }
+    func applicationWillTerminate(_ notification: Notification) {
+        loginItems.stop()
+        coordinator.stop()
+    }
 }

@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// One entry in the settings sidebar.
+/// A display-scoped settings category, available for shared defaults and display overrides.
 ///
 /// Case order is the sidebar order. Adding a pane means adding a case here, its copy to the
-/// string catalog, and its content to `SettingsDetailView`; nothing else has to change.
+/// string catalog, and its content to `SettingsDetailView`. App-wide General is a separate selection.
 enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
     case appearance
     case position

@@ -14,6 +14,17 @@ struct SettingsSidebar: View {
 
     var body: some View {
         List(selection: $selection) {
+            if SettingsSelection.generalMatches(searchText) {
+                Section {
+                    Label {
+                        Text(.settingsGeneral)
+                    } icon: {
+                        SettingsIconTile(glyph: .symbol("gearshape.fill"), colors: [.gray, .secondary])
+                    }
+                    .padding(.vertical, 3)
+                    .tag(SettingsSelection.general)
+                }
+            }
             Section {
                 ForEach(matches) { category in
                     SettingsCategoryRow(category: category, isSelected: selection == .defaults(category))
@@ -34,7 +45,7 @@ struct SettingsSidebar: View {
                     }
                 } header: { Text(.displayRememberedGroup) }
             }
-            if matches.isEmpty && !profiles.document.profiles.values.contains(where: matches) {
+            if !SettingsSelection.generalMatches(searchText) && matches.isEmpty && !profiles.document.profiles.values.contains(where: matches) {
                 Text(.settingsNoMatches).foregroundStyle(.secondary)
             }
         }

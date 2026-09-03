@@ -4,6 +4,7 @@ import SwiftUI
 struct DockSettingsView: View {
     let store: DockSettingsStore
     let profiles: DisplayProfilesStore
+    let loginItems: LoginItemController
     var coordinator: DockCoordinator? = nil
     @State private var selection: SettingsSelection? = .defaults(.appearance)
     @State private var settingsActive = false
@@ -16,6 +17,8 @@ struct DockSettingsView: View {
                 .navigationSplitViewColumnWidth(min: 200, ideal: 235, max: 300)
         } detail: {
             switch selection {
+            case .general:
+                GeneralSettingsPane(controller: loginItems)
             case .defaults(let category):
                 SettingsDetailView(store: store, category: category, profileError: profiles.errorMessage)
             case .display(let id):
@@ -33,6 +36,7 @@ struct DockSettingsView: View {
                 coordinator?.displayIndicator.stop()
             }, activityChanged: {
                 settingsActive = $0
+                if $0 { loginItems.refresh() }
                 updateDisplayIndicator(active: $0)
             })
         }
@@ -78,10 +82,10 @@ struct DockSettingsView: View {
 #if DEBUG
 #Preview("Multiple displays") {
     let profiles = DisplaySettingsPreview.make()
-    DockSettingsView(store: profiles.defaults, profiles: profiles)
+    DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller())
 }
 #Preview("Multiple displays — dark") {
     let profiles = DisplaySettingsPreview.make()
-    DockSettingsView(store: profiles.defaults, profiles: profiles).preferredColorScheme(.dark)
+    DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller()).preferredColorScheme(.dark)
 }
 #endif
