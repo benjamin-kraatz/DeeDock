@@ -23,6 +23,17 @@ struct DockAppButton: View {
         return DockAppearanceOpacity(settings: fade.settings, idleFraction: fade.fraction,
                                      reduceTransparency: reduceTransparency).icons
     }
+    /// Stable per-application shader variation, tinted by the icon's own dominant hue.
+    /// `DockIconAccent` caches by identity, so reading it from the body stays cheap.
+    private var indicatorVariant: DockIndicatorVariant {
+        DockIndicatorVariant(identity: item.id,
+                             accent: DockIconAccent.accent(for: item.icon, identity: item.id))
+    }
+    /// A dock nobody can see, or one that has already faded out, schedules no frames.
+    private var indicatorAnimated: Bool {
+        guard let interaction else { return false }
+        return interaction.animateIndicators && interaction.exposesContent && interaction.idleFade.fraction == 0
+    }
     @Environment(\.openSettings) private var openSettings
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
@@ -32,6 +43,7 @@ struct DockAppButton: View {
                                  available: item.isAvailable, running: item.isRunning,
                                  launching: isLaunching, keyboardSelected: isKeyboardSelected,
                                  runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
+                                 indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
                                  artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation)
                 .overlay {
                     if interaction?.documentTargetID == item.id {

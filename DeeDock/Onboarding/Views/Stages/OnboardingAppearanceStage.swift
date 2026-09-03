@@ -21,7 +21,7 @@ struct OnboardingAppearanceStage: View {
 
     /// A spread across the gallery — the restrained default, two geometric marks, and three of
     /// the expressive ones — rather than all fifteen, which at this pace would be a flicker.
-    private static let styles: [DockSettings.RunningIndicatorStyle] = [.dot, .bar, .neon, .aura, .orbit, .prism]
+    private static let styles: [DockSettings.RunningIndicatorStyle] = [.dot, .bar, .stardust, .orbit, .prism, .singularity]
     private static let dwell: Double = 1.5
     private static let crossFade: Double = 0.4
 

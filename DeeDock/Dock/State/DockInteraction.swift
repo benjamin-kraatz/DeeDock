@@ -13,6 +13,11 @@ final class DockInteraction {
     let idleFade = DockIdleFadeController()
     /// Per-display running marker appearance, separate from layout and keyboard focus.
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
+    /// The saved preference for animated shader indicators.
+    var animateIndicators = DockSettings.defaults.animateIndicators
+    /// Whether this panel currently paints anything. A hidden dock schedules no indicator
+    /// frames; the owner keeps this in step with the visibility controller.
+    var exposesContent = true
     var dragProposal: DockDragProposal?
     var dragActive = false
     var dragSourceID: String?

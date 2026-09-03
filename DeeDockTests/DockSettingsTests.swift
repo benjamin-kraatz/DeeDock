@@ -37,6 +37,28 @@ struct DockSettingsTests {
         #expect(settings.normalized?.magnification == 1.45)
     }
 
+    @Test("Withdrawn indicator styles migrate instead of failing the whole document")
+    func retiredIndicatorStyles() throws {
+        let decoder = JSONDecoder()
+        for (retired, replacement) in [("neon", DockSettings.RunningIndicatorStyle.plasma),
+                                       ("aura", .solarFlare)] {
+            let decoded = try decoder.decode(DockSettings.RunningIndicatorStyle.self,
+                                             from: Data("\"\(retired)\"".utf8))
+            #expect(decoded == replacement)
+        }
+        // A whole settings document carrying a withdrawn style still decodes, so an existing
+        // installation is not locked out of its own preferences.
+        var document = DockSettings.defaults
+        document.runningIndicatorStyle = .prism
+        var json = try #require(String(data: try JSONEncoder().encode(document), encoding: .utf8))
+        json = json.replacingOccurrences(of: "\"prism\"", with: "\"neon\"")
+        let migrated = try decoder.decode(DockSettings.self, from: Data(json.utf8))
+        #expect(migrated.runningIndicatorStyle == .plasma)
+        #expect(throws: (any Error).self) {
+            try decoder.decode(DockSettings.RunningIndicatorStyle.self, from: Data("\"nonsense\"".utf8))
+        }
+    }
+
     @Test("Settings round-trip and reset without changing pins")
     func persistenceAndReset() throws {
         let suite = "DeeDockSettingsTests.\(UUID().uuidString)"

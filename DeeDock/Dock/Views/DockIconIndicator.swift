@@ -1,31 +1,43 @@
 import SwiftUI
 
-/// Static running-state artwork inside the icon square. It never changes layout or hit regions.
+/// Running-state artwork inside the icon square. It never changes layout or hit regions.
 /// Apply before keyboard focus and launch overlays so those interaction states stay on top.
+///
+/// The drawn styles are decoration laid over any icon. The Metal styles instead read the
+/// icon through `DockIconAura`, so they vary per application and can animate; `variant` and
+/// `animated` are ignored by every other style.
 struct DockIconIndicator: ViewModifier {
     let style: DockSettings.RunningIndicatorStyle
     let running: Bool
     let size: CGFloat
+    var variant: DockIndicatorVariant = .neutral
+    var animated: Bool = false
     /// Inert preview override; live icons follow the system preference.
     var reduceTransparency: Bool? = nil
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
-        content
-            .background {
-                if running {
-                    DockIndicatorBackdrop(style: style, size: size,
-                        opaque: reduceTransparency ?? systemReduceTransparency)
-                        .accessibilityHidden(true).allowsHitTesting(false)
+        let opaque = reduceTransparency ?? systemReduceTransparency
+        let moving = animated && !reduceMotion
+        if running, style.usesIconAura {
+            content.modifier(DockIconAura(style: style, size: size, opaque: opaque,
+                                          variant: variant, animated: moving))
+        } else {
+            content
+                .background {
+                    if running {
+                        DockIndicatorBackdrop(style: style, size: size, opaque: opaque)
+                            .accessibilityHidden(true).allowsHitTesting(false)
+                    }
                 }
-            }
-            .overlay {
-                if running {
-                    DockIndicatorForeground(style: style, size: size,
-                        opaque: reduceTransparency ?? systemReduceTransparency)
-                        .accessibilityHidden(true).allowsHitTesting(false)
+                .overlay {
+                    if running {
+                        DockIndicatorForeground(style: style, size: size, variant: variant, animated: moving)
+                            .accessibilityHidden(true).allowsHitTesting(false)
+                    }
                 }
-            }
+        }
     }
 }
 
@@ -38,19 +50,6 @@ private struct DockIndicatorBackdrop: View {
     var body: some View {
         ZStack {
             switch style {
-            case .neon:
-                RoundedRectangle(cornerRadius: size * 0.22)
-                    .strokeBorder(.cyan, lineWidth: size * 0.12)
-                    .blur(radius: opaque ? 0 : size * 0.06)
-            case .aura:
-                RoundedRectangle(cornerRadius: size * 0.28)
-                    .fill(AngularGradient(colors: [.pink, .orange, .yellow, .pink], center: .center))
-                    .blur(radius: opaque ? 0 : size * 0.07)
-            case .glitch:
-                RoundedRectangle(cornerRadius: size * 0.18)
-                    .fill(.cyan).padding(size * 0.08).offset(x: -size * 0.07, y: size * 0.025)
-                RoundedRectangle(cornerRadius: size * 0.18)
-                    .fill(.pink).padding(size * 0.08).offset(x: size * 0.07, y: -size * 0.025)
             default:
                 EmptyView()
             }
@@ -65,22 +64,13 @@ private struct DockIndicatorBackdrop: View {
 private struct DockIndicatorForeground: View {
     let style: DockSettings.RunningIndicatorStyle
     let size: CGFloat
-    let opaque: Bool
+    /// Used only by Stardust, which scatters its sparkles from the variant's seed.
+    var variant: DockIndicatorVariant = .neutral
+    var animated = false
 
     var body: some View {
         ZStack {
             switch style {
-            case .plasma, .hologram, .solarFlare, .prism:
-                DockShaderIndicator(style: style, size: size, opaque: opaque)
-            case .neon:
-                RoundedRectangle(cornerRadius: size * 0.20)
-                    .strokeBorder(LinearGradient(colors: [.cyan, .blue, .pink],
-                        startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: max(2, size * 0.045))
-                    .padding(size * 0.055)
-            case .aura:
-                RoundedRectangle(cornerRadius: size * 0.25)
-                    .strokeBorder(.orange, lineWidth: max(1.5, size * 0.025))
-                    .padding(size * 0.025)
             case .targetLock:
                 DockTargetBrackets()
                     .stroke(.black, style: StrokeStyle(lineWidth: max(4, size * 0.08), lineCap: .square))
@@ -101,9 +91,7 @@ private struct DockIndicatorForeground: View {
                     .frame(width: size * 0.09, height: size * 0.09)
                     .position(x: size * 0.16, y: size * 0.80)
             case .stardust:
-                star(at: CGPoint(x: 0.18, y: 0.18), scale: 0.27, color: .yellow)
-                star(at: CGPoint(x: 0.86, y: 0.48), scale: 0.20, color: .pink)
-                star(at: CGPoint(x: 0.30, y: 0.87), scale: 0.16, color: .cyan)
+                DockStardust(size: size, variant: variant, animated: animated)
             case .powerBadge:
                 Image(systemName: "bolt.fill")
                     .font(.system(size: size * 0.19, weight: .black))
@@ -112,29 +100,11 @@ private struct DockIndicatorForeground: View {
                     .background(.yellow, in: Circle())
                     .overlay { Circle().strokeBorder(.black, lineWidth: max(1, size * 0.025)) }
                     .position(x: size * 0.79, y: size * 0.20)
-            case .glitch:
-                Rectangle().fill(.cyan)
-                    .frame(width: size * 0.40, height: max(2, size * 0.05))
-                    .position(x: size * 0.28, y: size * 0.10)
-                Rectangle().fill(.pink)
-                    .frame(width: size * 0.34, height: max(2, size * 0.05))
-                    .position(x: size * 0.74, y: size * 0.86)
-                Rectangle().fill(.cyan)
-                    .frame(width: size * 0.12, height: size * 0.16)
-                    .position(x: size * 0.11, y: size * 0.64)
             default:
                 EmptyView()
             }
         }
         .frame(width: size, height: size)
-    }
-
-    private func star(at point: CGPoint, scale: CGFloat, color: Color) -> some View {
-        Image(systemName: "sparkle")
-            .font(.system(size: size * scale, weight: .bold))
-            .foregroundStyle(color)
-            .shadow(color: .black, radius: 0, y: 1)
-            .position(x: size * point.x, y: size * point.y)
     }
 }
 

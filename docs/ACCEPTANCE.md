@@ -546,3 +546,66 @@ Layout was inspected by the user at several points during implementation and cor
 - Exercise Reduce Motion, Reduce Transparency, increased contrast, and larger text sizes on every page. Confirm the login card's approval and error states scroll rather than clip.
 - Use VoiceOver on the placement page: confirm the handles are reported as selectable buttons with the chosen one marked, that the illustrations elsewhere are silent, and that the page indicator reads its position.
 - Run with several displays, including a display whose Dock reserves a side edge, and with all docks disabled.
+
+## Icon-aware running indicators
+
+Added on 2026-09-03, after the first-launch tour.
+
+### What changed
+
+The four Metal styles were procedural drawings on a white square that never read the icon underneath, so every application showed the same figure in the same colours. They are now layer effects: each shader samples the artwork it decorates.
+
+A shared `iconEdge` helper walks four rings of twelve spokes around each output pixel and returns a signed distance to the artwork's alpha silhouette — negative on the artwork, positive in its transparent margin — together with the alpha-weighted colour of the artwork within reach. Every style shapes its light around that boundary, so the indicator follows the real outline of the icon rather than a rounded rectangle. The artwork is returned unmodified by the light-only styles, so icons stay crisp; a narrow rim just inside the edge keeps icons that fill their whole square from showing nothing.
+
+Two additional inputs vary the result per application:
+
+- `DockIndicatorVariant` derives a seed from FNV-1a over the application's stable identity. `Hashable` is deliberately not used because its per-process seed would reshuffle every launch. The seed selects lobe counts, spin direction and rate, facet counts, scan frequency, and phase.
+- `DockIconAccent` rasterizes each icon once to a 16×16 bitmap and averages hue on the colour circle, weighted by alpha, squared saturation, and brightness. Icons whose hues disagree, or that are close to achromatic, return no accent and each style keeps its own palette instead of glowing white. Results are cached by identity, which is what makes the lookup safe to read from a view body.
+
+Two existing styles were rebuilt and two new ones added. Glitch moved from offset silhouettes and static bars to a shader that cuts the icon into rows, slides a random subset of them sideways, separates the colour channels, and gates the whole thing behind a burst clock so the icon reads normally between faults. Stardust moved from three fixed sparkles to slots that each run a birth-to-death cycle, redrawing position, size and colour per generation. Lava Chrome melts the icon's own corners and edges: domain-warped noise displaces the artwork along its outward normal, weighted by distance from centre so corners go first and the middle is never touched, with a downward bias that turns overhangs into drips. Singularity puts an inclined orbiting black hole around the icon, lensing the artwork toward it with a radial and a tangential term, tearing a void where the event horizon passes, and lighting a photon ring and a Doppler-beamed accretion disk in the colours of the artwork falling in.
+
+Neon and Aura were withdrawn.
+
+### Persistence
+
+`animateIndicators` was added to `DockSettings` and to the inheritable display-override fields, defaulting to on. Saved documents without the key decode to on.
+
+Withdrawn style values no longer fail the whole settings document. `RunningIndicatorStyle` decodes `neon` as Plasma and `aura` as Solar Flare; genuinely unknown values still throw through the existing settings error handling, as before. This is a deliberate narrowing of the rule recorded in the *Running indicator styles* section above.
+
+### Motion
+
+Animated styles run on a `TimelineView` at 30 Hz. Motion stops when the preference is off, when Reduce Motion is on, while a panel is hidden (`DockInteraction.exposesContent`, kept in step with the visibility controller), and once a dock has faded out on idle. A hidden dock therefore schedules no frames.
+
+Elapsed time is wrapped to a 60-second period before it reaches a shader, because a 32-bit float cannot hold an absolute timestamp at animation precision. Every time-dependent term is an integer harmonic of that period, and the noise fields are sampled along wide circular orbits rather than translated, so the wrap is seamless rather than a jump once a minute. Angular multipliers are whole numbers for the same reason, so nothing seams at ±π.
+
+`maxSampleOffset` is 0.24× the icon dimension while the shaders sample at 0.16×. Glitch stacks a row slip and a channel split on top of the silhouette reach, and Singularity's deflection reaches further than its sampling; one shared value would have widened every other style's glow band.
+
+### Compilation
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug build
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug build-for-testing
+```
+
+Both reported **BUILD SUCCEEDED** and **TEST BUILD SUCCEEDED**. The Metal file compiles and links into `default.metallib` with no diagnostics. The only warning reported skipped App Intents metadata extraction, as before. The string catalog parses.
+
+### Validation status
+
+No tests were run, no app was launched, and no automated visual checks were performed, per the project's test policy. One test was added covering the withdrawn-style migration, a full settings document carrying a withdrawn value, and the rejection of an unknown value; it is compiled but not executed.
+
+Previews cover every shader style across six differently coloured sample icons, three icon dimensions, the still variant, and an explicit reduced-transparency variant, plus six sparkle repertoires. Previews were not run. Sample tiles in the Settings demonstration gained a proportional transparent margin, because real application artwork carries one and without it the shader styles have nowhere to put their light.
+
+The shader cost is an implementation constraint, not a measured result: the silhouette pass is 48 texture samples per output pixel, Lava Chrome adds three fbm evaluations, and Singularity adds none. No GPU or battery measurement was taken.
+
+### Remaining hands-on acceptance
+
+- Confirm each shader style visibly differs between adjacent running applications, and that the same application keeps its figure across a relaunch of DeeDock.
+- Confirm icons stay recognizable under Lava Chrome, Singularity, and Glitch at 32, 48, and 96 points, and while magnified.
+- Confirm greyscale icons (System Settings, Xcode) fall back to each style's own palette rather than glowing white, and that strongly coloured icons take their own hue.
+- Confirm motion stops when a dock auto-hides and when it fades out on idle, and that it never restarts while hidden.
+- Confirm Reduce Motion holds a single frame for every animated style, and that Glitch still reads as broken rather than merely offset when still.
+- Confirm Reduce Transparency replaces graduated light with solid bands on all seven shader styles.
+- Confirm a saved `neon` or `aura` preference, in shared defaults and in a display override, loads as Plasma and Solar Flare and does not surface a settings error.
+- Confirm the Animate indicators toggle is disabled for the styles that have no motion, and that it overrides independently per display.
+- Watch one animated dock for longer than a minute and confirm no jump at the cycle wrap.
+- Confirm indicator artwork stays inside its own icon square with item spacing at zero.

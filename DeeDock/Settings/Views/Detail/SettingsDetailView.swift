@@ -77,6 +77,7 @@ struct SettingsDetailView: View {
             AppearanceSettingsPane(edge: SettingsValueSource(store: store, context: context).value.edge, iconSize: binding(\.iconSize),
                                    magnification: binding(\.magnification), itemSpacing: binding(\.itemSpacing),
                                    runningIndicatorStyle: binding(\.runningIndicatorStyle),
+                                   animateIndicators: binding(\.animateIndicators),
                                    appearanceSettings: SettingsValueSource(store: store, context: context).value, overrideContext: context)
             DockTooltipSettingsPane(source: SettingsValueSource(store: store, context: context))
             DockFadingSettingsPane(source: SettingsValueSource(store: store, context: context))

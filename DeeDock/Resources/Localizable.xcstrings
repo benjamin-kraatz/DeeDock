@@ -2521,6 +2521,18 @@
         }
       }
     },
+    "settingsAnimateIndicators": {
+      "comment": "Toggle for motion in the running indicators that have any. Unavailable while a still style is selected.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Animate indicators"
+          }
+        }
+      }
+    },
     "settingsAppNames": {
       "comment": "Appearance gallery title for hover tooltip presets.",
       "extractionState": "manual",
@@ -2821,18 +2833,6 @@
         }
       }
     },
-    "settingsIndicatorAura": {
-      "comment": "Running indicator with warm colored backlighting behind the icon.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aura"
-          }
-        }
-      }
-    },
     "settingsIndicatorBar": {
       "comment": "Short line running-app marker option, oriented along the dock edge.",
       "extractionState": "manual",
@@ -2858,7 +2858,7 @@
       }
     },
     "settingsIndicatorGlitch": {
-      "comment": "Running indicator with offset cyan and pink silhouettes and pixel strips.",
+      "comment": "Metal running indicator: the app icon's own rows slip sideways and its colour channels separate.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2882,7 +2882,7 @@
       }
     },
     "settingsIndicatorHologram": {
-      "comment": "Metal running indicator with rainbow diffraction, scan lines, and a diagonal highlight.",
+      "comment": "Metal running indicator: a diffraction rim with scan lines around the app icon's own outline.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2893,14 +2893,14 @@
         }
       }
     },
-    "settingsIndicatorNeon": {
-      "comment": "Running indicator with a cyan, blue, and pink luminous frame around the icon.",
+    "settingsIndicatorLavaChrome": {
+      "comment": "Metal running indicator: molten chrome that eats into the app icon's own edges and corners.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Neon"
+            "value": "Lava Chrome"
           }
         }
       }
@@ -2918,7 +2918,7 @@
       }
     },
     "settingsIndicatorPlasma": {
-      "comment": "Metal running indicator with electric cyan and violet filaments around the icon.",
+      "comment": "Metal running indicator: an electric filament that traces the app icon's own outline.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2942,7 +2942,7 @@
       }
     },
     "settingsIndicatorPrism": {
-      "comment": "Metal running indicator with an octagonal spectral bevel and bright facet edges.",
+      "comment": "Metal running indicator: turning spectral facets around the app icon's own outline.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2953,8 +2953,20 @@
         }
       }
     },
+    "settingsIndicatorSingularity": {
+      "comment": "Metal running indicator: an orbiting black hole that bends and swallows part of the app icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Singularity"
+          }
+        }
+      }
+    },
     "settingsIndicatorSolarFlare": {
-      "comment": "Metal running indicator with a hot circular rim and orange solar rays.",
+      "comment": "Metal running indicator: hot rays reaching out from the app icon's own outline.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2978,7 +2990,7 @@
       }
     },
     "settingsIndicatorStardust": {
-      "comment": "Running indicator with colored stars around the icon.",
+      "comment": "Running indicator: sparkles popping in and out around the app icon.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3212,7 +3224,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Effects stay still and Hidden keeps icon spacing unchanged. Choose Focus Dock from the DeeDock menu to see the independent keyboard selection outline."
+            "value": "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DeeDock menu to see the independent keyboard selection outline."
           }
         }
       }

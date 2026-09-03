@@ -1,9 +1,11 @@
 import SwiftUI
 
-/// A gallery of static, production-rendered indicators, sized to keep every choice readable.
+/// A gallery of production-rendered indicators, sized to keep every choice readable.
 struct RunningIndicatorPicker: View {
     let edge: DockEdge
     @Binding var selection: DockSettings.RunningIndicatorStyle
+    /// Shows the shader styles as they will actually appear once chosen.
+    var animated = false
     var reduceTransparency: Bool? = nil
 
     var body: some View {
@@ -11,7 +13,7 @@ struct RunningIndicatorPicker: View {
             ForEach(DockSettings.RunningIndicatorStyle.settingsOptions) { option in
                 Button { selection = option.value } label: {
                     VStack(spacing: 8) {
-                        RunningIndicatorThumbnail(style: option.value, edge: edge,
+                        RunningIndicatorThumbnail(style: option.value, edge: edge, animated: animated,
                                                   reduceTransparency: reduceTransparency)
                             .frame(height: 56)
                         Text(option.title).font(.callout.weight(.medium))
@@ -46,6 +48,7 @@ struct RunningIndicatorPicker: View {
 private struct RunningIndicatorThumbnail: View {
     let style: DockSettings.RunningIndicatorStyle
     let edge: DockEdge
+    var animated = false
     var reduceTransparency: Bool? = nil
     private let size: CGFloat = 44
 
@@ -65,7 +68,8 @@ private struct RunningIndicatorThumbnail: View {
                 .padding(4)
                 .frame(width: size, height: size)
                 .modifier(DockIconIndicator(style: style, running: true, size: size,
-                                            reduceTransparency: reduceTransparency))
+                                            variant: DockIndicatorVariant(identity: style.rawValue, accent: .indigo),
+                                            animated: animated, reduceTransparency: reduceTransparency))
                 .position(center)
             DockRunningIndicator(style: style, edge: edge).position(marker)
         }
@@ -76,14 +80,14 @@ private struct RunningIndicatorThumbnail: View {
 
 #if DEBUG
 #Preview("Indicator gallery") {
-    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .neon
+    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .singularity
     ScrollView {
-        RunningIndicatorPicker(edge: .bottom, selection: $selection)
-    }.frame(width: 540, height: 460)
+        RunningIndicatorPicker(edge: .bottom, selection: $selection, animated: true)
+    }.frame(width: 540, height: 460).preferredColorScheme(.dark)
 }
 
 #Preview("Side indicators, dark and reduced transparency") {
-    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .aura
+    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .lavaChrome
     ScrollView {
         RunningIndicatorPicker(edge: .left, selection: $selection, reduceTransparency: true)
     }.frame(width: 440, height: 540).preferredColorScheme(.dark)

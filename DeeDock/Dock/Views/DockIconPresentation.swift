@@ -10,6 +10,10 @@ struct DockIconPresentation: View {
     let launching: Bool
     let keyboardSelected: Bool
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
+    /// Per-application shader variation; the drawn indicator styles ignore it.
+    var indicatorVariant: DockIndicatorVariant = .neutral
+    /// Whether the shader indicators may animate right now.
+    var indicatorAnimated = false
 
     /// Applied only to artwork, preserving focus/launch feedback and the button hit region.
     var artworkOpacity: Double = 1
@@ -25,7 +29,8 @@ struct DockIconPresentation: View {
             Image(nsImage: icon).resizable().interpolation(.high)
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
-                .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size))
+                .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size,
+                                            variant: indicatorVariant, animated: indicatorAnimated))
                 .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                 .overlay {
                     if keyboardSelected {

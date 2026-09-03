@@ -88,6 +88,7 @@ final class DockPanelController {
         interaction.retainHitRegions(exposedIDs)
         accessibilityIDs.formIntersection(exposedIDs)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
+        interaction.animateIndicators = settings.animateIndicators
         interaction.idleFade.configure(settings,
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
@@ -161,6 +162,7 @@ final class DockPanelController {
         if (visibility.phase == .hiding || !visibility.exposesContent) && !interaction.suppressTooltips {
             interaction.suppressTooltips = true; interaction.tooltips.clear()
         }
+        interaction.exposesContent = visibility.exposesContent
         if !visibility.exposesContent {
             panel.ignoresMouseEvents = true; interaction.pointer = nil
             if panel.isVisible { panel.orderOut(nil) }
@@ -330,7 +332,7 @@ final class DockPanelController {
 
     func stop() {
         invalidateDrag?(); invalidateDrag = nil
-        stopped = true; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
+        stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
