@@ -41,6 +41,7 @@ struct DockSettingsView: View {
             })
         }
         .onChange(of: profiles.displays) { _, _ in updateDisplayIndicator() }
+        .onChange(of: selectedDisplayDockEdge) { _, _ in updateDisplayIndicator() }
         .onChange(of: displayCategory) { _, _ in coordinator?.zonePreview.stop() }
         .onChange(of: selection) { _, _ in
             coordinator?.zonePreview.stop()
@@ -70,7 +71,17 @@ struct DockSettingsView: View {
     private func updateDisplayIndicator(active: Bool? = nil) {
         let id: String?
         if case .display(let selectedID) = selection { id = selectedID } else { id = nil }
-        coordinator?.displayIndicator.update(selectedID: id, displays: profiles.displays, settingsActive: active ?? settingsActive)
+        coordinator?.displayIndicator.update(
+            selectedID: id,
+            displays: profiles.displays,
+            dockEdge: selectedDisplayDockEdge,
+            settingsActive: active ?? settingsActive
+        )
+    }
+
+    private var selectedDisplayDockEdge: DockEdge? {
+        guard case .display(let id) = selection else { return nil }
+        return profiles.effectiveSettings(for: id).edge
     }
 
     private func zoneAction(for id: String) -> (() -> Void)? {

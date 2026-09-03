@@ -3,14 +3,16 @@ import SwiftUI
 /// A static outline and badge identify the display being edited without covering its content.
 struct DisplaySelectionIndicatorView: View {
     let displayName: String
-    /// Distance from the physical screen top to a position below reserved menu-bar/notch space.
-    var badgeTopInset: CGFloat = 44
+    /// The badge moves opposite a top Dock so it does not cover the live preview.
+    var dockEdge: DockEdge = .bottom
+    /// Distance from the chosen physical screen edge, including reserved system space.
+    var badgeScreenInset: CGFloat = 44
     /// Explicit appearance for inert previews; live presentation follows the system environment.
     var reduceTransparency: Bool? = nil
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
 
     var body: some View {
-        ZStack(alignment: .top) {
+        ZStack(alignment: dockEdge == .top ? .bottom : .top) {
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(Color.accentColor, lineWidth: 4)
                 .padding(8)
@@ -39,7 +41,7 @@ struct DisplaySelectionIndicatorView: View {
             }
             .overlay { RoundedRectangle(cornerRadius: 16).strokeBorder(.tint, lineWidth: 1) }
             .padding(.horizontal, 24)
-            .padding(.top, badgeTopInset)
+            .padding(dockEdge == .top ? .bottom : .top, badgeScreenInset)
         }
         // Settings already exposes the selected profile. This purely visual marker must not add
         // another focus target, and stays static regardless of the Reduce Motion preference.
@@ -51,6 +53,11 @@ struct DisplaySelectionIndicatorView: View {
 #if DEBUG
 #Preview("Selected display") {
     DisplaySelectionIndicatorView(displayName: "Studio Display")
+        .frame(width: 800, height: 480)
+}
+
+#Preview("Selected display with top Dock") {
+    DisplaySelectionIndicatorView(displayName: "Studio Display", dockEdge: .top)
         .frame(width: 800, height: 480)
 }
 
