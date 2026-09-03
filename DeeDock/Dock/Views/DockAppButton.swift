@@ -20,36 +20,10 @@ struct DockAppButton: View {
 
     var body: some View {
         Button(action: open) {
-            VStack(spacing: DockGeometry.indicatorSpacing) {
-                Image(nsImage: item.icon).resizable().interpolation(.high)
-                    .frame(width: size, height: size)
-                    .opacity(item.isAvailable ? 1 : 0.4)
-                    .overlay {
-                        if isLaunching {
-                            Circle().fill(.black.opacity(0.14))
-                        }
-                        if isSelected {
-                            RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(Color.accentColor, lineWidth: 2)
-                        }
-                    }
-                    .overlay {
-                        if isLaunching {
-                            ProgressView().controlSize(.small)
-                                .padding(8)
-                                .glassEffect(.clear)
-                        }
-                    }
-                if !isSelected {
-                    Circle().fill(.primary.opacity(item.isRunning ? 0.8 : 0))
-                        .frame(width: DockGeometry.indicatorSize, height: DockGeometry.indicatorSize)
-                } else {
-                    RoundedRectangle(cornerRadius: 2).fill(.primary)
-                        .frame(width: 16, height: DockGeometry.indicatorSize)
-                }
-            }
-            .frame(width: size, height: size + DockGeometry.indicatorAreaHeight)
-            .contentShape(.rect)
+            DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
+                                 available: item.isAvailable, running: item.isRunning,
+                                 launching: isLaunching, selected: isSelected)
+                .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .disabled(isLaunching)
@@ -102,13 +76,13 @@ struct DockAppButton: View {
                 Button {
                     interaction?.movePin?(item.id, -1)
                 } label: {
-                    Text(.actionMoveLeft)
+                    Text(interaction?.layout.edge.isVertical == true ? .actionMoveUp : .actionMoveLeft)
                 }
                 .disabled(interaction?.canMovePin?(item.id, -1) != true)
                 Button {
                     interaction?.movePin?(item.id, 1)
                 } label: {
-                    Text(.actionMoveRight)
+                    Text(interaction?.layout.edge.isVertical == true ? .actionMoveDown : .actionMoveRight)
                 }
                 .disabled(interaction?.canMovePin?(item.id, 1) != true)
             }

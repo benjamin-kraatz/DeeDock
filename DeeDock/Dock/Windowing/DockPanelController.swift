@@ -12,11 +12,12 @@ final class DockPanelController {
     private var dragHeld = false
     private var lastDisplay: DisplaySnapshot?
     private var lastSettings: DockSettings?
-    private var baseLayout = DockGeometry.layout(count: 0, favoriteCount: 0, availableWidth: 800)
+    private var baseLayout = DockGeometry.layout(count: 0, favoriteCount: 0, availableLength: 800)
     var invalidateDrag: (() -> Void)?
     private var menuHeld = false
     private var accessibilityIDs: Set<String> = []
     private var stopped = false
+    private var updatingGeometry = false
     var resignedFocus: (() -> Void)?
     var escape: (() -> Void)?
 
@@ -54,16 +55,24 @@ final class DockPanelController {
     func update(display: DisplaySnapshot, settings: DockSettings, resetVisibility: Bool = false) {
         guard !stopped else { return }
         if let previous = lastDisplay, previous != display || lastSettings != settings || resetVisibility { invalidateDrag?() }
+        let edgeChanged = lastSettings?.edge != settings.edge
+        let axisChanged = lastSettings?.edge.isVertical != settings.edge.isVertical
+        updatingGeometry = true
+        defer { updatingGeometry = false; updatePointer(); present() }
+        if edgeChanged { interaction.resetGeometry() }
+        if axisChanged { interaction.scrollOffset = 0; interaction.scrollRequest = 0 }
         lastDisplay = display; lastSettings = settings
         interaction.pinDestinations = store.pinDestinations
         // A mouse-up can occur while asleep or during display reconfiguration; do not retain a stale hold.
         if resetVisibility && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
         let reference = DockGeometry.referenceFrame(screenFrame: display.frame, visibleFrame: display.visibleFrame, settings: settings)
         baseLayout = DockGeometry.layout(count: store.items.count, favoriteCount: store.items.filter(\.isFavorite).count,
-                                         availableWidth: reference.width, settings: settings)
+                                         availableLength: settings.edge.length(of: reference.size),
+                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings)
         let slots = DockRenderSlot.slots(items: store.items, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                                                 availableWidth: reference.width, settings: settings)
+                                                 availableLength: settings.edge.length(of: reference.size),
+                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings)
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
         let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
@@ -71,18 +80,17 @@ final class DockPanelController {
         interaction.contentOrigin = updated.contentOrigin; interaction.windowSize = updated.windowFrame.size
         panel.setFrame(updated.windowFrame, display: true)
         visibility.configure(settings.behavior, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
-                             geometryChanged: changed || resetVisibility)
-        updatePointer(); present()
+                             geometryChanged: changed || resetVisibility || edgeChanged)
     }
 
     /// Native events and animation samples share top-left content coordinates after inverse transformation.
     func updatePointer(eventType: NSEvent.EventType? = nil) {
-        guard !stopped, let geometry else { return }
+        guard !stopped, !updatingGeometry, let geometry else { return }
         let local = panel.convertPoint(fromScreen: NSEvent.mouseLocation)
         let point = CGPoint(x: local.x - geometry.contentOrigin.x,
                             y: panel.frame.height - local.y - geometry.contentOrigin.y)
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
-                                                  size: geometry.contentSize, reduceMotion: visibility.reduceMotion)
+                                                  size: geometry.contentSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
         let rects = [interaction.surfaceRect, interaction.errorRect] + Array(interaction.iconRects.values)
         let inside = visibility.exposesContent && panel.frame.contains(NSEvent.mouseLocation) && rects.contains { sample.paintedRect($0).contains(point) }
         panel.ignoresMouseEvents = !inside
@@ -123,18 +131,20 @@ final class DockPanelController {
 
     private func contentPoint(_ screenPoint: CGPoint) -> CGPoint {
         let local = panel.convertPoint(fromScreen: screenPoint)
-        return CGPoint(x: local.x - interaction.contentOrigin.x,
-                       y: panel.frame.height - local.y - interaction.contentOrigin.y)
+        let point = CGPoint(x: local.x - interaction.contentOrigin.x,
+                            y: panel.frame.height - local.y - interaction.contentOrigin.y)
+        return DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
+            size: interaction.layout.viewportSize, reduceMotion: visibility.reduceMotion,
+            edge: interaction.layout.edge).inverse(point)
     }
 
     /// Resting glass in AppKit screen coordinates, including the current viewport clip.
     var restingDragBounds: CGRect {
-        let surface = baseLayout.surfaceFrame(sizes: baseLayout.sizes(pointerX: nil, reduceMotion: true))
-            .offsetBy(dx: interaction.scrollOffset, dy: 0)
-            .intersection(CGRect(x: 0, y: 0, width: baseLayout.viewportWidth, height: baseLayout.panelHeight))
-        return CGRect(x: panel.frame.minX + interaction.contentOrigin.x + surface.minX,
-                      y: panel.frame.maxY - interaction.contentOrigin.y - surface.maxY,
-                      width: surface.width, height: surface.height)
+        guard let geometry else { return .zero }
+        let frame = CGRect(x: panel.frame.minX + geometry.contentOrigin.x,
+                           y: panel.frame.maxY - geometry.contentOrigin.y - geometry.contentSize.height,
+                           width: geometry.contentSize.width, height: geometry.contentSize.height)
+        return DockGeometry.restingGlass(frame: frame, layout: baseLayout, scrollOffset: interaction.scrollOffset)
     }
 
     func containsDragRegion(_ point: CGPoint) -> Bool {
@@ -143,9 +153,19 @@ final class DockPanelController {
             || (visibility.exposesContent && interaction.containsDockPoint(contentPoint(point)))
     }
 
+    /// Transparent source callout space must not extend the deliberate unpin threshold.
+    func protectsDragRemoval(at point: CGPoint, isSource: Bool) -> Bool {
+        DockDragGeometry.protectsRemoval(at: point, isSource: isSource, restingGlass: restingDragBounds,
+                                         retention: geometry?.activation.retention ?? .zero)
+    }
+
     func insertionIndex(at point: CGPoint) -> Int? {
-        guard visibility.exposesContent, interaction.containsDockPoint(contentPoint(point)) else { return nil }
-        return DockDragGeometry.insertion(point: contentPoint(point), scrollOffset: interaction.scrollOffset,
+        let local = contentPoint(point)
+        let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
+            size: interaction.layout.viewportSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
+        guard visibility.exposesContent, geometry?.windowFrame.contains(point) == true,
+              sample.mask.contains(local), interaction.containsDockPoint(local) else { return nil }
+        return DockDragGeometry.insertion(point: local, scrollOffset: interaction.scrollOffset,
                                           layout: baseLayout, pinCount: store.pins.count)
     }
 
@@ -165,10 +185,10 @@ final class DockPanelController {
     }
 
     func dragScrollVelocity(at point: CGPoint) -> CGFloat {
-        guard visibility.exposesContent, interaction.dragActive, interaction.layout.canvasWidth > interaction.layout.viewportWidth else { return 0 }
-        let velocity = DockDragGeometry.scrollVelocity(x: contentPoint(point).x, width: interaction.layout.viewportWidth)
+        guard visibility.exposesContent, interaction.dragActive, interaction.layout.canvasLength > interaction.layout.viewportLength else { return 0 }
+        let velocity = DockDragGeometry.scrollVelocity(position: interaction.layout.edge.along(contentPoint(point)), length: interaction.layout.viewportLength)
         if velocity < 0 && interaction.scrollOffset >= 0 { return 0 }
-        if velocity > 0 && -interaction.scrollOffset >= interaction.layout.canvasWidth - interaction.layout.viewportWidth { return 0 }
+        if velocity > 0 && -interaction.scrollOffset >= interaction.layout.canvasLength - interaction.layout.viewportLength { return 0 }
         return velocity
     }
     func scrollDuringDrag(at point: CGPoint, elapsed: Double) {
@@ -186,11 +206,12 @@ final class DockPanelController {
     }
     func handleKey(_ event: NSEvent) -> Bool {
         guard store.keyboardFocus else { return false }
-        switch event.keyCode {
-        case 123, 124:
-            let distance = event.keyCode == 123 ? -1 : 1
+        if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
             if event.modifierFlags.contains(.option), let id = store.selectedID { store.movePin(id, by: distance) }
             else { store.moveSelection(by: distance) }
+            return true
+        }
+        switch event.keyCode {
         case 36, 76: store.openSelection()
         case 53: escape?()
         default: return false

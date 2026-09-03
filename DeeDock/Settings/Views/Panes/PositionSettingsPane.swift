@@ -1,41 +1,46 @@
 import SwiftUI
 
-/// Bottom-edge placement, previewed on a stand-in display.
+/// Physical edge placement, previewed on a stand-in display.
 /// Physical left and right are independent of interface reading direction.
 struct PositionSettingsPane: View {
+    @Binding var edge: DockEdge
     @Binding var reference: DockSettings.PositionReference
     @Binding var alignment: DockSettings.Alignment
-    @Binding var horizontalOffset: Double
-    @Binding var bottomDistance: Double
+    @Binding var alongEdgeOffset: Double
+    @Binding var edgeDistance: Double
 
     var overrideContext: SettingsOverrideContext? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
-                DockPlacementPreview(reference: reference, alignment: alignment,
-                                     horizontalOffset: horizontalOffset,
-                                     bottomDistance: bottomDistance)
+                DockPlacementPreview(edge: edge, reference: reference, alignment: alignment,
+                                     alongEdgeOffset: alongEdgeOffset,
+                                     edgeDistance: edgeDistance)
             }
             SettingsCard(title: .settingsCardAnchor, footnote: .settingsDockOverlapHelp) {
+                SettingsPickerRow(title: .settingsEdge, options: DockEdge.settingsOptions, selection: $edge)
+                    .settingsOverride(overrideContext, field: .edge)
                 SettingsPickerRow(title: .settingsPositionReference,
                                   options: DockSettings.PositionReference.settingsOptions,
                                   selection: $reference)
                     .settingsOverride(overrideContext, field: .positionReference)
                 SettingsPickerRow(title: .settingsAlignment,
-                                  options: DockSettings.Alignment.settingsOptions,
+                                  options: DockSettings.Alignment.settingsOptions(edge: edge),
                                   selection: $alignment)
                     .settingsOverride(overrideContext, field: .alignment)
             }
             SettingsCard(title: .settingsCardFineTuning, footnote: .settingsPositionHelp) {
-                SettingsSliderRow(title: .settingsHorizontalOffset, unit: .settingsPoints,
-                                  value: $horizontalOffset, range: -1000...1000, step: 1,
-                                  minimumSymbol: "arrow.left", maximumSymbol: "arrow.right")
-                    .settingsOverride(overrideContext, field: .horizontalOffset)
-                SettingsSliderRow(title: .settingsBottomDistance, unit: .settingsPoints,
-                                  value: $bottomDistance, range: 0...300, step: 1,
-                                  minimumSymbol: "arrow.down.to.line", maximumSymbol: "arrow.up")
-                    .settingsOverride(overrideContext, field: .bottomDistance)
+                SettingsSliderRow(title: .settingsAlongEdgeOffset, unit: .settingsPoints,
+                                  value: $alongEdgeOffset, range: -1000...1000, step: 1,
+                                  minimumSymbol: edge.isVertical ? "arrow.up" : "arrow.left",
+                                  maximumSymbol: edge.isVertical ? "arrow.down" : "arrow.right")
+                    .settingsOverride(overrideContext, field: .alongEdgeOffset)
+                SettingsSliderRow(title: .settingsEdgeDistance, unit: .settingsPoints,
+                                  value: $edgeDistance, range: 0...300, step: 1,
+                                  minimumSymbol: edge == .bottom ? "arrow.down.to.line" : (edge == .left ? "arrow.left.to.line" : "arrow.right.to.line"),
+                                  maximumSymbol: edge == .bottom ? "arrow.up" : (edge == .left ? "arrow.right" : "arrow.left"))
+                    .settingsOverride(overrideContext, field: .edgeDistance)
             }
         }
     }
@@ -43,13 +48,14 @@ struct PositionSettingsPane: View {
 
 #if DEBUG
 #Preview("Position pane") {
+    @Previewable @State var edge: DockEdge = .left
     @Previewable @State var reference: DockSettings.PositionReference = .usableDesktop
     @Previewable @State var alignment: DockSettings.Alignment = .center
     @Previewable @State var offset: Double = 0
     @Previewable @State var bottom: Double = 8
     ScrollView {
-        PositionSettingsPane(reference: $reference, alignment: $alignment,
-                             horizontalOffset: $offset, bottomDistance: $bottom)
+        PositionSettingsPane(edge: $edge, reference: $reference, alignment: $alignment,
+                             alongEdgeOffset: $offset, edgeDistance: $bottom)
             .padding(24)
     }
     .tint(SettingsCategory.position.tint)

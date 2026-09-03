@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Explicit playback uses the production effects and scheduler with inert symbol tiles, never live apps.
 struct DockAnimationPreview: View {
+    var edge: DockEdge = .bottom
     let style: DockAnimationStyle
     let duration: Double
     var reduceMotionOverride: Bool? = nil
@@ -9,19 +10,24 @@ struct DockAnimationPreview: View {
     private var reduceMotion: Bool { reduceMotionOverride ?? systemReduceMotion }
     @State private var controller = DockVisibilityController()
     @State private var playback: Task<Void, Never>?
-    private let size = CGSize(width: 300, height: 128)
+    private var layout: DockGeometry.Layout {
+        DockGeometry.layout(count: 5, favoriteCount: 5, availableLength: 400, settings: DockSettings(iconSize: 40, magnification: 1, edge: edge))
+    }
+    private var size: CGSize { layout.viewportSize }
 
     var body: some View {
         VStack(spacing: 6) {
-            DockAppearancePreview(iconSize: 48, magnification: 1, itemSpacing: 4)
+            DockSampleView(layout: layout)
                 .frame(width: size.width, height: size.height)
                 .modifier(DockPresentationModifier(sample: DockAnimationGeometry.sample(style: style, progress: controller.progress,
-                                                                                       size: size, reduceMotion: reduceMotion), size: size))
-                .frame(width: 380, height: 208).clipped().accessibilityHidden(true)
+                                                                                       size: size, reduceMotion: reduceMotion, edge: edge), size: size))
+                .scaleEffect(0.65)
+                .frame(width: 380, height: edge.isVertical ? 290 : 208).clipped().accessibilityHidden(true)
             Button(.behaviorPlayPreview, systemImage: "play.fill", action: play)
         }
         .frame(maxWidth: .infinity).padding(.bottom, 14)
         .background { SettingsWindowLifecycle { reset() } }
+        .onChange(of: edge) { _, _ in reset() }
         .onChange(of: style) { _, _ in reset() }
         .onChange(of: duration) { _, _ in reset() }
         .onChange(of: reduceMotion) { _, _ in reset() }

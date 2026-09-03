@@ -22,8 +22,8 @@ struct BehaviorSettingsPane: View {
                 BehaviorTimingControls(source: source)
             }
             SettingsCard(title: .behaviorAnimation, footnote: .behaviorAnimationHelp) {
-                DockAnimationPreview(style: source.value.behavior.animationStyle, duration: source.value.behavior.animationDuration, reduceMotionOverride: previewReduceMotion)
-                BehaviorAnimationPicker(selection: source.binding(\.behavior.animationStyle))
+                DockAnimationPreview(edge: source.value.edge, style: source.value.behavior.animationStyle, duration: source.value.behavior.animationDuration, reduceMotionOverride: previewReduceMotion)
+                BehaviorAnimationPicker(edge: source.value.edge, selection: source.binding(\.behavior.animationStyle))
                     .settingsOverride(source.context, field: .animationStyle)
                 SettingsSliderRow(title: .behaviorDuration, unit: .settingsSeconds,
                                   value: source.binding(\.behavior.animationDuration), range: 0...1, step: 0.05)

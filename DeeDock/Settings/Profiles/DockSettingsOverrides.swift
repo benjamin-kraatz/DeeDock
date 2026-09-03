@@ -2,24 +2,28 @@ import Foundation
 
 /// The independently inheritable settings; visibility and pins are always display-specific.
 enum DockSettingField: String, CaseIterable, Codable {
-    case iconSize, magnification, itemSpacing, alignment, horizontalOffset, bottomDistance, positionReference
+    case iconSize, magnification, itemSpacing, edge, alignment, positionReference
+    case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
-    case autoHide, activationLocation, widthMode, customWidth, zoneHeight, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
+    case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
+
+    case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
 
     var keyPath: PartialKeyPath<DockSettings> {
         switch self {
         case .iconSize: \.iconSize
         case .magnification: \.magnification
         case .itemSpacing: \.itemSpacing
+        case .edge: \.edge
         case .alignment: \.alignment
-        case .horizontalOffset: \.horizontalOffset
-        case .bottomDistance: \.bottomDistance
+        case .alongEdgeOffset: \.alongEdgeOffset
+        case .edgeDistance: \.edgeDistance
         case .positionReference: \.positionReference
         case .autoHide: \.behavior.autoHide
         case .activationLocation: \.behavior.activationLocation
-        case .widthMode: \.behavior.widthMode
-        case .customWidth: \.behavior.customWidth
-        case .zoneHeight: \.behavior.zoneHeight
+        case .lengthMode: \.behavior.lengthMode
+        case .customLength: \.behavior.customLength
+        case .zoneDepth: \.behavior.zoneDepth
         case .zoneOffset: \.behavior.zoneOffset
         case .revealDelay: \.behavior.revealDelay
         case .hideDelay: \.behavior.hideDelay
@@ -34,32 +38,40 @@ struct DockSettingsOverrides: Codable, Equatable {
     var iconSize: Double?
     var magnification: Double?
     var itemSpacing: Double?
+    var edge: DockEdge?
     var alignment: DockSettings.Alignment?
-    var horizontalOffset: Double?
-    var bottomDistance: Double?
+    var alongEdgeOffset: Double?
+    var edgeDistance: Double?
     var positionReference: DockSettings.PositionReference?
 
     var autoHide: Bool?
     var activationLocation: DockBehaviorSettings.ActivationLocation?
-    var widthMode: DockBehaviorSettings.WidthMode?
-    var customWidth: Double?
-    var zoneHeight: Double?
+    var lengthMode: DockBehaviorSettings.LengthMode?
+    var customLength: Double?
+    var zoneDepth: Double?
     var zoneOffset: Double?
     var revealDelay: Double?
     var hideDelay: Double?
     var animationStyle: DockAnimationStyle?
     var animationDuration: Double?
 
+    private enum CodingKeys: String, CodingKey {
+        case iconSize, magnification, itemSpacing, edge, alignment, positionReference
+        case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
+        case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
+        case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
+    }
+
     func resolving(_ defaults: DockSettings) -> DockSettings {
         var result = DockSettings(iconSize: iconSize ?? defaults.iconSize, magnification: magnification ?? defaults.magnification,
                      itemSpacing: itemSpacing ?? defaults.itemSpacing,
-                     alignment: alignment ?? defaults.alignment, horizontalOffset: horizontalOffset ?? defaults.horizontalOffset,
-                     bottomDistance: bottomDistance ?? defaults.bottomDistance, positionReference: positionReference ?? defaults.positionReference)
+                     edge: edge ?? defaults.edge, alignment: alignment ?? defaults.alignment, alongEdgeOffset: alongEdgeOffset ?? defaults.alongEdgeOffset,
+                     edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
         result.behavior.autoHide = autoHide ?? defaults.behavior.autoHide
         result.behavior.activationLocation = activationLocation ?? defaults.behavior.activationLocation
-        result.behavior.widthMode = widthMode ?? defaults.behavior.widthMode
-        result.behavior.customWidth = customWidth ?? defaults.behavior.customWidth
-        result.behavior.zoneHeight = zoneHeight ?? defaults.behavior.zoneHeight
+        result.behavior.lengthMode = lengthMode ?? defaults.behavior.lengthMode
+        result.behavior.customLength = customLength ?? defaults.behavior.customLength
+        result.behavior.zoneDepth = zoneDepth ?? defaults.behavior.zoneDepth
         result.behavior.zoneOffset = zoneOffset ?? defaults.behavior.zoneOffset
         result.behavior.revealDelay = revealDelay ?? defaults.behavior.revealDelay
         result.behavior.hideDelay = hideDelay ?? defaults.behavior.hideDelay
@@ -73,15 +85,16 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .iconSize: iconSize != nil
         case .magnification: magnification != nil
         case .itemSpacing: itemSpacing != nil
+        case .edge: edge != nil
         case .alignment: alignment != nil
-        case .horizontalOffset: horizontalOffset != nil
-        case .bottomDistance: bottomDistance != nil
+        case .alongEdgeOffset: alongEdgeOffset != nil
+        case .edgeDistance: edgeDistance != nil
         case .positionReference: positionReference != nil
         case .autoHide: autoHide != nil
         case .activationLocation: activationLocation != nil
-        case .widthMode: widthMode != nil
-        case .customWidth: customWidth != nil
-        case .zoneHeight: zoneHeight != nil
+        case .lengthMode: lengthMode != nil
+        case .customLength: customLength != nil
+        case .zoneDepth: zoneDepth != nil
         case .zoneOffset: zoneOffset != nil
         case .revealDelay: revealDelay != nil
         case .hideDelay: hideDelay != nil
@@ -95,15 +108,16 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .iconSize: iconSize = value?.iconSize
         case .magnification: magnification = value?.magnification
         case .itemSpacing: itemSpacing = value?.itemSpacing
+        case .edge: edge = value?.edge
         case .alignment: alignment = value?.alignment
-        case .horizontalOffset: horizontalOffset = value?.horizontalOffset
-        case .bottomDistance: bottomDistance = value?.bottomDistance
+        case .alongEdgeOffset: alongEdgeOffset = value?.alongEdgeOffset
+        case .edgeDistance: edgeDistance = value?.edgeDistance
         case .positionReference: positionReference = value?.positionReference
         case .autoHide: autoHide = value?.behavior.autoHide
         case .activationLocation: activationLocation = value?.behavior.activationLocation
-        case .widthMode: widthMode = value?.behavior.widthMode
-        case .customWidth: customWidth = value?.behavior.customWidth
-        case .zoneHeight: zoneHeight = value?.behavior.zoneHeight
+        case .lengthMode: lengthMode = value?.behavior.lengthMode
+        case .customLength: customLength = value?.behavior.customLength
+        case .zoneDepth: zoneDepth = value?.behavior.zoneDepth
         case .zoneOffset: zoneOffset = value?.behavior.zoneOffset
         case .revealDelay: revealDelay = value?.behavior.revealDelay
         case .hideDelay: hideDelay = value?.behavior.hideDelay
@@ -126,4 +140,29 @@ struct DisplayProfile: Codable, Equatable, Identifiable {
 struct DisplayProfilesDocument: Codable, Equatable {
     var initialPrimaryID: String?
     var profiles: [String: DisplayProfile] = [:]
+}
+
+extension DockSettingsOverrides {
+    /// Existing nullable overrides retain their decoding rules. A present edge must be a known value.
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        iconSize = try values.decodeIfPresent(Double.self, forKey: .iconSize)
+        magnification = try values.decodeIfPresent(Double.self, forKey: .magnification)
+        itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing)
+        alignment = try values.decodeIfPresent(DockSettings.Alignment.self, forKey: .alignment)
+        alongEdgeOffset = try values.decodeIfPresent(Double.self, forKey: .alongEdgeOffset)
+        edgeDistance = try values.decodeIfPresent(Double.self, forKey: .edgeDistance)
+        positionReference = try values.decodeIfPresent(DockSettings.PositionReference.self, forKey: .positionReference)
+        autoHide = try values.decodeIfPresent(Bool.self, forKey: .autoHide)
+        activationLocation = try values.decodeIfPresent(DockBehaviorSettings.ActivationLocation.self, forKey: .activationLocation)
+        lengthMode = try values.decodeIfPresent(DockBehaviorSettings.LengthMode.self, forKey: .lengthMode)
+        customLength = try values.decodeIfPresent(Double.self, forKey: .customLength)
+        zoneDepth = try values.decodeIfPresent(Double.self, forKey: .zoneDepth)
+        zoneOffset = try values.decodeIfPresent(Double.self, forKey: .zoneOffset)
+        revealDelay = try values.decodeIfPresent(Double.self, forKey: .revealDelay)
+        hideDelay = try values.decodeIfPresent(Double.self, forKey: .hideDelay)
+        animationStyle = try values.decodeIfPresent(DockAnimationStyle.self, forKey: .animationStyle)
+        animationDuration = try values.decodeIfPresent(Double.self, forKey: .animationDuration)
+        edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : nil
+    }
 }

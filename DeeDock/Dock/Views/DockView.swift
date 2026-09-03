@@ -12,9 +12,9 @@ struct DockView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
-        let size = CGSize(width: interaction.layout.viewportWidth, height: interaction.layout.panelHeight)
+        let size = interaction.layout.viewportSize
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
-                                                  size: size, reduceMotion: reduceMotion)
+                                                  size: size, reduceMotion: reduceMotion, edge: interaction.layout.edge)
         DockContentView(
             items: store.items,
             launchingIDs: store.launching,
@@ -28,6 +28,7 @@ struct DockView: View {
             togglePin: store.toggleFavorite,
             dismissError: { store.errorMessage = nil }
         )
+        .id(interaction.layout.edge.isVertical)
         .modifier(DockPresentationModifier(sample: sample, size: size))
         .accessibilityHidden(!visibility.exposesContent)
         .allowsHitTesting(visibility.exposesContent)

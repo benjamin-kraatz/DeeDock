@@ -36,6 +36,7 @@
 		DDB100000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift */; };
 		DDB100000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */; };
 		DDB100000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */; };
+		DDC100000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC200000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +71,7 @@
 		DDB200000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockDragPresentation.swift; sourceTree = SOURCE_ROOT; };
 		DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationResourceAccess.swift; sourceTree = SOURCE_ROOT; };
 		DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockApplicationImporter.swift; sourceTree = SOURCE_ROOT; };
+		DDC200000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Layout/DockEdge.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -121,6 +123,7 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DDC200000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift */,
 				DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */,
 				DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */,
 				DDB200000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift */,
@@ -252,6 +255,7 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				DDC100000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift in Sources */,
 				DD9000000000000000000006 /* DeeDock/Dock/Visibility/DockPreviewLease.swift in Sources */,
 				DD9000000000000000000005 /* DeeDock/Dock/Visibility/DockVisibilityController.swift in Sources */,
 				DD9000000000000000000004 /* DeeDock/Dock/Visibility/DockVisibilityState.swift in Sources */,

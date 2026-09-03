@@ -65,9 +65,9 @@ struct DisplayProfilesTests {
         profiles.synchronize([display]) { [DisplayFixtures.app("pin")] }
         profiles.update(display.id, keyPath: \.iconSize, to: 48) // Explicit, even though equal to the default.
         defaults.update(\.iconSize, to: 80)
-        defaults.update(\.bottomDistance, to: 40)
+        defaults.update(\.edgeDistance, to: 40)
         #expect(profiles.effectiveSettings(for: display.id).iconSize == 48)
-        #expect(profiles.effectiveSettings(for: display.id).bottomDistance == 40)
+        #expect(profiles.effectiveSettings(for: display.id).edgeDistance == 40)
         profiles.setEnabled(false, for: display.id)
         profiles.synchronize([]) { [] }
         profiles.update(display.id, keyPath: \.magnification, to: 2)

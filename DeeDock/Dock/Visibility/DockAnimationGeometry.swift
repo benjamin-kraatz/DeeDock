@@ -28,10 +28,17 @@ struct DockAnimationSample: Equatable {
 /// Pure effects in top-left logical coordinates: zero is fully shown, one is fully hidden.
 enum DockAnimationGeometry {
     static let margin: CGFloat = 40
-    static func sample(style: DockAnimationStyle, progress: Double, size: CGSize, reduceMotion: Bool) -> DockAnimationSample {
+    static func sample(style: DockAnimationStyle, progress: Double, size: CGSize, reduceMotion: Bool, edge: DockEdge = .bottom) -> DockAnimationSample {
+        let canonicalSize = CGSize(width: edge.length(of: size), height: edge.depth(of: size))
+        let canonical = canonicalSample(style: style, progress: progress, size: canonicalSize, reduceMotion: reduceMotion)
+        return DockAnimationSample(offset: edge.offset(canonical.offset), scale: canonical.scale, opacity: canonical.opacity,
+            mask: edge.rect(canonical.mask, depth: canonicalSize.height), anchor: edge.point(canonical.anchor, depth: canonicalSize.height))
+    }
+
+    private static func canonicalSample(style: DockAnimationStyle, progress: Double, size: CGSize, reduceMotion: Bool) -> DockAnimationSample {
         let p = CGFloat(min(1, max(0, progress)))
         let bounds = CGRect(origin: .zero, size: size)
-        var result = DockAnimationSample(mask: bounds, anchor: CGPoint(x: size.width / 2, y: size.height - DockGeometry.bottomMargin))
+        var result = DockAnimationSample(mask: bounds, anchor: CGPoint(x: size.width / 2, y: size.height - DockGeometry.outerMargin))
         if reduceMotion { result.opacity = 1 - Double(p); return result }
         switch style {
         case .slideFade: result.offset.height = 24 * p; result.opacity = 1 - Double(p)

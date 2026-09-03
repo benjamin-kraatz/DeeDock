@@ -229,3 +229,50 @@ The overlay uses a nonactivating AppKit panel with click-through content and no 
 The focused Debug app build (`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-drag-build build`) succeeded. Log: `/tmp/DeeDock-display-indicator-build.log`. The only build warning was skipped App Intents metadata extraction. The string catalog parses and the diff passes whitespace checks.
 
 No tests, automated visual checks, app launches, or hands-on acceptance were performed for this change. Remaining acceptance: identify both monitors while switching profiles/categories; select Defaults and disconnected profiles; disable a dock; close/reopen/minimize Settings and switch apps; rearrange/unplug displays; check negative origins, scaling, notch/menu-bar placement, mirroring, full-screen Spaces, contrast, Reduce Transparency, and click/focus passthrough. Full-screen auxiliary participation is requested through a public AppKit API; actual Spaces behavior remains unverified.
+
+## Feature 2: Left and right edge placement
+
+Implemented on 2026-09-03 against `13adfdc`, including the user's committed item spacing, glass padding, and source-display Settings changes.
+
+### Behavior and compatibility
+
+- Defaults and display profiles support Bottom, Left, and Right. Each edge uses one shared alignment, offset, and edge distance. Positive offsets move right below and down beside the display. Pins keep their order; both side docks read top to bottom.
+- `DockEdge` maps canonical dock geometry into physical top-left content coordinates. Placement converts those rectangles into AppKit screen coordinates. Icons, selection markers, running dots, separators, labels, scrolling, drag insertion, and native hit testing use the selected edge. Icons remain upright and magnify inward while glass thickness stays fixed.
+- Activation length follows the dock axis; depth extends inward from the glass or selected screen edge. The Settings diagrams and Show Zone overlay use production geometry. Directional animation offsets, anchors, and masks use the same transformation as native input. Side-specific names and descriptions match their direction.
+- Up/Down and Option-Up/Down navigate and reorder side docks. Menus and VoiceOver expose Move Up and Move Down. Cross-display copies support every source/destination edge pair. Finder imports, duplicate handling, bookmark access, and the 5-point drag and 64-point unpin thresholds remain in place. Transparent source-label space holds visibility without extending the unpin threshold; another dock still protects a rejected destination. Animated portions outside the visible mask cannot accept insertion.
+- Edge changes clear obsolete hit regions, cancel active drag/import work through the existing owner, and invalidate visibility deadlines. Keyboard selection stays in the store. Horizontal/vertical changes recreate scrolling presentation and reveal the selected app when keyboard-focused; left/right changes keep scroll position. A geometry change alone does not reveal a hidden dock.
+- Internal position and activation names now describe axes rather than bottom-only dimensions. Explicit Codable mappings preserve existing field names, alignment raw values, animation identifiers, and preferences keys. Missing edge defaults to bottom in shared settings and inheritance in display overrides. Unknown or null edge values refuse loading without replacing saved data.
+- UI copy remains in the string catalog. Added inert previews cover both sides, magnification, long labels, overflow, empty content, insertion feedback, errors, and reduced-motion/transparency appearances. No preview launches apps or changes real preferences.
+
+### Compilation and authored coverage
+
+The focused Debug app build and the unhosted test-target build use the existing DeeDock scheme:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-edge-build build
+
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-edge-build build-for-testing
+```
+
+Final results: **BUILD SUCCEEDED** for the app and **TEST BUILD SUCCEEDED** for the app plus test target. Logs are `/tmp/DeeDock-edge-app-build.log` and `/tmp/DeeDock-edge-test-build.log`. The normal final app build reported no warnings. The test build reported only skipped App Intents metadata extraction because the targets do not depend on AppIntents.
+
+The initial sandboxed build could not run Swift macro plugins; subsequent builds ran outside that sandbox. This does not change the app's App Sandbox setting. The string catalog passes `jq empty`, the Xcode project passes `plutil -lint`, and `git diff --check` is clean.
+
+New Swift Testing coverage checks legacy field compatibility, edge round trips, malformed-byte preservation, individual inheritance and resets, pin preservation, all edge alignments and reference frames, signed offsets, negative origins, clamping, overflow, fixed glass thickness, inward magnification, coordinate inverses, activation boundaries, all ten oriented animation masks, reduced-motion samples, vertical insertion/autoscroll, all nine cross-edge copy pairs, selected-app retention, keyboard direction mapping, and stale visibility callbacks. Existing model tests use the renamed interfaces. The test target explicitly includes the shared edge model.
+
+**No tests were executed. No app was launched, previews rendered, or automated visual checks performed.** Compilation does not establish passing assertions, native event delivery, animation quality, or Dock-like feel.
+
+### Remaining hands-on acceptance
+
+- Place docks on different edges across multiple monitors. Check top/center/bottom alignment, positive/negative offsets, zero and maximum distance, usable-desktop versus screen-edge references, negative display origins, scaling, and display unplug/reconnect.
+- Compare bottom placement with the committed baseline. On both sides, check upright icons and labels, outer running/selection markers, inward magnification, fixed glass thickness, readable errors, empty docks, and transparent-margin click passthrough.
+- Exercise vertical scrolling and autoscrolling, Finder batches, running-to-pinned insertion, all mixed-edge copy directions, deliberate outside unpinning, Escape, rejected destinations, and settings changes during a drag. Verify saved order after restart.
+- Exercise Focus Dock, parallel and perpendicular arrows, Option-arrow moves, native context menus, VoiceOver actions, and error dismissal. Confirm pointer interaction does not steal foreground focus and selected apps stay visible after an axis change.
+- Check both activation anchors, offsets, custom dimensions, elevated docks, and pointer travel through the connecting region. Play every animation on both sides, including reversal, zero duration, Reduce Motion, and Reduce Transparency. Verify Show Zone and Settings previews follow edge edits and close correctly.
+- Check ordinary Spaces, full-screen apps, Mission Control, mirroring, sleep/wake, and quitting during a transition or drag. Existing native collection behavior is unchanged; actual OS behavior remains unverified for this feature.
+
+Top placement, idle fading, background controls, and system Dock coexistence settings are outside this feature. No permissions, system Dock preferences, signing settings, language mode, deployment target, or dependencies were changed. Stop here for user review.

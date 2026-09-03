@@ -43,14 +43,14 @@ struct DockDragTests {
 
     @Test("Insertion uses resting canvas coordinates and accounts for horizontal scrolling")
     func geometry() {
-        let layout = DockGeometry.layout(count: 30, favoriteCount: 25, availableWidth: 600)
+        let layout = DockGeometry.layout(count: 30, favoriteCount: 25, availableLength: 600)
         let point = CGPoint(x: layout.restingCenters[10] + 1 - 150, y: 100)
         #expect(DockDragGeometry.insertion(point: point, scrollOffset: -150, layout: layout, pinCount: 25) == 11)
         #expect(DockDragGeometry.insertion(point: CGPoint(x: layout.restingCenters[27], y: 100), scrollOffset: 0, layout: layout, pinCount: 25) == nil)
         #expect(DockDragGeometry.insertion(point: .zero, scrollOffset: 0, layout: layout, pinCount: 0) == 0)
-        #expect(DockDragGeometry.scrollVelocity(x: 0, width: 500) < 0)
-        #expect(DockDragGeometry.scrollVelocity(x: 500, width: 500) > 0)
-        #expect(DockDragGeometry.scrollVelocity(x: 250, width: 500) == 0)
+        #expect(DockDragGeometry.scrollVelocity(position: 0, length: 500) < 0)
+        #expect(DockDragGeometry.scrollVelocity(position: 500, length: 500) > 0)
+        #expect(DockDragGeometry.scrollVelocity(position: 250, length: 500) == 0)
     }
 
     @Test("Insertion gaps are transient and retain surviving application identities")
@@ -63,17 +63,28 @@ struct DockDragTests {
         #expect(DockRenderSlot.slots(items: items, proposal: nil).map(\.id) == ["app:a", "app:b"])
     }
 
-    @Test("Copying pins preserves the source; unpinning a running app retains its running item")
-    func stores() {
+    @Test("Copying between any edges preserves source pins and keeps running apps after unpinning", arguments: DockEdge.allCases, DockEdge.allCases)
+    func stores(sourceEdge: DockEdge, destinationEdge: DockEdge) {
         let profiles = DisplayProfilesStore(defaults: DockSettingsStore(repository: nil), repository: nil)
         let displays = [DisplayFixtures.screen("one", runtimeID: 1, primary: true), DisplayFixtures.screen("two", runtimeID: 2)]
         profiles.synchronize(displays) { [a, b] }
+        profiles.update(displays[0].id, keyPath: \.edge, to: sourceEdge)
+        profiles.update(displays[1].id, keyPath: \.edge, to: destinationEdge)
         let service = DragFixtureService(running: [a])
         let catalog = ApplicationCatalog(service: service)
         catalog.refresh()
         let first = DockStore(displayID: displays[0].id, catalog: catalog, profiles: profiles)
         let second = DockStore(displayID: displays[1].id, catalog: catalog, profiles: profiles)
-        #expect(second.insertPins([a], at: 2))
+        let settings = profiles.effectiveSettings(for: displays[1].id)
+        let layout = DockGeometry.layout(count: 2, favoriteCount: 2, availableLength: 800, settings: settings)
+        let point = destinationEdge.point(CGPoint(x: layout.restingCenters[1] + 1, y: layout.panelDepth - 20), depth: layout.panelDepth)
+        let index = DockDragGeometry.insertion(point: point, scrollOffset: 0, layout: layout, pinCount: 2)
+        #expect(index == 2)
+        #expect(second.insertPins([a], at: index ?? 0))
+        first.selectedID = a.id
+        profiles.update(displays[0].id, keyPath: \.edge, to: destinationEdge)
+        first.refresh()
+        #expect(first.selectedID == a.id)
         #expect(first.pins == [a, b])
         #expect(second.pins == [b, a])
         #expect(first.removePin(a.id))

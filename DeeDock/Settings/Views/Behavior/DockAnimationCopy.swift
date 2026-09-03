@@ -41,3 +41,30 @@ extension DockAnimationStyle.Group {
         }
     }
 }
+
+extension DockAnimationStyle {
+    func title(for edge: DockEdge) -> LocalizedStringResource {
+        guard edge.isVertical else { return title }
+        switch self {
+        case .liftFade: return .animationSideLiftTitle
+        case .leftFade: return .animationSideStartTitle
+        case .rightFade: return .animationSideEndTitle
+        default: return title
+        }
+    }
+    func subtitle(for edge: DockEdge) -> LocalizedStringResource {
+        guard edge.isVertical else { return subtitle }
+        switch self {
+        case .slideFade: return .animationSideSlideFadeSubtitle
+        case .slide: return .animationSideSlideSubtitle
+        case .fade: return subtitle
+        case .liftFade: return .animationSideLiftSubtitle
+        case .leftFade: return .animationSideStartSubtitle
+        case .rightFade: return .animationSideEndSubtitle
+        case .scaleFade: return .animationSideScaleSubtitle
+        case .verticalWipe: return .animationSideWipeSubtitle
+        case .horizontalWipe: return .animationSideSqueezeSubtitle
+        case .bounceFade: return .animationSideBounceSubtitle
+        }
+    }
+}

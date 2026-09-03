@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Static grouped choices; only the explicit preview plays, never ten simultaneous animations.
 struct BehaviorAnimationPicker: View {
+    var edge: DockEdge = .bottom
     @Binding var selection: DockAnimationStyle
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -14,8 +15,8 @@ struct BehaviorAnimationPicker: View {
                                 Image(systemName: selection == style ? "checkmark.circle.fill" : "circle")
                                     .foregroundStyle(selection == style ? Color.accentColor : .secondary)
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text(style.title).font(.callout.weight(.semibold))
-                                    Text(style.subtitle).font(.caption).foregroundStyle(.secondary)
+                                    Text(style.title(for: edge)).font(.callout.weight(.semibold))
+                                    Text(style.subtitle(for: edge)).font(.caption).foregroundStyle(.secondary)
                                 }
                                 Spacer(minLength: 0)
                             }

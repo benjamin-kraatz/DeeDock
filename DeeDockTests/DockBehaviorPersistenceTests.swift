@@ -53,10 +53,10 @@ import Testing
         var settings = DockSettings()
         settings.behavior.revealDelay = 0.123
         #expect(settings.normalized?.behavior.revealDelay == 0.1)
-        settings.behavior.customWidth = .infinity
+        settings.behavior.customLength = .infinity
         #expect(settings.normalized == nil)
-        settings.behavior.customWidth = 320
-        settings.behavior.zoneHeight = 0
+        settings.behavior.customLength = 320
+        settings.behavior.zoneDepth = 0
         #expect(settings.normalized == nil)
     }
 }

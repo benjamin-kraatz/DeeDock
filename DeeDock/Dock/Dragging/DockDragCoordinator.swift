@@ -157,16 +157,16 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
            !references.isEmpty, let index = candidate.insertionIndex(at: point) {
             destinationID = candidate.store.displayID; destinationIndex = index
         }
-        let overDock = panels.values.contains { $0.containsDragRegion(point) }
+        let overDock = panels.contains { id, panel in panel.protectsDragRemoval(at: point, isSource: id == sourceID) }
         let removing = reference.map { ref in
             sourceID.flatMap { panels[$0] }?.store.pins.contains(where: { $0.id == ref.id }) == true
         } == true && !overDock && DockDragGeometry.distance(point, outside: sourceBounds) >= DockDragGeometry.removalDistance
         for (id, panel) in panels {
             let targeted = candidate === panel
             let proposal = id == destinationID ? DockDragProposal(references: references, index: destinationIndex!) : nil
-            let message: LocalizedStringResource? = targeted
+            let message: LocalizedStringResource? = id == sourceID && removing ? .actionUnpin : (targeted
                 ? (rejected || !panel.store.canEditPins ? .dragRejected : (references.isEmpty ? .dragCheckingApps : (proposal == nil ? .dragPinnedSection : .dragPinHere)))
-                : (id == sourceID && removing ? .actionUnpin : nil)
+                : nil)
             panel.setDragPresentation(proposal: proposal, source: id == sourceID ? reference?.id : nil,
                                       targeted: targeted, message: message)
         }
@@ -229,7 +229,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if let sourceID, let reference, let panel = panels[sourceID],
            completion.shouldUnpin(isPinned: panel.store.pins.contains { $0.id == reference.id },
                                   distance: DockDragGeometry.distance(screenPoint, outside: sourceBounds),
-                                  overDock: panels.values.contains { $0.containsDragRegion(screenPoint) }) {
+                                  overDock: panels.contains { id, target in target.protectsDragRemoval(at: screenPoint, isSource: id == sourceID) }) {
             committing = true
             _ = panel.store.removePin(reference.id)
             committing = false

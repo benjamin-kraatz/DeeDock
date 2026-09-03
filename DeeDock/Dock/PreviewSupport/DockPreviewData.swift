@@ -11,6 +11,13 @@ enum DockPreviewData {
          item("terminal", name: "Sample Terminal", symbol: "terminal", pinned: false, running: true)]
     }
 
+    static var crowdedItems: [DockItem] {
+        (0..<30).map { item("app\($0)", name: "Sample \($0)", symbol: "app.fill", pinned: $0 < 25, running: $0 % 2 == 0) }
+    }
+    static var longNameItems: [DockItem] {
+        [item("long", name: "A Sample Application With a Much Longer Display Name", symbol: "text.alignleft", pinned: true, running: true)] + items
+    }
+
     private static func item(_ id: String, name: String, symbol: String, pinned: Bool,
                              running: Bool, available: Bool = true) -> DockItem {
         DockItem(reference: ApplicationReference(bundleIdentifier: "preview.\(id)",
@@ -29,7 +36,7 @@ struct DockPreviewContent: View {
     @State private var interaction: DockInteraction
 
     init(items: [DockItem]? = nil, errorMessage: LocalizedStringResource? = nil,
-         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults) {
+         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults, availableLength: CGFloat = 800) {
         let items = items ?? DockPreviewData.items
         self.items = items
         self.errorMessage = errorMessage
@@ -41,9 +48,9 @@ struct DockPreviewContent: View {
         interaction.dragActive = dragProposal != nil || dragMessage != nil
         let slots = DockRenderSlot.slots(items: items, proposal: dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                                                  availableWidth: 800, settings: settings)
+                                                  availableLength: availableLength, settings: settings)
         if magnified, let x = interaction.layout.restingCenters.first {
-            interaction.pointer = CGPoint(x: x, y: interaction.layout.panelHeight - 36)
+            interaction.pointer = settings.edge.point(CGPoint(x: x, y: interaction.layout.panelDepth - 36), depth: interaction.layout.panelDepth)
         }
         _interaction = State(initialValue: interaction)
     }

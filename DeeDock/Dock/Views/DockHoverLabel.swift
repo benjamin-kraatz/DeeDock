@@ -1,17 +1,24 @@
 import SwiftUI
 
-/// A system-provided app name kept within the visible viewport, even in a scrolling dock.
+/// An upright app-name label placed inward and clamped to the supplied visible callout region.
 struct DockHoverLabel: View {
     let name: String
-    /// Desired label center in top-left canvas coordinates.
     let anchor: CGPoint
     let viewport: CGRect
-    @State private var measuredWidth: CGFloat = 180
+    var edge: DockEdge = .bottom
+    @State private var measuredSize = CGSize(width: 180, height: 30)
 
     private var maximumWidth: CGFloat { max(1, min(240, viewport.width - 16)) }
-    private var centerX: CGFloat {
-        let halfWidth = min(measuredWidth, maximumWidth) / 2
-        return min(max(anchor.x, viewport.minX + halfWidth + 8), viewport.maxX - halfWidth - 8)
+    private var center: CGPoint {
+        let halfWidth = min(measuredSize.width, maximumWidth) / 2
+        let halfHeight = min(measuredSize.height, viewport.height) / 2
+        let requestedX: CGFloat = switch edge {
+        case .bottom: anchor.x
+        case .left: viewport.minX + halfWidth + 8
+        case .right: viewport.maxX - halfWidth - 8
+        }
+        return CGPoint(x: min(max(requestedX, viewport.minX + halfWidth + 8), viewport.maxX - halfWidth - 8),
+                       y: min(max(anchor.y, viewport.minY + halfHeight), viewport.maxY - halfHeight))
     }
 
     var body: some View {
@@ -22,8 +29,8 @@ struct DockHoverLabel: View {
             .frame(maxWidth: maximumWidth)
             .fixedSize(horizontal: true, vertical: true)
             .background(.regularMaterial, in: .rect(cornerRadius: 7))
-            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { measuredWidth = $0 }
-            .position(x: centerX, y: anchor.y)
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { measuredSize = $0 }
+            .position(center)
             .allowsHitTesting(false)
             .accessibilityHidden(true)
     }

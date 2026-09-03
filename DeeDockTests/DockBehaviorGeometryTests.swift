@@ -15,32 +15,32 @@ import Testing
         let edge = DockActivationGeometry(screen: screen, restingGlass: glass, envelope: envelope, settings: settings)
         #expect(edge.zone.minY == screen.minY)
         #expect(edge.retention.contains(CGPoint(x: glass.midX, y: -200)))
-        settings.widthMode = .custom; settings.customWidth = 8192; settings.zoneOffset = 4096
+        settings.lengthMode = .custom; settings.customLength = 8192; settings.zoneOffset = 4096
         let clamped = DockActivationGeometry(screen: screen, restingGlass: glass, envelope: envelope, settings: settings)
         #expect(clamped.zone.width == screen.width)
         #expect(clamped.zone.minX == screen.minX)
-        #expect(settings.customWidth == 8192 && settings.zoneOffset == 4096)
+        #expect(settings.customLength == 8192 && settings.zoneOffset == 4096)
     }
 
     @Test("Resting activation width survives magnification and overflow; effects stay within their display")
     func envelope() {
         let screen = CGRect(x: -1200, y: 600, width: 1200, height: 800)
         var settings = DockSettings(); settings.iconSize = 96; settings.magnification = 2
-        let layout = DockGeometry.layout(count: 60, favoriteCount: 5, availableWidth: screen.width, settings: settings)
+        let layout = DockGeometry.layout(count: 60, favoriteCount: 5, availableLength: screen.width, settings: settings)
         let frame = DockGeometry.panelFrame(referenceFrame: screen, layout: layout, settings: settings)
         let geometry = DockPresentationGeometry(screen: screen, restingFrame: frame, layout: layout, settings: settings.behavior)
-        #expect(geometry.activation.zone.width == layout.viewportWidth)
+        #expect(geometry.activation.zone.width == layout.viewportLength)
         #expect(screen.contains(geometry.windowFrame))
         #expect(geometry.contentOrigin.x + geometry.windowFrame.minX == frame.minX)
         #expect(geometry.contentOrigin.y + frame.maxY == geometry.windowFrame.maxY)
-        let large = DockGeometry.layout(count: 6, favoriteCount: 3, availableWidth: screen.width, settings: settings)
+        let large = DockGeometry.layout(count: 6, favoriteCount: 3, availableLength: screen.width, settings: settings)
         let largeFrame = DockGeometry.panelFrame(referenceFrame: screen, layout: large, settings: settings)
         let magnified = DockPresentationGeometry(screen: screen, restingFrame: largeFrame, layout: large, settings: settings.behavior)
         settings.magnification = 1
-        let small = DockGeometry.layout(count: 6, favoriteCount: 3, availableWidth: screen.width, settings: settings)
+        let small = DockGeometry.layout(count: 6, favoriteCount: 3, availableLength: screen.width, settings: settings)
         let smallFrame = DockGeometry.panelFrame(referenceFrame: screen, layout: small, settings: settings)
         let resting = DockPresentationGeometry(screen: screen, restingFrame: smallFrame, layout: small, settings: settings.behavior)
-        #expect(large.panelHeight != small.panelHeight)
+        #expect(large.panelDepth != small.panelDepth)
         #expect(magnified.activation.zone == resting.activation.zone)
     }
 

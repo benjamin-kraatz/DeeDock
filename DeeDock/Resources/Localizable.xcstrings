@@ -242,13 +242,13 @@
       }
     },
     "settingsAlignment": {
-      "comment": "Label for the horizontal dock anchor.",
+      "comment": "Alignment control label. Choices run left/center/right on bottom docks and top/center/bottom on side docks.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Horizontal alignment"
+            "value": "Alignment"
           }
         }
       }
@@ -494,25 +494,25 @@
       }
     },
     "settingsPositionHelp": {
-      "comment": "Explains direction and display clamping.",
+      "comment": "Explains physical offset direction, edge distance, and clamping for all dock edges.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Positive offsets move right; negative offsets move left. Placement stays within the display while your requested values are remembered."
+            "value": "Positive offsets move right on bottom docks and down on side docks. Edge distance measures to the outside of the glass. Placement is constrained to the display; requested values remain saved."
           }
         }
       }
     },
     "settingsPositionKeywords": {
-      "comment": "Space-separated search synonyms for the Position pane; translate to words a user would type, not literally.",
+      "comment": "Space-separated search synonyms for bottom and side placement settings.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "position placement alignment offset bottom edge screen display margin"
+            "value": "edge bottom left right top center alignment offset distance usable desktop screen position vertical horizontal"
           }
         }
       }
@@ -866,13 +866,13 @@
       }
     },
     "settingsBehaviorKeywords": {
-      "comment": "Search synonyms for the Behavior Settings pane.",
+      "comment": "Space-separated search synonyms for auto-hide, activation dimensions, and animations.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "hide reveal activation zone animation timing delay fade slide"
+            "value": "auto hide reveal activation zone length depth width height offset delay animation duration preview edge"
           }
         }
       }
@@ -926,13 +926,13 @@
       }
     },
     "behaviorZoneHelp": {
-      "comment": "Explains triggering and system Dock coexistence.",
+      "comment": "Explains length along the selected edge, inward depth, offset direction, and the safe approach region.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rest the pointer in this area to reveal the dock. Screen-edge activation may also reveal the system Dock."
+            "value": "The activation zone follows the selected dock edge. Length runs along the edge; depth extends inward. Positive offsets move right on bottom docks and down on side docks. The connecting region keeps the dock visible while you approach it."
           }
         }
       }
@@ -1034,13 +1034,13 @@
       }
     },
     "behaviorZoneOffset": {
-      "comment": "Offset of trigger relative to dock center in points.",
+      "comment": "Signed activation-zone offset along the selected dock edge. Positive moves right below and down beside the display.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Activation horizontal offset"
+            "value": "Along-edge offset"
           }
         }
       }
@@ -1533,6 +1533,318 @@
           "stringUnit": {
             "state": "translated",
             "value": "Editing this display"
+          }
+        }
+      }
+    },
+    "settingsEdge": {
+      "comment": "Physical display edge picker in Position settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edge"
+          }
+        }
+      }
+    },
+    "settingsEdgeBottom": {
+      "comment": "Dock on the bottom edge of the display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom"
+          }
+        }
+      }
+    },
+    "settingsEdgeLeft": {
+      "comment": "Physical left display edge, independent of reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left"
+          }
+        }
+      }
+    },
+    "settingsEdgeRight": {
+      "comment": "Physical right display edge, independent of reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right"
+          }
+        }
+      }
+    },
+    "settingsAlignTop": {
+      "comment": "Align a vertical dock near the top of the display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top"
+          }
+        }
+      }
+    },
+    "settingsAlignBottom": {
+      "comment": "Align a vertical dock near the bottom of the display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom"
+          }
+        }
+      }
+    },
+    "settingsAlongEdgeOffset": {
+      "comment": "Signed position offset. Positive moves right on bottom docks and down on side docks.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Along-edge offset"
+          }
+        }
+      }
+    },
+    "settingsEdgeDistance": {
+      "comment": "Distance from the chosen reference edge to the outer edge of the glass.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edge distance"
+          }
+        }
+      }
+    },
+    "behaviorLengthMode": {
+      "comment": "Select how the activation region length along the dock is determined.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activation length"
+          }
+        }
+      }
+    },
+    "behaviorDockLength": {
+      "comment": "Match activation length to the resting visible glass length.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock length"
+          }
+        }
+      }
+    },
+    "behaviorCustomLength": {
+      "comment": "User-defined activation length along the selected screen edge.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom length"
+          }
+        }
+      }
+    },
+    "behaviorZoneDepth": {
+      "comment": "Activation zone thickness measured inward from its outer edge.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activation depth"
+          }
+        }
+      }
+    },
+    "actionMoveUp": {
+      "comment": "Move a pin one place toward the top of a side dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Up"
+          }
+        }
+      }
+    },
+    "actionMoveDown": {
+      "comment": "Move a pin one place toward the bottom of a side dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Down"
+          }
+        }
+      }
+    },
+    "animationSideLiftTitle": {
+      "comment": "Playful side-dock name for the inward lift-and-fade animation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Into the Room"
+          }
+        }
+      }
+    },
+    "animationSideStartTitle": {
+      "comment": "Playful side-dock name for moving upward and fading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up & Out"
+          }
+        }
+      }
+    },
+    "animationSideEndTitle": {
+      "comment": "Playful side-dock name for moving downward and fading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Down & Out"
+          }
+        }
+      }
+    },
+    "animationSideSlideFadeSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides toward the screen edge while fading."
+          }
+        }
+      }
+    },
+    "animationSideSlideSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides outward through the selected edge."
+          }
+        }
+      }
+    },
+    "animationSideLiftSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves inward while fading."
+          }
+        }
+      }
+    },
+    "animationSideStartSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves up while fading."
+          }
+        }
+      }
+    },
+    "animationSideEndSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves down while fading."
+          }
+        }
+      }
+    },
+    "animationSideScaleSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shrinks toward the outer edge while fading."
+          }
+        }
+      }
+    },
+    "animationSideWipeSubtitle": {
+      "comment": "Side-dock wipe animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closes across the glass toward the outer edge."
+          }
+        }
+      }
+    },
+    "animationSideSqueezeSubtitle": {
+      "comment": "Side-dock lengthwise wipe description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closes from the top and bottom toward the center."
+          }
+        }
+      }
+    },
+    "animationSideBounceSubtitle": {
+      "comment": "Side-dock bounce animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bounces inward, then retreats outward and fades."
           }
         }
       }

@@ -37,9 +37,15 @@ enum DockDragGeometry {
         return hypot(dx, dy)
     }
 
+    /// Source retention includes transparent label space. It holds visibility without blocking unpinning.
+    /// Other dock destinations retain protection even when they reject a drop.
+    static func protectsRemoval(at point: CGPoint, isSource: Bool, restingGlass: CGRect, retention: CGRect) -> Bool {
+        (isSource ? restingGlass : retention).contains(point)
+    }
+
     /// Returns a boundary in the persisted pinned section, or nil over the running-only section.
     static func insertion(point: CGPoint, scrollOffset: CGFloat, layout: DockGeometry.Layout, pinCount: Int) -> Int? {
-        let x = point.x - scrollOffset
+        let x = layout.edge.along(point) - scrollOffset
         let centers = layout.restingCenters
         let count = min(pinCount, centers.count)
         if count == 0 { return 0 }
@@ -48,9 +54,9 @@ enum DockDragGeometry {
     }
 
     /// Signed scroll velocity, active only within 28 points of a viewport edge.
-    static func scrollVelocity(x: CGFloat, width: CGFloat) -> CGFloat {
-        if x < 28 { return -240 * max(0, min(1, (28 - x) / 28)) }
-        if x > width - 28 { return 240 * max(0, min(1, (x - width + 28) / 28)) }
+    static func scrollVelocity(position: CGFloat, length: CGFloat) -> CGFloat {
+        if position < 28 { return -240 * max(0, min(1, (28 - position) / 28)) }
+        if position > length - 28 { return 240 * max(0, min(1, (position - length + 28) / 28)) }
         return 0
     }
 }

@@ -67,8 +67,8 @@ struct DockContextMenuBridge: NSViewRepresentable {
             menu.addItem(pin)
 
             if item.isFavorite {
-                for (title, action, distance) in [(String(localized: .actionMoveLeft), #selector(movePinLeft), -1),
-                                                  (String(localized: .actionMoveRight), #selector(movePinRight), 1)] {
+                for (title, action, distance) in [(String(localized: interaction?.layout.edge.isVertical == true ? .actionMoveUp : .actionMoveLeft), #selector(movePinLeft), -1),
+                                                  (String(localized: interaction?.layout.edge.isVertical == true ? .actionMoveDown : .actionMoveRight), #selector(movePinRight), 1)] {
                     let entry = NSMenuItem(title: title, action: action, keyEquivalent: "")
                     entry.target = self
                     entry.isEnabled = interaction?.canMovePin?(item.id, distance) == true

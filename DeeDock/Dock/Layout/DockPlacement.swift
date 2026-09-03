@@ -1,29 +1,47 @@
 import CoreGraphics
 
 extension DockGeometry {
-    /// Chooses the coordinate frame that the user's position settings refer to.
+    /// Chooses the full display or the area left by reserved system UI.
     static func referenceFrame(screenFrame: CGRect, visibleFrame: CGRect, settings: DockSettings) -> CGRect {
         settings.positionReference == .usableDesktop ? visibleFrame : screenFrame
     }
 
-    /// Anchors the resting glass, then clamps the whole magnification envelope to the reference frame.
-    /// Only the transparent bottom margin may extend below it, allowing zero glass-to-edge distance.
+    /// Anchors glass to the requested edge. Only the transparent outer margin may leave the reference.
+    /// Along-axis coordinates increase left-to-right below and top-to-bottom beside the display.
     static func panelFrame(referenceFrame: CGRect, layout: Layout, settings: DockSettings) -> CGRect {
         let settings = settings.normalized ?? .defaults
-        let restingWidth = layout.contentWidth(sizes: Array(repeating: layout.iconSize, count: layout.restingCenters.count))
-        let inset = max(0, (layout.viewportWidth - restingWidth) / 2)
-        let alignedX: CGFloat
+        let edge = settings.edge
+        let length = edge.length(of: referenceFrame.size)
+        let depth = edge.depth(of: referenceFrame.size)
+        let resting = layout.contentLength(sizes: Array(repeating: layout.iconSize, count: layout.restingCenters.count))
+        let inset = max(0, (layout.viewportLength - resting) / 2)
+        let aligned: CGFloat
         switch settings.alignment {
-        case .left: alignedX = referenceFrame.minX + 8 - inset
-        case .center: alignedX = referenceFrame.midX - layout.viewportWidth / 2
-        case .right: alignedX = referenceFrame.maxX - 8 - layout.viewportWidth + inset
+        case .start: aligned = 8 - inset
+        case .center: aligned = (length - layout.viewportLength) / 2
+        case .end: aligned = length - 8 - layout.viewportLength + inset
         }
-        let minimumX = referenceFrame.minX + 8
-        let maximumX = max(minimumX, referenceFrame.maxX - 8 - layout.viewportWidth)
-        let x = min(max(alignedX + CGFloat(settings.horizontalOffset), minimumX), maximumX)
-        let minimumY = referenceFrame.minY - bottomMargin
-        let maximumY = max(minimumY, referenceFrame.maxY - layout.panelHeight)
-        let y = min(max(minimumY + CGFloat(settings.bottomDistance), minimumY), maximumY)
-        return CGRect(x: x, y: y, width: layout.viewportWidth, height: layout.panelHeight)
+        let along = min(max(aligned + CGFloat(settings.alongEdgeOffset), 8), max(8, length - 8 - layout.viewportLength))
+        let distance = min(max(CGFloat(settings.edgeDistance) - outerMargin, -outerMargin), max(-outerMargin, depth - layout.panelDepth))
+        switch edge {
+        case .bottom:
+            return CGRect(x: referenceFrame.minX + along, y: referenceFrame.minY + distance,
+                          width: layout.viewportLength, height: layout.panelDepth)
+        case .left:
+            return CGRect(x: referenceFrame.minX + distance, y: referenceFrame.maxY - along - layout.viewportLength,
+                          width: layout.panelDepth, height: layout.viewportLength)
+        case .right:
+            return CGRect(x: referenceFrame.maxX - distance - layout.panelDepth, y: referenceFrame.maxY - along - layout.viewportLength,
+                          width: layout.panelDepth, height: layout.viewportLength)
+        }
+    }
+
+    /// Resting visible glass, shared by activation, diagrams, and drag removal bounds.
+    static func restingGlass(frame: CGRect, layout: Layout, scrollOffset: CGFloat = 0) -> CGRect {
+        let offset = layout.edge.isVertical ? CGSize(width: 0, height: scrollOffset) : CGSize(width: scrollOffset, height: 0)
+        let rect = layout.surfaceFrame(sizes: layout.sizes(pointerAlong: nil, reduceMotion: true))
+            .offsetBy(dx: offset.width, dy: offset.height)
+            .intersection(CGRect(origin: .zero, size: layout.viewportSize))
+        return DockEdge.screenRect(rect, in: frame)
     }
 }

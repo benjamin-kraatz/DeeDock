@@ -1,9 +1,6 @@
 import SwiftUI
 
-/// Owns viewport scrolling and hover state while rendering supplied app snapshots.
-///
-/// Actions are injected so previews never launch applications or write preferences.
-/// `interaction` exchanges panel-local geometry with the AppKit window controller.
+/// Owns scrolling and hover state. Geometry and actions come from the panel; previews stay inert.
 struct DockContentView: View {
     let items: [DockItem]
     let launchingIDs: Set<String>
@@ -19,130 +16,80 @@ struct DockContentView: View {
 
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollPosition = ScrollPosition(x: 0)
-    private var slots: [DockRenderSlot] {
-        DockRenderSlot.slots(items: items, proposal: interaction.dragProposal)
-    }
     @State private var hoveredID: String?
-
     private var layout: DockGeometry.Layout { interaction.layout }
+    private var slots: [DockRenderSlot] { DockRenderSlot.slots(items: items, proposal: interaction.dragProposal) }
     private var sizes: [CGFloat] {
-        // Convert viewport coordinates to the resting canvas, not the animated icon positions.
-        layout.sizes(
-            pointerX: interaction.dragActive
-                ? nil : interaction.pointer.map { $0.x - scrollOffset },
-            reduceMotion: reduceMotion
-        )
+        layout.sizes(pointerAlong: interaction.dragActive ? nil : interaction.pointer.map {
+            layout.edge.along($0) - scrollOffset
+        }, reduceMotion: reduceMotion)
     }
-    private var surface: CGRect { layout.surfaceFrame(sizes: sizes) }
-    private var viewport: CGRect {
-        CGRect(
-            x: 0,
-            y: 0,
-            width: layout.viewportWidth,
-            height: layout.panelHeight
-        )
+    private var viewport: CGRect { CGRect(origin: .zero, size: layout.viewportSize) }
+    private func shifted(_ rect: CGRect, by offset: CGFloat) -> CGRect {
+        rect.offsetBy(dx: layout.edge.isVertical ? 0 : offset, dy: layout.edge.isVertical ? offset : 0)
     }
     private var viewportSurface: CGRect {
-        surface.offsetBy(dx: scrollOffset, dy: 0).intersection(
-            viewport
-        )
+        shifted(layout.surfaceFrame(sizes: sizes), by: scrollOffset).intersection(viewport)
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
+        let edge = layout.edge
+        ZStack(alignment: .topLeading) {
             ScrollViewReader { proxy in
-                ScrollView(.horizontal) {
-                    DockSurfaceView(
-                        slots: slots,
-                        launchingIDs: launchingIDs,
-                        selectedID: selectedID,
-                        keyboardFocus: keyboardFocus,
-                        showsLabel: errorMessage == nil
-                            && !interaction.dragActive,
-                        layout: layout,
-                        sizes: sizes,
-                        surface: surface,
-                        viewport: viewport.offsetBy(dx: -scrollOffset, dy: 0),
-                        hoveredID: $hoveredID,
-                        reduceMotion: reduceMotion,
-                        reduceTransparency: reduceTransparency,
-                        openApp: openApp,
-                        togglePin: togglePin,
-                        interaction: interaction,
+                ScrollView(edge.isVertical ? .vertical : .horizontal) {
+                    DockSurfaceView(slots: slots, launchingIDs: launchingIDs, selectedID: selectedID,
+                        keyboardFocus: keyboardFocus, showsLabel: errorMessage == nil && !interaction.dragActive,
+                        layout: layout, sizes: sizes, surface: layout.surfaceFrame(sizes: sizes),
+                        viewport: shifted(viewport, by: -scrollOffset), hoveredID: $hoveredID,
+                        reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
+                        openApp: openApp, togglePin: togglePin, interaction: interaction,
                         iconFrameChanged: { id, rect in
-                            interaction.setIconRect(
-                                rect?.intersection(viewport),
-                                for: id
-                            )
-                        },
-                        menuTracking: { interaction.menuTrackingChanged?($0) },
-                        accessibilityFocus: {
-                            interaction.accessibilityFocusChanged?($0, $1)
-                        }
-                    )
+                            guard interaction.layout.edge == edge else { return }
+                            interaction.setIconRect(rect?.intersection(viewport), for: id)
+                        }, menuTracking: { interaction.menuTrackingChanged?($0) },
+                        accessibilityFocus: { interaction.accessibilityFocusChanged?($0, $1) })
                     .onGeometryChange(for: CGFloat.self) { geometry in
-                        geometry.frame(in: .named("dockViewport")).minX
-                    } action: {
-                        scrollOffset = $0
-                        interaction.scrollOffset = $0
+                        edge.along(geometry.frame(in: .named("dockViewport")).origin)
+                    } action: { value in
+                        guard interaction.layout.edge == edge else { return }
+                        scrollOffset = value; interaction.scrollOffset = value
                         interaction.scrollChanged?()
                     }
                 }
                 .scrollPosition($scrollPosition)
                 .onChange(of: interaction.scrollRequest) { previous, current in
-                    scrollPosition.scrollTo(
-                        x: min(
-                            max(0, -scrollOffset + current - previous),
-                            max(0, layout.canvasWidth - layout.viewportWidth)
-                        )
-                    )
+                    let offset = min(max(0, -scrollOffset + current - previous), max(0, layout.canvasLength - layout.viewportLength))
+                    if edge.isVertical { scrollPosition.scrollTo(y: offset) }
+                    else { scrollPosition.scrollTo(x: offset) }
                 }
                 .scrollIndicators(.hidden)
                 .scrollClipDisabled()
                 .coordinateSpace(name: "dockViewport")
+                .onAppear {
+                    // Axis changes recreate only presentation. Store selection remains stable.
+                    if keyboardFocus, let selectedID { proxy.scrollTo(selectedID, anchor: .center) }
+                }
                 .onChange(of: selectedID) { _, id in
                     if let id {
-                        withAnimation(
-                            reduceMotion ? nil : .easeOut(duration: 0.15)
-                        ) {
+                        withAnimation(reduceMotion ? nil : .easeOut(duration: 0.15)) {
                             proxy.scrollTo(id, anchor: .center)
                         }
                     }
                 }
             }
-            if let message = interaction.dragMessage {
-                DockDragFeedback(message: message)
-                    .position(
-                        x: layout.viewportWidth / 2,
-                        y: max(18, surface.minY - 20)
-                    )
-                    .allowsHitTesting(false)
-            }
-            if let errorMessage {
-                DockErrorBanner(
-                    message: errorMessage,
-                    maximumWidth: min(420, layout.viewportWidth - 16),
-                    dismiss: dismissError
-                )
-                .onGeometryChange(for: CGRect.self) {
-                    $0.frame(in: .named("dockRoot"))
-                } action: {
-                    interaction.errorRect = $0
-                }
-                .onDisappear { interaction.errorRect = .zero }
-            }
+            DockCalloutsView(errorMessage: errorMessage, dragMessage: interaction.dragMessage,
+                layout: layout, interaction: interaction, dismissError: dismissError)
         }
-        .frame(width: layout.viewportWidth, height: layout.panelHeight)
+        .frame(width: layout.viewportSize.width, height: layout.viewportSize.height)
         .coordinateSpace(name: "dockRoot")
         .clipped()
-        // Report only painted interactive regions. Transparent panel margins must pass clicks through.
         .onAppear { interaction.surfaceRect = viewportSurface }
         .onChange(of: viewportSurface) { _, rect in
+            guard interaction.layout.edge == edge else { return }
             interaction.surfaceRect = rect
         }
-        .onChange(of: interaction.pointer) { _, point in
-            if point == nil { hoveredID = nil }
-        }
+        .onChange(of: layout.edge) { _, _ in hoveredID = nil }
+        .onChange(of: interaction.pointer) { _, point in if point == nil { hoveredID = nil } }
         .onChange(of: items.map(\.id)) { _, ids in
             if let hoveredID, !ids.contains(hoveredID) { self.hoveredID = nil }
         }

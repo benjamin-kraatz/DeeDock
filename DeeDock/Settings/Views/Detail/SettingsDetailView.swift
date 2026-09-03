@@ -74,14 +74,14 @@ struct SettingsDetailView: View {
         case .behavior:
             BehaviorSettingsPane(source: SettingsValueSource(store: store, context: context), showZone: showZone)
         case .appearance:
-            AppearanceSettingsPane(iconSize: binding(\.iconSize),
+            AppearanceSettingsPane(edge: SettingsValueSource(store: store, context: context).value.edge, iconSize: binding(\.iconSize),
                                    magnification: binding(\.magnification), itemSpacing: binding(\.itemSpacing),
                                    overrideContext: context)
         case .position:
-            PositionSettingsPane(reference: binding(\.positionReference),
+            PositionSettingsPane(edge: binding(\.edge), reference: binding(\.positionReference),
                                  alignment: binding(\.alignment),
-                                 horizontalOffset: binding(\.horizontalOffset),
-                                 bottomDistance: binding(\.bottomDistance), overrideContext: context)
+                                 alongEdgeOffset: binding(\.alongEdgeOffset),
+                                 edgeDistance: binding(\.edgeDistance), overrideContext: context)
         }
     }
 

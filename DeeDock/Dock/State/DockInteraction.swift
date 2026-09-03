@@ -26,7 +26,7 @@ final class DockInteraction {
     @ObservationIgnored var accessibilityFocusChanged: ((String, Bool) -> Void)?
 
     /// Current resting layout for this panel’s ordered items and display width.
-    var layout = DockGeometry.layout(count: 0, favoriteCount: 0, availableWidth: 800)
+    var layout = DockGeometry.layout(count: 0, favoriteCount: 0, availableLength: 800)
     /// Pointer in panel-local, top-left-origin points; nil outside the surface and exposed app buttons.
     var pointer: CGPoint?
     /// Re-evaluates click passthrough when painted regions change under a stationary pointer.
@@ -43,6 +43,14 @@ final class DockInteraction {
         guard iconRects[id] != rect else { return }
         iconRects[id] = rect
         geometryDidChange?()
+    }
+
+    /// Invalidates old hit regions before the panel changes coordinate systems.
+    func resetGeometry() {
+        pointer = nil
+        iconRects.removeAll()
+        surfaceRect = .zero
+        errorRect = .zero
     }
 
     /// Whether a panel-local point reaches the glass or an exposed application button.

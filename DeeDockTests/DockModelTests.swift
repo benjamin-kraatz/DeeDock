@@ -10,20 +10,20 @@ struct DockModelTests {
     @Test("Placement preserves negative display origins and the visible-frame bottom")
     func placement() {
         let screen = CGRect(x: -1920, y: -360, width: 1920, height: 1000)
-        let layout = DockGeometry.layout(count: 8, favoriteCount: 4, availableWidth: screen.width)
+        let layout = DockGeometry.layout(count: 8, favoriteCount: 4, availableLength: screen.width)
         let frame = DockGeometry.panelFrame(referenceFrame: screen, layout: layout, settings: .defaults)
         #expect(frame.midX == screen.midX)
-        #expect(frame.minY + DockGeometry.bottomMargin == screen.minY + 8)
+        #expect(frame.minY + DockGeometry.outerMargin == screen.minY + 8)
         #expect(frame.minX >= screen.minX)
         #expect(frame.maxX <= screen.maxX)
     }
 
     @Test("Magnification stays bounded and derives from unchanged resting positions")
     func magnification() {
-        let layout = DockGeometry.layout(count: 8, favoriteCount: 4, availableWidth: 1400)
+        let layout = DockGeometry.layout(count: 8, favoriteCount: 4, availableLength: 1400)
         let resting = layout.restingCenters
         let pointer = resting[3]
-        let sizes = layout.sizes(pointerX: pointer, reduceMotion: false)
+        let sizes = layout.sizes(pointerAlong: pointer, reduceMotion: false)
         #expect(abs(sizes[3] - layout.iconSize * 1.4) < 0.001)
         #expect(sizes.allSatisfy { $0 >= layout.iconSize && $0 <= layout.iconSize * 1.4 })
         #expect(sizes[2] > layout.iconSize)
@@ -31,25 +31,25 @@ struct DockModelTests {
         let expanded = layout.centers(sizes: sizes)
         #expect(expanded[2] + sizes[2] / 2 < expanded[3] - sizes[3] / 2)
         #expect(layout.restingCenters == resting)
-        #expect(layout.sizes(pointerX: pointer, reduceMotion: false) == sizes)
-        #expect(layout.sizes(pointerX: pointer, reduceMotion: true).allSatisfy { $0 == layout.iconSize })
-        #expect(layout.sizes(pointerX: nil, reduceMotion: false).allSatisfy { $0 == layout.iconSize })
+        #expect(layout.sizes(pointerAlong: pointer, reduceMotion: false) == sizes)
+        #expect(layout.sizes(pointerAlong: pointer, reduceMotion: true).allSatisfy { $0 == layout.iconSize })
+        #expect(layout.sizes(pointerAlong: nil, reduceMotion: false).allSatisfy { $0 == layout.iconSize })
     }
 
     @Test("Magnification keeps the glass fixed while buttons grow above it from the same baseline")
     func fixedSurfaceHeight() {
         for width: CGFloat in [560, 1400] {
-            let layout = DockGeometry.layout(count: 10, favoriteCount: 3, availableWidth: width)
-            let resting = layout.sizes(pointerX: nil, reduceMotion: false)
-            let magnified = layout.sizes(pointerX: layout.restingCenters[4], reduceMotion: false)
+            let layout = DockGeometry.layout(count: 10, favoriteCount: 3, availableLength: width)
+            let resting = layout.sizes(pointerAlong: nil, reduceMotion: false)
+            let magnified = layout.sizes(pointerAlong: layout.restingCenters[4], reduceMotion: false)
             let glass = layout.surfaceFrame(sizes: resting)
             let hoveredGlass = layout.surfaceFrame(sizes: magnified)
             #expect(glass.minY == hoveredGlass.minY)
             #expect(glass.height == hoveredGlass.height)
             #expect(glass.maxY == hoveredGlass.maxY)
             #expect(hoveredGlass.width > glass.width)
-            let restingButton = layout.buttonFrame(centerX: layout.restingCenters[4], size: resting[4])
-            let hoveredButton = layout.buttonFrame(centerX: layout.centers(sizes: magnified)[4], size: magnified[4])
+            let restingButton = layout.buttonFrame(centerAlong: layout.restingCenters[4], size: resting[4])
+            let hoveredButton = layout.buttonFrame(centerAlong: layout.centers(sizes: magnified)[4], size: magnified[4])
             #expect(restingButton.maxY == hoveredButton.maxY)
             #expect(hoveredButton.minY < hoveredGlass.minY)
             #expect(hoveredButton.minY > 0)
@@ -61,14 +61,14 @@ struct DockModelTests {
 
     @Test("Crowded docks shrink to 32 points, then provide a wider scrollable canvas")
     func overflow() {
-        let normal = DockGeometry.layout(count: 5, favoriteCount: 3, availableWidth: 1400)
+        let normal = DockGeometry.layout(count: 5, favoriteCount: 3, availableLength: 1400)
         #expect(normal.iconSize == 48)
-        let compact = DockGeometry.layout(count: 10, favoriteCount: 3, availableWidth: 560)
+        let compact = DockGeometry.layout(count: 10, favoriteCount: 3, availableLength: 560)
         #expect(compact.iconSize >= 32 && compact.iconSize < 48)
-        let overflow = DockGeometry.layout(count: 40, favoriteCount: 3, availableWidth: 560)
+        let overflow = DockGeometry.layout(count: 40, favoriteCount: 3, availableLength: 560)
         #expect(overflow.iconSize == 32)
-        #expect(overflow.viewportWidth <= 560)
-        #expect(overflow.canvasWidth > overflow.viewportWidth)
+        #expect(overflow.viewportLength <= 560)
+        #expect(overflow.canvasLength > overflow.viewportLength)
     }
 
     @Test("Running apps deduplicate and retain order across launch and termination")

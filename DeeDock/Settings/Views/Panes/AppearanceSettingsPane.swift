@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Requested size and hover scale, previewed above the controls that change them.
 struct AppearanceSettingsPane: View {
+    var edge: DockEdge = .bottom
     @Binding var iconSize: Double
     @Binding var magnification: Double
     @Binding var itemSpacing: Double
@@ -11,7 +12,7 @@ struct AppearanceSettingsPane: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
-                DockAppearancePreview(iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing)
+                DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing)
             }
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,

@@ -38,19 +38,18 @@ struct DockSurfaceView: View {
             if slots.isEmpty {
                 Text(.dockEmptyState)
                     .font(.caption).foregroundStyle(.secondary)
-                    .frame(width: layout.canvasWidth)
-                    .position(x: layout.canvasWidth / 2, y: surface.midY)
+                    .frame(width: max(1, surface.width - 8), height: max(1, surface.height - 8))
+                    .minimumScaleFactor(0.7)
+                    .position(x: surface.midX, y: surface.midY)
             }
             if let index = layout.separatorIndex, index < centers.count {
+                let icon = layout.iconFrame(centerAlong: centers[index], size: layout.iconSize)
+                let position = centers[index] - sizes[index] / 2 - 12
                 Rectangle().fill(.primary.opacity(0.18))
-                    .frame(width: 1, height: layout.iconSize * 0.65)
-                    .position(
-                        x: centers[index] - sizes[index] / 2 - 12,
-                        y: layout.iconFrame(
-                            centerX: centers[index],
-                            size: layout.iconSize
-                        ).midY + 3
-                    )
+                    .frame(width: layout.edge.isVertical ? layout.iconSize * 0.65 : 1,
+                           height: layout.edge.isVertical ? 1 : layout.iconSize * 0.65)
+                    .position(x: layout.edge.isVertical ? icon.midX : position,
+                              y: layout.edge.isVertical ? position : icon.midY + 3)
                     .accessibilityHidden(true)
             }
             ForEach(Array(slots.enumerated()), id: \.element.id) {
@@ -58,11 +57,11 @@ struct DockSurfaceView: View {
                 slot in
                 if index < sizes.count {
                     let frame = layout.buttonFrame(
-                        centerX: centers[index],
+                        centerAlong: centers[index],
                         size: sizes[index]
                     )
                     let iconFrame = layout.iconFrame(
-                        centerX: centers[index],
+                        centerAlong: centers[index],
                         size: sizes[index]
                     )
                     if let item = slot.item {
@@ -118,23 +117,13 @@ struct DockSurfaceView: View {
                 let index = slots.firstIndex(where: { $0.item?.id == id }),
                 index < centers.count, showsLabel
             {
-                DockHoverLabel(
-                    name: slots[index].item?.reference.name ?? "",
-                    anchor: CGPoint(
-                        x: centers[index],
-                        y: min(
-                            surface.minY,
-                            layout.buttonFrame(
-                                centerX: centers[index],
-                                size: sizes[index]
-                            ).minY - 12
-                        ) - 20
-                    ),
-                    viewport: viewport
-                )
+                let region = layout.calloutRegion(size: sizes[index], length: layout.canvasLength).intersection(viewport)
+                DockHoverLabel(name: slots[index].item?.reference.name ?? "",
+                    anchor: CGPoint(x: centers[index], y: layout.edge.isVertical ? centers[index] : region.maxY - 20),
+                    viewport: region, edge: layout.edge)
             }
         }
-        .frame(width: layout.canvasWidth, height: layout.panelHeight)
+        .frame(width: layout.canvasSize.width, height: layout.canvasSize.height)
         .animation(
             reduceMotion ? nil : .easeOut(duration: 0.15),
             value: slots.map(\.id)

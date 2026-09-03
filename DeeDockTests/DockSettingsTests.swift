@@ -10,8 +10,8 @@ struct DockSettingsTests {
         #expect(settings.magnification == 1.4)
         #expect(settings.positionReference == .usableDesktop)
         #expect(settings.alignment == .center)
-        #expect(settings.horizontalOffset == 0)
-        #expect(settings.bottomDistance == 8)
+        #expect(settings.alongEdgeOffset == 0)
+        #expect(settings.edgeDistance == 8)
     }
 
     @Test("Invalid numeric values cannot reach geometry or persistence")
@@ -25,10 +25,10 @@ struct DockSettingsTests {
         settings.magnification = 2.1
         #expect(settings.normalized == nil)
         settings = .defaults
-        settings.horizontalOffset = -1001
+        settings.alongEdgeOffset = -1001
         #expect(settings.normalized == nil)
         settings = .defaults
-        settings.bottomDistance = -1
+        settings.edgeDistance = -1
         #expect(settings.normalized == nil)
         settings = .defaults
         settings.iconSize = 63.6
@@ -52,9 +52,9 @@ struct DockSettingsTests {
         custom.iconSize = 96
         custom.magnification = 2
         custom.positionReference = .screenEdge
-        custom.alignment = .right
-        custom.horizontalOffset = -150
-        custom.bottomDistance = 40
+        custom.alignment = .end
+        custom.alongEdgeOffset = -150
+        custom.edgeDistance = 40
         try repository.save(custom)
         #expect(try DockSettingsRepository(defaults: defaults).load() == custom)
         try repository.save(.defaults)

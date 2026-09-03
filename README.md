@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, position/appearance settings, and one dock per connected desktop display. Apps can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, left, or right edge. Apps can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -15,8 +15,8 @@ The macOS Dock is the reference for visual quality, interaction, and responsiven
 The product roadmap includes:
 
 - **A dock per monitor (implemented):** independent pins, shared defaults, per-setting overrides, and remembered disconnected displays.
-- **Precise placement:** edge, alignment, offset, and distance from the screen edge, with fine-grained controls.
-- **Activation zones (implemented):** choose dock-position or screen-edge triggering, dimensions, horizontal offset, and reveal timing.
+- **Precise placement, implemented:** bottom, left, or right edge; alignment, along-edge offset, and distance from the chosen reference edge.
+- **Activation zones (implemented):** choose dock-position or screen-edge triggering, length, depth, along-edge offset, and reveal timing.
 - **Size and appearance:** icon size, spacing, dock size, magnification, opacity, and fade controls.
 - **Behavior:** auto-hide, reveal/hide delays, and ten animation styles are implemented; broader interaction preferences remain planned.
 
@@ -72,26 +72,26 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 DeeDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DeeDock; dedicated coexistence controls are future work.
 
 - Click an icon to open or activate its application.
-- Hover to magnify nearby icons and see an app-name label. Running applications have a dot beneath them.
+- Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge.
 - Right-click an app for **Open**, **Pin**, or **Unpin**. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
-- Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app, Return opens it, and Escape returns focus to the previous app. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
+- Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on bottom docks; up/down arrows select an app on side docks. Return opens it, and Escape returns focus to the previous app. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
 - Choose **Quit DeeDock** from the menu-bar item or app menu to close it.
 
-The default icons are 48 points, with 8-point spacing and 12-point padding. Crowded docks reduce icon size to 32 points before scrolling horizontally. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
+The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally below or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
 Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Stacks/Trash, window previews, opacity/fade controls, and launch-at-login are not implemented.
 
 ## Arrange applications with drag-and-drop
 
-- Drag a pinned app left or right to reorder it. Drag a running app into the pinned section to pin it at that position. Running-only order remains automatic.
+- Drag a pinned app along the dock to reorder it. Drag a running app into the pinned section to pin it at that position. Running-only order remains automatic.
 - Drop one or more application bundles from Finder into the pinned section. The whole batch must contain valid, accessible applications other than DeeDock. Existing pins move into the dropped block; duplicate app identities appear only once.
 - Drag an app onto another display’s DeeDock to pin it there without removing the source pin. An existing destination pin moves to the chosen position.
 - Drag a pin at least 64 points outside its dock to see **Unpin**, then release to unpin it. Returning closer or pressing Escape cancels removal. Releasing over another DeeDock that rejects the drop keeps the source pin. Running apps remain in the running section after unpinning; applications are never quit or deleted.
 - During dragging, magnification settles to resting icon sizes and a live gap shows insertion. Overflowing docks scroll near their viewport edges. A hidden dock uses its existing activation zone and reveal delay; the source and revealed destination stay visible during the relevant interaction.
 - Pin edits save only when a drop completes. Cancelled drags restore the saved arrangement. Invalid batches are rejected together, and save errors appear on the affected dock.
 
-Right-click a pin for **Move Left**, **Move Right**, and **Pin on Display…**. With **Focus Dock** active, Option–Left/Right reorders the selected pin; ordinary arrows still navigate. VoiceOver exposes equivalent move and destination actions. The Pin on Display menu appends a new pin and leaves an existing destination pin in place.
+Right-click a pin for **Move Left** and **Move Right** on a bottom dock, or **Move Up** and **Move Down** on a side dock. **Pin on Display…** works with every edge. With **Focus Dock** active, hold Option with the corresponding arrow key to reorder the selected pin; ordinary arrows navigate. VoiceOver exposes equivalent move and destination actions. The Pin on Display menu appends a new pin and leaves an existing destination pin in place.
 
 Finder imports retain optional read-only security-scoped bookmarks so user-selected application bundles can remain accessible after restart. Older pins retain their existing format and identity. DeeDock adds only the app-scoped bookmark capability to its existing sandbox configuration; no Accessibility grant or system Dock preference changes are involved. Missing applications remain visible as unavailable pins.
 
@@ -105,16 +105,20 @@ Choose **Settings…** from the menu-bar item or app menu (⌘, while DeeDock is
 | --- | --- | --- |
 | Icon size | 32–96 points | 48 |
 | Maximum magnification | 1.0×–2.0×, in 0.05 steps | 1.4× |
-| Horizontal alignment | Left / Center / Right | Center |
-| Horizontal offset | −1,000 to +1,000 points | 0 |
-| Bottom distance | 0–300 points | 8 |
+| Item spacing | 0–24 points | 4 |
+| Edge | Bottom / Left / Right | Bottom |
+| Alignment | Left / Center / Right below; Top / Center / Bottom beside | Center |
+| Along-edge offset | −1,000 to +1,000 points | 0 |
+| Edge distance | 0–300 points | 8 |
 | Position relative to | Usable desktop / Screen edge | Usable desktop |
 
 Numeric controls support sliders and locale-aware typed values. Invalid drafts never enter layout calculations; leaving the field restores the last accepted value. **Restore Defaults** on the Defaults page resets shared configuration only and preserves display overrides, visibility, and pins. Unreadable saved settings are left intact and reported in Settings; Restore Defaults explicitly replaces them.
 
-Positive horizontal offsets move right. Bottom distance measures to the glass's bottom edge. Placement is constrained to keep the magnification envelope on the display, so left/right alignment or large offsets can be adjusted near an edge. Requested values remain saved across geometry changes. Crowded docks may use smaller icons than requested before scrolling; the requested size returns when space is available.
+Positive along-edge offsets move right on bottom docks and down on side docks. Edge distance measures from the reference frame to the outer edge of the glass. Placement keeps the magnification envelope on the display, so alignment and large offsets can be constrained near an edge. Requested values remain saved across geometry changes. Crowded docks may use smaller icons than requested before scrolling; the requested size returns when space is available.
 
-A 1.0× maximum disables magnification; Reduce Motion also disables it without changing the saved preference. Glass height stays fixed during hover, with icons and labels using a separate envelope above it. Screen-edge positioning can overlap the system Dock; neither mode changes macOS preferences. Settings resolve separately for each display. Auto-hide and activation behavior can be configured separately in the Behavior pane.
+A 1.0× maximum disables magnification; Reduce Motion also disables it without changing the saved preference. Glass thickness stays fixed during hover. Icons magnify inward and labels remain upright in a separate inward area. Screen-edge positioning can overlap the system Dock; neither mode changes macOS preferences. Settings resolve separately for each display. Auto-hide and activation behavior can be configured separately in the Behavior pane.
+
+Changing edges reuses the same alignment, offset, edge distance, and activation dimensions. Both side docks order pins and running apps from top to bottom. Pin order and keyboard selection survive edge changes. Switching between horizontal and vertical layout resets scrolling to the start unless keyboard focus requires revealing the selected app; switching between the two sides preserves scrolling. Edge changes apply immediately and cancel obsolete drag and visibility work. Old settings load as bottom placement.
 
 ## Displays and inheritance
 
@@ -136,15 +140,15 @@ Choose **Behavior** under Defaults or a display to configure automatic hiding. E
 | --- | --- | --- |
 | Automatically hide | On / Off | Off |
 | Activation location | Dock position / Screen edge | Dock position |
-| Activation width | Dock width / Custom | Dock width |
-| Custom width | 32–8,192 points | 320 |
-| Activation height | 1–64 points | 8 |
-| Activation horizontal offset | −4,096 to +4,096 points | 0 |
+| Activation length | Dock length / Custom length | Dock length |
+| Custom length | 32–8,192 points | 320 |
+| Activation depth | 1–64 points | 8 |
+| Along-edge offset | −4,096 to +4,096 points | 0 |
 | Reveal delay | 0–2 seconds | 0.10 |
 | Hide delay | 0–5 seconds | 0.40 |
 | Animation duration | 0–1 second | 0.20 |
 
-A dock-position zone starts at the resting glass bottom; a screen-edge zone starts at the physical display bottom. Dock width follows the resting glass, independently of hover magnification. Geometry fits to the current display without rewriting requested dimensions. The Settings diagram illustrates the zone and the safe approach area. **Show Zone** draws a click-through outline for 10 seconds on the selected connected, enabled desktop display. It updates during edits and closes with Settings or a changed selection.
+A dock-position zone starts at the resting glass outer edge; a screen-edge zone starts at the selected physical display edge. Length follows the dock axis and depth extends inward. Dock length follows the resting glass, independently of hover magnification. Geometry fits to the current display without rewriting requested dimensions. The Settings diagram illustrates the zone and the safe approach area. **Show Zone** draws a click-through outline for 10 seconds on the selected connected, enabled desktop display. It updates during edits and closes with Settings or a changed selection.
 
 Resting the pointer in the zone starts the reveal delay; leaving cancels it. The revealed dock stays visible while the pointer is over it or in the connecting approach area, and while you use a mouse button, its context menu, keyboard focus, or VoiceOver focus. After interaction ends and the pointer leaves, the hide delay begins. Re-entering cancels the delay or reverses an ongoing hide. Trigger and approach areas never capture clicks.
 
@@ -152,7 +156,7 @@ Resting the pointer in the zone starts the reveal delay; leaving cancels it. The
 
 ### Animation styles
 
-All ten are available immediately, grouped in Settings with a descriptive subtitle:
+All ten are available immediately, grouped in Settings with a descriptive subtitle. The table describes bottom placement:
 
 | Group | Name | Effect |
 | --- | --- | --- |
@@ -167,7 +171,9 @@ All ten are available immediately, grouped in Settings with a descriptive subtit
 | A Little Drama | Squeeze Play | Horizontal wipe |
 | A Little Drama | Boing Voyage | Bounce and fade |
 
-Reveal reverses the selected hiding sequence. **Play Preview** runs an inert sample; selecting a style does not repeatedly trigger live docks. A zero duration makes transitions instant. Reduce Motion replaces movement, scaling, and wipes with a fade lasting at most 0.10 seconds, including in previews. Glass remains fixed-height during hover, and visibility effects use a separate presentation transform and clipping envelope.
+On side docks, slides move outward through the selected edge; lift and bounce move inward. The former left/right effects move up/down and are named Up & Out and Down & Out. The inward lift is named Into the Room. Wipes close across the thickness or along the length, and scaling anchors at the outer-edge midpoint. Settings previews and descriptions follow the selected edge.
+
+Reveal reverses the selected hiding sequence. **Play Preview** runs an inert sample; selecting a style does not repeatedly trigger live docks. A zero duration makes transitions instant. Reduce Motion replaces movement, scaling, and wipes with a fade lasting at most 0.10 seconds, including in previews. Glass remains fixed-thickness during hover, and visibility effects use a separate presentation transform and clipping envelope.
 
 Auto-hide does not inspect overlapping app windows, use pressure gestures, modify the system Dock, or request permissions. Screen-edge triggering may also reveal the system Dock. Runtime acceptance for these interactions is still pending.
 
