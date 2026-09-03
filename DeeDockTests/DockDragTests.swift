@@ -164,5 +164,6 @@ private final class DragFixtureService: ApplicationServicing {
     func icon(for url: URL?) -> NSImage { NSImage(size: CGSize(width: 48, height: 48)) }
     func pruneIcons(keeping urls: Set<URL>) {}
     func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws { Issue.record("Unexpected document open") }
+    func performPrimaryAction(_ reference: ApplicationReference) async throws { Issue.record("Drag tests must never toggle applications") }
     func open(_ reference: ApplicationReference) async throws { Issue.record("Drag tests must never launch applications") }
 }

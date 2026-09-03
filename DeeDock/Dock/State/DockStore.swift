@@ -97,6 +97,16 @@ final class DockStore {
     func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
 
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
+    func performPrimaryAction(_ item: DockItem) {
+        let token = session.token
+        catalog.performPrimaryAction(item.reference) { [weak self] error in
+            guard let self, session.accepts(token) else { return }
+            if let error { errorMessage = error }
+            else { applicationOpened?() }
+        }
+    }
+
+    /// Opens or activates an app without applying the app-icon hide toggle.
     func open(_ item: DockItem) {
         let token = session.token
         catalog.open(item.reference) { [weak self] error in

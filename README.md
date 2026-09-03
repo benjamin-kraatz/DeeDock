@@ -71,7 +71,7 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 DeeDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DeeDock; dedicated coexistence controls are future work.
 
-- Click an icon to open or activate its application.
+- Click an icon to open or activate its application. Click the foreground application's icon to hide all of its windows; click again to show and activate it.
 - Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Neon, Aura, Target Lock, Orbit, Stardust, Power Badge, Glitch, Plasma, Hologram, Solar Flare, Prism, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
 - Right-click an app for **Open**, **Pin**, or **Unpin**. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.

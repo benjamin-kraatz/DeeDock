@@ -25,6 +25,7 @@ struct DockView: View {
             interaction: interaction,
             reduceMotion: reduceMotion,
             reduceTransparency: reduceTransparency,
+            primaryAppAction: store.performPrimaryAction,
             openApp: store.open,
             togglePin: store.toggleFavorite,
             dismissError: { store.errorMessage = nil }

@@ -11,6 +11,7 @@ struct DockContentView: View {
     let interaction: DockInteraction
     let reduceMotion: Bool
     let reduceTransparency: Bool
+    let primaryAppAction: (DockItem) -> Void
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
     let dismissError: () -> Void
@@ -43,7 +44,8 @@ struct DockContentView: View {
                         layout: layout, sizes: sizes, surface: layout.surfaceFrame(sizes: sizes),
                         viewport: shifted(viewport, by: -scrollOffset), hoveredID: $hoveredID,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
-                        openApp: openApp, togglePin: togglePin, interaction: interaction,
+                        primaryAppAction: primaryAppAction, openApp: openApp,
+                        togglePin: togglePin, interaction: interaction,
                         iconFrameChanged: { id, rect in
                             guard interaction.layout.edge == edge else { return }
                             interaction.setIconRect(rect?.intersection(viewport), for: id)

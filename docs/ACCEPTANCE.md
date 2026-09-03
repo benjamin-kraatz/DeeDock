@@ -48,7 +48,7 @@ These observations establish the specific behaviors above, not complete visual o
 
 ## Boundaries
 
-The app uses public AppKit/SwiftUI APIs and local preferences. It does not modify system Dock preferences, grant permissions, install a login item, reserve desktop work area, or manage other apps' windows through Accessibility APIs. Reopening/minimized-window behavior is delegated to Launch Services and the target app; exact system Dock parity is not promised.
+The app uses public AppKit/SwiftUI APIs and local preferences. It does not modify system Dock preferences, grant permissions, install a login item, reserve desktop work area, or manage other apps' windows through Accessibility APIs. Application-icon clicks use AppKit's app-wide hide request when the selected app is foreground; reopening and minimized-window behavior remain delegated to Launch Services and the target app. Exact system Dock parity is not promised.
 
 Placement uses the primary display's `visibleFrame`. When the system Dock auto-hides, macOS may not reserve space for it, so its temporary reveal can overlap DeeDock. Avoiding that overlap, persistent per-monitor choices, auto-hide, activation zones, drag reordering, and the wider configuration roadmap remain later slices.
 
@@ -170,6 +170,16 @@ New tests cover legacy decoding and corrupt-byte preservation; individual behavi
 - Exercise light/dark appearance, Reduce Motion/Transparency, multiple monitors, mirroring/unmirroring, primary-display changes, normal Spaces, full-screen apps, Mission Control, sleep/wake, and clean quitting during a transition/menu/preview/launch.
 
 These native scenarios remain unexercised for this build. Display-edge activation can also reveal the system Dock; DeeDock neither changes its preferences nor reserves desktop work area. Window-overlap detection, pressure gestures, broader drag behavior, and performance guarantees are outside this slice. No new permissions or machine settings were requested or changed.
+
+## Application icon show/hide toggle
+
+Ordinary app-icon clicks now check the live foreground application. A matching foreground app receives AppKit's app-wide hide request. A closed, background, or hidden app keeps the existing `NSWorkspace.openApplication` path, which launches or activates without creating a second instance. Bundle identity takes priority so moving a pinned application does not break the match; bundle-less references fall back to their standardized application URL.
+
+The primary icon action is separate from explicit Open. Context-menu Open, Focus Dock Return, file opening, and drag spring-loading never hide an app. All display docks still share duplicate suppression, cancellation, and error ownership through `ApplicationCatalog`. A rejected hide request produces localized feedback on the initiating dock. The sandbox and entitlements are unchanged, and the feature does not use Accessibility APIs or inspect individual windows.
+
+The focused Debug app build and a subsequent `build-for-testing` compilation succeeded with derived data at `/tmp/DeeDock-show-hide-build`. The initial `build-for-testing` attempt exposed the scheme's missing test-target dependency and stopped before app compilation; building the app first allowed the same test-source compilation to succeed. Xcode still reports that `DeeDockTests` is missing its discovered dependency on `DeeDock`.
+
+No tests were executed. The app was not launched, no previews were rendered, and no automated visual checks ran. Hands-on acceptance still needs to confirm foreground hide, hidden-app restoration, background activation, closed-app launch, multi-window app-wide hiding, multiple Spaces, full-screen apps, and rapid repeated clicks.
 
 Implementation changes are left uncommitted for review. Pause after slice 3; further roadmap work requires a new request.
 

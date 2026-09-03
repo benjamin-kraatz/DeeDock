@@ -16,10 +16,14 @@ struct OnboardingAppearanceStage: View {
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     private var reduceMotion: Bool { reduceMotionOverride ?? systemReduceMotion }
     @State private var index = 0
+    /// How far through the current style's dwell the cycle has travelled, 0 to 1.
+    @State private var elapsed: Double = 0
 
     /// A spread across the gallery — the restrained default, two geometric marks, and three of
     /// the expressive ones — rather than all fifteen, which at this pace would be a flicker.
     private static let styles: [DockSettings.RunningIndicatorStyle] = [.dot, .bar, .neon, .aura, .orbit, .prism]
+    private static let dwell: Double = 1.5
+    private static let crossFade: Double = 0.4
 
     private var style: DockSettings.RunningIndicatorStyle { Self.styles[index % Self.styles.count] }
 
@@ -30,22 +34,68 @@ struct OnboardingAppearanceStage: View {
 
     var body: some View {
         let layout = layout
-        DockSampleView(layout: layout, magnified: true, runningIndicatorStyle: style)
-            .frame(width: layout.viewportSize.width, height: layout.viewportSize.height)
-            .id(index)
-            // The two frames differ only in their markers, so a cross-fade of the whole dock
-            // reads as the markers changing rather than as the dock being replaced.
-            .transition(.opacity)
-            .task(id: reduceMotion) { await cycle() }
+        VStack(spacing: 16) {
+            DockSampleView(layout: layout, magnified: true, runningIndicatorStyle: style)
+                .frame(width: layout.viewportSize.width, height: layout.viewportSize.height)
+                .id(index)
+                // The two frames differ only in their markers, so a cross-fade of the whole dock
+                // reads as the markers changing rather than as the dock being replaced.
+                .transition(.opacity)
+            caption(width: layout.viewportSize.width * 0.62)
+        }
+        .task(id: reduceMotion) { await cycle() }
+    }
+
+    /// Names the marker on screen and shows how long it stays.
+    ///
+    /// Without this the dock changes for no visible reason and a person is left waiting to find
+    /// out whether it will change again. The name also teaches the vocabulary they will meet in
+    /// Settings. Under Reduce Motion nothing is running, so only the name is shown.
+    private func caption(width: CGFloat) -> some View {
+        HStack(spacing: 12) {
+            Text(style.indicatorName)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.secondary)
+                .animation(nil, value: index)
+                .frame(width: 90, alignment: .leading)
+            if !reduceMotion {
+                Capsule(style: .continuous)
+                    .fill(.quaternary)
+                    .frame(height: 3)
+                    .overlay(alignment: .leading) {
+                        GeometryReader { proxy in
+                            Capsule(style: .continuous)
+                                .fill(.secondary)
+                                .frame(width: proxy.size.width * elapsed)
+                        }
+                    }
+            }
+        }
+        .frame(width: width)
+        .accessibilityHidden(true)
     }
 
     private func cycle() async {
         guard !reduceMotion else { return }
         while !Task.isCancelled {
-            try? await Task.sleep(for: .seconds(2.1))
+            // Reset without animation, then let the fill run the length of the dwell, so the bar
+            // reads as time remaining rather than as an unexplained decoration.
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) { elapsed = 0 }
+            withAnimation(.linear(duration: Self.dwell)) { elapsed = 1 }
+
+            try? await Task.sleep(for: .seconds(Self.dwell))
             guard !Task.isCancelled else { return }
-            withAnimation(.easeInOut(duration: 0.5)) { index += 1 }
+            withAnimation(.easeInOut(duration: Self.crossFade)) { index += 1 }
         }
+    }
+}
+
+private extension DockSettings.RunningIndicatorStyle {
+    /// The name Settings gives this style, rather than a second set of strings that could drift.
+    var indicatorName: LocalizedStringResource {
+        Self.settingsOptions.first { $0.value == self }?.title ?? .settingsIndicatorDot
     }
 }
 

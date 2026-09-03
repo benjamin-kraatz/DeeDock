@@ -686,13 +686,13 @@
       }
     },
     "appOpenHint": {
-      "comment": "Accessibility hint for an application icon button.",
+      "comment": "Accessibility hint for an application icon button. The foreground app is hidden; any other app is opened or activated.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open or switch to this app"
+            "value": "Open, switch to, or hide this app"
           }
         }
       }
@@ -1629,6 +1629,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$(appName)@ couldn’t be found. You can unpin it, then pin it again after opening the app."
+          }
+        }
+      }
+    },
+    "errorHideApp": {
+      "comment": "Error banner shown when the foreground application rejects DeeDock's request to hide it. appName is the application name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t hide %1$(appName)@"
           }
         }
       }

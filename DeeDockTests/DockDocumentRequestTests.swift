@@ -128,6 +128,7 @@ private final class DocumentFixtureService: ApplicationServicing {
     func resolvedURL(for reference: ApplicationReference) -> URL? { reference.url }
     func icon(for url: URL?) -> NSImage { NSImage(size: NSSize(width: 48, height: 48)) }
     func pruneIcons(keeping urls: Set<URL>) {}
+    func performPrimaryAction(_ reference: ApplicationReference) async throws { try await request(reference, urls: nil) }
     func open(_ reference: ApplicationReference) async throws { try await request(reference, urls: nil) }
     func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws { try await request(reference, urls: urls) }
 

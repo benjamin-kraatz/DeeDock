@@ -2,7 +2,7 @@ import SwiftUI
 
 /// An app icon with running, launch-progress, selection, and accessibility states.
 ///
-/// `open` and `togglePin` express user intent; this component never invokes workspace APIs itself.
+/// Its closures express user intent; this component never invokes workspace APIs itself.
 struct DockAppButton: View {
     let item: DockItem
     /// Current magnified icon dimension in logical points; indicator space is additional.
@@ -10,6 +10,7 @@ struct DockAppButton: View {
     let isLaunching: Bool
     /// Set by Focus Dock navigation; does not identify the foreground application.
     let isKeyboardSelected: Bool
+    let primaryAction: () -> Void
     let open: () -> Void
     let togglePin: () -> Void
 
@@ -26,7 +27,7 @@ struct DockAppButton: View {
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
     var body: some View {
-        Button(action: open) {
+        Button(action: primaryAction) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
                                  available: item.isAvailable, running: item.isRunning,
                                  launching: isLaunching, keyboardSelected: isKeyboardSelected,
@@ -47,7 +48,7 @@ struct DockAppButton: View {
                 DockDragSourceView(
                     item: item,
                     enabled: !isLaunching,
-                    open: open,
+                    primaryAction: primaryAction,
                     begin: begin,
                     tracking: { interaction.sourceTrackingChanged?($0) }
                 )
@@ -123,6 +124,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: false,
                 isKeyboardSelected: true,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )
@@ -131,6 +133,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: false,
                 isKeyboardSelected: false,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )
@@ -139,6 +142,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: true,
                 isKeyboardSelected: false,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )
@@ -147,6 +151,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: false,
                 isKeyboardSelected: false,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )

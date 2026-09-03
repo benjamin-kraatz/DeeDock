@@ -19,6 +19,7 @@ struct DockSurfaceView: View {
     @State private var renderedFrames: [DockEntryID: CGRect] = [:]
     let reduceMotion: Bool
     let reduceTransparency: Bool
+    let primaryAppAction: (DockItem) -> Void
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
     let interaction: DockInteraction
@@ -76,7 +77,8 @@ struct DockSurfaceView: View {
                         launching: slot.item.map { launchingIDs.contains($0.id) } ?? false,
                         selected: keyboardFocus && selectedTarget == slot.target,
                         interaction: interaction, reduceTransparency: reduceTransparency,
-                        openApp: openApp, togglePin: togglePin, menuTracking: menuTracking,
+                        primaryAppAction: primaryAppAction, openApp: openApp,
+                        togglePin: togglePin, menuTracking: menuTracking,
                         accessibilityFocus: accessibilityFocus)
                         .onHover { inside in
                             if inside { hoveredID = slot.target }

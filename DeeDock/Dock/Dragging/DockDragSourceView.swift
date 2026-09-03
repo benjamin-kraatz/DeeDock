@@ -5,20 +5,20 @@ import SwiftUI
 struct DockDragSourceView: NSViewRepresentable {
     let item: DockItem
     let enabled: Bool
-    let open: () -> Void
+    let primaryAction: () -> Void
     let begin: (DockItem, NSView, NSEvent) -> Void
     let tracking: (Bool) -> Void
 
     func makeNSView(context: Context) -> SourceView { SourceView() }
     func updateNSView(_ view: SourceView, context: Context) {
-        view.item = item; view.enabled = enabled; view.open = open; view.begin = begin; view.tracking = tracking
+        view.item = item; view.enabled = enabled; view.primaryAction = primaryAction; view.begin = begin; view.tracking = tracking
     }
     static func dismantleNSView(_ view: SourceView, coordinator: ()) { view.stop() }
 
     final class SourceView: NSView {
         var item: DockItem?
         var enabled = true
-        var open: (() -> Void)?
+        var primaryAction: (() -> Void)?
         var begin: ((DockItem, NSView, NSEvent) -> Void)?
         var tracking: ((Bool) -> Void)?
         private var stopped = false
@@ -39,7 +39,7 @@ struct DockDragSourceView: NSViewRepresentable {
                                                         until: .distantFuture, inMode: .eventTracking, dequeue: true) {
                 if next.type == .keyDown { if next.keyCode == 53 { return }; continue }
                 if next.type == .leftMouseUp {
-                    if bounds.contains(convert(next.locationInWindow, from: nil)) { open?() }
+                    if bounds.contains(convert(next.locationInWindow, from: nil)) { primaryAction?() }
                     return
                 }
                 if hypot(next.locationInWindow.x - origin.x, next.locationInWindow.y - origin.y) >= DockDragGeometry.startDistance {
@@ -48,6 +48,6 @@ struct DockDragSourceView: NSViewRepresentable {
                 }
             }
         }
-        func stop() { tracking?(false); tracking = nil; stopped = true; begin = nil; open = nil; item = nil }
+        func stop() { tracking?(false); tracking = nil; stopped = true; begin = nil; primaryAction = nil; item = nil }
     }
 }
