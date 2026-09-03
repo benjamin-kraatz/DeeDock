@@ -153,6 +153,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         destinationID = nil; destinationIndex = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
+        for panel in panels.values {
+            panel.updateSectionDragHover(at: point, valid: candidate === panel && !rejected && !references.isEmpty && panel.store.canEditPins)
+        }
         if let candidate, candidate.visibility.exposesContent, candidate.store.canEditPins, !rejected,
            !references.isEmpty, let index = candidate.insertionIndex(at: point) {
             destinationID = candidate.store.displayID; destinationIndex = index
@@ -239,7 +242,10 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
 
     private func clearFeedback() {
         scrollTimer?.invalidate(); scrollTimer = nil
-        panels.values.forEach { $0.setDragPresentation(proposal: nil, source: nil, targeted: false, message: nil) }
+        panels.values.forEach {
+            $0.setDragPresentation(proposal: nil, source: nil, targeted: false, message: nil)
+            $0.endSectionDrag()
+        }
     }
 
     /// Invalidates late imports and native completion callbacks without committing an edit.

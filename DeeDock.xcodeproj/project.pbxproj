@@ -37,6 +37,14 @@
 		DDB100000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */; };
 		DDB100000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */; };
 		DDC100000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC200000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift */; };
+		DDE100000000000000000000 /* DeeDock/Dock/Sections/DockAppVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000000 /* DeeDock/Dock/Sections/DockAppVisibility.swift */; };
+		DDE100000000000000000001 /* DeeDock/Dock/Sections/DockSectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000001 /* DeeDock/Dock/Sections/DockSectionState.swift */; };
+		DDE100000000000000000002 /* DeeDock/Dock/Sections/DockSectionInsertion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000002 /* DeeDock/Dock/Sections/DockSectionInsertion.swift */; };
+		DDE100000000000000000003 /* DeeDock/Dock/Tooltips/DockTooltipPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000003 /* DeeDock/Dock/Tooltips/DockTooltipPreset.swift */; };
+		DDE100000000000000000004 /* DeeDock/Dock/Tooltips/DockTooltipController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000004 /* DeeDock/Dock/Tooltips/DockTooltipController.swift */; };
+		DDE100000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift */; };
+		DDE100000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift */; };
+		DDE100000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +80,14 @@
 		DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationResourceAccess.swift; sourceTree = SOURCE_ROOT; };
 		DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockApplicationImporter.swift; sourceTree = SOURCE_ROOT; };
 		DDC200000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Layout/DockEdge.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000000 /* DeeDock/Dock/Sections/DockAppVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Sections/DockAppVisibility.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000001 /* DeeDock/Dock/Sections/DockSectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Sections/DockSectionState.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000002 /* DeeDock/Dock/Sections/DockSectionInsertion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Sections/DockSectionInsertion.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000003 /* DeeDock/Dock/Tooltips/DockTooltipPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Tooltips/DockTooltipPreset.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000004 /* DeeDock/Dock/Tooltips/DockTooltipController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Tooltips/DockTooltipController.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Tooltips/DockTooltipGeometry.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/DockInteraction.swift; sourceTree = SOURCE_ROOT; };
+		DDE200000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Visibility/DockIdleFadeController.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -255,6 +271,14 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				DDE100000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift in Sources */,
+				DDE100000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift in Sources */,
+				DDE100000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift in Sources */,
+				DDE100000000000000000004 /* DeeDock/Dock/Tooltips/DockTooltipController.swift in Sources */,
+				DDE100000000000000000003 /* DeeDock/Dock/Tooltips/DockTooltipPreset.swift in Sources */,
+				DDE100000000000000000002 /* DeeDock/Dock/Sections/DockSectionInsertion.swift in Sources */,
+				DDE100000000000000000001 /* DeeDock/Dock/Sections/DockSectionState.swift in Sources */,
+				DDE100000000000000000000 /* DeeDock/Dock/Sections/DockAppVisibility.swift in Sources */,
 				DDC100000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift in Sources */,
 				DD9000000000000000000006 /* DeeDock/Dock/Visibility/DockPreviewLease.swift in Sources */,
 				DD9000000000000000000005 /* DeeDock/Dock/Visibility/DockVisibilityController.swift in Sources */,

@@ -12,6 +12,11 @@ struct DockSettings: Codable, Equatable {
         func resolved(for edge: DockEdge) -> Self { edge == .top ? .usableDesktop : self }
     }
 
+    /// Marker for running applications, independent of keyboard selection and foreground activity.
+    enum RunningIndicatorStyle: String, Codable, CaseIterable {
+        case dot, bar, square, neon, aura, targetLock, orbit, stardust, powerBadge, glitch, plasma, hologram, solarFlare, prism, hidden
+    }
+
     /// Layers affected by idle dimming. Labels and interaction feedback remain fully readable.
     enum FadeTarget: String, Codable, CaseIterable {
         case entireDock, backgroundOnly, iconsOnly
@@ -23,6 +28,9 @@ struct DockSettings: Codable, Equatable {
     var magnification: Double = 1.4
     /// Gap between adjacent Dock items in logical points.
     var itemSpacing: Double = 4
+    var appVisibility: DockAppVisibility = .showAll
+    var tooltipPreset: DockTooltipPreset = .classic
+    var runningIndicatorStyle: RunningIndicatorStyle = .dot
     var edge: DockEdge = .bottom
     var alignment: Alignment = .center
     /// Signed displacement from the alignment anchor, in points; positive moves right on horizontal docks and down on side docks.
@@ -83,7 +91,8 @@ struct DockSettings: Codable, Equatable {
 extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-        case iconSize, magnification, itemSpacing, edge, alignment, positionReference, behavior
+        case appVisibility, tooltipPreset
+        case iconSize, magnification, itemSpacing, runningIndicatorStyle, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -99,9 +108,13 @@ extension DockSettings {
         idleDelay = values.contains(.idleDelay) ? try values.decode(Double.self, forKey: .idleDelay) : 3
         fadeOutDuration = values.contains(.fadeOutDuration) ? try values.decode(Double.self, forKey: .fadeOutDuration) : 0.3
         restoreDuration = values.contains(.restoreDuration) ? try values.decode(Double.self, forKey: .restoreDuration) : 0.1
+        appVisibility = values.contains(.appVisibility) ? try values.decode(DockAppVisibility.self, forKey: .appVisibility) : .showAll
+        tooltipPreset = values.contains(.tooltipPreset) ? try values.decode(DockTooltipPreset.self, forKey: .tooltipPreset) : .classic
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing) ?? 4
+        runningIndicatorStyle = values.contains(.runningIndicatorStyle)
+            ? try values.decode(RunningIndicatorStyle.self, forKey: .runningIndicatorStyle) : .dot
         edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : .bottom
         alignment = try values.decode(Alignment.self, forKey: .alignment)
         alongEdgeOffset = try values.decode(Double.self, forKey: .alongEdgeOffset)

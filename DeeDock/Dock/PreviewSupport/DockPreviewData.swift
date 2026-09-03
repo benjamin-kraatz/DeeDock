@@ -34,9 +34,10 @@ struct DockPreviewContent: View {
     private let reduceMotion: Bool
     private let reduceTransparency: Bool
     @State private var interaction: DockInteraction
+    @State private var sections: DockSectionState
 
     init(items: [DockItem]? = nil, errorMessage: LocalizedStringResource? = nil,
-         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults, availableLength: CGFloat = 800) {
+         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults, availableLength: CGFloat = 800, expanded: Bool = false) {
         let items = items ?? DockPreviewData.items
         self.items = items
         self.errorMessage = errorMessage
@@ -46,7 +47,22 @@ struct DockPreviewContent: View {
         interaction.dragProposal = dragProposal
         interaction.dragMessage = dragMessage
         interaction.dragActive = dragProposal != nil || dragMessage != nil
-        let slots = DockRenderSlot.slots(items: items, proposal: dragProposal)
+        let sections = DockSectionState()
+        sections.configure(settings.appVisibility)
+        if expanded { sections.toggle() }
+        let entries = DockSectionProjection.entries(items: items, visibility: settings.appVisibility, expanded: sections.isExpanded)
+        let slots = DockRenderSlot.slots(entries: entries, proposal: dragProposal)
+        interaction.tooltipPreset = settings.tooltipPreset
+        interaction.idleFade.configure(settings, reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
+        sections.didChange = { [weak interaction, weak sections] in
+            guard let interaction, let sections else { return }
+            let entries = DockSectionProjection.entries(items: items, visibility: settings.appVisibility, expanded: sections.isExpanded)
+            let slots = DockRenderSlot.slots(entries: entries, proposal: dragProposal)
+            interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
+                availableLength: availableLength, settings: settings)
+        }
+        _sections = State(initialValue: sections)
+        interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                   availableLength: availableLength, settings: settings)
         if magnified, let x = interaction.layout.restingCenters.first {
@@ -56,11 +72,14 @@ struct DockPreviewContent: View {
     }
 
     var body: some View {
-        DockContentView(items: items, launchingIDs: [], selectedID: items.first?.id, keyboardFocus: true,
+        let entries = DockSectionProjection.entries(items: items, visibility: sections.visibility, expanded: sections.isExpanded)
+        DockContentView(items: items, entries: entries, launchingIDs: [], selectedTarget: entries.first?.target, keyboardFocus: true,
                         errorMessage: errorMessage, interaction: interaction,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
                         openApp: { _ in }, togglePin: { _ in }, dismissError: {})
             .padding(20)
+            .onAppear { interaction.toggleSection = { sections.toggle() } }
+            .onDisappear { interaction.toggleSection = nil; interaction.tooltips.clear() }
     }
 }
 #endif

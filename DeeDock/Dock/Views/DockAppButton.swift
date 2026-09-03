@@ -8,7 +8,8 @@ struct DockAppButton: View {
     /// Current magnified icon dimension in logical points; indicator space is additional.
     let size: CGFloat
     let isLaunching: Bool
-    let isSelected: Bool
+    /// Set by Focus Dock navigation; does not identify the foreground application.
+    let isKeyboardSelected: Bool
     let open: () -> Void
     let togglePin: () -> Void
 
@@ -28,7 +29,8 @@ struct DockAppButton: View {
         Button(action: open) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
                                  available: item.isAvailable, running: item.isRunning,
-                                 launching: isLaunching, selected: isSelected,
+                                 launching: isLaunching, keyboardSelected: isKeyboardSelected,
+                                 runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
                                  artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation)
                 .contentShape(.rect)
         }
@@ -111,7 +113,7 @@ struct DockAppButton: View {
                 item: DockPreviewData.items[0],
                 size: 48,
                 isLaunching: false,
-                isSelected: true,
+                isKeyboardSelected: true,
                 open: {},
                 togglePin: {}
             )
@@ -119,7 +121,7 @@ struct DockAppButton: View {
                 item: DockPreviewData.items[3],
                 size: 48,
                 isLaunching: false,
-                isSelected: false,
+                isKeyboardSelected: false,
                 open: {},
                 togglePin: {}
             )
@@ -127,7 +129,7 @@ struct DockAppButton: View {
                 item: DockPreviewData.items[1],
                 size: 48,
                 isLaunching: true,
-                isSelected: false,
+                isKeyboardSelected: false,
                 open: {},
                 togglePin: {}
             )
@@ -135,7 +137,7 @@ struct DockAppButton: View {
                 item: DockPreviewData.items[2],
                 size: 48,
                 isLaunching: false,
-                isSelected: false,
+                isKeyboardSelected: false,
                 open: {},
                 togglePin: {}
             )

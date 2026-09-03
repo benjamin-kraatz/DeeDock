@@ -72,10 +72,10 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 DeeDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DeeDock; dedicated coexistence controls are future work.
 
 - Click an icon to open or activate its application.
-- Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge.
+- Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Neon, Aura, Target Lock, Orbit, Stardust, Power Badge, Glitch, Plasma, Hologram, Solar Flare, Prism, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
 - Right-click an app for **Open**, **Pin**, or **Unpin**. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
-- Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, and Escape returns focus to the previous app. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
+- Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
 - Choose **Quit DeeDock** from the menu-bar item or app menu to close it.
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
@@ -145,6 +145,51 @@ Pointer entry, keyboard focus, VoiceOver focus, dragging, menus, mouse-button in
 Reduce Motion restores instantly and caps fade-out at 0.1 seconds. Reduce Transparency suppresses idle fading and uses an opaque background when enabled, while preserving saved preferences. A hidden background stays hidden. The Normal and Idle samples show the effective appearance; **Play Preview** includes the configured idle delay and cancels when settings change or the view closes.
 
 Compilation is verified; hands-on acceptance for material opacity, restoration timing, and native interaction remains pending in the [acceptance record](docs/ACCEPTANCE.md).
+
+## App visibility and section buttons
+
+Under **Behavior → App visibility**, choose **Show all**, **Hide running apps**, **Collapse running apps**, **Hide pinned apps**, or **Collapse pinned apps**. Each display can override the shared default independently. Only one section can be hidden or collapsed at a time. Show all is the default.
+
+Pinned apps remain in the pinned section while running. The running section contains only unpinned running apps. Hiding a section removes its icons from the dock without changing saved pins or quitting apps.
+
+Collapse replaces a section with a group button showing its app count, including zero. Click the button to expand or collapse the section. The button stays before its apps when expanded. Expansion survives auto-hide, pointer exit, app launches, and sleep while that dock remains alive. Restarting, recreating the dock, or changing its effective visibility choice starts it collapsed.
+
+Group buttons participate in Focus Dock navigation. Press Return or Space to toggle the selected group. VoiceOver announces its action, count, and expanded state. Hidden apps are excluded from navigation and hit testing. Groups follow the dock's icon fading settings while keyboard outlines stay visible.
+
+Hold a valid app drag over a collapsed pinned-group button for 0.5 seconds to expose insertion positions. The section returns to its previous expansion state when the drag ends. Dropping directly on the button appends pins. Completely hidden pins reject direct drops; **Pin** and **Pin on Display** remain available through app menus.
+
+## App-name tooltip presets
+
+Under **Appearance → App names**, choose one complete preset. Every choice combines its design, placement, hover delay, and entrance. Shared defaults and independent per-display overrides work like running indicators. **Classic** preserves the original rounded material label; **Off** hides visual labels while keeping accessible app names.
+
+| Preset | Design | Placement | Hover delay and entrance |
+| --- | --- | --- | --- |
+| Classic | Rounded material | Inward | Immediate, instant |
+| Glass pill | Bordered material capsule | Inward | 0.15 seconds, fade |
+| Compact | Small material label | Inward | 0.35 seconds, fade |
+| Plain | Text with contrast shadow | Inward | Immediate, instant |
+| Bold | Larger semibold text on an opaque plate | Inward | 0.15 seconds, fade |
+| Outline | Opaque plate with a fine outline | Inward | 0.20 seconds, fade |
+| Accent | Accent-colored capsule | Inward | 0.15 seconds, fade |
+| Speech bubble | Material bubble with a pointer | Inward | 0.20 seconds, lift |
+| Name card | App icon and up to two name lines | Inward | 0.40 seconds, fade |
+| Leading tag | Material label with an accent rule | Before icon | 0.15 seconds, slide |
+| Trailing tag | Material label with an accent rule | After icon | 0.15 seconds, slide |
+| Leading outline | Compact outlined label | Before icon | 0.30 seconds, fade |
+| Trailing pill | Accent-tinted material capsule | After icon | 0.30 seconds, fade |
+| Dock caption | Material capsule | Dock center | Immediate, crossfade |
+| Dock title | Larger text on an opaque plate | Dock center | 0.20 seconds, crossfade |
+| Lift | Rounded material | Inward | 0.20 seconds, lift |
+| Pop | Accent-bordered material | Inward | 0.15 seconds, restrained scale |
+| Spectrum | Static multicolor border | Inward | 0.20 seconds, fade |
+
+Inward means toward the desktop, adapting to each dock edge. Before and after follow app order within the inward label area. Dock-centered captions stay anchored to the visible resting dock. Labels stay upright and fit within the display and viewport. Before and after try the opposite side when space is limited, then fall back to the icon's inward position.
+
+Keyboard-selected entries show their label immediately. Pointer exit, dragging, menus, hiding, and error feedback clear labels and pending delays. Tooltips remain click-through, do not steal focus, and do not extend auto-hide retention. Showing one does not resize the dock. Section buttons use the chosen design for their localized action label.
+
+The gallery uses the same renderer as the dock. **Play Preview** demonstrates the selected delay and entrance on an inert sample. Reduce Motion substitutes short fades for movement and scale; Reduce Transparency uses opaque backgrounds. No preset runs a continuous animation.
+
+Compilation is checked separately from hands-on appearance and interaction. See the [acceptance record](docs/ACCEPTANCE.md) for the outstanding runtime scenarios.
 
 ## Displays and inheritance
 

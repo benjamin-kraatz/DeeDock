@@ -10,8 +10,16 @@ final class DockStore {
     /// A localized failure belonging only to this panel session.
     var errorMessage: LocalizedStringResource? { didSet { errorDidChange?() } }
     @ObservationIgnored var errorDidChange: (() -> Void)?
-    /// Stable application identity, retained across changes to item ordering.
-    var selectedID: String?
+    /// Stable application or control identity, retained across changes to entry ordering.
+    var selectedTarget: DockEntryID?
+    /// Compatibility for app-only callers; controls have no application identity.
+    var selectedID: String? {
+        get { if case .app(let id) = selectedTarget { return id }; return nil }
+        set { selectedTarget = newValue.map(DockEntryID.app) }
+    }
+    let sections = DockSectionState()
+    private(set) var entries: [DockRenderSlot] = []
+    @ObservationIgnored var presentationDidChange: (() -> Void)?
     /// Enabled by Focus Dock only; hover never enables keyboard handling.
     var keyboardFocus = false
     var launching: Set<String> { catalog.launching }
@@ -30,6 +38,7 @@ final class DockStore {
         self.catalog = catalog
         self.profiles = profiles
         errorMessage = profiles.pinErrors[displayID]
+        sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
     }
 
@@ -46,7 +55,13 @@ final class DockStore {
             return DockItem(reference: reference, icon: catalog.service.icon(for: url), isFavorite: favorites[id] != nil,
                             isRunning: running[id] != nil, isAvailable: url != nil)
         }
-        if let selectedID, !items.contains(where: { $0.id == selectedID }) { self.selectedID = items.first?.id }
+        refreshEntries()
+    }
+
+    private func refreshEntries() {
+        let next = DockSectionProjection.entries(items: items, visibility: sections.visibility, expanded: sections.isExpanded)
+        selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
+        entries = next
     }
 
     /// Saves this display's pins; the coordinator refreshes panels only after the write succeeds.
@@ -91,12 +106,15 @@ final class DockStore {
         }
     }
     func moveSelection(by distance: Int) {
-        guard !items.isEmpty else { return }
-        let index = selectedID.flatMap { id in items.firstIndex { $0.id == id } } ?? 0
-        selectedID = items[(index + distance + items.count) % items.count].id
+        guard !entries.isEmpty else { return }
+        let index = selectedTarget.flatMap { id in entries.firstIndex { $0.target == id } } ?? 0
+        selectedTarget = entries[(index + distance + entries.count) % entries.count].target
     }
-    func openSelection() { if let item = items.first(where: { $0.id == selectedID }) { open(item) } }
+    func openSelection() {
+        guard let entry = entries.first(where: { $0.target == selectedTarget }) else { return }
+        switch entry { case .app(let item): open(item); case .group: sections.toggle(); case .gap: break }
+    }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { copyPin = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { sections.stop(); presentationDidChange = nil; copyPin = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

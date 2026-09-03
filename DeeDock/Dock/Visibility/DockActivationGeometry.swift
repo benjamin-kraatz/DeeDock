@@ -40,7 +40,14 @@ struct DockPresentationGeometry {
         windowFrame = restingFrame.insetBy(dx: -DockAnimationGeometry.margin, dy: -DockAnimationGeometry.margin).intersection(screen)
         contentOrigin = CGPoint(x: restingFrame.minX - windowFrame.minX, y: windowFrame.maxY - restingFrame.maxY)
         contentSize = restingFrame.size
+        // Tooltip reservation is click-through and must not prolong auto-hide retention.
+        let depth = max(layout.surfaceDepth, layout.iconSize * layout.magnification
+                        + DockGeometry.indicatorAreaDepth + DockGeometry.crossPadding)
+        let artwork = layout.edge.rect(CGRect(x: 0,
+            y: layout.panelDepth - DockGeometry.outerMargin - depth,
+            width: layout.viewportLength, height: depth + DockGeometry.outerMargin), depth: layout.panelDepth)
+        let retention = DockEdge.screenRect(artwork, in: restingFrame)
         activation = DockActivationGeometry(screen: screen, restingGlass: DockGeometry.restingGlass(frame: restingFrame, layout: layout),
-                                            envelope: restingFrame, settings: settings, edge: layout.edge)
+                                            envelope: retention, settings: settings, edge: layout.edge)
     }
 }

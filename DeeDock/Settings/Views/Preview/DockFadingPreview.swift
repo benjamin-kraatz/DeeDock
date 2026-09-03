@@ -61,7 +61,8 @@ struct DockFadingPreview: View {
         let scale = min(0.5, 220 / max(layout.viewportSize.width, layout.viewportSize.height))
         return VStack(spacing: 4) {
             Text(title).font(.caption).foregroundStyle(.secondary)
-            DockSampleView(layout: layout, appearanceSettings: settings, idleFraction: idleFraction,
+            DockSampleView(layout: layout, runningIndicatorStyle: settings.runningIndicatorStyle,
+                           appearanceSettings: settings, idleFraction: idleFraction,
                            reduceMotionOverride: reduceMotion, reduceTransparencyOverride: reduceTransparency)
                 .scaleEffect(scale, anchor: .topLeading)
                 .frame(width: layout.viewportSize.width * scale,

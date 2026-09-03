@@ -17,8 +17,9 @@ struct DockView: View {
                                                   size: size, reduceMotion: reduceMotion, edge: interaction.layout.edge)
         DockContentView(
             items: store.items,
+            entries: store.entries,
             launchingIDs: store.launching,
-            selectedID: store.selectedID,
+            selectedTarget: store.selectedTarget,
             keyboardFocus: store.keyboardFocus,
             errorMessage: store.errorMessage,
             interaction: interaction,
@@ -32,8 +33,12 @@ struct DockView: View {
         .modifier(DockPresentationModifier(sample: sample, size: size))
         .accessibilityHidden(!visibility.exposesContent)
         .allowsHitTesting(visibility.exposesContent)
-        .offset(x: interaction.contentOrigin.x, y: interaction.contentOrigin.y)
-        .frame(width: interaction.windowSize.width, height: interaction.windowSize.height, alignment: .topLeading)
-        .clipped()
+        // The native panel animates its screen frame. Keep this coordinate conversion immediate
+        // so reported button rectangles and inverse pointer mapping use the same local origin.
+        .animation(nil) { content in
+            content.offset(x: interaction.contentOrigin.x, y: interaction.contentOrigin.y)
+                .frame(width: interaction.windowSize.width, height: interaction.windowSize.height, alignment: .topLeading)
+                .clipped()
+        }
     }
 }

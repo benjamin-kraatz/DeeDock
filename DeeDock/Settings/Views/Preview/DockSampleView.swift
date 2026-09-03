@@ -4,6 +4,7 @@ import SwiftUI
 struct DockSampleView: View {
     let layout: DockGeometry.Layout
     var magnified = false
+    var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
     var appearanceSettings = DockSettings.defaults
     var idleFraction: Double = 0
     var reduceMotionOverride: Bool? = nil
@@ -33,8 +34,19 @@ struct DockSampleView: View {
                             .font(.system(size: sizes[index] * 0.44, weight: .medium)).foregroundStyle(.white)
                     }
                     .frame(width: rect.width, height: rect.height)
+                    .modifier(DockIconIndicator(style: runningIndicatorStyle,
+                                                running: index.isMultiple(of: 2), size: sizes[index]))
                     .opacity(opacity.icons)
                     .position(x: rect.midX, y: rect.midY)
+                if index.isMultiple(of: 2) {
+                    let button = layout.buttonFrame(centerAlong: centers[index], size: sizes[index])
+                    let depth = sizes[index] + DockGeometry.indicatorAreaDepth
+                    let marker = layout.edge.point(CGPoint(x: sizes[index] / 2,
+                        y: sizes[index] + DockGeometry.indicatorSpacing + DockGeometry.indicatorSize / 2), depth: depth)
+                    DockRunningIndicator(style: runningIndicatorStyle, edge: layout.edge)
+                        .opacity(opacity.icons)
+                        .position(x: button.minX + marker.x, y: button.minY + marker.y)
+                }
             }
         }
         .frame(width: layout.viewportSize.width, height: layout.viewportSize.height)

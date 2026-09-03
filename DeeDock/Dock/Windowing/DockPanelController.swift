@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 /// Owns one panel, its visibility deadlines, and scoped interaction holds. Global events belong to the coordinator.
 @MainActor
@@ -50,11 +51,26 @@ final class DockPanelController {
         interaction.idleFade.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.didChange = { [weak self] in self?.present() }
+        store.presentationDidChange = { [weak self] in
+            guard let self, !updatingGeometry, let display = lastDisplay, let settings = lastSettings else { return }
+            interaction.tooltips.clear()
+            withAnimation(visibility.reduceMotion ? nil : .easeOut(duration: 0.18)) {
+                self.update(display: display, settings: settings, animateSectionChange: true)
+            }
+            interaction.scrollChanged?()
+        }
+        interaction.toggleSection = { [weak self] in
+            guard let self else { return }
+            withAnimation(visibility.reduceMotion ? nil : .easeOut(duration: 0.18)) {
+                if store.keyboardFocus, let group = store.sections.visibility.collapsedGroup { store.selectedTarget = .group(group) }
+                store.sections.toggle()
+            }
+        }
         store.errorDidChange = { [weak self] in self?.updatePointer() }
     }
 
     /// Reuses content and scrolling. Geometry/Space refreshes settle stale motion, never force a hidden dock frontmost.
-    func update(display: DisplaySnapshot, settings: DockSettings, resetVisibility: Bool = false) {
+    func update(display: DisplaySnapshot, settings: DockSettings, resetVisibility: Bool = false, animateSectionChange: Bool = false) {
         guard !stopped else { return }
         if let previous = lastDisplay, previous != display || lastSettings != settings || resetVisibility { invalidateDrag?() }
         let edgeChanged = lastSettings?.edge != settings.edge
@@ -63,7 +79,14 @@ final class DockPanelController {
         defer { updatingGeometry = false; updatePointer(); present() }
         if edgeChanged { interaction.resetGeometry() }
         if axisChanged { interaction.scrollOffset = 0; interaction.scrollRequest = 0 }
+        if lastSettings?.tooltipPreset != settings.tooltipPreset || edgeChanged || resetVisibility { interaction.tooltips.clear() }
         lastDisplay = display; lastSettings = settings
+        store.sections.configure(settings.appVisibility)
+        interaction.tooltipPreset = settings.tooltipPreset
+        let exposedIDs = Set(store.entries.compactMap(\.target).map(\.hitID))
+        interaction.retainHitRegions(exposedIDs)
+        accessibilityIDs.formIntersection(exposedIDs)
+        interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.idleFade.configure(settings,
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
@@ -73,10 +96,10 @@ final class DockPanelController {
         // A mouse-up can occur while asleep or during display reconfiguration; do not retain a stale hold.
         if resetVisibility && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
         let reference = DockGeometry.referenceFrame(screenFrame: display.frame, visibleFrame: display.visibleFrame, settings: settings)
-        baseLayout = DockGeometry.layout(count: store.items.count, favoriteCount: store.items.filter(\.isFavorite).count,
+        baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
                                          availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings)
-        let slots = DockRenderSlot.slots(items: store.items, proposal: interaction.dragProposal)
+        let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                  availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings)
@@ -85,7 +108,15 @@ final class DockPanelController {
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
         geometry = updated
         interaction.contentOrigin = updated.contentOrigin; interaction.windowSize = updated.windowFrame.size
-        panel.setFrame(updated.windowFrame, display: true)
+        if animateSectionChange && !visibility.reduceMotion && visibility.exposesContent {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.18
+                context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                panel.animator().setFrame(updated.windowFrame, display: true)
+            }
+        } else {
+            panel.setFrame(updated.windowFrame, display: true)
+        }
         visibility.configure(settings.behavior, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
                              geometryChanged: changed || resetVisibility || edgeChanged)
     }
@@ -106,6 +137,12 @@ final class DockPanelController {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
+        let suppress = idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+            || (visibility.phase != .visible && visibility.phase != .hideDelay)
+        if suppress != interaction.suppressTooltips {
+            interaction.suppressTooltips = suppress
+            if suppress { interaction.tooltips.clear() }
+        }
         let held = dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
         visibility.update(activation: geometry.activation.zone.contains(NSEvent.mouseLocation),
                           retained: geometry.activation.retention.contains(NSEvent.mouseLocation),
@@ -117,6 +154,9 @@ final class DockPanelController {
 
     private func present() {
         guard !stopped else { return }
+        if (visibility.phase == .hiding || !visibility.exposesContent) && !interaction.suppressTooltips {
+            interaction.suppressTooltips = true; interaction.tooltips.clear()
+        }
         if !visibility.exposesContent {
             panel.ignoresMouseEvents = true; interaction.pointer = nil
             if panel.isVisible { panel.orderOut(nil) }
@@ -174,11 +214,20 @@ final class DockPanelController {
         let local = contentPoint(point)
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
             size: interaction.layout.viewportSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
-        guard visibility.exposesContent, geometry?.windowFrame.contains(point) == true,
+        guard visibility.exposesContent, panel.frame.contains(point),
               sample.mask.contains(local), interaction.containsDockPoint(local) else { return nil }
-        return DockDragGeometry.insertion(point: local, scrollOffset: interaction.scrollOffset,
-                                          layout: baseLayout, pinCount: store.pins.count)
+        return DockSectionInsertion.index(point: local, scrollOffset: interaction.scrollOffset,
+            layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
     }
+
+    /// A stationary valid drag can reveal pins without adding polling or changing saved expansion.
+    func updateSectionDragHover(at point: CGPoint, valid: Bool) {
+        let local = contentPoint(point)
+        let control = interaction.iconRects[DockEntryID.group(.pinned).hitID]
+        store.sections.dragHover(valid && visibility.exposesContent && control?.contains(local) == true)
+    }
+
+    func endSectionDrag() { store.sections.endDrag() }
 
     func setDragPresentation(proposal: DockDragProposal?, source: String?, targeted: Bool, message: LocalizedStringResource?) {
         guard !stopped else { return }
@@ -211,7 +260,7 @@ final class DockPanelController {
         store.keyboardFocus = true
         visibility.showImmediately()
         panel.acceptsKeyboardFocus = true
-        store.selectedID = store.selectedID ?? store.items.first?.id
+        store.selectedTarget = store.selectedTarget ?? store.entries.first?.target
         NSApp.activate(); panel.makeKeyAndOrderFront(nil); panel.makeFirstResponder(panel)
         updatePointer()
     }
@@ -224,6 +273,7 @@ final class DockPanelController {
         }
         switch event.keyCode {
         case 36, 76: store.openSelection()
+        case 49: if case .group = store.selectedTarget { store.openSelection() }
         case 53: escape?()
         default: return false
         }
@@ -237,12 +287,13 @@ final class DockPanelController {
     /// Sleep cancels the idle deadline; the next display refresh resumes normal input handling.
     func suspendIdleFading() {
         idleSuspended = true
+        interaction.suppressTooltips = true; interaction.tooltips.clear()
         interaction.idleFade.reset()
     }
 
     func stop() {
         invalidateDrag?(); invalidateDrag = nil
-        stopped = true; interaction.idleFade.stop(); visibility.stop()
+        stopped = true; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.prepareSettings = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil

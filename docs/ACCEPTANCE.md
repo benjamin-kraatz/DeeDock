@@ -303,6 +303,41 @@ Results: **TEST BUILD SUCCEEDED** and **BUILD SUCCEEDED**. Logs are `/tmp/DeeDoc
 
 No tests were executed, app launched, or automated visual checks performed. Runtime acceptance remains pending for the disabled picker and subtitle, defaults and override restoration, menu-bar auto-hide, notched and unnotched displays, mixed-edge monitors, negative origins, display rearrangement, scrolling and drag destinations, native menus and focus, VoiceOver, all animations and activation zones, Spaces/full-screen behavior, and sleep/wake. The placement restriction uses the existing display visible frame supplied by macOS; compilation does not establish behavior when reserved system UI changes. Stop for review before committing this addition.
 
+## Running indicator styles
+
+Added on 2026-09-03 before the planned background and idle-fading work.
+
+Appearance offers fifteen styles for running applications: Dot, Bar, Square, Neon, Aura, Target Lock, Orbit, Stardust, Power Badge, Glitch, Plasma, Hologram, Solar Flare, Prism, and Hidden. A responsive thumbnail gallery replaces the original four-option segmented picker. The choice persists in shared defaults and can be overridden or reset independently per display. Existing saved defaults without the field use Dot; absent display overrides inherit. Unknown style values fail decoding through the existing settings error handling. The Hidden value is an explicit choice, separate from an absent override.
+
+Dot, Bar, and Square follow all four physical dock edges. Bars run along the edge. Neon frames the icon, Aura backlights it, Target Lock adds corner brackets, Orbit adds an arc and satellites, Stardust adds colored stars, Power Badge adds a lightning badge, and Glitch adds offset silhouettes and pixel strips. Icon decorations stay upright and inside the icon square. All effects are static, with no timers or continuous animation. Reduce Transparency replaces blurred backlighting with solid artwork. Keyboard selection and launch progress render above these decorations. Hidden preserves the reserved indicator strip, icon positions, and hit regions. Settings samples use the same marker view, with alternating running and inactive sample apps. New copy and search terms are in the string catalog.
+
+The former `isSelected` button flag is now `isKeyboardSelected`. It marks navigation after choosing **Focus Dock**, not the foreground application or hover. Keyboard selection keeps its accent outline with every running-indicator style. The old selection bar no longer replaces the running marker, so selection and running state remain separate. Running-state accessibility text is unaffected by hiding the visual marker.
+
+Validation used the focused Debug app build:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-indicators-build build
+```
+
+Result: **BUILD SUCCEEDED**, recorded in `/tmp/DeeDock-indicators-expanded-build.log`. The initial sandboxed attempt could not load Swift macro plugins; the successful build ran outside that sandbox. The only warning reported skipped App Intents metadata extraction because there is no AppIntents dependency. The string catalog parses and the diff passes whitespace checks.
+
+No tests were executed, app launched, or automated visual checks performed. Inert gallery previews cover all fifteen styles, including side placement, dark appearance, and an explicit reduced-transparency variant. Existing button previews cover keyboard selection and launch progress. Hands-on acceptance remains pending for light and dark appearance, magnification, reduced transparency, Focus Dock navigation, display overrides and reset, persistence after restart, and mixed-edge monitors. Background visibility and idle fading remain outside this change.
+
+
+### Four Metal indicator styles
+
+Plasma, Hologram, Solar Flare, and Prism fill the four remaining cells at a five-column gallery width. The gallery remains adaptive at other widths. Each style uses a stitchable Metal color function on an icon-sized rectangle, with transparent space in the center and premultiplied alpha. Plasma draws electric filaments, Hologram draws a diffraction rim and scan lines, Solar Flare draws a rayed corona, and Prism draws a spectral octagonal bevel.
+
+The shader functions use arithmetic without texture reads, layer sampling, particle simulation, timers, or a continuous animation loop. They redraw through the existing SwiftUI rendering lifecycle. Reduce Transparency changes translucent light to solid bands. All four remain static under Reduce Motion. These are implementation constraints, not measured GPU or battery results. Artwork stays inside the icon bounds and beneath keyboard focus and launch progress.
+
+The bridge uses Apple's [SwiftUI colorEffect shader API](https://developer.apple.com/documentation/swiftui/view/coloreffect(_:isenabled:)), checked against the installed macOS SDK. The synchronized Xcode source group includes the Metal file without manual project edits. No frameworks, dependencies, deployment changes, or signing changes were added.
+
+The focused Debug app build succeeded. `/tmp/DeeDock-indicators-metal-build.log` records both `CompileMetalFile` and `MetalLink`; the output app contains `Contents/Resources/default.metallib`. The only warning was the existing skipped App Intents metadata extraction. The string catalog parses and the diff passes whitespace checks. New inert previews show all four shaders on application icons at 32, 64, and 96 points; the gallery also has dark and reduced-transparency previews.
+
+No tests, live visual checks, or GPU profiling were run. Remaining acceptance includes runtime shader resolution, visual contrast on real icons, all dock edges, magnification, hidden/revealed docks, focus and launch overlays, reduced transparency, display scaling, and GPU cost with multiple running apps across displays.
+
 
 ## Background controls and idle fading
 
@@ -338,7 +373,7 @@ Remaining hands-on acceptance:
 - Combine fading with auto-hide and each reveal animation. Verify fresh full-opacity reveals, no stale deadlines after settings changes, independent displays, unplug/reconnect, sleep/wake, Spaces, full-screen apps, and quitting during a delay.
 - Toggle Reduce Motion and Reduce Transparency while fading and during preview playback. Verify immediate restoration, opaque enabled backgrounds, hidden backgrounds staying hidden, preserved preferences, and preview cancellation on Settings navigation or closure.
 
-The background and idle-fading feature is ready for delivery.
+The pre-existing running-indicator and layout edits remain in the working tree. The background and idle-fading feature is ready for delivery.
 
 
 ## Preserve native glass outside idle fading
@@ -350,3 +385,48 @@ Removed the steady Background opacity slider. Enabled backgrounds now use native
 DockBackgroundView now bypasses the opacity modifier at full visibility and draws no material at zero. Its animatable opacity interpolates between those branches during intentional idle fading. Partial idle fading still reduces the rendered glass effect; selecting Icons and indicators only keeps the glass intact while dimming icons. This change does not claim independently adjustable glass transparency.
 
 Validation: the focused Debug app build uses the existing DeeDock scheme and `/tmp/DeeDock-idle-build` derived data. Result: **BUILD SUCCEEDED**, recorded in `/tmp/DeeDock-glass-opacity-build.log`. The only warning was skipped App Intents metadata extraction. No tests, app launch, or automated visual checks were performed. Runtime acceptance remains required for native backdrop sampling after restoration, partial idle fading and reversal, saved legacy opacity values, background on/off, both accessibility settings, and Settings samples. Existing unrelated work remains intact.
+
+## Per-dock app visibility and tooltip presets
+
+Added on 2026-09-03. Behavior now provides five mutually exclusive visibility choices. One enum represents Show all, Hide running apps, Collapse running apps, Hide pinned apps, or Collapse pinned apps. Pinned apps retain their group while running. The catalog and saved pin lists remain complete.
+
+Collapsed groups have a count-bearing section button, including when empty. Expansion is local to the panel session and resets on an effective visibility-policy change or panel recreation. App events, auto-hide, and geometry refreshes preserve it. Typed entry identities distinguish applications from section actions. Rendering, keyboard selection, hit regions, accessibility, and insertion geometry consume the same projected entries. Removed entries cannot re-register stale hit rectangles during an exit animation.
+
+A valid drag dwelling on the pinned-group button for 0.5 seconds temporarily expands its pins. Completion or cancellation restores the prior state. Button drops append; expanded insertion positions map back to saved pin indices without counting the control. Completely hidden pins reject direct drops, while existing menu commands remain available. Native panel resizing and entry changes use a 0.18-second transition, with immediate changes under Reduce Motion.
+
+Appearance includes eighteen bundled app-name presets plus Off. Each choice includes design, placement, hover delay, and entrance. The gallery and inert preview use the production renderer. Placements adapt to all four edges; labels are upright, width-limited, and clamped to the viewport. Before/after placements try the opposite direction before centering. Dock captions use the resting visible dock and a stable inward anchor independent of the hovered icon's magnification.
+
+Each panel owns cancellable tooltip timing through the existing monotonic scheduler. Target changes, menus, dragging, hiding, error feedback, sleep, and teardown invalidate pending work. Keyboard labels bypass delays. Tooltips do not capture input, extend activation retention, or resize the panel when shown. Reduce Motion limits entrances to short fades; Reduce Transparency replaces material with opaque backgrounds. Settings playback also observes actual window closure because the Settings scene can retain its SwiftUI tree.
+
+Both settings support shared defaults, explicit per-display overrides, remembered displays, individual resets, and existing reset-all behavior. Missing legacy keys use Show all and Classic. Explicit Show all and Off remain distinct from absent overrides. Unknown enum values retain existing load-error handling. All new app-owned copy uses generated string-catalog symbols and translator comments.
+
+### Validation
+
+The focused Debug app build and test-target compilation succeeded. Test sources were compiled with `build-for-testing`; **no test cases were executed**. Commands:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-sections-build build
+
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-sections-build build-for-testing
+```
+
+Logs are `/tmp/DeeDock-sections-build.log` and `/tmp/DeeDock-sections-test-build.log`. The sandboxed attempt could not access the installed Metal toolchain. Builds outside that sandbox succeeded. The only remaining warning was skipped App Intents metadata extraction because the target has no AppIntents dependency.
+
+Authored regression cases cover visibility membership, running and unavailable pins, empty groups, independent expansion, selection repair, stale hit-region rejection, drag dwell and cancellation, insertion mapping on all four edges, legacy settings, explicit overrides, remembered-display persistence, resets preserving pins, tooltip timing, keyboard labels, Off, placement fallback, and activation retention. New source dependencies are registered with the existing test target. The string catalog parses and the diff passes whitespace checks.
+
+Inert previews cover the gallery, collapsed sections on every edge, expanded running apps, zero pins, long names, overflow, dark appearance, and reduced motion/transparency. No app was launched, no preview was rendered, and no automated visual checks were performed. Compilation does not establish passing assertions or native interaction quality.
+
+### Remaining hands-on acceptance
+
+- Exercise all visibility modes, empty groups, live launches/quits, pinning/unpinning, count updates, expansion, resizing, and overflow. Confirm focus and app order survive changes.
+- Use pointer, Focus Dock, Return/Space, and VoiceOver with section buttons. Confirm hidden apps cannot receive clicks, keyboard selection, or accessibility focus.
+- Drag from Finder and another dock onto collapsed pins, wait for expansion, insert at each boundary, cancel, and drop onto the button. Verify temporary expansion restores and hidden pins reject drops without unpinning the source.
+- Inspect every tooltip preset against light and dark desktops, with long names, all four edges, magnification, scrolling, mixed scale factors, and negative display origins. Confirm dock-centered labels stay fixed and tooltip regions never capture clicks or extend hiding delays.
+- Check rapid hover changes, pointer exit, menu tracking, errors, Reduce Motion/Transparency, and Settings preview cancellation on window close or navigation.
+- Combine sections and tooltips with all auto-hide styles and idle fading. Check separate display overrides, disabled docks, restart/reconnect, Spaces, full-screen apps, and sleep/wake.
+
+Existing uncommitted work is preserved. No signing, dependency, entitlement, language-mode, deployment-target, or system Dock preference changes were made. No files were staged or committed.

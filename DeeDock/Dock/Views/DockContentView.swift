@@ -3,8 +3,9 @@ import SwiftUI
 /// Owns scrolling and hover state. Geometry and actions come from the panel; previews stay inert.
 struct DockContentView: View {
     let items: [DockItem]
+    var entries: [DockRenderSlot]? = nil
     let launchingIDs: Set<String>
-    let selectedID: String?
+    let selectedTarget: DockEntryID?
     let keyboardFocus: Bool
     let errorMessage: LocalizedStringResource?
     let interaction: DockInteraction
@@ -16,9 +17,9 @@ struct DockContentView: View {
 
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollPosition = ScrollPosition(x: 0)
-    @State private var hoveredID: String?
+    @State private var hoveredID: DockEntryID?
     private var layout: DockGeometry.Layout { interaction.layout }
-    private var slots: [DockRenderSlot] { DockRenderSlot.slots(items: items, proposal: interaction.dragProposal) }
+    private var slots: [DockRenderSlot] { DockRenderSlot.slots(entries: entries ?? items.map(DockRenderSlot.app), proposal: interaction.dragProposal) }
     private var sizes: [CGFloat] {
         layout.sizes(pointerAlong: interaction.dragActive ? nil : interaction.pointer.map {
             layout.edge.along($0) - scrollOffset
@@ -37,7 +38,7 @@ struct DockContentView: View {
         ZStack(alignment: .topLeading) {
             ScrollViewReader { proxy in
                 ScrollView(edge.isVertical ? .vertical : .horizontal) {
-                    DockSurfaceView(slots: slots, launchingIDs: launchingIDs, selectedID: selectedID,
+                    DockSurfaceView(slots: slots, launchingIDs: launchingIDs, selectedTarget: selectedTarget,
                         keyboardFocus: keyboardFocus, showsLabel: errorMessage == nil && !interaction.dragActive,
                         layout: layout, sizes: sizes, surface: layout.surfaceFrame(sizes: sizes),
                         viewport: shifted(viewport, by: -scrollOffset), hoveredID: $hoveredID,
@@ -67,12 +68,12 @@ struct DockContentView: View {
                 .coordinateSpace(name: "dockViewport")
                 .onAppear {
                     // Axis changes recreate only presentation. Store selection remains stable.
-                    if keyboardFocus, let selectedID { proxy.scrollTo(selectedID, anchor: .center) }
+                    if keyboardFocus, let selectedTarget { proxy.scrollTo(selectedTarget.hitID, anchor: .center) }
                 }
-                .onChange(of: selectedID) { _, id in
+                .onChange(of: selectedTarget) { _, id in
                     if let id {
                         withAnimation(reduceMotion ? nil : .easeOut(duration: 0.15)) {
-                            proxy.scrollTo(id, anchor: .center)
+                            proxy.scrollTo(id.hitID, anchor: .center)
                         }
                     }
                 }
@@ -88,9 +89,13 @@ struct DockContentView: View {
             guard interaction.layout.edge == edge else { return }
             interaction.surfaceRect = rect
         }
+        .onChange(of: layout.canvasLength) { _, _ in
+            let offset = min(max(0, -scrollOffset), max(0, layout.canvasLength - layout.viewportLength))
+            if edge.isVertical { scrollPosition.scrollTo(y: offset) } else { scrollPosition.scrollTo(x: offset) }
+        }
         .onChange(of: layout.edge) { _, _ in hoveredID = nil }
         .onChange(of: interaction.pointer) { _, point in if point == nil { hoveredID = nil } }
-        .onChange(of: items.map(\.id)) { _, ids in
+        .onChange(of: slots.compactMap(\.target)) { _, ids in
             if let hoveredID, !ids.contains(hoveredID) { self.hoveredID = nil }
         }
     }

@@ -3,7 +3,8 @@ import Foundation
 /// The independently inheritable settings; visibility and pins are always display-specific.
 enum DockSettingField: String, CaseIterable, Codable {
     case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-    case iconSize, magnification, itemSpacing, edge, alignment, positionReference
+    case appVisibility, tooltipPreset
+    case iconSize, magnification, itemSpacing, runningIndicatorStyle, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
     case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
@@ -20,9 +21,12 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .idleDelay: \.idleDelay
         case .fadeOutDuration: \.fadeOutDuration
         case .restoreDuration: \.restoreDuration
+        case .appVisibility: \.appVisibility
+        case .tooltipPreset: \.tooltipPreset
         case .iconSize: \.iconSize
         case .magnification: \.magnification
         case .itemSpacing: \.itemSpacing
+        case .runningIndicatorStyle: \.runningIndicatorStyle
         case .edge: \.edge
         case .alignment: \.alignment
         case .alongEdgeOffset: \.alongEdgeOffset
@@ -52,9 +56,12 @@ struct DockSettingsOverrides: Codable, Equatable {
     var idleDelay: Double?
     var fadeOutDuration: Double?
     var restoreDuration: Double?
+    var appVisibility: DockAppVisibility?
+    var tooltipPreset: DockTooltipPreset?
     var iconSize: Double?
     var magnification: Double?
     var itemSpacing: Double?
+    var runningIndicatorStyle: DockSettings.RunningIndicatorStyle?
     var edge: DockEdge?
     var alignment: DockSettings.Alignment?
     var alongEdgeOffset: Double?
@@ -74,7 +81,8 @@ struct DockSettingsOverrides: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-        case iconSize, magnification, itemSpacing, edge, alignment, positionReference
+        case appVisibility, tooltipPreset
+        case iconSize, magnification, itemSpacing, runningIndicatorStyle, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
         case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
@@ -83,8 +91,11 @@ struct DockSettingsOverrides: Codable, Equatable {
     func resolving(_ defaults: DockSettings) -> DockSettings {
         var result = DockSettings(iconSize: iconSize ?? defaults.iconSize, magnification: magnification ?? defaults.magnification,
                      itemSpacing: itemSpacing ?? defaults.itemSpacing,
+                     runningIndicatorStyle: runningIndicatorStyle ?? defaults.runningIndicatorStyle,
                      edge: edge ?? defaults.edge, alignment: alignment ?? defaults.alignment, alongEdgeOffset: alongEdgeOffset ?? defaults.alongEdgeOffset,
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
+        result.appVisibility = appVisibility ?? defaults.appVisibility
+        result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground
         result.backgroundOpacity = backgroundOpacity ?? defaults.backgroundOpacity
         result.fadeWhenIdle = fadeWhenIdle ?? defaults.fadeWhenIdle
@@ -116,9 +127,12 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .idleDelay: idleDelay != nil
         case .fadeOutDuration: fadeOutDuration != nil
         case .restoreDuration: restoreDuration != nil
+        case .appVisibility: appVisibility != nil
+        case .tooltipPreset: tooltipPreset != nil
         case .iconSize: iconSize != nil
         case .magnification: magnification != nil
         case .itemSpacing: itemSpacing != nil
+        case .runningIndicatorStyle: runningIndicatorStyle != nil
         case .edge: edge != nil
         case .alignment: alignment != nil
         case .alongEdgeOffset: alongEdgeOffset != nil
@@ -147,9 +161,12 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .idleDelay: idleDelay = value?.idleDelay
         case .fadeOutDuration: fadeOutDuration = value?.fadeOutDuration
         case .restoreDuration: restoreDuration = value?.restoreDuration
+        case .appVisibility: appVisibility = value?.appVisibility
+        case .tooltipPreset: tooltipPreset = value?.tooltipPreset
         case .iconSize: iconSize = value?.iconSize
         case .magnification: magnification = value?.magnification
         case .itemSpacing: itemSpacing = value?.itemSpacing
+        case .runningIndicatorStyle: runningIndicatorStyle = value?.runningIndicatorStyle
         case .edge: edge = value?.edge
         case .alignment: alignment = value?.alignment
         case .alongEdgeOffset: alongEdgeOffset = value?.alongEdgeOffset
@@ -196,9 +213,12 @@ extension DockSettingsOverrides {
         idleDelay = try values.decodeIfPresent(Double.self, forKey: .idleDelay)
         fadeOutDuration = try values.decodeIfPresent(Double.self, forKey: .fadeOutDuration)
         restoreDuration = try values.decodeIfPresent(Double.self, forKey: .restoreDuration)
+        appVisibility = try values.decodeIfPresent(DockAppVisibility.self, forKey: .appVisibility)
+        tooltipPreset = try values.decodeIfPresent(DockTooltipPreset.self, forKey: .tooltipPreset)
         iconSize = try values.decodeIfPresent(Double.self, forKey: .iconSize)
         magnification = try values.decodeIfPresent(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing)
+        runningIndicatorStyle = try values.decodeIfPresent(DockSettings.RunningIndicatorStyle.self, forKey: .runningIndicatorStyle)
         alignment = try values.decodeIfPresent(DockSettings.Alignment.self, forKey: .alignment)
         alongEdgeOffset = try values.decodeIfPresent(Double.self, forKey: .alongEdgeOffset)
         edgeDistance = try values.decodeIfPresent(Double.self, forKey: .edgeDistance)

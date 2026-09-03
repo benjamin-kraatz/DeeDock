@@ -6,9 +6,8 @@ import SwiftUI
 /// and the existing spring applies to the whole surface rather than separate icon subtrees.
 struct DockSurfaceView: View {
     let slots: [DockRenderSlot]
-    private var items: [DockItem] { slots.compactMap(\.item) }
     let launchingIDs: Set<String>
-    let selectedID: String?
+    let selectedTarget: DockEntryID?
     let keyboardFocus: Bool
     let showsLabel: Bool
     let layout: DockGeometry.Layout
@@ -16,7 +15,8 @@ struct DockSurfaceView: View {
     let surface: CGRect
     /// Visible viewport expressed in the scrollable canvas coordinate space.
     let viewport: CGRect
-    @Binding var hoveredID: String?
+    @Binding var hoveredID: DockEntryID?
+    @State private var renderedFrames: [DockEntryID: CGRect] = [:]
     let reduceMotion: Bool
     let reduceTransparency: Bool
     let openApp: (DockItem) -> Void
@@ -72,68 +72,41 @@ struct DockSurfaceView: View {
                         centerAlong: centers[index],
                         size: sizes[index]
                     )
-                    if let item = slot.item {
-                        DockAppButton(
-                            item: item,
-                            size: sizes[index],
-                            isLaunching: launchingIDs.contains(item.id),
-                            isSelected: keyboardFocus && selectedID == item.id,
-                            open: { openApp(item) },
-                            togglePin: { togglePin(item) },
-                            interaction: interaction,
-                            menuTracking: menuTracking,
-                            accessibilityFocus: {
-                                accessibilityFocus(item.id, $0)
-                            }
-                        )
-                        .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
+                    DockEntryView(slot: slot, size: sizes[index],
+                        launching: slot.item.map { launchingIDs.contains($0.id) } ?? false,
+                        selected: keyboardFocus && selectedTarget == slot.target,
+                        interaction: interaction, reduceTransparency: reduceTransparency,
+                        openApp: openApp, togglePin: togglePin, menuTracking: menuTracking,
+                        accessibilityFocus: accessibilityFocus)
                         .onHover { inside in
-                            if inside {
-                                hoveredID = item.id
-                            } else if hoveredID == item.id {
-                                hoveredID = nil
-                            }
+                            if inside { hoveredID = slot.target }
+                            else if hoveredID == slot.target { hoveredID = nil }
                         }
-                        .onGeometryChange(for: CGRect.self) {
-                            $0.frame(in: .named("dockRoot"))
-                        } action: {
-                            iconFrameChanged(item.id, $0)
+                        .onGeometryChange(for: DockEntryFrames.self) {
+                            DockEntryFrames(root: $0.frame(in: .named("dockRoot")), canvas: $0.frame(in: .named("dockCanvas")))
+                        } action: { frames in
+                            guard let target = slot.target else { return }
+                            iconFrameChanged(target.hitID, frames.root)
+                            renderedFrames[target] = frames.canvas
                         }
-                        .onDisappear { iconFrameChanged(item.id, nil) }
-                        .id(item.id)
-                        .position(x: frame.midX, y: frame.midY)
-                    } else {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.accentColor.opacity(0.12))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10).strokeBorder(
-                                    .tint,
-                                    style: StrokeStyle(
-                                        lineWidth: 1,
-                                        dash: [3, 3]
-                                    )
-                                )
-                            )
-                            .frame(width: sizes[index], height: sizes[index])
-                            .position(x: iconFrame.midX, y: iconFrame.midY)
-                            .accessibilityHidden(true)
-                            .allowsHitTesting(false)
-                    }
+                        .onDisappear {
+                            guard let target = slot.target else { return }
+                            iconFrameChanged(target.hitID, nil); renderedFrames[target] = nil
+                        }
+                        .id(slot.id)
+                        .position(x: slot.item == nil && slot.target == nil ? iconFrame.midX : frame.midX,
+                                  y: slot.item == nil && slot.target == nil ? iconFrame.midY : frame.midY)
                 }
             }
-            if let id = hoveredID ?? (keyboardFocus ? selectedID : nil),
-                let index = slots.firstIndex(where: { $0.item?.id == id }),
-                index < centers.count, showsLabel
-            {
-                let region = layout.calloutRegion(size: sizes[index], length: layout.canvasLength).intersection(viewport)
-                DockHoverLabel(name: slots[index].item?.reference.name ?? "",
-                    anchor: CGPoint(x: centers[index], y: layout.edge.isVertical ? centers[index] : (layout.edge == .top ? region.minY + 20 : region.maxY - 20)),
-                    viewport: region, edge: layout.edge)
-            }
+            DockTooltipsOverlay(slots: slots, frames: renderedFrames, hovered: hoveredID,
+                selected: keyboardFocus ? selectedTarget : nil, enabled: showsLabel,
+                layout: layout, viewport: viewport, interaction: interaction,
+                reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
         }
         .frame(width: layout.canvasSize.width, height: layout.canvasSize.height)
+        .coordinateSpace(name: "dockCanvas")
         .animation(
-            reduceMotion ? nil : .easeOut(duration: 0.15),
+            reduceMotion ? nil : .easeOut(duration: 0.18),
             value: slots.map(\.id)
         )
         .animation(

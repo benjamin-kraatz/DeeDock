@@ -56,3 +56,23 @@ extension DockEdge {
         }
     }
 }
+
+extension DockSettings.RunningIndicatorStyle {
+    static var settingsOptions: [SettingsOption<Self>] {
+        [SettingsOption(value: .dot, title: .settingsIndicatorDot, symbol: "circle.fill"),
+         SettingsOption(value: .bar, title: .settingsIndicatorBar, symbol: "minus"),
+         SettingsOption(value: .square, title: .settingsIndicatorSquare, symbol: "square.fill"),
+         SettingsOption(value: .neon, title: .settingsIndicatorNeon, symbol: "lightbulb.fill"),
+         SettingsOption(value: .aura, title: .settingsIndicatorAura, symbol: "sun.max.fill"),
+         SettingsOption(value: .targetLock, title: .settingsIndicatorTargetLock, symbol: "viewfinder"),
+         SettingsOption(value: .orbit, title: .settingsIndicatorOrbit, symbol: "circle.dotted"),
+         SettingsOption(value: .stardust, title: .settingsIndicatorStardust, symbol: "sparkles"),
+         SettingsOption(value: .powerBadge, title: .settingsIndicatorPowerBadge, symbol: "bolt.fill"),
+         SettingsOption(value: .glitch, title: .settingsIndicatorGlitch, symbol: "waveform.path"),
+         SettingsOption(value: .plasma, title: .settingsIndicatorPlasma, symbol: "waveform"),
+         SettingsOption(value: .hologram, title: .settingsIndicatorHologram, symbol: "rectangle.on.rectangle"),
+         SettingsOption(value: .solarFlare, title: .settingsIndicatorSolarFlare, symbol: "sun.max.fill"),
+         SettingsOption(value: .prism, title: .settingsIndicatorPrism, symbol: "diamond.fill"),
+         SettingsOption(value: .hidden, title: .settingsIndicatorHidden, symbol: "eye.slash")]
+    }
+}

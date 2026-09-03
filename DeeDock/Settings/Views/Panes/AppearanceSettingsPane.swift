@@ -6,6 +6,7 @@ struct AppearanceSettingsPane: View {
     @Binding var iconSize: Double
     @Binding var magnification: Double
     @Binding var itemSpacing: Double
+    @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
 
     var appearanceSettings = DockSettings.defaults
     var overrideContext: SettingsOverrideContext? = nil
@@ -14,7 +15,11 @@ struct AppearanceSettingsPane: View {
         VStack(alignment: .leading, spacing: 22) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
                 DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing,
-                                      appearanceSettings: appearanceSettings)
+                                      runningIndicatorStyle: runningIndicatorStyle, appearanceSettings: appearanceSettings)
+            }
+            SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
+                RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle)
+                    .settingsOverride(overrideContext, field: .runningIndicatorStyle)
             }
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,
@@ -39,8 +44,9 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var iconSize: Double = 48
     @Previewable @State var magnification: Double = 1.4
     @Previewable @State var itemSpacing: Double = 4
+    @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .dot
     ScrollView {
-        AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing)
+        AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, runningIndicatorStyle: $indicator)
             .padding(24)
     }
     .tint(SettingsCategory.appearance.tint)

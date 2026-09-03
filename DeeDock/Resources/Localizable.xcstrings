@@ -296,7 +296,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "icon size magnification zoom scale hover background opacity transparency floating icons idle fading dimming delay restore"
+            "value": "icon size magnification zoom scale hover running indicator dot bar square hidden neon aura glow target orbit stardust power badge glitch plasma hologram solar flare prism shader metal background opacity transparency floating icons idle fading dimming delay restore tooltip app names labels presets caption"
           }
         }
       }
@@ -872,7 +872,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "auto hide reveal activation zone length depth width height offset delay animation duration preview edge"
+            "value": "auto hide reveal activation zone length depth width height offset delay animation duration preview edge app visibility hide pinned running collapse expand sections"
           }
         }
       }
@@ -2197,6 +2197,198 @@
         }
       }
     },
+    "settingsIndicatorAura": {
+      "comment": "Running indicator with warm colored backlighting behind the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aura"
+          }
+        }
+      }
+    },
+    "settingsIndicatorBar": {
+      "comment": "Short line running-app marker option, oriented along the dock edge.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar"
+          }
+        }
+      }
+    },
+    "settingsIndicatorDot": {
+      "comment": "Circular running-app marker option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dot"
+          }
+        }
+      }
+    },
+    "settingsIndicatorGlitch": {
+      "comment": "Running indicator with offset cyan and pink silhouettes and pixel strips.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glitch"
+          }
+        }
+      }
+    },
+    "settingsIndicatorHidden": {
+      "comment": "Hides running-app markers while preserving keyboard selection outlines.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden"
+          }
+        }
+      }
+    },
+    "settingsIndicatorHologram": {
+      "comment": "Metal running indicator with rainbow diffraction, scan lines, and a diagonal highlight.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hologram"
+          }
+        }
+      }
+    },
+    "settingsIndicatorNeon": {
+      "comment": "Running indicator with a cyan, blue, and pink luminous frame around the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neon"
+          }
+        }
+      }
+    },
+    "settingsIndicatorOrbit": {
+      "comment": "Running indicator with an orbital arc and satellites around the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orbit"
+          }
+        }
+      }
+    },
+    "settingsIndicatorPlasma": {
+      "comment": "Metal running indicator with electric cyan and violet filaments around the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plasma"
+          }
+        }
+      }
+    },
+    "settingsIndicatorPowerBadge": {
+      "comment": "Running indicator with a yellow lightning badge on the upper-right corner.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Badge"
+          }
+        }
+      }
+    },
+    "settingsIndicatorPrism": {
+      "comment": "Metal running indicator with an octagonal spectral bevel and bright facet edges.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prism"
+          }
+        }
+      }
+    },
+    "settingsIndicatorSolarFlare": {
+      "comment": "Metal running indicator with a hot circular rim and orange solar rays.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solar Flare"
+          }
+        }
+      }
+    },
+    "settingsIndicatorSquare": {
+      "comment": "Square running-app marker option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Square"
+          }
+        }
+      }
+    },
+    "settingsIndicatorStardust": {
+      "comment": "Running indicator with colored stars around the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stardust"
+          }
+        }
+      }
+    },
+    "settingsIndicatorStyle": {
+      "comment": "Picker for the shape or visibility of running-app markers.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indicator style"
+          }
+        }
+      }
+    },
+    "settingsIndicatorTargetLock": {
+      "comment": "Running indicator with four green corner brackets around the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Target Lock"
+          }
+        }
+      }
+    },
     "settingsPercent": {
       "comment": "Unit for opacity controls, whose values range from zero to one hundred.",
       "extractionState": "manual",
@@ -2205,6 +2397,690 @@
           "stringUnit": {
             "state": "translated",
             "value": "%"
+          }
+        }
+      }
+    },
+    "settingsRunningIndicators": {
+      "comment": "Appearance card for markers on applications that are running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running indicators"
+          }
+        }
+      }
+    },
+    "settingsRunningIndicatorsHelp": {
+      "comment": "Explains running markers versus keyboard selection, including how to reveal the selection outline.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Effects stay still and Hidden keeps icon spacing unchanged. Choose Focus Dock from the DeeDock menu to see the independent keyboard selection outline."
+          }
+        }
+      }
+    },
+    "settingsAppVisibility": {
+      "comment": "Behavior setting controlling which app section is hidden or collapsed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App visibility"
+          }
+        }
+      }
+    },
+    "settingsAppVisibilityHelp": {
+      "comment": "Explains mutually exclusive app section visibility modes.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinned apps stay in the pinned section while running. Collapse replaces one section with a button. Expansion lasts until clicked again or the dock is recreated."
+          }
+        }
+      }
+    },
+    "visibilityShowAll": {
+      "comment": "Show both app sections.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show all"
+          }
+        }
+      }
+    },
+    "visibilityHideRunning": {
+      "comment": "Completely omit unpinned running apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide running apps"
+          }
+        }
+      }
+    },
+    "visibilityCollapseRunning": {
+      "comment": "Replace unpinned running apps with an expand button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse running apps"
+          }
+        }
+      }
+    },
+    "visibilityHidePinned": {
+      "comment": "Completely omit pinned apps, including those that are running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide pinned apps"
+          }
+        }
+      }
+    },
+    "visibilityCollapsePinned": {
+      "comment": "Replace pinned apps with an expand button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse pinned apps"
+          }
+        }
+      }
+    },
+    "sectionExpanded": {
+      "comment": "Accessibility value for an open app section.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expanded"
+          }
+        }
+      }
+    },
+    "sectionCollapsed": {
+      "comment": "Accessibility value for a closed app section.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapsed"
+          }
+        }
+      }
+    },
+    "sectionShowPinned": {
+      "comment": "Section-button action. count is the number of pinned apps, including zero.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show pinned apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "sectionHidePinned": {
+      "comment": "Section-button action. count is the number of pinned apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide pinned apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "sectionShowRunning": {
+      "comment": "Section-button action. count is the number of unpinned running apps, including zero.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show running apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "sectionHideRunning": {
+      "comment": "Section-button action. count is the number of unpinned running apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide running apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "settingsAppNames": {
+      "comment": "Appearance gallery title for hover tooltip presets.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App names"
+          }
+        }
+      }
+    },
+    "settingsAppNamesHelp": {
+      "comment": "Help for bundled tooltip presets.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each preset includes its design, placement, hover delay, and entrance. Inward is toward the desktop; before and after follow app order. Keyboard labels appear immediately. Off preserves accessible app names."
+          }
+        }
+      }
+    },
+    "tooltipSampleApp": {
+      "comment": "Deterministic app name used only in Settings samples.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample App"
+          }
+        }
+      }
+    },
+    "tooltipPlayPreview": {
+      "comment": "Button plays the selected tooltip delay and entrance on an inert sample.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play Preview"
+          }
+        }
+      }
+    },
+    "tooltipClassic": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Classic"
+          }
+        }
+      }
+    },
+    "tooltipClassicDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · immediate · instant"
+          }
+        }
+      }
+    },
+    "tooltipGlassPill": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glass pill"
+          }
+        }
+      }
+    },
+    "tooltipGlassPillDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipCompact": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compact"
+          }
+        }
+      }
+    },
+    "tooltipCompactDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.35 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipPlain": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plain"
+          }
+        }
+      }
+    },
+    "tooltipPlainDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · immediate · instant"
+          }
+        }
+      }
+    },
+    "tooltipBold": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bold"
+          }
+        }
+      }
+    },
+    "tooltipBoldDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipOutline": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outline"
+          }
+        }
+      }
+    },
+    "tooltipOutlineDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipAccent": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accent"
+          }
+        }
+      }
+    },
+    "tooltipAccentDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipSpeechBubble": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech bubble"
+          }
+        }
+      }
+    },
+    "tooltipSpeechBubbleDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · lift"
+          }
+        }
+      }
+    },
+    "tooltipNameCard": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name card"
+          }
+        }
+      }
+    },
+    "tooltipNameCardDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.40 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipLeadingTag": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leading tag"
+          }
+        }
+      }
+    },
+    "tooltipLeadingTagDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before icon · 0.15 s · slide"
+          }
+        }
+      }
+    },
+    "tooltipTrailingTag": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trailing tag"
+          }
+        }
+      }
+    },
+    "tooltipTrailingTagDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After icon · 0.15 s · slide"
+          }
+        }
+      }
+    },
+    "tooltipLeadingOutline": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leading outline"
+          }
+        }
+      }
+    },
+    "tooltipLeadingOutlineDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before icon · 0.30 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipTrailingPill": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trailing pill"
+          }
+        }
+      }
+    },
+    "tooltipTrailingPillDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After icon · 0.30 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipDockCaption": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock caption"
+          }
+        }
+      }
+    },
+    "tooltipDockCaptionDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock center · immediate · crossfade"
+          }
+        }
+      }
+    },
+    "tooltipDockTitle": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock title"
+          }
+        }
+      }
+    },
+    "tooltipDockTitleDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock center · 0.20 s · crossfade"
+          }
+        }
+      }
+    },
+    "tooltipLift": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lift"
+          }
+        }
+      }
+    },
+    "tooltipLiftDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · lift"
+          }
+        }
+      }
+    },
+    "tooltipPop": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pop"
+          }
+        }
+      }
+    },
+    "tooltipPopDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · scale"
+          }
+        }
+      }
+    },
+    "tooltipSpectrum": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spectrum"
+          }
+        }
+      }
+    },
+    "tooltipSpectrumDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipOff": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        }
+      }
+    },
+    "tooltipOffDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No visual app names"
           }
         }
       }

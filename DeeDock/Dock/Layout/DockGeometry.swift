@@ -7,7 +7,7 @@ enum DockGeometry {
     static let padding: CGFloat = 6
     /// Inset on both sides of the icon and indicator across the glass thickness.
     static let crossPadding: CGFloat = 6
-    /// Gap between the image square and its running or selection indicator.
+    /// Gap between the image square and its running indicator.
     static let indicatorSpacing: CGFloat = 0
     static let indicatorSize: CGFloat = 4
     /// Reserved even for apps that are not running, so their icons share the outer baseline.
@@ -28,13 +28,13 @@ enum DockGeometry {
         let availableDepth: CGFloat
         /// Stable envelope accommodates the largest icon, running indicator, and hover label.
         var panelDepth: CGFloat {
-            // The 48 points reserve room for the hover label inward of the glass or a raised icon.
+            // The 72 points reserve room for the hover label inward of the glass or a raised icon.
             // Increasing the inner padding must not clip either in the transparent panel envelope.
             let contentHeight = max(surfaceDepth, ceil(iconSize * magnification)
                                     + DockGeometry.crossPadding + DockGeometry.indicatorAreaDepth)
             return edge.isVertical
                 ? min(availableDepth, contentHeight + DockGeometry.outerMargin + 260)
-                : max(128, contentHeight + DockGeometry.outerMargin + 48)
+                : max(128, contentHeight + DockGeometry.outerMargin + 72)
         }
         /// Resting glass thickness. Magnification never changes it.
         var surfaceDepth: CGFloat {

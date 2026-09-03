@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Upright artwork with its running or selection marker on the physical outside edge.
+/// Upright artwork with a running-state decoration and an independent keyboard-selection outline.
 struct DockIconPresentation: View {
     let icon: NSImage
     let size: CGFloat
@@ -8,7 +8,8 @@ struct DockIconPresentation: View {
     let available: Bool
     let running: Bool
     let launching: Bool
-    let selected: Bool
+    let keyboardSelected: Bool
+    var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
 
     /// Applied only to artwork, preserving focus/launch feedback and the button hit region.
     var artworkOpacity: Double = 1
@@ -24,9 +25,10 @@ struct DockIconPresentation: View {
             Image(nsImage: icon).resizable().interpolation(.high)
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
+                .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size))
                 .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                 .overlay {
-                    if selected {
+                    if keyboardSelected {
                         RoundedRectangle(cornerRadius: 12).strokeBorder(Color.accentColor, lineWidth: 2)
                     }
                     if launching {
@@ -35,15 +37,9 @@ struct DockIconPresentation: View {
                     }
                 }
                 .position(iconCenter)
-            if selected {
-                RoundedRectangle(cornerRadius: 2).fill(.primary)
-                    .frame(width: edge.isVertical ? DockGeometry.indicatorSize : 16,
-                           height: edge.isVertical ? 16 : DockGeometry.indicatorSize)
-                    .position(marker)
-            } else {
-                Circle().fill(.primary.opacity(running ? 0.8 : 0))
+            if running {
+                DockRunningIndicator(style: runningIndicatorStyle, edge: edge)
                     .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
-                    .frame(width: DockGeometry.indicatorSize, height: DockGeometry.indicatorSize)
                     .position(marker)
             }
         }

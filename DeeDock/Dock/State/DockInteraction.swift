@@ -6,7 +6,13 @@ import Observation
 @MainActor @Observable
 final class DockInteraction {
     /// Owns this panel's idle deadline and artwork opacity.
+    let tooltips = DockTooltipController()
+    var tooltipPreset: DockTooltipPreset = .classic
+    var suppressTooltips = false
+    @ObservationIgnored var toggleSection: (() -> Void)?
     let idleFade = DockIdleFadeController()
+    /// Per-display running marker appearance, separate from layout and keyboard focus.
+    var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
     var dragProposal: DockDragProposal?
     var dragActive = false
     var dragSourceID: String?
@@ -38,13 +44,21 @@ final class DockInteraction {
         didSet { geometryDidChange?() }
     }
     /// Separate icon bounds preserve clicks above the glass without capturing empty space between apps.
+    @ObservationIgnored private var acceptedHitIDs: Set<String>?
     @ObservationIgnored private(set) var iconRects: [String: CGRect] = [:]
 
     /// Updates a viewport-clipped button frame; nil removes a disappearing app's hit region.
     func setIconRect(_ rect: CGRect?, for id: String) {
+        guard rect == nil || acceptedHitIDs?.contains(id) != false else { return }
         guard iconRects[id] != rect else { return }
         iconRects[id] = rect
         geometryDidChange?()
+    }
+
+    /// Removed entries stop capturing clicks immediately, including while their exit artwork animates.
+    func retainHitRegions(_ ids: Set<String>) {
+        acceptedHitIDs = ids
+        iconRects = iconRects.filter { ids.contains($0.key) }
     }
 
     /// Invalidates old hit regions before the panel changes coordinate systems.

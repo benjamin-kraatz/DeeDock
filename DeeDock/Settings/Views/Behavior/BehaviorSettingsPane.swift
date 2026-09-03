@@ -7,6 +7,12 @@ struct BehaviorSettingsPane: View {
     var showZone: (() -> Void)? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
+            SettingsCard(title: .settingsAppVisibility, footnote: .settingsAppVisibilityHelp) {
+                Picker(selection: source.binding(\.appVisibility)) {
+                    ForEach(DockAppVisibility.allCases, id: \.self) { value in Text(value.title).tag(value) }
+                } label: { Text(.settingsAppVisibility) }
+                .padding(14).settingsOverride(source.context, field: .appVisibility)
+            }
             SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
                 Toggle(isOn: source.binding(\.behavior.autoHide)) { Text(.behaviorAutoHide) }
                     .padding(14).settingsOverride(source.context, field: .autoHide)
