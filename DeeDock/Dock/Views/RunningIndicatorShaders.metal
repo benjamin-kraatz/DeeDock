@@ -322,21 +322,38 @@ static half4 indicatorComposite(half4 source, float3 glow, float glowAlpha,
     return indicatorComposite(source, bars, coverage, bars, (upper + lower) * energy * 0.35f, p, opaque);
 }
 
-// A collapsed star in orbit around the icon. It lenses the artwork toward itself, tears a
+// A collapsed star loose on the icon. It lenses the artwork toward itself, tears a
 // void where its event horizon passes, and lights a photon ring and accretion disk in the
 // colours of whatever it is currently swallowing. Deflection falls off with the square of
 // the distance, so the middle of the icon never moves and the application stays readable.
 [[ stitchable ]] half4 deeDockSingularity(float2 position, SwiftUI::Layer layer, float size, float radius,
                                           float turn, float seed, float opaque, half4 accent, float accentStrength) {
     float2 p = indicatorPoint(position, size);
-    float sweep = harmonic(seed, 1.0f, 2.0f, 5.0f) * mix(-1.0f, 1.0f, step(0.5f, hash11(seed, 2.0f)));
+    float sweep = harmonic(seed, 1.0f, 2.0f, 4.0f) * mix(-1.0f, 1.0f, step(0.5f, hash11(seed, 2.0f)));
     float phase = hash11(seed, 3.0f) * 6.2831853f;
     float tilt = hash11(seed, 4.0f) * 3.1415927f;
     float angle = turn * sweep + phase;
-    // An inclined orbit: circular in its own plane, foreshortened and rotated into ours.
-    float2 orbit = float2(cos(angle) * 0.78f, sin(angle) * 0.50f);
-    float2 hole = float2(orbit.x * cos(tilt) - orbit.y * sin(tilt),
-                         orbit.x * sin(tilt) + orbit.y * cos(tilt));
+
+    // The hole does not run a fixed ellipse. A foreshortened base orbit carries two faster
+    // epicycles, and the three compose into a rosette: the hole wanders over the whole tile
+    // and only retraces itself once per animation cycle. Every rate is still an integer
+    // harmonic, so the path closes exactly at the wrap. Axes, epicycle rates, amplitudes,
+    // directions and phases all come from the seed, so no two applications share a route.
+    float2 axes = float2(0.44f + hash11(seed, 12.0f) * 0.28f, 0.24f + hash11(seed, 13.0f) * 0.32f);
+    float2 path = float2(cos(angle) * axes.x, sin(angle) * axes.y);
+    float epicycleA = harmonic(seed, 14.0f, 5.0f, 9.0f) * mix(-1.0f, 1.0f, step(0.5f, hash11(seed, 15.0f)));
+    float epicycleB = harmonic(seed, 16.0f, 11.0f, 17.0f) * mix(-1.0f, 1.0f, step(0.5f, hash11(seed, 17.0f)));
+    float wobbleA = turn * epicycleA + hash11(seed, 18.0f) * 6.2831853f;
+    float wobbleB = turn * epicycleB + hash11(seed, 19.0f) * 6.2831853f;
+    path += float2(cos(wobbleA), sin(wobbleA)) * (0.08f + hash11(seed, 20.0f) * 0.12f);
+    path += float2(cos(wobbleB), sin(wobbleB)) * (0.04f + hash11(seed, 21.0f) * 0.07f);
+    // A smooth radial squeeze keeps an unlucky combination of phases from carrying the hole
+    // off the tile. Scaling the vector rather than clamping its length avoids the kink a
+    // hard limit would leave in the path.
+    path *= 1.0f - 0.32f * smoothstep(0.70f, 1.15f, length(path));
+
+    float2 hole = float2(path.x * cos(tilt) - path.y * sin(tilt),
+                         path.x * sin(tilt) + path.y * cos(tilt));
 
     float2 toward = hole - p;
     float distance = length(toward);
