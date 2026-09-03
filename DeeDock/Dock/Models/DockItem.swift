@@ -12,3 +12,11 @@ struct DockItem: Identifiable {
     let isAvailable: Bool
     var id: String { reference.id }
 }
+
+/// A rendered folder pin whose icon and availability were resolved for this panel refresh.
+struct FolderDockItem: Identifiable {
+    let reference: FolderReference
+    let icon: NSImage
+    let isAvailable: Bool
+    var id: String { "folder:\(reference.id.uuidString)" }
+}

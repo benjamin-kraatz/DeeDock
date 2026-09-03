@@ -2,22 +2,37 @@ import Foundation
 import CoreGraphics
 
 /// Pure pin mutations. Insertion positions refer to the original list, before duplicates are removed.
-enum DockPinEditing {
-    static func inserting(_ incoming: [ApplicationReference], into pins: [ApplicationReference], at index: Int) -> [ApplicationReference] {
-        let block = DockOrdering.unique(incoming)
-        let ids = Set(block.map(\.id))
+nonisolated enum DockPinEditing {
+    static func identity(_ pin: DockPin) -> String {
+        switch pin {
+        case .application(let reference): return "application:\(reference.id)"
+        case .folder(let reference):
+            let access = FolderResourceAccess(reference)
+            defer { withExtendedLifetime(access) {} }
+            return "folder:\(access.url.standardizedFileURL.path)"
+        }
+    }
+
+    static func unique(_ pins: [DockPin]) -> [DockPin] {
+        var seen = Set<String>()
+        return pins.filter { seen.insert(identity($0)).inserted }
+    }
+
+    static func inserting(_ incoming: [DockPin], into pins: [DockPin], at index: Int) -> [DockPin] {
+        let block = unique(incoming)
+        let identities = Set(block.map(identity))
         let boundary = min(max(0, index), pins.count)
-        let adjusted = pins.prefix(boundary).filter { !ids.contains($0.id) }.count
-        var remaining = pins.filter { !ids.contains($0.id) }
-        // Prefer an existing bookmark when a running snapshot or a copied pin has no bookmark.
-        let enriched = block.map { reference in
-            reference.bookmarkData == nil ? (pins.first { $0.id == reference.id } ?? reference) : reference
+        let adjusted = pins.prefix(boundary).filter { !identities.contains(identity($0)) }.count
+        var remaining = pins.filter { !identities.contains(identity($0)) }
+        // Keep the established identity and bookmark when an existing pin is moved.
+        let enriched = block.map { pin in
+            pins.first { identity($0) == identity(pin) } ?? pin
         }
         remaining.insert(contentsOf: enriched, at: adjusted)
         return remaining
     }
 
-    static func moving(_ id: String, in pins: [ApplicationReference], by distance: Int) -> [ApplicationReference] {
+    static func moving(_ id: String, in pins: [DockPin], by distance: Int) -> [DockPin] {
         guard let index = pins.firstIndex(where: { $0.id == id }), pins.indices.contains(index + distance) else { return pins }
         var result = pins
         let item = result.remove(at: index)

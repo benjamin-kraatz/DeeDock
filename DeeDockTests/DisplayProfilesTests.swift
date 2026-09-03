@@ -13,13 +13,13 @@ struct DisplayProfilesTests {
         try profiles.savePins([], for: first.id)
         profiles.synchronize([second, first]) { [DisplayFixtures.app("must-not-seed")] }
         #expect(profiles.pinLists[second.id] == [])
-        try profiles.savePins([DisplayFixtures.app("local")], for: second.id)
+        try profiles.savePins([.application(DisplayFixtures.app("local"))], for: second.id)
         profiles.update(second.id, keyPath: \.iconSize, to: 72)
         let formerPrimary = DisplayFixtures.screen("first", runtimeID: 1, x: -1600)
         let newPrimary = DisplayFixtures.screen("second", runtimeID: 2, primary: true)
         profiles.synchronize([formerPrimary, newPrimary]) { [] }
         #expect(profiles.pinLists[first.id] == [])
-        #expect(profiles.pinLists[second.id] == [DisplayFixtures.app("local")])
+        #expect(profiles.pinLists[second.id] == [.application(DisplayFixtures.app("local"))])
         #expect(profiles.effectiveSettings(for: second.id).iconSize == 72)
         #expect(profiles.effectiveSettings(for: first.id).iconSize == 48)
     }
@@ -40,11 +40,11 @@ struct DisplayProfilesTests {
         let primary = DisplayFixtures.screen("primary", runtimeID: 1, primary: true)
         let other = DisplayFixtures.screen("other", runtimeID: 2, x: -1600)
         profiles.synchronize([other, primary]) { [DisplayFixtures.app("seed")] }
-        #expect(profiles.pinLists[primary.id] == [original])
-        #expect(profiles.pinLists[other.id] == [original])
+        #expect(profiles.pinLists[primary.id] == [.application(original)])
+        #expect(profiles.pinLists[other.id] == [.application(original)])
         #expect(profiles.effectiveSettings(for: other.id).iconSize == 72)
         try profiles.savePins([], for: other.id)
-        try profiles.savePins([DisplayFixtures.app("changed")], for: primary.id)
+        try profiles.savePins([.application(DisplayFixtures.app("changed"))], for: primary.id)
         profiles.synchronize([primary]) { [] }
         #expect(profiles.remembered.map(\.id) == [other.id])
         let new = DisplayFixtures.screen("new", runtimeID: 3)
@@ -78,7 +78,7 @@ struct DisplayProfilesTests {
         profiles.useDefaults(for: display.id)
         #expect(profiles.effectiveSettings(for: display.id) == .defaults)
         #expect(profiles.document.profiles[display.id]?.enabled == false)
-        #expect(profiles.pinLists[display.id] == [DisplayFixtures.app("pin")])
+        #expect(profiles.pinLists[display.id] == [.application(DisplayFixtures.app("pin"))])
     }
 
     @Test("Interrupted migration resumes and corrupt pins or profiles are never overwritten")
@@ -97,6 +97,7 @@ struct DisplayProfilesTests {
         #expect(resumed.pinLists[display.id] == [])
         let bad = Data("bad".utf8)
         preferences.set(bad, forKey: "dock.favorites.v2.\(display.id)")
+        preferences.removeObject(forKey: "dock.pins.v3.\(display.id)")
         let corrupt = DisplayProfilesStore(defaults: defaults, repository: repository)
         corrupt.synchronize([display]) { [] }
         #expect(corrupt.pinErrors[display.id] != nil)
@@ -120,7 +121,7 @@ struct DisplayProfilesTests {
         let display = DisplayFixtures.screen("ambiguous", runtimeID: 1, primary: true, persistent: false)
         profiles.synchronize([display]) { [] }
         profiles.update(display.id, keyPath: \.iconSize, to: 80)
-        try profiles.savePins([DisplayFixtures.app("temporary")], for: display.id)
+        try profiles.savePins([.application(DisplayFixtures.app("temporary"))], for: display.id)
         #expect(try repository.load().profiles.isEmpty)
         #expect(try repository.existingPins(for: display.id) == nil)
         profiles.synchronize([]) { [] }

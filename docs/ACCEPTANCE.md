@@ -1,6 +1,6 @@
 # DeeDock acceptance record
 
-Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current auto-hide slice.
+Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current folder-stack slice.
 
 ## Compilation
 
@@ -609,3 +609,53 @@ The shader cost is an implementation constraint, not a measured result: the silh
 - Confirm the Animate indicators toggle is disabled for the styles that have no motion, and that it overrides independently per display.
 - Watch one animated dock for longer than a minute and confirm no jump at the cycle wrap.
 - Confirm indicator artwork stays inside its own icon square with item spacing at zero.
+
+## Folder stacks
+
+Implemented on 2026-09-03 after the running-indicator work was committed on the existing `codex/onboarding-tour` branch. No branch switch, merge, staging, commit, or push was performed for this feature.
+
+### Behavior and implementation
+
+- Per-display pin storage is now an ordered `DockPin` list containing applications and folders. A missing `dock.pins.v3.<displayID>` key migrates the corresponding application-only list once, while v1 and v2 bytes remain unchanged. Unknown or corrupt v3 bytes block edits and remain available for recovery.
+- Folder identity is a persistent UUID plus resolved standardized URL. Reimporting the same location moves the established pin and retains its bookmark, UUID, and presentation. New displays copy the primary display's complete typed list once; later edits and Grid/List changes are independent.
+- Finder classification runs outside pointer callbacks. Insertion boundaries accept ordered all-pinnable batches of applications and ordinary non-package folders. Direct application targets continue to accept document-only batches, including folders. A folder drag chooses one presentation owner per pointer update: document feedback directly over an application, otherwise pin-insertion feedback. Insertion hit-testing stays in the pre-preview resting frame so a gap cannot resize the panel and invalidate itself; duplicate geometry callbacks are ignored. Packages, aliases, plain files, unreadable items, and mixed pinnable/non-pinnable selections reject pin insertion as a complete operation.
+- One app-wide coordinator owns a transient nonactivating panel. Clicking its source folder toggles it closed without the outside-click monitor reopening it. The panel anchors inward on all four edges, clamps to the display's visible frame with a 16-point margin, and points back to the source icon with a two-point visual join. It uses a 560×420-point ideal size and 280×220-point minimum, and reanchors after display geometry changes.
+- The open panel holds its source dock revealed and suppresses idle fading and tooltips. It fades and slides from its source edge when opening and closing, while Reduce Motion makes both transitions immediate. Outside click, Escape, a second source click, successful open or drag, replacement, source hiding/removal, display removal, sleep, and shutdown close it. Folder resolution and scoped access are renewed for each opening; stale bookmarks are refreshed in the source display's pin.
+- Immediate non-hidden children load away from the main actor and return immutable snapshots. Files, packages, and aliases are leaves; ordinary subfolders reveal in Finder. One scoped directory event source runs only while the panel is open, debounces bursts, and stale loads cannot update a replacement session.
+- Grid uses adaptive columns, 48-point icons, and two-line labels. List uses 24-point icons and one-line labels. Loading, empty, unavailable, and retryable error states are present. Reduce Transparency selects an opaque native background; the stack introduces no required motion.
+- Folder icons and their stack cues use the same idle artwork opacity and animation as application icons.
+- One child can be opened or dragged at a time. Native drag sources export a file URL with copy and move operations while the panel retains its security-scoped folder lease through the AppKit session. DeeDock does not mutate the filesystem.
+- Focus Dock transfers explicit keyboard focus into a stack. Arrow keys navigate, Return opens, Escape returns to the source pin, and Tab reaches Grid/List. Folder menus and VoiceOver actions cover opening, Finder reveal, presentation, movement, copying to another display, and unpinning. New app-owned copy is in the string catalog with translator comments.
+
+### Compilation and authored coverage
+
+The focused Debug app build and the test-target compilation used:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -derivedDataPath /tmp/DeeDock-folder-stacks-derived \
+  CODE_SIGNING_ALLOWED=NO build
+
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -derivedDataPath /tmp/DeeDock-folder-stacks-derived \
+  CODE_SIGNING_ALLOWED=NO build-for-testing
+```
+
+Both succeeded. Xcode reported the existing skipped App Intents metadata warning and its existing test-target dependency-scan warning. The latter does not prevent test compilation.
+
+Authored Swift Testing coverage includes v2-to-v3 migration without legacy-byte mutation, unknown v3 tags and byte preservation, folder identity/deduplication with established metadata, presentation round trips and failed-save rollback, mixed Finder pin ordering, folder document-versus-pin routing, package and symbolic-link rejection, scoped-access release, hidden-child filtering, localized numeric sorting, packages as leaves, and four-edge panel clamping with a negative display origin. Existing profile, pin-editing, insertion, cross-display, document-payload, and selection tests were adapted to typed pins.
+
+Deterministic previews cover Grid and List, populated, loading, empty, unavailable, recoverable error, long-name, dark, and opaque-background states. They were compiled but not rendered.
+
+**No tests were executed. The app was not launched. No previews were rendered, and no automated visual checks or hands-on acceptance were performed.**
+
+### Required hands-on acceptance
+
+- Import mixed folders and apps, restart, reorder, copy between displays, drag out to unpin, and verify Grid/List independence. Exercise a moved, renamed, deleted, unreadable, and stale-bookmark folder.
+- Open regular files, packages, aliases, and subfolders. Verify successful opens close the panel; failed opens remain visible and Retry works.
+- Drag children to Finder and applications with copy, move, modifier changes, rejection, and cancellation. Confirm DeeDock itself never changes the filesystem and that access ends after AppKit completes the session.
+- Change directory contents while the stack is open and closed. Verify live updates, event-burst settling, no stale result after replacement, and no idle watcher when closed.
+- Check all four dock edges, negative origins, visible-frame clamping, small displays, overflow, collapsed and hidden pins, auto-hide, multiple displays, display removal, Spaces, full-screen apps, and sleep/wake.
+- Exercise pointer focus passthrough, Focus Dock keyboard transfer and return, Tab routing, VoiceOver labels/actions/counts, long names, dark appearance, Reduce Motion, and Reduce Transparency.
+
+Trash, Fan and Automatic modes, recursive navigation, search, Quick Look, multi-selection, file promises, two-way folder drops, and persistent utility windows remain planned.

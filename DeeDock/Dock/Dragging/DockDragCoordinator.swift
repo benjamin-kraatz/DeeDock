@@ -6,12 +6,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     static let pasteboardType = NSPasteboard.PasteboardType("de.benjaminkraatz.DeeDock.application-drag")
     private var panels: [String: DockPanelController] = [:]
     private var sourceID: String?
-    private var reference: ApplicationReference?
+    private var sourcePin: DockPin?
     private var token: String?
     private var nativeSession: NSDraggingSession?
     private var completion = DockDragCompletion()
     private var payload: DockExternalPayload = .checking
-    private var references: [ApplicationReference] { payload.applications }
+    private var pins: [DockPin] { payload.pins }
     private let documentDrag = DockDocumentDragState()
     private var nativeDisplayID: String?
     private var destinationID: String?
@@ -40,17 +40,25 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
 
     /// Starts a private app-reference drag; no file representation is exported to other applications.
     func begin(_ item: DockItem, from displayID: String, view: NSView, event: NSEvent) {
+        begin(pin: .application(item.reference), icon: item.icon, from: displayID, view: view, event: event)
+    }
+
+    func begin(_ item: FolderDockItem, from displayID: String, view: NSView, event: NSEvent) {
+        begin(pin: .folder(item.reference), icon: item.icon, from: displayID, view: view, event: event)
+    }
+
+    private func begin(pin: DockPin, icon: NSImage, from displayID: String, view: NSView, event: NSEvent) {
         guard let panel = panels[displayID], panel.store.canEditPins else { return }
         cancel()
-        active = true; sourceID = displayID; reference = item.reference
-        payload = .applications([item.reference]); token = UUID().uuidString; sourceBounds = panel.restingDragBounds
+        active = true; sourceID = displayID; sourcePin = pin
+        payload = .selection(pins: [pin], documents: nil); token = UUID().uuidString; sourceBounds = panel.restingDragBounds
         completion = DockDragCompletion()
         let pasteboard = NSPasteboardItem()
         pasteboard.setString(token!, forType: Self.pasteboardType)
         let dragItem = NSDraggingItem(pasteboardWriter: pasteboard)
         let dimension = min(view.bounds.width, view.bounds.height)
         dragItem.setDraggingFrame(CGRect(x: view.bounds.midX - dimension / 2, y: view.bounds.maxY - dimension,
-                                        width: dimension, height: dimension), contents: item.icon)
+                                        width: dimension, height: dimension), contents: icon)
         installMonitor()
         nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)
         nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
@@ -81,11 +89,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard validates(info.draggingPasteboard) else { return [] }
         nativeDisplayID = displayID // Loading a new payload clears the preceding session.
         update(at: NSEvent.mouseLocation)
-        if payload.documents != nil {
+        if documentDrag.displayID != nil {
             guard documentDrag.displayID == displayID else { return [] }
             return DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask)
         }
-        guard destinationID == displayID, destinationIndex != nil, !references.isEmpty else { return [] }
+        guard destinationID == displayID, destinationIndex != nil, !pins.isEmpty else { return [] }
         return sourceID == displayID ? .move : .copy
     }
 
@@ -93,7 +101,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
-        if let documents = payload.documents {
+        if let documents = payload.documents, documentDrag.displayID != nil {
             guard documentDrag.displayID == displayID, let item = documentDrag.item,
                   let panel = panels[displayID],
                   !DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask).isEmpty else { return false }
@@ -104,9 +112,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             return true
         }
         guard !completion.cancelled, destinationID == displayID, let index = destinationIndex,
-              let panel = panels[displayID], !references.isEmpty else { return false }
+              let panel = panels[displayID], !pins.isEmpty else { return false }
         committing = true
-        let success = panel.store.insertPins(references, at: index)
+        let success = panel.store.insertPins(pins, at: index)
         committing = false
         // A rejected save must not be reinterpreted as dragging out to unpin the source.
         completion.committed = true
@@ -197,35 +205,43 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
         if payload.documents != nil {
-            documentDrag.update(at: point, candidate: candidate, nativeDisplayID: nativeDisplayID, panels: panels)
-            updateScrollTimer()
-            return
+            let documentOwnsPresentation = documentDrag.update(
+                at: point,
+                candidate: candidate,
+                nativeDisplayID: nativeDisplayID,
+                panels: panels,
+                presentsFallback: payload.presentsDocumentFallback
+            )
+            if documentOwnsPresentation { updateScrollTimer(); return }
         }
         for panel in panels.values {
-            panel.updateSectionDragHover(at: point, valid: candidate === panel && !rejected && !references.isEmpty && panel.store.canEditPins)
+            panel.updateSectionDragHover(at: point, valid: candidate === panel && !rejected && !pins.isEmpty && panel.store.canEditPins)
         }
         if let candidate, candidate.visibility.exposesContent, candidate.store.canEditPins, !rejected,
-           !references.isEmpty, let index = candidate.insertionIndex(at: point) {
+           !pins.isEmpty, let index = candidate.insertionIndex(at: point) {
             destinationID = candidate.store.displayID; destinationIndex = index
         }
         let overDock = panels.contains { id, panel in panel.protectsDragRemoval(at: point, isSource: id == sourceID) }
-        let removing = reference.map { ref in
-            sourceID.flatMap { panels[$0] }?.store.pins.contains(where: { $0.id == ref.id }) == true
+        let removing = sourcePin.map { pin in
+            sourceID.flatMap { panels[$0] }?.store.pins.contains(where: { $0.id == pin.id }) == true
         } == true && !overDock && DockDragGeometry.distance(point, outside: sourceBounds) >= DockDragGeometry.removalDistance
         for (id, panel) in panels {
             let targeted = candidate === panel
-            let proposal = id == destinationID ? DockDragProposal(references: references, index: destinationIndex!) : nil
+            let proposal = id == destinationID ? DockDragProposal(pins: pins, index: destinationIndex!) : nil
             let message: LocalizedStringResource? = id == sourceID && removing ? .actionUnpin : (targeted
-                ? (rejected || (!references.isEmpty && !panel.store.canEditPins) ? .dragRejected : (references.isEmpty ? .dragCheckingFiles : (proposal == nil ? .dragPinnedSection : .dragPinHere)))
+                ? (rejected || (!pins.isEmpty && !panel.store.canEditPins) ? .dragRejected
+                    : (payload.isChecking ? .dragCheckingFiles
+                        : (pins.isEmpty ? .dragDocumentTarget : (proposal == nil ? .dragPinnedSection : .dragPinHere))))
                 : nil)
-            panel.setDragPresentation(proposal: proposal, source: id == sourceID ? reference?.id : nil,
+            panel.setDragPresentation(proposal: proposal, source: id == sourceID ? sourcePin?.id : nil,
                                       targeted: targeted, message: message)
         }
         nativeSession?.animatesToStartingPositionsOnCancelOrFail = !removing
         if let nativeSession, lastRemovalCue != removing {
             lastRemovalCue = removing
             nativeSession.enumerateDraggingItems(options: [], for: nil, classes: [NSPasteboardItem.self], searchOptions: [:]) { item, _, _ in
-                guard let icon = self.reference.flatMap({ ref in self.panels[self.sourceID ?? ""]?.store.items.first { $0.id == ref.id }?.icon }) else { return }
+                guard let pin = self.sourcePin,
+                      let icon = self.panels[self.sourceID ?? ""]?.store.entries.first(where: { $0.pin?.id == pin.id })?.icon else { return }
                 let imageSize = item.draggingFrame.size
                 item.imageComponentsProvider = {
                     let component = NSDraggingImageComponent(key: .icon)
@@ -277,12 +293,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if event.type == .leftMouseUp { completion.released = true }
             if event.type == .keyDown, event.keyCode == 53 { completion.cancelled = true }
         }
-        if let sourceID, let reference, let panel = panels[sourceID],
-           completion.shouldUnpin(isPinned: panel.store.pins.contains { $0.id == reference.id },
+        if let sourceID, let sourcePin, let panel = panels[sourceID],
+           completion.shouldUnpin(isPinned: panel.store.pins.contains { $0.id == sourcePin.id },
                                   distance: DockDragGeometry.distance(screenPoint, outside: sourceBounds),
                                   overDock: panels.contains { id, target in target.protectsDragRemoval(at: screenPoint, isSource: id == sourceID) }) {
             committing = true
-            _ = panel.store.removePin(reference.id)
+            _ = panel.store.removePin(sourcePin.id)
             committing = false
         }
         cancel()
@@ -310,7 +326,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         cleanupTask?.cancel(); cleanupTask = nil
         clearFeedback()
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
-        nativeSession = nil; lastRemovalCue = nil; sourceID = nil; reference = nil; token = nil
+        nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; token = nil
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }
         pasteboardChange = nil

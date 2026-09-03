@@ -89,7 +89,9 @@ struct DockSurfaceView: View {
                         } action: { frames in
                             guard let target = slot.target else { return }
                             iconFrameChanged(target.hitID, frames.root)
-                            renderedFrames[target] = frames.canvas
+                            if renderedFrames[target] != frames.canvas {
+                                renderedFrames[target] = frames.canvas
+                            }
                         }
                         .onDisappear {
                             guard let target = slot.target else { return }

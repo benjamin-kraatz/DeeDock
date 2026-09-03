@@ -108,7 +108,7 @@ struct DockSectionTests {
         #expect(index(layout.restingCenters[2] + 1) == 2)
         #expect(index(layout.restingCenters[3]) == nil)
         #expect(index(layout.restingCenters[1], mode: .hidePinned) == nil)
-        let proposal = DockDragProposal(references: [DisplayFixtures.app("pin")], index: 2)
+        let proposal = DockDragProposal(pins: [.application(DisplayFixtures.app("pin"))], index: 2)
         let slots = DockRenderSlot.slots(entries: entries, proposal: proposal)
         #expect(slots.map(\.id) == ["group:pinned", "app:missing", "gap:pin", "app:running"])
         let collapsed = DockSectionProjection.entries(items: items, visibility: .collapsePinned, expanded: false)

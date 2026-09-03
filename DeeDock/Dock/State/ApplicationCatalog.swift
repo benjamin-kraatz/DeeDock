@@ -104,8 +104,14 @@ final class ApplicationCatalog {
         }
     }
 
-    func pruneIcons(items: [DockItem]) {
-        service.pruneIcons(keeping: Set(items.compactMap { service.resolvedURL(for: $0.reference) }))
+    func pruneIcons(items: [DockItem], folders: [FolderDockItem] = []) {
+        let applicationURLs = items.compactMap { service.resolvedURL(for: $0.reference) }
+        let folderURLs = folders.compactMap { item -> URL? in
+            let access = FolderResourceAccess(item.reference)
+            defer { withExtendedLifetime(access) {} }
+            return access.isAvailable ? access.url : nil
+        }
+        service.pruneIcons(keeping: Set(applicationURLs + folderURLs))
     }
 
     /// Every accepted batch owns a task and its file access, independent of launch suppression.

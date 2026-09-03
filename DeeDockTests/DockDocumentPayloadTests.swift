@@ -16,7 +16,7 @@ struct DockDocumentPayloadTests {
         let payload = try DockExternalPayload.read(access, excluding: "deedock")
         #expect(payload.documents === access)
         #expect(payload.documents?.urls == [folder, file, package])
-        #expect(payload.applications.isEmpty)
+        #expect(payload.pins.isEmpty)
         try DockExternalPayload.validateDocuments(access.urls)
     }
 
@@ -31,7 +31,7 @@ struct DockDocumentPayloadTests {
         try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
             .write(to: contents.appendingPathComponent("Info.plist"))
         let payload = try DockExternalPayload.read(DocumentResourceAccess([app]), excluding: "deedock", bookmark: { _ in Data([1]) })
-        #expect(payload.applications.map(\.id) == ["example"])
+        #expect(payload.pins.map(\.id) == ["example"])
         #expect(payload.documents == nil)
         let file = root.appendingPathComponent("notes.txt")
         try Data().write(to: file)

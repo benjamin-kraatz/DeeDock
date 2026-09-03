@@ -23,7 +23,7 @@ import SwiftUI
 }
 
 #Preview("Side insertion gap") {
-    DockPreviewContent(dragProposal: DockDragProposal(references: [DockPreviewData.items[0].reference], index: 3),
+    DockPreviewContent(dragProposal: DockDragProposal(pins: [.application(DockPreviewData.items[0].reference)], index: 3),
                        dragMessage: .dragPinHere, settings: DockSettings(edge: .right))
 }
 
@@ -42,7 +42,7 @@ import SwiftUI
 }
 
 #Preview("Top insertion gap") {
-    DockPreviewContent(dragProposal: DockDragProposal(references: [DockPreviewData.items[0].reference], index: 3),
+    DockPreviewContent(dragProposal: DockDragProposal(pins: [.application(DockPreviewData.items[0].reference)], index: 3),
                        dragMessage: .dragPinHere, settings: DockSettings(edge: .top))
 }
 

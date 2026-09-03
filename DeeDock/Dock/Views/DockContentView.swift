@@ -55,6 +55,7 @@ struct DockContentView: View {
                         edge.along(geometry.frame(in: .named("dockViewport")).origin)
                     } action: { value in
                         guard interaction.layout.edge == edge else { return }
+                        guard scrollOffset != value || interaction.scrollOffset != value else { return }
                         scrollOffset = value; interaction.scrollOffset = value
                         interaction.scrollChanged?()
                     }
@@ -107,7 +108,7 @@ struct DockContentView: View {
     #Preview("Drag: live insertion gap") {
         DockPreviewContent(
             dragProposal: DockDragProposal(
-                references: [DockPreviewData.items[0].reference],
+                pins: [.application(DockPreviewData.items[0].reference)],
                 index: 3
             ),
             dragMessage: .dragPinHere
@@ -120,9 +121,7 @@ struct DockContentView: View {
             reduceMotion: true,
             reduceTransparency: true,
             dragProposal: DockDragProposal(
-                references: Array(DockPreviewData.items.prefix(2)).map(
-                    \.reference
-                ),
+                pins: Array(DockPreviewData.items.prefix(2)).map { .application($0.reference) },
                 index: 0
             ),
             dragMessage: .dragPinHere

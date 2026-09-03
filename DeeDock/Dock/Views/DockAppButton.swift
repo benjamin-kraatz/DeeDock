@@ -119,7 +119,7 @@ struct DockAppButton: View {
             }
             ForEach(interaction?.pinDestinations ?? []) { destination in
                 Button {
-                    interaction?.copyPin?(item.reference, destination.id)
+                    interaction?.copyPin?(.application(item.reference), destination.id)
                 } label: {
                     Text(.actionPinOnDisplayName(display: destination.name))
                 }

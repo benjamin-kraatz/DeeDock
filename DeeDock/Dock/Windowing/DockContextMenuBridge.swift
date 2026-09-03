@@ -124,7 +124,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         @objc private func movePinLeft() { if let item { interaction?.movePin?(item.id, -1) } }
         @objc private func movePinRight() { if let item { interaction?.movePin?(item.id, 1) } }
         @objc private func copyPinToDisplay(_ sender: NSMenuItem) {
-            if let item, let id = sender.representedObject as? String { interaction?.copyPin?(item.reference, id) }
+            if let item, let id = sender.representedObject as? String { interaction?.copyPin?(.application(item.reference), id) }
         }
 
         @objc private func showSettings() { openSettings?() }

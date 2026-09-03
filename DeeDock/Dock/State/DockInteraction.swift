@@ -25,15 +25,20 @@ final class DockInteraction {
     var documentTargetID: String?
     var springEmphasized = false
     @ObservationIgnored var openFiles: ((DockItem) -> Void)?
+    @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
+    @ObservationIgnored var revealFolder: ((FolderDockItem) -> Void)?
+    @ObservationIgnored var removePin: ((String) -> Void)?
+    @ObservationIgnored var setFolderPresentation: ((UUID, FolderStackPresentation) -> Void)?
     var scrollOffset: CGFloat = 0
     var scrollRequest: CGFloat = 0
     /// Selects this panel's display before SwiftUI opens the Settings scene.
     @ObservationIgnored var prepareSettings: (() -> Void)?
     @ObservationIgnored var sourceTrackingChanged: ((Bool) -> Void)?
     @ObservationIgnored var beginDrag: ((DockItem, NSView, NSEvent) -> Void)?
+    @ObservationIgnored var beginFolderDrag: ((FolderDockItem, NSView, NSEvent) -> Void)?
     @ObservationIgnored var movePin: ((String, Int) -> Void)?
     @ObservationIgnored var canMovePin: ((String, Int) -> Bool)?
-    @ObservationIgnored var copyPin: ((ApplicationReference, String) -> Void)?
+    @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     var pinDestinations: [DockPinDestination] = []
     @ObservationIgnored var scrollChanged: (() -> Void)?
     var contentOrigin = CGPoint.zero

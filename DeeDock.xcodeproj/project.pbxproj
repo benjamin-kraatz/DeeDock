@@ -56,6 +56,15 @@
 		DDF5000000000000000000001 /* DeeDock/Onboarding/Models/SystemDockReservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF6000000000000000000001 /* DeeDock/Onboarding/Models/SystemDockReservation.swift */; };
 		DDF5000000000000000000002 /* DeeDock/Onboarding/Persistence/OnboardingRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF6000000000000000000002 /* DeeDock/Onboarding/Persistence/OnboardingRepository.swift */; };
 		DDF5000000000000000000003 /* DeeDock/Onboarding/State/OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF6000000000000000000003 /* DeeDock/Onboarding/State/OnboardingStore.swift */; };
+		DDF7000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift */; };
+		DDF7000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift */; };
+		DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */; };
+		DDF7000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */; };
+		DDF7000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */; };
+		DDF7000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */; };
+		DDF7000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */; };
+		DDF7000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */; };
+		DDF7000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,6 +119,15 @@
 		DDF6000000000000000000001 /* DeeDock/Onboarding/Models/SystemDockReservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Onboarding/Models/SystemDockReservation.swift; sourceTree = SOURCE_ROOT; };
 		DDF6000000000000000000002 /* DeeDock/Onboarding/Persistence/OnboardingRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Onboarding/Persistence/OnboardingRepository.swift; sourceTree = SOURCE_ROOT; };
 		DDF6000000000000000000003 /* DeeDock/Onboarding/State/OnboardingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Onboarding/State/OnboardingStore.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/FolderReference.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockPin.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Persistence/DockPinsRepository.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/FolderResourceAccess.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockPinImporter.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackEntry.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackGeometry.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackState.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -177,6 +195,15 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DDF8000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift */,
+				DDF8000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift */,
+				DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */,
+				DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */,
+				DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */,
+				DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */,
+				DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */,
+				DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */,
+				DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */,
 				DDF6000000000000000000000 /* DeeDock/Onboarding/Models/OnboardingStep.swift */,
 				DDF6000000000000000000001 /* DeeDock/Onboarding/Models/SystemDockReservation.swift */,
 				DDF6000000000000000000002 /* DeeDock/Onboarding/Persistence/OnboardingRepository.swift */,
@@ -320,6 +347,15 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				DDF7000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift in Sources */,
+				DDF7000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift in Sources */,
+				DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */,
+				DDF7000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift in Sources */,
+				DDF7000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift in Sources */,
+				DDF7000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift in Sources */,
+				DDF7000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift in Sources */,
+				DDF7000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift in Sources */,
+				DDF7000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift in Sources */,
 				DDF5000000000000000000000 /* DeeDock/Onboarding/Models/OnboardingStep.swift in Sources */,
 				DDF5000000000000000000001 /* DeeDock/Onboarding/Models/SystemDockReservation.swift in Sources */,
 				DDF5000000000000000000002 /* DeeDock/Onboarding/Persistence/OnboardingRepository.swift in Sources */,

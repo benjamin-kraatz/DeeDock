@@ -69,7 +69,7 @@ struct DockPresentationSettingsTests {
         #expect(restored.effectiveSettings(for: screens[1].id).tooltipPreset == .pop)
         restored.useDefaults(for: screens[0].id)
         #expect(restored.effectiveSettings(for: screens[0].id).appVisibility == .showAll)
-        #expect(restored.pinLists[screens[0].id] == [pin])
-        #expect(restored.pinLists[screens[1].id] == [pin])
+        #expect(restored.pinLists[screens[0].id] == [.application(pin)])
+        #expect(restored.pinLists[screens[1].id] == [.application(pin)])
     }
 }

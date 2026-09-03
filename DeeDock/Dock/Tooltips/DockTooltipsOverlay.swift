@@ -31,9 +31,11 @@ struct DockTooltipsOverlay: View {
                 let dock = layout.surfaceFrame(sizes: Array(repeating: layout.iconSize, count: slots.count)).intersection(viewport)
                 let frame = DockTooltipGeometry.frame(size: measuredSize, icon: iconFrame, dock: dock, region: region,
                                                       edge: layout.edge, placement: interaction.tooltipPreset.placement)
-                DockTooltipArtwork(name: name(slot), icon: slot.item?.icon, preset: interaction.tooltipPreset,
+                DockTooltipArtwork(name: slot.name, icon: slot.icon, preset: interaction.tooltipPreset,
                     edge: layout.edge, maximumWidth: max(1, region.width - 16), reduceTransparency: reduceTransparency)
-                    .onGeometryChange(for: CGSize.self) { $0.size } action: { measuredSize = $0 }
+                    .onGeometryChange(for: CGSize.self) { $0.size } action: {
+                        if measuredSize != $0 { measuredSize = $0 }
+                    }
                     // Follow already-rendered icon geometry without applying a second hover spring.
                     .animation(nil) { content in
                         content.frame(width: frame.width, height: frame.height).clipped()
@@ -49,9 +51,5 @@ struct DockTooltipsOverlay: View {
         .onChange(of: request, initial: true) { _, value in interaction.tooltips.update(value) }
         .onChange(of: interaction.tooltips.revision) { _, _ in interaction.tooltips.update(request) }
         .onDisappear { interaction.tooltips.clear() }
-    }
-
-    private func name(_ slot: DockRenderSlot) -> String {
-        switch slot { case .app(let item): item.reference.name; case .group(let control): String(localized: control.title); case .gap: "" }
     }
 }

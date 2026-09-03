@@ -1705,6 +1705,111 @@
         }
       }
     },
+    "folderStackAccessibilityLabel": {
+      "comment": "VoiceOver label for an open folder stack. folderName is the Finder display name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Folder stack: %1$(folderName)@" } } }
+    },
+    "folderStackAccessibilityValue": {
+      "comment": "VoiceOver value for a pinned folder icon.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Folder stack" } } }
+    },
+    "folderStackDockHint": {
+      "comment": "VoiceOver hint for a pinned folder icon.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Opens the folder stack" } } }
+    },
+    "folderStackEmpty": {
+      "comment": "Empty-state title for a folder with no visible children.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "This folder is empty" } } }
+    },
+    "folderStackGrid": {
+      "comment": "Folder stack presentation mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Grid" } } }
+    },
+    "folderStackItemUnavailable": {
+      "comment": "Inline error when a folder child disappeared before it opened. itemName is Finder's display name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "%1$(itemName)@ is no longer available." } } }
+    },
+    "folderStackItemCount": {
+      "comment": "VoiceOver value for an open folder stack. count is the number of visible immediate children; mode is the localized Grid or List name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "%1$(count)lld items, %2$(mode)@" } } }
+    },
+    "folderStackList": {
+      "comment": "Folder stack presentation mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "List" } } }
+    },
+    "folderStackLoading": {
+      "comment": "VoiceOver label while folder children are loading.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Loading folder" } } }
+    },
+    "folderStackOpen": {
+      "comment": "Action that opens a pinned folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Open Stack" } } }
+    },
+    "folderStackOpenFailed": {
+      "comment": "Inline error when macOS could not open a folder child. itemName is Finder's display name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t open %1$(itemName)@." } } }
+    },
+    "folderStackOpenHint": {
+      "comment": "VoiceOver hint for a regular file, package, or alias in a folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Opens with the default application" } } }
+    },
+    "folderStackPresentationControl": {
+      "comment": "VoiceOver label for the Grid and List presentation control.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Presentation" } } }
+    },
+    "folderStackRetry": {
+      "comment": "Retries loading the open folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Retry" } } }
+    },
+    "folderStackRevealHint": {
+      "comment": "VoiceOver hint for a subfolder in a folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Shows this folder in Finder" } } }
+    },
+    "folderStackSaveFailed": {
+      "comment": "Inline error shown when saving Grid or List mode fails.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t save the folder view." } } }
+    },
+    "folderStackShowInFinder": {
+      "comment": "Action that reveals a folder in Finder.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show in Finder" } } }
+    },
+    "folderStackUnavailable": {
+      "comment": "Error when a pinned folder bookmark cannot be resolved or read.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "This folder is unavailable." } } }
+    },
+    "folderStackUnavailableTitle": {
+      "comment": "Title for an inaccessible or failed folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Folder unavailable" } } }
+    },
+    "folderStackUseGrid": {
+      "comment": "Accessibility action that switches a folder stack to Grid mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Use Grid" } } }
+    },
+    "folderStackUseList": {
+      "comment": "Accessibility action that switches a folder stack to List mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Use List" } } }
+    },
     "loginCancelRequest": {
       "comment": "Button withdrawing a login-item registration that is awaiting approval.",
       "extractionState": "manual",
