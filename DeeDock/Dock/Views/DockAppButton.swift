@@ -12,6 +12,7 @@ struct DockAppButton: View {
     let open: () -> Void
     let togglePin: () -> Void
 
+    var interaction: DockInteraction? = nil
     var menuTracking: (Bool) -> Void = { _ in }
     var accessibilityFocus: (Bool) -> Void = { _ in }
     @Environment(\.openSettings) private var openSettings
@@ -53,10 +54,17 @@ struct DockAppButton: View {
         .buttonStyle(.plain)
         .disabled(isLaunching)
         .overlay {
+            if let interaction, let begin = interaction.beginDrag {
+                DockDragSourceView(item: item, enabled: !isLaunching, open: open, begin: begin,
+                                   tracking: { interaction.sourceTrackingChanged?($0) })
+            }
+        }
+        .overlay {
             DockContextMenuBridge(
                 item: item,
                 open: open,
                 togglePin: togglePin,
+                interaction: interaction,
                 openSettings: {
                     NSApp.activate()
                     openSettings()
@@ -71,6 +79,19 @@ struct DockAppButton: View {
         .accessibilityValue(Text(item.isAvailable ? (item.isRunning ? .appStatusRunning : .appStatusUnavailable) : .appStatusUnavailable))
         .accessibilityHint(Text(.appOpenHint))
         .accessibilityAction(named: Text(item.isFavorite ? .actionUnpin : .actionPin), togglePin)
+        .accessibilityActions {
+            if item.isFavorite {
+                Button { interaction?.movePin?(item.id, -1) } label: { Text(.actionMoveLeft) }
+                    .disabled(interaction?.canMovePin?(item.id, -1) != true)
+                Button { interaction?.movePin?(item.id, 1) } label: { Text(.actionMoveRight) }
+                    .disabled(interaction?.canMovePin?(item.id, 1) != true)
+            }
+            ForEach(interaction?.pinDestinations ?? []) { destination in
+                Button { interaction?.copyPin?(item.reference, destination.id) } label: {
+                    Text(.actionPinOnDisplayName(display: destination.name))
+                }
+            }
+        }
     }
 }
 

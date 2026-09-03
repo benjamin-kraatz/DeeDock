@@ -33,7 +33,9 @@ final class ApplicationService: ApplicationServicing {
 
     /// Uses the saved location when present, then resolves moved apps by bundle identifier.
     func resolvedURL(for reference: ApplicationReference) -> URL? {
-        if FileManager.default.fileExists(atPath: reference.url.path) { return reference.url }
+        let access = ApplicationResourceAccess(reference)
+        defer { withExtendedLifetime(access) {} }
+        if FileManager.default.fileExists(atPath: access.url.path) { return access.url }
         return reference.bundleIdentifier.flatMap { workspace.urlForApplication(withBundleIdentifier: $0) }
     }
 
@@ -54,6 +56,8 @@ final class ApplicationService: ApplicationServicing {
     /// - Throws: A missing-bundle error or the failure reported by Launch Services.
     /// - Note: Cancellation cannot undo a launch already submitted to macOS.
     func open(_ reference: ApplicationReference) async throws {
+        let access = ApplicationResourceAccess(reference)
+        defer { withExtendedLifetime(access) {} }
         guard let url = resolvedURL(for: reference) else {
             throw CocoaError(.fileNoSuchFile, userInfo: [NSLocalizedDescriptionKey: String(localized: .errorAppNotFound(appName: reference.name))])
         }

@@ -29,14 +29,18 @@ struct DockPreviewContent: View {
     @State private var interaction: DockInteraction
 
     init(items: [DockItem]? = nil, errorMessage: LocalizedStringResource? = nil,
-         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, settings: DockSettings = .defaults) {
+         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults) {
         let items = items ?? DockPreviewData.items
         self.items = items
         self.errorMessage = errorMessage
         self.reduceMotion = reduceMotion
         self.reduceTransparency = reduceTransparency
         let interaction = DockInteraction()
-        interaction.layout = DockGeometry.layout(count: items.count, favoriteCount: items.filter(\.isFavorite).count,
+        interaction.dragProposal = dragProposal
+        interaction.dragMessage = dragMessage
+        interaction.dragActive = dragProposal != nil || dragMessage != nil
+        let slots = DockRenderSlot.slots(items: items, proposal: dragProposal)
+        interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                   availableWidth: 800, settings: settings)
         if magnified, let x = interaction.layout.restingCenters.first {
             interaction.pointer = CGPoint(x: x, y: interaction.layout.panelHeight - 36)

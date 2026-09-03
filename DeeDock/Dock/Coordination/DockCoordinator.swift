@@ -7,9 +7,12 @@ final class DockCoordinator {
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
     let zonePreview = DockZonePreviewController()
+    let displayIndicator = DisplaySelectionIndicatorController()
+    @ObservationIgnored private var suspensionObserver: NSObjectProtocol?
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
     var canFocus: Bool { !enabledDisplays.isEmpty }
+    @ObservationIgnored private let dragging = DockDragCoordinator()
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let displayService = DisplayService()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
@@ -39,6 +42,7 @@ final class DockCoordinator {
         }
         profiles.didChange = { [weak self] in
             guard let self else { return }
+            if !dragging.committing { dragging.cancel() }
             reconcile(profiles.displays, resetVisibility: false)
         }
         settings.settingsDidChange = { [weak self] in self?.refreshPanels() }
@@ -48,22 +52,27 @@ final class DockCoordinator {
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
         ) { [weak self] _ in MainActor.assumeIsolated { self?.refreshPanels(resetVisibility: true) } }
+        suspensionObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.willSleepNotification, object: nil, queue: .main
+        ) { [weak self] _ in MainActor.assumeIsolated { self?.dragging.cancel() } }
         let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
                                          .scrollWheel, .leftMouseDown, .rightMouseDown, .otherMouseDown,
                                          .leftMouseUp, .rightMouseUp, .otherMouseUp]
-        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] event in self?.updatePointers(eventType: event.type) }) {
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] event in self?.updatePointers(eventType: event.type); self?.dragging.observe(event) }) {
             monitors.append(monitor)
         }
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: mask.union(.keyDown), handler: { [weak self] event in
             guard let self else { return event }
-            if event.type == .keyDown, let id = focusedID, let panel = panels[id], panel.owns(event.window), panel.handleKey(event) { return nil }
+            if event.type == .keyDown, !dragging.isDragging, let id = focusedID, let panel = panels[id], panel.owns(event.window), panel.handleKey(event) { return nil }
             updatePointers(eventType: event.type)
+            dragging.observe(event)
             return event
         }) { monitors.append(monitor) }
     }
 
     private func reconcile(_ displays: [DisplaySnapshot], resetVisibility: Bool = true) {
         guard started, !reconciling else { return }
+        if resetVisibility { dragging.cancel() }
         reconciling = true
         defer { reconciling = false }
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
@@ -83,7 +92,18 @@ final class DockCoordinator {
             store.applicationOpened = { [weak self] in
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
             }
+            panel.connectDragging(dragging)
+            store.copyPin = { [weak self] reference, targetID in
+                guard let self, let target = panels[targetID] else { return }
+                if !target.store.pins.contains(where: { $0.id == reference.id }) {
+                    _ = target.store.insertPins([reference], at: target.store.pins.count)
+                }
+            }
             panels[display.id] = panel
+        }
+        dragging.setPanels(panels)
+        for (id, panel) in panels {
+            panel.store.pinDestinations = enabledDisplays.filter { $0.id != id }.map { DockPinDestination(id: $0.id, name: $0.name) }
         }
         refreshPanels(resetVisibility: resetVisibility)
     }
@@ -136,8 +156,12 @@ final class DockCoordinator {
         monitors.forEach { NSEvent.removeMonitor($0) }
         monitors.removeAll()
         zonePreview.stop()
+        displayIndicator.stop()
+        dragging.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil
+        if let suspensionObserver { NSWorkspace.shared.notificationCenter.removeObserver(suspensionObserver) }
+        suspensionObserver = nil
         displayService.stop()
         profiles.didChange = nil
         settings.settingsDidChange = nil

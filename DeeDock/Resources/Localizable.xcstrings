@@ -1416,6 +1416,114 @@
           }
         }
       }
+    },
+    "actionMoveLeft": {
+      "comment": "Move a pinned application one position to the left.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Left"
+          }
+        }
+      }
+    },
+    "actionMoveRight": {
+      "comment": "Move a pinned application one position to the right.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Right"
+          }
+        }
+      }
+    },
+    "actionPinOnDisplay": {
+      "comment": "Submenu listing other connected displays that have a dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin on Display…"
+          }
+        }
+      }
+    },
+    "actionPinOnDisplayName": {
+      "comment": "VoiceOver action to pin an app on the named display. Display name comes from macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin on %(display)@"
+          }
+        }
+      }
+    },
+    "dragRejected": {
+      "comment": "Drag feedback for an invalid batch or a destination whose pins cannot be edited.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drop applications only. Pins could not be changed."
+          }
+        }
+      }
+    },
+    "dragCheckingApps": {
+      "comment": "Shown while dropped application bundles are being validated.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking applications…"
+          }
+        }
+      }
+    },
+    "dragPinnedSection": {
+      "comment": "Drop guidance when the pointer is over automatically ordered running apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag into the pinned section"
+          }
+        }
+      }
+    },
+    "dragPinHere": {
+      "comment": "Insertion feedback while dragging apps into a dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin here"
+          }
+        }
+      }
+    },
+    "displayIndicatorEditing": {
+      "comment": "Badge shown on the physical monitor whose display-specific Settings are currently active. The monitor name appears below it.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editing this display"
+          }
+        }
+      }
     }
   },
   "version": "1.3"

@@ -172,3 +172,60 @@ New tests cover legacy decoding and corrupt-byte preservation; individual behavi
 These native scenarios remain unexercised for this build. Display-edge activation can also reveal the system Dock; DeeDock neither changes its preferences nor reserves desktop work area. Window-overlap detection, pressure gestures, broader drag behavior, and performance guarantees are outside this slice. No new permissions or machine settings were requested or changed.
 
 Implementation changes are left uncommitted for review. Pause after slice 3; further roadmap work requires a new request.
+
+## App organization slice 1: drag-and-drop
+
+Implemented on 2026-09-03 after the user selected and approved the app-organization plan. Includes per-display pin reordering, running-to-pinned insertion, multiple Finder application imports, copying pins between displays, and deliberate drag-out-to-unpin. Cross-display copying was explicitly included during planning. No later placement or appearance features were started.
+
+### Behavior and implementation
+
+- Native AppKit source tracking distinguishes a click from movement beyond 5 logical points. Internal pasteboards expose an opaque session token rather than file URLs; the active coordinator resolves its source display and application identity. AppKit destination callbacks accept same-dock moves and cross-dock copies.
+- Temporary render slots show insertion gaps without editing the store or preferences. Resting geometry drives insertion while magnification is settled; overflow autoscrolling runs only during active dragging, including over the running section when necessary to reach off-screen pins.
+- Successful pin edits use one save. Existing identities are relocated, incoming duplicates are removed, and cross-display copies preserve source pins. Failed writes retain saved state and show the existing error UI on the affected dock.
+- Drag-out unpinning requires an explicit release, a pinned source, at least 64 points beyond its resting visible bounds, and no destination dock under the pointer. Cancellation and accepted destination drops take priority. AppKit failure alone never authorizes removal; late source callbacks must match the active native session.
+- Finder batches are validated off the main actor before any pin commit. Non-apps, inaccessible bundles, mixed batches, and DeeDock itself are rejected. Worker cancellation and session tokens prevent late imports from changing replacement sessions. The existing pointer policy reveals hidden docks; native destination entry validates the payload after reveal, avoiding stale pasteboard reads during unrelated mouse drags.
+- Source/destination holds integrate with auto-hide; normal visibility resumes after completion. Conflicting profile edits, display/placement changes, sleep, Space transitions, removal, and shutdown invalidate drag state. Temporary event monitors, import/cleanup tasks, and scrolling timers have explicit teardown.
+- `ApplicationReference` adds optional bookmark data while preserving older pin decoding and stable identities. Scoped resource leases cover metadata, icons, and asynchronous launches. The app retains its sandbox and read-only user-selected-files setting and adds `com.apple.security.files.bookmarks.app-scope`; signing mode, language mode, deployment target, and dependencies are unchanged.
+- Move Left/Right are available in native menus, VoiceOver actions, and Option–Left/Right during Focus Dock. Pin on Display lists other connected enabled docks, appends absent pins, and preserves existing destination positions. All app-owned copy uses the string catalog. Insertion, empty-dock, rejection, and removal feedback have inert previews.
+
+### Compilation and authored coverage
+
+The focused app and unhosted test target are compiled with:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-drag-build build-for-testing
+```
+
+Result: **TEST BUILD SUCCEEDED**. Build log: `/tmp/DeeDock-drag-build.log`. The only reported build warning was skipped App Intents metadata extraction because these targets do not depend on AppIntents.
+
+A subsequent normal Debug app build using the same command with `build` instead of `build-for-testing` also returned **BUILD SUCCEEDED**; log: `/tmp/DeeDock-drag-app-build.log`. Its signed entitlements were inspected: App Sandbox, read-only user-selected files, app-scoped bookmarks, and the normal Debug `get-task-allow` entitlement. Xcode's build-for-testing artifact adds temporary testing permissions; that artifact must not be used as evidence of normal sandbox restrictions.
+
+The string catalog parses with `jq empty`, the entitlement file passes `plutil -lint`, and `git diff --check` is clean. These are static checks, not runtime sandbox or native-interaction acceptance.
+
+Added Swift Testing cases cover both reorder directions and boundaries, ordered batch insertion and duplicates, preserved bookmark metadata, transient gap identities, cross-display pin independence, running state after unpinning, explicit-release/cancel/committed-drop precedence, the removal threshold, scrolling coordinates, invalid Finder batches, bookmark failures and backward-compatible decoding, corrupt-byte preservation, stale session completion, and visibility-hold release/teardown. Tests use isolated stores and inert application services; importer fixtures use temporary bundles and injected bookmark data rather than launching apps or granting access.
+
+**No test cases were executed. No app was launched, no previews were rendered, and no automated visual checks or hands-on acceptance were performed.**
+
+### Required hands-on acceptance
+
+- Verify native click-versus-drag behavior and context clicks without foreground-focus changes. Exercise Escape both before and after the drag threshold, outside release, and rejection over another dock; confirm cancelled drags never unpin.
+- Reorder first/last pins, pin a running app, populate an empty dock, import multiple apps, and repeat imports containing existing pins. Verify insertion feedback and saved order after restart.
+- Import an application from a user-selected restricted folder and restart DeeDock. Verify metadata, icon, and launch access from the stored bookmark, then exercise a moved or unavailable app.
+- Exercise magnification settling, gap motion, Reduce Motion/Transparency, maximum sizes, horizontal overflow and edge scrolling in both directions, and transparent-margin click passthrough.
+- Copy between displays with negative origins and different scaling. Test existing destination pins, rejected/disabled destinations, disconnects during dragging, conflicting settings/pin edits, sleep/wake, Spaces, and quitting mid-drag.
+- Drag from Finder toward hidden activation zones at configured delays, including a stationary pointer during reveal, and verify destination holds and cleanup after successful, rejected, and cancelled sessions. Native AppKit tracking-loop delivery and foreground-app focus require runtime verification.
+- Exercise native menu moves, Option-arrow reordering, VoiceOver move/copy actions, boundary-disabled actions, selection retention, and destination-specific save errors.
+
+These checks are still pending. Compilation establishes neither drag-event delivery nor native interaction quality. The changes stop here for review and remain uncommitted.
+
+## Settings display identification
+
+Added an automatic, static accent outline and localized “Editing this display” badge naming the selected physical monitor. The marker appears only while the Settings window is active and more than one connected desktop surface exists. It follows display-profile selection and remains across Appearance, Position, and Behavior. Disabled docks are still identifiable; Defaults, disconnected profiles, and mirrored followers do not receive a marker.
+
+The overlay uses a nonactivating AppKit panel with click-through content and no keyboard/main-window eligibility or accessibility focus target. Its frame uses the selected display’s full frame in logical points, including negative origins, and the badge sits below the visible-frame top inset. SwiftUI follows Reduce Transparency; no animation is used. Settings window/app notifications handle closing, reopening a retained window, focus changes, minimization, and app hiding. Display snapshots refresh placement and connectivity, and quitting explicitly closes the panel. Preview fixtures create no native overlays or preference changes.
+
+The focused Debug app build (`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-drag-build build`) succeeded. Log: `/tmp/DeeDock-display-indicator-build.log`. The only build warning was skipped App Intents metadata extraction. The string catalog parses and the diff passes whitespace checks.
+
+No tests, automated visual checks, app launches, or hands-on acceptance were performed for this change. Remaining acceptance: identify both monitors while switching profiles/categories; select Defaults and disconnected profiles; disable a dock; close/reopen/minimize Settings and switch apps; rearrange/unplug displays; check negative origins, scaling, notch/menu-bar placement, mirroring, full-screen Spaces, contrast, Reduce Transparency, and click/focus passthrough. Full-screen auxiliary participation is requested through a public AppKit API; actual Spaces behavior remains unverified.

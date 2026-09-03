@@ -31,7 +31,11 @@
 		DD9000000000000000000003 /* DeeDock/Dock/Visibility/DockActivationGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA000000000000000000003 /* DeeDock/Dock/Visibility/DockActivationGeometry.swift */; };
 		DD9000000000000000000004 /* DeeDock/Dock/Visibility/DockVisibilityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA000000000000000000004 /* DeeDock/Dock/Visibility/DockVisibilityState.swift */; };
 		DD9000000000000000000005 /* DeeDock/Dock/Visibility/DockVisibilityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA000000000000000000005 /* DeeDock/Dock/Visibility/DockVisibilityController.swift */; };
-		DD9000000000000000000006 /* DockPreviewLease.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA000000000000000000006 /* DockPreviewLease.swift */; };
+		DD9000000000000000000006 /* DeeDock/Dock/Visibility/DockPreviewLease.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA000000000000000000006 /* DeeDock/Dock/Visibility/DockPreviewLease.swift */; };
+		DDB100000000000000000000 /* DeeDock/Dock/Dragging/DockPinEditing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000000 /* DeeDock/Dock/Dragging/DockPinEditing.swift */; };
+		DDB100000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift */; };
+		DDB100000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */; };
+		DDB100000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,7 +65,11 @@
 		DDA000000000000000000003 /* DeeDock/Dock/Visibility/DockActivationGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Visibility/DockActivationGeometry.swift; sourceTree = SOURCE_ROOT; };
 		DDA000000000000000000004 /* DeeDock/Dock/Visibility/DockVisibilityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Visibility/DockVisibilityState.swift; sourceTree = SOURCE_ROOT; };
 		DDA000000000000000000005 /* DeeDock/Dock/Visibility/DockVisibilityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Visibility/DockVisibilityController.swift; sourceTree = SOURCE_ROOT; };
-		DDA000000000000000000006 /* DockPreviewLease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Visibility/DockPreviewLease.swift; sourceTree = SOURCE_ROOT; };
+		DDA000000000000000000006 /* DeeDock/Dock/Visibility/DockPreviewLease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Visibility/DockPreviewLease.swift; sourceTree = SOURCE_ROOT; };
+		DDB200000000000000000000 /* DeeDock/Dock/Dragging/DockPinEditing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockPinEditing.swift; sourceTree = SOURCE_ROOT; };
+		DDB200000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockDragPresentation.swift; sourceTree = SOURCE_ROOT; };
+		DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationResourceAccess.swift; sourceTree = SOURCE_ROOT; };
+		DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockApplicationImporter.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -113,7 +121,11 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
-				DDA000000000000000000006 /* DockPreviewLease.swift */,
+				DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */,
+				DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */,
+				DDB200000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift */,
+				DDB200000000000000000000 /* DeeDock/Dock/Dragging/DockPinEditing.swift */,
+				DDA000000000000000000006 /* DeeDock/Dock/Visibility/DockPreviewLease.swift */,
 				DDA000000000000000000005 /* DeeDock/Dock/Visibility/DockVisibilityController.swift */,
 				DDA000000000000000000004 /* DeeDock/Dock/Visibility/DockVisibilityState.swift */,
 				DDA000000000000000000003 /* DeeDock/Dock/Visibility/DockActivationGeometry.swift */,
@@ -240,7 +252,7 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				DD9000000000000000000006 /* DockPreviewLease.swift in Sources */,
+				DD9000000000000000000006 /* DeeDock/Dock/Visibility/DockPreviewLease.swift in Sources */,
 				DD9000000000000000000005 /* DeeDock/Dock/Visibility/DockVisibilityController.swift in Sources */,
 				DD9000000000000000000004 /* DeeDock/Dock/Visibility/DockVisibilityState.swift in Sources */,
 				DD9000000000000000000003 /* DeeDock/Dock/Visibility/DockActivationGeometry.swift in Sources */,
@@ -261,6 +273,10 @@
 				DD4000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift in Sources */,
 				DD4000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift in Sources */,
 				DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */,
+				DDB100000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift in Sources */,
+				DDB100000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift in Sources */,
+				DDB100000000000000000001 /* DeeDock/Dock/Dragging/DockDragPresentation.swift in Sources */,
+				DDB100000000000000000000 /* DeeDock/Dock/Dragging/DockPinEditing.swift in Sources */,
 				DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */,
 				DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */,
 				DD1000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift in Sources */,
@@ -406,6 +422,7 @@
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "DeeDock" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -458,6 +475,7 @@
 		000000000000000112000000 /* Release configuration for PBXNativeTarget "DeeDock" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

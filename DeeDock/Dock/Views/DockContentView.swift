@@ -18,12 +18,14 @@ struct DockContentView: View {
     let dismissError: () -> Void
 
     @State private var scrollOffset: CGFloat = 0
+    @State private var scrollPosition = ScrollPosition(x: 0)
+    private var slots: [DockRenderSlot] { DockRenderSlot.slots(items: items, proposal: interaction.dragProposal) }
     @State private var hoveredID: String?
 
     private var layout: DockGeometry.Layout { interaction.layout }
     private var sizes: [CGFloat] {
         // Convert viewport coordinates to the resting canvas, not the animated icon positions.
-        layout.sizes(pointerX: interaction.pointer.map { $0.x - scrollOffset }, reduceMotion: reduceMotion)
+        layout.sizes(pointerX: interaction.dragActive ? nil : interaction.pointer.map { $0.x - scrollOffset }, reduceMotion: reduceMotion)
     }
     private var surface: CGRect { layout.surfaceFrame(sizes: sizes) }
     private var viewport: CGRect {
@@ -39,12 +41,12 @@ struct DockContentView: View {
             ScrollViewReader { proxy in
                 ScrollView(.horizontal) {
                     DockSurfaceView(
-                        items: items, launchingIDs: launchingIDs, selectedID: selectedID,
-                        keyboardFocus: keyboardFocus, showsLabel: errorMessage == nil,
+                        slots: slots, launchingIDs: launchingIDs, selectedID: selectedID,
+                        keyboardFocus: keyboardFocus, showsLabel: errorMessage == nil && !interaction.dragActive,
                         layout: layout, sizes: sizes, surface: surface,
                         viewport: viewport.offsetBy(dx: -scrollOffset, dy: 0), hoveredID: $hoveredID,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
-                        openApp: openApp, togglePin: togglePin,
+                        openApp: openApp, togglePin: togglePin, interaction: interaction,
                         iconFrameChanged: { id, rect in
                             interaction.setIconRect(rect?.intersection(viewport), for: id)
                         },
@@ -53,7 +55,14 @@ struct DockContentView: View {
                     )
                     .onGeometryChange(for: CGFloat.self) { geometry in
                         geometry.frame(in: .named("dockViewport")).minX
-                    } action: { scrollOffset = $0 }
+                    } action: {
+                        scrollOffset = $0; interaction.scrollOffset = $0
+                        interaction.scrollChanged?()
+                    }
+                }
+                .scrollPosition($scrollPosition)
+                .onChange(of: interaction.scrollRequest) { previous, current in
+                    scrollPosition.scrollTo(x: min(max(0, -scrollOffset + current - previous), max(0, layout.canvasWidth - layout.viewportWidth)))
                 }
                 .scrollIndicators(.hidden)
                 .scrollClipDisabled()
@@ -65,6 +74,11 @@ struct DockContentView: View {
                         }
                     }
                 }
+            }
+            if let message = interaction.dragMessage {
+                DockDragFeedback(message: message)
+                    .position(x: layout.viewportWidth / 2, y: max(18, surface.minY - 20))
+                    .allowsHitTesting(false)
             }
             if let errorMessage {
                 DockErrorBanner(message: errorMessage, maximumWidth: min(420, layout.viewportWidth - 16),
@@ -89,6 +103,19 @@ struct DockContentView: View {
 }
 
 #if DEBUG
+#Preview("Drag: live insertion gap") {
+    DockPreviewContent(dragProposal: DockDragProposal(references: [DockPreviewData.items[0].reference], index: 3), dragMessage: .dragPinHere)
+}
+
+#Preview("Drag: empty dock with incoming apps") {
+    DockPreviewContent(items: [], reduceMotion: true, reduceTransparency: true,
+                       dragProposal: DockDragProposal(references: Array(DockPreviewData.items.prefix(2)).map(\.reference), index: 0), dragMessage: .dragPinHere)
+}
+
+#Preview("Drag: rejected batch") {
+    DockPreviewContent(dragMessage: .dragRejected)
+}
+
 #Preview("Pinned and running") {
     DockPreviewContent()
 }

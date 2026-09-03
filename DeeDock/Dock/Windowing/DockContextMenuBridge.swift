@@ -6,6 +6,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
     let item: DockItem
     let open: () -> Void
     let togglePin: () -> Void
+    var interaction: DockInteraction? = nil
     let openSettings: () -> Void
     let tracking: (Bool) -> Void
 
@@ -15,6 +16,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         view.item = item
         view.open = open
         view.togglePin = togglePin
+        view.interaction = interaction
         view.openSettings = openSettings
         view.tracking = tracking
     }
@@ -24,6 +26,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
     /// Only context-clicks reach this overlay; ordinary left-clicks remain SwiftUI button actions.
     final class MenuView: NSView, NSMenuDelegate {
         var item: DockItem?
+        weak var interaction: DockInteraction?
         var open: (() -> Void)?
         var togglePin: (() -> Void)?
         var openSettings: (() -> Void)?
@@ -63,6 +66,27 @@ struct DockContextMenuBridge: NSViewRepresentable {
             pin.target = self
             menu.addItem(pin)
 
+            if item.isFavorite {
+                for (title, action, distance) in [(String(localized: .actionMoveLeft), #selector(movePinLeft), -1),
+                                                  (String(localized: .actionMoveRight), #selector(movePinRight), 1)] {
+                    let entry = NSMenuItem(title: title, action: action, keyEquivalent: "")
+                    entry.target = self
+                    entry.isEnabled = interaction?.canMovePin?(item.id, distance) == true
+                    menu.addItem(entry)
+                }
+            }
+            if let destinations = interaction?.pinDestinations, !destinations.isEmpty {
+                let parent = NSMenuItem(title: String(localized: .actionPinOnDisplay), action: nil, keyEquivalent: "")
+                let submenu = NSMenu()
+                for destination in destinations {
+                    let entry = NSMenuItem(title: destination.name, action: #selector(copyPinToDisplay(_:)), keyEquivalent: "")
+                    entry.target = self; entry.representedObject = destination.id
+                    submenu.addItem(entry)
+                }
+                parent.submenu = submenu; menu.addItem(parent)
+            }
+            menu.autoenablesItems = false
+
             menu.addItem(.separator())
 
             let settings = NSMenuItem(title: String(localized: .actionSettings), action: #selector(showSettings), keyEquivalent: "")
@@ -85,6 +109,12 @@ struct DockContextMenuBridge: NSViewRepresentable {
 
         @objc private func changePin() { togglePin?() }
 
+        @objc private func movePinLeft() { if let item { interaction?.movePin?(item.id, -1) } }
+        @objc private func movePinRight() { if let item { interaction?.movePin?(item.id, 1) } }
+        @objc private func copyPinToDisplay(_ sender: NSMenuItem) {
+            if let item, let id = sender.representedObject as? String { interaction?.copyPin?(item.reference, id) }
+        }
+
         @objc private func showSettings() { openSettings?() }
 
         func stop() {
@@ -93,6 +123,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
             trackedMenu = nil
             tracking?(false)
             tracking = nil
+            interaction = nil
             open = nil
             togglePin = nil
             openSettings = nil

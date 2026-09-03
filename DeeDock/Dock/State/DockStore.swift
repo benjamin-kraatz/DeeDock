@@ -16,6 +16,11 @@ final class DockStore {
     var keyboardFocus = false
     var launching: Set<String> { catalog.launching }
     @ObservationIgnored private let catalog: ApplicationCatalog
+    var pinDestinations: [DockPinDestination] = []
+    @ObservationIgnored var copyPin: ((ApplicationReference, String) -> Void)?
+    var pins: [ApplicationReference] { profiles.pinLists[displayID] ?? [] }
+    var canEditPins: Bool { !profiles.requiresReset && profiles.pinErrors[displayID] == nil }
+
     @ObservationIgnored private let profiles: DisplayProfilesStore
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
@@ -34,7 +39,9 @@ final class DockStore {
         let running = Dictionary(uniqueKeysWithValues: catalog.running.map { ($0.id, $0) })
         let favorites = Dictionary(uniqueKeysWithValues: pins.map { ($0.id, $0) })
         items = DockOrdering.itemOrder(favorites: pins, runningIDs: catalog.runningIDs).compactMap { id in
-            guard let reference = running[id] ?? favorites[id] else { return nil }
+            guard let reference = favorites[id] ?? running[id] else { return nil }
+            let access = ApplicationResourceAccess(reference)
+            defer { withExtendedLifetime(access) {} }
             let url = catalog.service.resolvedURL(for: reference)
             return DockItem(reference: reference, icon: catalog.service.icon(for: url), isFavorite: favorites[id] != nil,
                             isRunning: running[id] != nil, isAvailable: url != nil)
@@ -50,6 +57,29 @@ final class DockStore {
         do { try profiles.savePins(pins, for: displayID) }
         catch { errorMessage = .errorSavePins(details: error.localizedDescription) }
     }
+
+    /// Persists one completed edit. Preview state must never call this method.
+    @discardableResult
+    func savePins(_ proposed: [ApplicationReference]) -> Bool {
+        guard proposed != pins else { return true }
+        do { try profiles.savePins(proposed, for: displayID); return true }
+        catch { errorMessage = .errorSavePins(details: error.localizedDescription); return false }
+    }
+
+    func insertPins(_ references: [ApplicationReference], at index: Int) -> Bool {
+        savePins(DockPinEditing.inserting(references, into: pins, at: index))
+    }
+
+    func movePin(_ id: String, by distance: Int) {
+        _ = savePins(DockPinEditing.moving(id, in: pins, by: distance))
+    }
+
+    func canMovePin(_ id: String, by distance: Int) -> Bool {
+        guard canEditPins, let index = pins.firstIndex(where: { $0.id == id }) else { return false }
+        return pins.indices.contains(index + distance)
+    }
+
+    func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
 
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
     func open(_ item: DockItem) {
@@ -68,5 +98,5 @@ final class DockStore {
     func openSelection() { if let item = items.first(where: { $0.id == selectedID }) { open(item) } }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { copyPin = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

@@ -6,6 +6,7 @@ struct DockSettingsView: View {
     let profiles: DisplayProfilesStore
     var coordinator: DockCoordinator? = nil
     @State private var selection: SettingsSelection? = .defaults(.appearance)
+    @State private var settingsActive = false
     @State private var searchText = ""
     @State private var displayCategory: SettingsCategory = .appearance
 
@@ -26,16 +27,39 @@ struct DockSettingsView: View {
                 SettingsDetailView(store: store, category: nil)
             }
         }
-        .background { SettingsWindowLifecycle { coordinator?.zonePreview.stop() } }
+        .background {
+            SettingsWindowLifecycle(closed: {
+                coordinator?.zonePreview.stop()
+                coordinator?.displayIndicator.stop()
+            }, activityChanged: {
+                settingsActive = $0
+                updateDisplayIndicator(active: $0)
+            })
+        }
+        .onChange(of: profiles.displays) { _, _ in updateDisplayIndicator() }
         .onChange(of: displayCategory) { _, _ in coordinator?.zonePreview.stop() }
-        .onChange(of: selection) { _, _ in coordinator?.zonePreview.stop() }
-        .onDisappear { coordinator?.zonePreview.stop() }
+        .onChange(of: selection) { _, _ in
+            coordinator?.zonePreview.stop()
+            updateDisplayIndicator()
+        }
+        .onAppear { updateDisplayIndicator() }
+        .onDisappear {
+            settingsActive = false
+            coordinator?.zonePreview.stop()
+            coordinator?.displayIndicator.stop()
+        }
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 740, idealWidth: 820, minHeight: 540, idealHeight: 650)
         .onChange(of: profiles.document.profiles.keys.sorted()) { _, ids in
             if case .display(let id) = selection, !ids.contains(id) { selection = .defaults(.appearance) }
         }
     }
+    private func updateDisplayIndicator(active: Bool? = nil) {
+        let id: String?
+        if case .display(let selectedID) = selection { id = selectedID } else { id = nil }
+        coordinator?.displayIndicator.update(selectedID: id, displays: profiles.displays, settingsActive: active ?? settingsActive)
+    }
+
     private func zoneAction(for id: String) -> (() -> Void)? {
         guard let coordinator, coordinator.enabledDisplays.contains(where: { $0.id == id }) else { return nil }
         return { coordinator.showZone(for: id) }

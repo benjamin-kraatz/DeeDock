@@ -1,10 +1,23 @@
-import CoreGraphics
+import AppKit
 import Foundation
 import Observation
 
 /// Per-panel geometry shared between SwiftUI presentation and AppKit pointer handling.
 @MainActor @Observable
 final class DockInteraction {
+    var dragProposal: DockDragProposal?
+    var dragActive = false
+    var dragSourceID: String?
+    var dragMessage: LocalizedStringResource?
+    var scrollOffset: CGFloat = 0
+    var scrollRequest: CGFloat = 0
+    @ObservationIgnored var sourceTrackingChanged: ((Bool) -> Void)?
+    @ObservationIgnored var beginDrag: ((DockItem, NSView, NSEvent) -> Void)?
+    @ObservationIgnored var movePin: ((String, Int) -> Void)?
+    @ObservationIgnored var canMovePin: ((String, Int) -> Bool)?
+    @ObservationIgnored var copyPin: ((ApplicationReference, String) -> Void)?
+    var pinDestinations: [DockPinDestination] = []
+    @ObservationIgnored var scrollChanged: (() -> Void)?
     var contentOrigin = CGPoint.zero
     var windowSize = CGSize(width: 800, height: 248)
     @ObservationIgnored var menuTrackingChanged: ((Bool) -> Void)?
