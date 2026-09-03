@@ -4,7 +4,7 @@ import Foundation
 enum DockSettingField: String, CaseIterable, Codable {
     case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
     case appVisibility, tooltipPreset
-    case iconSize, magnification, itemSpacing, runningIndicatorStyle, edge, alignment, positionReference
+    case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
     case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
@@ -27,6 +27,7 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .magnification: \.magnification
         case .itemSpacing: \.itemSpacing
         case .runningIndicatorStyle: \.runningIndicatorStyle
+        case .animateIndicators: \.animateIndicators
         case .edge: \.edge
         case .alignment: \.alignment
         case .alongEdgeOffset: \.alongEdgeOffset
@@ -62,6 +63,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     var magnification: Double?
     var itemSpacing: Double?
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle?
+    var animateIndicators: Bool?
     var edge: DockEdge?
     var alignment: DockSettings.Alignment?
     var alongEdgeOffset: Double?
@@ -82,7 +84,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case appVisibility, tooltipPreset
-        case iconSize, magnification, itemSpacing, runningIndicatorStyle, edge, alignment, positionReference
+        case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
         case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
@@ -94,6 +96,7 @@ struct DockSettingsOverrides: Codable, Equatable {
                      runningIndicatorStyle: runningIndicatorStyle ?? defaults.runningIndicatorStyle,
                      edge: edge ?? defaults.edge, alignment: alignment ?? defaults.alignment, alongEdgeOffset: alongEdgeOffset ?? defaults.alongEdgeOffset,
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
+        result.animateIndicators = animateIndicators ?? defaults.animateIndicators
         result.appVisibility = appVisibility ?? defaults.appVisibility
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground
@@ -133,6 +136,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .magnification: magnification != nil
         case .itemSpacing: itemSpacing != nil
         case .runningIndicatorStyle: runningIndicatorStyle != nil
+        case .animateIndicators: animateIndicators != nil
         case .edge: edge != nil
         case .alignment: alignment != nil
         case .alongEdgeOffset: alongEdgeOffset != nil
@@ -167,6 +171,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .magnification: magnification = value?.magnification
         case .itemSpacing: itemSpacing = value?.itemSpacing
         case .runningIndicatorStyle: runningIndicatorStyle = value?.runningIndicatorStyle
+        case .animateIndicators: animateIndicators = value?.animateIndicators
         case .edge: edge = value?.edge
         case .alignment: alignment = value?.alignment
         case .alongEdgeOffset: alongEdgeOffset = value?.alongEdgeOffset
@@ -219,6 +224,7 @@ extension DockSettingsOverrides {
         magnification = try values.decodeIfPresent(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing)
         runningIndicatorStyle = try values.decodeIfPresent(DockSettings.RunningIndicatorStyle.self, forKey: .runningIndicatorStyle)
+        animateIndicators = try values.decodeIfPresent(Bool.self, forKey: .animateIndicators)
         alignment = try values.decodeIfPresent(DockSettings.Alignment.self, forKey: .alignment)
         alongEdgeOffset = try values.decodeIfPresent(Double.self, forKey: .alongEdgeOffset)
         edgeDistance = try values.decodeIfPresent(Double.self, forKey: .edgeDistance)

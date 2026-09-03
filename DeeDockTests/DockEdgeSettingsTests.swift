@@ -107,7 +107,7 @@ import Testing
         profiles.synchronize([display]) { [] }
         #expect(profiles.effectiveSettings(for: display.id) == settings)
         profiles.useDefaults(for: display.id)
-        #expect(profiles.pinLists[display.id] == pins)
+        #expect(profiles.pinLists[display.id] == pins.map(DockPin.application))
         #expect(profiles.document.profiles[display.id]?.enabled == false)
         let old = try JSONDecoder().decode(DockSettingsOverrides.self,
             from: Data(#"{"alignment":"left","horizontalOffset":42,"bottomDistance":12,"widthMode":"dockWidth"}"#.utf8))

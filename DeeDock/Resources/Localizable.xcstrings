@@ -25,6 +25,54 @@
         }
       }
     },
+    "actionMoveDown": {
+      "comment": "Move a pin one place toward the bottom of a side dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Down"
+          }
+        }
+      }
+    },
+    "actionMoveLeft": {
+      "comment": "Move a pinned application one position to the left.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Left"
+          }
+        }
+      }
+    },
+    "actionMoveRight": {
+      "comment": "Move a pinned application one position to the right.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Right"
+          }
+        }
+      }
+    },
+    "actionMoveUp": {
+      "comment": "Move a pin one place toward the top of a side dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Up"
+          }
+        }
+      }
+    },
     "actionOpen": {
       "comment": "Context-menu action that opens or activates the selected application.",
       "extractionState": "manual",
@@ -37,6 +85,18 @@
         }
       }
     },
+    "actionOpenFiles": {
+      "comment": "Context-menu and accessibility action. Choose files or folders to open in this application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Files…"
+          }
+        }
+      }
+    },
     "actionPin": {
       "comment": "Context-menu and accessibility action. Keep this app in the pinned section even when it is not running.",
       "extractionState": "manual",
@@ -45,6 +105,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pin"
+          }
+        }
+      }
+    },
+    "actionPinOnDisplay": {
+      "comment": "Submenu listing other connected displays that have a dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin on Display…"
+          }
+        }
+      }
+    },
+    "actionPinOnDisplayName": {
+      "comment": "VoiceOver action to pin an app on the named display. Display name comes from macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin on %(display)@"
           }
         }
       }
@@ -85,6 +169,510 @@
         }
       }
     },
+    "animationBounceFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bounce & Fade"
+          }
+        }
+      }
+    },
+    "animationBounceFadeTitle": {
+      "comment": "Playful name for the Bounce & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boing Voyage"
+          }
+        }
+      }
+    },
+    "animationFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fade"
+          }
+        }
+      }
+    },
+    "animationFadeTitle": {
+      "comment": "Playful name for the Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghost Mode"
+          }
+        }
+      }
+    },
+    "animationGroupDramatic": {
+      "comment": "Playful group name: scale, wipe, and bounce effects.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Little Drama"
+          }
+        }
+      }
+    },
+    "animationGroupScenic": {
+      "comment": "Playful group name: directional departures.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taking the Scenic Route"
+          }
+        }
+      }
+    },
+    "animationGroupSmooth": {
+      "comment": "Playful animation group name: simple slide and fade styles.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smooth Operators"
+          }
+        }
+      }
+    },
+    "animationHorizontalWipeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horizontal Wipe"
+          }
+        }
+      }
+    },
+    "animationHorizontalWipeTitle": {
+      "comment": "Playful name for the Horizontal Wipe auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squeeze Play"
+          }
+        }
+      }
+    },
+    "animationLeftFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left & Fade"
+          }
+        }
+      }
+    },
+    "animationLeftFadeTitle": {
+      "comment": "Playful name for the Left & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exit Stage Left"
+          }
+        }
+      }
+    },
+    "animationLiftFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lift & Fade"
+          }
+        }
+      }
+    },
+    "animationLiftFadeTitle": {
+      "comment": "Playful name for the Lift & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up, Up & Away"
+          }
+        }
+      }
+    },
+    "animationRightFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right & Fade"
+          }
+        }
+      }
+    },
+    "animationRightFadeTitle": {
+      "comment": "Playful name for the Right & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right on Cue"
+          }
+        }
+      }
+    },
+    "animationScaleFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scale & Fade"
+          }
+        }
+      }
+    },
+    "animationScaleFadeTitle": {
+      "comment": "Playful name for the Scale & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mini Me"
+          }
+        }
+      }
+    },
+    "animationSideBounceSubtitle": {
+      "comment": "Side-dock bounce animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bounces inward, then retreats outward and fades."
+          }
+        }
+      }
+    },
+    "animationSideEndSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves down while fading."
+          }
+        }
+      }
+    },
+    "animationSideEndTitle": {
+      "comment": "Playful side-dock name for moving downward and fading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Down & Out"
+          }
+        }
+      }
+    },
+    "animationSideLiftSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves inward while fading."
+          }
+        }
+      }
+    },
+    "animationSideLiftTitle": {
+      "comment": "Playful side-dock name for the inward lift-and-fade animation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Into the Room"
+          }
+        }
+      }
+    },
+    "animationSideScaleSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shrinks toward the outer edge while fading."
+          }
+        }
+      }
+    },
+    "animationSideSlideFadeSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides toward the screen edge while fading."
+          }
+        }
+      }
+    },
+    "animationSideSlideSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides outward through the selected edge."
+          }
+        }
+      }
+    },
+    "animationSideSqueezeSubtitle": {
+      "comment": "Side-dock lengthwise wipe description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closes from the top and bottom toward the center."
+          }
+        }
+      }
+    },
+    "animationSideStartSubtitle": {
+      "comment": "Side-dock animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves up while fading."
+          }
+        }
+      }
+    },
+    "animationSideStartTitle": {
+      "comment": "Playful side-dock name for moving upward and fading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up & Out"
+          }
+        }
+      }
+    },
+    "animationSideWipeSubtitle": {
+      "comment": "Side-dock wipe animation description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closes across the glass toward the outer edge."
+          }
+        }
+      }
+    },
+    "animationSlideFadeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slide & Fade"
+          }
+        }
+      }
+    },
+    "animationSlideFadeTitle": {
+      "comment": "Playful name for the Slide & Fade auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glide & Seek"
+          }
+        }
+      }
+    },
+    "animationSlideSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slide"
+          }
+        }
+      }
+    },
+    "animationSlideTitle": {
+      "comment": "Playful name for the Slide auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slip Away"
+          }
+        }
+      }
+    },
+    "animationTopBounceSubtitle": {
+      "comment": "Hiding description for bounce and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bounces down, then retreats upward while fading."
+          }
+        }
+      }
+    },
+    "animationTopLiftSubtitle": {
+      "comment": "Hiding description for lift and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves down into the desktop while fading."
+          }
+        }
+      }
+    },
+    "animationTopLiftTitle": {
+      "comment": "Top-dock title for the existing lift and fade effect, which moves inward and down.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Down & Away"
+          }
+        }
+      }
+    },
+    "animationTopScaleSubtitle": {
+      "comment": "Hiding description for scale and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shrinks toward the top edge while fading."
+          }
+        }
+      }
+    },
+    "animationTopSlideFadeSubtitle": {
+      "comment": "Hiding description for slide and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides upward toward the top edge while fading."
+          }
+        }
+      }
+    },
+    "animationTopSlideSubtitle": {
+      "comment": "Hiding description for slide on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides upward toward the top edge."
+          }
+        }
+      }
+    },
+    "animationTopWipeSubtitle": {
+      "comment": "Hiding description for the thickness wipe on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapses upward toward the top edge."
+          }
+        }
+      }
+    },
+    "animationVerticalWipeSubtitle": {
+      "comment": "Plain-language description of the animation style.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertical Wipe"
+          }
+        }
+      }
+    },
+    "animationVerticalWipeTitle": {
+      "comment": "Playful name for the Vertical Wipe auto-hide animation; adapt the wordplay for the locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Curtain Call"
+          }
+        }
+      }
+    },
     "appName": {
       "comment": "Product name, used by the menu-bar item and dock panel. Keep the brand name unchanged.",
       "extractionState": "manual",
@@ -98,13 +686,13 @@
       }
     },
     "appOpenHint": {
-      "comment": "Accessibility hint for an application icon button.",
+      "comment": "Accessibility hint for an application icon button. The foreground app is hidden; any other app is opened or activated.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open or switch to this app"
+            "value": "Open, switch to, or hide this app"
           }
         }
       }
@@ -141,1830 +729,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unavailable"
-          }
-        }
-      }
-    },
-    "dockEmptyState": {
-      "comment": "Empty dock guidance. Opening an app makes it appear temporarily; pinning keeps it in the dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open an app to see it in DeeDock. Pin it to keep it here."
-          }
-        }
-      }
-    },
-    "errorAppNotFound": {
-      "comment": "Missing-application error. appName is the name of the pinned application. Unpinning does not delete the application.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$(appName)@ couldn’t be found. You can unpin it, then pin it again after opening the app."
-          }
-        }
-      }
-    },
-    "errorLoadPins": {
-      "comment": "Error banner when reading saved pins fails. details is the localized underlying error description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t load pinned apps: %1$(details)@"
-          }
-        }
-      }
-    },
-    "errorOpenApp": {
-      "comment": "Error banner for a failed launch. appName is the application name; details is the localized underlying error description. Placeholders may be reordered.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t open %1$(appName)@: %2$(details)@"
-          }
-        }
-      }
-    },
-    "errorSavePins": {
-      "comment": "Error banner when saving pins fails. details is the localized underlying error description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t save pinned apps: %1$(details)@"
-          }
-        }
-      }
-    },
-    "settingsAlignCenter": {
-      "comment": "Horizontal center alignment.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Center"
-          }
-        }
-      }
-    },
-    "settingsAlignLeft": {
-      "comment": "Physical left alignment, not text reading direction.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Left"
-          }
-        }
-      }
-    },
-    "settingsAlignRight": {
-      "comment": "Physical right alignment, not text reading direction.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Right"
-          }
-        }
-      }
-    },
-    "settingsAlignment": {
-      "comment": "Alignment control label. Choices run left/center/right on top and bottom docks and top/center/bottom on side docks.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alignment"
-          }
-        }
-      }
-    },
-    "settingsAllowedRange": {
-      "comment": "Numeric field help. lower and upper are locale-formatted numeric limits. Units appear next to the field.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allowed range: %1$(lower)@ to %2$(upper)@."
-          }
-        }
-      }
-    },
-    "settingsAppearance": {
-      "comment": "Settings section heading.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Appearance"
-          }
-        }
-      }
-    },
-    "settingsAppearanceHelp": {
-      "comment": "Explains effective versus requested size and accessibility behavior.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Crowded docks use smaller icons before scrolling. Reduce Motion disables magnification without changing your preference."
-          }
-        }
-      }
-    },
-    "settingsAppearanceKeywords": {
-      "comment": "Space-separated search synonyms for the Appearance pane; translate to words a user would type, not literally.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "icon size magnification zoom scale hover running indicator dot bar square hidden neon aura glow target orbit stardust power badge glitch plasma hologram solar flare prism shader metal background opacity transparency floating icons idle fading dimming delay restore tooltip app names labels presets caption"
-          }
-        }
-      }
-    },
-    "settingsBottomDistance": {
-      "comment": "Distance from the chosen bottom edge to the glass bottom, in points.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bottom distance"
-          }
-        }
-      }
-    },
-    "settingsCardAnchor": {
-      "comment": "Heading for the group choosing the reference frame and horizontal alignment.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anchor"
-          }
-        }
-      }
-    },
-    "settingsCardFineTuning": {
-      "comment": "Heading for the group with the offset and bottom distance sliders.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fine-tuning"
-          }
-        }
-      }
-    },
-    "settingsCardIcons": {
-      "comment": "Heading for the icon size and magnification group.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Icons"
-          }
-        }
-      }
-    },
-    "settingsDockOverlapHelp": {
-      "comment": "Coexistence note; no system preferences are changed.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Screen-edge positioning can overlap the system Dock. An automatically hidden system Dock may overlap either mode."
-          }
-        }
-      }
-    },
-    "settingsGroupDock": {
-      "comment": "Sidebar group heading collecting the dock configuration panes.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dock"
-          }
-        }
-      }
-    },
-    "settingsHorizontalOffset": {
-      "comment": "Signed offset in points; positive is right.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Horizontal offset"
-          }
-        }
-      }
-    },
-    "settingsIconSize": {
-      "comment": "Requested resting app icon size in logical points.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Icon size"
-          }
-        }
-      }
-    },
-    "settingsItemSpacing": {
-      "comment": "Gap between neighboring Dock items in logical points.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Item spacing"
-          }
-        }
-      }
-    },
-    "settingsInvalidNumber": {
-      "comment": "Inline feedback for incomplete, invalid, or out-of-range numeric input.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter a number within the allowed range."
-          }
-        }
-      }
-    },
-    "settingsLoadError": {
-      "comment": "Corrupt saved settings are preserved until the user explicitly resets.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t read saved settings. Defaults are being used. Choose Restore Defaults to replace the unreadable settings; your pinned apps will be kept."
-          }
-        }
-      }
-    },
-    "settingsMagnification": {
-      "comment": "Maximum hover scale; 1 means no magnification.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Maximum magnification"
-          }
-        }
-      }
-    },
-    "settingsMultiplier": {
-      "comment": "Unit symbol for magnification scale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "×"
-          }
-        }
-      }
-    },
-    "settingsNoMatches": {
-      "comment": "Shown in the settings sidebar when a search filters out every pane.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No settings match your search."
-          }
-        }
-      }
-    },
-    "settingsPoints": {
-      "comment": "Abbreviation for logical points in numeric settings.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "pt"
-          }
-        }
-      }
-    },
-    "settingsPosition": {
-      "comment": "Settings section heading.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Position"
-          }
-        }
-      }
-    },
-    "settingsPositionHelp": {
-      "comment": "Explains physical offset direction, edge distance, and clamping for all dock edges.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Positive offsets move right on top and bottom docks and down on side docks. Edge distance measures to the outside of the glass. Placement is constrained to the display; requested values remain saved."
-          }
-        }
-      }
-    },
-    "settingsPositionKeywords": {
-      "comment": "Space-separated search synonyms for all four physical edge placement settings.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "edge bottom left right top center alignment offset distance usable desktop screen position vertical horizontal"
-          }
-        }
-      }
-    },
-    "settingsPositionReference": {
-      "comment": "Label for the frame used to measure dock placement.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Position relative to"
-          }
-        }
-      }
-    },
-    "settingsPreview": {
-      "comment": "Heading for the illustrated, non-interactive preview of the current settings.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preview"
-          }
-        }
-      }
-    },
-    "settingsPreviewDisclaimer": {
-      "comment": "Clarifies that the preview uses sample icons and a stand-in display.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An illustration of your settings, not a live view of your dock."
-          }
-        }
-      }
-    },
-    "settingsRestoreDefaults": {
-      "comment": "Resets configuration only; pinned apps are preserved.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restore Defaults"
-          }
-        }
-      }
-    },
-    "settingsSaveError": {
-      "comment": "A failed edit was not published; user can retry.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t save settings. Your previous settings are still in use."
-          }
-        }
-      }
-    },
-    "settingsScreenEdge": {
-      "comment": "Physical display frame, including areas occupied by the system Dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Screen edge"
-          }
-        }
-      }
-    },
-    "settingsSearchPrompt": {
-      "comment": "Placeholder in the settings sidebar search field.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search"
-          }
-        }
-      }
-    },
-    "settingsSelectCategory": {
-      "comment": "Placeholder shown when no settings pane is selected.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose a settings category"
-          }
-        }
-      }
-    },
-    "settingsUsableDesktop": {
-      "comment": "Frame excluding space reserved by macOS, including the system Dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usable desktop"
-          }
-        }
-      }
-    },
-    "displayUnnamed": {
-      "comment": "Fallback display name when macOS provides no localized name.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Display"
-          }
-        }
-      }
-    },
-    "displayProfilesError": {
-      "comment": "Shown in Settings when display metadata is malformed or cannot be saved.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t read or save display preferences. Saved profiles have not been replaced."
-          }
-        }
-      }
-    },
-    "displayDefaults": {
-      "comment": "Sidebar section for shared settings inherited by displays.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Defaults"
-          }
-        }
-      }
-    },
-    "displayConnectedGroup": {
-      "comment": "Sidebar section for online displays, including mirror followers.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connected displays"
-          }
-        }
-      }
-    },
-    "displayRememberedGroup": {
-      "comment": "Sidebar section for retained profiles that are currently offline.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disconnected displays"
-          }
-        }
-      }
-    },
-    "displayConnected": {
-      "comment": "Display connection status.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connected"
-          }
-        }
-      }
-    },
-    "displayPrimaryConnected": {
-      "comment": "Display status indicating the main display.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connected · Primary"
-          }
-        }
-      }
-    },
-    "displayDisconnected": {
-      "comment": "Display connection status; preferences remain editable.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disconnected"
-          }
-        }
-      }
-    },
-    "displayMirrored": {
-      "comment": "Status for a display showing another display’s desktop.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mirrored"
-          }
-        }
-      }
-    },
-    "displaySessionOnly": {
-      "comment": "Identity could not safely be persisted.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Session only"
-          }
-        }
-      }
-    },
-    "displayDockDisabled": {
-      "comment": "Accessibility label for a disabled display dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dock disabled"
-          }
-        }
-      }
-    },
-    "displayShowDock": {
-      "comment": "Per-display visibility toggle; retained across reconnects.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Dock"
-          }
-        }
-      }
-    },
-    "displayCustomized": {
-      "comment": "Indicates an explicit per-setting display override.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Customized"
-          }
-        }
-      }
-    },
-    "displayFollowingDefault": {
-      "comment": "Setting inherits the shared default, including future changes.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Following default"
-          }
-        }
-      }
-    },
-    "displayUseDefault": {
-      "comment": "Clear one display setting override.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use Default"
-          }
-        }
-      }
-    },
-    "displayUseDefaults": {
-      "comment": "Clear all appearance and position overrides for this display; preserve pins and visibility.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use Defaults"
-          }
-        }
-      }
-    },
-    "displayIdentityWarning": {
-      "comment": "Missing or duplicate display identity: session-only state is used.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This display cannot be identified reliably. Changes apply only for this connection and won’t replace any saved display profile."
-          }
-        }
-      }
-    },
-    "displayMirrorHelp": {
-      "comment": "Explains why a mirror follower does not create another panel.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "While mirroring, the source display controls the dock. These preferences will apply when this display has its own desktop again."
-          }
-        }
-      }
-    },
-    "displayDisconnectedHelp": {
-      "comment": "Offline profiles remain editable.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Changes are saved for when this display reconnects."
-          }
-        }
-      }
-    },
-    "settingsBehavior": {
-      "comment": "Settings navigation category for auto-hide and activation.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Behavior"
-          }
-        }
-      }
-    },
-    "settingsBehaviorKeywords": {
-      "comment": "Space-separated search synonyms for auto-hide, activation dimensions, and animations.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "auto hide reveal activation zone length depth width height offset delay animation duration preview edge app visibility hide pinned running collapse expand sections"
-          }
-        }
-      }
-    },
-    "settingsSeconds": {
-      "comment": "Unit abbreviation for seconds.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "s"
-          }
-        }
-      }
-    },
-    "behaviorHelp": {
-      "comment": "Auto-hide explanation.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hide each dock when you’re not using it. Your system Dock settings stay unchanged."
-          }
-        }
-      }
-    },
-    "behaviorAutoHide": {
-      "comment": "Toggle for pointer-triggered dock visibility.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Automatically hide"
-          }
-        }
-      }
-    },
-    "behaviorActivationZone": {
-      "comment": "Settings card heading.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activation Zone"
-          }
-        }
-      }
-    },
-    "behaviorZoneHelp": {
-      "comment": "Explains length along the selected edge, inward depth, offset direction, and the safe approach region.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The activation zone follows the selected dock edge. Length runs along the edge; depth extends inward. Positive offsets move right on top and bottom docks and down on side docks. The connecting region keeps the dock visible while you approach it."
-          }
-        }
-      }
-    },
-    "behaviorShowZone": {
-      "comment": "Show the selected display’s activation outline for ten seconds.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Zone"
-          }
-        }
-      }
-    },
-    "behaviorLocation": {
-      "comment": "Zone vertical anchor choice.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activation location"
-          }
-        }
-      }
-    },
-    "behaviorDockPosition": {
-      "comment": "Anchor activation at the resting glass bottom.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dock position"
-          }
-        }
-      }
-    },
-    "behaviorScreenEdge": {
-      "comment": "Anchor activation at the physical screen bottom.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Screen edge"
-          }
-        }
-      }
-    },
-    "behaviorWidthMode": {
-      "comment": "Zone width mode label.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activation width"
-          }
-        }
-      }
-    },
-    "behaviorDockWidth": {
-      "comment": "Follow the resting dock width.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dock width"
-          }
-        }
-      }
-    },
-    "behaviorCustomWidth": {
-      "comment": "Exact activation width in points.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Custom width"
-          }
-        }
-      }
-    },
-    "behaviorZoneHeight": {
-      "comment": "Height of the trigger band in points.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activation height"
-          }
-        }
-      }
-    },
-    "behaviorZoneOffset": {
-      "comment": "Signed activation-zone offset along the selected dock edge. Positive moves right below and down beside the display.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Along-edge offset"
-          }
-        }
-      }
-    },
-    "behaviorTiming": {
-      "comment": "Delay controls card heading.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Timing"
-          }
-        }
-      }
-    },
-    "behaviorTimingHelp": {
-      "comment": "Explains independent dwell and retention timers.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Entering the zone starts the reveal delay. Leaving the dock and its approach area starts the hide delay."
-          }
-        }
-      }
-    },
-    "behaviorRevealDelay": {
-      "comment": "Pointer dwell before revealing.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reveal delay"
-          }
-        }
-      }
-    },
-    "behaviorHideDelay": {
-      "comment": "Delay after ending interaction.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hide delay"
-          }
-        }
-      }
-    },
-    "behaviorAnimation": {
-      "comment": "Animation styles card heading.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Animation"
-          }
-        }
-      }
-    },
-    "behaviorAnimationHelp": {
-      "comment": "Animation and accessibility explanation.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preview plays a sample dock. Zero duration is instant. Reduce Motion uses a brief fade for every style."
-          }
-        }
-      }
-    },
-    "behaviorDuration": {
-      "comment": "Reveal and hide duration, before reversal scaling.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Animation duration"
-          }
-        }
-      }
-    },
-    "behaviorPlayPreview": {
-      "comment": "Play one hide-and-reveal cycle using an inert sample.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Play Preview"
-          }
-        }
-      }
-    },
-    "behaviorDiagramLegend": {
-      "comment": "Legend for the deterministic Settings zone diagram.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cyan: activation zone. Dashed outline: the area that keeps the dock visible while you approach it."
-          }
-        }
-      }
-    },
-    "animationGroupSmooth": {
-      "comment": "Playful animation group name: simple slide and fade styles.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smooth Operators"
-          }
-        }
-      }
-    },
-    "animationGroupScenic": {
-      "comment": "Playful group name: directional departures.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Taking the Scenic Route"
-          }
-        }
-      }
-    },
-    "animationGroupDramatic": {
-      "comment": "Playful group name: scale, wipe, and bounce effects.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A Little Drama"
-          }
-        }
-      }
-    },
-    "animationSlideFadeTitle": {
-      "comment": "Playful name for the Slide & Fade auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Glide & Seek"
-          }
-        }
-      }
-    },
-    "animationSlideFadeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slide & Fade"
-          }
-        }
-      }
-    },
-    "animationSlideTitle": {
-      "comment": "Playful name for the Slide auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slip Away"
-          }
-        }
-      }
-    },
-    "animationSlideSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slide"
-          }
-        }
-      }
-    },
-    "animationFadeTitle": {
-      "comment": "Playful name for the Fade auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ghost Mode"
-          }
-        }
-      }
-    },
-    "animationFadeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fade"
-          }
-        }
-      }
-    },
-    "animationLiftFadeTitle": {
-      "comment": "Playful name for the Lift & Fade auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Up, Up & Away"
-          }
-        }
-      }
-    },
-    "animationLiftFadeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lift & Fade"
-          }
-        }
-      }
-    },
-    "animationLeftFadeTitle": {
-      "comment": "Playful name for the Left & Fade auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exit Stage Left"
-          }
-        }
-      }
-    },
-    "animationLeftFadeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Left & Fade"
-          }
-        }
-      }
-    },
-    "animationRightFadeTitle": {
-      "comment": "Playful name for the Right & Fade auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Right on Cue"
-          }
-        }
-      }
-    },
-    "animationRightFadeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Right & Fade"
-          }
-        }
-      }
-    },
-    "animationScaleFadeTitle": {
-      "comment": "Playful name for the Scale & Fade auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mini Me"
-          }
-        }
-      }
-    },
-    "animationScaleFadeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scale & Fade"
-          }
-        }
-      }
-    },
-    "animationVerticalWipeTitle": {
-      "comment": "Playful name for the Vertical Wipe auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Curtain Call"
-          }
-        }
-      }
-    },
-    "animationVerticalWipeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vertical Wipe"
-          }
-        }
-      }
-    },
-    "animationHorizontalWipeTitle": {
-      "comment": "Playful name for the Horizontal Wipe auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Squeeze Play"
-          }
-        }
-      }
-    },
-    "animationHorizontalWipeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Horizontal Wipe"
-          }
-        }
-      }
-    },
-    "animationBounceFadeTitle": {
-      "comment": "Playful name for the Bounce & Fade auto-hide animation; adapt the wordplay for the locale.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Boing Voyage"
-          }
-        }
-      }
-    },
-    "animationBounceFadeSubtitle": {
-      "comment": "Plain-language description of the animation style.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bounce & Fade"
-          }
-        }
-      }
-    },
-    "actionMoveLeft": {
-      "comment": "Move a pinned application one position to the left.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Left"
-          }
-        }
-      }
-    },
-    "actionMoveRight": {
-      "comment": "Move a pinned application one position to the right.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Right"
-          }
-        }
-      }
-    },
-    "actionPinOnDisplay": {
-      "comment": "Submenu listing other connected displays that have a dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pin on Display…"
-          }
-        }
-      }
-    },
-    "actionPinOnDisplayName": {
-      "comment": "VoiceOver action to pin an app on the named display. Display name comes from macOS.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pin on %(display)@"
-          }
-        }
-      }
-    },
-    "dragRejected": {
-      "comment": "Drag feedback for an invalid batch or a destination whose pins cannot be edited.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Drop applications only. Pins could not be changed."
-          }
-        }
-      }
-    },
-    "dragCheckingApps": {
-      "comment": "Shown while dropped application bundles are being validated.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Checking applications…"
-          }
-        }
-      }
-    },
-    "dragPinnedSection": {
-      "comment": "Drop guidance when the pointer is over automatically ordered running apps.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Drag into the pinned section"
-          }
-        }
-      }
-    },
-    "dragPinHere": {
-      "comment": "Insertion feedback while dragging apps into a dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pin here"
-          }
-        }
-      }
-    },
-    "displayIndicatorEditing": {
-      "comment": "Badge shown on the physical monitor whose display-specific Settings are currently active. The monitor name appears below it.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editing this display"
-          }
-        }
-      }
-    },
-    "settingsEdge": {
-      "comment": "Physical display edge picker in Position settings.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Edge"
-          }
-        }
-      }
-    },
-    "settingsEdgeBottom": {
-      "comment": "Dock on the bottom edge of the display.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bottom"
-          }
-        }
-      }
-    },
-    "settingsEdgeLeft": {
-      "comment": "Physical left display edge, independent of reading direction.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Left"
-          }
-        }
-      }
-    },
-    "settingsEdgeRight": {
-      "comment": "Physical right display edge, independent of reading direction.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Right"
-          }
-        }
-      }
-    },
-    "settingsAlignTop": {
-      "comment": "Align a vertical dock near the top of the display.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Top"
-          }
-        }
-      }
-    },
-    "settingsAlignBottom": {
-      "comment": "Align a vertical dock near the bottom of the display.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bottom"
-          }
-        }
-      }
-    },
-    "settingsAlongEdgeOffset": {
-      "comment": "Signed position offset. Positive moves right on top and bottom docks and down on side docks.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Along-edge offset"
-          }
-        }
-      }
-    },
-    "settingsEdgeDistance": {
-      "comment": "Distance from the chosen reference edge to the outer edge of the glass.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Edge distance"
-          }
-        }
-      }
-    },
-    "behaviorLengthMode": {
-      "comment": "Select how the activation region length along the dock is determined.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activation length"
-          }
-        }
-      }
-    },
-    "behaviorDockLength": {
-      "comment": "Match activation length to the resting visible glass length.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dock length"
-          }
-        }
-      }
-    },
-    "behaviorCustomLength": {
-      "comment": "User-defined activation length along the selected screen edge.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Custom length"
-          }
-        }
-      }
-    },
-    "behaviorZoneDepth": {
-      "comment": "Activation zone thickness measured inward from its outer edge.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activation depth"
-          }
-        }
-      }
-    },
-    "actionMoveUp": {
-      "comment": "Move a pin one place toward the top of a side dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Up"
-          }
-        }
-      }
-    },
-    "actionMoveDown": {
-      "comment": "Move a pin one place toward the bottom of a side dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Down"
-          }
-        }
-      }
-    },
-    "animationSideLiftTitle": {
-      "comment": "Playful side-dock name for the inward lift-and-fade animation.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Into the Room"
-          }
-        }
-      }
-    },
-    "animationSideStartTitle": {
-      "comment": "Playful side-dock name for moving upward and fading.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Up & Out"
-          }
-        }
-      }
-    },
-    "animationSideEndTitle": {
-      "comment": "Playful side-dock name for moving downward and fading.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Down & Out"
-          }
-        }
-      }
-    },
-    "animationSideSlideFadeSubtitle": {
-      "comment": "Side-dock animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slides toward the screen edge while fading."
-          }
-        }
-      }
-    },
-    "animationSideSlideSubtitle": {
-      "comment": "Side-dock animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slides outward through the selected edge."
-          }
-        }
-      }
-    },
-    "animationSideLiftSubtitle": {
-      "comment": "Side-dock animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moves inward while fading."
-          }
-        }
-      }
-    },
-    "animationSideStartSubtitle": {
-      "comment": "Side-dock animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moves up while fading."
-          }
-        }
-      }
-    },
-    "animationSideEndSubtitle": {
-      "comment": "Side-dock animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moves down while fading."
-          }
-        }
-      }
-    },
-    "animationSideScaleSubtitle": {
-      "comment": "Side-dock animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shrinks toward the outer edge while fading."
-          }
-        }
-      }
-    },
-    "animationSideWipeSubtitle": {
-      "comment": "Side-dock wipe animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Closes across the glass toward the outer edge."
-          }
-        }
-      }
-    },
-    "animationSideSqueezeSubtitle": {
-      "comment": "Side-dock lengthwise wipe description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Closes from the top and bottom toward the center."
-          }
-        }
-      }
-    },
-    "animationSideBounceSubtitle": {
-      "comment": "Side-dock bounce animation description.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bounces inward, then retreats outward and fades."
-          }
-        }
-      }
-    },
-    "settingsEdgeTop": {
-      "comment": "Physical top edge choice in Dock placement settings.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Top"
-          }
-        }
-      }
-    },
-    "settingsTopReferenceHelp": {
-      "comment": "Subtitle beneath the disabled position reference picker for top docks. The saved choice for other edges is preserved.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Top placement always uses the usable desktop to avoid overlapping the menu bar and notch."
-          }
-        }
-      }
-    },
-    "behaviorTopZoneHelp": {
-      "comment": "Explains the separate activation anchor choices for top placement. Placement itself always uses the usable desktop.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Screen-edge activation at the top can also reveal the menu bar. Choose Dock position to activate beside the resting dock."
-          }
-        }
-      }
-    },
-    "animationTopLiftTitle": {
-      "comment": "Top-dock title for the existing lift and fade effect, which moves inward and down.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Down & Away"
-          }
-        }
-      }
-    },
-    "animationTopSlideFadeSubtitle": {
-      "comment": "Hiding description for slide and fade on a top dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slides upward toward the top edge while fading."
-          }
-        }
-      }
-    },
-    "animationTopSlideSubtitle": {
-      "comment": "Hiding description for slide on a top dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slides upward toward the top edge."
-          }
-        }
-      }
-    },
-    "animationTopLiftSubtitle": {
-      "comment": "Hiding description for lift and fade on a top dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moves down into the desktop while fading."
-          }
-        }
-      }
-    },
-    "animationTopScaleSubtitle": {
-      "comment": "Hiding description for scale and fade on a top dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shrinks toward the top edge while fading."
-          }
-        }
-      }
-    },
-    "animationTopWipeSubtitle": {
-      "comment": "Hiding description for the thickness wipe on a top dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collapses upward toward the top edge."
-          }
-        }
-      }
-    },
-    "animationTopBounceSubtitle": {
-      "comment": "Hiding description for bounce and fade on a top dock.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bounces down, then retreats upward while fading."
           }
         }
       }
@@ -2197,428 +961,188 @@
         }
       }
     },
-    "settingsIndicatorAura": {
-      "comment": "Running indicator with warm colored backlighting behind the icon.",
+    "behaviorActivationZone": {
+      "comment": "Settings card heading.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aura"
+            "value": "Activation Zone"
           }
         }
       }
     },
-    "settingsIndicatorBar": {
-      "comment": "Short line running-app marker option, oriented along the dock edge.",
+    "behaviorAnimation": {
+      "comment": "Animation styles card heading.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bar"
+            "value": "Animation"
           }
         }
       }
     },
-    "settingsIndicatorDot": {
-      "comment": "Circular running-app marker option.",
+    "behaviorAnimationHelp": {
+      "comment": "Animation and accessibility explanation.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dot"
+            "value": "Preview plays a sample dock. Zero duration is instant. Reduce Motion uses a brief fade for every style."
           }
         }
       }
     },
-    "settingsIndicatorGlitch": {
-      "comment": "Running indicator with offset cyan and pink silhouettes and pixel strips.",
+    "behaviorAutoHide": {
+      "comment": "Toggle for pointer-triggered dock visibility.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Glitch"
+            "value": "Automatically hide"
           }
         }
       }
     },
-    "settingsIndicatorHidden": {
-      "comment": "Hides running-app markers while preserving keyboard selection outlines.",
+    "behaviorCustomLength": {
+      "comment": "User-defined activation length along the selected screen edge.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hidden"
+            "value": "Custom length"
           }
         }
       }
     },
-    "settingsIndicatorHologram": {
-      "comment": "Metal running indicator with rainbow diffraction, scan lines, and a diagonal highlight.",
+    "behaviorCustomWidth": {
+      "comment": "Exact activation width in points.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hologram"
+            "value": "Custom width"
           }
         }
       }
     },
-    "settingsIndicatorNeon": {
-      "comment": "Running indicator with a cyan, blue, and pink luminous frame around the icon.",
+    "behaviorDiagramLegend": {
+      "comment": "Legend for the deterministic Settings zone diagram.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Neon"
+            "value": "Cyan: activation zone. Dashed outline: the area that keeps the dock visible while you approach it."
           }
         }
       }
     },
-    "settingsIndicatorOrbit": {
-      "comment": "Running indicator with an orbital arc and satellites around the icon.",
+    "behaviorDockLength": {
+      "comment": "Match activation length to the resting visible glass length.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orbit"
+            "value": "Dock length"
           }
         }
       }
     },
-    "settingsIndicatorPlasma": {
-      "comment": "Metal running indicator with electric cyan and violet filaments around the icon.",
+    "behaviorDockPosition": {
+      "comment": "Anchor activation at the resting glass bottom.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Plasma"
+            "value": "Dock position"
           }
         }
       }
     },
-    "settingsIndicatorPowerBadge": {
-      "comment": "Running indicator with a yellow lightning badge on the upper-right corner.",
+    "behaviorDockWidth": {
+      "comment": "Follow the resting dock width.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Power Badge"
+            "value": "Dock width"
           }
         }
       }
     },
-    "settingsIndicatorPrism": {
-      "comment": "Metal running indicator with an octagonal spectral bevel and bright facet edges.",
+    "behaviorDuration": {
+      "comment": "Reveal and hide duration, before reversal scaling.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prism"
+            "value": "Animation duration"
           }
         }
       }
     },
-    "settingsIndicatorSolarFlare": {
-      "comment": "Metal running indicator with a hot circular rim and orange solar rays.",
+    "behaviorHelp": {
+      "comment": "Auto-hide explanation.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Solar Flare"
+            "value": "Hide each dock when you’re not using it. Your system Dock settings stay unchanged."
           }
         }
       }
     },
-    "settingsIndicatorSquare": {
-      "comment": "Square running-app marker option.",
+    "behaviorHideDelay": {
+      "comment": "Delay after ending interaction.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Square"
+            "value": "Hide delay"
           }
         }
       }
     },
-    "settingsIndicatorStardust": {
-      "comment": "Running indicator with colored stars around the icon.",
+    "behaviorLengthMode": {
+      "comment": "Select how the activation region length along the dock is determined.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stardust"
+            "value": "Activation length"
           }
         }
       }
     },
-    "settingsIndicatorStyle": {
-      "comment": "Picker for the shape or visibility of running-app markers.",
+    "behaviorLocation": {
+      "comment": "Zone vertical anchor choice.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Indicator style"
+            "value": "Activation location"
           }
         }
       }
     },
-    "settingsIndicatorTargetLock": {
-      "comment": "Running indicator with four green corner brackets around the icon.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Target Lock"
-          }
-        }
-      }
-    },
-    "settingsPercent": {
-      "comment": "Unit for opacity controls, whose values range from zero to one hundred.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%"
-          }
-        }
-      }
-    },
-    "settingsRunningIndicators": {
-      "comment": "Appearance card for markers on applications that are running.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Running indicators"
-          }
-        }
-      }
-    },
-    "settingsRunningIndicatorsHelp": {
-      "comment": "Explains running markers versus keyboard selection, including how to reveal the selection outline.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Effects stay still and Hidden keeps icon spacing unchanged. Choose Focus Dock from the DeeDock menu to see the independent keyboard selection outline."
-          }
-        }
-      }
-    },
-    "settingsAppVisibility": {
-      "comment": "Behavior setting controlling which app section is hidden or collapsed.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App visibility"
-          }
-        }
-      }
-    },
-    "settingsAppVisibilityHelp": {
-      "comment": "Explains mutually exclusive app section visibility modes.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pinned apps stay in the pinned section while running. Collapse replaces one section with a button. Expansion lasts until clicked again or the dock is recreated."
-          }
-        }
-      }
-    },
-    "visibilityShowAll": {
-      "comment": "Show both app sections.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show all"
-          }
-        }
-      }
-    },
-    "visibilityHideRunning": {
-      "comment": "Completely omit unpinned running apps.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hide running apps"
-          }
-        }
-      }
-    },
-    "visibilityCollapseRunning": {
-      "comment": "Replace unpinned running apps with an expand button.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collapse running apps"
-          }
-        }
-      }
-    },
-    "visibilityHidePinned": {
-      "comment": "Completely omit pinned apps, including those that are running.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hide pinned apps"
-          }
-        }
-      }
-    },
-    "visibilityCollapsePinned": {
-      "comment": "Replace pinned apps with an expand button.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collapse pinned apps"
-          }
-        }
-      }
-    },
-    "sectionExpanded": {
-      "comment": "Accessibility value for an open app section.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Expanded"
-          }
-        }
-      }
-    },
-    "sectionCollapsed": {
-      "comment": "Accessibility value for a closed app section.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collapsed"
-          }
-        }
-      }
-    },
-    "sectionShowPinned": {
-      "comment": "Section-button action. count is the number of pinned apps, including zero.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show pinned apps (%1$(count)lld)"
-          }
-        }
-      }
-    },
-    "sectionHidePinned": {
-      "comment": "Section-button action. count is the number of pinned apps.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hide pinned apps (%1$(count)lld)"
-          }
-        }
-      }
-    },
-    "sectionShowRunning": {
-      "comment": "Section-button action. count is the number of unpinned running apps, including zero.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show running apps (%1$(count)lld)"
-          }
-        }
-      }
-    },
-    "sectionHideRunning": {
-      "comment": "Section-button action. count is the number of unpinned running apps.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hide running apps (%1$(count)lld)"
-          }
-        }
-      }
-    },
-    "settingsAppNames": {
-      "comment": "Appearance gallery title for hover tooltip presets.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App names"
-          }
-        }
-      }
-    },
-    "settingsAppNamesHelp": {
-      "comment": "Help for bundled tooltip presets.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Each preset includes its design, placement, hover delay, and entrance. Inward is toward the desktop; before and after follow app order. Keyboard labels appear immediately. Off preserves accessible app names."
-          }
-        }
-      }
-    },
-    "tooltipSampleApp": {
-      "comment": "Deterministic app name used only in Settings samples.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sample App"
-          }
-        }
-      }
-    },
-    "tooltipPlayPreview": {
-      "comment": "Button plays the selected tooltip delay and entrance on an inert sample.",
+    "behaviorPlayPreview": {
+      "comment": "Play one hide-and-reveal cycle using an inert sample.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2629,470 +1153,398 @@
         }
       }
     },
-    "tooltipClassic": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "behaviorRevealDelay": {
+      "comment": "Pointer dwell before revealing.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Classic"
+            "value": "Reveal delay"
           }
         }
       }
     },
-    "tooltipClassicDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "behaviorScreenEdge": {
+      "comment": "Anchor activation at the physical screen bottom.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · immediate · instant"
+            "value": "Screen edge"
           }
         }
       }
     },
-    "tooltipGlassPill": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "behaviorShowZone": {
+      "comment": "Show the selected display’s activation outline for ten seconds.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Glass pill"
+            "value": "Show Zone"
           }
         }
       }
     },
-    "tooltipGlassPillDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "behaviorTiming": {
+      "comment": "Delay controls card heading.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.15 s · fade"
+            "value": "Timing"
           }
         }
       }
     },
-    "tooltipCompact": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "behaviorTimingHelp": {
+      "comment": "Explains independent dwell and retention timers.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Compact"
+            "value": "Entering the zone starts the reveal delay. Leaving the dock and its approach area starts the hide delay."
           }
         }
       }
     },
-    "tooltipCompactDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "behaviorTopZoneHelp": {
+      "comment": "Explains the separate activation anchor choices for top placement. Placement itself always uses the usable desktop.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.35 s · fade"
+            "value": "Screen-edge activation at the top can also reveal the menu bar. Choose Dock position to activate beside the resting dock."
           }
         }
       }
     },
-    "tooltipPlain": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "behaviorWidthMode": {
+      "comment": "Zone width mode label.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Plain"
+            "value": "Activation width"
           }
         }
       }
     },
-    "tooltipPlainDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "behaviorZoneDepth": {
+      "comment": "Activation zone thickness measured inward from its outer edge.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · immediate · instant"
+            "value": "Activation depth"
           }
         }
       }
     },
-    "tooltipBold": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "behaviorZoneHeight": {
+      "comment": "Height of the trigger band in points.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bold"
+            "value": "Activation height"
           }
         }
       }
     },
-    "tooltipBoldDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "behaviorZoneHelp": {
+      "comment": "Explains length along the selected edge, inward depth, offset direction, and the safe approach region.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.15 s · fade"
+            "value": "The activation zone follows the selected dock edge. Length runs along the edge; depth extends inward. Positive offsets move right on top and bottom docks and down on side docks. The connecting region keeps the dock visible while you approach it."
           }
         }
       }
     },
-    "tooltipOutline": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "behaviorZoneOffset": {
+      "comment": "Signed activation-zone offset along the selected dock edge. Positive moves right below and down beside the display.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Outline"
+            "value": "Along-edge offset"
           }
         }
       }
     },
-    "tooltipOutlineDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayConnected": {
+      "comment": "Display connection status.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.20 s · fade"
+            "value": "Connected"
           }
         }
       }
     },
-    "tooltipAccent": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayConnectedGroup": {
+      "comment": "Sidebar section for online displays, including mirror followers.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accent"
+            "value": "Connected displays"
           }
         }
       }
     },
-    "tooltipAccentDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayCustomized": {
+      "comment": "Indicates an explicit per-setting display override.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.15 s · fade"
+            "value": "Customized"
           }
         }
       }
     },
-    "tooltipSpeechBubble": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayDefaults": {
+      "comment": "Sidebar section for shared settings inherited by displays.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Speech bubble"
+            "value": "Defaults"
           }
         }
       }
     },
-    "tooltipSpeechBubbleDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayDisconnected": {
+      "comment": "Display connection status; preferences remain editable.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.20 s · lift"
+            "value": "Disconnected"
           }
         }
       }
     },
-    "tooltipNameCard": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayDisconnectedHelp": {
+      "comment": "Offline profiles remain editable.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Name card"
+            "value": "Changes are saved for when this display reconnects."
           }
         }
       }
     },
-    "tooltipNameCardDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayDockDisabled": {
+      "comment": "Accessibility label for a disabled display dock.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.40 s · fade"
+            "value": "Dock disabled"
           }
         }
       }
     },
-    "tooltipLeadingTag": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayFollowingDefault": {
+      "comment": "Setting inherits the shared default, including future changes.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leading tag"
+            "value": "Following default"
           }
         }
       }
     },
-    "tooltipLeadingTagDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayIdentityWarning": {
+      "comment": "Missing or duplicate display identity: session-only state is used.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Before icon · 0.15 s · slide"
+            "value": "This display cannot be identified reliably. Changes apply only for this connection and won’t replace any saved display profile."
           }
         }
       }
     },
-    "tooltipTrailingTag": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayIndicatorEditing": {
+      "comment": "Badge shown on the physical monitor whose display-specific Settings are currently active. The monitor name appears below it.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Trailing tag"
+            "value": "Editing this display"
           }
         }
       }
     },
-    "tooltipTrailingTagDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayMirrorHelp": {
+      "comment": "Explains why a mirror follower does not create another panel.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "After icon · 0.15 s · slide"
+            "value": "While mirroring, the source display controls the dock. These preferences will apply when this display has its own desktop again."
           }
         }
       }
     },
-    "tooltipLeadingOutline": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayMirrored": {
+      "comment": "Status for a display showing another display’s desktop.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leading outline"
+            "value": "Mirrored"
           }
         }
       }
     },
-    "tooltipLeadingOutlineDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayPrimaryConnected": {
+      "comment": "Display status indicating the main display.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Before icon · 0.30 s · fade"
+            "value": "Connected · Primary"
           }
         }
       }
     },
-    "tooltipTrailingPill": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayProfilesError": {
+      "comment": "Shown in Settings when display metadata is malformed or cannot be saved.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Trailing pill"
+            "value": "Couldn’t read or save display preferences. Saved profiles have not been replaced."
           }
         }
       }
     },
-    "tooltipTrailingPillDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayRememberedGroup": {
+      "comment": "Sidebar section for retained profiles that are currently offline.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "After icon · 0.30 s · fade"
+            "value": "Disconnected displays"
           }
         }
       }
     },
-    "tooltipDockCaption": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displaySessionOnly": {
+      "comment": "Identity could not safely be persisted.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dock caption"
+            "value": "Session only"
           }
         }
       }
     },
-    "tooltipDockCaptionDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayShowDock": {
+      "comment": "Per-display visibility toggle; retained across reconnects.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dock center · immediate · crossfade"
+            "value": "Show Dock"
           }
         }
       }
     },
-    "tooltipDockTitle": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayUnnamed": {
+      "comment": "Fallback display name when macOS provides no localized name.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dock title"
+            "value": "Display"
           }
         }
       }
     },
-    "tooltipDockTitleDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "displayUseDefault": {
+      "comment": "Clear one display setting override.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dock center · 0.20 s · crossfade"
+            "value": "Use Default"
           }
         }
       }
     },
-    "tooltipLift": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "displayUseDefaults": {
+      "comment": "Clear all appearance and position overrides for this display; preserve pins and visibility.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lift"
+            "value": "Use Defaults"
           }
         }
       }
     },
-    "tooltipLiftDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+    "dockEmptyState": {
+      "comment": "Empty dock guidance. Opening an app makes it appear temporarily; pinning keeps it in the dock.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inward · 0.20 s · lift"
+            "value": "Open an app to see it in DeeDock. Pin it to keep it here."
           }
         }
       }
     },
-    "tooltipPop": {
-      "comment": "Name of a complete app-name tooltip preset.",
+    "dragCheckingApps": {
+      "comment": "Shown while dropped application bundles are being validated.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pop"
-          }
-        }
-      }
-    },
-    "tooltipPopDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inward · 0.15 s · scale"
-          }
-        }
-      }
-    },
-    "tooltipSpectrum": {
-      "comment": "Name of a complete app-name tooltip preset.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spectrum"
-          }
-        }
-      }
-    },
-    "tooltipSpectrumDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inward · 0.20 s · fade"
-          }
-        }
-      }
-    },
-    "tooltipOff": {
-      "comment": "Name of a complete app-name tooltip preset.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Off"
-          }
-        }
-      }
-    },
-    "tooltipOffDetail": {
-      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No visual app names"
-          }
-        }
-      }
-    },
-    "actionOpenFiles": {
-      "comment": "Context-menu and accessibility action. Choose files or folders to open in this application.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open Files…"
+            "value": "Checking applications…"
           }
         }
       }
@@ -3133,6 +1585,66 @@
         }
       }
     },
+    "dragPinHere": {
+      "comment": "Insertion feedback while dragging apps into a dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin here"
+          }
+        }
+      }
+    },
+    "dragPinnedSection": {
+      "comment": "Drop guidance when the pointer is over automatically ordered running apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag into the pinned section"
+          }
+        }
+      }
+    },
+    "dragRejected": {
+      "comment": "Drag feedback for an invalid batch or a destination whose pins cannot be edited.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drop applications only. Pins could not be changed."
+          }
+        }
+      }
+    },
+    "errorAppNotFound": {
+      "comment": "Missing-application error. appName is the name of the pinned application. Unpinning does not delete the application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(appName)@ couldn’t be found. You can unpin it, then pin it again after opening the app."
+          }
+        }
+      }
+    },
+    "errorHideApp": {
+      "comment": "Error banner shown when the foreground application rejects DeeDock's request to hide it. appName is the application name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t hide %1$(appName)@"
+          }
+        }
+      }
+    },
     "errorInvalidDocuments": {
       "comment": "File picker validation failure; no subset of the selection is opened.",
       "extractionState": "manual",
@@ -3141,6 +1653,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Choose accessible files or folders. Applications cannot be included."
+          }
+        }
+      }
+    },
+    "errorLoadPins": {
+      "comment": "Error banner when reading saved pins fails. details is the localized underlying error description.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t load pinned apps: %1$(details)@"
+          }
+        }
+      }
+    },
+    "errorOpenApp": {
+      "comment": "Error banner for a failed launch. appName is the application name; details is the localized underlying error description. Placeholders may be reordered.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t open %1$(appName)@: %2$(details)@"
           }
         }
       }
@@ -3157,17 +1693,122 @@
         }
       }
     },
-    "openFilesPickerTitle": {
-      "comment": "Native picker title. appName is the fixed destination application.",
+    "errorSavePins": {
+      "comment": "Error banner when saving pins fails. details is the localized underlying error description.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Files in %(appName)@"
+            "value": "Couldn’t save pinned apps: %1$(details)@"
           }
         }
       }
+    },
+    "folderStackAccessibilityLabel": {
+      "comment": "VoiceOver label for an open folder stack. folderName is the Finder display name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Folder stack: %1$(folderName)@" } } }
+    },
+    "folderStackAccessibilityValue": {
+      "comment": "VoiceOver value for a pinned folder icon.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Folder stack" } } }
+    },
+    "folderStackDockHint": {
+      "comment": "VoiceOver hint for a pinned folder icon.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Opens the folder stack" } } }
+    },
+    "folderStackEmpty": {
+      "comment": "Empty-state title for a folder with no visible children.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "This folder is empty" } } }
+    },
+    "folderStackGrid": {
+      "comment": "Folder stack presentation mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Grid" } } }
+    },
+    "folderStackItemUnavailable": {
+      "comment": "Inline error when a folder child disappeared before it opened. itemName is Finder's display name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "%1$(itemName)@ is no longer available." } } }
+    },
+    "folderStackItemCount": {
+      "comment": "VoiceOver value for an open folder stack. count is the number of visible immediate children; mode is the localized Grid or List name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "%1$(count)lld items, %2$(mode)@" } } }
+    },
+    "folderStackList": {
+      "comment": "Folder stack presentation mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "List" } } }
+    },
+    "folderStackLoading": {
+      "comment": "VoiceOver label while folder children are loading.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Loading folder" } } }
+    },
+    "folderStackOpen": {
+      "comment": "Action that opens a pinned folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Open Stack" } } }
+    },
+    "folderStackOpenFailed": {
+      "comment": "Inline error when macOS could not open a folder child. itemName is Finder's display name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t open %1$(itemName)@." } } }
+    },
+    "folderStackOpenHint": {
+      "comment": "VoiceOver hint for a regular file, package, or alias in a folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Opens with the default application" } } }
+    },
+    "folderStackPresentationControl": {
+      "comment": "VoiceOver label for the Grid and List presentation control.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Presentation" } } }
+    },
+    "folderStackRetry": {
+      "comment": "Retries loading the open folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Retry" } } }
+    },
+    "folderStackRevealHint": {
+      "comment": "VoiceOver hint for a subfolder in a folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Shows this folder in Finder" } } }
+    },
+    "folderStackSaveFailed": {
+      "comment": "Inline error shown when saving Grid or List mode fails.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t save the folder view." } } }
+    },
+    "folderStackShowInFinder": {
+      "comment": "Action that reveals a folder in Finder.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show in Finder" } } }
+    },
+    "folderStackUnavailable": {
+      "comment": "Error when a pinned folder bookmark cannot be resolved or read.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "This folder is unavailable." } } }
+    },
+    "folderStackUnavailableTitle": {
+      "comment": "Title for an inaccessible or failed folder stack.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Folder unavailable" } } }
+    },
+    "folderStackUseGrid": {
+      "comment": "Accessibility action that switches a folder stack to Grid mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Use Grid" } } }
+    },
+    "folderStackUseList": {
+      "comment": "Accessibility action that switches a folder stack to List mode.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Use List" } } }
     },
     "loginCancelRequest": {
       "comment": "Button withdrawing a login-item registration that is awaiting approval.",
@@ -3373,6 +2014,870 @@
         }
       }
     },
+    "onboardingAppearanceSummary": {
+      "comment": "Body of tour page 4, which demonstrates the appearance settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icon size, magnification, spacing, how running apps are marked, and how their names appear — set each one for every display or just one."
+          }
+        }
+      }
+    },
+    "onboardingAppearanceTitle": {
+      "comment": "Title of tour page 4, about appearance settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make it look right"
+          }
+        }
+      }
+    },
+    "onboardingBack": {
+      "comment": "Button that returns to the previous page of the tour.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "onboardingContinue": {
+      "comment": "Button that moves to the next page of the tour.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "onboardingDisplaysSummary": {
+      "comment": "Body of tour page 6.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each display keeps its own pinned apps and can override any shared setting. Disconnected displays are remembered."
+          }
+        }
+      }
+    },
+    "onboardingDisplaysTitle": {
+      "comment": "Title of tour page 6, about per-display docks.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One dock for every display"
+          }
+        }
+      }
+    },
+    "onboardingFinish": {
+      "comment": "Button on the last page of the tour that closes it.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Using DeeDock"
+          }
+        }
+      }
+    },
+    "onboardingHidingSummary": {
+      "comment": "Body of tour page 5. 'activation zone' is the strip of screen that reveals a hidden dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide the dock and bring it back by reaching an activation zone you define. Tune how long it waits and how it moves."
+          }
+        }
+      }
+    },
+    "onboardingHidingTitle": {
+      "comment": "Title of tour page 5, about auto-hide and activation zones.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Out of the way until you need it"
+          }
+        }
+      }
+    },
+    "onboardingOpenDesktopAndDock": {
+      "comment": "Button on tour page 2 that opens the macOS Desktop & Dock settings pane. Use Apple's translation of the pane name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Desktop & Dock"
+          }
+        }
+      }
+    },
+    "onboardingOpenSettings": {
+      "comment": "Button on the last page of the tour that opens DeeDock's Settings window.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "onboardingPlacementBottom": {
+      "comment": "Accessibility label for the bottom-edge target on tour page 3.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Place the dock at the bottom"
+          }
+        }
+      }
+    },
+    "onboardingPlacementLeft": {
+      "comment": "Accessibility label for the left-edge target on tour page 3.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Place the dock on the left"
+          }
+        }
+      }
+    },
+    "onboardingPlacementPickerLabel": {
+      "comment": "Accessibility label for the interactive screen diagram on tour page 3, whose four edges choose where the dock sits.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock placement"
+          }
+        }
+      }
+    },
+    "onboardingPlacementPrompt": {
+      "comment": "Prompt under the interactive diagram on tour page 3. Shown only on pages a person can operate.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Click an edge to move your dock there."
+          }
+        }
+      }
+    },
+    "onboardingPlacementRight": {
+      "comment": "Accessibility label for the right-edge target on tour page 3.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Place the dock on the right"
+          }
+        }
+      }
+    },
+    "onboardingPlacementSummary": {
+      "comment": "Body of tour page 3, which lets a person pick a screen edge and moves the real dock to it.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an edge and your dock moves there now. Alignment, offset, and distance from the edge are waiting in Settings."
+          }
+        }
+      }
+    },
+    "onboardingPlacementTitle": {
+      "comment": "Title of tour page 3, about dock placement.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Put it where you want it"
+          }
+        }
+      }
+    },
+    "onboardingPlacementTop": {
+      "comment": "Accessibility label for the top-edge target on tour page 3.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Place the dock at the top"
+          }
+        }
+      }
+    },
+    "onboardingProgress": {
+      "comment": "Accessibility label for the tour's page indicator. Both values are page numbers.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Step %1$(step)lld of %2$(total)lld"
+          }
+        }
+      }
+    },
+    "onboardingReadyKeyboard": {
+      "comment": "Hint on tour page 7. 'Focus Dock' is a DeeDock menu command; keep it consistent with the command's own translation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press Command-Comma for Settings, or choose Focus Dock to move through your apps with the arrow keys."
+          }
+        }
+      }
+    },
+    "onboardingReadyMenuBar": {
+      "comment": "Hint on tour page 7. 'menu bar' is the macOS menu bar.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DeeDock lives in the menu bar. Its icon is where you find Settings and Quit."
+          }
+        }
+      }
+    },
+    "onboardingReadyPinning": {
+      "comment": "Hint on tour page 7. Keep the Pin/Unpin terminology used throughout DeeDock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag an app from Finder onto the dock to pin it, or right-click any app for Pin and Unpin."
+          }
+        }
+      }
+    },
+    "onboardingReadySummary": {
+      "comment": "Body of tour page 7, introducing a short list of hints.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three things worth knowing before you start."
+          }
+        }
+      }
+    },
+    "onboardingReadyTitle": {
+      "comment": "Title of tour page 7, the closing page.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You’re set"
+          }
+        }
+      }
+    },
+    "onboardingShowWelcome": {
+      "comment": "Menu command that reopens the first-launch tour.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welcome to DeeDock"
+          }
+        }
+      }
+    },
+    "onboardingSkip": {
+      "comment": "Button that passes over the optional macOS Dock guide.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "onboardingSystemDockStatusClear": {
+      "comment": "Live status on tour page 2 once the system Dock no longer reserves screen space.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your desktop is clear."
+          }
+        }
+      }
+    },
+    "onboardingSystemDockStatusReserving": {
+      "comment": "Live status on tour page 2 while the system Dock reserves screen space. Describes reserved space, not the state of a switch.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The macOS Dock is still holding space on your desktop."
+          }
+        }
+      }
+    },
+    "onboardingSystemDockStepOne": {
+      "comment": "First numbered instruction on tour page 2. 'Desktop & Dock' is the macOS settings pane name; use Apple's translation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open System Settings, then Desktop & Dock."
+          }
+        }
+      }
+    },
+    "onboardingSystemDockStepTwo": {
+      "comment": "Second numbered instruction on tour page 2. The quoted text is a macOS switch label; use Apple's translation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on “Automatically hide and show the Dock”."
+          }
+        }
+      }
+    },
+    "onboardingSystemDockSummary": {
+      "comment": "Body of tour page 2. Currently unused in layout, retained for translators if the page changes.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DeeDock the space."
+          }
+        }
+      }
+    },
+    "onboardingSystemDockTitle": {
+      "comment": "Title of tour page 2, the guide to hiding the system Dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move the macOS Dock aside"
+          }
+        }
+      }
+    },
+    "onboardingWelcomeSummary": {
+      "comment": "Body of tour page 1. 'menu bar' is the macOS menu bar.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DeeDock is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
+          }
+        }
+      }
+    },
+    "onboardingWelcomeTitle": {
+      "comment": "Title of tour page 1, introducing the product.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Dock that does what you want"
+          }
+        }
+      }
+    },
+    "onboardingWindowTitle": {
+      "comment": "Title of the first-launch tour window. Not shown in the title bar; read by VoiceOver and listed in the Window menu.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welcome to DeeDock"
+          }
+        }
+      }
+    },
+    "openFilesPickerTitle": {
+      "comment": "Native picker title. appName is the fixed destination application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Files in %(appName)@"
+          }
+        }
+      }
+    },
+    "sectionCollapsed": {
+      "comment": "Accessibility value for a closed app section.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapsed"
+          }
+        }
+      }
+    },
+    "sectionExpanded": {
+      "comment": "Accessibility value for an open app section.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expanded"
+          }
+        }
+      }
+    },
+    "sectionHidePinned": {
+      "comment": "Section-button action. count is the number of pinned apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide pinned apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "sectionHideRunning": {
+      "comment": "Section-button action. count is the number of unpinned running apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide running apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "sectionShowPinned": {
+      "comment": "Section-button action. count is the number of pinned apps, including zero.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show pinned apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "sectionShowRunning": {
+      "comment": "Section-button action. count is the number of unpinned running apps, including zero.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show running apps (%1$(count)lld)"
+          }
+        }
+      }
+    },
+    "settingsAlignBottom": {
+      "comment": "Align a vertical dock near the bottom of the display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom"
+          }
+        }
+      }
+    },
+    "settingsAlignCenter": {
+      "comment": "Horizontal center alignment.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Center"
+          }
+        }
+      }
+    },
+    "settingsAlignLeft": {
+      "comment": "Physical left alignment, not text reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left"
+          }
+        }
+      }
+    },
+    "settingsAlignRight": {
+      "comment": "Physical right alignment, not text reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right"
+          }
+        }
+      }
+    },
+    "settingsAlignTop": {
+      "comment": "Align a vertical dock near the top of the display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top"
+          }
+        }
+      }
+    },
+    "settingsAlignment": {
+      "comment": "Alignment control label. Choices run left/center/right on top and bottom docks and top/center/bottom on side docks.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alignment"
+          }
+        }
+      }
+    },
+    "settingsAllowedRange": {
+      "comment": "Numeric field help. lower and upper are locale-formatted numeric limits. Units appear next to the field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowed range: %1$(lower)@ to %2$(upper)@."
+          }
+        }
+      }
+    },
+    "settingsAlongEdgeOffset": {
+      "comment": "Signed position offset. Positive moves right on top and bottom docks and down on side docks.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Along-edge offset"
+          }
+        }
+      }
+    },
+    "settingsAnimateIndicators": {
+      "comment": "Toggle for motion in the running indicators that have any. Unavailable while a still style is selected.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Animate indicators"
+          }
+        }
+      }
+    },
+    "settingsAppNames": {
+      "comment": "Appearance gallery title for hover tooltip presets.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App names"
+          }
+        }
+      }
+    },
+    "settingsAppNamesHelp": {
+      "comment": "Help for bundled tooltip presets.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each preset includes its design, placement, hover delay, and entrance. Inward is toward the desktop; before and after follow app order. Keyboard labels appear immediately. Off preserves accessible app names."
+          }
+        }
+      }
+    },
+    "settingsAppVisibility": {
+      "comment": "Behavior setting controlling which app section is hidden or collapsed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App visibility"
+          }
+        }
+      }
+    },
+    "settingsAppVisibilityHelp": {
+      "comment": "Explains mutually exclusive app section visibility modes.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinned apps stay in the pinned section while running. Collapse replaces one section with a button. Expansion lasts until clicked again or the dock is recreated."
+          }
+        }
+      }
+    },
+    "settingsAppearance": {
+      "comment": "Settings section heading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance"
+          }
+        }
+      }
+    },
+    "settingsAppearanceHelp": {
+      "comment": "Explains effective versus requested size and accessibility behavior.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crowded docks use smaller icons before scrolling. Reduce Motion disables magnification without changing your preference."
+          }
+        }
+      }
+    },
+    "settingsAppearanceKeywords": {
+      "comment": "Space-separated search synonyms for the Appearance pane; translate to words a user would type, not literally.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "icon size magnification zoom scale hover running indicator dot bar square hidden neon aura glow target orbit stardust power badge glitch plasma hologram solar flare prism shader metal background opacity transparency floating icons idle fading dimming delay restore tooltip app names labels presets caption"
+          }
+        }
+      }
+    },
+    "settingsBehavior": {
+      "comment": "Settings navigation category for auto-hide and activation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behavior"
+          }
+        }
+      }
+    },
+    "settingsBehaviorKeywords": {
+      "comment": "Space-separated search synonyms for auto-hide, activation dimensions, and animations.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "auto hide reveal activation zone length depth width height offset delay animation duration preview edge app visibility hide pinned running collapse expand sections"
+          }
+        }
+      }
+    },
+    "settingsBottomDistance": {
+      "comment": "Distance from the chosen bottom edge to the glass bottom, in points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom distance"
+          }
+        }
+      }
+    },
+    "settingsCardAnchor": {
+      "comment": "Heading for the group choosing the reference frame and horizontal alignment.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anchor"
+          }
+        }
+      }
+    },
+    "settingsCardFineTuning": {
+      "comment": "Heading for the group with the offset and bottom distance sliders.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fine-tuning"
+          }
+        }
+      }
+    },
+    "settingsCardIcons": {
+      "comment": "Heading for the icon size and magnification group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icons"
+          }
+        }
+      }
+    },
+    "settingsDockOverlapHelp": {
+      "comment": "Coexistence note; no system preferences are changed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen-edge positioning can overlap the system Dock. An automatically hidden system Dock may overlap either mode."
+          }
+        }
+      }
+    },
+    "settingsEdge": {
+      "comment": "Physical display edge picker in Position settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edge"
+          }
+        }
+      }
+    },
+    "settingsEdgeBottom": {
+      "comment": "Dock on the bottom edge of the display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bottom"
+          }
+        }
+      }
+    },
+    "settingsEdgeDistance": {
+      "comment": "Distance from the chosen reference edge to the outer edge of the glass.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edge distance"
+          }
+        }
+      }
+    },
+    "settingsEdgeLeft": {
+      "comment": "Physical left display edge, independent of reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left"
+          }
+        }
+      }
+    },
+    "settingsEdgeRight": {
+      "comment": "Physical right display edge, independent of reading direction.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right"
+          }
+        }
+      }
+    },
+    "settingsEdgeTop": {
+      "comment": "Physical top edge choice in Dock placement settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top"
+          }
+        }
+      }
+    },
     "settingsGeneral": {
       "comment": "Sidebar title for app-wide settings, separate from display defaults and overrides.",
       "extractionState": "manual",
@@ -3393,6 +2898,1062 @@
           "stringUnit": {
             "state": "translated",
             "value": "general login startup automatic launch launch at login"
+          }
+        }
+      }
+    },
+    "settingsGroupDock": {
+      "comment": "Sidebar group heading collecting the dock configuration panes.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock"
+          }
+        }
+      }
+    },
+    "settingsHorizontalOffset": {
+      "comment": "Signed offset in points; positive is right.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horizontal offset"
+          }
+        }
+      }
+    },
+    "settingsIconSize": {
+      "comment": "Requested resting app icon size in logical points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icon size"
+          }
+        }
+      }
+    },
+    "settingsIndicatorBar": {
+      "comment": "Short line running-app marker option, oriented along the dock edge.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar"
+          }
+        }
+      }
+    },
+    "settingsIndicatorDot": {
+      "comment": "Circular running-app marker option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dot"
+          }
+        }
+      }
+    },
+    "settingsIndicatorGlitch": {
+      "comment": "Metal running indicator: the app icon's own rows slip sideways and its colour channels separate.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glitch"
+          }
+        }
+      }
+    },
+    "settingsIndicatorHidden": {
+      "comment": "Hides running-app markers while preserving keyboard selection outlines.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden"
+          }
+        }
+      }
+    },
+    "settingsIndicatorHologram": {
+      "comment": "Metal running indicator: a diffraction rim with scan lines around the app icon's own outline.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hologram"
+          }
+        }
+      }
+    },
+    "settingsIndicatorLavaChrome": {
+      "comment": "Metal running indicator: molten chrome that eats into the app icon's own edges and corners.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lava Chrome"
+          }
+        }
+      }
+    },
+    "settingsIndicatorOrbit": {
+      "comment": "Running indicator with an orbital arc and satellites around the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orbit"
+          }
+        }
+      }
+    },
+    "settingsIndicatorPlasma": {
+      "comment": "Metal running indicator: an electric filament that traces the app icon's own outline.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plasma"
+          }
+        }
+      }
+    },
+    "settingsIndicatorPowerBadge": {
+      "comment": "Running indicator with a yellow lightning badge on the upper-right corner.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Badge"
+          }
+        }
+      }
+    },
+    "settingsIndicatorPrism": {
+      "comment": "Metal running indicator: turning spectral facets around the app icon's own outline.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prism"
+          }
+        }
+      }
+    },
+    "settingsIndicatorSingularity": {
+      "comment": "Metal running indicator: an orbiting black hole that bends and swallows part of the app icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Singularity"
+          }
+        }
+      }
+    },
+    "settingsIndicatorSolarFlare": {
+      "comment": "Metal running indicator: hot rays reaching out from the app icon's own outline.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solar Flare"
+          }
+        }
+      }
+    },
+    "settingsIndicatorSquare": {
+      "comment": "Square running-app marker option.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Square"
+          }
+        }
+      }
+    },
+    "settingsIndicatorStardust": {
+      "comment": "Running indicator: sparkles popping in and out around the app icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stardust"
+          }
+        }
+      }
+    },
+    "settingsIndicatorStyle": {
+      "comment": "Picker for the shape or visibility of running-app markers.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indicator style"
+          }
+        }
+      }
+    },
+    "settingsIndicatorTargetLock": {
+      "comment": "Running indicator with four green corner brackets around the icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Target Lock"
+          }
+        }
+      }
+    },
+    "settingsInvalidNumber": {
+      "comment": "Inline feedback for incomplete, invalid, or out-of-range numeric input.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a number within the allowed range."
+          }
+        }
+      }
+    },
+    "settingsItemSpacing": {
+      "comment": "Gap between neighboring Dock items in logical points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Item spacing"
+          }
+        }
+      }
+    },
+    "settingsLoadError": {
+      "comment": "Corrupt saved settings are preserved until the user explicitly resets.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t read saved settings. Defaults are being used. Choose Restore Defaults to replace the unreadable settings; your pinned apps will be kept."
+          }
+        }
+      }
+    },
+    "settingsMagnification": {
+      "comment": "Maximum hover scale; 1 means no magnification.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maximum magnification"
+          }
+        }
+      }
+    },
+    "settingsMultiplier": {
+      "comment": "Unit symbol for magnification scale.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "×"
+          }
+        }
+      }
+    },
+    "settingsNoMatches": {
+      "comment": "Shown in the settings sidebar when a search filters out every pane.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No settings match your search."
+          }
+        }
+      }
+    },
+    "settingsPercent": {
+      "comment": "Unit for opacity controls, whose values range from zero to one hundred.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%"
+          }
+        }
+      }
+    },
+    "settingsPoints": {
+      "comment": "Abbreviation for logical points in numeric settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pt"
+          }
+        }
+      }
+    },
+    "settingsPosition": {
+      "comment": "Settings section heading.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Position"
+          }
+        }
+      }
+    },
+    "settingsPositionHelp": {
+      "comment": "Explains physical offset direction, edge distance, and clamping for all dock edges.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Positive offsets move right on top and bottom docks and down on side docks. Edge distance measures to the outside of the glass. Placement is constrained to the display; requested values remain saved."
+          }
+        }
+      }
+    },
+    "settingsPositionKeywords": {
+      "comment": "Space-separated search synonyms for all four physical edge placement settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "edge bottom left right top center alignment offset distance usable desktop screen position vertical horizontal"
+          }
+        }
+      }
+    },
+    "settingsPositionReference": {
+      "comment": "Label for the frame used to measure dock placement.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Position relative to"
+          }
+        }
+      }
+    },
+    "settingsPreview": {
+      "comment": "Heading for the illustrated, non-interactive preview of the current settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preview"
+          }
+        }
+      }
+    },
+    "settingsPreviewDisclaimer": {
+      "comment": "Clarifies that the preview uses sample icons and a stand-in display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An illustration of your settings, not a live view of your dock."
+          }
+        }
+      }
+    },
+    "settingsRestoreDefaults": {
+      "comment": "Resets configuration only; pinned apps are preserved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore Defaults"
+          }
+        }
+      }
+    },
+    "settingsRunningIndicators": {
+      "comment": "Appearance card for markers on applications that are running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running indicators"
+          }
+        }
+      }
+    },
+    "settingsRunningIndicatorsHelp": {
+      "comment": "Explains running markers versus keyboard selection, including how to reveal the selection outline.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DeeDock menu to see the independent keyboard selection outline."
+          }
+        }
+      }
+    },
+    "settingsSaveError": {
+      "comment": "A failed edit was not published; user can retry.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t save settings. Your previous settings are still in use."
+          }
+        }
+      }
+    },
+    "settingsScreenEdge": {
+      "comment": "Physical display frame, including areas occupied by the system Dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen edge"
+          }
+        }
+      }
+    },
+    "settingsSearchPrompt": {
+      "comment": "Placeholder in the settings sidebar search field.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        }
+      }
+    },
+    "settingsSeconds": {
+      "comment": "Unit abbreviation for seconds.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "s"
+          }
+        }
+      }
+    },
+    "settingsSelectCategory": {
+      "comment": "Placeholder shown when no settings pane is selected.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a settings category"
+          }
+        }
+      }
+    },
+    "settingsTopReferenceHelp": {
+      "comment": "Subtitle beneath the disabled position reference picker for top docks. The saved choice for other edges is preserved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top placement always uses the usable desktop to avoid overlapping the menu bar and notch."
+          }
+        }
+      }
+    },
+    "settingsUsableDesktop": {
+      "comment": "Frame excluding space reserved by macOS, including the system Dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usable desktop"
+          }
+        }
+      }
+    },
+    "tooltipAccent": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accent"
+          }
+        }
+      }
+    },
+    "tooltipAccentDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipBold": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bold"
+          }
+        }
+      }
+    },
+    "tooltipBoldDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipClassic": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Classic"
+          }
+        }
+      }
+    },
+    "tooltipClassicDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · immediate · instant"
+          }
+        }
+      }
+    },
+    "tooltipCompact": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compact"
+          }
+        }
+      }
+    },
+    "tooltipCompactDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.35 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipDockCaption": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock caption"
+          }
+        }
+      }
+    },
+    "tooltipDockCaptionDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock center · immediate · crossfade"
+          }
+        }
+      }
+    },
+    "tooltipDockTitle": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock title"
+          }
+        }
+      }
+    },
+    "tooltipDockTitleDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock center · 0.20 s · crossfade"
+          }
+        }
+      }
+    },
+    "tooltipGlassPill": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glass pill"
+          }
+        }
+      }
+    },
+    "tooltipGlassPillDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipLeadingOutline": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leading outline"
+          }
+        }
+      }
+    },
+    "tooltipLeadingOutlineDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before icon · 0.30 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipLeadingTag": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leading tag"
+          }
+        }
+      }
+    },
+    "tooltipLeadingTagDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before icon · 0.15 s · slide"
+          }
+        }
+      }
+    },
+    "tooltipLift": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lift"
+          }
+        }
+      }
+    },
+    "tooltipLiftDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · lift"
+          }
+        }
+      }
+    },
+    "tooltipNameCard": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name card"
+          }
+        }
+      }
+    },
+    "tooltipNameCardDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.40 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipOff": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        }
+      }
+    },
+    "tooltipOffDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No visual app names"
+          }
+        }
+      }
+    },
+    "tooltipOutline": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outline"
+          }
+        }
+      }
+    },
+    "tooltipOutlineDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipPlain": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plain"
+          }
+        }
+      }
+    },
+    "tooltipPlainDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · immediate · instant"
+          }
+        }
+      }
+    },
+    "tooltipPlayPreview": {
+      "comment": "Button plays the selected tooltip delay and entrance on an inert sample.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play Preview"
+          }
+        }
+      }
+    },
+    "tooltipPop": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pop"
+          }
+        }
+      }
+    },
+    "tooltipPopDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.15 s · scale"
+          }
+        }
+      }
+    },
+    "tooltipSampleApp": {
+      "comment": "Deterministic app name used only in Settings samples.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample App"
+          }
+        }
+      }
+    },
+    "tooltipSpectrum": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spectrum"
+          }
+        }
+      }
+    },
+    "tooltipSpectrumDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipSpeechBubble": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech bubble"
+          }
+        }
+      }
+    },
+    "tooltipSpeechBubbleDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inward · 0.20 s · lift"
+          }
+        }
+      }
+    },
+    "tooltipTrailingPill": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trailing pill"
+          }
+        }
+      }
+    },
+    "tooltipTrailingPillDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After icon · 0.30 s · fade"
+          }
+        }
+      }
+    },
+    "tooltipTrailingTag": {
+      "comment": "Name of a complete app-name tooltip preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trailing tag"
+          }
+        }
+      }
+    },
+    "tooltipTrailingTagDetail": {
+      "comment": "Tooltip placement, hover delay in seconds, and entrance. Before and after follow dock app order; inward means toward the desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After icon · 0.15 s · slide"
+          }
+        }
+      }
+    },
+    "visibilityCollapsePinned": {
+      "comment": "Replace pinned apps with an expand button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse pinned apps"
+          }
+        }
+      }
+    },
+    "visibilityCollapseRunning": {
+      "comment": "Replace unpinned running apps with an expand button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse running apps"
+          }
+        }
+      }
+    },
+    "visibilityHidePinned": {
+      "comment": "Completely omit pinned apps, including those that are running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide pinned apps"
+          }
+        }
+      }
+    },
+    "visibilityHideRunning": {
+      "comment": "Completely omit unpinned running apps.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide running apps"
+          }
+        }
+      }
+    },
+    "visibilityShowAll": {
+      "comment": "Show both app sections.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show all"
           }
         }
       }

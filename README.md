@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -71,8 +71,10 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 DeeDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DeeDock; dedicated coexistence controls are future work.
 
-- Click an icon to open or activate its application.
-- Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Neon, Aura, Target Lock, Orbit, Stardust, Power Badge, Glitch, Plasma, Hologram, Solar Flare, Prism, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
+- Click an icon to open or activate its application. Click the foreground application's icon to hide all of its windows; click again to show and activate it.
+- Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Target Lock, Orbit, Stardust, Power Badge, Glitch, Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
+- Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, and Glitch are Metal layer effects that read the app's own artwork: the light follows the icon's real silhouette and borrows its colours, and each app draws a different figure from a seed derived from its bundle identifier, so the same app always looks the same. Lava Chrome melts the icon's own corners and edges, Singularity puts an orbiting black hole that lenses and swallows part of the artwork, and Glitch slips its rows sideways and separates its colour channels. **Animate indicators** switches motion on for those seven and for Stardust; it is on by default, honours Reduce Motion, and stops while a dock is hidden or has faded out.
+- Neon and Aura were withdrawn. A saved preference naming either migrates to Plasma and Solar Flare respectively, rather than failing to load.
 - Right-click an app for **Open**, **Pin**, or **Unpin**. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
 - Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
@@ -80,7 +82,7 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Stacks/Trash and window previews are not implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks are implemented. Trash and window previews are not implemented.
 
 ## Launch at login
 
@@ -92,10 +94,24 @@ Turning off Launch at Login prevents future automatic launches and leaves DeeDoc
 
 The implementation uses `SMAppService.mainApp`; it stores no duplicate preference and installs no helper or launch-agent plist. Registration is opt-in. Real registration and logout/login acceptance require a consistently signed installed copy; see [acceptance notes](docs/ACCEPTANCE.md#launch-at-login).
 
-## Arrange applications with drag-and-drop
+## First launch
+
+The first time DeeDock runs, a tour opens over the desktop. The docks are already live behind it, so every page describes something you can see. Seven pages: what DeeDock is, a guide to hiding the macOS Dock, placement, running indicators, auto-hide, one dock per display, and a closing page with the launch-at-login toggle.
+
+Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DeeDock** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
+
+One page changes a setting; the rest only demonstrate. **Put it where you want it** lets you click a screen edge, which sets **Edge** in shared defaults and moves the docks immediately. It writes shared defaults only and leaves per-display overrides alone, so a display already overriding that control keeps its own value, and the change is reversible in Settings.
+
+That page carries a prompt line under its illustration and its handles respond to the pointer. The prompt is the only signal that a page is interactive; pages without one do nothing when clicked.
+
+The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DeeDock never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames, because an App Sandbox cannot read another application's preferences: turning on *Automatically hide and show the Dock* releases the space and clears the status, while moving the Dock to another edge does not. The page can be skipped.
+
+The illustrations use production code, not artwork. Placement runs the same `DockPlacement` calculation as a real dock, the running indicators are drawn by `DockIconIndicator` and `DockRunningIndicator`, and the auto-hide page is driven by the real `DockVisibilityController`. Reduce Motion holds a single frame on every page and cross-fades between them instead of sliding; Reduce Transparency uses opaque backgrounds. Only the visible page animates.
+
+## Arrange pins with drag-and-drop
 
 - Drag a pinned app along the dock to reorder it. Drag a running app into the pinned section to pin it at that position. Running-only order remains automatic.
-- Drop one or more application bundles from Finder into the pinned section. The whole batch must contain valid, accessible applications other than DeeDock. Existing pins move into the dropped block; duplicate app identities appear only once.
+- Drop one or more application bundles or ordinary folders from Finder into the pinned section. Mixed app-and-folder batches are accepted in Finder order. The whole batch must be pinnable: plain files, packages, aliases, unreadable items, and DeeDock itself reject the pin operation. Existing pins move into the dropped block; duplicate app identities and resolved folder locations appear only once.
 - Drag an app onto another display’s DeeDock to pin it there without removing the source pin. An existing destination pin moves to the chosen position.
 - Drag a pin at least 64 points outside its dock to see **Unpin**, then release to unpin it. Returning closer or pressing Escape cancels removal. Releasing over another DeeDock that rejects the drop keeps the source pin. Running apps remain in the running section after unpinning; applications are never quit or deleted.
 - During dragging, magnification settles to resting icon sizes and a live gap shows insertion. Overflowing docks scroll near their viewport edges. A hidden dock uses its existing activation zone and reveal delay; the source and revealed destination stay visible during the relevant interaction.
@@ -103,9 +119,21 @@ The implementation uses `SMAppService.mainApp`; it stores no duplicate preferenc
 
 Right-click a pin for **Move Left** and **Move Right** on a top or bottom dock, or **Move Up** and **Move Down** on a side dock. **Pin on Display…** works with every edge. With **Focus Dock** active, hold Option with the corresponding arrow key to reorder the selected pin; ordinary arrows navigate. VoiceOver exposes equivalent move and destination actions. The Pin on Display menu appends a new pin and leaves an existing destination pin in place.
 
-Finder imports retain optional read-only security-scoped bookmarks so user-selected application bundles can remain accessible after restart. Older pins retain their existing format and identity. DeeDock adds only the app-scoped bookmark capability to its existing sandbox configuration; no Accessibility grant or system Dock preference changes are involved. Missing applications remain visible as unavailable pins.
+Finder imports retain read-only security-scoped bookmarks so user-selected application bundles and folders can remain accessible after restart. Application-only lists migrate once to typed v3 pins; the older bytes remain untouched for rollback and recovery. DeeDock adds only the app-scoped bookmark capability to its existing sandbox configuration; no Accessibility grant or system Dock preference changes are involved. Missing applications and unresolved folders remain visible as unavailable pins.
 
-File export and selecting multiple apps within DeeDock remain outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
+Selecting multiple pins within DeeDock remains outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
+
+## Folder stacks
+
+Click a pinned folder to open one transient stack inward from its dock icon. Only one stack can be open across all displays. The header shows the Finder folder name and a per-pin Grid/List choice; both modes scroll and hide hidden children. Items are sorted together by localized name without grouping folders first.
+
+The stack shows immediate children only. Click a regular file, package, or alias to open it with its default application. Click a subfolder to reveal it in Finder. Drag one child to Finder or another app through the native file-drag session; the destination and modifier keys negotiate copy or move, and DeeDock never changes the filesystem itself. A cancelled drag leaves the stack open.
+
+The source dock stays revealed and suppresses fading and tooltips while its stack is open. The panel closes after a successful open or drag, outside click, Escape, another stack opening, source removal/hiding, display removal, sleep, or shutdown. Failed opens remain visible with a retryable inline error. Directory changes are watched only while the panel is open.
+
+Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Escape returns focus to the source folder, and Tab reaches the Grid/List control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
+
+Trash, Fan and Automatic presentations, nested browsing, search, Quick Look, multi-selection, file promises, dropping into a folder, and persistent utility windows remain planned.
 
 ## Open files and folders in an app
 
@@ -295,6 +323,7 @@ The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing t
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
 - `DeeDock/Settings` groups shared settings, display profiles and persistence, sidebar navigation, and focused native controls. `General` contains the app-owned login-item controller, service boundary, and presentation.
+- `DeeDock/Onboarding` holds the first-launch tour: step and reservation models, the completion record, navigation and screen-observation state, its AppKit window, and views. The models stay free of SwiftUI so the test target does not pull in the settings view layer.
 - `DeeDockTests` contains the focused model tests. The Xcode **Test Model Sources** group references the app's source files for the unhosted test target; it does not contain copies.
 
 Useful previews live beside their views: pinned/running/unavailable apps, launch progress, empty content, error text, and dark appearance with reduced motion/transparency. Open the canvas for `DockContentView`, `DockAppButton`, `DockBackgroundView`, or `DockErrorBanner`. Settings previews include multiple displays, per-setting overrides, and a disconnected display using isolated in-memory stores. Previews do not construct live workspace services, read saved pins, or launch applications. Production accessibility values are read from SwiftUI's environment and passed into the same presentation components used by previews.

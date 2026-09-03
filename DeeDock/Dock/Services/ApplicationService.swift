@@ -52,6 +52,18 @@ final class ApplicationService: ApplicationServicing {
     /// Releases icons no longer referenced by any active dock snapshot.
     func pruneIcons(keeping urls: Set<URL>) { iconCache = iconCache.filter { urls.contains($0.key) } }
 
+    /// Hides the selected app when it is already foreground, otherwise opens or activates it.
+    ///
+    /// The live foreground process is checked at click time. Dock snapshots intentionally track
+    /// only running state and may lag behind activation changes by one main-run-loop turn.
+    func performPrimaryAction(_ reference: ApplicationReference) async throws {
+        if let frontmost = workspace.frontmostApplication, matches(frontmost, reference: reference) {
+            guard frontmost.hide() else { throw ApplicationPrimaryActionError.hideRejected }
+            return
+        }
+        try await open(reference)
+    }
+
     /// Opens or activates the referenced app without requesting a new process instance.
     /// - Throws: A missing-bundle error or the failure reported by Launch Services.
     /// - Note: Cancellation cannot undo a launch already submitted to macOS.
@@ -84,6 +96,15 @@ final class ApplicationService: ApplicationServicing {
         configuration.activates = true
         configuration.createsNewApplicationInstance = false
         _ = try await workspace.open(documents.urls, withApplicationAt: url, configuration: configuration)
+    }
+
+    /// Bundle identity is primary because an application may move after it was pinned.
+    /// URL identity keeps bundle-less application references usable.
+    private func matches(_ application: NSRunningApplication, reference: ApplicationReference) -> Bool {
+        if let bundleIdentifier = reference.bundleIdentifier {
+            return application.bundleIdentifier == bundleIdentifier
+        }
+        return application.bundleURL?.standardizedFileURL == reference.url.standardizedFileURL
     }
 
 }

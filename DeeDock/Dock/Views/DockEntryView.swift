@@ -8,6 +8,7 @@ struct DockEntryView: View {
     let selected: Bool
     let interaction: DockInteraction
     let reduceTransparency: Bool
+    let primaryAppAction: (DockItem) -> Void
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
     let menuTracking: (Bool) -> Void
@@ -17,8 +18,14 @@ struct DockEntryView: View {
         switch slot {
         case .app(let item):
             DockAppButton(item: item, size: size, isLaunching: launching, isKeyboardSelected: selected,
-                open: { openApp(item) }, togglePin: { togglePin(item) }, interaction: interaction,
+                primaryAction: { primaryAppAction(item) }, open: { openApp(item) },
+                togglePin: { togglePin(item) }, interaction: interaction,
                 menuTracking: menuTracking, accessibilityFocus: { accessibilityFocus(DockEntryID.app(item.id).hitID, $0) })
+                .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
+        case .folder(let item):
+            DockFolderButton(item: item, size: size, selected: selected, interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: { accessibilityFocus(DockEntryID.folder(item.reference.id).hitID, $0) })
                 .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
         case .group(let control):
             DockGroupButton(control: control, size: size, selected: selected, interaction: interaction,

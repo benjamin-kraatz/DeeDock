@@ -21,18 +21,31 @@ struct DisplayProfilesRepository {
         defaults.set(try JSONEncoder().encode(persistent), forKey: key)
     }
 
-    /// Loading seeds only an absent key; an empty list and malformed data are never reseeded.
-    func pins(for id: String, seed: () -> [ApplicationReference]) throws -> [ApplicationReference] {
-        try FavoritesRepository(defaults: defaults, key: "dock.favorites.v2.\(id)").load(seed: seed)
+    /// Typed storage wins. An absent v3 key migrates the existing application list once.
+    func pins(for id: String, seed: () -> [ApplicationReference]) throws -> [DockPin] {
+        let typed = DockPinsRepository(defaults: defaults, displayID: id)
+        if let pins = try typed.load() { return pins }
+        let applications = try savedApplications(forKey: "dock.favorites.v2.\(id)") ?? seed()
+        let pins = applications.map(DockPin.application)
+        try typed.save(pins)
+        return pins
     }
-    func existingPins(for id: String) throws -> [ApplicationReference]? {
-        guard defaults.object(forKey: "dock.favorites.v2.\(id)") != nil else { return nil }
+    func existingPins(for id: String) throws -> [DockPin]? {
+        let typedKey = "dock.pins.v3.\(id)"
+        guard defaults.object(forKey: typedKey) != nil || defaults.object(forKey: "dock.favorites.v2.\(id)") != nil else { return nil }
         return try pins(for: id) { [] }
     }
-    func savePins(_ pins: [ApplicationReference], for id: String) throws {
-        try FavoritesRepository(defaults: defaults, key: "dock.favorites.v2.\(id)").save(pins)
+    func savePins(_ pins: [DockPin], for id: String) throws {
+        try DockPinsRepository(defaults: defaults, displayID: id).save(pins)
     }
-    func legacyPins(seed: () -> [ApplicationReference]) throws -> [ApplicationReference] {
-        try FavoritesRepository(defaults: defaults).load(seed: seed)
+    func legacyPins(seed: () -> [ApplicationReference]) throws -> [DockPin] {
+        try (savedApplications(forKey: "dock.favorites.v1") ?? seed()).map(DockPin.application)
+    }
+
+    /// Migration reads legacy evidence without normalizing or rewriting it.
+    private func savedApplications(forKey key: String) throws -> [ApplicationReference]? {
+        guard let object = defaults.object(forKey: key) else { return nil }
+        guard let data = object as? Data else { throw CocoaError(.coderReadCorrupt) }
+        return DockOrdering.unique(try JSONDecoder().decode([ApplicationReference].self, from: data))
     }
 }

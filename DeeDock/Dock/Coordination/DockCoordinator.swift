@@ -15,6 +15,7 @@ final class DockCoordinator {
     private(set) var enabledDisplays: [DisplaySnapshot] = []
     var canFocus: Bool { !enabledDisplays.isEmpty }
     @ObservationIgnored private let dragging = DockDragCoordinator()
+    @ObservationIgnored private let folderStacks = FolderStackCoordinator()
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let displayService = DisplayService()
@@ -37,6 +38,10 @@ final class DockCoordinator {
         guard !started else { return }
         started = true
         rememberExternal(NSWorkspace.shared.frontmostApplication)
+        folderStacks.keyboardDismissed = { [weak self] displayID in
+            guard let self, focusedID == displayID else { return }
+            endFocus(restore: false)
+        }
         catalog.didChange = { [weak self] in self?.refreshPanels() }
         catalog.activated = { [weak self] app in
             guard app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return }
@@ -59,6 +64,7 @@ final class DockCoordinator {
             forName: NSWorkspace.willSleepNotification, object: nil, queue: .main
         ) { [weak self] _ in MainActor.assumeIsolated {
             self?.dragging.cancel()
+            self?.folderStacks.close(returnFocus: false)
             self?.panels.values.forEach { $0.suspendIdleFading() }
         } }
         let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
@@ -86,6 +92,7 @@ final class DockCoordinator {
         let desired = Set(enabledDisplays.map(\.id))
         for id in Array(panels.keys) where !desired.contains(id) {
             filePicker.cancel(for: id)
+            folderStacks.close(for: id, returnFocus: false)
             if focusedID == id { endFocus(restore: true) }
             panels.removeValue(forKey: id)?.stop()
         }
@@ -93,7 +100,8 @@ final class DockCoordinator {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.resignedFocus = { [weak self] in
-                if self?.focusedID == display.id { self?.endFocus(restore: false) }
+                guard let self else { return }
+                if focusedID == display.id, !folderStacks.isKeyboardActive { endFocus(restore: false) }
             }
             panel.escape = { [weak self] in self?.endFocus(restore: true) }
             store.applicationOpened = { [weak self] in
@@ -104,15 +112,29 @@ final class DockCoordinator {
                 guard let self, let panel else { return }
                 self.openFiles(for: item, on: panel)
             }
+            panel.interaction.openFolder = { [weak self, weak panel] folder, keyboard in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                folderStacks.show(folder, on: panel, keyboard: keyboard)
+            }
+            panel.interaction.revealFolder = { [weak panel] folder in
+                guard folder.isAvailable else { return }
+                let access = FolderResourceAccess(folder.reference)
+                guard access.isAvailable else {
+                    panel?.store.errorMessage = .folderStackUnavailable
+                    return
+                }
+                NSWorkspace.shared.activateFileViewerSelecting([access.url])
+                withExtendedLifetime(access) {}
+            }
             panel.interaction.prepareSettings = { [weak self] in
                 guard let self else { return }
                 settingsDisplayRequest = profiles.displays.count > 1
                     && profiles.displays.contains(where: { $0.id == display.id }) ? display.id : nil
             }
-            store.copyPin = { [weak self] reference, targetID in
+            store.copyPin = { [weak self] pin, targetID in
                 guard let self, let target = panels[targetID] else { return }
-                if !target.store.pins.contains(where: { $0.id == reference.id }) {
-                    _ = target.store.insertPins([reference], at: target.store.pins.count)
+                if !target.store.pins.contains(where: { $0.id == pin.id }) {
+                    _ = target.store.insertPins([pin], at: target.store.pins.count)
                 }
             }
             panels[display.id] = panel
@@ -131,11 +153,13 @@ final class DockCoordinator {
             panel.store.refresh()
             panel.update(display: display, settings: profiles.effectiveSettings(for: display.id), resetVisibility: resetVisibility)
         }
+        folderStacks.reanchor()
         if let id = zonePreview.displayID {
             if let geometry = panels[id]?.geometry { zonePreview.update(geometry) }
             else { zonePreview.stop() }
         }
-        catalog.pruneIcons(items: panels.values.flatMap { $0.store.items })
+        catalog.pruneIcons(items: panels.values.flatMap { $0.store.items },
+                           folders: panels.values.flatMap { $0.store.folders })
     }
     private func updatePointers(eventType: NSEvent.EventType) { panels.values.forEach { $0.updatePointer(eventType: eventType) } }
 
@@ -200,6 +224,7 @@ final class DockCoordinator {
         settingsDisplayRequest = nil
         filePicker.stop()
         dragging.stop()
+        folderStacks.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil
         if let suspensionObserver { NSWorkspace.shared.notificationCenter.removeObserver(suspensionObserver) }

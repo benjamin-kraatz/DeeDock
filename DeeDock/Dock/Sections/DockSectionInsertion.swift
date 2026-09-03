@@ -11,7 +11,7 @@ enum DockSectionInsertion {
             if abs(along - centers[controlIndex]) <= layout.iconSize / 2 + layout.itemSpacing / 2 { return pinCount }
             if case .group(let control) = entries[controlIndex], !control.expanded { return nil }
         }
-        let pins = entries.indices.filter { entries[$0].item?.isFavorite == true && $0 < centers.count }
+        let pins = entries.indices.filter { entries[$0].pin != nil && $0 < centers.count }
         if let running = entries.firstIndex(where: { !$0.isPinned }), running < centers.count,
            along > centers[running] - layout.iconSize / 2 - 4 { return nil }
         guard !pins.isEmpty else { return 0 }

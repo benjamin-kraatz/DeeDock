@@ -16,8 +16,8 @@ struct DockRunningIndicator: View {
                                 height: edge.isVertical ? 16 : DockGeometry.indicatorSize)
             case .square:
                 Rectangle().frame(width: DockGeometry.indicatorSize, height: DockGeometry.indicatorSize)
-            case .neon, .aura, .targetLock, .orbit, .stardust, .powerBadge, .glitch,
-                 .plasma, .hologram, .solarFlare, .prism, .hidden:
+            case .targetLock, .orbit, .stardust, .powerBadge, .glitch, .plasma, .hologram,
+                 .solarFlare, .prism, .lavaChrome, .singularity, .hidden:
                 Color.clear.frame(width: DockGeometry.indicatorSize, height: DockGeometry.indicatorSize)
             }
         }

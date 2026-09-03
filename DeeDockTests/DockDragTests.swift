@@ -9,20 +9,22 @@ struct DockDragTests {
 
     @Test("Reordering interprets boundaries before removing the original pin")
     func reorder() {
-        #expect(DockPinEditing.inserting([a], into: [a, b, c], at: 3) == [b, c, a])
-        #expect(DockPinEditing.inserting([c], into: [a, b, c], at: 0) == [c, a, b])
-        #expect(DockPinEditing.inserting([b], into: [a, b, c], at: 2) == [a, b, c])
-        #expect(DockPinEditing.moving(a.id, in: [a, b], by: -1) == [a, b])
-        #expect(DockPinEditing.moving(b.id, in: [a, b], by: 1) == [a, b])
-        #expect(DockPinEditing.moving(b.id, in: [a, b], by: -1) == [b, a])
+        let pins = [a, b, c].map(DockPin.application)
+        #expect(DockPinEditing.inserting([pins[0]], into: pins, at: 3) == [pins[1], pins[2], pins[0]])
+        #expect(DockPinEditing.inserting([pins[2]], into: pins, at: 0) == [pins[2], pins[0], pins[1]])
+        #expect(DockPinEditing.inserting([pins[1]], into: pins, at: 2) == pins)
+        #expect(DockPinEditing.moving(a.id, in: Array(pins.prefix(2)), by: -1) == Array(pins.prefix(2)))
+        #expect(DockPinEditing.moving(b.id, in: Array(pins.prefix(2)), by: 1) == Array(pins.prefix(2)))
+        #expect(DockPinEditing.moving(b.id, in: Array(pins.prefix(2)), by: -1) == [pins[1], pins[0]])
     }
 
     @Test("Finder batches insert existing and new apps as one ordered, deduplicated block")
     func batch() {
-        #expect(DockPinEditing.inserting([c, a, c], into: [a, b], at: 2) == [b, c, a])
-        #expect(DockPinEditing.inserting([b, a, b], into: [], at: 0) == [b, a])
+        let aPin = DockPin.application(a), bPin = DockPin.application(b), cPin = DockPin.application(c)
+        #expect(DockPinEditing.inserting([cPin, aPin, cPin], into: [aPin, bPin], at: 2) == [bPin, cPin, aPin])
+        #expect(DockPinEditing.inserting([bPin, aPin, bPin], into: [], at: 0) == [bPin, aPin])
         var bookmarked = a; bookmarked.bookmarkData = Data([1, 2, 3])
-        #expect(DockPinEditing.inserting([a], into: [bookmarked, b], at: 2) == [b, bookmarked])
+        #expect(DockPinEditing.inserting([aPin], into: [.application(bookmarked), bPin], at: 2) == [bPin, .application(bookmarked)])
     }
 
     @Test("Only explicit outside release may unpin", arguments: [false, true])
@@ -57,7 +59,7 @@ struct DockDragTests {
     func preview() {
         let icon = NSImage(size: CGSize(width: 48, height: 48))
         let items = [a, b].map { DockItem(reference: $0, icon: icon, isFavorite: true, isRunning: false, isAvailable: true) }
-        let slots = DockRenderSlot.slots(items: items, proposal: DockDragProposal(references: [a, c], index: 2))
+        let slots = DockRenderSlot.slots(items: items, proposal: DockDragProposal(pins: [.application(a), .application(c)], index: 2))
         #expect(slots.map(\.id) == ["app:b", "gap:a", "gap:c"])
         #expect(items.map(\.id) == ["a", "b"])
         #expect(DockRenderSlot.slots(items: items, proposal: nil).map(\.id) == ["app:a", "app:b"])
@@ -80,13 +82,13 @@ struct DockDragTests {
         let point = destinationEdge.point(CGPoint(x: layout.restingCenters[1] + 1, y: layout.panelDepth - 20), depth: layout.panelDepth)
         let index = DockDragGeometry.insertion(point: point, scrollOffset: 0, layout: layout, pinCount: 2)
         #expect(index == 2)
-        #expect(second.insertPins([a], at: index ?? 0))
+        #expect(second.insertPins([.application(a)], at: index ?? 0))
         first.selectedID = a.id
         profiles.update(displays[0].id, keyPath: \.edge, to: destinationEdge)
         first.refresh()
         #expect(first.selectedID == a.id)
-        #expect(first.pins == [a, b])
-        #expect(second.pins == [b, a])
+        #expect(first.pins == [.application(a), .application(b)])
+        #expect(second.pins == [.application(b), .application(a)])
         #expect(first.removePin(a.id))
         first.refresh()
         #expect(first.items.map(\.id) == [b.id, a.id])
@@ -115,14 +117,14 @@ struct DockDragTests {
         let profiles = DisplayProfilesStore(defaults: DockSettingsStore(repository: nil), repository: repository)
         profiles.synchronize([display]) { [a] }
         // Corrupt every saved pin collection but leave display metadata and migration markers intact.
-        let pinKey = "dock.favorites.v2.\(display.id)"
+        let pinKey = "dock.pins.v3.\(display.id)"
         let corrupt = Data([0xff, 0x00])
         defaults.set(corrupt, forKey: pinKey)
         let reloaded = DisplayProfilesStore(defaults: DockSettingsStore(repository: nil), repository: repository)
         reloaded.synchronize([display]) { [a] }
         let dock = DockStore(displayID: display.id, catalog: ApplicationCatalog(service: DragFixtureService(running: [])), profiles: reloaded)
         #expect(!dock.canEditPins)
-        #expect(!dock.insertPins([b], at: 0))
+        #expect(!dock.insertPins([.application(b)], at: 0))
         #expect(dock.errorMessage != nil)
         #expect(defaults.data(forKey: pinKey) == corrupt)
     }
@@ -164,5 +166,6 @@ private final class DragFixtureService: ApplicationServicing {
     func icon(for url: URL?) -> NSImage { NSImage(size: CGSize(width: 48, height: 48)) }
     func pruneIcons(keeping urls: Set<URL>) {}
     func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws { Issue.record("Unexpected document open") }
+    func performPrimaryAction(_ reference: ApplicationReference) async throws { Issue.record("Drag tests must never toggle applications") }
     func open(_ reference: ApplicationReference) async throws { Issue.record("Drag tests must never launch applications") }
 }

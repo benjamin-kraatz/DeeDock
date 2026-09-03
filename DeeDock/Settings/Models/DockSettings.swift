@@ -14,7 +14,23 @@ struct DockSettings: Codable, Equatable {
 
     /// Marker for running applications, independent of keyboard selection and foreground activity.
     enum RunningIndicatorStyle: String, Codable, CaseIterable {
-        case dot, bar, square, neon, aura, targetLock, orbit, stardust, powerBadge, glitch, plasma, hologram, solarFlare, prism, hidden
+        case dot, bar, square, targetLock, orbit, stardust, powerBadge, glitch,
+             plasma, hologram, solarFlare, prism, lavaChrome, singularity, hidden
+
+        /// Withdrawn styles, mapped to their nearest survivor. A saved preference naming one
+        /// must keep working: rejecting it would fail the whole settings document, not just
+        /// this field. Genuinely unknown values still throw.
+        private static let retired: [String: Self] = ["neon": .plasma, "aura": .solarFlare]
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let raw = try container.decode(String.self)
+            guard let value = Self(rawValue: raw) ?? Self.retired[raw] else {
+                throw DecodingError.dataCorruptedError(in: container,
+                    debugDescription: "Unknown running indicator style \(raw)")
+            }
+            self = value
+        }
     }
 
     /// Layers affected by idle dimming. Labels and interaction feedback remain fully readable.
@@ -31,6 +47,9 @@ struct DockSettings: Codable, Equatable {
     var appVisibility: DockAppVisibility = .showAll
     var tooltipPreset: DockTooltipPreset = .classic
     var runningIndicatorStyle: RunningIndicatorStyle = .dot
+    /// Whether the shader indicator styles animate. The drawn styles are always still, and
+    /// Reduce Motion overrides this without rewriting the saved preference.
+    var animateIndicators: Bool = true
     var edge: DockEdge = .bottom
     var alignment: Alignment = .center
     /// Signed displacement from the alignment anchor, in points; positive moves right on horizontal docks and down on side docks.
@@ -92,7 +111,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case appVisibility, tooltipPreset
-        case iconSize, magnification, itemSpacing, runningIndicatorStyle, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -115,6 +134,8 @@ extension DockSettings {
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing) ?? 4
         runningIndicatorStyle = values.contains(.runningIndicatorStyle)
             ? try values.decode(RunningIndicatorStyle.self, forKey: .runningIndicatorStyle) : .dot
+        animateIndicators = values.contains(.animateIndicators)
+            ? try values.decode(Bool.self, forKey: .animateIndicators) : true
         edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : .bottom
         alignment = try values.decode(Alignment.self, forKey: .alignment)
         alongEdgeOffset = try values.decode(Double.self, forKey: .alongEdgeOffset)

@@ -62,8 +62,6 @@ extension DockSettings.RunningIndicatorStyle {
         [SettingsOption(value: .dot, title: .settingsIndicatorDot, symbol: "circle.fill"),
          SettingsOption(value: .bar, title: .settingsIndicatorBar, symbol: "minus"),
          SettingsOption(value: .square, title: .settingsIndicatorSquare, symbol: "square.fill"),
-         SettingsOption(value: .neon, title: .settingsIndicatorNeon, symbol: "lightbulb.fill"),
-         SettingsOption(value: .aura, title: .settingsIndicatorAura, symbol: "sun.max.fill"),
          SettingsOption(value: .targetLock, title: .settingsIndicatorTargetLock, symbol: "viewfinder"),
          SettingsOption(value: .orbit, title: .settingsIndicatorOrbit, symbol: "circle.dotted"),
          SettingsOption(value: .stardust, title: .settingsIndicatorStardust, symbol: "sparkles"),
@@ -73,6 +71,8 @@ extension DockSettings.RunningIndicatorStyle {
          SettingsOption(value: .hologram, title: .settingsIndicatorHologram, symbol: "rectangle.on.rectangle"),
          SettingsOption(value: .solarFlare, title: .settingsIndicatorSolarFlare, symbol: "sun.max.fill"),
          SettingsOption(value: .prism, title: .settingsIndicatorPrism, symbol: "diamond.fill"),
+         SettingsOption(value: .lavaChrome, title: .settingsIndicatorLavaChrome, symbol: "drop.fill"),
+         SettingsOption(value: .singularity, title: .settingsIndicatorSingularity, symbol: "hurricane"),
          SettingsOption(value: .hidden, title: .settingsIndicatorHidden, symbol: "eye.slash")]
     }
 }

@@ -12,9 +12,12 @@ final class DockPanelController {
     private var mouseHeld = false
     private var dragHeld = false
     private var pickerHeld = false
+    private var folderStackHeld = false
     private var lastDisplay: DisplaySnapshot?
     private var lastSettings: DockSettings?
     private var baseLayout = DockGeometry.layout(count: 0, favoriteCount: 0, availableLength: 800)
+    /// Resting content frame before a transient insertion gap changes the panel's dimensions.
+    private var baseRestingFrame = CGRect.zero
     var invalidateDrag: (() -> Void)?
     private var menuHeld = false
     private var accessibilityIDs: Set<String> = []
@@ -37,6 +40,8 @@ final class DockPanelController {
         interaction.movePin = { [weak store] id, distance in store?.movePin(id, by: distance) }
         interaction.canMovePin = { [weak store] id, distance in store?.canMovePin(id, by: distance) ?? false }
         interaction.copyPin = { [weak store] reference, displayID in store?.copyPin?(reference, displayID) }
+        interaction.removePin = { [weak store] id in _ = store?.removePin(id) }
+        interaction.setFolderPresentation = { [weak store] id, value in _ = store?.setFolderPresentation(value, for: id) }
         interaction.geometryDidChange = { [weak self] in self?.updatePointer() }
         interaction.menuTrackingChanged = { [weak self] tracking in
             self?.menuHeld = tracking
@@ -88,6 +93,7 @@ final class DockPanelController {
         interaction.retainHitRegions(exposedIDs)
         accessibilityIDs.formIntersection(exposedIDs)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
+        interaction.animateIndicators = settings.animateIndicators
         interaction.idleFade.configure(settings,
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
@@ -100,6 +106,7 @@ final class DockPanelController {
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
                                          availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings)
+        baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                  availableLength: settings.edge.length(of: reference.size),
@@ -138,13 +145,13 @@ final class DockPanelController {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
-        let suppress = pickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+        let suppress = pickerHeld || folderStackHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
             || (visibility.phase != .visible && visibility.phase != .hideDelay)
         if suppress != interaction.suppressTooltips {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = pickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
+        let held = pickerHeld || folderStackHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
         // Tooltips are absent from `rects`, so their transparent reservation stays excluded.
@@ -161,6 +168,7 @@ final class DockPanelController {
         if (visibility.phase == .hiding || !visibility.exposesContent) && !interaction.suppressTooltips {
             interaction.suppressTooltips = true; interaction.tooltips.clear()
         }
+        interaction.exposesContent = visibility.exposesContent
         if !visibility.exposesContent {
             panel.ignoresMouseEvents = true; interaction.pointer = nil
             if panel.isVisible { panel.orderOut(nil) }
@@ -183,6 +191,7 @@ final class DockPanelController {
         host.springHighlight = { [weak coordinator] info in coordinator?.springHighlight(info, on: id) }
         interaction.sourceTrackingChanged = { [weak coordinator] in coordinator?.trackSource($0) }
         interaction.beginDrag = { [weak coordinator] item, view, event in coordinator?.begin(item, from: id, view: view, event: event) }
+        interaction.beginFolderDrag = { [weak coordinator] item, view, event in coordinator?.begin(item, from: id, view: view, event: event) }
         interaction.scrollChanged = { [weak coordinator] in coordinator?.geometryChanged() }
         interaction.geometryDidChange = { [weak self, weak coordinator] in
             self?.updatePointer()
@@ -202,11 +211,7 @@ final class DockPanelController {
 
     /// Resting glass in AppKit screen coordinates, including the current viewport clip.
     var restingDragBounds: CGRect {
-        guard let geometry else { return .zero }
-        let frame = CGRect(x: panel.frame.minX + geometry.contentOrigin.x,
-                           y: panel.frame.maxY - geometry.contentOrigin.y - geometry.contentSize.height,
-                           width: geometry.contentSize.width, height: geometry.contentSize.height)
-        return DockGeometry.restingGlass(frame: frame, layout: baseLayout, scrollOffset: interaction.scrollOffset)
+        DockGeometry.restingGlass(frame: baseRestingFrame, layout: baseLayout, scrollOffset: interaction.scrollOffset)
     }
 
     func containsDragRegion(_ point: CGPoint) -> Bool {
@@ -222,11 +227,11 @@ final class DockPanelController {
     }
 
     func insertionIndex(at point: CGPoint) -> Int? {
-        let local = contentPoint(point)
-        let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
-            size: interaction.layout.viewportSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
-        guard visibility.exposesContent, panel.frame.contains(point),
-              sample.mask.contains(local), interaction.containsDockPoint(local) else { return nil }
+        // The preview can resize and recenter the native panel. Resolving the next boundary
+        // against that transient frame makes the preview invalidate its own hit test and cycle.
+        // Keep the whole drag session in the pre-preview content coordinate space instead.
+        guard visibility.exposesContent, restingDragBounds.contains(point), !baseRestingFrame.isEmpty else { return nil }
+        let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
         return DockSectionInsertion.index(point: local, scrollOffset: interaction.scrollOffset,
             layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
     }
@@ -257,11 +262,31 @@ final class DockPanelController {
         updatePointer()
     }
 
+    func holdFolderStack(_ held: Bool) {
+        folderStackHeld = held
+        if held { visibility.showImmediately(); interaction.tooltips.clear() }
+        updatePointer()
+    }
+
+    func folderStackAnchor(for id: UUID) -> FolderStackAnchor? {
+        guard !stopped, let display = lastDisplay, let settings = lastSettings,
+              let rect = interaction.iconRects[DockEntryID.folder(id).hitID] else { return nil }
+        let screenRect = CGRect(x: panel.frame.minX + interaction.contentOrigin.x + rect.minX,
+            y: panel.frame.maxY - interaction.contentOrigin.y - rect.maxY,
+            width: rect.width, height: rect.height)
+        return FolderStackAnchor(icon: screenRect, edge: settings.edge, visibleFrame: display.visibleFrame)
+    }
+
     func endSectionDrag() { store.sections.endDrag() }
 
     func setDragPresentation(proposal: DockDragProposal?, source: String?, targeted: Bool, message: LocalizedStringResource?) {
         guard !stopped else { return }
-        let changed = interaction.dragProposal != proposal
+        let previousSlots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
+        let nextSlots = DockRenderSlot.slots(entries: store.entries, proposal: proposal)
+        // Moving one preview between boundaries changes slot order, not panel geometry. Avoid
+        // synchronously setting the native window frame again from AppKit's drag callback.
+        let layoutChanged = previousSlots.count != nextSlots.count
+            || previousSlots.filter(\.isPinned).count != nextSlots.filter(\.isPinned).count
         interaction.dragProposal = proposal
         interaction.dragSourceID = source
         interaction.dragActive = source != nil || targeted
@@ -270,7 +295,7 @@ final class DockPanelController {
         dragHeld = source != nil || (targeted && visibility.exposesContent)
         if !interaction.dragActive && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
         if source != nil { visibility.showImmediately() }
-        if changed, let display = lastDisplay, let settings = lastSettings { update(display: display, settings: settings) }
+        if layoutChanged, let display = lastDisplay, let settings = lastSettings { update(display: display, settings: settings) }
         else { updatePointer() }
     }
 
@@ -304,8 +329,12 @@ final class DockPanelController {
             return true
         }
         if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
-            if event.modifierFlags.contains(.option), let id = store.selectedID { store.movePin(id, by: distance) }
-            else { store.moveSelection(by: distance) }
+            if event.modifierFlags.contains(.option),
+               let pin = store.entries.first(where: { $0.target == store.selectedTarget })?.pin {
+                store.movePin(pin.id, by: distance)
+            } else {
+                store.moveSelection(by: distance)
+            }
             return true
         }
         switch event.keyCode {
@@ -330,15 +359,17 @@ final class DockPanelController {
 
     func stop() {
         invalidateDrag?(); invalidateDrag = nil
-        stopped = true; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
+        stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
-        interaction.prepareSettings = nil; interaction.openFiles = nil
+        interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil
+        interaction.removePin = nil; interaction.setFolderPresentation = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
+        interaction.beginFolderDrag = nil
         interaction.copyPin = nil; interaction.scrollChanged = nil
         panel.contentView?.unregisterDraggedTypes()
         interaction.geometryDidChange = nil; interaction.menuTrackingChanged = nil; interaction.accessibilityFocusChanged = nil
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil
-        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false
+        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; folderStackHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }
 }

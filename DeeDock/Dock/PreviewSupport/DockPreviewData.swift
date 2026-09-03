@@ -76,7 +76,7 @@ struct DockPreviewContent: View {
         DockContentView(items: items, entries: entries, launchingIDs: [], selectedTarget: entries.first?.target, keyboardFocus: true,
                         errorMessage: errorMessage, interaction: interaction,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
-                        openApp: { _ in }, togglePin: { _ in }, dismissError: {})
+                        primaryAppAction: { _ in }, openApp: { _ in }, togglePin: { _ in }, dismissError: {})
             .padding(20)
             .onAppear { interaction.toggleSection = { sections.toggle() } }
             .onDisappear { interaction.toggleSection = nil; interaction.tooltips.clear() }

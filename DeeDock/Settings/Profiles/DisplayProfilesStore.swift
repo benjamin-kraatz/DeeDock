@@ -7,7 +7,7 @@ final class DisplayProfilesStore {
     let defaults: DockSettingsStore
     private(set) var document = DisplayProfilesDocument()
     private(set) var displays: [DisplaySnapshot] = []
-    private(set) var pinLists: [String: [ApplicationReference]] = [:]
+    private(set) var pinLists: [String: [DockPin]] = [:]
     private(set) var pinErrors: [String: LocalizedStringResource] = [:]
     private(set) var errorMessage: LocalizedStringResource?
     private(set) var requiresReset = false
@@ -60,7 +60,7 @@ final class DisplayProfilesStore {
                     pinLists[display.id] = existing
                     continue
                 }
-                let seed: [ApplicationReference]
+                let seed: [DockPin]
                 let primaryID = displays.first(where: \.isPrimary)?.id
                 if let primaryID, primaryID != display.id, pinErrors[primaryID] != nil {
                     throw CocoaError(.coderReadCorrupt)
@@ -69,7 +69,7 @@ final class DisplayProfilesStore {
                 } else if let original = document.initialPrimaryID, original != display.id,
                           let originalPins = try repository?.existingPins(for: original) {
                     seed = originalPins
-                } else { seed = try repository?.legacyPins(seed: starterPins) ?? starterPins() }
+                } else { seed = try repository?.legacyPins(seed: starterPins) ?? starterPins().map(DockPin.application) }
                 if display.isPersistent && !requiresReset { try repository?.savePins(seed, for: display.id) }
                 pinLists[display.id] = seed
             } catch {
@@ -105,9 +105,9 @@ final class DisplayProfilesStore {
     }
 
     /// Saves only this display's pins. Failed loads remain blocked instead of destroying saved bytes.
-    func savePins(_ pins: [ApplicationReference], for id: String) throws {
+    func savePins(_ pins: [DockPin], for id: String) throws {
         guard !requiresReset, pinErrors[id] == nil, let profile = document.profiles[id] else { throw CocoaError(.coderReadCorrupt) }
-        let unique = DockOrdering.unique(pins)
+        let unique = DockPinEditing.unique(pins)
         if profile.isPersistent { try repository?.savePins(unique, for: id) }
         pinLists[id] = unique
         didChange?()

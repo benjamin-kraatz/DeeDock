@@ -13,6 +13,11 @@ final class DockInteraction {
     let idleFade = DockIdleFadeController()
     /// Per-display running marker appearance, separate from layout and keyboard focus.
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
+    /// The saved preference for animated shader indicators.
+    var animateIndicators = DockSettings.defaults.animateIndicators
+    /// Whether this panel currently paints anything. A hidden dock schedules no indicator
+    /// frames; the owner keeps this in step with the visibility controller.
+    var exposesContent = true
     var dragProposal: DockDragProposal?
     var dragActive = false
     var dragSourceID: String?
@@ -20,15 +25,20 @@ final class DockInteraction {
     var documentTargetID: String?
     var springEmphasized = false
     @ObservationIgnored var openFiles: ((DockItem) -> Void)?
+    @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
+    @ObservationIgnored var revealFolder: ((FolderDockItem) -> Void)?
+    @ObservationIgnored var removePin: ((String) -> Void)?
+    @ObservationIgnored var setFolderPresentation: ((UUID, FolderStackPresentation) -> Void)?
     var scrollOffset: CGFloat = 0
     var scrollRequest: CGFloat = 0
     /// Selects this panel's display before SwiftUI opens the Settings scene.
     @ObservationIgnored var prepareSettings: (() -> Void)?
     @ObservationIgnored var sourceTrackingChanged: ((Bool) -> Void)?
     @ObservationIgnored var beginDrag: ((DockItem, NSView, NSEvent) -> Void)?
+    @ObservationIgnored var beginFolderDrag: ((FolderDockItem, NSView, NSEvent) -> Void)?
     @ObservationIgnored var movePin: ((String, Int) -> Void)?
     @ObservationIgnored var canMovePin: ((String, Int) -> Bool)?
-    @ObservationIgnored var copyPin: ((ApplicationReference, String) -> Void)?
+    @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     var pinDestinations: [DockPinDestination] = []
     @ObservationIgnored var scrollChanged: (() -> Void)?
     var contentOrigin = CGPoint.zero

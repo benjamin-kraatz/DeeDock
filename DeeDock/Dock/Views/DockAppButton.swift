@@ -2,7 +2,7 @@ import SwiftUI
 
 /// An app icon with running, launch-progress, selection, and accessibility states.
 ///
-/// `open` and `togglePin` express user intent; this component never invokes workspace APIs itself.
+/// Its closures express user intent; this component never invokes workspace APIs itself.
 struct DockAppButton: View {
     let item: DockItem
     /// Current magnified icon dimension in logical points; indicator space is additional.
@@ -10,6 +10,7 @@ struct DockAppButton: View {
     let isLaunching: Bool
     /// Set by Focus Dock navigation; does not identify the foreground application.
     let isKeyboardSelected: Bool
+    let primaryAction: () -> Void
     let open: () -> Void
     let togglePin: () -> Void
 
@@ -22,15 +23,27 @@ struct DockAppButton: View {
         return DockAppearanceOpacity(settings: fade.settings, idleFraction: fade.fraction,
                                      reduceTransparency: reduceTransparency).icons
     }
+    /// Stable per-application shader variation, tinted by the icon's own dominant hue.
+    /// `DockIconAccent` caches by identity, so reading it from the body stays cheap.
+    private var indicatorVariant: DockIndicatorVariant {
+        DockIndicatorVariant(identity: item.id,
+                             accent: DockIconAccent.accent(for: item.icon, identity: item.id))
+    }
+    /// A dock nobody can see, or one that has already faded out, schedules no frames.
+    private var indicatorAnimated: Bool {
+        guard let interaction else { return false }
+        return interaction.animateIndicators && interaction.exposesContent && interaction.idleFade.fraction == 0
+    }
     @Environment(\.openSettings) private var openSettings
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
     var body: some View {
-        Button(action: open) {
+        Button(action: primaryAction) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
                                  available: item.isAvailable, running: item.isRunning,
                                  launching: isLaunching, keyboardSelected: isKeyboardSelected,
                                  runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
+                                 indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
                                  artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation)
                 .overlay {
                     if interaction?.documentTargetID == item.id {
@@ -47,7 +60,7 @@ struct DockAppButton: View {
                 DockDragSourceView(
                     item: item,
                     enabled: !isLaunching,
-                    open: open,
+                    primaryAction: primaryAction,
                     begin: begin,
                     tracking: { interaction.sourceTrackingChanged?($0) }
                 )
@@ -106,7 +119,7 @@ struct DockAppButton: View {
             }
             ForEach(interaction?.pinDestinations ?? []) { destination in
                 Button {
-                    interaction?.copyPin?(item.reference, destination.id)
+                    interaction?.copyPin?(.application(item.reference), destination.id)
                 } label: {
                     Text(.actionPinOnDisplayName(display: destination.name))
                 }
@@ -123,6 +136,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: false,
                 isKeyboardSelected: true,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )
@@ -131,6 +145,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: false,
                 isKeyboardSelected: false,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )
@@ -139,6 +154,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: true,
                 isKeyboardSelected: false,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )
@@ -147,6 +163,7 @@ struct DockAppButton: View {
                 size: 48,
                 isLaunching: false,
                 isKeyboardSelected: false,
+                primaryAction: {},
                 open: {},
                 togglePin: {}
             )

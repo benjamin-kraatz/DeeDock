@@ -26,9 +26,13 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case app(String), group(DockAppGroup)
+    case app(String), folder(UUID), group(DockAppGroup)
     var hitID: String {
-        switch self { case .app(let id): "app:\(id)"; case .group(let group): "group:\(group.rawValue)" }
+        switch self {
+        case .app(let id): "app:\(id)"
+        case .folder(let id): "folder:\(id.uuidString)"
+        case .group(let group): "group:\(group.rawValue)"
+        }
     }
 }
 
@@ -50,15 +54,30 @@ struct DockGroupControl {
 
 /// Projects catalog snapshots without changing pins, running order, or resource ownership.
 enum DockSectionProjection {
-    static func entries(items: [DockItem], visibility: DockAppVisibility, expanded: Bool) -> [DockRenderSlot] {
-        [DockAppGroup.pinned, .running].flatMap { group -> [DockRenderSlot] in
-            let apps = items.filter { $0.isFavorite == (group == .pinned) }
+    static func entries(items: [DockItem], folders: [FolderDockItem] = [], pins: [DockPin]? = nil,
+                        visibility: DockAppVisibility, expanded: Bool) -> [DockRenderSlot] {
+        let pinned: [DockRenderSlot]
+        if let pins {
+            let applications = Dictionary(uniqueKeysWithValues: items.filter(\.isFavorite).map { ($0.reference.id, $0) })
+            let folderItems = Dictionary(uniqueKeysWithValues: folders.map { ($0.reference.id, $0) })
+            pinned = pins.compactMap { pin in
+                switch pin {
+                case .application(let reference): applications[reference.id].map(DockRenderSlot.app)
+                case .folder(let reference): folderItems[reference.id].map(DockRenderSlot.folder)
+                }
+            }
+        } else {
+            pinned = items.filter(\.isFavorite).map(DockRenderSlot.app)
+        }
+        let running = items.filter { !$0.isFavorite }.map(DockRenderSlot.app)
+        return [DockAppGroup.pinned, .running].flatMap { group -> [DockRenderSlot] in
+            let entries = group == .pinned ? pinned : running
             if visibility.hiddenGroup == group { return [] }
             if visibility.collapsedGroup == group {
-                return [.group(DockGroupControl(group: group, count: apps.count, expanded: expanded))]
-                    + (expanded ? apps.map(DockRenderSlot.app) : [])
+                return [.group(DockGroupControl(group: group, count: entries.count, expanded: expanded))]
+                    + (expanded ? entries : [])
             }
-            return apps.map(DockRenderSlot.app)
+            return entries
         }
     }
 

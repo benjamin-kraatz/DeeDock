@@ -1,6 +1,6 @@
 # DeeDock acceptance record
 
-Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current auto-hide slice.
+Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current folder-stack slice.
 
 ## Compilation
 
@@ -48,7 +48,7 @@ These observations establish the specific behaviors above, not complete visual o
 
 ## Boundaries
 
-The app uses public AppKit/SwiftUI APIs and local preferences. It does not modify system Dock preferences, grant permissions, install a login item, reserve desktop work area, or manage other apps' windows through Accessibility APIs. Reopening/minimized-window behavior is delegated to Launch Services and the target app; exact system Dock parity is not promised.
+The app uses public AppKit/SwiftUI APIs and local preferences. It does not modify system Dock preferences, grant permissions, install a login item, reserve desktop work area, or manage other apps' windows through Accessibility APIs. Application-icon clicks use AppKit's app-wide hide request when the selected app is foreground; reopening and minimized-window behavior remain delegated to Launch Services and the target app. Exact system Dock parity is not promised.
 
 Placement uses the primary display's `visibleFrame`. When the system Dock auto-hides, macOS may not reserve space for it, so its temporary reveal can overlap DeeDock. Avoiding that overlap, persistent per-monitor choices, auto-hide, activation zones, drag reordering, and the wider configuration roadmap remain later slices.
 
@@ -170,6 +170,16 @@ New tests cover legacy decoding and corrupt-byte preservation; individual behavi
 - Exercise light/dark appearance, Reduce Motion/Transparency, multiple monitors, mirroring/unmirroring, primary-display changes, normal Spaces, full-screen apps, Mission Control, sleep/wake, and clean quitting during a transition/menu/preview/launch.
 
 These native scenarios remain unexercised for this build. Display-edge activation can also reveal the system Dock; DeeDock neither changes its preferences nor reserves desktop work area. Window-overlap detection, pressure gestures, broader drag behavior, and performance guarantees are outside this slice. No new permissions or machine settings were requested or changed.
+
+## Application icon show/hide toggle
+
+Ordinary app-icon clicks now check the live foreground application. A matching foreground app receives AppKit's app-wide hide request. A closed, background, or hidden app keeps the existing `NSWorkspace.openApplication` path, which launches or activates without creating a second instance. Bundle identity takes priority so moving a pinned application does not break the match; bundle-less references fall back to their standardized application URL.
+
+The primary icon action is separate from explicit Open. Context-menu Open, Focus Dock Return, file opening, and drag spring-loading never hide an app. All display docks still share duplicate suppression, cancellation, and error ownership through `ApplicationCatalog`. A rejected hide request produces localized feedback on the initiating dock. The sandbox and entitlements are unchanged, and the feature does not use Accessibility APIs or inspect individual windows.
+
+The focused Debug app build and a subsequent `build-for-testing` compilation succeeded with derived data at `/tmp/DeeDock-show-hide-build`. The initial `build-for-testing` attempt exposed the scheme's missing test-target dependency and stopped before app compilation; building the app first allowed the same test-source compilation to succeed. Xcode still reports that `DeeDockTests` is missing its discovered dependency on `DeeDock`.
+
+No tests were executed. The app was not launched, no previews were rendered, and no automated visual checks ran. Hands-on acceptance still needs to confirm foreground hide, hidden-app restoration, background activation, closed-app launch, multi-window app-wide hiding, multiple Spaces, full-screen apps, and rapid repeated clicks.
 
 Implementation changes are left uncommitted for review. Pause after slice 3; further roadmap work requires a new request.
 
@@ -492,3 +502,160 @@ Static review checked the separate General navigation path, initial Appearance s
 - With user control of logout, verify automatic startup after signing out and back in. Confirm configured docks and the menu-bar item return without Settings opening or deliberate focus transfer. Disable registration and repeat. Quit DeeDock before each logout or otherwise exclude macOS session restoration so it cannot be mistaken for login-item startup.
 
 No real registration changes, logout/login cycles, or machine-setting changes were performed during implementation. The existing panel retention change, recovered-reference group, and concurrent Xcode build-number change are retained in the requested clean-tree delivery.
+
+## First-launch onboarding
+
+Adds a seven-page tour shown once on first launch, reopenable from the menu-bar item and the app menu. Sources live in `DeeDock/Onboarding`, split into `Models`, `Persistence`, `State`, `Windowing`, and `Views`. `OnboardingStep` and `SystemDockReservation` stay free of SwiftUI so the unhosted test target does not need the settings view layer; step artwork lives in `Views/OnboardingStepPresentation.swift`.
+
+The tour is presented after `coordinator.start()`, so the real docks exist behind it. `OnboardingRepository` stores `{ completedVersion }` under `onboarding.v1`. Reaching the end, opening Settings from the last page, and closing the window all record completion; reopening from a menu never rewrites the record. Unlike the settings repositories, an unreadable record is treated as already completed rather than surfaced as an error, so a stray byte cannot make the tour reappear on every launch. Reading never rewrites the stored bytes.
+
+One page writes a setting, through the existing `DockSettingsStore.update`: placement sets `edge`. It does not touch per-display overrides and goes through the same validation and save path as Settings. Every other page changes nothing. The writing page carries a prompt line and pointer affordances and the others carry neither, which is the tour's only signal of which is which.
+
+An interactive running-indicator gallery was built and then removed at the user's direction. Showing six apps each wearing a different marker asked a person to choose a global style by clicking an individual app, a mapping with no meaning, and it depicted a dock no screen can produce. The page is a demonstration again: one coherent dock cross-fading between styles.
+
+Illustrations reuse production code rather than re-creating it: `DockGeometry`/`DockPlacement` for placement, `DockSampleView` for the magnification sweep and the indicator demonstration, `DockDisplayDiagram` for the display page, and `DockVisibilityController` with `DockAnimationGeometry` and `DockPresentationModifier` for the auto-hide page. `DockSampleView` gained an optional `pointerAlong`, which defaults to its previous behavior. The macOS Dock page is drawn separately because it depicts the system Dock, where reusing the DeeDock diagram would be misleading.
+
+Each page runs at most one ambient task, started by `.task` and cancelled by SwiftUI when the page leaves, so a page a person has moved past animates nothing. `SystemDockMonitor` observes `NSApplication.didChangeScreenParametersNotification` and removes its observer when the view disappears and when the window controller stops; nothing polls.
+
+### System Dock detection
+
+`SystemDockReservation` compares each screen's `frame` and `visibleFrame` and reports the non-top edge whose inset exceeds one point. The top inset is excluded because the menu bar and notch always reserve it. This is a deliberate limitation, not a shortcut: an App Sandbox cannot read `com.apple.dock`, so the switch itself is unreadable, and `AGENTS.md` forbids writing it. The status is therefore worded as reserved space rather than as the state of a preference. Turning on automatic hiding releases the band and clears the status; moving the Dock to another edge does not, which is correct.
+
+### API limitation
+
+`SettingsWindowOpener` reaches the SwiftUI `Settings` scene through `NSApp.sendAction(Selector(("showSettingsWindow:")))`. `@Environment(\.openSettings)` is delivered only to views inside the `App` scene graph, and the tour is an AppKit-hosted window, so that action is unavailable to it. No public symbol exposes the selector. The call reports whether it was accepted and nothing depends on it: the menu-bar item and ⌘, remain the documented routes to Settings, and the tour's final page says so.
+
+### Validation status
+
+`xcodebuild build` and `build-for-testing` both succeeded for the Debug app and the unhosted `DeeDockTests` target, using the same commands recorded in the Compilation section. The suite was executed once at the user's implicit request during implementation and passed: 132 tests across 25 suites, including the two new suites. The user then asked that tests not be run again, and none were run after that point; later source changes to the placement and indicator pickers are compiled but not re-tested.
+
+New tests cover reserved-edge detection for each edge, menu-bar-only insets, released space, sub-point rounding, negative screen origins, empty frames, and multi-display aggregation; and tour navigation ordering, clamping at both ends, skip applying only to the macOS Dock page, direction tracking, first-launch presentation, completion, an older completed version, unreadable data, and a value of the wrong type. Four onboarding sources were added to the Xcode **Test Model Sources** group and the test target's Sources phase.
+
+Previews cover every page, both system-Dock states, the placement picker on all four edges, an indicator style outside the curated gallery, dark appearance, Reduce Motion, Reduce Transparency, and accessibility text sizes. Previews use scratch `UserDefaults` suites and a stub login service, so none of them registers a login item or writes the real completion record. Previews were not run.
+
+Layout was inspected by the user at several points during implementation and corrected in response: the window height was reduced and its content made scrollable, the placement handles were moved outside the screen diagram after they were found to cover the dock, and the indicator gallery was first corrected — four of six options rendered as nothing because only `DockRunningIndicator` was applied and not `DockIconIndicator` — and then withdrawn in favor of a demonstration.
+
+### Remaining hands-on acceptance
+
+- Delete `onboarding.v1` and launch. Confirm the window is centered and focused, the docks are already visible behind it, and every page animates.
+- Walk forward and back through all seven pages. Confirm the slide direction reverses, only the visible page animates, and closing part-way through does not re-present the tour on the next launch.
+- On the macOS Dock page, confirm the status reads as reserving space, open Desktop & Dock from the button, turn on automatic hiding, and confirm the status clears without returning to DeeDock. Turn it off and confirm it returns. Confirm Skip works and that nothing in `com.apple.dock` changed.
+- Click each placement handle and confirm the real docks move to that edge. Confirm a display with an existing edge override keeps its own value. Confirm no other page changes anything when clicked.
+- Open Settings from the last page and confirm the tour closes and Settings opens. Reopen the tour from the menu-bar item and the app menu, and confirm a second window is never created.
+- Enable Launch at Login from the last page and confirm the state matches Settings → General afterwards, including a pending approval.
+- Exercise Reduce Motion, Reduce Transparency, increased contrast, and larger text sizes on every page. Confirm the login card's approval and error states scroll rather than clip.
+- Use VoiceOver on the placement page: confirm the handles are reported as selectable buttons with the chosen one marked, that the illustrations elsewhere are silent, and that the page indicator reads its position.
+- Run with several displays, including a display whose Dock reserves a side edge, and with all docks disabled.
+
+## Icon-aware running indicators
+
+Added on 2026-09-03, after the first-launch tour.
+
+### What changed
+
+The four Metal styles were procedural drawings on a white square that never read the icon underneath, so every application showed the same figure in the same colours. They are now layer effects: each shader samples the artwork it decorates.
+
+A shared `iconEdge` helper walks four rings of twelve spokes around each output pixel and returns a signed distance to the artwork's alpha silhouette — negative on the artwork, positive in its transparent margin — together with the alpha-weighted colour of the artwork within reach. Every style shapes its light around that boundary, so the indicator follows the real outline of the icon rather than a rounded rectangle. The artwork is returned unmodified by the light-only styles, so icons stay crisp; a narrow rim just inside the edge keeps icons that fill their whole square from showing nothing.
+
+Two additional inputs vary the result per application:
+
+- `DockIndicatorVariant` derives a seed from FNV-1a over the application's stable identity. `Hashable` is deliberately not used because its per-process seed would reshuffle every launch. The seed selects lobe counts, spin direction and rate, facet counts, scan frequency, and phase.
+- `DockIconAccent` rasterizes each icon once to a 16×16 bitmap and averages hue on the colour circle, weighted by alpha, squared saturation, and brightness. Icons whose hues disagree, or that are close to achromatic, return no accent and each style keeps its own palette instead of glowing white. Results are cached by identity, which is what makes the lookup safe to read from a view body.
+
+Two existing styles were rebuilt and two new ones added. Glitch moved from offset silhouettes and static bars to a shader that cuts the icon into rows, slides a random subset of them sideways, separates the colour channels, and gates the whole thing behind a burst clock so the icon reads normally between faults. Stardust moved from three fixed sparkles to slots that each run a birth-to-death cycle, redrawing position, size and colour per generation. Lava Chrome melts the icon's own corners and edges: domain-warped noise displaces the artwork along its outward normal, weighted by distance from centre so corners go first and the middle is never touched, with a downward bias that turns overhangs into drips. Singularity puts an inclined orbiting black hole around the icon, lensing the artwork toward it with a radial and a tangential term, tearing a void where the event horizon passes, and lighting a photon ring and a Doppler-beamed accretion disk in the colours of the artwork falling in.
+
+Neon and Aura were withdrawn.
+
+### Persistence
+
+`animateIndicators` was added to `DockSettings` and to the inheritable display-override fields, defaulting to on. Saved documents without the key decode to on.
+
+Withdrawn style values no longer fail the whole settings document. `RunningIndicatorStyle` decodes `neon` as Plasma and `aura` as Solar Flare; genuinely unknown values still throw through the existing settings error handling, as before. This is a deliberate narrowing of the rule recorded in the *Running indicator styles* section above.
+
+### Motion
+
+Animated styles run on a `TimelineView` at 30 Hz. Motion stops when the preference is off, when Reduce Motion is on, while a panel is hidden (`DockInteraction.exposesContent`, kept in step with the visibility controller), and once a dock has faded out on idle. A hidden dock therefore schedules no frames.
+
+Elapsed time is wrapped to a 60-second period before it reaches a shader, because a 32-bit float cannot hold an absolute timestamp at animation precision. Every time-dependent term is an integer harmonic of that period, and the noise fields are sampled along wide circular orbits rather than translated, so the wrap is seamless rather than a jump once a minute. Angular multipliers are whole numbers for the same reason, so nothing seams at ±π.
+
+`maxSampleOffset` is 0.24× the icon dimension while the shaders sample at 0.16×. Glitch stacks a row slip and a channel split on top of the silhouette reach, and Singularity's deflection reaches further than its sampling; one shared value would have widened every other style's glow band.
+
+### Compilation
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug build
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug build-for-testing
+```
+
+Both reported **BUILD SUCCEEDED** and **TEST BUILD SUCCEEDED**. The Metal file compiles and links into `default.metallib` with no diagnostics. The only warning reported skipped App Intents metadata extraction, as before. The string catalog parses.
+
+### Validation status
+
+No tests were run, no app was launched, and no automated visual checks were performed, per the project's test policy. One test was added covering the withdrawn-style migration, a full settings document carrying a withdrawn value, and the rejection of an unknown value; it is compiled but not executed.
+
+Previews cover every shader style across six differently coloured sample icons, three icon dimensions, the still variant, and an explicit reduced-transparency variant, plus six sparkle repertoires. Previews were not run. Sample tiles in the Settings demonstration gained a proportional transparent margin, because real application artwork carries one and without it the shader styles have nowhere to put their light.
+
+The shader cost is an implementation constraint, not a measured result: the silhouette pass is 48 texture samples per output pixel, Lava Chrome adds three fbm evaluations, and Singularity adds none. No GPU or battery measurement was taken.
+
+### Remaining hands-on acceptance
+
+- Confirm each shader style visibly differs between adjacent running applications, and that the same application keeps its figure across a relaunch of DeeDock.
+- Confirm icons stay recognizable under Lava Chrome, Singularity, and Glitch at 32, 48, and 96 points, and while magnified.
+- Confirm greyscale icons (System Settings, Xcode) fall back to each style's own palette rather than glowing white, and that strongly coloured icons take their own hue.
+- Confirm motion stops when a dock auto-hides and when it fades out on idle, and that it never restarts while hidden.
+- Confirm Reduce Motion holds a single frame for every animated style, and that Glitch still reads as broken rather than merely offset when still.
+- Confirm Reduce Transparency replaces graduated light with solid bands on all seven shader styles.
+- Confirm a saved `neon` or `aura` preference, in shared defaults and in a display override, loads as Plasma and Solar Flare and does not surface a settings error.
+- Confirm the Animate indicators toggle is disabled for the styles that have no motion, and that it overrides independently per display.
+- Watch one animated dock for longer than a minute and confirm no jump at the cycle wrap.
+- Confirm indicator artwork stays inside its own icon square with item spacing at zero.
+
+## Folder stacks
+
+Implemented on 2026-09-03 after the running-indicator work was committed on the existing `codex/onboarding-tour` branch. No branch switch, merge, staging, commit, or push was performed for this feature.
+
+### Behavior and implementation
+
+- Per-display pin storage is now an ordered `DockPin` list containing applications and folders. A missing `dock.pins.v3.<displayID>` key migrates the corresponding application-only list once, while v1 and v2 bytes remain unchanged. Unknown or corrupt v3 bytes block edits and remain available for recovery.
+- Folder identity is a persistent UUID plus resolved standardized URL. Reimporting the same location moves the established pin and retains its bookmark, UUID, and presentation. New displays copy the primary display's complete typed list once; later edits and Grid/List changes are independent.
+- Finder classification runs outside pointer callbacks. Insertion boundaries accept ordered all-pinnable batches of applications and ordinary non-package folders. Direct application targets continue to accept document-only batches, including folders. A folder drag chooses one presentation owner per pointer update: document feedback directly over an application, otherwise pin-insertion feedback. Insertion hit-testing stays in the pre-preview resting frame so a gap cannot resize the panel and invalidate itself; duplicate geometry callbacks are ignored. Packages, aliases, plain files, unreadable items, and mixed pinnable/non-pinnable selections reject pin insertion as a complete operation.
+- One app-wide coordinator owns a transient nonactivating panel. Clicking its source folder toggles it closed without the outside-click monitor reopening it. The panel anchors inward on all four edges, clamps to the display's visible frame with a 16-point margin, and points back to the source icon with a two-point visual join. It uses a 560×420-point ideal size and 280×220-point minimum, and reanchors after display geometry changes.
+- The open panel holds its source dock revealed and suppresses idle fading and tooltips. It fades and slides from its source edge when opening and closing, while Reduce Motion makes both transitions immediate. Outside click, Escape, a second source click, successful open or drag, replacement, source hiding/removal, display removal, sleep, and shutdown close it. Folder resolution and scoped access are renewed for each opening; stale bookmarks are refreshed in the source display's pin.
+- Immediate non-hidden children load away from the main actor and return immutable snapshots. Files, packages, and aliases are leaves; ordinary subfolders reveal in Finder. One scoped directory event source runs only while the panel is open, debounces bursts, and stale loads cannot update a replacement session.
+- Grid uses adaptive columns, 48-point icons, and two-line labels. List uses 24-point icons and one-line labels. Loading, empty, unavailable, and retryable error states are present. Reduce Transparency selects an opaque native background; the stack introduces no required motion.
+- Folder icons and their stack cues use the same idle artwork opacity and animation as application icons.
+- One child can be opened or dragged at a time. Native drag sources export a file URL with copy and move operations while the panel retains its security-scoped folder lease through the AppKit session. DeeDock does not mutate the filesystem.
+- Focus Dock transfers explicit keyboard focus into a stack. Arrow keys navigate, Return opens, Escape returns to the source pin, and Tab reaches Grid/List. Folder menus and VoiceOver actions cover opening, Finder reveal, presentation, movement, copying to another display, and unpinning. New app-owned copy is in the string catalog with translator comments.
+
+### Compilation and authored coverage
+
+The focused Debug app build and the test-target compilation used:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -derivedDataPath /tmp/DeeDock-folder-stacks-derived \
+  CODE_SIGNING_ALLOWED=NO build
+
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -derivedDataPath /tmp/DeeDock-folder-stacks-derived \
+  CODE_SIGNING_ALLOWED=NO build-for-testing
+```
+
+Both succeeded. Xcode reported the existing skipped App Intents metadata warning and its existing test-target dependency-scan warning. The latter does not prevent test compilation.
+
+Authored Swift Testing coverage includes v2-to-v3 migration without legacy-byte mutation, unknown v3 tags and byte preservation, folder identity/deduplication with established metadata, presentation round trips and failed-save rollback, mixed Finder pin ordering, folder document-versus-pin routing, package and symbolic-link rejection, scoped-access release, hidden-child filtering, localized numeric sorting, packages as leaves, and four-edge panel clamping with a negative display origin. Existing profile, pin-editing, insertion, cross-display, document-payload, and selection tests were adapted to typed pins.
+
+Deterministic previews cover Grid and List, populated, loading, empty, unavailable, recoverable error, long-name, dark, and opaque-background states. They were compiled but not rendered.
+
+**No tests were executed. The app was not launched. No previews were rendered, and no automated visual checks or hands-on acceptance were performed.**
+
+### Required hands-on acceptance
+
+- Import mixed folders and apps, restart, reorder, copy between displays, drag out to unpin, and verify Grid/List independence. Exercise a moved, renamed, deleted, unreadable, and stale-bookmark folder.
+- Open regular files, packages, aliases, and subfolders. Verify successful opens close the panel; failed opens remain visible and Retry works.
+- Drag children to Finder and applications with copy, move, modifier changes, rejection, and cancellation. Confirm DeeDock itself never changes the filesystem and that access ends after AppKit completes the session.
+- Change directory contents while the stack is open and closed. Verify live updates, event-burst settling, no stale result after replacement, and no idle watcher when closed.
+- Check all four dock edges, negative origins, visible-frame clamping, small displays, overflow, collapsed and hidden pins, auto-hide, multiple displays, display removal, Spaces, full-screen apps, and sleep/wake.
+- Exercise pointer focus passthrough, Focus Dock keyboard transfer and return, Tab routing, VoiceOver labels/actions/counts, long names, dark appearance, Reduce Motion, and Reduce Transparency.
+
+Trash, Fan and Automatic modes, recursive navigation, search, Quick Look, multi-selection, file promises, two-way folder drops, and persistent utility windows remain planned.

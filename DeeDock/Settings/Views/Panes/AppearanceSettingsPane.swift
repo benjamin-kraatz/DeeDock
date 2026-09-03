@@ -7,6 +7,7 @@ struct AppearanceSettingsPane: View {
     @Binding var magnification: Double
     @Binding var itemSpacing: Double
     @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
+    @Binding var animateIndicators: Bool
 
     var appearanceSettings = DockSettings.defaults
     var overrideContext: SettingsOverrideContext? = nil
@@ -18,8 +19,12 @@ struct AppearanceSettingsPane: View {
                                       runningIndicatorStyle: runningIndicatorStyle, appearanceSettings: appearanceSettings)
             }
             SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
-                RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle)
+                RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle, animated: animateIndicators)
                     .settingsOverride(overrideContext, field: .runningIndicatorStyle)
+                Toggle(isOn: $animateIndicators) { Text(.settingsAnimateIndicators) }
+                    .padding(14)
+                    .disabled(!runningIndicatorStyle.animates)
+                    .settingsOverride(overrideContext, field: .animateIndicators)
             }
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,
@@ -44,9 +49,11 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var iconSize: Double = 48
     @Previewable @State var magnification: Double = 1.4
     @Previewable @State var itemSpacing: Double = 4
-    @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .dot
+    @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .plasma
+    @Previewable @State var animate = true
     ScrollView {
-        AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, runningIndicatorStyle: $indicator)
+        AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing,
+                               runningIndicatorStyle: $indicator, animateIndicators: $animate)
             .padding(24)
     }
     .tint(SettingsCategory.appearance.tint)

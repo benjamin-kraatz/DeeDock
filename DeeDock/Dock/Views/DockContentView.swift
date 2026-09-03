@@ -11,6 +11,7 @@ struct DockContentView: View {
     let interaction: DockInteraction
     let reduceMotion: Bool
     let reduceTransparency: Bool
+    let primaryAppAction: (DockItem) -> Void
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
     let dismissError: () -> Void
@@ -43,7 +44,8 @@ struct DockContentView: View {
                         layout: layout, sizes: sizes, surface: layout.surfaceFrame(sizes: sizes),
                         viewport: shifted(viewport, by: -scrollOffset), hoveredID: $hoveredID,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
-                        openApp: openApp, togglePin: togglePin, interaction: interaction,
+                        primaryAppAction: primaryAppAction, openApp: openApp,
+                        togglePin: togglePin, interaction: interaction,
                         iconFrameChanged: { id, rect in
                             guard interaction.layout.edge == edge else { return }
                             interaction.setIconRect(rect?.intersection(viewport), for: id)
@@ -53,6 +55,7 @@ struct DockContentView: View {
                         edge.along(geometry.frame(in: .named("dockViewport")).origin)
                     } action: { value in
                         guard interaction.layout.edge == edge else { return }
+                        guard scrollOffset != value || interaction.scrollOffset != value else { return }
                         scrollOffset = value; interaction.scrollOffset = value
                         interaction.scrollChanged?()
                     }
@@ -105,7 +108,7 @@ struct DockContentView: View {
     #Preview("Drag: live insertion gap") {
         DockPreviewContent(
             dragProposal: DockDragProposal(
-                references: [DockPreviewData.items[0].reference],
+                pins: [.application(DockPreviewData.items[0].reference)],
                 index: 3
             ),
             dragMessage: .dragPinHere
@@ -118,9 +121,7 @@ struct DockContentView: View {
             reduceMotion: true,
             reduceTransparency: true,
             dragProposal: DockDragProposal(
-                references: Array(DockPreviewData.items.prefix(2)).map(
-                    \.reference
-                ),
+                pins: Array(DockPreviewData.items.prefix(2)).map { .application($0.reference) },
                 index: 0
             ),
             dragMessage: .dragPinHere

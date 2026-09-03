@@ -45,9 +45,32 @@ final class ApplicationCatalog {
         didChange?()
     }
 
+    /// Owns app-icon toggle work so all display docks share duplicate suppression and teardown.
+    func performPrimaryAction(_ reference: ApplicationReference,
+                              completion: @escaping (LocalizedStringResource?) -> Void) {
+        submit(reference, operation: { service in try await service.performPrimaryAction(reference) }) { error in
+            if error is ApplicationPrimaryActionError {
+                completion(.errorHideApp(appName: reference.name))
+            } else {
+                completion(.errorOpenApp(appName: reference.name, details: error.localizedDescription))
+            }
+        } completion: {
+            completion(nil)
+        }
+    }
+
     /// Only this catalog owns cancellation. The initiating dock supplies a weak, session-checked callback.
     func open(_ reference: ApplicationReference, ifCurrent: @escaping () -> Bool = { true },
               completion: @escaping (LocalizedStringResource?) -> Void) {
+        submit(reference, ifCurrent: ifCurrent, operation: { service in try await service.open(reference) }) { error in
+            completion(.errorOpenApp(appName: reference.name, details: error.localizedDescription))
+        } completion: { completion(nil) }
+    }
+
+    private func submit(_ reference: ApplicationReference, ifCurrent: @escaping () -> Bool = { true },
+                        operation: @escaping (any ApplicationServicing) async throws -> Void,
+                        failure: @escaping (any Error) -> Void,
+                        completion: @escaping () -> Void) {
         guard tasks[reference.id] == nil else { return }
         let currentGeneration = generation
         launching.insert(reference.id)
@@ -59,13 +82,13 @@ final class ApplicationCatalog {
             do {
                 try Task.checkCancellation()
                 guard ifCurrent() else { return }
-                try await service.open(reference)
+                try await operation(service)
                 guard !Task.isCancelled, generation == currentGeneration else { return }
-                completion(nil)
+                completion()
                 refresh()
             } catch {
                 guard !Task.isCancelled, generation == currentGeneration else { return }
-                completion(.errorOpenApp(appName: reference.name, details: error.localizedDescription))
+                failure(error)
             }
         }
     }
@@ -81,8 +104,14 @@ final class ApplicationCatalog {
         }
     }
 
-    func pruneIcons(items: [DockItem]) {
-        service.pruneIcons(keeping: Set(items.compactMap { service.resolvedURL(for: $0.reference) }))
+    func pruneIcons(items: [DockItem], folders: [FolderDockItem] = []) {
+        let applicationURLs = items.compactMap { service.resolvedURL(for: $0.reference) }
+        let folderURLs = folders.compactMap { item -> URL? in
+            let access = FolderResourceAccess(item.reference)
+            defer { withExtendedLifetime(access) {} }
+            return access.isAvailable ? access.url : nil
+        }
+        service.pruneIcons(keeping: Set(applicationURLs + folderURLs))
     }
 
     /// Every accepted batch owns a task and its file access, independent of launch suppression.

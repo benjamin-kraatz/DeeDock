@@ -10,6 +10,7 @@ struct DeeDockApp: App {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
             OpenDockSettingsButton()
+            Button(.onboardingShowWelcome) { delegate.onboarding.present() }
             Divider()
             Button(.actionQuit) { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
@@ -21,6 +22,7 @@ struct DeeDockApp: App {
                 OpenDockSettingsButton().keyboardShortcut(",")
             }
             CommandGroup(after: .appInfo) {
+                Button(.onboardingShowWelcome) { delegate.onboarding.present() }
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
             }

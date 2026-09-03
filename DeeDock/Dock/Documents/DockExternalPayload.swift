@@ -4,20 +4,27 @@ import UniformTypeIdentifiers
 /// Classification is completed once per external drag, off the UI actor.
 nonisolated enum DockExternalPayload: Sendable {
     case checking
-    case applications([ApplicationReference])
+    case selection(pins: [DockPin]?, documents: DocumentResourceAccess?)
     case documents(DocumentResourceAccess)
     case rejected
 
-    var applications: [ApplicationReference] {
-        if case .applications(let apps) = self { return apps }
+    var pins: [DockPin] {
+        if case .selection(let pins, _) = self { return pins ?? [] }
         return []
     }
     var documents: DocumentResourceAccess? {
-        if case .documents(let access) = self { return access }
-        return nil
+        switch self {
+        case .selection(_, let access): return access
+        case .documents(let access): return access
+        default: return nil
+        }
     }
     var isRejected: Bool { if case .rejected = self { return true }; return false }
-    var isReady: Bool { !applications.isEmpty || documents != nil }
+    var isChecking: Bool { if case .checking = self { return true }; return false }
+    var isReady: Bool { !pins.isEmpty || documents != nil }
+    /// Document-only batches need generic application-target feedback. A folder batch defers
+    /// to pin insertion unless the pointer is directly over an application.
+    var presentsDocumentFallback: Bool { documents != nil && pins.isEmpty }
 
     /// Rejects incomplete batches before either pin editing or document delivery can occur.
     static func read(_ access: DocumentResourceAccess, excluding ownIdentifier: String,
@@ -25,34 +32,29 @@ nonisolated enum DockExternalPayload: Sendable {
                          try $0.bookmarkData(options: [.withSecurityScope, .securityScopeAllowOnlyReadAccess],
                                              includingResourceValuesForKeys: nil, relativeTo: nil)
                      }) throws -> Self {
-        let applicationFlags = try classify(access.urls)
-        if applicationFlags.allSatisfy({ $0 }) {
-            let apps = try DockApplicationImporter.read(access.urls, excluding: ownIdentifier, bookmark: bookmark)
-            var identities = Set<String>()
-            return .applications(apps.filter { identities.insert($0.id).inserted })
+        let kinds = try access.urls.map(DockPinImporter.kind)
+        let hasApplication = kinds.contains { if case .application = $0 { return true }; return false }
+        let allPinnable = kinds.allSatisfy { kind in
+            if case .other = kind { return false }
+            return true
         }
-        guard !applicationFlags.contains(true) else { throw DockDocumentValidationError.unsupportedSelection }
-        return .documents(access)
+        if allPinnable {
+            let pins = try DockPinImporter.read(access.urls, kinds: kinds, excluding: ownIdentifier, bookmark: bookmark)
+            return .selection(pins: pins, documents: hasApplication ? nil : access)
+        }
+        guard !hasApplication else { throw DockDocumentValidationError.unsupportedSelection }
+        return .selection(pins: nil, documents: access)
     }
 
     /// Used again immediately before handoff and by the picker. Never traverses folder contents.
     static func validateDocuments(_ urls: [URL]) throws {
-        guard try !classify(urls).contains(true) else { throw DockDocumentValidationError.unsupportedSelection }
-    }
-
-    private static func classify(_ urls: [URL]) throws -> [Bool] {
         guard !urls.isEmpty else { throw CocoaError(.fileReadUnknown) }
-        return try urls.map { url in
+        for url in urls {
             try Task.checkCancellation()
             guard url.isFileURL else { throw DockDocumentValidationError.unsupportedSelection }
-            var probe = url
-            probe.removeAllCachedResourceValues()
-            let values = try probe.resourceValues(forKeys: [.contentTypeKey, .isDirectoryKey, .isRegularFileKey, .isReadableKey])
-            guard values.isReadable != false, values.isDirectory == true || values.isRegularFile == true else {
-                throw CocoaError(.fileReadNoPermission)
+            if case .application = try DockPinImporter.kind(of: url) {
+                throw DockDocumentValidationError.unsupportedSelection
             }
-            // Broken or unregistered .app bundles must never become document payloads.
-            return values.contentType?.conforms(to: .applicationBundle) == true || url.pathExtension.lowercased() == "app"
         }
     }
 }

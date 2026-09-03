@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import UniformTypeIdentifiers
 
 /// One display's pins and transient selection/error state; workspace work belongs to the shared catalog.
 @MainActor @Observable
@@ -7,6 +8,7 @@ final class DockStore {
     let displayID: String
     /// Ordered render snapshots: this display's pins, followed by shared running applications.
     private(set) var items: [DockItem] = []
+    private(set) var folders: [FolderDockItem] = []
     /// A localized failure belonging only to this panel session.
     var errorMessage: LocalizedStringResource? { didSet { errorDidChange?() } }
     @ObservationIgnored var errorDidChange: (() -> Void)?
@@ -25,8 +27,9 @@ final class DockStore {
     var launching: Set<String> { catalog.busyApplications }
     @ObservationIgnored private let catalog: ApplicationCatalog
     var pinDestinations: [DockPinDestination] = []
-    @ObservationIgnored var copyPin: ((ApplicationReference, String) -> Void)?
-    var pins: [ApplicationReference] { profiles.pinLists[displayID] ?? [] }
+    @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
+    @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
+    var pins: [DockPin] { profiles.pinLists[displayID] ?? [] }
     var canEditPins: Bool { !profiles.requiresReset && profiles.pinErrors[displayID] == nil }
 
     @ObservationIgnored private let profiles: DisplayProfilesStore
@@ -45,9 +48,10 @@ final class DockStore {
     /// Rebuilds presentation from shared data without starting workspace observation.
     func refresh() {
         let pins = profiles.pinLists[displayID] ?? []
+        let pinnedApplications = pins.compactMap(\.application)
         let running = Dictionary(uniqueKeysWithValues: catalog.running.map { ($0.id, $0) })
-        let favorites = Dictionary(uniqueKeysWithValues: pins.map { ($0.id, $0) })
-        items = DockOrdering.itemOrder(favorites: pins, runningIDs: catalog.runningIDs).compactMap { id in
+        let favorites = Dictionary(uniqueKeysWithValues: pinnedApplications.map { ($0.id, $0) })
+        items = DockOrdering.itemOrder(favorites: pinnedApplications, runningIDs: catalog.runningIDs).compactMap { id in
             guard let reference = favorites[id] ?? running[id] else { return nil }
             let access = ApplicationResourceAccess(reference)
             defer { withExtendedLifetime(access) {} }
@@ -55,11 +59,26 @@ final class DockStore {
             return DockItem(reference: reference, icon: catalog.service.icon(for: url), isFavorite: favorites[id] != nil,
                             isRunning: running[id] != nil, isAvailable: url != nil)
         }
+        folders = pins.compactMap { pin -> FolderDockItem? in
+            guard let reference = pin.folder else { return nil }
+            let access = FolderResourceAccess(reference)
+            defer { withExtendedLifetime(access) {} }
+            let available = access.isAvailable
+            let icon: NSImage
+            if available {
+                icon = catalog.service.icon(for: access.url)
+            } else {
+                icon = NSWorkspace.shared.icon(for: .folder)
+                icon.size = NSSize(width: 128, height: 128)
+            }
+            return FolderDockItem(reference: reference, icon: icon, isAvailable: available)
+        }
         refreshEntries()
     }
 
     private func refreshEntries() {
-        let next = DockSectionProjection.entries(items: items, visibility: sections.visibility, expanded: sections.isExpanded)
+        let next = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
+                                                  visibility: sections.visibility, expanded: sections.isExpanded)
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
     }
@@ -67,22 +86,22 @@ final class DockStore {
     /// Saves this display's pins; the coordinator refreshes panels only after the write succeeds.
     func toggleFavorite(_ item: DockItem) {
         var pins = profiles.pinLists[displayID] ?? []
-        if pins.contains(where: { $0.id == item.id }) { pins.removeAll { $0.id == item.id } }
-        else { pins.append(item.reference) }
+        if pins.contains(where: { $0.application?.id == item.id }) { pins.removeAll { $0.application?.id == item.id } }
+        else { pins.append(.application(item.reference)) }
         do { try profiles.savePins(pins, for: displayID) }
         catch { errorMessage = .errorSavePins(details: error.localizedDescription) }
     }
 
     /// Persists one completed edit. Preview state must never call this method.
     @discardableResult
-    func savePins(_ proposed: [ApplicationReference]) -> Bool {
+    func savePins(_ proposed: [DockPin]) -> Bool {
         guard proposed != pins else { return true }
         do { try profiles.savePins(proposed, for: displayID); return true }
         catch { errorMessage = .errorSavePins(details: error.localizedDescription); return false }
     }
 
-    func insertPins(_ references: [ApplicationReference], at index: Int) -> Bool {
-        savePins(DockPinEditing.inserting(references, into: pins, at: index))
+    func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
+        savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
     }
 
     func movePin(_ id: String, by distance: Int) {
@@ -96,7 +115,33 @@ final class DockStore {
 
     func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
 
+    func setFolderPresentation(_ presentation: FolderStackPresentation, for id: UUID) -> Bool {
+        var proposed = pins
+        guard let index = proposed.firstIndex(where: { $0.folder?.id == id }),
+              var folder = proposed[index].folder else { return false }
+        folder.presentation = presentation
+        proposed[index] = .folder(folder)
+        return savePins(proposed)
+    }
+
+    func refreshFolderReference(_ folder: FolderReference) -> Bool {
+        var proposed = pins
+        guard let index = proposed.firstIndex(where: { $0.folder?.id == folder.id }) else { return false }
+        proposed[index] = .folder(folder)
+        return savePins(proposed)
+    }
+
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
+    func performPrimaryAction(_ item: DockItem) {
+        let token = session.token
+        catalog.performPrimaryAction(item.reference) { [weak self] error in
+            guard let self, session.accepts(token) else { return }
+            if let error { errorMessage = error }
+            else { applicationOpened?() }
+        }
+    }
+
+    /// Opens or activates an app without applying the app-icon hide toggle.
     func open(_ item: DockItem) {
         let token = session.token
         catalog.open(item.reference) { [weak self] error in
@@ -133,9 +178,14 @@ final class DockStore {
     }
     func openSelection() {
         guard let entry = entries.first(where: { $0.target == selectedTarget }) else { return }
-        switch entry { case .app(let item): open(item); case .group: sections.toggle(); case .gap: break }
+        switch entry {
+        case .app(let item): open(item)
+        case .folder(let folder): openFolder?(folder, keyboardFocus)
+        case .group: sections.toggle()
+        case .gap: break
+        }
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { sections.stop(); presentationDidChange = nil; copyPin = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }
