@@ -14,6 +14,17 @@
 		DD4000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift */; };
 		DD4000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift */; };
 		DD4000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift */; };
+		DD6000000000000000000000 /* DisplaySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000000 /* DisplaySnapshot.swift */; };
+		DD6000000000000000000001 /* DockSettingsOverrides.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000001 /* DockSettingsOverrides.swift */; };
+		DD6000000000000000000002 /* DisplayProfilesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000002 /* DisplayProfilesRepository.swift */; };
+		DD6000000000000000000003 /* DisplayProfilesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000003 /* DisplayProfilesStore.swift */; };
+		DD6000000000000000000004 /* DockSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000004 /* DockSettingsStore.swift */; };
+		DD6000000000000000000005 /* DockSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000005 /* DockSession.swift */; };
+		DD6000000000000000000006 /* ApplicationCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000006 /* ApplicationCatalog.swift */; };
+		DD6000000000000000000007 /* DockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000007 /* DockStore.swift */; };
+		DD6000000000000000000008 /* DockItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000008 /* DockItem.swift */; };
+		DD6000000000000000000009 /* ApplicationServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7000000000000000000009 /* ApplicationServicing.swift */; };
+		DD8000000000000000000000 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DD8000000000000000000001 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +37,17 @@
 		DD5000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Models/DockSettings.swift; sourceTree = SOURCE_ROOT; };
 		DD5000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Persistence/DockSettingsRepository.swift; sourceTree = SOURCE_ROOT; };
 		DD5000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Layout/DockPlacement.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000000 /* DisplaySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Displays/Models/DisplaySnapshot.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000001 /* DockSettingsOverrides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Profiles/DockSettingsOverrides.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000002 /* DisplayProfilesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Profiles/DisplayProfilesRepository.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000003 /* DisplayProfilesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Profiles/DisplayProfilesStore.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000004 /* DockSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/State/DockSettingsStore.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000005 /* DockSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/DockSession.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000006 /* ApplicationCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/ApplicationCatalog.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000007 /* DockStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/DockStore.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000008 /* DockItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockItem.swift; sourceTree = SOURCE_ROOT; };
+		DD7000000000000000000009 /* ApplicationServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationServicing.swift; sourceTree = SOURCE_ROOT; };
+		DD8000000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = DeeDock/Resources/Localizable.xcstrings; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -77,6 +99,17 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DD8000000000000000000001 /* Localizable.xcstrings */,
+				DD7000000000000000000009 /* ApplicationServicing.swift */,
+				DD7000000000000000000008 /* DockItem.swift */,
+				DD7000000000000000000007 /* DockStore.swift */,
+				DD7000000000000000000006 /* ApplicationCatalog.swift */,
+				DD7000000000000000000005 /* DockSession.swift */,
+				DD7000000000000000000004 /* DockSettingsStore.swift */,
+				DD7000000000000000000003 /* DisplayProfilesStore.swift */,
+				DD7000000000000000000002 /* DisplayProfilesRepository.swift */,
+				DD7000000000000000000001 /* DockSettingsOverrides.swift */,
+				DD7000000000000000000000 /* DisplaySnapshot.swift */,
 				DD5000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift */,
 				DD5000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift */,
 				DD5000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift */,
@@ -115,6 +148,7 @@
 			buildPhases = (
 				DD0000000000000000000008 /* Sources */,
 				DD0000000000000000000005 /* Frameworks */,
+				DD8000000000000000000002 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -168,6 +202,7 @@
 			files = (
 			);
 		};
+		DD8000000000000000000002 /* Resources */ = {isa = PBXResourcesBuildPhase; files = (DD8000000000000000000000 /* Localizable.xcstrings in Resources */,); };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -179,6 +214,16 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				DD6000000000000000000009 /* ApplicationServicing.swift in Sources */,
+				DD6000000000000000000008 /* DockItem.swift in Sources */,
+				DD6000000000000000000007 /* DockStore.swift in Sources */,
+				DD6000000000000000000006 /* ApplicationCatalog.swift in Sources */,
+				DD6000000000000000000005 /* DockSession.swift in Sources */,
+				DD6000000000000000000004 /* DockSettingsStore.swift in Sources */,
+				DD6000000000000000000003 /* DisplayProfilesStore.swift in Sources */,
+				DD6000000000000000000002 /* DisplayProfilesRepository.swift in Sources */,
+				DD6000000000000000000001 /* DockSettingsOverrides.swift in Sources */,
+				DD6000000000000000000000 /* DisplaySnapshot.swift in Sources */,
 				DD4000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift in Sources */,
 				DD4000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift in Sources */,
 				DD4000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift in Sources */,

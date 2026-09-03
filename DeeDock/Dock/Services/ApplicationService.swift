@@ -2,7 +2,7 @@ import AppKit
 
 /// Main-actor adapter for app discovery, icon caching, and Launch Services operations.
 @MainActor
-final class ApplicationService {
+final class ApplicationService: ApplicationServicing {
     private let workspace: NSWorkspace
     private var iconCache: [URL: NSImage] = [:]
 
@@ -47,7 +47,7 @@ final class ApplicationService {
         return image
     }
 
-    /// Releases icons no longer referenced by the current dock snapshot.
+    /// Releases icons no longer referenced by any active dock snapshot.
     func pruneIcons(keeping urls: Set<URL>) { iconCache = iconCache.filter { urls.contains($0.key) } }
 
     /// Opens or activates the referenced app without requesting a new process instance.

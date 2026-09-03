@@ -8,6 +8,8 @@ struct PositionSettingsPane: View {
     @Binding var horizontalOffset: Double
     @Binding var bottomDistance: Double
 
+    var overrideContext: SettingsOverrideContext? = nil
+
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
@@ -19,17 +21,21 @@ struct PositionSettingsPane: View {
                 SettingsPickerRow(title: .settingsPositionReference,
                                   options: DockSettings.PositionReference.settingsOptions,
                                   selection: $reference)
+                    .settingsOverride(overrideContext, field: .positionReference)
                 SettingsPickerRow(title: .settingsAlignment,
                                   options: DockSettings.Alignment.settingsOptions,
                                   selection: $alignment)
+                    .settingsOverride(overrideContext, field: .alignment)
             }
             SettingsCard(title: .settingsCardFineTuning, footnote: .settingsPositionHelp) {
                 SettingsSliderRow(title: .settingsHorizontalOffset, unit: .settingsPoints,
                                   value: $horizontalOffset, range: -1000...1000, step: 1,
                                   minimumSymbol: "arrow.left", maximumSymbol: "arrow.right")
+                    .settingsOverride(overrideContext, field: .horizontalOffset)
                 SettingsSliderRow(title: .settingsBottomDistance, unit: .settingsPoints,
                                   value: $bottomDistance, range: 0...300, step: 1,
                                   minimumSymbol: "arrow.down.to.line", maximumSymbol: "arrow.up")
+                    .settingsOverride(overrideContext, field: .bottomDistance)
             }
         }
     }

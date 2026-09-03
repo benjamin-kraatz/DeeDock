@@ -8,16 +8,36 @@ import SwiftUI
 struct SettingsDetailView: View {
     let store: DockSettingsStore
     let category: SettingsCategory?
+    var context: SettingsOverrideContext? = nil
+    var profileError: LocalizedStringResource? = nil
+    @Binding var displayCategory: SettingsCategory
+
+    init(store: DockSettingsStore, category: SettingsCategory?, context: SettingsOverrideContext? = nil,
+         profileError: LocalizedStringResource? = nil,
+         displayCategory: Binding<SettingsCategory> = .constant(.appearance)) {
+        self.store = store
+        self.category = category
+        self.context = context
+        self.profileError = profileError
+        _displayCategory = displayCategory
+    }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private func binding<Value>(_ keyPath: WritableKeyPath<DockSettings, Value>) -> Binding<Value> {
-        Binding(get: { store.value[keyPath: keyPath] }, set: { store.update(keyPath, to: $0) })
+        Binding(get: { (context.map { $0.profiles.effectiveSettings(for: $0.id) } ?? store.value)[keyPath: keyPath] },
+                set: { value in
+                    if let context { context.profiles.update(context.id, keyPath: keyPath, to: value) }
+                    else { store.update(keyPath, to: value) }
+                })
     }
 
     var body: some View {
         ScrollView {
             if let category {
-                pane(for: category)
+                VStack(alignment: .leading, spacing: 22) {
+                    if let context { DisplaySettingsHeader(context: context, category: $displayCategory) }
+                    pane(for: category)
+                }
                     .frame(maxWidth: 620, alignment: .leading)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, 26)
@@ -38,11 +58,16 @@ struct SettingsDetailView: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(paneWash)
         .tint(category?.tint ?? .accentColor)
-        .disabled(store.requiresReset)
+        .disabled(store.requiresReset || context?.profiles.requiresReset == true)
         .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: category)
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            SettingsFooterBar(errorMessage: store.errorMessage,
-                              restoreDefaults: { store.restoreDefaults() })
+            SettingsFooterBar(errorMessage: profileError ?? store.errorMessage,
+                              resetTitle: context == nil ? .settingsRestoreDefaults : .displayUseDefaults,
+                              resetDisabled: context?.profiles.requiresReset == true,
+                              restoreDefaults: {
+                                  if let context { context.profiles.useDefaults(for: context.id) }
+                                  else { store.restoreDefaults() }
+                              })
         }
     }
 
@@ -50,12 +75,12 @@ struct SettingsDetailView: View {
         switch category {
         case .appearance:
             AppearanceSettingsPane(iconSize: binding(\.iconSize),
-                                   magnification: binding(\.magnification))
+                                   magnification: binding(\.magnification), overrideContext: context)
         case .position:
             PositionSettingsPane(reference: binding(\.positionReference),
                                  alignment: binding(\.alignment),
                                  horizontalOffset: binding(\.horizontalOffset),
-                                 bottomDistance: binding(\.bottomDistance))
+                                 bottomDistance: binding(\.bottomDistance), overrideContext: context)
         }
     }
 
@@ -72,3 +97,19 @@ struct SettingsDetailView: View {
             .ignoresSafeArea()
     }
 }
+
+#if DEBUG
+#Preview("Display overrides") {
+    let profiles = DisplaySettingsPreview.make()
+    SettingsDetailView(store: profiles.defaults, category: .appearance,
+                       context: SettingsOverrideContext(profiles: profiles, id: "display.preview2"))
+        .frame(width: 620, height: 650)
+}
+#Preview("Disconnected display") {
+    let profiles = DisplaySettingsPreview.make()
+    SettingsDetailView(store: profiles.defaults, category: .position,
+                       context: SettingsOverrideContext(profiles: profiles, id: "display.preview3"),
+                       displayCategory: .constant(.position))
+        .frame(width: 620, height: 650)
+}
+#endif

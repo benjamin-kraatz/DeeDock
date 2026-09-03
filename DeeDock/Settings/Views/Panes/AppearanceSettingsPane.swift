@@ -5,6 +5,8 @@ struct AppearanceSettingsPane: View {
     @Binding var iconSize: Double
     @Binding var magnification: Double
 
+    var overrideContext: SettingsOverrideContext? = nil
+
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
@@ -14,9 +16,11 @@ struct AppearanceSettingsPane: View {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,
                                   value: $iconSize, range: 32...96, step: 1,
                                   minimumSymbol: "square", maximumSymbol: "square.fill")
+                    .settingsOverride(overrideContext, field: .iconSize)
                 SettingsSliderRow(title: .settingsMagnification, unit: .settingsMultiplier,
                                   value: $magnification, range: 1...2, step: 0.05,
                                   minimumSymbol: "magnifyingglass", maximumSymbol: "plus.magnifyingglass")
+                    .settingsOverride(overrideContext, field: .magnification)
             }
         }
     }

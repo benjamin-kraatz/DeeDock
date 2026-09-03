@@ -3,6 +3,8 @@ import SwiftUI
 /// Persistent bar under the panes: failure feedback plus the one destructive action.
 struct SettingsFooterBar: View {
     let errorMessage: LocalizedStringResource?
+    var resetTitle: LocalizedStringResource = .settingsRestoreDefaults
+    var resetDisabled = false
     let restoreDefaults: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -17,11 +19,12 @@ struct SettingsFooterBar: View {
                 Spacer()
                 Button(action: restoreDefaults) {
                     Label {
-                        Text(.settingsRestoreDefaults)
+                        Text(resetTitle)
                     } icon: {
                         Image(systemName: "arrow.counterclockwise")
                     }
                 }
+                .disabled(resetDisabled)
             }
         }
         .padding(.horizontal, 24)

@@ -1,45 +1,45 @@
 import SwiftUI
 
-/// Pane navigation with live filtering, ready to hold more grouped entries as settings grow.
+/// Searchable defaults and device navigation, retaining the pane artwork and native list styling.
 struct SettingsSidebar: View {
-    @Binding var selection: SettingsCategory?
+    @Binding var selection: SettingsSelection?
     @Binding var searchText: String
+    let profiles: DisplayProfilesStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var matches: [SettingsCategory] {
-        SettingsCategory.allCases.filter { $0.matches(searchText) }
+    private var matches: [SettingsCategory] { SettingsCategory.allCases.filter { $0.matches(searchText) } }
+    private func matches(_ profile: DisplayProfile) -> Bool {
+        searchText.isEmpty || profile.name.localizedStandardContains(searchText) || !matches.isEmpty
     }
 
     var body: some View {
         List(selection: $selection) {
-            if matches.isEmpty {
-                Text(.settingsNoMatches)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 6)
-            } else {
-                Section {
-                    ForEach(matches) { category in
-                        SettingsCategoryRow(category: category, isSelected: selection == category)
-                            .tag(category)
-                    }
-                } header: {
-                    Text(.settingsGroupDock)
+            Section {
+                ForEach(matches) { category in
+                    SettingsCategoryRow(category: category, isSelected: selection == .defaults(category))
+                        .tag(SettingsSelection.defaults(category))
                 }
+            } header: { Text(.displayDefaults) }
+            Section {
+                ForEach(profiles.displays) { display in
+                    if let profile = profiles.document.profiles[display.id], matches(profile) {
+                        DisplayProfileRow(profile: profile, snapshot: display).tag(SettingsSelection.display(display.id))
+                    }
+                }
+            } header: { Text(.displayConnectedGroup) }
+            if !profiles.remembered.isEmpty {
+                Section {
+                    ForEach(profiles.remembered.filter(matches)) { profile in
+                        DisplayProfileRow(profile: profile, snapshot: nil).tag(SettingsSelection.display(profile.id))
+                    }
+                } header: { Text(.displayRememberedGroup) }
+            }
+            if matches.isEmpty && !profiles.document.profiles.values.contains(where: matches) {
+                Text(.settingsNoMatches).foregroundStyle(.secondary)
             }
         }
         .searchable(text: $searchText, placement: .sidebar, prompt: Text(.settingsSearchPrompt))
-        // Settings has a fixed two-column shape; a collapse control would only hide navigation.
         .toolbar(removing: .sidebarToggle)
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: matches)
     }
 }
-
-#if DEBUG
-#Preview("Sidebar") {
-    @Previewable @State var selection: SettingsCategory? = .appearance
-    @Previewable @State var search = ""
-    SettingsSidebar(selection: $selection, searchText: $search)
-        .frame(width: 215, height: 400)
-}
-#endif

@@ -1,26 +1,17 @@
 import AppKit
 
-/// Owns one dock panel, display placement, event observation, and explicit keyboard focus.
-/// The app delegate must pair `start()` with `stop()` before releasing this controller.
+/// Owns one native panel and its local geometry/keyboard handlers. The coordinator owns global events.
 @MainActor
 final class DockPanelController {
-    private let store: DockStore
-    private let settings: DockSettingsStore
+    let store: DockStore
     private let interaction = DockInteraction()
     private let panel: DockPanel
-    private var displayID: CGDirectDisplayID?
-    private var eventMonitors: [Any] = []
-    private var appObservers: [NSObjectProtocol] = []
-    private var workspaceObservers: [NSObjectProtocol] = []
-    private var previousApplication: NSRunningApplication?
-    private var lastExternalApplication: NSRunningApplication?
+    var resignedFocus: (() -> Void)?
+    var escape: (() -> Void)?
 
-    /// Connects the live store and SwiftUI host without installing global event monitors.
-    init(store: DockStore, settings: DockSettingsStore) {
+    init(store: DockStore) {
         self.store = store
-        self.settings = settings
-        panel = DockPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
-                          backing: .buffered, defer: false)
+        panel = DockPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.title = String(localized: .appName)
         panel.isOpaque = false
         panel.backgroundColor = .clear
@@ -33,93 +24,33 @@ final class DockPanelController {
         panel.becomesKeyOnlyIfNeeded = true
         panel.contentView = DockHostingView(rootView: DockView(store: store, interaction: interaction))
         interaction.geometryDidChange = { [weak self] in self?.updatePointer() }
-        panel.keyboardHandler = { [weak self] event in self?.handleKey(event) ?? false }
-        panel.resignedKey = { [weak self] in self?.endKeyboardFocus(restore: false) }
-        settings.settingsDidChange = { [weak self] in self?.placePanel() }
-        store.itemsDidChange = { [weak self] in self?.placePanel() }
-        store.applicationOpened = { [weak self] in self?.endKeyboardFocus(restore: false) }
+        panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
+        panel.resignedKey = { [weak self] in self?.resignedFocus?() }
     }
 
-    /// Presents the panel and installs its event monitors and display/workspace observers.
-    /// Call once per controller lifetime.
-    func start() {
-        if let frontmost = NSWorkspace.shared.frontmostApplication,
-           frontmost.processIdentifier != ProcessInfo.processInfo.processIdentifier {
-            lastExternalApplication = frontmost
-        }
-        placePanel()
-        panel.orderFrontRegardless()
-        // Both monitors are needed: global events cover other apps, local events cover this app.
-        let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .scrollWheel]
-        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] _ in
-            self?.updatePointer()
-        }) { eventMonitors.append(monitor) }
-        if let monitor = NSEvent.addLocalMonitorForEvents(matching: mask.union(.keyDown), handler: { [weak self] event in
-            guard let self else { return event }
-            if event.type == .keyDown, event.window === panel, store.keyboardFocus, handleKey(event) { return nil }
-            updatePointer()
-            return event
-        }) { eventMonitors.append(monitor) }
-        appObservers.append(NotificationCenter.default.addObserver(
-            forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
-        ) { [weak self] _ in MainActor.assumeIsolated { self?.placePanel() } })
-        let center = NSWorkspace.shared.notificationCenter
-        for name in [NSWorkspace.didWakeNotification, NSWorkspace.activeSpaceDidChangeNotification] {
-            workspaceObservers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.placePanel() }
-            })
-        }
-        workspaceObservers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification,
-                                                     object: nil, queue: .main) { [weak self] notification in
-            MainActor.assumeIsolated {
-                guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
-                      app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return }
-                self?.lastExternalApplication = app
-                self?.endKeyboardFocus(restore: false)
-            }
-        })
-        updatePointer()
-    }
-
-    private func placePanel() {
-        // NSScreen.main follows keyboard focus; the system display ID identifies the primary display.
-        let primaryID = CGMainDisplayID()
-        guard let screen = NSScreen.screens.first(where: {
-            ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value == primaryID
-        }) else {
-            panel.orderOut(nil)
-            interaction.pointer = nil
-            return
-        }
-        if displayID != primaryID { interaction.pointer = nil }
-        displayID = primaryID
-        let configuration = settings.value
-        let reference = DockGeometry.referenceFrame(screenFrame: screen.frame, visibleFrame: screen.visibleFrame,
-                                                     settings: configuration)
-        interaction.layout = DockGeometry.layout(count: store.items.count,
-                                                  favoriteCount: store.items.filter(\.isFavorite).count,
-                                                  availableWidth: reference.width, settings: configuration)
-        panel.setFrame(DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout,
-                                               settings: configuration), display: true)
+    /// Reuses the panel and SwiftUI state across arrangement, settings, and application changes.
+    func update(display: DisplaySnapshot, settings: DockSettings) {
+        let reference = DockGeometry.referenceFrame(screenFrame: display.frame, visibleFrame: display.visibleFrame, settings: settings)
+        interaction.layout = DockGeometry.layout(count: store.items.count, favoriteCount: store.items.filter(\.isFavorite).count,
+                                                  availableWidth: reference.width, settings: settings)
+        panel.setFrame(DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings), display: true)
         if !panel.isVisible { panel.orderFrontRegardless() }
         updatePointer()
     }
 
-    private func updatePointer() {
+    func updatePointer() {
         let point = panel.convertPoint(fromScreen: NSEvent.mouseLocation)
-        // AppKit is bottom-left-origin; SwiftUI reports top-left-origin geometry in logical points.
+        // AppKit screen points are bottom-left-origin; SwiftUI reports top-left panel coordinates.
         let flipped = CGPoint(x: point.x, y: panel.frame.height - point.y)
         let inside = interaction.containsDockPoint(flipped)
-        let inError = interaction.errorRect.contains(flipped)
-        // Transparent window margins must pass through to the app beneath the dock.
-        panel.ignoresMouseEvents = !inside && !inError
+        panel.ignoresMouseEvents = !inside && !interaction.errorRect.contains(flipped)
         let pointer = inside ? flipped : nil
         if interaction.pointer != pointer { interaction.pointer = pointer }
     }
 
-    /// Explicitly grants keyboard focus and remembers the external app to restore on Escape.
-    func focusDock() {
-        previousApplication = lastExternalApplication
+    func owns(_ window: NSWindow?) -> Bool { window === panel }
+
+    func focus() {
         panel.acceptsKeyboardFocus = true
         store.keyboardFocus = true
         store.selectedID = store.selectedID ?? store.items.first?.id
@@ -128,43 +59,33 @@ final class DockPanelController {
         panel.makeFirstResponder(panel)
     }
 
-    private func handleKey(_ event: NSEvent) -> Bool {
+    func handleKey(_ event: NSEvent) -> Bool {
         guard store.keyboardFocus else { return false }
         switch event.keyCode {
         case 123: store.moveSelection(by: -1)
         case 124: store.moveSelection(by: 1)
         case 36, 76: store.openSelection()
-        case 53: endKeyboardFocus(restore: true)
+        case 53: escape?()
         default: return false
         }
         return true
     }
 
-    private func endKeyboardFocus(restore: Bool) {
-        guard store.keyboardFocus else { return }
-        // Clear the guard before resignKey, whose callback re-enters this method.
+    /// The coordinator clears its focus owner before this potentially reentrant resign operation.
+    func endFocus() {
         store.keyboardFocus = false
         store.selectedID = nil
         panel.acceptsKeyboardFocus = false
         panel.resignKey()
-        if restore, let previousApplication, !previousApplication.isTerminated {
-            previousApplication.activate(options: [])
-        }
-        previousApplication = nil
     }
 
-    /// Removes every owned monitor/observer and closes the panel without changing system settings.
     func stop() {
-        eventMonitors.forEach { NSEvent.removeMonitor($0) }
-        eventMonitors.removeAll()
-        appObservers.forEach { NotificationCenter.default.removeObserver($0) }
-        workspaceObservers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
-        appObservers.removeAll()
-        workspaceObservers.removeAll()
-        settings.settingsDidChange = nil
         interaction.geometryDidChange = nil
         panel.resignedKey = nil
         panel.keyboardHandler = nil
+        resignedFocus = nil
+        escape = nil
+        store.stop()
         panel.close()
         panel.contentView = nil
     }

@@ -1,6 +1,6 @@
-# First-slice acceptance
+# DeeDock acceptance record
 
-Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f).
+Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current multi-display slice.
 
 ## Compilation
 
@@ -83,3 +83,50 @@ The focused Debug app and test-target compilation succeeded using `xcodebuild ..
 New tests cover settings defaults, numeric validation/normalization, persistence and reset without changing pins, unreadable settings preservation, both placement references with negative origins, alignment/offset clamping, overflow, and the maximum magnification envelope with fixed glass height. Settings and maximum-size dock previews use isolated state and do not read or write real preferences.
 
 Runtime acceptance remains unexercised for this slice: opening/reopening the same Settings window through both menus and the ⌘, shortcut, live sliders and numeric entry (including locale decimal separators), reset while editing, persistence after restart, focus preservation, screen-edge placement, labels and click targets at maximum size, Reduce Motion/Transparency, keyboard/VoiceOver use, and display changes/wake. Build success does not establish native feel or runtime acceptance. Implementation stops here for review; multiple docks have not been started.
+
+
+## Slice 2: one dock per monitor
+
+Implemented after the committed Settings redesign (`3a3114f`), preserving its sidebar artwork, search, pane transitions, cards, sliders, numeric fields, and inline previews. Added display scope, visibility controls, individual inheritance actions, and remembered disconnected displays. All new production copy is in `Localizable.xcstrings`; previews use deterministic in-memory display fixtures.
+
+### Implementation contracts
+
+- One shared catalog owns workspace observation, running order, icon caching, and duplicate-suppressed launches. Each panel owns its own render store, hover, scrolling, selection, hit regions, effective geometry, and launch-error feedback. Cache pruning uses all active docks.
+- A coordinator owns global pointer monitors and reconciles enabled logical desktop surfaces. Existing panels are reused on arrangement, geometry, and settings changes. Disabled/disconnected panels are stopped and released. Only one panel can own keyboard focus; removal restores the previous application when available.
+- ColorSync UUIDs identify persistent profiles. Primary-first discovery preserves legacy pins and seeds new displays once from current primary pins, including an intentionally empty list. Changing the primary display does not transfer profiles.
+- Mirroring uses the source profile for one panel and preserves follower profiles. Duplicate/missing UUIDs become session-local identities, with a Settings warning and no saved-profile replacement.
+- Shared defaults retain the original settings key. Metadata and each display's pins have separate keys; original pins remain intact. An initial-primary marker makes interrupted migration retryable. Malformed data produces localized errors and blocks affected writes rather than replacing saved bytes.
+- Per-setting overrides inherit independently. Resetting shared defaults does not clear overrides, visibility, or pins; Use Defaults on a display clears only its overrides. All docks may be disabled while Settings and Quit remain available.
+- Panel removal invalidates its completion token without cancelling a shared launch. Application shutdown removes observers and monitors, closes panels, and cancels launch tasks. Cancellation cannot undo a request already submitted to Launch Services.
+
+### Compilation and authored coverage
+
+The focused Debug app and unhosted test target compiled successfully with Xcode 27 on 2026-09-02:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-displays-build build-for-testing
+```
+
+Result: **TEST BUILD SUCCEEDED**. Log: `/tmp/DeeDock-displays-build.log`. Xcode MCP was attempted but its transport was closed, so the focused command-line fallback was used. Only skipped App Intents metadata extraction warnings were reported. The existing Swift language mode, signing, sandbox, deployment target, and dependencies are unchanged.
+
+Added tests cover legacy migration, preserved empty lists, primary-first/one-time seeding, independent pins, primary reassignment, inheritance and explicit-equal overrides, resets preserving visibility and pins, offline profile edits, interrupted migration, corrupt-byte preservation, session-only identity, mirrored/disabled display selection, pointer/fallback focus routing, stale panel completions, shared launch suppression, and shutdown cancellation. Existing geometry coverage remains for negative origins, display fitting, overflow, and fixed-height magnification. The tests use isolated preferences and a controlled application service; they do not launch real applications.
+
+**No test cases were executed. No previews were rendered, no automated visual checks were run, and no hands-on app acceptance was performed for slice 2.** Compilation establishes neither passing assertions nor native interaction quality. Native panel reconciliation, monitor teardown, and actual focus restoration still require runtime checks beyond the policy/session tests.
+
+### Remaining hands-on acceptance for the current build
+
+- Show simultaneous docks on displays with different scaling and negative origins; confirm placement uses each display's current frame and usable frame.
+- Hover, magnify, scroll, and select independently. Confirm fixed glass height, exposed-icon clicks, labels, transparent click passthrough, keyboard overflow access, and no foreground-app activation from hover.
+- Pin/unpin locally, including an empty primary list before attaching a new monitor. Restart and reconnect to confirm independent persistence and one-time seeding.
+- Change shared defaults and individual overrides; confirm untouched controls follow defaults and individual/all override resets preserve visibility and pins. Edit a remembered disconnected display and reconnect it.
+- Disable every dock and recover through Settings. Exercise Focus Dock under the pointer and its fallback order. Disable or unplug the keyboard-focused dock and verify restoration to the previous app.
+- Change primary display, rearrange, disconnect/reconnect, and enable/disable mirroring. Verify source-only rendering and follower profile restoration. Where hardware permits, exercise missing/duplicate display identity and its session-only warning.
+- Launch from one dock while interacting with another; verify duplicate suppression and failure placement. Disconnect the initiating display before completion and confirm no stale UI or disruption elsewhere.
+- Check light/dark appearance, Reduce Motion/Transparency, VoiceOver, keyboard-only Settings, normal Spaces, full-screen apps, Mission Control, and sleep/wake.
+- Quit with multiple panels and with a pending launch; verify all panel/monitor/observer resources are released. Measure performance separately before claiming idle-use or frame-rate results.
+
+Public display UUIDs can be unavailable or ambiguous for some hardware/virtual-display configurations; this is reported rather than guessed from a name or screen position. DeeDock does not reserve desktop work area or modify the system Dock. Screen-edge positioning or a transient system-Dock reveal may overlap it. Actual mirroring/Spaces behavior remains subject to macOS and hardware acceptance.
+
+Changes are left uncommitted for review. Slice 2 stops here; auto-hide, activation zones, pin-management screens, profile deletion, and release work remain outside scope.

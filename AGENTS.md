@@ -8,7 +8,7 @@ Treat look, behavior, and feel as separate acceptance criteria. A visually simil
 
 ## Current scope
 
-The first native dock slice and its position/appearance settings are implemented. Pause for user review before starting multiple docks; do not infer authorization to continue from the roadmap. Read `docs/ACCEPTANCE.md` for its validation status and limitations. Work on the user’s requested slice; do not automatically begin the remaining customization roadmap. Once a slice is authorized, carry it through without asking for repeated approval of routine, reversible implementation choices.
+The native dock, position/appearance settings, and one-dock-per-monitor slice are implemented. Pause for user review after this slice; auto-hide and activation zones are not authorized by the roadmap. Read `docs/ACCEPTANCE.md` for its validation status and limitations. Work on the user’s requested slice; do not automatically begin the remaining customization roadmap. Once a slice is authorized, carry it through without asking for repeated approval of routine, reversible implementation choices.
 
 Keep future features clearly labeled as planned. Do not silently substitute simpler behavior for an agreed requirement or expand a small slice into the entire settings system.
 

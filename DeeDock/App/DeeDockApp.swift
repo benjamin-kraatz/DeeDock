@@ -7,7 +7,8 @@ struct DeeDockApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            Button(.actionFocusDock) { delegate.controller?.focusDock() }
+            Button(.actionFocusDock) { delegate.coordinator.focusDock() }
+                .disabled(!delegate.coordinator.canFocus)
             OpenDockSettingsButton()
             Divider()
             Button(.actionQuit) { NSApp.terminate(nil) }
@@ -20,11 +21,12 @@ struct DeeDockApp: App {
                 OpenDockSettingsButton().keyboardShortcut(",")
             }
             CommandGroup(after: .appInfo) {
-                Button(.actionFocusDock) { delegate.controller?.focusDock() }
+                Button(.actionFocusDock) { delegate.coordinator.focusDock() }
+                .disabled(!delegate.coordinator.canFocus)
             }
         }
         Settings {
-            DockSettingsView(store: delegate.settings)
+            DockSettingsView(store: delegate.coordinator.settings, profiles: delegate.coordinator.profiles)
         }
     }
 }

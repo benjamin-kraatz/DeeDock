@@ -612,6 +612,234 @@
           }
         }
       }
+    },
+    "displayUnnamed": {
+      "comment": "Fallback display name when macOS provides no localized name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display"
+          }
+        }
+      }
+    },
+    "displayProfilesError": {
+      "comment": "Shown in Settings when display metadata is malformed or cannot be saved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t read or save display preferences. Saved profiles have not been replaced."
+          }
+        }
+      }
+    },
+    "displayDefaults": {
+      "comment": "Sidebar section for shared settings inherited by displays.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Defaults"
+          }
+        }
+      }
+    },
+    "displayConnectedGroup": {
+      "comment": "Sidebar section for online displays, including mirror followers.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected displays"
+          }
+        }
+      }
+    },
+    "displayRememberedGroup": {
+      "comment": "Sidebar section for retained profiles that are currently offline.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disconnected displays"
+          }
+        }
+      }
+    },
+    "displayConnected": {
+      "comment": "Display connection status.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        }
+      }
+    },
+    "displayPrimaryConnected": {
+      "comment": "Display status indicating the main display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected · Primary"
+          }
+        }
+      }
+    },
+    "displayDisconnected": {
+      "comment": "Display connection status; preferences remain editable.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disconnected"
+          }
+        }
+      }
+    },
+    "displayMirrored": {
+      "comment": "Status for a display showing another display’s desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mirrored"
+          }
+        }
+      }
+    },
+    "displaySessionOnly": {
+      "comment": "Identity could not safely be persisted.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Session only"
+          }
+        }
+      }
+    },
+    "displayDockDisabled": {
+      "comment": "Accessibility label for a disabled display dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock disabled"
+          }
+        }
+      }
+    },
+    "displayShowDock": {
+      "comment": "Per-display visibility toggle; retained across reconnects.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Dock"
+          }
+        }
+      }
+    },
+    "displayCustomized": {
+      "comment": "Indicates an explicit per-setting display override.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Customized"
+          }
+        }
+      }
+    },
+    "displayFollowingDefault": {
+      "comment": "Setting inherits the shared default, including future changes.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Following default"
+          }
+        }
+      }
+    },
+    "displayUseDefault": {
+      "comment": "Clear one display setting override.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use Default"
+          }
+        }
+      }
+    },
+    "displayUseDefaults": {
+      "comment": "Clear all appearance and position overrides for this display; preserve pins and visibility.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use Defaults"
+          }
+        }
+      }
+    },
+    "displayIdentityWarning": {
+      "comment": "Missing or duplicate display identity: session-only state is used.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This display cannot be identified reliably. Changes apply only for this connection and won’t replace any saved display profile."
+          }
+        }
+      }
+    },
+    "displayMirrorHelp": {
+      "comment": "Explains why a mirror follower does not create another panel.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While mirroring, the source display controls the dock. These preferences will apply when this display has its own desktop again."
+          }
+        }
+      }
+    },
+    "displayDisconnectedHelp": {
+      "comment": "Offline profiles remain editable.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changes are saved for when this display reconnects."
+          }
+        }
+      }
     }
   },
   "version": "1.3"
