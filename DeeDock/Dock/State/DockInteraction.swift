@@ -11,6 +11,8 @@ final class DockInteraction {
     var dragMessage: LocalizedStringResource?
     var scrollOffset: CGFloat = 0
     var scrollRequest: CGFloat = 0
+    /// Selects this panel's display before SwiftUI opens the Settings scene.
+    @ObservationIgnored var prepareSettings: (() -> Void)?
     @ObservationIgnored var sourceTrackingChanged: ((Bool) -> Void)?
     @ObservationIgnored var beginDrag: ((DockItem, NSView, NSEvent) -> Void)?
     @ObservationIgnored var movePin: ((String, Int) -> Void)?

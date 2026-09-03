@@ -206,6 +206,7 @@ final class DockPanelController {
         invalidateDrag?(); invalidateDrag = nil
         stopped = true; visibility.stop()
         interaction.sourceTrackingChanged = nil
+        interaction.prepareSettings = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
         interaction.copyPin = nil; interaction.scrollChanged = nil
         panel.contentView?.unregisterDraggedTypes()

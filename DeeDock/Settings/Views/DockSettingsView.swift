@@ -43,6 +43,15 @@ struct DockSettingsView: View {
             updateDisplayIndicator()
         }
         .onAppear { updateDisplayIndicator() }
+        .onChange(of: coordinator?.settingsDisplayRequest, initial: true) { _, requestedID in
+            guard let requestedID else { return }
+            coordinator?.settingsDisplayRequest = nil
+            // Connectivity may have changed between the menu action and scene creation.
+            guard profiles.displays.count > 1,
+                  profiles.displays.contains(where: { $0.id == requestedID }) else { return }
+            searchText = ""
+            selection = .display(requestedID)
+        }
         .onDisappear {
             settingsActive = false
             coordinator?.zonePreview.stop()

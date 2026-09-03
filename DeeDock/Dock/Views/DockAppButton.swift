@@ -71,6 +71,7 @@ struct DockAppButton: View {
                 togglePin: togglePin,
                 interaction: interaction,
                 openSettings: {
+                    interaction?.prepareSettings?()
                     NSApp.activate()
                     openSettings()
                 },

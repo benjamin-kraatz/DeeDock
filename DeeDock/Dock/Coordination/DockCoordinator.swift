@@ -8,6 +8,8 @@ final class DockCoordinator {
     let profiles: DisplayProfilesStore
     let zonePreview = DockZonePreviewController()
     let displayIndicator = DisplaySelectionIndicatorController()
+    /// One-shot navigation consumed by Settings, including when its window is first created.
+    var settingsDisplayRequest: String?
     @ObservationIgnored private var suspensionObserver: NSObjectProtocol?
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
@@ -93,6 +95,11 @@ final class DockCoordinator {
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
             }
             panel.connectDragging(dragging)
+            panel.interaction.prepareSettings = { [weak self] in
+                guard let self else { return }
+                settingsDisplayRequest = profiles.displays.count > 1
+                    && profiles.displays.contains(where: { $0.id == display.id }) ? display.id : nil
+            }
             store.copyPin = { [weak self] reference, targetID in
                 guard let self, let target = panels[targetID] else { return }
                 if !target.store.pins.contains(where: { $0.id == reference.id }) {
@@ -157,6 +164,7 @@ final class DockCoordinator {
         monitors.removeAll()
         zonePreview.stop()
         displayIndicator.stop()
+        settingsDisplayRequest = nil
         dragging.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil
