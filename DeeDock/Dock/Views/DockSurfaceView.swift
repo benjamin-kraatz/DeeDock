@@ -37,8 +37,9 @@ struct DockSurfaceView: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            DockBackgroundView(reduceTransparency: reduceTransparency)
-                .animation(interaction.idleFade.animation) { $0.opacity(opacity.background) }
+            DockBackgroundView(reduceTransparency: reduceTransparency,
+                idleOpacity: opacity.background)
+                .animation(interaction.idleFade.animation, value: opacity.background)
                 .frame(width: surface.width, height: surface.height)
                 .position(x: surface.midX, y: surface.midY)
             if slots.isEmpty {

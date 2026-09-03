@@ -76,11 +76,11 @@ struct DockFadingPreview: View {
         .frame(width: 550).padding()
 }
 #Preview("Side dock, background-only fading") {
-    DockFadingPreview(settings: DockSettings(edge: .left, backgroundOpacity: 60,
+    DockFadingPreview(settings: DockSettings(edge: .left,
         fadeWhenIdle: true, fadeTarget: .backgroundOnly)).frame(width: 550).padding()
 }
 #Preview("Reduced transparency, dark") {
-    DockFadingPreview(settings: DockSettings(backgroundOpacity: 20, fadeWhenIdle: true),
+    DockFadingPreview(settings: DockSettings(fadeWhenIdle: true),
                       reduceMotionOverride: true, reduceTransparencyOverride: true)
         .preferredColorScheme(.dark).frame(width: 550).padding()
 }

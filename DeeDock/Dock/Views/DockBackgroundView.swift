@@ -1,10 +1,29 @@
 import SwiftUI
 
 /// The dock's native material, with an opaque alternative for Reduce Transparency.
-struct DockBackgroundView: View {
+struct DockBackgroundView: View, Animatable {
     let reduceTransparency: Bool
+    /// Idle dimming is intentional. At full visibility, the glass has no opacity wrapper.
+    var idleOpacity: Double = 1
+    // Interpolate the scalar before choosing a branch so returning to native glass preserves
+    // the configured duration instead of swapping whole views at the start of a transition.
+    var animatableData: Double {
+        get { idleOpacity }
+        set { idleOpacity = newValue }
+    }
 
     var body: some View {
+        if idleOpacity >= 1 {
+            material
+        } else if idleOpacity > 0 {
+            material
+                .opacity(idleOpacity)
+        } else {
+            Color.clear
+        }
+    }
+
+    @ViewBuilder private var material: some View {
         if reduceTransparency {
             RoundedRectangle(cornerRadius: 22).fill(
                 Color(nsColor: .windowBackgroundColor)

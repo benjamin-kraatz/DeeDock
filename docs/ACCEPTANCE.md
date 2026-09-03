@@ -339,3 +339,14 @@ Remaining hands-on acceptance:
 - Toggle Reduce Motion and Reduce Transparency while fading and during preview playback. Verify immediate restoration, opaque enabled backgrounds, hidden backgrounds staying hidden, preserved preferences, and preview cancellation on Settings navigation or closure.
 
 The background and idle-fading feature is ready for delivery.
+
+
+## Preserve native glass outside idle fading
+
+On 2026-09-03, the user reported that lowering Background opacity made the dock lose its glass appearance. Source inspection confirmed that the setting applied alpha to the entire rendered glass effect. Apple's [public Glass configuration](https://developer.apple.com/documentation/swiftui/glass) and the installed SDK expose variants, tint, and interaction, but no independent material-opacity control. The reported visual degradation is consistent with whole-effect alpha; it was not reproduced in a live UI session here.
+
+Removed the steady Background opacity slider. Enabled backgrounds now use native glass at full strength, regardless of the legacy stored opacity. The old value and display override remain encoded for compatibility; no preferences are rewritten. Show background still enables floating icons, and Reduce Transparency still selects an opaque native background. The live dock and Settings samples use the same calculation.
+
+DockBackgroundView now bypasses the opacity modifier at full visibility and draws no material at zero. Its animatable opacity interpolates between those branches during intentional idle fading. Partial idle fading still reduces the rendered glass effect; selecting Icons and indicators only keeps the glass intact while dimming icons. This change does not claim independently adjustable glass transparency.
+
+Validation: the focused Debug app build uses the existing DeeDock scheme and `/tmp/DeeDock-idle-build` derived data. Result: **BUILD SUCCEEDED**, recorded in `/tmp/DeeDock-glass-opacity-build.log`. The only warning was skipped App Intents metadata extraction. No tests, app launch, or automated visual checks were performed. Runtime acceptance remains required for native backdrop sampling after restoration, partial idle fading and reversal, saved legacy opacity values, background on/off, both accessibility settings, and Settings samples. Existing unrelated work remains intact.

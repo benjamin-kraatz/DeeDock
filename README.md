@@ -17,7 +17,7 @@ The product roadmap includes:
 - **A dock per monitor (implemented):** independent pins, shared defaults, per-setting overrides, and remembered disconnected displays.
 - **Precise placement, implemented:** bottom, top, left, or right edge; alignment, along-edge offset, and distance from the chosen reference edge.
 - **Activation zones (implemented):** choose dock-position or screen-edge triggering, length, depth, along-edge offset, and reveal timing.
-- **Size and appearance (implemented):** icon size, spacing, magnification, running indicators, background visibility and opacity, and configurable idle fading.
+- **Size and appearance (implemented):** icon size, spacing, magnification, running indicators, background visibility, and configurable idle fading.
 - **Behavior:** auto-hide, reveal/hide delays, and ten animation styles are implemented; broader interaction preferences remain planned.
 
 These are product goals, not a finished feature specification. Exact options, ranges, defaults, and delivery order will be decided slice by slice.
@@ -129,7 +129,6 @@ Appearance includes background and idle controls in shared defaults and per-disp
 | Control | Range / options | Default |
 | --- | --- | --- |
 | Show background | On / Off | On |
-| Background opacity | 0–100%, in 10% steps | 100% |
 | Fade when idle | On / Off | Off |
 | Fade target | Entire dock / Background only / Icons and indicators only | Entire dock |
 | Idle opacity | 0–100% of normal appearance, in 5% steps | 40% |
@@ -137,9 +136,9 @@ Appearance includes background and idle controls in shared defaults and per-disp
 | Fade-out duration | 0–2 seconds, in 0.05-second steps | 0.3 seconds |
 | Restore duration | 0–0.5 seconds, in 0.05-second steps | 0.1 seconds |
 
-Turning off the background leaves floating icons with the same geometry and hit regions. Background opacity affects the native material, its border and shadow, and the pinned-section separator. The saved opacity returns when the background is enabled again.
+Turning off the background leaves floating icons with the same geometry and hit regions. When enabled, the background uses native Liquid Glass without a steady opacity modifier. The former Background opacity preference remains stored for compatibility but no longer changes the material; its slider has been removed.
 
-Idle means no interaction with that display's dock. Working elsewhere allows it to fade. Idle opacity multiplies normal appearance: a 60% background at 50% idle opacity becomes 30%, while icons become 50%, when Entire dock is selected. Labels, keyboard outlines, launch progress, and error feedback retain full opacity.
+Idle means no interaction with that display's dock. Working elsewhere allows it to fade. Idle opacity multiplies normal appearance. At 50% idle opacity, Entire dock temporarily fades the background and icons to 50%. This intentionally weakens the glass while idle; Icons and indicators only preserves native glass throughout the idle period. Labels, keyboard outlines, launch progress, and error feedback retain full opacity.
 
 Pointer entry, keyboard focus, VoiceOver focus, dragging, menus, mouse-button interaction, and errors restore visibility and prevent further fading during interaction. Even at 0% idle opacity, the dock retains its hit regions and restores on pointer entry. Auto-hide takes precedence; hidden docks do not schedule idle fading, and every reveal starts at normal opacity. Sleep, display refreshes, and teardown cancel stale deadlines. Each dock owns its own idle timing.
 

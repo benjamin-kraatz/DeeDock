@@ -2000,7 +2000,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hide the background for floating icons. Background opacity includes the glass, border, shadow, and separator; icon positions stay the same."
+            "value": "Hide the background for floating icons. When shown, Liquid Glass keeps its native appearance. Idle fading can temporarily dim it. Icon positions stay the same."
           }
         }
       }

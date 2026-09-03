@@ -10,10 +10,6 @@ struct DockFadingSettingsPane: View {
             SettingsCard(title: .appearanceBackground, footnote: .appearanceBackgroundHelp) {
                 Toggle(isOn: source.binding(\.showBackground)) { Text(.appearanceShowBackground) }
                     .padding(14).settingsOverride(source.context, field: .showBackground)
-                SettingsSliderRow(title: .appearanceBackgroundOpacity, unit: .settingsPercent,
-                    value: source.binding(\.backgroundOpacity), range: 0...100, step: 10)
-                    .disabled(!source.value.showBackground || reduceTransparency)
-                    .settingsOverride(source.context, field: .backgroundOpacity)
             }
             SettingsCard(title: .appearanceIdleFading, footnote: .appearanceIdleHelp) {
                 Toggle(isOn: source.binding(\.fadeWhenIdle)) { Text(.appearanceFadeWhenIdle) }

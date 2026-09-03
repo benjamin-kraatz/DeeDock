@@ -33,7 +33,7 @@ struct DockSettings: Codable, Equatable {
 
     /// Hiding the material retains its opacity preference and the dock geometry.
     var showBackground: Bool = true
-    /// Percentage of the native material's normal appearance, snapped to ten-percent steps.
+    /// Legacy preference retained for round trips; native glass ignores steady-state opacity.
     var backgroundOpacity: Double = 100
     var fadeWhenIdle: Bool = false
     var fadeTarget: DockSettings.FadeTarget = .entireDock
