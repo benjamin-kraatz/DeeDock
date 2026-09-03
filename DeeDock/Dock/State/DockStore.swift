@@ -22,7 +22,7 @@ final class DockStore {
     @ObservationIgnored var presentationDidChange: (() -> Void)?
     /// Enabled by Focus Dock only; hover never enables keyboard handling.
     var keyboardFocus = false
-    var launching: Set<String> { catalog.launching }
+    var launching: Set<String> { catalog.busyApplications }
     @ObservationIgnored private let catalog: ApplicationCatalog
     var pinDestinations: [DockPinDestination] = []
     @ObservationIgnored var copyPin: ((ApplicationReference, String) -> Void)?
@@ -103,6 +103,27 @@ final class DockStore {
             guard let self, session.accepts(token) else { return }
             if let error { errorMessage = error }
             else { applicationOpened?() }
+        }
+    }
+
+    /// Captures this panel's session, not its mutable selection or display index.
+    func openDocuments(_ documents: DocumentResourceAccess, with reference: ApplicationReference) {
+        let token = session.token
+        catalog.openDocuments(documents, with: reference) { [weak self] error in
+            guard let self, session.accepts(token) else { return }
+            if let error { errorMessage = error }
+            else { applicationOpened?() }
+        }
+    }
+
+    /// A spring activation may outlive hover, but late failures must not reveal an abandoned target.
+    func springOpen(_ item: DockItem, isCurrent: @escaping () -> Bool) {
+        let token = session.token
+        catalog.springOpen(item.reference, isCurrent: { [weak self] in
+            self?.session.accepts(token) == true && isCurrent()
+        }) { [weak self] error in
+            guard let self, session.accepts(token), isCurrent() else { return }
+            if let error { errorMessage = error }
         }
     }
     func moveSelection(by distance: Int) {

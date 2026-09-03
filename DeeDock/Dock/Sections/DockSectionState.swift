@@ -32,8 +32,9 @@ final class DockSectionState {
     }
 
     /// Leaving cancels only a pending dwell; an opened drag destination stays open until completion.
-    func dragHover(_ valid: Bool) {
-        guard valid, visibility == .collapsePinned, !isExpanded else { cancelDwell(); return }
+    func dragHover(_ valid: Bool, documents: Bool = false) {
+        guard valid, visibility.collapsedGroup != nil,
+              documents || visibility == .collapsePinned, !isExpanded else { cancelDwell(); return }
         guard pending == nil else { return }
         let token = generation
         pending = scheduler.schedule(after: 0.5) { [weak self] in

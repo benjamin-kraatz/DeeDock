@@ -33,7 +33,8 @@ struct DockApplicationImportTests {
         #expect(imported.allSatisfy { $0.bookmarkData == Data([1, 2]) })
         #expect(throws: (any Error).self) {
             try DockApplicationImporter.read([first, second], excluding: "deedock", bookmark: { url in
-                if url == second { throw CocoaError(.fileReadNoPermission) }
+                // Import resolves symlinks and directory URL formatting before bookmarking.
+                if url.path == second.resolvingSymlinksInPath().path { throw CocoaError(.fileReadNoPermission) }
                 return Data([1])
             })
         }

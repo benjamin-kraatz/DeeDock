@@ -66,4 +66,24 @@ final class ApplicationService: ApplicationServicing {
         configuration.createsNewApplicationInstance = false
         _ = try await workspace.openApplication(at: url, configuration: configuration)
     }
+
+    func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws {
+        let documents = DocumentResourceAccess(urls)
+        let access = ApplicationResourceAccess(reference)
+        defer { withExtendedLifetime((documents, access)) {} }
+        // Metadata can block on external volumes. Never perform it in native drag callbacks.
+        let worker = Task.detached { try DockExternalPayload.validateDocuments(documents.urls) }
+        do {
+            try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
+        } catch is DockDocumentValidationError {
+            throw CocoaError(.fileReadUnknown, userInfo: [NSLocalizedDescriptionKey: String(localized: .errorInvalidDocuments)])
+        }
+        try Task.checkCancellation()
+        guard let url = resolvedURL(for: reference) else { throw CocoaError(.fileNoSuchFile) }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        configuration.createsNewApplicationInstance = false
+        _ = try await workspace.open(documents.urls, withApplicationAt: url, configuration: configuration)
+    }
+
 }

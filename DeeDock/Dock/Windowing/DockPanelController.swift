@@ -11,6 +11,7 @@ final class DockPanelController {
     private(set) var geometry: DockPresentationGeometry?
     private var mouseHeld = false
     private var dragHeld = false
+    private var pickerHeld = false
     private var lastDisplay: DisplaySnapshot?
     private var lastSettings: DockSettings?
     private var baseLayout = DockGeometry.layout(count: 0, favoriteCount: 0, availableLength: 800)
@@ -137,13 +138,13 @@ final class DockPanelController {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
-        let suppress = idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+        let suppress = pickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
             || (visibility.phase != .visible && visibility.phase != .hideDelay)
         if suppress != interaction.suppressTooltips {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
+        let held = pickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
         visibility.update(activation: geometry.activation.zone.contains(NSEvent.mouseLocation),
                           retained: geometry.activation.retention.contains(NSEvent.mouseLocation),
                           held: held)
@@ -174,9 +175,16 @@ final class DockPanelController {
         host.dragPerformed = { [weak coordinator] info in coordinator?.perform(info, on: id) ?? false }
         host.dragExited = { [weak coordinator] in coordinator?.exited() }
         host.dragEnded = { [weak coordinator] in coordinator?.externalEnded() }
+        host.springTarget = { [weak coordinator] info in coordinator?.springTarget(info, on: id) }
+        host.springActivate = { [weak coordinator] info in coordinator?.springActivate(info, on: id) }
+        host.springHighlight = { [weak coordinator] info in coordinator?.springHighlight(info, on: id) }
         interaction.sourceTrackingChanged = { [weak coordinator] in coordinator?.trackSource($0) }
         interaction.beginDrag = { [weak coordinator] item, view, event in coordinator?.begin(item, from: id, view: view, event: event) }
-        interaction.scrollChanged = { [weak coordinator] in coordinator?.exited() }
+        interaction.scrollChanged = { [weak coordinator] in coordinator?.geometryChanged() }
+        interaction.geometryDidChange = { [weak self, weak coordinator] in
+            self?.updatePointer()
+            coordinator?.geometryChanged()
+        }
         invalidateDrag = { [weak coordinator] in if coordinator?.committing != true { coordinator?.cancel() } }
     }
 
@@ -220,11 +228,30 @@ final class DockPanelController {
             layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
     }
 
-    /// A stationary valid drag can reveal pins without adding polling or changing saved expansion.
-    func updateSectionDragHover(at point: CGPoint, valid: Bool) {
+    /// Document hits use the same inverse animation transform and viewport-clipped icons as clicks.
+    func documentTarget(at point: CGPoint) -> DockItem? {
+        guard !stopped, panel.frame.contains(point) else { return nil }
+        let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
+            size: interaction.layout.viewportSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
+        return DockDocumentTarget.app(at: contentPoint(point), entries: store.entries, frames: interaction.iconRects,
+                                      mask: sample.mask, exposed: visibility.exposesContent)
+    }
+
+    /// Document drags can expose either group; application drags still expose only pins.
+    func updateSectionDragHover(at point: CGPoint, valid: Bool, documents: Bool = false) {
         let local = contentPoint(point)
-        let control = interaction.iconRects[DockEntryID.group(.pinned).hitID]
-        store.sections.dragHover(valid && visibility.exposesContent && control?.contains(local) == true)
+        let group = documents ? store.sections.visibility.collapsedGroup : .pinned
+        let control = group.flatMap { interaction.iconRects[DockEntryID.group($0).hitID] }
+        let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
+            size: interaction.layout.viewportSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
+        store.sections.dragHover(valid && visibility.exposesContent && panel.frame.contains(point)
+            && sample.mask.contains(local) && control?.contains(local) == true, documents: documents)
+    }
+
+    func holdFilePicker(_ held: Bool) {
+        pickerHeld = held
+        if held { visibility.showImmediately() }
+        updatePointer()
     }
 
     func endSectionDrag() { store.sections.endDrag() }
@@ -266,6 +293,13 @@ final class DockPanelController {
     }
     func handleKey(_ event: NSEvent) -> Bool {
         guard store.keyboardFocus else { return false }
+        if event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
+           event.charactersIgnoringModifiers?.lowercased() == "o" {
+            if let item = store.entries.compactMap(\.item).first(where: { $0.id == store.selectedID }), item.isAvailable {
+                interaction.openFiles?(item)
+            }
+            return true
+        }
         if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
             if event.modifierFlags.contains(.option), let id = store.selectedID { store.movePin(id, by: distance) }
             else { store.moveSelection(by: distance) }
@@ -295,7 +329,7 @@ final class DockPanelController {
         invalidateDrag?(); invalidateDrag = nil
         stopped = true; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
-        interaction.prepareSettings = nil
+        interaction.prepareSettings = nil; interaction.openFiles = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
         interaction.copyPin = nil; interaction.scrollChanged = nil
         panel.contentView?.unregisterDraggedTypes()

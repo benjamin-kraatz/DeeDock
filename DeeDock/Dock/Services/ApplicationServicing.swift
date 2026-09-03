@@ -9,4 +9,6 @@ protocol ApplicationServicing {
     func icon(for url: URL?) -> NSImage
     func pruneIcons(keeping urls: Set<URL>)
     func open(_ reference: ApplicationReference) async throws
+    /// Hands the entire user-selected batch to this app; success describes the OS handoff only.
+    func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws
 }

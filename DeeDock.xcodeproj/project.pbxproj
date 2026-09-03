@@ -45,6 +45,10 @@
 		DDE100000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift */; };
 		DDE100000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift */; };
 		DDE100000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE200000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift */; };
+		DDF100000000000000000000 /* DeeDock/Dock/Documents/DocumentResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF200000000000000000000 /* DeeDock/Dock/Documents/DocumentResourceAccess.swift */; };
+		DDF100000000000000000001 /* DeeDock/Dock/Documents/DockExternalPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF200000000000000000001 /* DeeDock/Dock/Documents/DockExternalPayload.swift */; };
+		DDF100000000000000000002 /* DeeDock/Dock/Documents/DockDocumentTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF200000000000000000002 /* DeeDock/Dock/Documents/DockDocumentTarget.swift */; };
+		DDF100000000000000000003 /* DeeDock/Dock/Documents/DockFilePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF200000000000000000003 /* DeeDock/Dock/Documents/DockFilePickerController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +92,10 @@
 		DDE200000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Tooltips/DockTooltipGeometry.swift; sourceTree = SOURCE_ROOT; };
 		DDE200000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/DockInteraction.swift; sourceTree = SOURCE_ROOT; };
 		DDE200000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Visibility/DockIdleFadeController.swift; sourceTree = SOURCE_ROOT; };
+		DDF200000000000000000000 /* DeeDock/Dock/Documents/DocumentResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Documents/DocumentResourceAccess.swift; sourceTree = SOURCE_ROOT; };
+		DDF200000000000000000001 /* DeeDock/Dock/Documents/DockExternalPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Documents/DockExternalPayload.swift; sourceTree = SOURCE_ROOT; };
+		DDF200000000000000000002 /* DeeDock/Dock/Documents/DockDocumentTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Documents/DockDocumentTarget.swift; sourceTree = SOURCE_ROOT; };
+		DDF200000000000000000003 /* DeeDock/Dock/Documents/DockFilePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Documents/DockFilePickerController.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -139,6 +147,10 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DDF200000000000000000003 /* DeeDock/Dock/Documents/DockFilePickerController.swift */,
+				DDF200000000000000000002 /* DeeDock/Dock/Documents/DockDocumentTarget.swift */,
+				DDF200000000000000000001 /* DeeDock/Dock/Documents/DockExternalPayload.swift */,
+				DDF200000000000000000000 /* DeeDock/Dock/Documents/DocumentResourceAccess.swift */,
 				DDC200000000000000000000 /* DeeDock/Dock/Layout/DockEdge.swift */,
 				DDB200000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift */,
 				DDB200000000000000000002 /* DeeDock/Dock/Services/ApplicationResourceAccess.swift */,
@@ -271,6 +283,10 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				DDF100000000000000000003 /* DeeDock/Dock/Documents/DockFilePickerController.swift in Sources */,
+				DDF100000000000000000002 /* DeeDock/Dock/Documents/DockDocumentTarget.swift in Sources */,
+				DDF100000000000000000001 /* DeeDock/Dock/Documents/DockExternalPayload.swift in Sources */,
+				DDF100000000000000000000 /* DeeDock/Dock/Documents/DocumentResourceAccess.swift in Sources */,
 				DDE100000000000000000007 /* DeeDock/Dock/Visibility/DockIdleFadeController.swift in Sources */,
 				DDE100000000000000000006 /* DeeDock/Dock/State/DockInteraction.swift in Sources */,
 				DDE100000000000000000005 /* DeeDock/Dock/Tooltips/DockTooltipGeometry.swift in Sources */,

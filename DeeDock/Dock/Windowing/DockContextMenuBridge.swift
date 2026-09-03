@@ -58,6 +58,11 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 entry.image = NSImage(systemSymbolName: "arrow.up.forward.app", accessibilityDescription: nil)
                 entry.target = self
                 menu.addItem(entry)
+                let files = NSMenuItem(title: String(localized: .actionOpenFiles), action: #selector(openFiles), keyEquivalent: "o")
+                files.keyEquivalentModifierMask = .command
+                files.target = self
+                files.isEnabled = interaction?.openFiles != nil
+                menu.addItem(files)
                 menu.addItem(.separator())
             }
 
@@ -106,6 +111,13 @@ struct DockContextMenuBridge: NSViewRepresentable {
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
 
         @objc private func openApplication() { open?() }
+
+        @objc private func openFiles() {
+            guard let item, item.isAvailable else { return }
+            // Let menu tracking release its hold before the native picker gains focus.
+            let action = interaction?.openFiles
+            DispatchQueue.main.async { action?(item) }
+        }
 
         @objc private func changePin() { togglePin?() }
 

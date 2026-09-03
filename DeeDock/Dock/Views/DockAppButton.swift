@@ -32,6 +32,12 @@ struct DockAppButton: View {
                                  launching: isLaunching, keyboardSelected: isKeyboardSelected,
                                  runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
                                  artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation)
+                .overlay {
+                    if interaction?.documentTargetID == item.id {
+                        DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
+                            .allowsHitTesting(false)
+                    }
+                }
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -81,6 +87,9 @@ struct DockAppButton: View {
             togglePin
         )
         .accessibilityActions {
+            if item.isAvailable {
+                Button(.actionOpenFiles) { interaction?.openFiles?(item) }
+            }
             if item.isFavorite {
                 Button {
                     interaction?.movePin?(item.id, -1)

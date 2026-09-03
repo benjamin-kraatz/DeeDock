@@ -15,6 +15,7 @@ final class DockCoordinator {
     private(set) var enabledDisplays: [DisplaySnapshot] = []
     var canFocus: Bool { !enabledDisplays.isEmpty }
     @ObservationIgnored private let dragging = DockDragCoordinator()
+    @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let displayService = DisplayService()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
@@ -84,6 +85,7 @@ final class DockCoordinator {
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
         let desired = Set(enabledDisplays.map(\.id))
         for id in Array(panels.keys) where !desired.contains(id) {
+            filePicker.cancel(for: id)
             if focusedID == id { endFocus(restore: true) }
             panels.removeValue(forKey: id)?.stop()
         }
@@ -98,6 +100,10 @@ final class DockCoordinator {
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
             }
             panel.connectDragging(dragging)
+            panel.interaction.openFiles = { [weak self, weak panel] item in
+                guard let self, let panel else { return }
+                self.openFiles(for: item, on: panel)
+            }
             panel.interaction.prepareSettings = { [weak self] in
                 guard let self else { return }
                 settingsDisplayRequest = profiles.displays.count > 1
@@ -138,6 +144,30 @@ final class DockCoordinator {
         guard let geometry = panels[id]?.geometry else { return }
         zonePreview.show(displayID: id, geometry: geometry)
     }
+    /// Explicit picker activation captures focus before AppKit resigns the dock's key panel.
+    private func openFiles(for item: DockItem, on panel: DockPanelController) {
+        guard item.isAvailable, panels[panel.store.displayID] === panel else { return }
+        let id = panel.store.displayID
+        let selection = panel.store.keyboardFocus ? panel.store.selectedTarget : nil
+        let previous = previousApplication ?? lastExternalApplication
+        filePicker.show(reference: item.reference, displayID: id,
+            hold: { [weak panel] in panel?.holdFilePicker($0) },
+            submit: { [weak panel] documents, reference in panel?.store.openDocuments(documents, with: reference) },
+            cancelled: { [weak self, weak panel] in
+                guard let self, let panel, self.panels[id] === panel, NSApp.isActive else { return }
+                if let selection {
+                    self.endFocus(restore: false)
+                    self.previousApplication = previous
+                    self.focusedID = id
+                    panel.store.selectedTarget = panel.store.entries.contains { $0.target == selection }
+                        ? selection : panel.store.entries.first?.target
+                    panel.focus()
+                } else if let previous, !previous.isTerminated {
+                    previous.activate(options: [])
+                }
+            })
+    }
+
     private func rememberExternal(_ app: NSRunningApplication?) {
         if let app, app.processIdentifier != ProcessInfo.processInfo.processIdentifier { lastExternalApplication = app }
     }
@@ -168,6 +198,7 @@ final class DockCoordinator {
         zonePreview.stop()
         displayIndicator.stop()
         settingsDisplayRequest = nil
+        filePicker.stop()
         dragging.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil

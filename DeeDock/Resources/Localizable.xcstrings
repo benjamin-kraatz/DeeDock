@@ -3084,6 +3084,90 @@
           }
         }
       }
+    },
+    "actionOpenFiles": {
+      "comment": "Context-menu and accessibility action. Choose files or folders to open in this application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Files…"
+          }
+        }
+      }
+    },
+    "dragCheckingFiles": {
+      "comment": "Drag feedback while the complete external file batch is validated.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking items…"
+          }
+        }
+      }
+    },
+    "dragDocumentTarget": {
+      "comment": "Guidance for a document or folder drag that is not yet over an available application icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drop onto an app to open"
+          }
+        }
+      }
+    },
+    "dragOpenIn": {
+      "comment": "Valid document drop target. appName is the application name provided by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in %(appName)@"
+          }
+        }
+      }
+    },
+    "errorInvalidDocuments": {
+      "comment": "File picker validation failure; no subset of the selection is opened.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose accessible files or folders. Applications cannot be included."
+          }
+        }
+      }
+    },
+    "errorOpenDocuments": {
+      "comment": "Document handoff failure. appName is the receiving application; details is the system error.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not open items in %1$(appName)@: %2$(details)@"
+          }
+        }
+      }
+    },
+    "openFilesPickerTitle": {
+      "comment": "Native picker title. appName is the fixed destination application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Files in %(appName)@"
+          }
+        }
+      }
     }
   },
   "version": "1.3"

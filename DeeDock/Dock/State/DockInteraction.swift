@@ -17,6 +17,9 @@ final class DockInteraction {
     var dragActive = false
     var dragSourceID: String?
     var dragMessage: LocalizedStringResource?
+    var documentTargetID: String?
+    var springEmphasized = false
+    @ObservationIgnored var openFiles: ((DockItem) -> Void)?
     var scrollOffset: CGFloat = 0
     var scrollRequest: CGFloat = 0
     /// Selects this panel's display before SwiftUI opens the Settings scene.

@@ -95,7 +95,23 @@ Right-click a pin for **Move Left** and **Move Right** on a top or bottom dock, 
 
 Finder imports retain optional read-only security-scoped bookmarks so user-selected application bundles can remain accessible after restart. Older pins retain their existing format and identity. DeeDock adds only the app-scoped bookmark capability to its existing sandbox configuration; no Accessibility grant or system Dock preference changes are involved. Missing applications remain visible as unavailable pins.
 
-This slice does not support documents dropped onto apps, file export, or selecting multiple apps within DeeDock. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
+File export and selecting multiple apps within DeeDock remain outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
+
+## Open files and folders in an app
+
+Drag files, document packages, or folders from Finder onto an available app icon. The outlined target shows **Open in {app}**. Releasing sends the complete batch to that app. DeeDock lets the receiving app decide which document types it supports. Files are opened in place; DeeDock does not move, copy, or save them.
+
+Application bundles still use the pinning behavior above. Mixing applications and documents rejects the whole batch. Web links, pasted content, and promised files are not supported. While **Checking items…** is visible, the batch is not yet ready to drop. Missing or inaccessible items reject the batch before handoff.
+
+Hover over a collapsed pinned or running section for half a second to expose its apps. The previous expansion state returns after the drag ends. Drop onto an app, not the section button. Completely hidden sections remain hidden. Auto-hidden docks use their configured activation zone and reveal delay; overflow scrolling remains available during dragging.
+
+Spring-loading uses the macOS hover and Force Click preferences. Dwelling on an app can activate it or launch it if closed, without sending the files. You can then continue dragging into its window. Leaving an icon cancels pending activation, but a launch already submitted to macOS cannot be undone. A completed spring activation does not quit or hide the app when the drag ends.
+
+Known limitation on the development Mac: Escape cancels a Finder drag before switching apps, but did not cancel after spring activation. The same failure occurred when switching with Command-Tab without using DeeDock. Escape cancellation after an app switch is therefore not guaranteed in this environment.
+
+Right-click an available app and choose **Open Files…** to select files and folders in a native picker. VoiceOver exposes the same action. With **Focus Dock**, select an app and press **⌘O**. One picker is shared by all displays; it retains the app selected when it opened. Cancelling restores the originating dock selection or previous app when DeeDock still owns focus.
+
+Each completed drop or picker confirmation submits its own batch, including consecutive drops onto an app that is still launching. Failures appear on the initiating dock. A successful macOS handoff does not prove that the receiving app displayed every item. Document access is temporary, with no saved bookmarks or document history. See the [acceptance record](docs/ACCEPTANCE.md) for build evidence and outstanding runtime checks.
 
 ## Position and appearance settings
 
