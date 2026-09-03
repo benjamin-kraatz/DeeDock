@@ -28,7 +28,7 @@ enum DockGeometry {
         let availableDepth: CGFloat
         /// Stable envelope accommodates the largest icon, running indicator, and hover label.
         var panelDepth: CGFloat {
-            // The 48 points reserve room for the hover label above either the glass or a raised icon.
+            // The 48 points reserve room for the hover label inward of the glass or a raised icon.
             // Increasing the inner padding must not clip either in the transparent panel envelope.
             let contentHeight = max(surfaceDepth, ceil(iconSize * magnification)
                                     + DockGeometry.crossPadding + DockGeometry.indicatorAreaDepth)

@@ -31,6 +31,40 @@ import Testing
         }
     }
 
+    @Test("Top uses usable desktop while preserving shared and per-display reference requests")
+    func topReference() throws {
+        var settings = DockSettings(edge: .top, positionReference: .screenEdge)
+        #expect(settings.positionReference.resolved(for: settings.edge) == .usableDesktop)
+        settings = try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(settings))
+        #expect(settings.edge == .top && settings.positionReference == .screenEdge)
+        for edge in [DockEdge.bottom, .left, .right] {
+            settings.edge = edge
+            #expect(settings.positionReference.resolved(for: settings.edge) == .screenEdge)
+        }
+
+        let defaults = DockSettingsStore(repository: nil)
+        let profiles = DisplayProfilesStore(defaults: defaults, repository: nil)
+        let display = DisplayFixtures.screen("top", runtimeID: 1, primary: true)
+        profiles.synchronize([display]) { [] }
+        defaults.update(\.positionReference, to: .screenEdge)
+        profiles.update(display.id, keyPath: \.edge, to: .top)
+        let inherited = profiles.effectiveSettings(for: display.id)
+        #expect(inherited.positionReference == .screenEdge)
+        #expect(inherited.positionReference.resolved(for: inherited.edge) == .usableDesktop)
+        #expect(profiles.document.profiles[display.id]?.overrides.positionReference == nil)
+
+        profiles.update(display.id, keyPath: \.positionReference, to: .screenEdge)
+        defaults.update(\.positionReference, to: .usableDesktop)
+        profiles.update(display.id, keyPath: \.edge, to: .bottom)
+        #expect(profiles.effectiveSettings(for: display.id).positionReference == .screenEdge)
+        profiles.update(display.id, keyPath: \.edge, to: .top)
+        profiles.useDefault(.positionReference, for: display.id)
+        defaults.update(\.positionReference, to: .screenEdge)
+        profiles.useDefault(.edge, for: display.id)
+        #expect(profiles.effectiveSettings(for: display.id).edge == .bottom)
+        #expect(profiles.effectiveSettings(for: display.id).positionReference == .screenEdge)
+    }
+
     @Test("Malformed edge values refuse loading without replacing saved bytes")
     func invalidEdges() throws {
         let suite = "DeeDockEdges.\(UUID().uuidString)"
@@ -38,7 +72,7 @@ import Testing
         defer { defaults.removePersistentDomain(forName: suite) }
         let repository = DockSettingsRepository(defaults: defaults)
         var object = try #require(JSONSerialization.jsonObject(with: legacy) as? [String: Any])
-        for value in ["top" as Any, 4, NSNull()] {
+        for value in ["diagonal" as Any, 4, NSNull()] {
             object["edge"] = value
             let data = try JSONSerialization.data(withJSONObject: object)
             defaults.set(data, forKey: "dock.settings.v1")

@@ -5,7 +5,12 @@ struct DockSettings: Codable, Equatable {
     /// Physical along-edge anchor, independent of interface reading direction.
     enum Alignment: String, Codable, CaseIterable { case start = "left", center, end = "right" }
     /// Screen geometry used to measure placement; usableDesktop respects reserved system UI.
-    enum PositionReference: String, Codable, CaseIterable { case usableDesktop, screenEdge }
+    enum PositionReference: String, Codable, CaseIterable {
+        case usableDesktop, screenEdge
+
+        /// Top placement uses reserved desktop bounds without overwriting the saved request.
+        func resolved(for edge: DockEdge) -> Self { edge == .top ? .usableDesktop : self }
+    }
 
     /// Requested resting size in points; the display may require a smaller effective size.
     var iconSize: Double = 48
@@ -15,7 +20,7 @@ struct DockSettings: Codable, Equatable {
     var itemSpacing: Double = 4
     var edge: DockEdge = .bottom
     var alignment: Alignment = .center
-    /// Signed displacement from the alignment anchor, in points; positive moves right on bottom docks and down on side docks.
+    /// Signed displacement from the alignment anchor, in points; positive moves right on horizontal docks and down on side docks.
     var alongEdgeOffset: Double = 0
     /// Distance in points from the chosen reference edge to the glass outer edge.
     var edgeDistance: Double = 8

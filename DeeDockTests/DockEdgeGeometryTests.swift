@@ -17,6 +17,7 @@ import Testing
         let glass = DockGeometry.restingGlass(frame: frame, layout: layout)
         switch edge {
         case .bottom: #expect(glass.minY == screen.minY + 30)
+        case .top: #expect(glass.maxY == screen.maxY - 30)
         case .left: #expect(glass.minX == screen.minX + 30)
         case .right: #expect(glass.maxX == screen.maxX - 30)
         }
@@ -44,12 +45,15 @@ import Testing
         for mode in DockSettings.PositionReference.allCases {
             let settings = DockSettings(edge: edge, edgeDistance: 0, positionReference: mode)
             let reference = DockGeometry.referenceFrame(screenFrame: screen, visibleFrame: visible, settings: settings)
+            #expect(reference == (edge == .top || mode == .usableDesktop ? visible : screen))
+            #expect(settings.positionReference == mode)
             let layout = DockGeometry.layout(count: 4, favoriteCount: 2, availableLength: edge.length(of: reference.size),
                                              availableDepth: edge.depth(of: reference.size), settings: settings)
             let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: layout, settings: settings)
             let glass = DockGeometry.restingGlass(frame: frame, layout: layout)
             switch edge {
             case .bottom: #expect(glass.minY == reference.minY)
+            case .top: #expect(glass.maxY == reference.maxY)
             case .left: #expect(glass.minX == reference.minX)
             case .right: #expect(glass.maxX == reference.maxX)
             }
@@ -64,6 +68,7 @@ import Testing
         let raised = layout.buttonFrame(centerAlong: center, size: layout.iconSize * 2)
         switch edge {
         case .bottom: #expect(raised.maxY == resting.maxY && raised.minY < resting.minY)
+        case .top: #expect(raised.minY == resting.minY && raised.maxY > resting.maxY)
         case .left: #expect(raised.minX == resting.minX && raised.maxX > resting.maxX)
         case .right: #expect(raised.maxX == resting.maxX && raised.minX < resting.minX)
         }
@@ -77,7 +82,7 @@ import Testing
         #expect(overflow.canvasLength > overflow.viewportLength)
     }
 
-    @Test("Coordinate transforms preserve item order and invert on either side", arguments: DockEdge.allCases)
+    @Test("Coordinate transforms preserve item order and invert on every edge", arguments: DockEdge.allCases)
     func coordinates(edge: DockEdge) {
         let points = [CGPoint.zero, CGPoint(x: 120, y: 44), CGPoint(x: -28, y: 300)]
         for point in points {
@@ -106,6 +111,7 @@ import Testing
             let boundary = anchor == .screenEdge ? screen : glass
             switch edge {
             case .bottom: #expect(a.zone.minY == boundary.minY)
+            case .top: #expect(a.zone.maxY == boundary.maxY)
             case .left: #expect(a.zone.minX == boundary.minX)
             case .right: #expect(a.zone.maxX == boundary.maxX)
             }

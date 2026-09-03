@@ -23,7 +23,36 @@ extension DockSettings.PositionReference {
 extension DockEdge {
     static var settingsOptions: [SettingsOption<Self>] {
         [SettingsOption(value: .bottom, title: .settingsEdgeBottom, symbol: "rectangle.bottomthird.inset.filled"),
+         SettingsOption(value: .top, title: .settingsEdgeTop, symbol: "rectangle.topthird.inset.filled"),
          SettingsOption(value: .left, title: .settingsEdgeLeft, symbol: "rectangle.leadingthird.inset.filled"),
          SettingsOption(value: .right, title: .settingsEdgeRight, symbol: "rectangle.trailingthird.inset.filled")]
+    }
+}
+
+extension DockEdge {
+    /// Physical direction symbols shared by placement and activation controls.
+    var edgeSymbol: String {
+        switch self {
+        case .bottom: "rectangle.bottomthird.inset.filled"
+        case .top: "rectangle.topthird.inset.filled"
+        case .left: "rectangle.leadingthird.inset.filled"
+        case .right: "rectangle.trailingthird.inset.filled"
+        }
+    }
+    var outwardSymbol: String {
+        switch self {
+        case .bottom: "arrow.down.to.line"
+        case .top: "arrow.up.to.line"
+        case .left: "arrow.left.to.line"
+        case .right: "arrow.right.to.line"
+        }
+    }
+    var inwardSymbol: String {
+        switch self {
+        case .bottom: "arrow.up"
+        case .top: "arrow.down"
+        case .left: "arrow.right"
+        case .right: "arrow.left"
+        }
     }
 }

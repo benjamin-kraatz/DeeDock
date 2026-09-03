@@ -276,3 +276,29 @@ New Swift Testing coverage checks legacy field compatibility, edge round trips, 
 - Check ordinary Spaces, full-screen apps, Mission Control, mirroring, sleep/wake, and quitting during a transition or drag. Existing native collection behavior is unchanged; actual OS behavior remains unverified for this feature.
 
 Top placement, idle fading, background controls, and system Dock coexistence settings are outside this feature. No permissions, system Dock preferences, signing settings, language mode, deployment target, or dependencies were changed. Stop here for user review.
+
+## Top placement and fixed usable-desktop reference
+
+Added on 2026-09-03 after the Bottom/Left/Right checkpoint `b564d85` at the user's request.
+
+Top is available in shared defaults and per-display edge overrides. It keeps horizontal ordering and keyboard controls, with upright icons, indicators above, and magnification, labels, and callouts below. The shared coordinate transformation also maps activation, insertion, scrolling, animation masks, native hit testing, and previews. Top and Bottom share a scrolling axis, so switching between them retains scroll position.
+
+For Top, **Position relative to** displays **Usable desktop** and is disabled. A caption explains that this avoids overlapping the menu bar and notch. A shared model rule selects the effective reference for both placement and Settings diagrams without rewriting the stored reference or its inheritance. The reference override status and reset action are hidden while Top is selected; they return with the saved choice on another edge. Activation location remains independent, and its top-specific help explains that physical screen-edge activation can also reveal the menu bar.
+
+Authored coverage now includes Top in edge persistence, geometry, animation, input, and cross-display copy cases. Added assertions cover the forced usable-desktop frame, unchanged encoded reference values, inherited and explicit display requests, and restoring those requests after switching edges. Inert previews cover Top with magnification, long labels, overflow, reduced appearance settings, insertion feedback, errors, empty content, and a disabled reference picker whose saved choice is Screen edge.
+
+Compilation succeeded with the existing scheme and build configuration:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-edge-build build-for-testing
+
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-edge-build build
+```
+
+Results: **TEST BUILD SUCCEEDED** and **BUILD SUCCEEDED**. Logs are `/tmp/DeeDock-top-test-build.log` and `/tmp/DeeDock-top-app-build.log`. Both reported only skipped App Intents metadata extraction. The string catalog parses and the diff passes whitespace checks. No signing, sandbox, language-mode, deployment-target, or dependency settings changed.
+
+No tests were executed, app launched, or automated visual checks performed. Runtime acceptance remains pending for the disabled picker and subtitle, defaults and override restoration, menu-bar auto-hide, notched and unnotched displays, mixed-edge monitors, negative origins, display rearrangement, scrolling and drag destinations, native menus and focus, VoiceOver, all animations and activation zones, Spaces/full-screen behavior, and sleep/wake. The placement restriction uses the existing display visible frame supplied by macOS; compilation does not establish behavior when reserved system UI changes. Stop for review before committing this addition.

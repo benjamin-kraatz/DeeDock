@@ -9,7 +9,7 @@ struct DockCalloutsView: View {
     let dismissError: () -> Void
 
     var body: some View {
-        let region = layout.edge == .bottom && errorMessage != nil
+        let region = !layout.edge.isVertical && errorMessage != nil
             ? CGRect(origin: .zero, size: layout.viewportSize)
             : layout.calloutRegion(size: layout.iconSize * layout.magnification, length: layout.viewportLength)
         Group {
@@ -29,7 +29,7 @@ struct DockCalloutsView: View {
                     .allowsHitTesting(false)
             }
         }
-        .frame(width: region.width, height: region.height, alignment: layout.edge.isVertical ? .center : .top)
+        .frame(width: region.width, height: region.height, alignment: layout.edge.isVertical ? .center : (layout.edge == .top ? .bottom : .top))
         .clipped()
         .position(x: region.midX, y: region.midY)
     }

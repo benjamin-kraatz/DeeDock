@@ -49,7 +49,7 @@ struct DockSurfaceView: View {
                     .frame(width: layout.edge.isVertical ? layout.iconSize * 0.65 : 1,
                            height: layout.edge.isVertical ? 1 : layout.iconSize * 0.65)
                     .position(x: layout.edge.isVertical ? icon.midX : position,
-                              y: layout.edge.isVertical ? position : icon.midY + 3)
+                              y: layout.edge.isVertical ? position : icon.midY + (layout.edge == .top ? -3 : 3))
                     .accessibilityHidden(true)
             }
             ForEach(Array(slots.enumerated()), id: \.element.id) {
@@ -119,7 +119,7 @@ struct DockSurfaceView: View {
             {
                 let region = layout.calloutRegion(size: sizes[index], length: layout.canvasLength).intersection(viewport)
                 DockHoverLabel(name: slots[index].item?.reference.name ?? "",
-                    anchor: CGPoint(x: centers[index], y: layout.edge.isVertical ? centers[index] : region.maxY - 20),
+                    anchor: CGPoint(x: centers[index], y: layout.edge.isVertical ? centers[index] : (layout.edge == .top ? region.minY + 20 : region.maxY - 20)),
                     viewport: region, edge: layout.edge)
             }
         }

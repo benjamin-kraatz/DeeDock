@@ -11,9 +11,10 @@ struct DockActivationGeometry {
         let depth = min(edge.depth(of: screen.size), CGFloat(settings.zoneDepth))
         let offset = CGFloat(settings.zoneOffset)
         switch edge {
-        case .bottom:
+        case .bottom, .top:
             let x = min(max(restingGlass.midX - length / 2 + offset, screen.minX), screen.maxX - length)
-            let y = settings.activationLocation == .screenEdge ? screen.minY : restingGlass.minY
+            let boundary = settings.activationLocation == .screenEdge ? screen : restingGlass
+            let y = edge == .top ? boundary.maxY - depth : boundary.minY
             zone = CGRect(x: x, y: min(max(y, screen.minY), screen.maxY - depth), width: length, height: depth)
         case .left, .right:
             // Positive offsets move down, opposite AppKit's screen y axis.

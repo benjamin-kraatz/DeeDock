@@ -242,7 +242,7 @@
       }
     },
     "settingsAlignment": {
-      "comment": "Alignment control label. Choices run left/center/right on bottom docks and top/center/bottom on side docks.",
+      "comment": "Alignment control label. Choices run left/center/right on top and bottom docks and top/center/bottom on side docks.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -500,13 +500,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Positive offsets move right on bottom docks and down on side docks. Edge distance measures to the outside of the glass. Placement is constrained to the display; requested values remain saved."
+            "value": "Positive offsets move right on top and bottom docks and down on side docks. Edge distance measures to the outside of the glass. Placement is constrained to the display; requested values remain saved."
           }
         }
       }
     },
     "settingsPositionKeywords": {
-      "comment": "Space-separated search synonyms for bottom and side placement settings.",
+      "comment": "Space-separated search synonyms for all four physical edge placement settings.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -932,7 +932,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The activation zone follows the selected dock edge. Length runs along the edge; depth extends inward. Positive offsets move right on bottom docks and down on side docks. The connecting region keeps the dock visible while you approach it."
+            "value": "The activation zone follows the selected dock edge. Length runs along the edge; depth extends inward. Positive offsets move right on top and bottom docks and down on side docks. The connecting region keeps the dock visible while you approach it."
           }
         }
       }
@@ -1610,7 +1610,7 @@
       }
     },
     "settingsAlongEdgeOffset": {
-      "comment": "Signed position offset. Positive moves right on bottom docks and down on side docks.",
+      "comment": "Signed position offset. Positive moves right on top and bottom docks and down on side docks.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1845,6 +1845,126 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bounces inward, then retreats outward and fades."
+          }
+        }
+      }
+    },
+    "settingsEdgeTop": {
+      "comment": "Physical top edge choice in Dock placement settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top"
+          }
+        }
+      }
+    },
+    "settingsTopReferenceHelp": {
+      "comment": "Subtitle beneath the disabled position reference picker for top docks. The saved choice for other edges is preserved.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top placement always uses the usable desktop to avoid overlapping the menu bar and notch."
+          }
+        }
+      }
+    },
+    "behaviorTopZoneHelp": {
+      "comment": "Explains the separate activation anchor choices for top placement. Placement itself always uses the usable desktop.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen-edge activation at the top can also reveal the menu bar. Choose Dock position to activate beside the resting dock."
+          }
+        }
+      }
+    },
+    "animationTopLiftTitle": {
+      "comment": "Top-dock title for the existing lift and fade effect, which moves inward and down.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Down & Away"
+          }
+        }
+      }
+    },
+    "animationTopSlideFadeSubtitle": {
+      "comment": "Hiding description for slide and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides upward toward the top edge while fading."
+          }
+        }
+      }
+    },
+    "animationTopSlideSubtitle": {
+      "comment": "Hiding description for slide on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slides upward toward the top edge."
+          }
+        }
+      }
+    },
+    "animationTopLiftSubtitle": {
+      "comment": "Hiding description for lift and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moves down into the desktop while fading."
+          }
+        }
+      }
+    },
+    "animationTopScaleSubtitle": {
+      "comment": "Hiding description for scale and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shrinks toward the top edge while fading."
+          }
+        }
+      }
+    },
+    "animationTopWipeSubtitle": {
+      "comment": "Hiding description for the thickness wipe on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapses upward toward the top edge."
+          }
+        }
+      }
+    },
+    "animationTopBounceSubtitle": {
+      "comment": "Hiding description for bounce and fade on a top dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bounces down, then retreats upward while fading."
           }
         }
       }

@@ -44,6 +44,7 @@ extension DockAnimationStyle.Group {
 
 extension DockAnimationStyle {
     func title(for edge: DockEdge) -> LocalizedStringResource {
+        if edge == .top { return self == .liftFade ? .animationTopLiftTitle : title }
         guard edge.isVertical else { return title }
         switch self {
         case .liftFade: return .animationSideLiftTitle
@@ -53,6 +54,17 @@ extension DockAnimationStyle {
         }
     }
     func subtitle(for edge: DockEdge) -> LocalizedStringResource {
+        if edge == .top {
+            switch self {
+            case .slideFade: return .animationTopSlideFadeSubtitle
+            case .slide: return .animationTopSlideSubtitle
+            case .liftFade: return .animationTopLiftSubtitle
+            case .scaleFade: return .animationTopScaleSubtitle
+            case .verticalWipe: return .animationTopWipeSubtitle
+            case .bounceFade: return .animationTopBounceSubtitle
+            default: return subtitle
+            }
+        }
         guard edge.isVertical else { return subtitle }
         switch self {
         case .slideFade: return .animationSideSlideFadeSubtitle

@@ -6,7 +6,7 @@ struct BehaviorActivationControls: View {
     var body: some View {
         SettingsPickerRow(title: .behaviorLocation, options: [
             SettingsOption(value: DockBehaviorSettings.ActivationLocation.dockPosition, title: .behaviorDockPosition, symbol: "dock.rectangle"),
-            SettingsOption(value: .screenEdge, title: .behaviorScreenEdge, symbol: source.value.edge == .bottom ? "rectangle.bottomthird.inset.filled" : (source.value.edge == .left ? "rectangle.leadingthird.inset.filled" : "rectangle.trailingthird.inset.filled"))
+            SettingsOption(value: .screenEdge, title: .behaviorScreenEdge, symbol: source.value.edge.edgeSymbol)
         ], selection: source.binding(\.behavior.activationLocation))
             .settingsOverride(source.context, field: .activationLocation)
         SettingsPickerRow(title: .behaviorLengthMode, options: [

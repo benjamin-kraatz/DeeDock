@@ -11,6 +11,14 @@ struct PositionSettingsPane: View {
 
     var overrideContext: SettingsOverrideContext? = nil
 
+    // Reading the effective value never writes to the inherited or overridden preference.
+    private var referenceSelection: Binding<DockSettings.PositionReference> {
+        Binding(get: { reference.resolved(for: edge) }, set: { value in
+            guard edge != .top else { return }
+            reference = value
+        })
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
@@ -18,13 +26,22 @@ struct PositionSettingsPane: View {
                                      alongEdgeOffset: alongEdgeOffset,
                                      edgeDistance: edgeDistance)
             }
-            SettingsCard(title: .settingsCardAnchor, footnote: .settingsDockOverlapHelp) {
+            SettingsCard(title: .settingsCardAnchor, footnote: edge == .top ? nil : .settingsDockOverlapHelp) {
                 SettingsPickerRow(title: .settingsEdge, options: DockEdge.settingsOptions, selection: $edge)
                     .settingsOverride(overrideContext, field: .edge)
-                SettingsPickerRow(title: .settingsPositionReference,
-                                  options: DockSettings.PositionReference.settingsOptions,
-                                  selection: $reference)
-                    .settingsOverride(overrideContext, field: .positionReference)
+                VStack(alignment: .leading, spacing: 0) {
+                    SettingsPickerRow(title: .settingsPositionReference,
+                                      options: DockSettings.PositionReference.settingsOptions,
+                                      selection: referenceSelection)
+                        .settingsOverride(edge == .top ? nil : overrideContext, field: .positionReference)
+                        .disabled(edge == .top)
+                    if edge == .top {
+                        Text(.settingsTopReferenceHelp)
+                            .font(.caption).foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 14).padding(.bottom, 10)
+                    }
+                }
                 SettingsPickerRow(title: .settingsAlignment,
                                   options: DockSettings.Alignment.settingsOptions(edge: edge),
                                   selection: $alignment)
@@ -38,8 +55,8 @@ struct PositionSettingsPane: View {
                     .settingsOverride(overrideContext, field: .alongEdgeOffset)
                 SettingsSliderRow(title: .settingsEdgeDistance, unit: .settingsPoints,
                                   value: $edgeDistance, range: 0...300, step: 1,
-                                  minimumSymbol: edge == .bottom ? "arrow.down.to.line" : (edge == .left ? "arrow.left.to.line" : "arrow.right.to.line"),
-                                  maximumSymbol: edge == .bottom ? "arrow.up" : (edge == .left ? "arrow.right" : "arrow.left"))
+                                  minimumSymbol: edge.outwardSymbol,
+                                  maximumSymbol: edge.inwardSymbol)
                     .settingsOverride(overrideContext, field: .edgeDistance)
             }
         }
@@ -47,9 +64,9 @@ struct PositionSettingsPane: View {
 }
 
 #if DEBUG
-#Preview("Position pane") {
-    @Previewable @State var edge: DockEdge = .left
-    @Previewable @State var reference: DockSettings.PositionReference = .usableDesktop
+#Preview("Top placement preserves a saved screen-edge request") {
+    @Previewable @State var edge: DockEdge = .top
+    @Previewable @State var reference: DockSettings.PositionReference = .screenEdge
     @Previewable @State var alignment: DockSettings.Alignment = .center
     @Previewable @State var offset: Double = 0
     @Previewable @State var bottom: Double = 8

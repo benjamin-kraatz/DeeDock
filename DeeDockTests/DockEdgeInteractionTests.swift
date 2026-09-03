@@ -30,6 +30,7 @@ import Testing
         let inward = DockAnimationGeometry.sample(style: .liftFade, progress: 0.5, size: size, reduceMotion: false, edge: edge)
         switch edge {
         case .bottom: #expect(outward.offset.height > 0 && inward.offset.height < 0)
+        case .top: #expect(outward.offset.height < 0 && inward.offset.height > 0)
         case .left: #expect(outward.offset.width < 0 && inward.offset.width > 0)
         case .right: #expect(outward.offset.width > 0 && inward.offset.width < 0)
         }
@@ -39,6 +40,7 @@ import Testing
         let wipe = DockAnimationGeometry.sample(style: .verticalWipe, progress: 0.5, size: size, reduceMotion: false, edge: edge)
         switch edge {
         case .bottom: #expect(wipe.mask.maxY == size.height - DockGeometry.outerMargin)
+        case .top: #expect(wipe.mask.minY == DockGeometry.outerMargin)
         case .left: #expect(wipe.mask.minX == DockGeometry.outerMargin)
         case .right: #expect(wipe.mask.maxX == size.width - DockGeometry.outerMargin)
         }

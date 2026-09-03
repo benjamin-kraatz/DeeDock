@@ -3,11 +3,11 @@ import CoreGraphics
 extension DockGeometry {
     /// Chooses the full display or the area left by reserved system UI.
     static func referenceFrame(screenFrame: CGRect, visibleFrame: CGRect, settings: DockSettings) -> CGRect {
-        settings.positionReference == .usableDesktop ? visibleFrame : screenFrame
+        settings.positionReference.resolved(for: settings.edge) == .usableDesktop ? visibleFrame : screenFrame
     }
 
     /// Anchors glass to the requested edge. Only the transparent outer margin may leave the reference.
-    /// Along-axis coordinates increase left-to-right below and top-to-bottom beside the display.
+    /// Along-axis coordinates increase left-to-right above/below and top-to-bottom beside the display.
     static func panelFrame(referenceFrame: CGRect, layout: Layout, settings: DockSettings) -> CGRect {
         let settings = settings.normalized ?? .defaults
         let edge = settings.edge
@@ -26,6 +26,9 @@ extension DockGeometry {
         switch edge {
         case .bottom:
             return CGRect(x: referenceFrame.minX + along, y: referenceFrame.minY + distance,
+                          width: layout.viewportLength, height: layout.panelDepth)
+        case .top:
+            return CGRect(x: referenceFrame.minX + along, y: referenceFrame.maxY - distance - layout.panelDepth,
                           width: layout.viewportLength, height: layout.panelDepth)
         case .left:
             return CGRect(x: referenceFrame.minX + distance, y: referenceFrame.maxY - along - layout.viewportLength,

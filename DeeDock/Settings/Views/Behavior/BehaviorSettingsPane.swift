@@ -11,7 +11,7 @@ struct BehaviorSettingsPane: View {
                 Toggle(isOn: source.binding(\.behavior.autoHide)) { Text(.behaviorAutoHide) }
                     .padding(14).settingsOverride(source.context, field: .autoHide)
             }
-            SettingsCard(title: .behaviorActivationZone, footnote: .behaviorZoneHelp) {
+            SettingsCard(title: .behaviorActivationZone, footnote: source.value.edge == .top ? .behaviorTopZoneHelp : .behaviorZoneHelp) {
                 DockZoneDiagram(settings: source.value).padding(14)
                 if let showZone {
                     Button(.behaviorShowZone, systemImage: "viewfinder", action: showZone).padding(14)

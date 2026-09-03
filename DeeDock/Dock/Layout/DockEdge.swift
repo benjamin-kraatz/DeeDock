@@ -2,9 +2,9 @@ import CoreGraphics
 
 /// Physical screen edge, independent of language direction and display-array order.
 enum DockEdge: String, Codable, CaseIterable {
-    case bottom, left, right
+    case bottom, top, left, right
 
-    var isVertical: Bool { self != .bottom }
+    var isVertical: Bool { self == .left || self == .right }
 
     /// Extracts distance along the ordered axis in top-left coordinates.
     func along(_ point: CGPoint) -> CGFloat { isVertical ? point.y : point.x }
@@ -15,10 +15,11 @@ enum DockEdge: String, Codable, CaseIterable {
     }
 
     /// Canonical coordinates describe a bottom dock: x follows item order and y points outward.
-    /// Transform geometry only. Icons and text remain upright on both side docks.
+    /// Transform geometry only. Icons and text remain upright on every edge.
     func point(_ point: CGPoint, depth: CGFloat) -> CGPoint {
         switch self {
         case .bottom: point
+        case .top: CGPoint(x: point.x, y: depth - point.y)
         case .left: CGPoint(x: depth - point.y, y: point.x)
         case .right: CGPoint(x: point.y, y: point.x)
         }
@@ -27,6 +28,7 @@ enum DockEdge: String, Codable, CaseIterable {
     func canonical(_ point: CGPoint, depth: CGFloat) -> CGPoint {
         switch self {
         case .bottom: point
+        case .top: CGPoint(x: point.x, y: depth - point.y)
         case .left: CGPoint(x: point.y, y: depth - point.x)
         case .right: CGPoint(x: point.y, y: point.x)
         }
@@ -42,6 +44,7 @@ enum DockEdge: String, Codable, CaseIterable {
     func offset(_ offset: CGSize) -> CGSize {
         switch self {
         case .bottom: offset
+        case .top: CGSize(width: offset.width, height: -offset.height)
         case .left: CGSize(width: -offset.height, height: offset.width)
         case .right: CGSize(width: offset.height, height: offset.width)
         }

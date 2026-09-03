@@ -13,7 +13,7 @@ struct DockHoverLabel: View {
         let halfWidth = min(measuredSize.width, maximumWidth) / 2
         let halfHeight = min(measuredSize.height, viewport.height) / 2
         let requestedX: CGFloat = switch edge {
-        case .bottom: anchor.x
+        case .bottom, .top: anchor.x
         case .left: viewport.minX + halfWidth + 8
         case .right: viewport.maxX - halfWidth - 8
         }
