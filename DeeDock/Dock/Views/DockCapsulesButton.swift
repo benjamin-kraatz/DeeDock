@@ -70,9 +70,8 @@ struct DockSessionCapsuleButton: View {
                                  available: true, running: false, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation) {
-                CapsuleGlyph(size: size)
+                SessionCapsuleStack(icons: item.applicationIcons, size: size)
             }
-                .overlay(alignment: .bottom) { badge }
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -90,21 +89,6 @@ struct DockSessionCapsuleButton: View {
         }
         .accessibilityAction(named: Text(.capsulesDelete)) {
             interaction.deleteSessionCapsule?(item.capsuleID)
-        }
-    }
-
-    /// The capsule's own applications, so a saved tile says which work it holds before it is opened.
-    @ViewBuilder private var badge: some View {
-        if item.applicationIcons.isEmpty {
-            Image(systemName: "bookmark.fill")
-                .font(.system(size: max(9, size * 0.22), weight: .semibold))
-                .foregroundStyle(.tint)
-                .padding(3).background(.background.opacity(0.85), in: .circle)
-                .offset(y: size * 0.04)
-                .accessibilityHidden(true)
-        } else {
-            TwinedAppIconStack(icons: item.applicationIcons, size: max(12, size * 0.36))
-                .offset(y: size * 0.06)
         }
     }
 }

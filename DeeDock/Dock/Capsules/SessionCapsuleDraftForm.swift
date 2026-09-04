@@ -17,16 +17,15 @@ struct SessionCapsuleDraftForm: View {
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: CapsuleMetrics.section) {
                     titleField
                     summarySection
                     taskSection
                     noteSection
                     SessionCapsuleWindowList(windows: draft.windows)
                 }
-                .padding(18)
+                .padding(CapsuleMetrics.page)
             }
-            Divider()
             footer
         }
     }
@@ -116,7 +115,7 @@ struct SessionCapsuleDraftForm: View {
                 .keyboardShortcut(.defaultAction)
                 .disabled(!draft.canSave)
         }
-        .padding(.horizontal, 16).padding(.vertical, 12)
+        .capsuleFooterBar()
     }
 
     // MARK: - Editing
@@ -255,15 +254,6 @@ struct SessionCapsuleWindowList: View {
             Image(systemName: "macwindow").foregroundStyle(.secondary)
                 .frame(width: 22, height: 22).accessibilityHidden(true)
         }
-    }
-}
-
-extension View {
-    /// Read-only counterpart of the draft field surface, for saved capsule detail cards.
-    func capsuleReadingCard() -> some View {
-        padding(.horizontal, 12).padding(.vertical, 10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.quaternary.opacity(0.35), in: .rect(cornerRadius: 10))
     }
 }
 

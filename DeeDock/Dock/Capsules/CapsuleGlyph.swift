@@ -15,8 +15,8 @@ struct CapsuleGlyph: View {
     /// Drop shadows help on the Dock but muddy the mark inline in a panel row.
     var elevated = true
 
-    private var shellWidth: CGFloat { size * 0.46 }
-    private var shellHeight: CGFloat { size * 0.94 }
+    private var shellWidth: CGFloat { size * 0.40 }
+    private var shellHeight: CGFloat { size * 0.82 }
     private var hairline: CGFloat { max(0.5, size * 0.016) }
 
     var body: some View {
@@ -144,6 +144,95 @@ struct TwinedAppIconStack: View {
         guard slots > 1 else { return 0 }
         let centre = Double(slots - 1) / 2
         return (Double(index) - centre) * 8
+    }
+}
+
+/// A saved capsule's Dock tile: the applications it holds, twisted into a stack.
+///
+/// A capsule is identified by what it contains, so the tile shows real application artwork rather than
+/// a generic mark. The front card stands upright and the ones behind it turn alternately left and
+/// right — +7°, -7°, +14° — so their corners emerge on *both* sides of the upright card. Turning them
+/// all the same way, which is the obvious reading of a twisted stack, does not work: the cards hide
+/// behind the front one and the little that escapes on a single side makes the front icon itself look
+/// crooked. A capsule holding one application would be indistinguishable from that application's own
+/// tile, so a lone icon gets a blank card on each side instead.
+struct SessionCapsuleStack: View {
+    let icons: [NSImage]
+    let size: CGFloat
+    /// Beyond four cards the fan stops adding depth and starts adding clutter.
+    var maximum = 4
+    /// Turn added by each pair of cards behind the front one.
+    var step: Angle = .degrees(7)
+
+    /// Cards are drawn a little under the tile's full size because rotation grows their bounding box.
+    private var cardSize: CGFloat { size * 0.86 }
+    private var corner: CGFloat { cardSize * 0.22 }
+    private var shown: [NSImage] { Array(icons.prefix(maximum)) }
+    private var overflow: Int { max(0, icons.count - maximum) }
+
+    var body: some View {
+        ZStack {
+            if shown.count <= 1 {
+                ghost(depth: 2)
+                ghost(depth: 1)
+            }
+            // Reversed so the deepest card is drawn first and the upright one lands on top.
+            ForEach(Array(shown.enumerated()).reversed(), id: \.offset) { index, icon in
+                card(icon, depth: index)
+            }
+            if shown.isEmpty { CapsuleGlyph(size: cardSize * 0.6, elevated: false) }
+        }
+        .frame(width: size, height: size)
+        .overlay(alignment: .bottomTrailing) { if overflow > 0 { counter } }
+        .accessibilityHidden(true)
+    }
+
+    private func card(_ icon: NSImage, depth: Int) -> some View {
+        Image(nsImage: icon).resizable().interpolation(.high)
+            .frame(width: cardSize, height: cardSize)
+            // Cards recede as they turn, so the front application stays the one being read.
+            .brightness(-0.1 * Double(depth))
+            .saturation(1 - 0.14 * Double(depth))
+            .shadow(color: .black.opacity(0.45), radius: cardSize * 0.045, y: cardSize * 0.015)
+            .rotationEffect(angle(depth))
+    }
+
+    /// The cards that say "stack" when the artwork alone cannot: blank layers behind a lone icon.
+    ///
+    /// Mid-grey rather than near-black on purpose. Behind a dark application icon a dark card merges
+    /// with it, and the pair then reads as one crooked tile instead of a stack.
+    private func ghost(depth: Int) -> some View {
+        RoundedRectangle(cornerRadius: corner, style: .continuous)
+            .fill(Color.secondary.opacity(0.45))
+            .background(RoundedRectangle(cornerRadius: corner, style: .continuous)
+                .fill(.ultraThinMaterial))
+            .overlay {
+                RoundedRectangle(cornerRadius: corner, style: .continuous)
+                    .strokeBorder(.white.opacity(0.22), lineWidth: max(0.5, cardSize * 0.018))
+            }
+            .frame(width: cardSize, height: cardSize)
+            .brightness(-0.1 * Double(depth))
+            .shadow(color: .black.opacity(0.45), radius: cardSize * 0.045, y: cardSize * 0.015)
+            .rotationEffect(angle(depth))
+    }
+
+    /// Alternating turns: the odd cards lean one way, the even cards the other, widening every pair.
+    private func angle(_ depth: Int) -> Angle {
+        guard depth > 0 else { return .zero }
+        let magnitude = Double((depth + 1) / 2)
+        return step * (depth.isMultiple(of: 2) ? -magnitude : magnitude)
+    }
+
+    /// The same count badge the Session Capsules tile wears, so both read as "and this many more".
+    private var counter: some View {
+        Text(.capsulesMoreApplications(count: overflow))
+            .font(.system(size: max(9, size * 0.2), weight: .semibold)).monospacedDigit()
+            .foregroundStyle(.white)
+            .padding(.horizontal, max(4, size * 0.09))
+            .padding(.vertical, max(1, size * 0.02))
+            .background(Color.accentColor, in: .capsule)
+            .overlay { Capsule().strokeBorder(.background.opacity(0.7), lineWidth: 1) }
+            .offset(x: size * 0.04, y: size * 0.02)
     }
 }
 
