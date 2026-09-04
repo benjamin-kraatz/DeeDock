@@ -13,6 +13,7 @@ private struct SettingsOverrideModifier: ViewModifier {
 
     private var isOverridden: Bool {
         guard let context else { return false }
+        if field == .appVisibility { return context.profiles.hasModeVisibilityOverride(for: context.id) }
         return context.profiles.document.profiles[context.id]?.overrides.contains(field) == true
     }
 

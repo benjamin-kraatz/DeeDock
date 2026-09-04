@@ -30,7 +30,9 @@ final class DockStore {
     @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     var pins: [DockPin] { profiles.pinLists[displayID] ?? [] }
-    var canEditPins: Bool { !profiles.requiresReset && profiles.pinErrors[displayID] == nil }
+    var canEditPins: Bool {
+        !profiles.requiresReset && !profiles.modes.requiresReset && profiles.pinErrors[displayID] == nil
+    }
 
     @ObservationIgnored private let profiles: DisplayProfilesStore
     @ObservationIgnored private let trash: TrashController?

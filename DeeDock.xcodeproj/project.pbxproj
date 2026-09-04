@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */; };
+		AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */; };
+		AB0100000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */; };
+		AB0100000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift */; };
+		AB0100000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift */; };
+		AB0100000000000000000005 /* DeeDock/Modes/Picker/DockModePickerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000005 /* DeeDock/Modes/Picker/DockModePickerState.swift */; };
+		AB0100000000000000000006 /* DeeDock/Dock/Peek/WindowPeekModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000006 /* DeeDock/Dock/Peek/WindowPeekModels.swift */; };
+		AB0100000000000000000007 /* DeeDock/Dock/Peek/WindowPeekGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000007 /* DeeDock/Dock/Peek/WindowPeekGeometry.swift */; };
+		AB0100000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift */; };
+		AB0100000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift */; };
+		AB010000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB020000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift */; };
 		DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */; };
 		DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */; };
 		DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */; };
@@ -75,6 +86,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Models/WindowPeekSettings.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Models/DockMode.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Persistence/DockModesRepository.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/State/DockModesStore.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Picker/DockModePickerGeometry.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000005 /* DeeDock/Modes/Picker/DockModePickerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Picker/DockModePickerState.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000006 /* DeeDock/Dock/Peek/WindowPeekModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Peek/WindowPeekModels.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000007 /* DeeDock/Dock/Peek/WindowPeekGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Peek/WindowPeekGeometry.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Peek/WindowThumbnailService.swift; sourceTree = SOURCE_ROOT; };
+		AB0200000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift; sourceTree = SOURCE_ROOT; };
+		AB020000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Previews/ScreenCaptureAccessController.swift; sourceTree = SOURCE_ROOT; };
 		000000000000000000000120 /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,6 +241,17 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
+				AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */,
+				AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */,
+				AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */,
+				AB0200000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift */,
+				AB0200000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift */,
+				AB0200000000000000000005 /* DeeDock/Modes/Picker/DockModePickerState.swift */,
+				AB0200000000000000000006 /* DeeDock/Dock/Peek/WindowPeekModels.swift */,
+				AB0200000000000000000007 /* DeeDock/Dock/Peek/WindowPeekGeometry.swift */,
+				AB0200000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift */,
+				AB0200000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift */,
+				AB020000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift */,
 				DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */,
 				DDFB00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift */,
 				DDFB00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift */,
@@ -378,6 +411,17 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */,
+				AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */,
+				AB0100000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift in Sources */,
+				AB0100000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift in Sources */,
+				AB0100000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift in Sources */,
+				AB0100000000000000000005 /* DeeDock/Modes/Picker/DockModePickerState.swift in Sources */,
+				AB0100000000000000000006 /* DeeDock/Dock/Peek/WindowPeekModels.swift in Sources */,
+				AB0100000000000000000007 /* DeeDock/Dock/Peek/WindowPeekGeometry.swift in Sources */,
+				AB0100000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift in Sources */,
+				AB0100000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift in Sources */,
+				AB010000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift in Sources */,
 				DDFA00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift in Sources */,
 				DDFA00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift in Sources */,
 				DDFA00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift in Sources */,

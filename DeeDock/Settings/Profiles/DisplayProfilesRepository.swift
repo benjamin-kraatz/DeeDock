@@ -5,6 +5,7 @@ struct DisplayProfilesRepository {
     private let defaults: UserDefaults
     private let key = "dock.displays.v1"
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }
+    var dockModesRepository: DockModesRepository { DockModesRepository(defaults: defaults) }
 
     func load() throws -> DisplayProfilesDocument {
         guard let object = defaults.object(forKey: key) else { return DisplayProfilesDocument() }

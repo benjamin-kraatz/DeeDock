@@ -778,3 +778,26 @@ The final focused Xcode app build succeeded with no reported diagnostics. The si
 - Check every size, layout, style, preset, and filter under Defaults and per-display overrides. Include four edges, negative origins, scaling, crowded panels, remembered displays, and long localization.
 - Exercise Focus Dock with Space, arrow navigation, Return, and Escape, plus VoiceOver, Reduce Motion, Reduce Transparency, and foreground-focus preservation.
 - Measure idle and visible-Peek CPU, GPU, and memory use. Confirm capture stops and images are released when Peek closes.
+
+## Dock Modes
+
+Implemented on 2026-09-04 as an app-wide named configuration layer over display pins and App Visibility. The first launch after this change creates **Default** from the existing shared visibility, display visibility overrides, and every remembered display's typed pins. Legacy keys remain untouched for rollback, while subsequent pin and visibility edits write to the active mode.
+
+The versioned modes document stores ordered stable IDs, names, active and previous IDs, shared App Visibility, and each remembered display's pins and optional visibility override. Saves complete before live state changes. Load corruption preserves the recoverable legacy projection, blocks persistent pin and mode edits, and exposes an explicit Settings reset. A newly discovered display copies the primary display's pins independently in every mode.
+
+**Settings → Modes** supports creation by duplicating the active mode, renaming, arbitrary duplication, reordering, activation, and deletion while retaining at least one mode. Names are trimmed and unique under case- and diacritic-insensitive comparison. App Visibility remains in Behavior, where Defaults edits the active mode's shared value and displays can create or clear independent overrides. Other settings remain outside modes.
+
+The menu-bar **Dock Mode** submenu lists modes in their saved order, marks the active one, exposes Previous Mode, and opens management. Focus Dock opens an anchored keyboard picker with M; Up and Down navigate, Return selects, and Escape returns to the dock. Switching closes Window Peek and folder stacks, cancels window discovery, and is blocked during native menu tracking, file picking, and drag sessions. Connected docks refresh together after persistence succeeds, while running-only applications keep discovery order.
+
+Authored Swift Testing coverage includes legacy migration and key retention, corrupt recovery, failed-save atomicity, naming, ordering, duplication, active deletion, previous-mode toggling, live-edit isolation, display visibility overrides, new-display seeding across modes, four-edge geometry with a negative display origin, and keyboard picker navigation. Deterministic SwiftUI samples cover normal management, long names, corrupt-storage recovery, the picker, and its reduced-transparency rendering. Preview dependencies neither inspect applications nor touch real preferences.
+
+Xcode's focused build-for-testing completed successfully in 4.747 seconds, compiling the app and test targets without executing tests. The subsequent focused DeeDock app build completed successfully, and Xcode reported no warning-level diagnostics. No test suite, SwiftUI preview, automated visual check, app launch, or permission-sensitive runtime action was performed.
+
+### Required hands-on acceptance
+
+- Switch among at least three modes from the menu bar and Focus Dock. Confirm Previous Mode toggles the last two modes and selecting the active mode does nothing.
+- Edit pins, folder presentation, shared App Visibility, and a display visibility override in each mode. Restart and confirm isolation, order, inheritance, and remembered disconnected displays.
+- Attach a new display and confirm each mode seeds it from that mode's primary-display pins while inheriting shared visibility. Repeat with a negative-origin arrangement and each dock edge.
+- Switch with Window Peek and a folder stack open. Confirm both close, focus selection repairs to a stable surviving item or its nearest neighbor, and running-only app order remains unchanged.
+- Confirm switching is disabled during native menus, file selection, and cross-display or Finder drags. Cancel each operation and verify switching becomes available again.
+- Exercise long localized names, VoiceOver actions, Reduce Motion, Reduce Transparency, sleep/wake, display removal, and corrupt modes reset in a disposable preferences domain.

@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, a Trash tile, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, Trash visibility, and ten reveal/hide animation styles. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, a Trash tile, Window Peek, Dock Modes, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Named Dock Modes switch every display's pins and app visibility together. Display-independent appearance and behavior settings still use shared defaults with optional per-display overrides. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -79,11 +79,22 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 - Right-click an app for opening and Finder commands, running-app commands, and **Pin** or **Unpin**. Running-app commands include Hide or Show, Bring All to Front, and cooperative Quit. One icon represents every matching regular process, so those commands apply to all matching instances. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
 - Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, Space opens Window Peek for a running app, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
+- Choose a named configuration from **Dock Mode** in the menu-bar item, or press M in Focus Dock to open the keyboard mode picker. A mode changes every display's pins and App Visibility together; it does not launch, quit, hide, or reorder running-only apps.
 - Choose **Quit DeeDock** from the menu-bar item or app menu to close it.
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
 Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, Trash, and Window Peek are implemented.
+
+## Dock Modes
+
+Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DeeDock keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
+
+Each mode owns the ordered app and folder pins for every remembered display, plus the shared App Visibility choice and any display-specific App Visibility overrides. Pinning, unpinning, reordering, folder presentation changes, and App Visibility edits apply directly to the active mode. Appearance, placement, auto-hide, Trash, Window Peek, and other controls remain independent.
+
+The menu-bar **Dock Mode** submenu switches configurations across all connected docks after the new choice has saved successfully. **Previous Mode** toggles between the last two configurations. During Focus Dock, press M, use Up or Down, then Return; Escape closes the picker without switching. Switching is unavailable while a native menu, file picker, or drag operation is active, and closes open Window Peek and folder panels before changing the docks.
+
+Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DeeDock continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
 
 ## Launch at login
 

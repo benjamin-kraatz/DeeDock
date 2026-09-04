@@ -19,6 +19,7 @@ final class DockFilePickerController {
     }
     private var session: Session?
     private let makePicker: () -> any DockFileChoosing
+    var isActive: Bool { session != nil }
 
     init(makePicker: @escaping () -> any DockFileChoosing) { self.makePicker = makePicker }
 

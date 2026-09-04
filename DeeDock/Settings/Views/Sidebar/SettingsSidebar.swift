@@ -14,8 +14,8 @@ struct SettingsSidebar: View {
 
     var body: some View {
         List(selection: $selection) {
-            if SettingsSelection.generalMatches(searchText) {
-                Section {
+            Section {
+                if SettingsSelection.generalMatches(searchText) {
                     Label {
                         Text(.settingsGeneral)
                     } icon: {
@@ -23,6 +23,16 @@ struct SettingsSidebar: View {
                     }
                     .padding(.vertical, 3)
                     .tag(SettingsSelection.general)
+                }
+
+                if SettingsSelection.modesMatches(searchText) {
+                    Label {
+                        Text(.dockModesTitle)
+                    } icon: {
+                        SettingsIconTile(glyph: .symbol("square.stack.3d.up.fill"), colors: [.indigo, .purple])
+                    }
+                    .padding(.vertical, 3)
+                    .tag(SettingsSelection.modes)
                 }
             }
             Section {
@@ -45,7 +55,11 @@ struct SettingsSidebar: View {
                     }
                 } header: { Text(.displayRememberedGroup).font(.caption.weight(.semibold)) }
             }
-            if !SettingsSelection.generalMatches(searchText) && matches.isEmpty && !profiles.document.profiles.values.contains(where: matches) {
+            if !SettingsSelection.generalMatches(searchText)
+                && !SettingsSelection.modesMatches(searchText)
+                && matches.isEmpty
+                && !profiles.document.profiles.values.contains(where: matches)
+            {
                 Text(.settingsNoMatches)
                     .font(.callout)
                     .foregroundStyle(.secondary)

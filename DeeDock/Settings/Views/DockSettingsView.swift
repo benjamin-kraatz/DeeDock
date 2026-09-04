@@ -21,18 +21,23 @@ struct DockSettingsView: View {
             switch selection {
             case .general:
                 GeneralSettingsPane(controller: loginItems)
+            case .modes:
+                DockModesSettingsPane(store: profiles.modes,
+                                      activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
+                                      deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) })
             case .defaults(let category):
-                SettingsDetailView(store: store, category: category, profileError: profiles.errorMessage,
+                SettingsDetailView(store: store, profiles: profiles, category: category,
+                                   profileError: profiles.errorMessage ?? profiles.modes.errorMessage,
                                    windowAccess: windowAccess, screenCapture: screenCapture)
             case .display(let id):
-                SettingsDetailView(store: store, category: displayCategory,
+                SettingsDetailView(store: store, profiles: profiles, category: displayCategory,
                                    context: SettingsOverrideContext(profiles: profiles, id: id),
-                                   profileError: profiles.errorMessage ?? profiles.pinErrors[id], showZone: zoneAction(for: id),
+                                   profileError: profiles.errorMessage ?? profiles.modes.errorMessage ?? profiles.pinErrors[id], showZone: zoneAction(for: id),
                                    windowAccess: windowAccess, screenCapture: screenCapture,
                                    displayCategory: $displayCategory)
                     .id(id)
             case nil:
-                SettingsDetailView(store: store, category: nil)
+                SettingsDetailView(store: store, profiles: profiles, category: nil)
             }
         }
         .background {
@@ -65,6 +70,12 @@ struct DockSettingsView: View {
                   profiles.displays.contains(where: { $0.id == requestedID }) else { return }
             searchText = ""
             selection = .display(requestedID)
+        }
+        .onChange(of: coordinator?.settingsModesRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsModesRequest = false
+            searchText = ""
+            selection = .modes
         }
         .onChange(of: coordinator?.settingsPreviewDisplayRequest, initial: true) { _, requestedID in
             guard let requestedID else { return }

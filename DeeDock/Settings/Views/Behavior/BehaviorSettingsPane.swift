@@ -8,9 +8,12 @@ struct BehaviorSettingsPane: View {
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
             SettingsCard(title: .settingsAppVisibility, footnote: .settingsAppVisibilityHelp) {
-                SettingsMenuRow(title: .settingsAppVisibility, selection: source.binding(\.appVisibility)) {
+                SettingsMenuRow(title: .settingsAppVisibility,
+                                subtitle: source.activeModeName.map { .dockModesSavedIn(modeName: $0) },
+                                selection: source.appVisibilityBinding()) {
                     ForEach(DockAppVisibility.allCases, id: \.self) { value in Text(value.title).tag(value) }
                 }
+                .disabled(!source.modeSettingsAvailable)
                 .settingsOverride(source.context, field: .appVisibility)
             }
             SettingsCard(title: .settingsTrash, footnote: .settingsTrashHelp) {

@@ -7,6 +7,7 @@ import SwiftUI
 /// unrelated controls into each other.
 struct SettingsDetailView: View {
     let store: DockSettingsStore
+    let profiles: DisplayProfilesStore?
     let category: SettingsCategory?
     var context: SettingsOverrideContext? = nil
     var profileError: LocalizedStringResource? = nil
@@ -15,11 +16,13 @@ struct SettingsDetailView: View {
     let screenCapture: ScreenCaptureAccessController?
     @Binding var displayCategory: SettingsCategory
 
-    init(store: DockSettingsStore, category: SettingsCategory?, context: SettingsOverrideContext? = nil,
+    init(store: DockSettingsStore, profiles: DisplayProfilesStore? = nil,
+         category: SettingsCategory?, context: SettingsOverrideContext? = nil,
          profileError: LocalizedStringResource? = nil, showZone: (() -> Void)? = nil,
          windowAccess: WindowAccessController? = nil, screenCapture: ScreenCaptureAccessController? = nil,
          displayCategory: Binding<SettingsCategory> = .constant(.appearance)) {
         self.store = store
+        self.profiles = profiles
         self.category = category
         self.context = context
         self.profileError = profileError
@@ -31,7 +34,7 @@ struct SettingsDetailView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private func binding<Value>(_ keyPath: WritableKeyPath<DockSettings, Value>) -> Binding<Value> {
-        SettingsValueSource(store: store, context: context).binding(keyPath)
+        SettingsValueSource(store: store, profiles: profiles, context: context).binding(keyPath)
     }
 
     var body: some View {
@@ -71,7 +74,10 @@ struct SettingsDetailView: View {
                               resetDisabled: context?.profiles.requiresReset == true,
                               restoreDefaults: {
                                   if let context { context.profiles.useDefaults(for: context.id) }
-                                  else { store.restoreDefaults() }
+                                  else {
+                                      store.restoreDefaults()
+                                      profiles?.restoreDefaultVisibility()
+                                  }
                               })
         }
     }
@@ -87,15 +93,15 @@ struct SettingsDetailView: View {
     @ViewBuilder private func pane(for category: SettingsCategory) -> some View {
         switch category {
         case .behavior:
-            BehaviorSettingsPane(source: SettingsValueSource(store: store, context: context), showZone: showZone)
+            BehaviorSettingsPane(source: SettingsValueSource(store: store, profiles: profiles, context: context), showZone: showZone)
         case .appearance:
-            AppearanceSettingsPane(edge: SettingsValueSource(store: store, context: context).value.edge, iconSize: binding(\.iconSize),
+            AppearanceSettingsPane(edge: SettingsValueSource(store: store, profiles: profiles, context: context).value.edge, iconSize: binding(\.iconSize),
                                    magnification: binding(\.magnification), itemSpacing: binding(\.itemSpacing),
                                    runningIndicatorStyle: binding(\.runningIndicatorStyle),
                                    animateIndicators: binding(\.animateIndicators),
-                                   appearanceSettings: SettingsValueSource(store: store, context: context).value, overrideContext: context)
-            DockTooltipSettingsPane(source: SettingsValueSource(store: store, context: context))
-            DockFadingSettingsPane(source: SettingsValueSource(store: store, context: context))
+                                   appearanceSettings: SettingsValueSource(store: store, profiles: profiles, context: context).value, overrideContext: context)
+            DockTooltipSettingsPane(source: SettingsValueSource(store: store, profiles: profiles, context: context))
+            DockFadingSettingsPane(source: SettingsValueSource(store: store, profiles: profiles, context: context))
         case .position:
             PositionSettingsPane(edge: binding(\.edge), reference: binding(\.positionReference),
                                  alignment: binding(\.alignment),
@@ -103,7 +109,7 @@ struct SettingsDetailView: View {
                                  edgeDistance: binding(\.edgeDistance), overrideContext: context)
         case .previews:
             if let windowAccess, let screenCapture {
-                PreviewsSettingsPane(source: SettingsValueSource(store: store, context: context),
+                PreviewsSettingsPane(source: SettingsValueSource(store: store, profiles: profiles, context: context),
                                      windowAccess: windowAccess, screenCapture: screenCapture,
                                      persistentSettingsDisabled: settingsLocked)
             }

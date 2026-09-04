@@ -12,10 +12,16 @@ final class DockCoordinator {
     var settingsDisplayRequest: String?
     /// One-shot route used by Window Peek's permission fallback.
     var settingsPreviewDisplayRequest: String?
+    /// One-shot route opened from the menu-bar mode submenu.
+    var settingsModesRequest = false
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
     var canFocus: Bool { !enabledDisplays.isEmpty }
+    var canSwitchModes: Bool {
+        profiles.modes.canEdit && !dragging.isDragging && !filePicker.isActive
+            && !panels.values.contains(where: \.isMenuTracking)
+    }
     @ObservationIgnored private let dragging = DockDragCoordinator()
     @ObservationIgnored private let folderStacks = FolderStackCoordinator()
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
@@ -23,6 +29,7 @@ final class DockCoordinator {
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
+    @ObservationIgnored private let modePicker = DockModePickerCoordinator()
     @ObservationIgnored private let displayService = DisplayService()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
     @ObservationIgnored private var monitors: [Any] = []
@@ -35,7 +42,8 @@ final class DockCoordinator {
     init(windowAccess: WindowAccessController, screenCapture: ScreenCaptureAccessController) {
         let settings = DockSettingsStore(repository: DockSettingsRepository())
         self.settings = settings
-        profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository())
+        profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository(),
+                                         modesRepository: DockModesRepository())
         let applicationService = ApplicationService()
         catalog = ApplicationCatalog(service: applicationService)
         let menus = ApplicationMenuController(
@@ -56,7 +64,10 @@ final class DockCoordinator {
             endFocus(restore: false)
         }
         folderStacks.openChanged = { [weak self] open in
-            if open { self?.windowPeeks.close(returnFocus: false) }
+            if open {
+                self?.windowPeeks.close(returnFocus: false)
+                self?.modePicker.close(returnFocus: false)
+            }
             self?.panels.values.forEach { $0.holdFolderStack(open) }
         }
         windowPeeks.prepareSettings = { [weak self] displayID in
@@ -92,6 +103,7 @@ final class DockCoordinator {
                 self?.dragging.cancel()
                 self?.folderStacks.close(returnFocus: false)
                 self?.windowPeeks.close(returnFocus: false)
+                self?.modePicker.close(returnFocus: false)
                 self?.applicationMenus.cancelAllDiscoveries()
                 self?.panels.values.forEach { $0.suspendIdleFading() }
             } })
@@ -113,7 +125,10 @@ final class DockCoordinator {
 
     private func reconcile(_ displays: [DisplaySnapshot], resetVisibility: Bool = true) {
         guard started, !reconciling else { return }
-        if resetVisibility { dragging.cancel() }
+        if resetVisibility {
+            dragging.cancel()
+            modePicker.close(returnFocus: false)
+        }
         reconciling = true
         defer { reconciling = false }
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
@@ -130,11 +145,21 @@ final class DockCoordinator {
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
-                if focusedID == display.id, !folderStacks.isKeyboardActive, !windowPeeks.isKeyboardActive {
+                if focusedID == display.id, !folderStacks.isKeyboardActive, !windowPeeks.isKeyboardActive,
+                   !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
             }
-            panel.exclusiveInteractionBegan = { [weak self] in self?.windowPeeks.close(returnFocus: false) }
+            panel.exclusiveInteractionBegan = { [weak self] in
+                self?.windowPeeks.close(returnFocus: false)
+                self?.modePicker.close(returnFocus: false)
+            }
+            panel.modePickerRequested = { [weak self, weak panel] in
+                guard let self, let panel, canSwitchModes else { return }
+                modePicker.show(modes: profiles.modes.modes,
+                                activeModeID: profiles.modes.document.activeModeID,
+                                on: panel) { [weak self] id in self?.activateMode(id) ?? false }
+            }
             panel.escape = { [weak self] in self?.endFocus(restore: true) }
             store.applicationOpened = { [weak self] in
                 self?.windowPeeks.close(returnFocus: false)
@@ -269,8 +294,35 @@ final class DockCoordinator {
         panel.focus()
     }
 
+    @discardableResult
+    func activateMode(_ id: UUID) -> Bool {
+        guard canSwitchModes else { return false }
+        folderStacks.close(returnFocus: false)
+        windowPeeks.close(returnFocus: false)
+        modePicker.close(returnFocus: false)
+        applicationMenus.cancelAllDiscoveries()
+        return profiles.modes.activate(id)
+    }
+
+    @discardableResult
+    func activatePreviousMode() -> Bool {
+        guard let id = profiles.modes.previousMode?.id else { return false }
+        return activateMode(id)
+    }
+
+    @discardableResult
+    func deleteMode(_ id: UUID) -> Bool {
+        guard canSwitchModes else { return false }
+        folderStacks.close(returnFocus: false)
+        windowPeeks.close(returnFocus: false)
+        modePicker.close(returnFocus: false)
+        applicationMenus.cancelAllDiscoveries()
+        return profiles.modes.delete(id)
+    }
+
     private func endFocus(restore: Bool) {
         guard let id = focusedID else { return }
+        modePicker.close(returnFocus: false)
         focusedID = nil // Clear before resignKey can call back into the coordinator.
         let previous = previousApplication
         previousApplication = nil
@@ -288,10 +340,12 @@ final class DockCoordinator {
         displayIndicator.stop()
         settingsDisplayRequest = nil
         settingsPreviewDisplayRequest = nil
+        settingsModesRequest = false
         filePicker.stop()
         dragging.stop()
         folderStacks.stop()
         windowPeeks.stop()
+        modePicker.stop()
         applicationMenus.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil

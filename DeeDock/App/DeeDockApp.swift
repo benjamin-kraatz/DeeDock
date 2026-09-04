@@ -9,6 +9,7 @@ struct DeeDockApp: App {
         MenuBarExtra {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
+            DockModesMenu(coordinator: delegate.coordinator)
             OpenDockSettingsButton()
             Button(.onboardingShowWelcome) { delegate.onboarding.present() }
             Divider()
