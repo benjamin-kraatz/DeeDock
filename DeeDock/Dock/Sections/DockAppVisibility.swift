@@ -26,12 +26,14 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case app(String), folder(UUID), group(DockAppGroup), shelf, trash
+    case app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, trash
     var hitID: String {
         switch self {
         case .app(let id): "app:\(id)"
         case .folder(let id): "folder:\(id.uuidString)"
         case .group(let group): "group:\(group.rawValue)"
+        case .sessionCapsule(let id): "session-capsule:\(id.uuidString)"
+        case .sessionCapsules: "session-capsules"
         case .shelf: "shelf"
         case .trash: "trash"
         }
@@ -58,7 +60,9 @@ struct DockGroupControl {
 enum DockSectionProjection {
     static func entries(items: [DockItem], folders: [FolderDockItem] = [], pins: [DockPin]? = nil,
                         visibility: DockAppVisibility, expanded: Bool,
-                        shelf: ShelfDockItem? = nil, trash: TrashDockItem? = nil) -> [DockRenderSlot] {
+                        sessionCapsules: [SessionCapsuleDockItem] = [],
+                        capsules: CapsuleDockItem? = nil, shelf: ShelfDockItem? = nil,
+                        trash: TrashDockItem? = nil) -> [DockRenderSlot] {
         let pinned: [DockRenderSlot]
         if let pins {
             let applications = Dictionary(uniqueKeysWithValues: items.filter(\.isFavorite).map { ($0.reference.id, $0) })
@@ -82,8 +86,10 @@ enum DockSectionProjection {
             }
             return entries
         }
-        // Utility tiles trail every application, sharing one divider: Shelf, then Trash.
-        return applications + (shelf.map { [.shelf($0)] } ?? []) + (trash.map { [.trash($0)] } ?? [])
+        // Utility tiles trail every application, sharing one divider.
+        return applications + sessionCapsules.map(DockRenderSlot.sessionCapsule)
+            + (capsules.map { [.sessionCapsules($0)] } ?? [])
+            + (shelf.map { [.shelf($0)] } ?? []) + (trash.map { [.trash($0)] } ?? [])
     }
 
     /// Retains identity, then the disappearing app's group control, then the nearest surviving entry.

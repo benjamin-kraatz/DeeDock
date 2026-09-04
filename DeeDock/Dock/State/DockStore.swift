@@ -30,6 +30,8 @@ final class DockStore {
     @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    @ObservationIgnored var openSessionCapsules: (() -> Void)?
+    @ObservationIgnored var openSessionCapsule: ((UUID) -> Void)?
     var pins: [DockPin] { profiles.pinLists[displayID] ?? [] }
     var canEditPins: Bool {
         !profiles.requiresReset && !profiles.modes.requiresReset && profiles.pinErrors[displayID] == nil
@@ -38,18 +40,22 @@ final class DockStore {
     @ObservationIgnored private let profiles: DisplayProfilesStore
     @ObservationIgnored private let trash: TrashController?
     @ObservationIgnored private let shelf: ShelfController?
+    @ObservationIgnored private let capsules: SessionCapsuleController?
     @ObservationIgnored private var showsTrash = true
     @ObservationIgnored private var showsShelf = true
+    @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
-         trash: TrashController? = nil, shelf: ShelfController? = nil) {
+         trash: TrashController? = nil, shelf: ShelfController? = nil,
+         capsules: SessionCapsuleController? = nil) {
         self.displayID = displayID
         self.catalog = catalog
         self.profiles = profiles
         self.trash = trash
         self.shelf = shelf
+        self.capsules = capsules
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
@@ -89,6 +95,8 @@ final class DockStore {
     private func refreshEntries() {
         let next = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
+                                                  sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
+                                                  capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
                                                   trash: showsTrash ? trash?.item : nil)
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
@@ -104,6 +112,12 @@ final class DockStore {
     func configureShelf(_ visible: Bool) {
         guard showsShelf != visible else { return }
         showsShelf = visible
+        refreshEntries()
+    }
+
+    func configureSessionCapsules(_ visible: Bool) {
+        guard showsSessionCapsules != visible else { return }
+        showsSessionCapsules = visible
         refreshEntries()
     }
 
@@ -274,6 +288,8 @@ final class DockStore {
         case .app(let item): open(item)
         case .folder(let folder): openFolder?(folder, keyboardFocus)
         case .group: sections.toggle()
+        case .sessionCapsule(let item): openSessionCapsule?(item.capsuleID)
+        case .sessionCapsules: openSessionCapsules?()
         case .shelf: openShelf?()
         case .trash: openTrash()
         case .gap: break
@@ -281,5 +297,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

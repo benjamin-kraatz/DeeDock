@@ -26,11 +26,13 @@ final class DockCoordinator {
     @ObservationIgnored private let popovers = DockPopoverPresenter()
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
     @ObservationIgnored private let shelves: ShelfCoordinator
+    @ObservationIgnored private let sessionCapsules: SessionCapsuleCoordinator
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
+    @ObservationIgnored private let capsules = SessionCapsuleController()
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
     @ObservationIgnored private let modePicker = DockModePickerCoordinator()
@@ -62,6 +64,8 @@ final class DockCoordinator {
         )
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
         shelves = ShelfCoordinator(shelf: shelf, presenter: popovers, organizer: semanticStacks)
+        sessionCapsules = SessionCapsuleCoordinator(capsules: capsules, presenter: popovers,
+                                                    screenCapture: screenCapture)
         let shelf = self.shelf
         shelfSemanticWarmup = ShelfSemanticWarmupController(organizer: semanticStacks) {
             let items = shelf.ordered
@@ -88,6 +92,10 @@ final class DockCoordinator {
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)
         }
+        sessionCapsules.keyboardDismissed = { [weak self] displayID in
+            guard let self, focusedID == displayID else { return }
+            endFocus(restore: false)
+        }
         popovers.openChanged = { [weak self] open in
             if open {
                 self?.windowPeeks.close(returnFocus: false)
@@ -104,6 +112,10 @@ final class DockCoordinator {
         shelf.didChange = { [weak self] in
             self?.scheduleShelfSemanticWarmup()
             self?.shelves.reload()
+            self?.refreshPanels()
+        }
+        capsules.didChange = { [weak self] in
+            self?.sessionCapsules.reload()
             self?.refreshPanels()
         }
         catalog.activated = { [weak self] app in
@@ -126,6 +138,7 @@ final class DockCoordinator {
         catalog.start()
         trash.start()
         shelf.start()
+        capsules.start()
         scheduleShelfSemanticWarmup()
         displayService.start()
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -175,16 +188,18 @@ final class DockCoordinator {
             filePicker.cancel(for: id)
             folderStacks.close(for: id, returnFocus: false)
             shelves.close(for: id, returnFocus: false)
+            sessionCapsules.close(for: id, returnFocus: false)
             if focusedID == id { endFocus(restore: true) }
             panels.removeValue(forKey: id)?.stop()
         }
         for display in enabledDisplays where panels[display.id] == nil {
-            let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles, trash: trash, shelf: shelf)
+            let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
+                                  trash: trash, shelf: shelf, capsules: capsules)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
-                   !modePicker.isKeyboardActive {
+                   !sessionCapsules.isOpen, !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
             }
@@ -252,6 +267,30 @@ final class DockCoordinator {
                 guard let self, let panel, panels[display.id] === panel else { return }
                 shelves.toggle(on: panel, keyboard: panel.store.keyboardFocus)
             }
+            store.openSessionCapsules = { [weak self, weak panel] in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                sessionCapsules.toggle(on: panel)
+            }
+            store.openSessionCapsule = { [weak self, weak panel] id in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                sessionCapsules.show(id, on: panel)
+            }
+            panel.interaction.openSessionCapsules = { [weak self, weak panel] in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                sessionCapsules.toggle(on: panel)
+            }
+            panel.interaction.openSessionCapsule = { [weak self, weak panel] id in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                sessionCapsules.show(id, on: panel)
+            }
+            panel.interaction.resumeSessionCapsule = { [weak self, weak panel] id in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                sessionCapsules.resume(id)
+            }
+            panel.interaction.deleteSessionCapsule = { [weak self, weak panel] id in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                sessionCapsules.delete(id)
+            }
             panel.interaction.openShelf = { [weak self, weak panel] in
                 guard let self, let panel, panels[display.id] === panel else { return }
                 shelves.toggle(on: panel, keyboard: false)
@@ -291,6 +330,7 @@ final class DockCoordinator {
         }
         folderStacks.reanchor()
         shelves.reanchor()
+        sessionCapsules.reanchor()
         windowPeeks.refresh()
         if let id = zonePreview.displayID {
             if let geometry = panels[id]?.geometry { zonePreview.update(geometry) }
@@ -403,9 +443,11 @@ final class DockCoordinator {
         dragging.stop()
         folderStacks.stop()
         shelves.stop()
+        sessionCapsules.stop()
         shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
+        capsules.stop()
         windowPeeks.stop()
         modePicker.stop()
         applicationMenus.stop()

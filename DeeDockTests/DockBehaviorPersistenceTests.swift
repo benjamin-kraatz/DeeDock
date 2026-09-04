@@ -9,10 +9,12 @@ import Testing
         defer { defaults.removePersistentDomain(forName: suite) }
         var old = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(DockSettings())) as? [String: Any])
         old.removeValue(forKey: "behavior")
+        old.removeValue(forKey: "showSessionCapsules")
         let legacy = try JSONSerialization.data(withJSONObject: old)
         defaults.set(legacy, forKey: "dock.settings.v1")
         let repository = DockSettingsRepository(defaults: defaults)
         #expect(try repository.load().behavior == DockBehaviorSettings())
+        #expect(try repository.load().showSessionCapsules)
         #expect(defaults.data(forKey: "dock.settings.v1") == legacy)
         old["behavior"] = NSNull()
         let malformed = try JSONSerialization.data(withJSONObject: old)

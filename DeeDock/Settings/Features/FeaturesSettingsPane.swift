@@ -20,6 +20,11 @@ struct FeaturesSettingsPane: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+                SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {
+                    SettingsToggleRow(title: .settingsShowCapsules,
+                                      isOn: source.binding(\.showSessionCapsules))
+                }
+                .disabled(locked)
                 SettingsCard(title: .settingsShelf, footnote: .settingsShelfHelp) {
                     SettingsToggleRow(title: .settingsShowShelf, isOn: source.binding(\.showShelf))
                 }

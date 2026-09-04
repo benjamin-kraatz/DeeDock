@@ -97,6 +97,7 @@ final class DockPanelController {
         lastDisplay = display; lastSettings = settings
         store.sections.configure(settings.appVisibility)
         store.configureShelf(settings.showShelf)
+        store.configureSessionCapsules(settings.showSessionCapsules)
         store.configureTrash(settings.showTrash)
         interaction.confirmsTrashEmpty = settings.confirmBeforeEmptyingTrash
         interaction.tooltipPreset = settings.tooltipPreset
@@ -446,6 +447,8 @@ final class DockPanelController {
         interaction.sourceTrackingChanged = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil
         interaction.openTrash = nil; interaction.emptyTrash = nil
+        interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
+        interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil
         interaction.windowPeekHoverChanged = nil; interaction.openWindowPeek = nil
         interaction.removePin = nil; interaction.setFolderPresentation = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil

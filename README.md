@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, a Shelf tile, a Trash tile, Window Peek, Dock Modes, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Named Dock Modes switch every display's pins and app visibility together. Display-independent appearance and behavior settings still use shared defaults with optional per-display overrides. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, Session Capsules, a Shelf tile, a Trash tile, Window Peek, Dock Modes, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Named Dock Modes switch every display's pins and app visibility together. Display-independent appearance and behavior settings still use shared defaults with optional per-display overrides. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -59,7 +59,7 @@ Current configuration:
 | App Sandbox | Enabled |
 | External package dependencies | None |
 
-Use Xcode 27 and macOS 27. The app retains the original Swift language mode, App Sandbox, and signing configuration. Distribution and broader OS support are not part of this slice. DeeDock requests Accessibility or Screen Recording access only when you explicitly enable it in Settings; it never asks at startup or from the dock. DeeDock does not change the system Dock’s preferences.
+Use Xcode 27 and macOS 27. The app retains the original Swift language mode, App Sandbox, and signing configuration. Distribution and broader OS support are not part of this slice. DeeDock requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DeeDock does not change the system Dock’s preferences.
 
 ## Working in this repository
 
@@ -84,7 +84,7 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, the Shelf, Trash, and Window Peek are implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, Session Capsules, the Shelf, Trash, and Window Peek are implemented.
 
 ## Dock Modes
 
@@ -161,9 +161,17 @@ Fan and Automatic presentations, nested browsing, search, Quick Look, multi-sele
 
 ## Features
 
-**Settings → Features** collects DeeDock's opt-in capabilities: the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
+**Settings → Features** collects DeeDock's opt-in capabilities: Session Capsules, the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
 
 That is the distinction the sidebar draws. Panes under **Defaults** describe how a dock looks and where it sits, so each display can override them individually. A feature is either on or off for DeeDock as a whole; no display holds its own copy. Appearance, Position, and Behavior keep their per-display overrides exactly as before.
+
+## Session Capsules
+
+Session Capsules save mental context without restoring window geometry. Open the shared Capsules tile, choose up to twelve visible windows, and create a draft. DeeDock captures those windows once with ScreenCaptureKit, runs on-device Vision OCR, and gives the images plus window metadata to the system default Apple Intelligence model. Foundation Models produces typed structured output for the title, summary, and unfinished tasks; the prompt never asks for JSON. If the model is unavailable or generation fails, DeeDock creates a plain editable draft from the selected window metadata instead.
+
+Nothing is saved until you review the draft and choose **Save Capsule**. Raw screenshots and recognized text remain in memory only for draft creation and are discarded afterward. Each saved checkpoint then appears beside the collection tile as its own temporary, title-bearing Dock item until you delete it. The persisted capsule contains the approved text, optional personal note, application bundle identities, and window titles. **Resume** reopens missing applications and uses Accessibility to raise the first exact title match when available, otherwise it activates a referenced app. It deliberately does not move, resize, or rearrange windows.
+
+The underlying window-context service is feature-neutral: its public values contain current window identity, application identity, bounds, one-time imagery, and OCR. The planned Window Scout can reuse that capture boundary without depending on the Capsules repository or UI.
 
 ## Shelf
 

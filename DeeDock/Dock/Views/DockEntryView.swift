@@ -30,6 +30,13 @@ struct DockEntryView: View {
         case .group(let control):
             DockGroupButton(control: control, size: size, selected: selected, interaction: interaction,
                             reduceTransparency: reduceTransparency)
+        case .sessionCapsule(let item):
+            DockSessionCapsuleButton(item: item, size: size, selected: selected, interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: { accessibilityFocus(DockEntryID.sessionCapsule(item.capsuleID).hitID, $0) })
+        case .sessionCapsules(let item):
+            DockCapsulesButton(item: item, size: size, selected: selected, interaction: interaction,
+                accessibilityFocus: { accessibilityFocus(DockEntryID.sessionCapsules.hitID, $0) })
         case .shelf(let item):
             DockShelfButton(item: item, size: size, selected: selected, interaction: interaction,
                 menuTracking: menuTracking,

@@ -40,3 +40,20 @@ struct ShelfDockItem: Identifiable {
     var id: String { "shelf" }
     var isEmpty: Bool { count == 0 }
 }
+
+/// A snapshot of the shared Session Capsules collection used by every display dock.
+struct CapsuleDockItem: Identifiable {
+    let count: Int
+    let icon: NSImage
+    var id: String { "session-capsules" }
+}
+
+/// One saved checkpoint projected as a temporary, title-bearing Dock item.
+struct SessionCapsuleDockItem: Identifiable {
+    let capsuleID: UUID
+    let title: String
+    let icon: NSImage
+    /// Distinct applications the capsule holds, capped at what the tile badge can show legibly.
+    var applicationIcons: [NSImage] = []
+    var id: String { "session-capsule:\(capsuleID.uuidString)" }
+}

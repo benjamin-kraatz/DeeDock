@@ -1766,6 +1766,62 @@
         }
       }
     },
+    "capsulesAddTask": { "comment": "Adds an unfinished task to a capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Add Task" } } } },
+    "capsulesAllowScreenRecording": { "comment": "Requests Screen Recording access for capsule capture.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Allow Screen Recording" } } } },
+    "capsulesBack": { "comment": "Returns to the Session Capsules collection.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Back" } } } },
+    "capsulesCancel": { "comment": "Cancels deletion of a Session Capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Cancel" } } } },
+    "capsulesCaptureUnavailable": { "comment": "Shown when selected window content cannot be captured or analyzed.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t read the selected window context." } } } },
+    "capsulesChooseWindows": { "comment": "Title above the window selection step.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Choose Windows" } } } },
+    "capsulesCount": { "comment": "VoiceOver value for the Session Capsules tile. count is the number of saved capsules.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "%1$(count)lld capsules" } } } },
+    "capsulesCreateDraft": { "comment": "Captures selected windows and creates an editable capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Create Draft" } } } },
+    "capsulesDelete": { "comment": "Deletes one saved Session Capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Delete" } } } },
+    "capsulesDeleteConfirmationMessage": { "comment": "Explains that deleting a capsule removes its saved checkpoint.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "This removes the saved checkpoint. It does not close apps or delete documents." } } } },
+    "capsulesDeleteConfirmationTitle": { "comment": "Title of the destructive capsule deletion confirmation.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Delete this capsule?" } } } },
+    "capsulesDeleteFailed": { "comment": "Shown when a capsule could not be deleted. details is the system error.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t delete the capsule: %1$(details)@" } } } },
+    "capsulesDetails": { "comment": "Title of a saved capsule detail page.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Capsule" } } } },
+    "capsulesEmptyMessage": { "comment": "Explains how to create the first Session Capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Capture the windows that matter before you switch projects or step away." } } } },
+    "capsulesEmptyTitle": { "comment": "Empty state title for the Session Capsules collection.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "No saved checkpoints" } } } },
+    "capsulesFallbackSummary": { "comment": "Non-AI capsule summary. applications is a localized list of selected app names.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Selected work across %1$(applications)@. Add the current state and next step before saving." } } } },
+    "capsulesFallbackTitle": { "comment": "Non-AI capsule title. subject is a selected window or app name.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Continue %1$(subject)@" } } } },
+    "capsulesFallbackWork": { "comment": "Fallback subject when selected window metadata has no name.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "current work" } } } },
+    "capsulesFindingWindows": { "comment": "Progress label while Session Capsules discovers visible windows.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Finding windows…" } } } },
+    "capsulesIncludedWindows": { "comment": "Heading above windows referenced by a capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Included Windows" } } } },
+    "capsulesMoreApplications": { "comment": "Count of a capsule's applications that do not fit in the Dock badge. count is the number hidden.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "+%1$(count)lld" } } } },
+    "capsulesName": { "comment": "Name of the Session Capsules Dock tile and panel.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Session Capsules" } } } },
+    "capsulesNew": { "comment": "Starts capture of a new Session Capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "New Capsule" } } } },
+    "capsulesNoWindows": { "comment": "Shown when no eligible visible windows are available for a capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "No visible windows are available to capture." } } } },
+    "capsulesNoteHeading": { "comment": "Heading of the optional personal note field in a capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Personal Note" } } } },
+    "capsulesNotePlaceholder": { "comment": "Placeholder for the optional personal note in a capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Anything you want to remember later" } } } },
+    "capsulesOptional": { "comment": "Badge marking a capsule draft field that can be left empty.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Optional" } } } },
+    "capsulesOpenHint": { "comment": "VoiceOver hint for the Session Capsules tile.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Opens saved work checkpoints" } } } },
+    "capsulesPersonalNote": { "comment": "Label for the optional personal note in a capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Personal Note (Optional)" } } } },
+    "capsulesPrivacyNote": { "comment": "Explains capsule capture retention before saving.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Screenshots and OCR are discarded after this draft." } } } },
+    "capsulesProgressPatience": { "comment": "First progress subtitle while a capsule step runs.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "This can take a few moments." } } } },
+    "capsulesProgressStillFive": { "comment": "Rotating progress subtitle shown while a capsule step is still running.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Still going. Nearly there." } } } },
+    "capsulesProgressStillFour": { "comment": "Rotating progress subtitle shown while a capsule step is still running.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "This one is taking a little longer than usual." } } } },
+    "capsulesProgressStillOne": { "comment": "Rotating progress subtitle shown while a capsule step is still running.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Still working on it." } } } },
+    "capsulesProgressStillThree": { "comment": "Rotating progress subtitle shown while a capsule step is still running.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Almost there. Hang tight." } } } },
+    "capsulesProgressStillTwo": { "comment": "Rotating progress subtitle shown while a capsule step is still running.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Making sense of what you had open." } } } },
+    "capsulesReadingContext": { "comment": "Progress label while selected window content is analyzed.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Reading selected context…" } } } },
+    "capsulesRemoveTask": { "comment": "Accessibility label for removing one unfinished task from a capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Remove Task" } } } },
+    "capsulesResume": { "comment": "Returns to the applications and window referenced by a capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Resume" } } } },
+    "capsulesResumeUnavailable": { "comment": "Shown when none of a capsule's applications can be reopened.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "None of the referenced applications are available." } } } },
+    "capsulesReviewDraft": { "comment": "Title of the editable capsule review step.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Review Capsule" } } } },
+    "capsulesSave": { "comment": "Saves a user-approved Session Capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Save Capsule" } } } },
+    "capsulesSavedOpenHint": { "comment": "VoiceOver hint for a saved capsule Dock item.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Opens this saved checkpoint" } } } },
+    "capsulesSaveFailed": { "comment": "Shown when a capsule could not be saved. details is the system error.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t save the capsule: %1$(details)@" } } } },
+    "capsulesScreenRecordingMessage": { "comment": "Explains why Session Capsules needs Screen Recording access.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "DeeDock uses one-time window images to create the draft. Captures are not saved." } } } },
+    "capsulesScreenRecordingTitle": { "comment": "Title shown when Session Capsules lacks Screen Recording access.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Screen Recording is off" } } } },
+    "capsulesSelectedWindows": { "comment": "Window selection count. count is the number of selected windows.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "%1$(count)lld selected" } } } },
+    "capsulesSummary": { "comment": "Label for an editable capsule summary.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Summary" } } } },
+    "capsulesSummaryPlaceholder": { "comment": "Placeholder for the editable capsule summary.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "What state is this work in, and what comes next?" } } } },
+    "capsulesTaskPlaceholder": { "comment": "Placeholder for one unfinished task in a capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Next step or open question" } } } },
+    "capsulesTitle": { "comment": "Label for an editable capsule title.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Title" } } } },
+    "capsulesTitlePlaceholder": { "comment": "Placeholder for the editable capsule title.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Name this checkpoint" } } } },
+    "capsulesUnavailable": { "comment": "Shown when the Session Capsules panel cannot be opened.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Session Capsules are unavailable right now." } } } },
+    "capsulesUnfinished": { "comment": "Heading for unfinished tasks in a capsule.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Unfinished" } } } },
+    "capsulesUnfinishedHint": { "comment": "Empty state under the unfinished task list in a capsule draft.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Add the next step so you know where to pick up." } } } },
+    "capsulesUntitledWindow": { "comment": "Fallback label for a selected window without a title.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Untitled Window" } } } },
     "dockEmptyState": {
       "comment": "Empty dock guidance. Opening an app makes it appear temporarily; pinning keeps it in the dock.",
       "extractionState": "manual",
@@ -3825,7 +3881,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "features shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture"
+            "value": "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture"
           }
         }
       }
@@ -4346,6 +4402,9 @@
         }
       }
     },
+    "settingsCapsules": { "comment": "Behavior settings card for Session Capsules.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Session Capsules" } } } },
+    "settingsCapsulesHelp": { "comment": "Explains Session Capsules and its privacy boundary.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Save a compact, editable checkpoint from selected windows. Images and recognized text are used only to create the draft and are not stored." } } } },
+    "settingsShowCapsules": { "comment": "Toggle that includes the Session Capsules tile in every dock.", "extractionState": "manual", "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show Session Capsules" } } } },
     "settingsShelf": {
       "comment": "Behavior settings card for the Shelf tile.",
       "extractionState": "manual",

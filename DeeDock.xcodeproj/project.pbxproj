@@ -25,6 +25,11 @@
 		AB0400000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0300000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift */; };
 		AB0500000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */; };
 		AB0500000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0600000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift */; };
+		AB0700000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift */; };
+		AB0700000000000000000001 /* DeeDock/Dock/Capsules/SessionCapsuleRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000001 /* DeeDock/Dock/Capsules/SessionCapsuleRepository.swift */; };
+		AB0700000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift */; };
+		AB0700000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift */; };
+		AB0700000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift */; };
 		DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */; };
 		DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */; };
 		DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */; };
@@ -113,6 +118,11 @@
 		AB0300000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/ShelfSelection.swift; sourceTree = SOURCE_ROOT; };
 		AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/SemanticStacks/SemanticStackModels.swift; sourceTree = SOURCE_ROOT; };
 		AB0600000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift; sourceTree = SOURCE_ROOT; };
+		AB0800000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/SessionCapsuleModels.swift; sourceTree = SOURCE_ROOT; };
+		AB0800000000000000000001 /* DeeDock/Dock/Capsules/SessionCapsuleRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/SessionCapsuleRepository.swift; sourceTree = SOURCE_ROOT; };
+		AB0800000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/SessionCapsuleController.swift; sourceTree = SOURCE_ROOT; };
+		AB0800000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/CapsuleGlyph.swift; sourceTree = SOURCE_ROOT; };
+		AB0800000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift; sourceTree = SOURCE_ROOT; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationReference.swift; sourceTree = SOURCE_ROOT; };
 		DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockOrdering.swift; sourceTree = SOURCE_ROOT; };
@@ -282,6 +292,11 @@
 				AB0300000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift */,
 				AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */,
 				AB0600000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift */,
+				AB0800000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift */,
+				AB0800000000000000000001 /* DeeDock/Dock/Capsules/SessionCapsuleRepository.swift */,
+				AB0800000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift */,
+				AB0800000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift */,
+				AB0800000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift */,
 				DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */,
 				DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */,
 				DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */,
@@ -459,6 +474,11 @@
 				AB0400000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift in Sources */,
 				AB0500000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift in Sources */,
 				AB0500000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift in Sources */,
+				AB0700000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift in Sources */,
+				AB0700000000000000000001 /* DeeDock/Dock/Capsules/SessionCapsuleRepository.swift in Sources */,
+				AB0700000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift in Sources */,
+				AB0700000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift in Sources */,
+				AB0700000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift in Sources */,
 				DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */,
 				DDF7000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift in Sources */,
 				DDF7000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift in Sources */,

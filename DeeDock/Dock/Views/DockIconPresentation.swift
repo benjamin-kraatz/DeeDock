@@ -1,8 +1,11 @@
 import SwiftUI
 
 /// Upright artwork with a running-state decoration and an independent keyboard-selection outline.
-struct DockIconPresentation: View {
-    let icon: NSImage
+///
+/// Most tiles draw an `NSImage`, but Session Capsules draw a vector mark, so the artwork is generic
+/// and the `icon:` initializer is the convenience for the common case.
+struct DockIconPresentation<Artwork: View>: View {
+    let artwork: Artwork
     let size: CGFloat
     let edge: DockEdge
     let available: Bool
@@ -19,6 +22,25 @@ struct DockIconPresentation: View {
     var artworkOpacity: Double = 1
     var artworkAnimation: Animation? = nil
 
+    init(size: CGFloat, edge: DockEdge, available: Bool, running: Bool, launching: Bool,
+         keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
+         indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
+         artworkOpacity: Double = 1, artworkAnimation: Animation? = nil,
+         @ViewBuilder artwork: () -> Artwork) {
+        self.artwork = artwork()
+        self.size = size
+        self.edge = edge
+        self.available = available
+        self.running = running
+        self.launching = launching
+        self.keyboardSelected = keyboardSelected
+        self.runningIndicatorStyle = runningIndicatorStyle
+        self.indicatorVariant = indicatorVariant
+        self.indicatorAnimated = indicatorAnimated
+        self.artworkOpacity = artworkOpacity
+        self.artworkAnimation = artworkAnimation
+    }
+
     var body: some View {
         let depth = size + DockGeometry.indicatorAreaDepth
         let bounds = edge.size(length: size, depth: depth)
@@ -26,7 +48,7 @@ struct DockIconPresentation: View {
         let marker = edge.point(CGPoint(x: size / 2,
             y: size + DockGeometry.indicatorSpacing + DockGeometry.indicatorSize / 2), depth: depth)
         ZStack(alignment: .topLeading) {
-            Image(nsImage: icon).resizable().interpolation(.high)
+            artwork
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
                 .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size,
@@ -49,5 +71,19 @@ struct DockIconPresentation: View {
             }
         }
         .frame(width: bounds.width, height: bounds.height)
+    }
+}
+
+extension DockIconPresentation where Artwork == Image {
+    init(icon: NSImage, size: CGFloat, edge: DockEdge, available: Bool, running: Bool, launching: Bool,
+         keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
+         indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
+         artworkOpacity: Double = 1, artworkAnimation: Animation? = nil) {
+        self.init(size: size, edge: edge, available: available, running: running, launching: launching,
+                  keyboardSelected: keyboardSelected, runningIndicatorStyle: runningIndicatorStyle,
+                  indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
+                  artworkOpacity: artworkOpacity, artworkAnimation: artworkAnimation) {
+            Image(nsImage: icon).resizable().interpolation(.high)
+        }
     }
 }

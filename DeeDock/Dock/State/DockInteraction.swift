@@ -40,6 +40,10 @@ final class DockInteraction {
     @ObservationIgnored var openTrash: (() -> Void)?
     @ObservationIgnored var emptyTrash: (() -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    @ObservationIgnored var openSessionCapsules: (() -> Void)?
+    @ObservationIgnored var openSessionCapsule: ((UUID) -> Void)?
+    @ObservationIgnored var resumeSessionCapsule: ((UUID) -> Void)?
+    @ObservationIgnored var deleteSessionCapsule: ((UUID) -> Void)?
     @ObservationIgnored var clearShelf: (() -> Void)?
     @ObservationIgnored var beginShelfDrag: ((NSView, NSEvent) -> Void)?
     @ObservationIgnored var removePin: ((String) -> Void)?
