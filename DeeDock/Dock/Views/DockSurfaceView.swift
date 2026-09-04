@@ -16,7 +16,6 @@ struct DockSurfaceView: View {
     /// Visible viewport expressed in the scrollable canvas coordinate space.
     let viewport: CGRect
     @Binding var hoveredID: DockEntryID?
-    @State private var renderedFrames: [DockEntryID: CGRect] = [:]
     let reduceMotion: Bool
     let reduceTransparency: Bool
     let primaryAppAction: (DockItem) -> Void
@@ -89,20 +88,19 @@ struct DockSurfaceView: View {
                         } action: { frames in
                             guard let target = slot.target else { return }
                             iconFrameChanged(target.hitID, frames.root)
-                            if renderedFrames[target] != frames.canvas {
-                                renderedFrames[target] = frames.canvas
-                            }
+                            interaction.setRenderedFrame(frames.canvas, for: target)
                         }
                         .onDisappear {
                             guard let target = slot.target else { return }
-                            iconFrameChanged(target.hitID, nil); renderedFrames[target] = nil
+                            iconFrameChanged(target.hitID, nil)
+                            interaction.setRenderedFrame(nil, for: target)
                         }
                         .id(slot.id)
                         .position(x: slot.item == nil && slot.target == nil ? iconFrame.midX : frame.midX,
                                   y: slot.item == nil && slot.target == nil ? iconFrame.midY : frame.midY)
                 }
             }
-            DockTooltipsOverlay(slots: slots, frames: renderedFrames, hovered: hoveredID,
+            DockTooltipsOverlay(slots: slots, frames: interaction.renderedFrames, hovered: hoveredID,
                 selected: keyboardFocus ? selectedTarget : nil, enabled: showsLabel,
                 layout: layout, viewport: viewport, interaction: interaction,
                 reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)

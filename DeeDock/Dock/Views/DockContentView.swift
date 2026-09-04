@@ -97,7 +97,7 @@ struct DockContentView: View {
             if edge.isVertical { scrollPosition.scrollTo(y: offset) } else { scrollPosition.scrollTo(x: offset) }
         }
         .onChange(of: layout.edge) { _, _ in hoveredID = nil }
-        .onChange(of: interaction.pointer) { _, point in if point == nil { hoveredID = nil } }
+        .onChange(of: interaction.pointer == nil) { _, outside in if outside { hoveredID = nil } }
         .onChange(of: slots.compactMap(\.target)) { _, ids in
             if let hoveredID, !ids.contains(hoveredID) { self.hoveredID = nil }
         }

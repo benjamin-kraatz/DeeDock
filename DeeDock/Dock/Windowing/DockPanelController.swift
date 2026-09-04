@@ -140,7 +140,7 @@ final class DockPanelController {
         let rects = [interaction.surfaceRect, interaction.errorRect] + Array(interaction.iconRects.values)
         let inside = visibility.exposesContent && panel.frame.contains(NSEvent.mouseLocation) && rects.contains { sample.paintedRect($0).contains(point) }
         panel.ignoresMouseEvents = !inside
-        interaction.pointer = inside ? sample.inverse(point) : nil
+        interaction.setPointer(inside ? sample.inverse(point) : nil)
         if let eventType {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
@@ -170,7 +170,7 @@ final class DockPanelController {
         }
         interaction.exposesContent = visibility.exposesContent
         if !visibility.exposesContent {
-            panel.ignoresMouseEvents = true; interaction.pointer = nil
+            panel.ignoresMouseEvents = true; interaction.setPointer(nil)
             if panel.isVisible { panel.orderOut(nil) }
         } else {
             if !panel.isVisible { panel.orderFrontRegardless() }
@@ -367,6 +367,7 @@ final class DockPanelController {
         interaction.beginFolderDrag = nil
         interaction.copyPin = nil; interaction.scrollChanged = nil
         panel.contentView?.unregisterDraggedTypes()
+        interaction.stopGeometryUpdates()
         interaction.geometryDidChange = nil; interaction.menuTrackingChanged = nil; interaction.accessibilityFocusChanged = nil
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil
         accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; folderStackHeld = false

@@ -52,9 +52,15 @@ final class DockInteraction {
     var pointer: CGPoint?
     /// Re-evaluates click passthrough when painted regions change under a stationary pointer.
     @ObservationIgnored var geometryDidChange: (() -> Void)?
+    /// Canvas-space frames published once per layout turn for tooltip placement.
+    private(set) var renderedFrames: [DockEntryID: CGRect] = [:]
+    @ObservationIgnored private var pendingRenderedFrames: [DockEntryID: CGRect] = [:]
+    @ObservationIgnored private var geometryRefreshTask: Task<Void, Never>?
     /// Painted dock bounds in panel-local, top-left-origin points, clipped to the viewport.
     @ObservationIgnored var surfaceRect = CGRect.zero {
-        didSet { geometryDidChange?() }
+        didSet {
+            if oldValue != surfaceRect { scheduleGeometryRefresh() }
+        }
     }
     /// Separate icon bounds preserve clicks above the glass without capturing empty space between apps.
     @ObservationIgnored private var acceptedHitIDs: Set<String>?
@@ -65,21 +71,41 @@ final class DockInteraction {
         guard rect == nil || acceptedHitIDs?.contains(id) != false else { return }
         guard iconRects[id] != rect else { return }
         iconRects[id] = rect
-        geometryDidChange?()
+        scheduleGeometryRefresh()
+    }
+
+    /// Collects tooltip geometry without feeding every animated icon frame back into SwiftUI.
+    func setRenderedFrame(_ frame: CGRect?, for target: DockEntryID) {
+        guard frame == nil || acceptedHitIDs?.contains(target.hitID) != false else { return }
+        guard pendingRenderedFrames[target] != frame else { return }
+        pendingRenderedFrames[target] = frame
+        scheduleGeometryRefresh()
     }
 
     /// Removed entries stop capturing clicks immediately, including while their exit artwork animates.
     func retainHitRegions(_ ids: Set<String>) {
         acceptedHitIDs = ids
-        iconRects = iconRects.filter { ids.contains($0.key) }
+        let retainedIconRects = iconRects.filter { ids.contains($0.key) }
+        let retainedRenderedFrames = pendingRenderedFrames.filter { ids.contains($0.key.hitID) }
+        guard retainedIconRects != iconRects || retainedRenderedFrames != pendingRenderedFrames else { return }
+        iconRects = retainedIconRects
+        pendingRenderedFrames = retainedRenderedFrames
+        scheduleGeometryRefresh()
     }
 
     /// Invalidates old hit regions before the panel changes coordinate systems.
     func resetGeometry() {
-        pointer = nil
+        setPointer(nil)
         iconRects.removeAll()
+        pendingRenderedFrames.removeAll()
         surfaceRect = .zero
         errorRect = .zero
+        scheduleGeometryRefresh()
+    }
+
+    /// Avoids invalidating the dock again when geometry resamples the same native pointer event.
+    func setPointer(_ point: CGPoint?) {
+        if pointer != point { pointer = point }
     }
 
     /// Whether a panel-local point reaches the glass or an exposed application button.
@@ -89,6 +115,29 @@ final class DockInteraction {
 
     /// Error-banner hit region in the same coordinates; zero when no banner is visible.
     @ObservationIgnored var errorRect = CGRect.zero {
-        didSet { geometryDidChange?() }
+        didSet {
+            if oldValue != errorRect { scheduleGeometryRefresh() }
+        }
+    }
+
+    /// Cancels the deferred geometry publication owned by this panel.
+    func stopGeometryUpdates() {
+        geometryRefreshTask?.cancel()
+        geometryRefreshTask = nil
+    }
+
+    private func scheduleGeometryRefresh() {
+        guard geometryRefreshTask == nil else { return }
+        // SwiftUI reports each magnifying entry separately during layout. Publish their latest
+        // frames together after that pass so pointer resampling cannot recursively start layout.
+        geometryRefreshTask = Task { @MainActor [weak self] in
+            await Task.yield()
+            guard let self, !Task.isCancelled else { return }
+            geometryRefreshTask = nil
+            if renderedFrames != pendingRenderedFrames {
+                renderedFrames = pendingRenderedFrames
+            }
+            geometryDidChange?()
+        }
     }
 }
