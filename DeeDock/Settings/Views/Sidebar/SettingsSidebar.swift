@@ -30,23 +30,27 @@ struct SettingsSidebar: View {
                     SettingsCategoryRow(category: category, isSelected: selection == .defaults(category))
                         .tag(SettingsSelection.defaults(category))
                 }
-            } header: { Text(.displayDefaults) }
+            } header: { Text(.displayDefaults).font(.caption.weight(.semibold)) }
             Section {
                 ForEach(profiles.displays) { display in
                     if let profile = profiles.document.profiles[display.id], matches(profile) {
                         DisplayProfileRow(profile: profile, snapshot: display).tag(SettingsSelection.display(display.id))
                     }
                 }
-            } header: { Text(.displayConnectedGroup) }
+            } header: { Text(.displayConnectedGroup).font(.caption.weight(.semibold)) }
             if !profiles.remembered.isEmpty {
                 Section {
                     ForEach(profiles.remembered.filter(matches)) { profile in
                         DisplayProfileRow(profile: profile, snapshot: nil).tag(SettingsSelection.display(profile.id))
                     }
-                } header: { Text(.displayRememberedGroup) }
+                } header: { Text(.displayRememberedGroup).font(.caption.weight(.semibold)) }
             }
             if !SettingsSelection.generalMatches(searchText) && matches.isEmpty && !profiles.document.profiles.values.contains(where: matches) {
-                Text(.settingsNoMatches).foregroundStyle(.secondary)
+                Text(.settingsNoMatches)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 12)
             }
         }
         .searchable(text: $searchText, placement: .sidebar, prompt: Text(.settingsSearchPrompt))

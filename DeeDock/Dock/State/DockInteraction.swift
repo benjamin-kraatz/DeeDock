@@ -30,6 +30,8 @@ final class DockInteraction {
     @ObservationIgnored var beginApplicationWindowDiscovery: ((DockItem, ApplicationMenuSnapshot, @escaping (ApplicationWindowMenuState) -> Void) -> UUID?)?
     @ObservationIgnored var cancelApplicationWindowDiscovery: ((UUID) -> Void)?
     @ObservationIgnored var performApplicationMenuAction: ((ApplicationMenuAction, DockItem) -> Void)?
+    @ObservationIgnored var windowPeekHoverChanged: ((DockItem?) -> Void)?
+    @ObservationIgnored var openWindowPeek: ((DockItem) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var revealFolder: ((FolderDockItem) -> Void)?
     /// Per-display policy for DeeDock's own Empty Trash warning.

@@ -49,6 +49,15 @@ struct DockSettings: Codable, Equatable {
     var showTrash: Bool = true
     /// Whether Empty Trash requires DeeDock's destructive confirmation alert.
     var confirmBeforeEmptyingTrash: Bool = true
+    /// Whether hovering a running app can present its windows.
+    var windowPeekEnabled: Bool = true
+    var windowPeekSize: WindowPeekSize = .medium
+    var windowPeekLayout: WindowPeekLayout = .grid
+    var windowPeekStyle: WindowPeekStyle = .glass
+    var windowPeekIncludeMinimized: Bool = true
+    var windowPeekIncludeUntitled: Bool = true
+    /// Seconds a pointer must remain over an app before Peek opens.
+    var windowPeekHoverDelay: Double = 0.4
     var tooltipPreset: DockTooltipPreset = .classic
     var runningIndicatorStyle: RunningIndicatorStyle = .dot
     /// Whether the shader indicator styles animate. The drawn styles are always still, and
@@ -87,8 +96,9 @@ struct DockSettings: Codable, Equatable {
             && [backgroundOpacity, idleOpacity, idleDelay, fadeOutDuration, restoreDuration].allSatisfy(\.isFinite)
             && behavior.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
             && (0...24).contains(itemSpacing)
+            && (0.2...1).contains(windowPeekHoverDelay)
             && (-1000...1000).contains(alongEdgeOffset) && (0...300).contains(edgeDistance)
-            && [iconSize, magnification, itemSpacing, alongEdgeOffset, edgeDistance].allSatisfy(\.isFinite)
+            && [iconSize, magnification, itemSpacing, windowPeekHoverDelay, alongEdgeOffset, edgeDistance].allSatisfy(\.isFinite)
     }
 
     /// Snaps valid values to the controls' precision. Invalid values have no normalized result.
@@ -104,6 +114,7 @@ struct DockSettings: Codable, Equatable {
         result.iconSize = iconSize.rounded()
         result.magnification = (magnification * 20).rounded() / 20
         result.itemSpacing = itemSpacing.rounded()
+        result.windowPeekHoverDelay = (windowPeekHoverDelay * 10).rounded() / 10
         result.alongEdgeOffset = alongEdgeOffset.rounded()
         result.edgeDistance = edgeDistance.rounded()
         return result
@@ -115,6 +126,8 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case appVisibility, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
+        case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
+        case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
@@ -135,6 +148,13 @@ extension DockSettings {
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true
         confirmBeforeEmptyingTrash = values.contains(.confirmBeforeEmptyingTrash)
             ? try values.decode(Bool.self, forKey: .confirmBeforeEmptyingTrash) : true
+        windowPeekEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnabled) ?? true
+        windowPeekSize = try values.decodeIfPresent(WindowPeekSize.self, forKey: .windowPeekSize) ?? .medium
+        windowPeekLayout = try values.decodeIfPresent(WindowPeekLayout.self, forKey: .windowPeekLayout) ?? .grid
+        windowPeekStyle = try values.decodeIfPresent(WindowPeekStyle.self, forKey: .windowPeekStyle) ?? .glass
+        windowPeekIncludeMinimized = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeMinimized) ?? true
+        windowPeekIncludeUntitled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeUntitled) ?? true
+        windowPeekHoverDelay = try values.decodeIfPresent(Double.self, forKey: .windowPeekHoverDelay) ?? 0.4
         tooltipPreset = values.contains(.tooltipPreset) ? try values.decode(DockTooltipPreset.self, forKey: .tooltipPreset) : .classic
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)

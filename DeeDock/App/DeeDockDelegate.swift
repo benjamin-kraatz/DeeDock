@@ -4,16 +4,17 @@ import AppKit
 @MainActor
 final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let windowAccess = WindowAccessController(service: SystemWindowAccessService())
-    private(set) lazy var coordinator = DockCoordinator(windowAccess: windowAccess)
+    let screenCapture = ScreenCaptureAccessController(service: SystemScreenCaptureAccessService())
+    private(set) lazy var coordinator = DockCoordinator(windowAccess: windowAccess, screenCapture: screenCapture)
     let loginItems = LoginItemController(service: SystemLoginItemService())
     private(set) lazy var onboarding = OnboardingWindowController(
-        loginItems: loginItems, settings: coordinator.settings,
-        openSettings: { SettingsWindowOpener.open() })
+        loginItems: loginItems, settings: coordinator.settings)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         loginItems.refresh()
         windowAccess.refresh()
+        screenCapture.refresh()
         coordinator.start()
         // After the docks exist, so a first-time reader sees the real thing behind the tour
         // rather than an empty desktop and a description of one.
@@ -24,6 +25,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         onboarding.stop()
         loginItems.stop()
         windowAccess.stop()
+        screenCapture.stop()
         coordinator.stop()
     }
 }

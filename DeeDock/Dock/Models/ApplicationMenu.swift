@@ -1,7 +1,7 @@
 import Foundation
 
 /// Current authorization state for reading and controlling another application's windows.
-enum WindowAccessStatus: Equatable, Sendable {
+nonisolated enum WindowAccessStatus: Equatable, Sendable {
     case enabled
     case notEnabled
     case unavailable
@@ -23,11 +23,24 @@ nonisolated struct ApplicationWindowToken: Hashable, Sendable {
 /// Display-safe window metadata. Native Accessibility handles never leave their service actor.
 nonisolated struct ApplicationWindowSummary: Equatable, Identifiable, Sendable {
     let token: ApplicationWindowToken
+    let processIdentifier: pid_t
     let title: String?
+    /// Global Quartz window bounds used only for conservative ScreenCaptureKit matching.
+    let frame: CGRect?
     let isMinimized: Bool
     let isMain: Bool
 
     var id: ApplicationWindowToken { token }
+}
+
+/// A display-safe reason why a granted window query could not produce summaries.
+nonisolated enum ApplicationWindowDiscoveryFailure: Equatable, Sendable {
+    case permissionRequired
+    case sandboxRestricted
+    case applicationUnavailable
+    case windowUnavailable
+    case accessibility(Int32)
+    case unknown
 }
 
 /// Window section shown by an application's native context menu.
@@ -35,7 +48,7 @@ nonisolated enum ApplicationWindowMenuState: Equatable, Sendable {
     case hidden
     case loading
     case loaded([ApplicationWindowSummary])
-    case unavailable
+    case unavailable(ApplicationWindowDiscoveryFailure)
 }
 
 /// Live application state captured when a context menu opens.

@@ -1,9 +1,11 @@
 import ApplicationServices
 import AppKit
+import Security
 
 /// Failures from public Accessibility window discovery and control.
 nonisolated enum ApplicationWindowServiceError: Error, Equatable, Sendable {
     case permissionRequired
+    case sandboxRestricted
     case applicationUnavailable
     case windowUnavailable
     case accessibility(Int32)
@@ -33,6 +35,18 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
 
     func discover(processes: [ApplicationProcessSnapshot], sessionID: UUID) async throws -> [ApplicationWindowSummary] {
         guard AXIsProcessTrusted() else { throw ApplicationWindowServiceError.permissionRequired }
+        do {
+            return try discoverTrusted(processes: processes, sessionID: sessionID)
+        } catch let error as ApplicationWindowServiceError {
+            if Self.isSandboxed, case .accessibility = error {
+                throw ApplicationWindowServiceError.sandboxRestricted
+            }
+            throw error
+        }
+    }
+
+    private func discoverTrusted(processes: [ApplicationProcessSnapshot], sessionID: UUID) throws
+        -> [ApplicationWindowSummary] {
         handles = handles.filter { $0.key.sessionID != sessionID }
         var result: [ApplicationWindowSummary] = []
 
@@ -53,7 +67,9 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
                 let rawTitle = string(window, attribute: kAXTitleAttribute as CFString)
                 result.append(ApplicationWindowSummary(
                     token: token,
+                    processIdentifier: process.processIdentifier,
                     title: rawTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? rawTitle : nil,
+                    frame: rect(window),
                     isMinimized: boolean(window, attribute: kAXMinimizedAttribute as CFString) ?? false,
                     isMain: boolean(window, attribute: kAXMainAttribute as CFString) ?? false
                 ))
@@ -111,6 +127,18 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         return CFBooleanGetValue((value as! CFBoolean))
     }
 
+    private func rect(_ element: AXUIElement) -> CGRect? {
+        guard let positionValue = try? copy(element, attribute: kAXPositionAttribute as CFString),
+              let sizeValue = try? copy(element, attribute: kAXSizeAttribute as CFString),
+              CFGetTypeID(positionValue) == AXValueGetTypeID(),
+              CFGetTypeID(sizeValue) == AXValueGetTypeID() else { return nil }
+        var origin = CGPoint.zero
+        var size = CGSize.zero
+        guard AXValueGetValue(positionValue as! AXValue, .cgPoint, &origin),
+              AXValueGetValue(sizeValue as! AXValue, .cgSize, &size) else { return nil }
+        return CGRect(origin: origin, size: size)
+    }
+
     private func isSettable(_ element: AXUIElement, attribute: CFString) -> Bool {
         var settable = DarwinBoolean(false)
         return AXUIElementIsAttributeSettable(element, attribute, &settable) == .success && settable.boolValue
@@ -123,5 +151,15 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
     private func check(_ error: AXError) throws {
         guard error != .success else { return }
         throw ApplicationWindowServiceError.accessibility(error.rawValue)
+    }
+
+    /// TCC trust and App Sandbox policy are separate checks. A signed sandboxed build can pass
+    /// `AXIsProcessTrusted` while cross-process AX calls remain unavailable.
+    private static var isSandboxed: Bool {
+        guard let task = SecTaskCreateFromSelf(nil),
+              let value = SecTaskCopyValueForEntitlement(
+                task, "com.apple.security.app-sandbox" as CFString, nil
+              ) else { return false }
+        return value as? Bool == true
     }
 }

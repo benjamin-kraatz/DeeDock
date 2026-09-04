@@ -20,11 +20,12 @@ struct PositionSettingsPane: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
-                DockPlacementPreview(edge: edge, reference: reference, alignment: alignment,
-                                     alongEdgeOffset: alongEdgeOffset,
-                                     edgeDistance: edgeDistance)
+                SettingsStackedRow {
+                    DockPlacementPreview(edge: edge, reference: reference, alignment: alignment,
+                                         alongEdgeOffset: alongEdgeOffset, edgeDistance: edgeDistance)
+                }
             }
             SettingsCard(title: .settingsCardAnchor, footnote: edge == .top ? nil : .settingsDockOverlapHelp) {
                 SettingsPickerRow(title: .settingsEdge, options: DockEdge.settingsOptions, selection: $edge)
@@ -39,7 +40,7 @@ struct PositionSettingsPane: View {
                         Text(.settingsTopReferenceHelp)
                             .font(.caption).foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal, 14).padding(.bottom, 10)
+                            .padding(.horizontal, SettingsMetrics.rowInset).padding(.bottom, 10)
                     }
                 }
                 SettingsPickerRow(title: .settingsAlignment,

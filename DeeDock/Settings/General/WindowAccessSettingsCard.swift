@@ -8,38 +8,27 @@ struct WindowAccessSettingsCard: View {
     var openSettings: () -> Void = {}
 
     var body: some View {
-        SettingsCard {
-            VStack(alignment: .leading, spacing: 12) {
+        SettingsCard(title: .windowAccessTitle, footnote: .windowAccessExplanation) {
+            SettingsStackedRow {
                 Label {
-                    Text(.windowAccessTitle)
+                    Text(status.message)
                 } icon: {
-                    Image(systemName: status == .enabled ? "macwindow.badge.checkmark" : "macwindow")
-                        .accessibilityHidden(true)
+                    Image(systemName: status == .enabled ? "checkmark.circle.fill" : "circle.dashed")
                 }
-                .font(.headline)
-
-                Text(.windowAccessExplanation)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Label(status.message, systemImage: status == .enabled ? "checkmark.circle.fill" : "circle.dashed")
-                    .foregroundStyle(status == .enabled ? .green : .secondary)
-
-                ViewThatFits(in: .horizontal) {
-                    HStack { actions }
-                    VStack(alignment: .leading) { actions }
-                }
+                .font(.callout)
+                .foregroundStyle(status == .enabled ? AnyShapeStyle(Color.green) : AnyShapeStyle(.secondary))
+                .labelStyle(.titleAndIcon)
             }
-            .padding(14)
+            SettingsActionRow { actions }
         }
     }
 
     @ViewBuilder private var actions: some View {
-        if status != .enabled {
-            Button(.windowAccessEnable, action: requestAccess)
-        }
         Button(.windowAccessCheckAgain, action: refresh)
         Button(.windowAccessOpenSettings, action: openSettings)
+        if status != .enabled {
+            Button(.windowAccessEnable, action: requestAccess).buttonStyle(.borderedProminent)
+        }
     }
 }
 

@@ -42,7 +42,7 @@ final class ApplicationMenuController {
                 return
             } catch {
                 await windows.discard(sessionID: sessionID)
-                state = .unavailable
+                state = .unavailable(Self.discoveryFailure(error))
             }
             guard let self, !Task.isCancelled, generation == currentGeneration,
                   discoveryTasks[sessionID] != nil else { return }
@@ -50,6 +50,17 @@ final class ApplicationMenuController {
             completion(state)
         }
         return sessionID
+    }
+
+    private static func discoveryFailure(_ error: Error) -> ApplicationWindowDiscoveryFailure {
+        guard let error = error as? ApplicationWindowServiceError else { return .unknown }
+        return switch error {
+        case .permissionRequired: .permissionRequired
+        case .sandboxRestricted: .sandboxRestricted
+        case .applicationUnavailable: .applicationUnavailable
+        case .windowUnavailable: .windowUnavailable
+        case .accessibility(let code): .accessibility(code)
+        }
     }
 
     func cancelDiscovery(_ sessionID: UUID) {

@@ -11,4 +11,12 @@ struct SettingsValueSource {
             else { store.update(keyPath, to: proposed) }
         })
     }
+
+    func apply(_ preset: WindowPeekPreset) {
+        if let context {
+            context.profiles.update(context.id, fields: DockSettingField.windowPeekFields) { preset.apply(to: &$0) }
+        } else {
+            store.update { preset.apply(to: &$0) }
+        }
+    }
 }

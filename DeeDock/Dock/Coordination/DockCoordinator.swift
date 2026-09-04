@@ -10,7 +10,9 @@ final class DockCoordinator {
     let displayIndicator = DisplaySelectionIndicatorController()
     /// One-shot navigation consumed by Settings, including when its window is first created.
     var settingsDisplayRequest: String?
-    @ObservationIgnored private var suspensionObserver: NSObjectProtocol?
+    /// One-shot route used by Window Peek's permission fallback.
+    var settingsPreviewDisplayRequest: String?
+    @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
     var canFocus: Bool { !enabledDisplays.isEmpty }
@@ -20,6 +22,7 @@ final class DockCoordinator {
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
+    @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
     @ObservationIgnored private let displayService = DisplayService()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
     @ObservationIgnored private var monitors: [Any] = []
@@ -29,17 +32,19 @@ final class DockCoordinator {
     @ObservationIgnored private var started = false
     @ObservationIgnored private var reconciling = false
 
-    init(windowAccess: WindowAccessController) {
+    init(windowAccess: WindowAccessController, screenCapture: ScreenCaptureAccessController) {
         let settings = DockSettingsStore(repository: DockSettingsRepository())
         self.settings = settings
         profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository())
         let applicationService = ApplicationService()
         catalog = ApplicationCatalog(service: applicationService)
-        applicationMenus = ApplicationMenuController(
+        let menus = ApplicationMenuController(
             access: windowAccess,
             applications: ApplicationMenuService(applications: applicationService),
             windows: AccessibilityApplicationWindowService()
         )
+        applicationMenus = menus
+        windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture)
     }
 
     func start() {
@@ -51,7 +56,11 @@ final class DockCoordinator {
             endFocus(restore: false)
         }
         folderStacks.openChanged = { [weak self] open in
+            if open { self?.windowPeeks.close(returnFocus: false) }
             self?.panels.values.forEach { $0.holdFolderStack(open) }
+        }
+        windowPeeks.prepareSettings = { [weak self] displayID in
+            self?.settingsPreviewDisplayRequest = displayID
         }
         catalog.didChange = { [weak self] in self?.refreshPanels() }
         trash.didChange = { [weak self] in self?.refreshPanels() }
@@ -59,6 +68,7 @@ final class DockCoordinator {
             guard app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return }
             if app.bundleIdentifier == "com.apple.finder" { self?.trash.refreshAfterFinderActivity() }
             self?.rememberExternal(app)
+            self?.windowPeeks.close(returnFocus: false)
             self?.endFocus(restore: false)
         }
         profiles.didChange = { [weak self] in
@@ -74,14 +84,18 @@ final class DockCoordinator {
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
         ) { [weak self] _ in MainActor.assumeIsolated { self?.refreshPanels(resetVisibility: true) } }
-        suspensionObserver = NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.willSleepNotification, object: nil, queue: .main
-        ) { [weak self] _ in MainActor.assumeIsolated {
-            self?.dragging.cancel()
-            self?.folderStacks.close(returnFocus: false)
-            self?.applicationMenus.cancelAllDiscoveries()
-            self?.panels.values.forEach { $0.suspendIdleFading() }
-        } }
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification,
+                     NSWorkspace.sessionDidResignActiveNotification] {
+            suspensionObservers.append(NSWorkspace.shared.notificationCenter.addObserver(
+                forName: name, object: nil, queue: .main
+            ) { [weak self] _ in MainActor.assumeIsolated {
+                self?.dragging.cancel()
+                self?.folderStacks.close(returnFocus: false)
+                self?.windowPeeks.close(returnFocus: false)
+                self?.applicationMenus.cancelAllDiscoveries()
+                self?.panels.values.forEach { $0.suspendIdleFading() }
+            } })
+        }
         let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
                                          .scrollWheel, .leftMouseDown, .rightMouseDown, .otherMouseDown,
                                          .leftMouseUp, .rightMouseUp, .otherMouseUp]
@@ -116,10 +130,14 @@ final class DockCoordinator {
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
-                if focusedID == display.id, !folderStacks.isKeyboardActive { endFocus(restore: false) }
+                if focusedID == display.id, !folderStacks.isKeyboardActive, !windowPeeks.isKeyboardActive {
+                    endFocus(restore: false)
+                }
             }
+            panel.exclusiveInteractionBegan = { [weak self] in self?.windowPeeks.close(returnFocus: false) }
             panel.escape = { [weak self] in self?.endFocus(restore: true) }
             store.applicationOpened = { [weak self] in
+                self?.windowPeeks.close(returnFocus: false)
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
             }
             panel.connectDragging(dragging)
@@ -144,6 +162,14 @@ final class DockCoordinator {
                     if let error { panel.store.errorMessage = error }
                     else if action.activatesApplication { panel.store.applicationOpened?() }
                 }
+            }
+            panel.interaction.windowPeekHoverChanged = { [weak self, weak panel] item in
+                guard let self, let panel else { return }
+                windowPeeks.hover(item, on: panel)
+            }
+            panel.interaction.openWindowPeek = { [weak self, weak panel] item in
+                guard let self, let panel else { return }
+                windowPeeks.showKeyboard(item, on: panel)
             }
             panel.interaction.openFolder = { [weak self, weak panel] folder, keyboard in
                 guard let self, let panel, panels[display.id] === panel else { return }
@@ -188,6 +214,7 @@ final class DockCoordinator {
             panel.update(display: display, settings: profiles.effectiveSettings(for: display.id), resetVisibility: resetVisibility)
         }
         folderStacks.reanchor()
+        windowPeeks.refresh()
         if let id = zonePreview.displayID {
             if let geometry = panels[id]?.geometry { zonePreview.update(geometry) }
             else { zonePreview.stop() }
@@ -195,7 +222,10 @@ final class DockCoordinator {
         catalog.pruneIcons(items: panels.values.flatMap { $0.store.items },
                            folders: panels.values.flatMap { $0.store.folders })
     }
-    private func updatePointers(eventType: NSEvent.EventType) { panels.values.forEach { $0.updatePointer(eventType: eventType) } }
+    private func updatePointers(eventType: NSEvent.EventType) {
+        panels.values.forEach { $0.updatePointer(eventType: eventType) }
+        windowPeeks.updatePointer()
+    }
 
     /// Only connected enabled desktop surfaces have a live zone to outline.
     func showZone(for id: String) {
@@ -205,6 +235,7 @@ final class DockCoordinator {
     /// Explicit picker activation captures focus before AppKit resigns the dock's key panel.
     private func openFiles(for item: DockItem, on panel: DockPanelController) {
         guard item.isAvailable, panels[panel.store.displayID] === panel else { return }
+        windowPeeks.close(returnFocus: false)
         let id = panel.store.displayID
         let selection = panel.store.keyboardFocus ? panel.store.selectedTarget : nil
         let previous = previousApplication ?? lastExternalApplication
@@ -256,14 +287,16 @@ final class DockCoordinator {
         zonePreview.stop()
         displayIndicator.stop()
         settingsDisplayRequest = nil
+        settingsPreviewDisplayRequest = nil
         filePicker.stop()
         dragging.stop()
         folderStacks.stop()
+        windowPeeks.stop()
         applicationMenus.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil
-        if let suspensionObserver { NSWorkspace.shared.notificationCenter.removeObserver(suspensionObserver) }
-        suspensionObserver = nil
+        suspensionObservers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
+        suspensionObservers.removeAll()
         displayService.stop()
         profiles.didChange = nil
         settings.settingsDidChange = nil

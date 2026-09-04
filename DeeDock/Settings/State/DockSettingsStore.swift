@@ -31,6 +31,15 @@ final class DockSettingsStore {
         save(normalized)
     }
 
+    /// Applies one coherent multi-field edit and persists it once.
+    func update(_ mutation: (inout DockSettings) -> Void) {
+        guard !requiresReset else { return }
+        var proposed = value
+        mutation(&proposed)
+        guard let normalized = proposed.normalized, normalized != value else { return }
+        save(normalized)
+    }
+
     /// Explicitly replaces only configuration, including unreadable saved configuration.
     func restoreDefaults() { save(.defaults) }
 

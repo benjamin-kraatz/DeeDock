@@ -30,6 +30,7 @@ struct DeeDockApp: App {
         Settings {
             DockSettingsView(store: delegate.coordinator.settings, profiles: delegate.coordinator.profiles,
                              loginItems: delegate.loginItems, windowAccess: delegate.windowAccess,
+                             screenCapture: delegate.screenCapture,
                              coordinator: delegate.coordinator)
         }
     }

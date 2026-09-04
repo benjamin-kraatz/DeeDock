@@ -6,44 +6,47 @@ struct DockFadingSettingsPane: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
             SettingsCard(title: .appearanceBackground, footnote: .appearanceBackgroundHelp) {
-                Toggle(isOn: source.binding(\.showBackground)) { Text(.appearanceShowBackground) }
-                    .padding(14).settingsOverride(source.context, field: .showBackground)
+                SettingsToggleRow(title: .appearanceShowBackground, isOn: source.binding(\.showBackground))
+                    .settingsOverride(source.context, field: .showBackground)
             }
             SettingsCard(title: .appearanceIdleFading, footnote: .appearanceIdleHelp) {
-                Toggle(isOn: source.binding(\.fadeWhenIdle)) { Text(.appearanceFadeWhenIdle) }
-                    .padding(14).settingsOverride(source.context, field: .fadeWhenIdle)
+                SettingsToggleRow(title: .appearanceFadeWhenIdle, isOn: source.binding(\.fadeWhenIdle))
+                    .settingsOverride(source.context, field: .fadeWhenIdle)
                 idleControls
             }
             SettingsCard(title: .settingsPreview, footnote: .appearanceAccessibilityHelp) {
-                DockFadingPreview(settings: source.value)
+                SettingsStackedRow { DockFadingPreview(settings: source.value) }
             }
         }
     }
 
     private var idleControls: some View {
         VStack(spacing: 0) {
-            Picker(selection: source.binding(\.fadeTarget)) {
+            SettingsMenuRow(title: .appearanceFadeTarget, selection: source.binding(\.fadeTarget)) {
                 Text(.appearanceFadeEntireDock).tag(DockSettings.FadeTarget.entireDock)
                 Text(.appearanceFadeBackground).tag(DockSettings.FadeTarget.backgroundOnly)
                 Text(.appearanceFadeIcons).tag(DockSettings.FadeTarget.iconsOnly)
-            } label: { Text(.appearanceFadeTarget) }
-                .padding(14)
+            }
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .fadeTarget)
+            Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceIdleOpacity, unit: .settingsPercent,
                 value: source.binding(\.idleOpacity), range: 0...100, step: 5)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .idleOpacity)
+            Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceIdleDelay, unit: .settingsSeconds,
                 value: source.binding(\.idleDelay), range: 0...30, step: 1)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .idleDelay)
+            Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceFadeOutDuration, unit: .settingsSeconds,
                 value: source.binding(\.fadeOutDuration), range: 0...2, step: 0.05)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .fadeOutDuration)
+            Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceRestoreDuration, unit: .settingsSeconds,
                 value: source.binding(\.restoreDuration), range: 0...0.5, step: 0.05)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)

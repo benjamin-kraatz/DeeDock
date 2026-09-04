@@ -25,19 +25,15 @@ struct DockTooltipPicker: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 136, alignment: .top)
                     .padding(10)
-                    .background(selection == preset ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06),
-                                in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(alignment: .topTrailing) {
-                        if selection == preset { Image(systemName: "checkmark.circle.fill").foregroundStyle(.tint).padding(6) }
-                    }
-                    .contentShape(.rect)
+                    .settingsSelectionCard(isSelected: selection == preset)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(preset.title))
                 .accessibilityHint(Text(preset.subtitle))
                 .accessibilityAddTraits(selection == preset ? [.isSelected] : [])
             }
-        }.padding(14)
+        }
+        .padding(SettingsMetrics.rowInset)
     }
 }
 

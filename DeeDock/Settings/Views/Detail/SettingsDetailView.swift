@@ -11,16 +11,21 @@ struct SettingsDetailView: View {
     var context: SettingsOverrideContext? = nil
     var profileError: LocalizedStringResource? = nil
     var showZone: (() -> Void)?
+    let windowAccess: WindowAccessController?
+    let screenCapture: ScreenCaptureAccessController?
     @Binding var displayCategory: SettingsCategory
 
     init(store: DockSettingsStore, category: SettingsCategory?, context: SettingsOverrideContext? = nil,
          profileError: LocalizedStringResource? = nil, showZone: (() -> Void)? = nil,
+         windowAccess: WindowAccessController? = nil, screenCapture: ScreenCaptureAccessController? = nil,
          displayCategory: Binding<SettingsCategory> = .constant(.appearance)) {
         self.store = store
         self.category = category
         self.context = context
         self.profileError = profileError
         self.showZone = showZone
+        self.windowAccess = windowAccess
+        self.screenCapture = screenCapture
         _displayCategory = displayCategory
     }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -32,16 +37,18 @@ struct SettingsDetailView: View {
     var body: some View {
         ScrollView {
             if let category {
-                VStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
                     if let context { DisplaySettingsHeader(context: context, category: $displayCategory) }
                     pane(for: category)
+                        .disabled(settingsLocked && category != .previews)
+                        .id(category)
+                        .transition(transition)
                 }
                     .frame(maxWidth: 620, alignment: .leading)
                     .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 26)
-                    .padding(.vertical, 22)
-                    .id(category)
-                    .transition(transition)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 18)
+                    .padding(.bottom, 24)
             } else {
                 ContentUnavailableView {
                     Label {
@@ -54,9 +61,9 @@ struct SettingsDetailView: View {
             }
         }
         .scrollBounceBehavior(.basedOnSize)
-        .background(paneWash)
+        .background(paneBackground)
         .tint(category?.tint ?? .accentColor)
-        .disabled(store.requiresReset || context?.profiles.requiresReset == true)
+        .navigationTitle(navigationTitle)
         .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: category)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             SettingsFooterBar(errorMessage: profileError ?? store.errorMessage,
@@ -67,6 +74,14 @@ struct SettingsDetailView: View {
                                   else { store.restoreDefaults() }
                               })
         }
+    }
+
+    /// Display panes are titled by the device; shared panes by the category the sidebar selected.
+    private var navigationTitle: Text {
+        if let context, let profile = context.profiles.document.profiles[context.id] {
+            return Text(verbatim: profile.name)
+        }
+        return Text(category?.title ?? .settingsSelectCategory)
     }
 
     @ViewBuilder private func pane(for category: SettingsCategory) -> some View {
@@ -86,7 +101,17 @@ struct SettingsDetailView: View {
                                  alignment: binding(\.alignment),
                                  alongEdgeOffset: binding(\.alongEdgeOffset),
                                  edgeDistance: binding(\.edgeDistance), overrideContext: context)
+        case .previews:
+            if let windowAccess, let screenCapture {
+                PreviewsSettingsPane(source: SettingsValueSource(store: store, context: context),
+                                     windowAccess: windowAccess, screenCapture: screenCapture,
+                                     persistentSettingsDisabled: settingsLocked)
+            }
         }
+    }
+
+    private var settingsLocked: Bool {
+        store.requiresReset || context?.profiles.requiresReset == true
     }
 
     private var transition: AnyTransition {
@@ -94,10 +119,19 @@ struct SettingsDetailView: View {
         return .asymmetric(insertion: .offset(y: 14).combined(with: .opacity), removal: .opacity)
     }
 
-    /// A faint wash of the pane color ties the content area to the sidebar selection.
-    private var paneWash: some View {
-        LinearGradient(colors: [(category?.tint ?? .accentColor).opacity(0.12), .clear],
-                       startPoint: .top, endPoint: .center)
+    /// The window's own material, with a whisper of the pane color at the top edge.
+    ///
+    /// macOS keeps content areas neutral, so the identity color stays a hint that fades out
+    /// well before the first card instead of washing the whole pane.
+    private var paneBackground: some View {
+        (category?.tint ?? .accentColor)
+            .opacity(0.05)
+            .mask {
+                LinearGradient(stops: [.init(color: .white, location: 0), .init(color: .clear, location: 1)],
+                               startPoint: .top, endPoint: .bottom)
+                    .frame(height: 180)
+                    .frame(maxHeight: .infinity, alignment: .top)
+            }
             .animation(reduceMotion ? nil : .smooth(duration: 0.45), value: category)
             .ignoresSafeArea()
     }

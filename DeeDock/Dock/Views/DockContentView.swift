@@ -101,6 +101,15 @@ struct DockContentView: View {
         .onChange(of: slots.compactMap(\.target)) { _, ids in
             if let hoveredID, !ids.contains(hoveredID) { self.hoveredID = nil }
         }
+        .onChange(of: hoveredID) { _, target in
+            guard case .app(let id) = target,
+                  let item = slots.compactMap(\.item).first(where: { $0.id == id }) else {
+                interaction.windowPeekHoverChanged?(nil)
+                return
+            }
+            interaction.windowPeekHoverChanged?(item)
+        }
+        .onDisappear { interaction.windowPeekHoverChanged?(nil) }
     }
 }
 

@@ -19,7 +19,6 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     private let systemDock = SystemDockMonitor()
     private let loginItems: LoginItemController
     private let settings: DockSettingsStore
-    private let openSettings: () -> Void
     private var window: NSWindow?
 
     /// - Parameters:
@@ -27,13 +26,11 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     ///     request Settings shows afterwards.
     ///   - settings: the application's shared dock defaults, so the placement page moves the
     ///     real docks rather than a copy of them.
-    ///   - openSettings: opens the Settings window from the tour's final page.
     init(store: OnboardingStore? = nil, loginItems: LoginItemController,
-         settings: DockSettingsStore, openSettings: @escaping () -> Void) {
+         settings: DockSettingsStore) {
         self.store = store ?? OnboardingStore()
         self.loginItems = loginItems
         self.settings = settings
-        self.openSettings = openSettings
     }
 
     /// Shows the tour only on a launch where it has not yet been completed or dismissed.
@@ -85,17 +82,15 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         window.contentView = NSHostingView(rootView:
             OnboardingView(store: store, systemDock: systemDock, loginItems: loginItems,
                            settings: settings,
-                           openSettings: { [weak self] in self?.openSettingsFromTour() },
+                           settingsSelected: { [weak self] in
+                               Task { @MainActor in
+                                   await Task.yield()
+                                   self?.finish()
+                               }
+                           },
                            finish: { [weak self] in self?.finish() })
                 .frame(width: OnboardingWindowMetrics.size.width, height: OnboardingWindowMetrics.size.height))
         return window
-    }
-
-    /// Opening Settings ends the tour: a person who wants the real controls has finished with
-    /// the summary, and leaving both windows stacked would be clutter.
-    private func openSettingsFromTour() {
-        finish()
-        openSettings()
     }
 
     private func finish() {

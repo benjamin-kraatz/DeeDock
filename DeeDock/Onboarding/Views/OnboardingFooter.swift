@@ -11,7 +11,7 @@ struct OnboardingFooter: View {
     var back: () -> Void = {}
     var skip: () -> Void = {}
     var advance: () -> Void = {}
-    var openSettings: () -> Void = {}
+    var settingsSelected: () -> Void = {}
 
     var body: some View {
         HStack(spacing: 12) {
@@ -23,7 +23,10 @@ struct OnboardingFooter: View {
                     .foregroundStyle(.secondary)
             }
             if isFinalStep {
-                Button(.onboardingOpenSettings, action: openSettings)
+                SettingsLink {
+                    Text(.onboardingOpenSettings)
+                }
+                .simultaneousGesture(TapGesture().onEnded { settingsSelected() })
             }
             if canGoBack {
                 Button(.onboardingBack, action: back)

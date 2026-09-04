@@ -13,16 +13,18 @@ struct AppearanceSettingsPane: View {
     var overrideContext: SettingsOverrideContext? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
             SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
-                DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing,
-                                      runningIndicatorStyle: runningIndicatorStyle, appearanceSettings: appearanceSettings)
+                SettingsStackedRow {
+                    DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification,
+                                          itemSpacing: itemSpacing, runningIndicatorStyle: runningIndicatorStyle,
+                                          appearanceSettings: appearanceSettings)
+                }
             }
             SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
                 RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle, animated: animateIndicators)
                     .settingsOverride(overrideContext, field: .runningIndicatorStyle)
-                Toggle(isOn: $animateIndicators) { Text(.settingsAnimateIndicators) }
-                    .padding(14)
+                SettingsToggleRow(title: .settingsAnimateIndicators, isOn: $animateIndicators)
                     .disabled(!runningIndicatorStyle.animates)
                     .settingsOverride(overrideContext, field: .animateIndicators)
             }

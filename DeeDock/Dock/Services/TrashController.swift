@@ -159,6 +159,9 @@ private struct FinderTrashResult: Sendable {
 /// Serializes Finder scripting and keeps AppleScript objects off the main actor.
 private actor FinderTrashAutomation {
     private static let finderIdentifier = "com.apple.finder"
+    /// Reuse the read-only script while monitoring. Recompiling it every two seconds causes
+    /// macOS to repeatedly rescan the same source through XProtect.
+    private lazy var countScript = NSAppleScript(source: "tell application id \"com.apple.finder\" to count items of trash")
 
     func open() -> FinderTrashResult {
         execute("""
@@ -181,12 +184,16 @@ private actor FinderTrashAutomation {
 
     func itemCountIfAuthorized() -> Int? {
         guard Self.hasPermissionWithoutPrompt else { return nil }
-        return execute("tell application id \"com.apple.finder\" to count items of trash").count
+        return execute(countScript).count
     }
 
     private func execute(_ source: String) -> FinderTrashResult {
+        execute(NSAppleScript(source: source))
+    }
+
+    private func execute(_ script: NSAppleScript?) -> FinderTrashResult {
         var error: NSDictionary?
-        let descriptor = NSAppleScript(source: source)?.executeAndReturnError(&error)
+        let descriptor = script?.executeAndReturnError(&error)
         if let error {
             let message = error[NSAppleScript.errorMessage] as? String
                 ?? error[NSAppleScript.errorBriefMessage] as? String

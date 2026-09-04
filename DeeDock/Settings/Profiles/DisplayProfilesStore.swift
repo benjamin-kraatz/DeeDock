@@ -87,6 +87,14 @@ final class DisplayProfilesStore {
         guard let normalized = effective.normalized else { return }
         edit(id) { $0.overrides.set(field, from: normalized) }
     }
+
+    /// Applies several explicit overrides as one saved display-profile edit.
+    func update(_ id: String, fields: [DockSettingField], mutation: (inout DockSettings) -> Void) {
+        var effective = effectiveSettings(for: id)
+        mutation(&effective)
+        guard let normalized = effective.normalized else { return }
+        edit(id) { profile in fields.forEach { profile.overrides.set($0, from: normalized) } }
+    }
     func useDefault(_ field: DockSettingField, for id: String) { edit(id) { $0.overrides.set(field, from: nil) } }
     func useDefaults(for id: String) { edit(id) { $0.overrides = DockSettingsOverrides() } }
     func setEnabled(_ enabled: Bool, for id: String) { edit(id) { $0.enabled = enabled } }

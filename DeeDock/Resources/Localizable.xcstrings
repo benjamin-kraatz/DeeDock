@@ -4206,7 +4206,7 @@
     "windowAccessExplanation": {
       "comment": "General Settings explanation of optional individual-window access.",
       "extractionState": "manual",
-      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Allow DeeDock to list and select another app’s windows. App actions such as Hide, Quit, and Show in Finder work without this access. DeeDock never captures window contents." } } }
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Allow DeeDock to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images." } } }
     },
     "windowAccessOpenSettings": {
       "comment": "Button opening the Accessibility pane in System Settings.",
@@ -4232,6 +4232,251 @@
       "comment": "Heading for optional Accessibility controls in General Settings.",
       "extractionState": "manual",
       "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window access" } } }
+    },
+    "screenCaptureAccessEnable": {
+      "comment": "Explicit button that requests macOS Screen Recording authorization.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Enable Screen Recording" } } }
+    },
+    "screenCaptureAccessStatusEnabled": {
+      "comment": "Screen Recording authorization status in Previews settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Thumbnail access is enabled." } } }
+    },
+    "screenCaptureAccessStatusNotEnabled": {
+      "comment": "Screen Recording authorization status in Previews settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Thumbnail access is not enabled." } } }
+    },
+    "screenCaptureAccessStatusUnavailable": {
+      "comment": "Screen Recording authorization status when macOS cannot provide capture access.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Thumbnail access is unavailable in this build." } } }
+    },
+    "screenCaptureAccessTitle": {
+      "comment": "Heading for Screen Recording controls in Previews settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Screen Recording" } } }
+    },
+    "settingsPreviews": {
+      "comment": "Title of the display-scoped Window Peek settings category.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Previews" } } }
+    },
+    "settingsPreviewsKeywords": {
+      "comment": "Search terms for Window Peek settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "preview peek thumbnail window screen recording accessibility hover" } } }
+    },
+    "windowPeekAccessibilityLabel": {
+      "comment": "VoiceOver label for a Window Peek panel. appName is supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Windows for %(appName)@" } } }
+    },
+    "windowPeekDesignTitle": {
+      "comment": "Heading for Window Peek size, layout, and card appearance controls.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Design" } } }
+    },
+    "windowPeekApplicationSelectionHelp": {
+      "comment": "Explains the reduced selection behavior of ScreenCaptureKit-only preview cards.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Selecting a preview shows the app. Exact-window control needs Window Access outside the App Sandbox." } } }
+    },
+    "windowPeekDiscoveryFailed": {
+      "comment": "Window Peek fallback when permission is granted but Accessibility window discovery fails.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window Access is enabled, but DeeDock could not read this app's windows. You can still show the app." } } }
+    },
+    "windowPeekEnabled": {
+      "comment": "Switch that enables Window Peek on a dock.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show Window Peek" } } }
+    },
+    "windowPeekExample": {
+      "comment": "Label above the deterministic Window Peek settings sample.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Example" } } }
+    },
+    "windowPeekFiltersTitle": {
+      "comment": "Heading for Window Peek filtering controls.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Windows" } } }
+    },
+    "windowPeekHelp": {
+      "comment": "Explanation beneath Window Peek's main enable switch and presets.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Hover over a running app, or press Space while using Focus Dock. DeeDock never asks for permission from the dock itself." } } }
+    },
+    "windowPeekHoverDelay": {
+      "comment": "Slider controlling the hover dwell before Window Peek opens.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Open after" } } }
+    },
+    "windowPeekIncludeMinimized": {
+      "comment": "Window Peek filter switch for minimized windows.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Include minimized windows" } } }
+    },
+    "windowPeekIncludeUntitled": {
+      "comment": "Window Peek filter switch for windows without a title.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Include untitled windows" } } }
+    },
+    "windowPeekLayout": {
+      "comment": "Label for the Window Peek arrangement picker.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Layout" } } }
+    },
+    "windowPeekLayoutFilmstrip": {
+      "comment": "Horizontal Window Peek layout name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Filmstrip" } } }
+    },
+    "windowPeekLayoutGrid": {
+      "comment": "Grid Window Peek layout name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Grid" } } }
+    },
+    "windowPeekLayoutList": {
+      "comment": "List Window Peek layout name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "List" } } }
+    },
+    "windowPeekLoading": {
+      "comment": "Transient Window Peek state while Accessibility window discovery runs.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Loading windows…" } } }
+    },
+    "windowPeekMainWindow": {
+      "comment": "Status under the app's main window in Window Peek.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Main window" } } }
+    },
+    "windowPeekMinimized": {
+      "comment": "Status under a minimized window in Window Peek.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Minimized" } } }
+    },
+    "windowPeekNoMatch": {
+      "comment": "Window Peek state when the configured filters hide every discovered window.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "No windows match these filters." } } }
+    },
+    "windowPeekNoWindows": {
+      "comment": "Window Peek state when Accessibility reports no standard windows.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "No windows are available." } } }
+    },
+    "windowPeekOpenSettings": {
+      "comment": "Window Peek fallback action that opens its permission settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Preview Settings…" } } }
+    },
+    "windowPeekPermissionsHelp": {
+      "comment": "Explanation beneath app-wide Window Peek permission controls.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "These macOS permissions apply to every DeeDock display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings." } } }
+    },
+    "windowPeekPermissionsTitle": {
+      "comment": "Heading for app-wide Window Peek permission controls.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Permissions" } } }
+    },
+    "windowPeekPreset": {
+      "comment": "Label above opinionated Window Peek setting combinations.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Preset" } } }
+    },
+    "windowPeekPresetBalanced": {
+      "comment": "Default Window Peek preset name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Balanced" } } }
+    },
+    "windowPeekPresetCompact": {
+      "comment": "Dense Window Peek preset name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Compact" } } }
+    },
+    "windowPeekPresetCustom": {
+      "comment": "Status shown when current Window Peek settings do not match a named preset.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Custom settings" } } }
+    },
+    "windowPeekPresetShowcase": {
+      "comment": "Large Window Peek preset name.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Showcase" } } }
+    },
+    "windowPeekSandboxFallback": {
+      "comment": "Window Peek fallback when App Sandbox blocks cross-process Accessibility calls despite a TCC grant.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window Access is enabled, but this sandboxed DeeDock build cannot read other apps' windows. You can still show the app." } } }
+    },
+    "windowPeekShowAll": {
+      "comment": "Session-only action that ignores Window Peek filters.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show All" } } }
+    },
+    "windowPeekShowApp": {
+      "comment": "Fallback action that opens or activates the application instead of one window.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show App" } } }
+    },
+    "windowPeekSize": {
+      "comment": "Label for the Window Peek thumbnail size picker.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Size" } } }
+    },
+    "windowPeekSizeLarge": {
+      "comment": "Large Window Peek thumbnail size.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Large" } } }
+    },
+    "windowPeekSizeMedium": {
+      "comment": "Medium Window Peek thumbnail size.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Medium" } } }
+    },
+    "windowPeekSizeSmall": {
+      "comment": "Small Window Peek thumbnail size.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Small" } } }
+    },
+    "windowPeekStyle": {
+      "comment": "Label for the Window Peek card appearance picker.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Style" } } }
+    },
+    "windowPeekStyleCaptioned": {
+      "comment": "Window Peek style with a persistent caption below the thumbnail.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Captioned" } } }
+    },
+    "windowPeekStyleGlass": {
+      "comment": "Window Peek style with a native material card.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Glass" } } }
+    },
+    "windowPeekStyleMinimal": {
+      "comment": "Window Peek style with minimal card chrome.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Minimal" } } }
+    },
+    "windowPeekTimingTitle": {
+      "comment": "Heading for Window Peek hover timing.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Timing" } } }
+    },
+    "windowPeekTitle": {
+      "comment": "Heading for Window Peek's primary settings card.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window Peek" } } }
+    },
+    "windowPeekWindowAccessFallback": {
+      "comment": "Window Peek fallback when Accessibility permission is not enabled.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window Access is needed to list and select individual windows. You can still show the app." } } }
     }
   },
   "version": "1.3"

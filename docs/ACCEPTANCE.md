@@ -723,7 +723,7 @@ Implemented on 2026-09-03. App Sandbox, signing settings, and entitlements were 
 - Settings is the only place that can request Accessibility consent. Startup and application menus only read current trust. No duplicate permission preference is stored.
 - VoiceOver actions cover available app commands and discovered windows. Existing context-click handling, focus navigation, tooltip suppression, auto-hide holds, and pin/display commands remain in place.
 
-Spaces and full-screen transitions are best-effort: public APIs neither expose complete Space ownership nor guarantee cross-Space activation. Windows owned by helper processes with unusual Accessibility trees may not appear beneath the regular app's icon. Thumbnails remain deferred because capture would introduce a distinct Screen Recording permission flow. DeeDock uses no private window-server API, AppleScript, or ScreenCaptureKit for this feature.
+Spaces and full-screen transitions are best-effort: public APIs neither expose complete Space ownership nor guarantee cross-Space activation. Windows owned by helper processes with unusual Accessibility trees may not appear beneath the regular app's icon. This application-menu slice did not itself capture thumbnails; the later Window Peek slice below adds a separate, explicit Screen Recording permission flow. DeeDock uses no private window-server API or AppleScript for either feature.
 
 ### Compilation and authored coverage
 
@@ -753,3 +753,28 @@ The string catalog parses, the entitlement plist is valid, and the diff passes w
 - Verify VoiceOver window and app actions, Focus Dock behavior, tooltip suppression, and auto-hide menu holds.
 
 If the signed sandbox checkpoint cannot read, unminimize, and raise representative windows after a manual grant, stop with application-level actions intact. Do not remove App Sandbox, add exceptions, or change distribution without a separate decision.
+
+## Window Peek
+
+Implemented as an app-wide transient panel with shared defaults and independent display overrides under the new Previews settings category. Window Peek is enabled by default. Hover uses a configurable 0.2 to 1.0 second dwell, while Focus Dock opens it with Space. Ordinary icon clicks and application context menus keep their existing actions.
+
+The panel supports Small, Medium, and Large cards; List, Grid, and Filmstrip layouts; Glass, Minimal, and Captioned styles; minimized and untitled filters; and Compact, Balanced, and Showcase presets. Presets apply the underlying fields rather than adding another persisted value. Existing settings documents receive Balanced defaults, and each field follows the existing nullable display-override model.
+
+Accessibility remains the source for exact individual-window discovery and raising. ScreenCaptureKit supplies one-shot, memory-only thumbnail images after an explicit Screen Recording grant. Public APIs expose no direct identity bridge, so AX-backed capture matches PID, normalized title, and near-identical bounds and refuses ambiguous matches. If AX discovery fails, ScreenCaptureKit's public PID, title, and bounds metadata supplies capture-only cards; selecting those activates the app instead of claiming exact-window control. Capture errors, protected content, minimized windows, missing permission, and individual matching failures preserve metadata or app-level fallback actions.
+
+Permission trust and usable AX window access are reported separately. The current target keeps App Sandbox enabled. Apple documents accessibility APIs used by assistive apps as incompatible with App Sandbox, so a build can retain its TCC grant while every cross-process query fails. DeeDock falls through to ScreenCaptureKit preview cards when that service is granted, otherwise reports the sandbox restriction and keeps Show App available. Removing App Sandbox or introducing a separate helper remains a product and distribution decision, not an implicit Window Peek change.
+
+Permissions are app-wide and live at the top of both Defaults and display Previews pages. Permission actions remain enabled if persisted settings require reset. Startup and hover only read status; only the Settings Enable buttons request macOS consent. No entitlement, dependency, persistent image store, private window-server API, or automatic System Settings change was added.
+
+Authored tests cover absent-key defaults, preset projection, display inheritance, permission request gating, the fallback matrix, dwell retention, stale-result suppression, delay normalization, conservative matching, and four-edge clamped placement. Deterministic SwiftUI samples cover the permission combinations, preset-driven sizes/layouts/styles, fallback states, long text, and Reduce Transparency without requesting permissions or inspecting real windows.
+
+The final focused Xcode app build succeeded with no reported diagnostics. The signed Debug app launched, and its console showed one XProtect rule-read diagnostic at startup but no two-second recurrence after the Trash monitor stopped recompiling its read-only script. The currently launched Debug identity reported both privacy grants as disabled, so thumbnail rendering and window-card interaction could not be accepted in that process. No test suite, SwiftUI preview, or automated visual check was run. Compilation and the bounded console observation do not establish permission behavior, capture correctness, window selection, native input, or visual quality.
+
+### Required hands-on acceptance
+
+- Grant, deny, revoke, and regrant each permission independently in one consistently signed build. Confirm no prompt appears from startup, hover, context menus, or Focus Dock.
+- Exercise exact selection, disappearing windows, duplicate and untitled windows, minimized and protected content, helper-owned windows, multiple Spaces, and full-screen apps. Confirm uncertain matches never display another window's image.
+- Check hover dwell and rapid target changes, pointer travel into the panel, outside clicks, app clicks, menu opening, dragging, folder stacks, file picking, display removal, settings changes, lock, sleep, wake, and shutdown.
+- Check every size, layout, style, preset, and filter under Defaults and per-display overrides. Include four edges, negative origins, scaling, crowded panels, remembered displays, and long localization.
+- Exercise Focus Dock with Space, arrow navigation, Return, and Escape, plus VoiceOver, Reduce Motion, Reduce Transparency, and foreground-focus preservation.
+- Measure idle and visible-Peek CPU, GPU, and memory use. Confirm capture stops and images are released when Peek closes.

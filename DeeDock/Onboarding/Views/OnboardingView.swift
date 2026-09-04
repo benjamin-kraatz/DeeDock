@@ -12,8 +12,8 @@ struct OnboardingView: View {
     /// Shared dock defaults. The tour reads the current edge so the placement page opens on
     /// what a person already has, and that page is the only thing in the tour that writes.
     let settings: DockSettingsStore
-    /// Opens the Settings window; the tour itself never edits dock configuration.
-    var openSettings: () -> Void = {}
+    /// Runs beside the system Settings link so the completed tour can close itself.
+    var settingsSelected: () -> Void = {}
     /// Ends the tour, which the owning window controller turns into a close.
     var finish: () -> Void = {}
     /// Previews pass explicit values; the tour otherwise follows the system settings. Both are
@@ -43,7 +43,7 @@ struct OnboardingView: View {
                              back: { withAnimation(pageAnimation) { store.goBack() } },
                              skip: { withAnimation(pageAnimation) { store.skip() } },
                              advance: advance,
-                             openSettings: openSettings)
+                             settingsSelected: settingsSelected)
         }
         .padding(.horizontal, 30)
         .padding(.top, 26)

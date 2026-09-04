@@ -3,32 +3,27 @@ import SwiftUI
 /// App-wide preferences remain usable even when display configuration cannot be loaded.
 struct GeneralSettingsPane: View {
     let controller: LoginItemController
-    let windowAccess: WindowAccessController
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
                 LoginItemSettingsCard(status: controller.status, pendingOperation: controller.pendingOperation,
                                       errorMessage: controller.errorMessage,
                                       setEnabled: { controller.setEnabled($0) },
                                       cancelRequest: { controller.cancelRequest() },
                                       refresh: controller.refresh, openSettings: controller.openSystemSettings,
                                       dismissError: controller.dismissError)
-                WindowAccessSettingsCard(status: windowAccess.status,
-                                         requestAccess: windowAccess.requestAccess,
-                                         refresh: windowAccess.refresh,
-                                         openSettings: windowAccess.openSystemSettings)
             }
                 .frame(maxWidth: 620, alignment: .leading)
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal, 26)
-                .padding(.vertical, 22)
+                .padding(.horizontal, 24)
+                .padding(.top, 18)
+                .padding(.bottom, 24)
         }
         .scrollBounceBehavior(.basedOnSize)
         .navigationTitle(Text(.settingsGeneral))
         .onAppear {
             controller.refresh()
-            windowAccess.refresh()
         }
     }
 }
@@ -47,17 +42,33 @@ enum LoginItemPreview {
 }
 
 enum WindowAccessPreview {
-    static func controller() -> WindowAccessController { WindowAccessController(service: Service()) }
+    static func controller(status: WindowAccessStatus = .notEnabled) -> WindowAccessController {
+        WindowAccessController(service: Service(status: status))
+    }
 
     private final class Service: WindowAccessServicing {
-        var status: WindowAccessStatus { .notEnabled }
+        let status: WindowAccessStatus
+        init(status: WindowAccessStatus) { self.status = status }
+        func requestAccess() {}
+        func openSystemSettings() {}
+    }
+}
+
+enum ScreenCaptureAccessPreview {
+    static func controller(status: ScreenCaptureAccessStatus = .notEnabled) -> ScreenCaptureAccessController {
+        ScreenCaptureAccessController(service: Service(status: status))
+    }
+
+    private final class Service: ScreenCaptureAccessServicing {
+        let status: ScreenCaptureAccessStatus
+        init(status: ScreenCaptureAccessStatus) { self.status = status }
         func requestAccess() {}
         func openSystemSettings() {}
     }
 }
 
 #Preview("General") {
-    GeneralSettingsPane(controller: LoginItemPreview.controller(), windowAccess: WindowAccessPreview.controller())
+    GeneralSettingsPane(controller: LoginItemPreview.controller())
         .frame(width: 560, height: 520)
 }
 #endif

@@ -132,7 +132,7 @@ struct ApplicationMenuTests {
 
         await windows.setDiscoveryResult(.failure(.accessibility(-25204)))
         let unavailableState = await discover(controller, item: item, snapshot: snapshot)
-        #expect(unavailableState == .unavailable)
+        #expect(unavailableState == .unavailable(.accessibility(-25204)))
         controller.stop()
     }
 
@@ -242,7 +242,9 @@ struct ApplicationMenuTests {
                         main: Bool = false) -> ApplicationWindowSummary {
         ApplicationWindowSummary(
             token: ApplicationWindowToken(sessionID: sessionID, id: UUID()),
+            processIdentifier: 100,
             title: title,
+            frame: CGRect(x: 10, y: 20, width: 800, height: 600),
             isMinimized: minimized,
             isMain: main
         )
@@ -299,7 +301,9 @@ private actor StubApplicationWindowService: ApplicationWindowServicing {
         return try discoveryResult.get().map {
             ApplicationWindowSummary(
                 token: ApplicationWindowToken(sessionID: sessionID, id: $0.token.id),
+                processIdentifier: $0.processIdentifier,
                 title: $0.title,
+                frame: $0.frame,
                 isMinimized: $0.isMinimized,
                 isMain: $0.isMain
             )

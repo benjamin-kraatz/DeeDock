@@ -6,32 +6,32 @@ struct BehaviorSettingsPane: View {
     var previewReduceMotion: Bool? = nil
     var showZone: (() -> Void)? = nil
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
             SettingsCard(title: .settingsAppVisibility, footnote: .settingsAppVisibilityHelp) {
-                Picker(selection: source.binding(\.appVisibility)) {
+                SettingsMenuRow(title: .settingsAppVisibility, selection: source.binding(\.appVisibility)) {
                     ForEach(DockAppVisibility.allCases, id: \.self) { value in Text(value.title).tag(value) }
-                } label: { Text(.settingsAppVisibility) }
-                .padding(14).settingsOverride(source.context, field: .appVisibility)
+                }
+                .settingsOverride(source.context, field: .appVisibility)
             }
             SettingsCard(title: .settingsTrash, footnote: .settingsTrashHelp) {
-                VStack(spacing: 0) {
-                    Toggle(isOn: source.binding(\.showTrash)) { Text(.settingsShowTrash) }
-                        .padding(14).settingsOverride(source.context, field: .showTrash)
-                    Divider()
-                    Toggle(isOn: source.binding(\.confirmBeforeEmptyingTrash)) {
-                        Text(.settingsConfirmBeforeEmptyingTrash)
-                    }
-                    .padding(14).settingsOverride(source.context, field: .confirmBeforeEmptyingTrash)
-                }
+                SettingsToggleRow(title: .settingsShowTrash, isOn: source.binding(\.showTrash))
+                    .settingsOverride(source.context, field: .showTrash)
+                SettingsToggleRow(title: .settingsConfirmBeforeEmptyingTrash,
+                                  isOn: source.binding(\.confirmBeforeEmptyingTrash))
+                    .settingsOverride(source.context, field: .confirmBeforeEmptyingTrash)
             }
             SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
-                Toggle(isOn: source.binding(\.behavior.autoHide)) { Text(.behaviorAutoHide) }
-                    .padding(14).settingsOverride(source.context, field: .autoHide)
+                SettingsToggleRow(title: .behaviorAutoHide, isOn: source.binding(\.behavior.autoHide))
+                    .settingsOverride(source.context, field: .autoHide)
             }
-            SettingsCard(title: .behaviorActivationZone, footnote: source.value.edge == .top ? .behaviorTopZoneHelp : .behaviorZoneHelp) {
-                DockZoneDiagram(settings: source.value).padding(14)
-                if let showZone {
-                    Button(.behaviorShowZone, systemImage: "viewfinder", action: showZone).padding(14)
+            SettingsCard(title: .behaviorActivationZone,
+                         footnote: source.value.edge == .top ? .behaviorTopZoneHelp : .behaviorZoneHelp) {
+                SettingsStackedRow {
+                    DockZoneDiagram(settings: source.value)
+                    if let showZone {
+                        Button(.behaviorShowZone, systemImage: "viewfinder", action: showZone)
+                            .controlSize(.small)
+                    }
                 }
                 BehaviorActivationControls(source: source)
             }
@@ -39,7 +39,11 @@ struct BehaviorSettingsPane: View {
                 BehaviorTimingControls(source: source)
             }
             SettingsCard(title: .behaviorAnimation, footnote: .behaviorAnimationHelp) {
-                DockAnimationPreview(edge: source.value.edge, style: source.value.behavior.animationStyle, duration: source.value.behavior.animationDuration, reduceMotionOverride: previewReduceMotion)
+                SettingsStackedRow {
+                    DockAnimationPreview(edge: source.value.edge, style: source.value.behavior.animationStyle,
+                                         duration: source.value.behavior.animationDuration,
+                                         reduceMotionOverride: previewReduceMotion)
+                }
                 BehaviorAnimationPicker(edge: source.value.edge, selection: source.binding(\.behavior.animationStyle))
                     .settingsOverride(source.context, field: .animationStyle)
                 SettingsSliderRow(title: .behaviorDuration, unit: .settingsSeconds,

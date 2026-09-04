@@ -6,6 +6,7 @@ struct DockSettingsView: View {
     let profiles: DisplayProfilesStore
     let loginItems: LoginItemController
     let windowAccess: WindowAccessController
+    let screenCapture: ScreenCaptureAccessController
     var coordinator: DockCoordinator? = nil
     @State private var selection: SettingsSelection? = .defaults(.appearance)
     @State private var settingsActive = false
@@ -19,13 +20,16 @@ struct DockSettingsView: View {
         } detail: {
             switch selection {
             case .general:
-                GeneralSettingsPane(controller: loginItems, windowAccess: windowAccess)
+                GeneralSettingsPane(controller: loginItems)
             case .defaults(let category):
-                SettingsDetailView(store: store, category: category, profileError: profiles.errorMessage)
+                SettingsDetailView(store: store, category: category, profileError: profiles.errorMessage,
+                                   windowAccess: windowAccess, screenCapture: screenCapture)
             case .display(let id):
                 SettingsDetailView(store: store, category: displayCategory,
                                    context: SettingsOverrideContext(profiles: profiles, id: id),
-                                   profileError: profiles.errorMessage ?? profiles.pinErrors[id], showZone: zoneAction(for: id), displayCategory: $displayCategory)
+                                   profileError: profiles.errorMessage ?? profiles.pinErrors[id], showZone: zoneAction(for: id),
+                                   windowAccess: windowAccess, screenCapture: screenCapture,
+                                   displayCategory: $displayCategory)
                     .id(id)
             case nil:
                 SettingsDetailView(store: store, category: nil)
@@ -40,6 +44,7 @@ struct DockSettingsView: View {
                 if $0 {
                     loginItems.refresh()
                     windowAccess.refresh()
+                    screenCapture.refresh()
                 }
                 updateDisplayIndicator(active: $0)
             })
@@ -60,6 +65,18 @@ struct DockSettingsView: View {
                   profiles.displays.contains(where: { $0.id == requestedID }) else { return }
             searchText = ""
             selection = .display(requestedID)
+        }
+        .onChange(of: coordinator?.settingsPreviewDisplayRequest, initial: true) { _, requestedID in
+            guard let requestedID else { return }
+            coordinator?.settingsPreviewDisplayRequest = nil
+            searchText = ""
+            if profiles.displays.count > 1,
+               profiles.displays.contains(where: { $0.id == requestedID }) {
+                displayCategory = .previews
+                selection = .display(requestedID)
+            } else {
+                selection = .defaults(.previews)
+            }
         }
         .onDisappear {
             settingsActive = false
@@ -98,11 +115,11 @@ struct DockSettingsView: View {
 #Preview("Multiple displays") {
     let profiles = DisplaySettingsPreview.make()
     DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller(),
-                     windowAccess: WindowAccessPreview.controller())
+                     windowAccess: WindowAccessPreview.controller(), screenCapture: ScreenCaptureAccessPreview.controller())
 }
 #Preview("Multiple displays — dark") {
     let profiles = DisplaySettingsPreview.make()
     DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller(),
-                     windowAccess: WindowAccessPreview.controller()).preferredColorScheme(.dark)
+                     windowAccess: WindowAccessPreview.controller(), screenCapture: ScreenCaptureAccessPreview.controller()).preferredColorScheme(.dark)
 }
 #endif

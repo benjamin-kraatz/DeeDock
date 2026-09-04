@@ -23,7 +23,7 @@ struct SettingsSliderRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
+        SettingsStackedRow {
             HStack(spacing: 12) {
                 Text(title)
                 Spacer(minLength: 8)
@@ -36,8 +36,6 @@ struct SettingsSliderRow: View {
                 endcap(maximumSymbol)
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
     }
 
     @ViewBuilder private func endcap(_ symbol: String?) -> some View {

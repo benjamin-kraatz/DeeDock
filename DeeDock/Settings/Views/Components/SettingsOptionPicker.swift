@@ -37,7 +37,7 @@ struct SettingsOptionPicker<Value: Hashable>: View {
                                 Capsule(style: .continuous)
                                     .fill(.tint)
                                     .matchedGeometryEffect(id: "selection", in: indicator)
-                                    .shadow(color: .black.opacity(0.16), radius: 2, y: 1)
+                                    .shadow(color: .black.opacity(0.14), radius: 1.5, y: 0.5)
                             }
                         }
                 }
@@ -46,7 +46,8 @@ struct SettingsOptionPicker<Value: Hashable>: View {
             }
         }
         .padding(2)
-        .background(Capsule(style: .continuous).fill(.quaternary.opacity(0.55)))
+        .background(Capsule(style: .continuous).fill(.quaternary.opacity(0.5)))
+        .overlay(Capsule(style: .continuous).strokeBorder(.separator.opacity(0.5), lineWidth: 0.5))
         .animation(reduceMotion ? nil : .snappy(duration: 0.25, extraBounce: 0.1), value: selection)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(title))
@@ -60,11 +61,8 @@ struct SettingsPickerRow<Value: Hashable>: View {
     @Binding var selection: Value
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            Text(title)
+        SettingsStackedRow(title: title) {
             SettingsOptionPicker(title: title, options: options, selection: $selection)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
     }
 }

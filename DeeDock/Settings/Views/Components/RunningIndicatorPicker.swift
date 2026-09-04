@@ -22,23 +22,14 @@ struct RunningIndicatorPicker: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 88)
                     .padding(10)
-                    .background(selection == option.value ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.06),
-                                in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(alignment: .topTrailing) {
-                        if selection == option.value {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(Color.accentColor)
-                                .padding(6)
-                        }
-                    }
-                    .contentShape(.rect)
+                    .settingsSelectionCard(isSelected: selection == option.value)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(option.title))
                 .accessibilityAddTraits(selection == option.value ? [.isSelected] : [])
             }
         }
-        .padding(14)
+        .padding(SettingsMetrics.rowInset)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(.settingsIndicatorStyle))
     }

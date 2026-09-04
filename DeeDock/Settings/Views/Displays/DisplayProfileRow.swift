@@ -14,14 +14,22 @@ struct DisplayProfileRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "display").font(.title3).foregroundStyle(.secondary)
-            VStack(alignment: .leading, spacing: 3) {
+        HStack(spacing: 8) {
+            // Matched to the category tiles above so both groups share one leading edge.
+            Image(systemName: "display")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+                .frame(width: 24, height: 24)
+            VStack(alignment: .leading, spacing: 1) {
                 Text(verbatim: profile.name).lineLimit(1)
-                Text(status).font(.caption).foregroundStyle(.secondary)
+                Text(status).font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
             Spacer(minLength: 0)
-            if !profile.enabled { Image(systemName: "eye.slash").accessibilityLabel(Text(.displayDockDisabled)) }
+            if !profile.enabled {
+                Image(systemName: "eye.slash")
+                    .foregroundStyle(.secondary)
+                    .accessibilityLabel(Text(.displayDockDisabled))
+            }
         }
         .padding(.vertical, 3)
     }

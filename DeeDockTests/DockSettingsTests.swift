@@ -12,6 +12,24 @@ struct DockSettingsTests {
         #expect(settings.alignment == .center)
         #expect(settings.alongEdgeOffset == 0)
         #expect(settings.edgeDistance == 8)
+        #expect(settings.windowPeekEnabled)
+        #expect(settings.windowPeekSize == .medium)
+        #expect(settings.windowPeekLayout == .grid)
+        #expect(settings.windowPeekStyle == .glass)
+        #expect(settings.windowPeekHoverDelay == 0.4)
+    }
+
+    @Test("Settings saved before Window Peek receive the Balanced defaults")
+    func windowPeekBackwardDecode() throws {
+        let encoded = try JSONEncoder().encode(DockSettings.defaults)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        for key in ["windowPeekEnabled", "windowPeekSize", "windowPeekLayout", "windowPeekStyle",
+                    "windowPeekIncludeMinimized", "windowPeekIncludeUntitled", "windowPeekHoverDelay"] {
+            object.removeValue(forKey: key)
+        }
+        let decoded = try JSONDecoder().decode(DockSettings.self,
+            from: JSONSerialization.data(withJSONObject: object))
+        #expect(WindowPeekPreset.matching(decoded) == .balanced)
     }
 
     @Test("Invalid numeric values cannot reach geometry or persistence")

@@ -15,67 +15,51 @@ struct LoginItemSettingsCard: View {
 
     var body: some View {
         SettingsCard {
-            VStack(alignment: .leading, spacing: 12) {
+            SettingsRow(title: .loginLaunchAtLogin, subtitle: status.message) {
                 Toggle(isOn: Binding(get: { status.isEnabled }, set: setEnabled)) {
                     Text(.loginLaunchAtLogin)
                 }
+                .labelsHidden()
                 .toggleStyle(.switch)
+                .controlSize(.small)
                 .disabled(isPending || !status.canToggle)
                 .accessibilityHint(Text(.loginToggleHint))
+            }
 
-                Text(status.message)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if let pendingOperation {
+            if let pendingOperation {
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
                     Text(pendingOperation.message)
                         .font(.callout)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityAddTraits(.updatesFrequently)
+                    Spacer(minLength: 0)
                 }
-
-                if status == .requiresApproval {
-                    ViewThatFits(in: .horizontal) {
-                        HStack { approvalActions }
-                        VStack(alignment: .leading) { approvalActions }
-                    }
-                } else if status == .notFound || status == .unknown {
-                    ViewThatFits(in: .horizontal) {
-                        HStack { recoveryActions }
-                        VStack(alignment: .leading) { recoveryActions }
-                    }
-                }
+                .padding(.horizontal, SettingsMetrics.rowInset)
+                .padding(.vertical, 10)
+                .accessibilityAddTraits(.updatesFrequently)
             }
-            .padding(14)
+
+            if status == .requiresApproval {
+                SettingsActionRow { approvalActions }
+            } else if status == .notFound || status == .unknown {
+                SettingsActionRow { recoveryActions }
+            }
 
             if let errorMessage {
-                HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                        .accessibilityHidden(true)
-                    Text(errorMessage)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Button(action: dismissError) {
-                        Image(systemName: "xmark")
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(.actionDismissError))
-                    .help(Text(.actionDismissError))
-                }
-                .padding(14)
+                SettingsInlineError(message: errorMessage, dismiss: dismissError)
             }
         }
     }
 
     @ViewBuilder private var approvalActions: some View {
-        Button(.loginOpenSystemSettings, action: openSettings)
         Button(.loginCancelRequest, action: cancelRequest).disabled(isPending)
+        Button(.loginOpenSystemSettings, action: openSettings).buttonStyle(.borderedProminent)
     }
 
     @ViewBuilder private var recoveryActions: some View {
         Button(.loginRefresh, action: refresh).disabled(isPending)
-        Button(.loginOpenSystemSettings, action: openSettings)
+        Button(.loginOpenSystemSettings, action: openSettings).buttonStyle(.borderedProminent)
     }
 }
 

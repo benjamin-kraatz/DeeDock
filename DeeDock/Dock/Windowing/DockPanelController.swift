@@ -13,6 +13,7 @@ final class DockPanelController {
     private var dragHeld = false
     private var pickerHeld = false
     private var folderStackHeld = false
+    private var windowPeekHeld = false
     private var lastDisplay: DisplaySnapshot?
     private var lastSettings: DockSettings?
     private var baseLayout = DockGeometry.layout(count: 0, favoriteCount: 0, availableLength: 800)
@@ -26,6 +27,7 @@ final class DockPanelController {
     private var updatingGeometry = false
     var resignedFocus: (() -> Void)?
     var escape: (() -> Void)?
+    var exclusiveInteractionBegan: (() -> Void)?
 
     init(store: DockStore, settings: DockSettings) {
         self.store = store
@@ -46,6 +48,7 @@ final class DockPanelController {
         interaction.emptyTrash = { [weak store] in store?.emptyTrash() }
         interaction.geometryDidChange = { [weak self] in self?.updatePointer() }
         interaction.menuTrackingChanged = { [weak self] tracking in
+            if tracking { self?.exclusiveInteractionBegan?() }
             self?.menuHeld = tracking
             if !tracking { self?.mouseHeld = false }
             self?.updatePointer()
@@ -153,13 +156,13 @@ final class DockPanelController {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
-        let suppress = pickerHeld || folderStackHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+        let suppress = pickerHeld || folderStackHeld || windowPeekHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
             || (visibility.phase != .visible && visibility.phase != .hideDelay)
         if suppress != interaction.suppressTooltips {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = pickerHeld || folderStackHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
+        let held = pickerHeld || folderStackHeld || windowPeekHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
         // Tooltips are absent from `rects`, so their transparent reservation stays excluded.
@@ -275,15 +278,40 @@ final class DockPanelController {
     }
 
     func holdFilePicker(_ held: Bool) {
+        if held { exclusiveInteractionBegan?() }
         pickerHeld = held
         if held { visibility.showImmediately() }
         updatePointer()
     }
 
     func holdFolderStack(_ held: Bool) {
+        if held { exclusiveInteractionBegan?() }
         folderStackHeld = held
         if held { visibility.showImmediately(); interaction.tooltips.clear() }
         updatePointer()
+    }
+
+    func holdWindowPeek(_ held: Bool) {
+        windowPeekHeld = held
+        if held { visibility.showImmediately(); interaction.tooltips.clear() }
+        updatePointer()
+    }
+
+    struct WindowPeekContext {
+        let anchor: WindowPeekAnchor
+        let settings: DockSettings
+    }
+
+    func windowPeekContext(for id: String) -> WindowPeekContext? {
+        guard !stopped, let display = lastDisplay, let settings = lastSettings,
+              let rect = interaction.iconRects[DockEntryID.app(id).hitID],
+              store.items.contains(where: { $0.id == id && $0.isRunning }) else { return nil }
+        let screenRect = CGRect(x: panel.frame.minX + interaction.contentOrigin.x + rect.minX,
+                                y: panel.frame.maxY - interaction.contentOrigin.y - rect.maxY,
+                                width: rect.width, height: rect.height)
+        return WindowPeekContext(anchor: WindowPeekAnchor(icon: screenRect, edge: settings.edge,
+                                                          visibleFrame: display.visibleFrame),
+                                 settings: settings)
     }
 
     func folderStackAnchor(for id: UUID) -> FolderStackAnchor? {
@@ -309,6 +337,7 @@ final class DockPanelController {
         interaction.dragSourceID = source
         interaction.dragActive = source != nil || targeted
         interaction.dragMessage = message
+        if source != nil || targeted { exclusiveInteractionBegan?() }
         // Only revealed destinations are held. Hidden targets must still satisfy the configured dwell.
         dragHeld = source != nil || (targeted && visibility.exposesContent)
         if !interaction.dragActive && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
@@ -357,7 +386,10 @@ final class DockPanelController {
         }
         switch event.keyCode {
         case 36, 76: store.openSelection()
-        case 49: if case .group = store.selectedTarget { store.openSelection() }
+        case 49:
+            if case .app(let id) = store.selectedTarget,
+               let item = store.items.first(where: { $0.id == id }) { interaction.openWindowPeek?(item) }
+            else if case .group = store.selectedTarget { store.openSelection() }
         case 53: escape?()
         default: return false
         }
@@ -381,6 +413,7 @@ final class DockPanelController {
         interaction.sourceTrackingChanged = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil
         interaction.openTrash = nil; interaction.emptyTrash = nil
+        interaction.windowPeekHoverChanged = nil; interaction.openWindowPeek = nil
         interaction.removePin = nil; interaction.setFolderPresentation = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
         interaction.beginFolderDrag = nil
@@ -388,8 +421,8 @@ final class DockPanelController {
         panel.contentView?.unregisterDraggedTypes()
         interaction.stopGeometryUpdates()
         interaction.geometryDidChange = nil; interaction.menuTrackingChanged = nil; interaction.accessibilityFocusChanged = nil
-        panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil
-        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; folderStackHeld = false
+        panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil; exclusiveInteractionBegan = nil
+        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; folderStackHeld = false; windowPeekHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }
 }

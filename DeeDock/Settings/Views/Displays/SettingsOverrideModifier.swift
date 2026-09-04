@@ -9,24 +9,34 @@ struct SettingsOverrideContext {
 private struct SettingsOverrideModifier: ViewModifier {
     let context: SettingsOverrideContext?
     let field: DockSettingField
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var isOverridden: Bool {
+        guard let context else { return false }
+        return context.profiles.document.profiles[context.id]?.overrides.contains(field) == true
+    }
 
     func body(content: Content) -> some View {
         VStack(spacing: 0) {
             content
-            if let context {
-                let overridden = context.profiles.document.profiles[context.id]?.overrides.contains(field) == true
-                HStack {
-                    Text(overridden ? .displayCustomized : .displayFollowingDefault)
-                        .font(.caption).foregroundStyle(.secondary)
-                    Spacer()
-                    if overridden {
-                        Button(.displayUseDefault) { context.profiles.useDefault(field, for: context.id) }
-                            .font(.caption)
-                    }
+            // An inherited value is the quiet default, so only a customized row explains itself.
+            if let context, isOverridden {
+                HStack(spacing: 8) {
+                    Spacer(minLength: 0)
+                    Text(.displayCustomized)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button(.displayUseDefault) { context.profiles.useDefault(field, for: context.id) }
+                        .buttonStyle(.link)
+                        .font(.caption)
                 }
-                .padding(.horizontal, 14).padding(.bottom, 10)
+                .padding(.horizontal, SettingsMetrics.rowInset)
+                .padding(.bottom, 9)
             }
         }
+        // A faint tint of the pane color marks the rows this display no longer inherits.
+        .background(isOverridden ? AnyShapeStyle(.tint.opacity(0.06)) : AnyShapeStyle(.clear))
+        .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: isOverridden)
     }
 }
 
