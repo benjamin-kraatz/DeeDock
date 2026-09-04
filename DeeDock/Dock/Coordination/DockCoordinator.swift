@@ -26,6 +26,7 @@ final class DockCoordinator {
     @ObservationIgnored private let popovers = DockPopoverPresenter()
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
     @ObservationIgnored private let shelves: ShelfCoordinator
+    @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let trash = TrashController()
@@ -56,9 +57,23 @@ final class DockCoordinator {
         )
         applicationMenus = menus
         windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture)
-        let semanticStacks = FoundationModelsSemanticStackOrganizer()
+        let semanticStacks = CoalescingSemanticStackOrganizer(
+            base: FoundationModelsSemanticStackOrganizer()
+        )
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
         shelves = ShelfCoordinator(shelf: shelf, presenter: popovers, organizer: semanticStacks)
+        let shelf = self.shelf
+        shelfSemanticWarmup = ShelfSemanticWarmupController(organizer: semanticStacks) {
+            let items = shelf.ordered
+            let accesses = shelf.resolveAll()
+            let accessByID = Dictionary(uniqueKeysWithValues: accesses.map { ($0.id, $0) })
+            let inputs = ShelfSemanticRequestBuilder.inputs(for: items, accessByID: accessByID)
+            guard inputs.count >= 4 else { return nil }
+            let candidates = await SemanticStackMetadataLoader.candidates(from: inputs)
+            withExtendedLifetime(accesses) {}
+            guard !Task.isCancelled, candidates.count >= 4 else { return nil }
+            return ShelfSemanticRequestBuilder.request(candidates: candidates)
+        }
     }
 
     func start() {
@@ -87,6 +102,7 @@ final class DockCoordinator {
         trash.didChange = { [weak self] in self?.refreshPanels() }
         // One shared Shelf: an edit on any display re-renders every dock and the open panel.
         shelf.didChange = { [weak self] in
+            self?.scheduleShelfSemanticWarmup()
             self?.shelves.reload()
             self?.refreshPanels()
         }
@@ -102,11 +118,15 @@ final class DockCoordinator {
             if !dragging.committing { dragging.cancel() }
             reconcile(profiles.displays, resetVisibility: false)
         }
-        settings.settingsDidChange = { [weak self] in self?.refreshPanels() }
+        settings.settingsDidChange = { [weak self] in
+            self?.scheduleShelfSemanticWarmup()
+            self?.refreshPanels()
+        }
         displayService.didChange = { [weak self] in self?.reconcile($0) }
         catalog.start()
         trash.start()
         shelf.start()
+        scheduleShelfSemanticWarmup()
         displayService.start()
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
@@ -117,6 +137,7 @@ final class DockCoordinator {
                 forName: name, object: nil, queue: .main
             ) { [weak self] _ in MainActor.assumeIsolated {
                 self?.dragging.cancel()
+                self?.shelfSemanticWarmup.cancel()
                 self?.popovers.closeAll()
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
@@ -317,6 +338,12 @@ final class DockCoordinator {
         if let app, app.processIdentifier != ProcessInfo.processInfo.processIdentifier { lastExternalApplication = app }
     }
 
+    private func scheduleShelfSemanticWarmup() {
+        shelfSemanticWarmup.schedule(
+            enabled: settings.value.showShelf && shelf.sort == .smart && shelf.items.count >= 4
+        )
+    }
+
     func focusDock() {
         guard let id = DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation), let panel = panels[id] else { return }
         endFocus(restore: false)
@@ -376,6 +403,7 @@ final class DockCoordinator {
         dragging.stop()
         folderStacks.stop()
         shelves.stop()
+        shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
         windowPeeks.stop()

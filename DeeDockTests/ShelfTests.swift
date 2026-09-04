@@ -302,4 +302,172 @@ struct ShelfTests {
         let hidden = DockSectionProjection.entries(items: [], visibility: .showAll, expanded: true, shelf: nil)
         #expect(hidden.isEmpty)
     }
+
+    @Test("Smart Shelf changes silently warm the current semantic request")
+    func smartWarmup() async {
+        let organizer = RecordingSemanticOrganizer()
+        let request = semanticRequest()
+        let warmup = ShelfSemanticWarmupController(
+            organizer: organizer,
+            makeRequest: { request },
+            delay: {},
+            isLowPowerModeEnabled: { false }
+        )
+
+        warmup.schedule(enabled: true)
+        await warmup.waitUntilIdle()
+
+        #expect(await organizer.requests == [request])
+    }
+
+    @Test("Warm-up stays idle when Smart is disabled or Low Power Mode is active")
+    func guardedWarmup() async {
+        let organizer = RecordingSemanticOrganizer()
+        let request = semanticRequest()
+        let disabled = ShelfSemanticWarmupController(
+            organizer: organizer,
+            makeRequest: { request },
+            delay: {},
+            isLowPowerModeEnabled: { false }
+        )
+        disabled.schedule(enabled: false)
+        await disabled.waitUntilIdle()
+
+        let lowPower = ShelfSemanticWarmupController(
+            organizer: organizer,
+            makeRequest: { request },
+            delay: {},
+            isLowPowerModeEnabled: { true }
+        )
+        lowPower.schedule(enabled: true)
+        await lowPower.waitUntilIdle()
+
+        #expect(await organizer.requests.isEmpty)
+    }
+
+    @Test("Warm-up and an open panel share one in-flight generation")
+    func coalescedSemanticGeneration() async throws {
+        let base = BlockingSemanticOrganizer()
+        let organizer = CoalescingSemanticStackOrganizer(base: base)
+        let request = semanticRequest()
+        let firstStream = await organizer.snapshots(for: request)
+        let first = Task { try await Self.collect(firstStream) }
+        await base.waitUntilSubscribed()
+
+        let secondStream = await organizer.snapshots(for: request)
+        let second = Task { try await Self.collect(secondStream) }
+        let expected = SemanticStackSnapshot(sections: [], isFinal: true)
+        await base.finish(with: expected)
+
+        #expect(try await first.value == [expected])
+        #expect(try await second.value == [expected])
+        #expect(await base.starts == 1)
+    }
+
+    @Test("A newer Shelf change cancels the older debounce")
+    func warmupDebounceKeepsLatestRequest() async {
+        let organizer = RecordingSemanticOrganizer()
+        let delay = FirstDelayBlocksUntilCancelled()
+        let request = semanticRequest()
+        let warmup = ShelfSemanticWarmupController(
+            organizer: organizer,
+            makeRequest: { request },
+            delay: { try await delay.wait() },
+            isLowPowerModeEnabled: { false }
+        )
+
+        warmup.schedule(enabled: true)
+        await delay.waitUntilStarted()
+        warmup.schedule(enabled: true)
+        await warmup.waitUntilIdle()
+
+        #expect(await organizer.requests == [request])
+    }
+
+    private func semanticRequest() -> SemanticStackRequest {
+        SemanticStackRequest(
+            source: .shelf,
+            candidates: (0..<4).map {
+                SemanticStackCandidate(
+                    id: "item-\($0)", name: "Item \($0)", kind: "txt", contentType: "public.text",
+                    isDirectory: false, byteCount: 4, createdAt: nil, modifiedAt: nil, addedAt: nil
+                )
+            },
+            localeIdentifier: "en"
+        )
+    }
+
+    private static func collect(
+        _ stream: AsyncThrowingStream<SemanticStackSnapshot, Error>
+    ) async throws -> [SemanticStackSnapshot] {
+        var snapshots: [SemanticStackSnapshot] = []
+        for try await snapshot in stream { snapshots.append(snapshot) }
+        return snapshots
+    }
+}
+
+private actor RecordingSemanticOrganizer: SemanticStackOrganizing {
+    private(set) var requests: [SemanticStackRequest] = []
+
+    func availability() -> SemanticStackAvailability { .available }
+
+    func snapshots(
+        for request: SemanticStackRequest
+    ) -> AsyncThrowingStream<SemanticStackSnapshot, Error> {
+        requests.append(request)
+        return AsyncThrowingStream { continuation in
+            continuation.yield(SemanticStackSnapshot(sections: [], isFinal: true))
+            continuation.finish()
+        }
+    }
+}
+
+private actor BlockingSemanticOrganizer: SemanticStackOrganizing {
+    private(set) var starts = 0
+    private var continuation: AsyncThrowingStream<SemanticStackSnapshot, Error>.Continuation?
+    private var subscriptionWaiters: [CheckedContinuation<Void, Never>] = []
+
+    func availability() -> SemanticStackAvailability { .available }
+
+    func snapshots(
+        for request: SemanticStackRequest
+    ) -> AsyncThrowingStream<SemanticStackSnapshot, Error> {
+        starts += 1
+        var captured: AsyncThrowingStream<SemanticStackSnapshot, Error>.Continuation?
+        let stream = AsyncThrowingStream<SemanticStackSnapshot, Error> { captured = $0 }
+        continuation = captured
+        subscriptionWaiters.forEach { $0.resume() }
+        subscriptionWaiters.removeAll()
+        return stream
+    }
+
+    func waitUntilSubscribed() async {
+        guard continuation == nil else { return }
+        await withCheckedContinuation { subscriptionWaiters.append($0) }
+    }
+
+    func finish(with snapshot: SemanticStackSnapshot) {
+        continuation?.yield(snapshot)
+        continuation?.finish()
+        continuation = nil
+    }
+}
+
+private actor FirstDelayBlocksUntilCancelled {
+    private var calls = 0
+    private var startWaiters: [CheckedContinuation<Void, Never>] = []
+
+    func wait() async throws {
+        calls += 1
+        if calls == 1 {
+            startWaiters.forEach { $0.resume() }
+            startWaiters.removeAll()
+            try await Task.sleep(for: .seconds(60))
+        }
+    }
+
+    func waitUntilStarted() async {
+        guard calls == 0 else { return }
+        await withCheckedContinuation { startWaiters.append($0) }
+    }
 }

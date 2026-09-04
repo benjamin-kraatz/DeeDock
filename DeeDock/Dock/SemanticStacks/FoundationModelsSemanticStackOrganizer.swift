@@ -102,6 +102,9 @@ actor FoundationModelsSemanticStackOrganizer: SemanticStackOrganizing {
                 otherTitle: String(localized: .semanticStackOther),
                 organizingTitle: String(localized: .semanticStackOrganizing)
             )
+            // A warm Shelf can produce many fingerprints over one app session. Only the latest
+            // completed request for a source is useful; retaining older candidates grows without bound.
+            cache = cache.filter { $0.key.source != request.source }
             cache[request] = completed
             continuation.yield(completed)
             continuation.finish()

@@ -870,6 +870,8 @@ Folder Smart is a third per-pin presentation. It groups up to 60 children ranked
 
 The organizer caches completed results for the process lifetime using source identity plus a metadata fingerprint. Folder changes and Shelf edits create a new request, cancel current work, and reject stale snapshots. Panel close and presentation changes also cancel generation. Reduce Motion removes section movement, and VoiceOver receives one completion or failure announcement rather than every streamed update.
 
+When the Shelf is visible and Smart remains selected, startup and persisted Shelf edits schedule a silent refresh after a 500 ms debounce. A newer edit cancels the older request. Warm-up skips unavailable models, fewer than four available items, and Low Power Mode; it never presents an error. Identical active requests share one Foundation Models generation, so opening the Shelf while warm-up is running joins the same stream and the panel retains responsibility for progress, fallback, Retry, and accessibility announcements.
+
 Authored Swift Testing coverage covers Smart persistence, metadata loading, output normalization, duplicate and unknown item numbers, omitted items, stable alphabetical repair, and a fake streamed organizer. Tests do not invoke Apple Intelligence. The focused unsigned DeeDock Debug build compiles against the macOS 27 Foundation Models SDK. Live generation, model-unavailable UI, keyboard movement across groups, multi-selection while groups stream, and VoiceOver announcements still need hands-on acceptance.
 
 ### Required hands-on acceptance

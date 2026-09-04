@@ -82,7 +82,7 @@ final class ShelfPanelState {
                presentation: ShelfPresentation = .list, animated: Bool = true,
                resolve: (ShelfItem) -> ShelfResourceAccess?) {
         var accesses: [ShelfResourceAccess] = []
-        let next = items.map { item in
+        let next = items.map { item in 
             let access = resolve(item)
             if let access { accesses.append(access) }
             let resolvedURL = access?.url ?? item.url
@@ -292,22 +292,15 @@ final class ShelfPanelState {
         )]) + (unavailableSection.map { [$0] } ?? [])
 
         let accessByID = Dictionary(uniqueKeysWithValues: suppliedAccesses.map { ($0.id, $0) })
-        let inputs = availableEntries.map { entry in
-            let url = accessByID[entry.id]?.url ?? entry.item.url
-            return (id: entry.id.uuidString, name: entry.item.name, url: url,
-                    isDirectory: entry.item.isDirectory, addedAt: entry.item.addedAt)
-        }
+        let inputs = ShelfSemanticRequestBuilder.inputs(
+            for: availableEntries.map(\.item),
+            accessByID: accessByID
+        )
         organizing = inputs.count >= 4
 
         semanticTask = Task { [weak self] in
             guard let self else { return }
-            let worker = Task.detached {
-                inputs.map {
-                    SemanticStackMetadataLoader.candidate(id: $0.id, name: $0.name, url: $0.url,
-                                                          isDirectory: $0.isDirectory, addedAt: $0.addedAt)
-                }
-            }
-            let candidates = await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
+            let candidates = await SemanticStackMetadataLoader.candidates(from: inputs)
             withExtendedLifetime(suppliedAccesses) {}
             guard !Task.isCancelled, semanticGeneration == token else { return }
 
@@ -328,9 +321,7 @@ final class ShelfPanelState {
                 return
             }
 
-            let locale = Bundle.main.preferredLocalizations.first ?? Locale.current.identifier
-            let request = SemanticStackRequest(source: .shelf, candidates: candidates,
-                                               localeIdentifier: locale)
+            let request = ShelfSemanticRequestBuilder.request(candidates: candidates)
             let stream = await organizer.snapshots(for: request)
             do {
                 for try await snapshot in stream {

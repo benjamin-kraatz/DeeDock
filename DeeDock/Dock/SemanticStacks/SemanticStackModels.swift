@@ -68,6 +68,87 @@ nonisolated protocol SemanticStackOrganizing: Sendable {
     func snapshots(for request: SemanticStackRequest) async -> AsyncThrowingStream<SemanticStackSnapshot, Error>
 }
 
+/// Shares one active generation between every consumer of an identical request.
+///
+/// A Shelf warm-up can therefore continue feeding a panel that opens before generation finishes.
+/// The underlying organizer is cancelled only after its last consumer leaves.
+actor CoalescingSemanticStackOrganizer: SemanticStackOrganizing {
+    private typealias Continuation = AsyncThrowingStream<SemanticStackSnapshot, Error>.Continuation
+
+    private struct Flight {
+        var subscribers: [UUID: Continuation]
+        var task: Task<Void, Never>?
+    }
+
+    private let base: any SemanticStackOrganizing
+    private var flights: [SemanticStackRequest: Flight] = [:]
+
+    init(base: any SemanticStackOrganizing) {
+        self.base = base
+    }
+
+    func availability() async -> SemanticStackAvailability {
+        await base.availability()
+    }
+
+    func snapshots(for request: SemanticStackRequest) -> AsyncThrowingStream<SemanticStackSnapshot, Error> {
+        let subscriberID = UUID()
+        var captured: Continuation?
+        let stream = AsyncThrowingStream<SemanticStackSnapshot, Error> { captured = $0 }
+        guard let continuation = captured else { return stream }
+        continuation.onTermination = { @Sendable [weak self] _ in
+            Task { await self?.removeSubscriber(subscriberID, from: request) }
+        }
+
+        if flights[request] != nil {
+            flights[request]?.subscribers[subscriberID] = continuation
+            return stream
+        }
+
+        flights[request] = Flight(subscribers: [subscriberID: continuation], task: nil)
+        let task = Task<Void, Never> { [weak self] in
+            guard let self else { return }
+            await self.run(request)
+        }
+        flights[request]?.task = task
+        return stream
+    }
+
+    private func run(_ request: SemanticStackRequest) async {
+        do {
+            let snapshots = await base.snapshots(for: request)
+            for try await snapshot in snapshots {
+                guard !Task.isCancelled else { return }
+                flights[request]?.subscribers.values.forEach { $0.yield(snapshot) }
+            }
+            finish(request, throwing: nil)
+        } catch is CancellationError {
+            finish(request, throwing: nil)
+        } catch {
+            finish(request, throwing: error)
+        }
+    }
+
+    private func removeSubscriber(_ id: UUID, from request: SemanticStackRequest) {
+        guard var flight = flights[request] else { return }
+        flight.subscribers.removeValue(forKey: id)
+        guard flight.subscribers.isEmpty else {
+            flights[request] = flight
+            return
+        }
+        flights.removeValue(forKey: request)
+        flight.task?.cancel()
+    }
+
+    private func finish(_ request: SemanticStackRequest, throwing error: (any Error)?) {
+        guard let flight = flights.removeValue(forKey: request) else { return }
+        for continuation in flight.subscribers.values {
+            if let error { continuation.finish(throwing: error) }
+            else { continuation.finish() }
+        }
+    }
+}
+
 nonisolated enum SemanticStackGenerationError: Error, Sendable {
     case modelUnavailable
 }
@@ -160,6 +241,33 @@ nonisolated enum SemanticStackNormalizer {
 
 /// Reads only URL resource metadata. It never opens or reads file contents.
 nonisolated enum SemanticStackMetadataLoader {
+    struct Input: Sendable {
+        let id: String
+        let name: String
+        let url: URL
+        let isDirectory: Bool
+        let addedAt: Date?
+    }
+
+    /// Loads a bounded batch away from the caller's actor while retaining cooperative cancellation.
+    static func candidates(from inputs: [Input]) async -> [SemanticStackCandidate] {
+        let worker = Task.detached(priority: .utility) { () -> [SemanticStackCandidate] in
+            var candidates: [SemanticStackCandidate] = []
+            candidates.reserveCapacity(inputs.count)
+            for input in inputs {
+                guard !Task.isCancelled else { return [SemanticStackCandidate]() }
+                candidates.append(candidate(id: input.id, name: input.name, url: input.url,
+                                                isDirectory: input.isDirectory, addedAt: input.addedAt))
+            }
+            return candidates
+        }
+        return await withTaskCancellationHandler {
+            await worker.value
+        } onCancel: {
+            worker.cancel()
+        }
+    }
+
     static func candidate(id: String, name: String, url: URL, isDirectory: Bool,
                           addedAt: Date? = nil) -> SemanticStackCandidate {
         let keys: Set<URLResourceKey> = [
