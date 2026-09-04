@@ -5,9 +5,9 @@ struct FolderStackView: View {
     let keyboard: Bool
     var forceOpaqueBackground = false
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        let shape = FolderStackPanelShape(chrome: state.chrome)
         VStack(spacing: 0) {
             header
             Divider()
@@ -22,26 +22,25 @@ struct FolderStackView: View {
                 .background(.quaternary)
                 Divider()
             }
+            if let error = state.semanticError, state.presentation == .smart {
+                HStack(spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow)
+                    Text(verbatim: error).font(.callout).lineLimit(2)
+                    Spacer(minLength: 4)
+                    Button(.folderStackRetry) { state.retrySemanticOrganization() }
+                }
+                .padding(.horizontal, 14).padding(.vertical, 9)
+                .background(.quaternary)
+                Divider()
+            }
             content
         }
-        .padding(.top, state.chrome.edge == .top ? FolderStackGeometry.pointerDepth : 0)
-        .padding(.bottom, state.chrome.edge == .bottom ? FolderStackGeometry.pointerDepth : 0)
-        .padding(.leading, state.chrome.edge == .left ? FolderStackGeometry.pointerDepth : 0)
-        .padding(.trailing, state.chrome.edge == .right ? FolderStackGeometry.pointerDepth : 0)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-            if reduceTransparency || forceOpaqueBackground {
-                shape.fill(Color(nsColor: .windowBackgroundColor))
-            } else {
-                shape.fill(.regularMaterial)
-            }
-        }
-        .clipShape(shape)
+        .dockPopoverChrome(state.chrome, opaque: reduceTransparency || forceOpaqueBackground)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(.folderStackAccessibilityLabel(folderName: state.folder.name)))
         .accessibilityValue(Text(.folderStackItemCount(
             count: state.entries.count,
-            mode: String(localized: state.presentation == .grid ? .folderStackGrid : .folderStackList)
+            mode: String(localized: modeTitle(state.presentation))
         )))
     }
 
@@ -53,6 +52,7 @@ struct FolderStackView: View {
             HStack(spacing: 2) {
                 modeButton(.grid, symbol: "square.grid.2x2")
                 modeButton(.list, symbol: "list.bullet")
+                modeButton(.smart, symbol: "sparkles")
             }
             .padding(2)
             .background(.quaternary, in: .rect(cornerRadius: 7))
@@ -74,7 +74,7 @@ struct FolderStackView: View {
                             in: .rect(cornerRadius: 5))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text(mode == .grid ? .folderStackGrid : .folderStackList))
+        .accessibilityLabel(Text(modeTitle(mode)))
         .accessibilityAddTraits(state.presentation == mode ? .isSelected : [])
     }
 
@@ -99,13 +99,55 @@ struct FolderStackView: View {
                 }
                 .padding(16)
             }
-        } else {
+        } else if state.presentation == .list {
             ScrollView {
                 LazyVStack(spacing: 2) {
                     ForEach(state.entries) { entry in item(entry, grid: false) }
                 }
                 .padding(8)
             }
+        } else {
+            smartContent
+        }
+    }
+
+    private var smartContent: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 2, pinnedViews: [.sectionHeaders]) {
+                ForEach(state.semanticSections) { section in
+                    Section {
+                        ForEach(section.itemIDs, id: \.self) { id in
+                            if let entry = state.entries.first(where: { $0.id == id }) {
+                                item(entry, grid: false)
+                                    .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+                            }
+                        }
+                    } header: {
+                        HStack(spacing: 6) {
+                            Text(verbatim: section.title)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                            if section.kind == .organizing {
+                                ProgressView().controlSize(.mini)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, 8).padding(.vertical, 6)
+                        .background(.regularMaterial)
+                        .accessibilityAddTraits(.isHeader)
+                    }
+                }
+            }
+            .padding(8)
+            .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: state.semanticSections)
+        }
+    }
+
+    private func modeTitle(_ mode: FolderStackPresentation) -> LocalizedStringResource {
+        switch mode {
+        case .grid: .folderStackGrid
+        case .list: .folderStackList
+        case .smart: .semanticStackSmart
         }
     }
 
@@ -143,45 +185,6 @@ struct FolderStackView: View {
                 state.openEntry?(entry.reference)
             }
         }
-    }
-}
-
-private struct FolderStackPanelShape: Shape {
-    let chrome: FolderStackChrome
-
-    func path(in rect: CGRect) -> Path {
-        let depth = FolderStackGeometry.pointerDepth
-        let halfWidth: CGFloat = 10
-        var body = rect
-        switch chrome.edge {
-        case .bottom: body.size.height -= depth
-        case .top: body.origin.y += depth; body.size.height -= depth
-        case .left: body.origin.x += depth; body.size.width -= depth
-        case .right: body.size.width -= depth
-        }
-        var path = Path(roundedRect: body, cornerRadius: 18)
-        var pointer = Path()
-        switch chrome.edge {
-        case .bottom:
-            pointer.move(to: CGPoint(x: chrome.attachment - halfWidth, y: body.maxY - 1))
-            pointer.addLine(to: CGPoint(x: chrome.attachment, y: rect.maxY))
-            pointer.addLine(to: CGPoint(x: chrome.attachment + halfWidth, y: body.maxY - 1))
-        case .top:
-            pointer.move(to: CGPoint(x: chrome.attachment - halfWidth, y: body.minY + 1))
-            pointer.addLine(to: CGPoint(x: chrome.attachment, y: rect.minY))
-            pointer.addLine(to: CGPoint(x: chrome.attachment + halfWidth, y: body.minY + 1))
-        case .left:
-            pointer.move(to: CGPoint(x: body.minX + 1, y: chrome.attachment - halfWidth))
-            pointer.addLine(to: CGPoint(x: rect.minX, y: chrome.attachment))
-            pointer.addLine(to: CGPoint(x: body.minX + 1, y: chrome.attachment + halfWidth))
-        case .right:
-            pointer.move(to: CGPoint(x: body.maxX - 1, y: chrome.attachment - halfWidth))
-            pointer.addLine(to: CGPoint(x: rect.maxX, y: chrome.attachment))
-            pointer.addLine(to: CGPoint(x: body.maxX - 1, y: chrome.attachment + halfWidth))
-        }
-        pointer.closeSubpath()
-        path.addPath(pointer)
-        return path
     }
 }
 

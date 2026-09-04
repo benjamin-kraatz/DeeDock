@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, a Trash tile, Window Peek, Dock Modes, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Named Dock Modes switch every display's pins and app visibility together. Display-independent appearance and behavior settings still use shared defaults with optional per-display overrides. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, a Shelf tile, a Trash tile, Window Peek, Dock Modes, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Named Dock Modes switch every display's pins and app visibility together. Display-independent appearance and behavior settings still use shared defaults with optional per-display overrides. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -84,7 +84,7 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, Trash, and Window Peek are implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, the Shelf, Trash, and Window Peek are implemented.
 
 ## Dock Modes
 
@@ -108,7 +108,7 @@ The implementation uses `SMAppService.mainApp`; it stores no duplicate preferenc
 
 ## Window-aware application menus
 
-Open **Settings → Previews → Permissions** to manage Window Access and Screen Recording. Each row reports Enabled, Not Enabled, or Unavailable. The Enable buttons are the only actions that ask macOS for consent; **Open System Settings…** and **Check Again** manage and refresh the external grants. Permissions apply to the app as a whole, while the controls below them inherit from Defaults or can be overridden per display. DeeDock stores no copy of permission state.
+Open **Settings → Features → Permissions** to manage Window Access and Screen Recording. Each row reports Enabled, Not Enabled, or Unavailable. The Enable buttons are the only actions that ask macOS for consent; **Open System Settings…** and **Check Again** manage and refresh the external grants. Permissions and the Window Peek controls below them apply to the app as a whole. DeeDock stores no copy of permission state.
 
 Application-level actions do not need Accessibility access. For a running app, its context menu can Hide or Show every matching instance, Bring All to Front, or request a cooperative Quit. Available app bundles also offer Open, Open Files, and Show in Finder. These commands remain available when window access is off.
 
@@ -149,25 +149,55 @@ Selecting multiple pins within DeeDock remains outside this slice. File and fold
 
 ## Folder stacks
 
-Click a pinned folder to open one transient stack inward from its dock icon. Only one stack can be open across all displays. The header shows the Finder folder name and a per-pin Grid/List choice; both modes scroll and hide hidden children. Items are sorted together by localized name without grouping folders first.
+Click a pinned folder to open one transient stack inward from its dock icon. Only one stack can be open across all displays. The header shows the Finder folder name and a per-pin Grid/List/Smart choice. Grid and List sort visible children by localized name. Smart uses Apple Intelligence on file metadata to build a grouped list without reading file contents. It organizes the 60 most recently modified children and keeps any remainder in More Items.
 
 The stack shows immediate children only. Click a regular file, package, or alias to open it with its default application. Click a subfolder to reveal it in Finder. Drag one child to Finder or another app through the native file-drag session; the destination and modifier keys negotiate copy or move, and DeeDock never changes the filesystem itself. A cancelled drag leaves the stack open.
 
 The source dock stays revealed and suppresses fading and tooltips while its stack is open. The panel closes after a successful open or drag, outside click, Escape, another stack opening, source removal/hiding, display removal, sleep, or shutdown. Failed opens remain visible with a retryable inline error. Directory changes are watched only while the panel is open.
 
-Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Escape returns focus to the source folder, and Tab reaches the Grid/List control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
+Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Escape returns focus to the source folder, and Tab reaches the Grid/List/Smart control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
 
 Fan and Automatic presentations, nested browsing, search, Quick Look, multi-selection, file promises, dropping into a folder, and persistent utility windows remain planned.
 
+## Features
+
+**Settings → Features** collects DeeDock's opt-in capabilities: the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
+
+That is the distinction the sidebar draws. Panes under **Defaults** describe how a dock looks and where it sits, so each display can override them individually. A feature is either on or off for DeeDock as a whole; no display holds its own copy. Appearance, Position, and Behavior keep their per-display overrides exactly as before.
+
+## Shelf
+
+The Shelf is a staging area for files you are carrying somewhere else. Drop files on it, walk to another Space, display, or full-screen app, and drag them back out. It appears before Trash in the trailing utility area, shares that divider, and is enabled by default. Under **Features → Shelf**, turn it off for the whole app.
+
+One Shelf is shared by every dock, so an item staged on one display is immediately on all of them. Its contents are independent of the active Dock Mode. The tile stays visible when empty, so the target never moves; a badge shows the item count once something is staged.
+
+**The Shelf never touches the filesystem.** An item is a security-scoped reference to a file that stays exactly where it was. Dragging an item out hands other applications an ordinary file URL, exactly as Finder would, and the item deliberately stays on the Shelf: taking something out is a copy of the reference, not a hand-off. Nothing is moved, copied, or deleted.
+
+Click the tile, press Return while it is selected in Focus Dock, or choose **Open Shelf** to open the panel. Each item shows its Quick Look thumbnail — the same artwork Finder draws, not a generic type icon — with the enclosing folder and when it was staged. Drag the tile itself to take every staged reference at once. Items animate as they arrive and leave, unless Reduce Motion is on.
+
+Double-click an item to open it with its default application. Right-click for **Open**, **Show in Finder**, **Copy**, **Select All**, **Remove from Shelf**, and **Clear Shelf**; each command names how many items it acts on and applies to the whole selection. The header carries an **Arrange** menu with Date Added, Name, and Smart. Smart uses Apple Intelligence to group the Shelf's available file metadata in a list and keeps missing references in Unavailable. The List/Grid switch returns with its previous choice when you leave Smart. Both choices persist with the Shelf itself.
+
+Keyboard, while the panel is open: Up and Down select, Return opens, ⌘R shows in Finder, ⌘C copies, ⌘A selects everything, Delete removes the selection, and Escape drops a multiple selection before it closes the panel.
+
+Select items the way a Finder list does: click to replace the selection, Command-click to toggle one, Shift-click to extend from the last, and drag across empty space to sweep a rubber band. The band never starts on an item or over the scroller, so pressing an item still drags it and the list still scrolls. Dragging any selected item carries the whole selection at once; dragging an unselected one carries just that item.
+
+Removal is always explicit. Use a row's Remove, **Clear Shelf…** from the tile menu or the panel header, or drag an item onto the dock's Trash tile — that drop reads **Remove from Shelf**, discards the reference, and leaves the file on disk. A Finder batch dropped on Trash still reads **Move to Trash** and still trashes; the two paths stay distinct because a Shelf drag also carries a private pasteboard type that only DeeDock reads.
+
+The Shelf holds at most 50 items; a larger drop is accepted up to the limit and reports the rest on the initiating dock. A file that is moved or deleted stays listed as unavailable rather than disappearing, so you can see what happened and remove it yourself. Unreadable stored bytes are reported and never overwritten.
+
+Keyboard, while the panel is open: Up and Down select, Return shows the selected item in Finder, Delete removes it, and Escape returns focus to the dock. Only one dock popover is open at a time, so opening the Shelf closes an open folder stack and the reverse.
+
+Quick Look, multi-selection, reordering, auto-expiry, and multiple named shelves remain planned.
+
 ## Trash
 
-Trash appears as the final tile after its own divider and is enabled by default. Under **Behavior → Trash**, turn it off in shared defaults or override that choice for any display. The tile is independent of the pinned and running sections, including their hidden and collapsed states.
+Trash appears as the final tile after its own divider and is enabled by default. Under **Features → Trash**, turn it off for the whole app. The tile is independent of the pinned and running sections, including their hidden and collapsed states.
 
 Click Trash, press Return while it is selected in Focus Dock, or choose **Open Trash** from its menu to open Trash in Finder. VoiceOver exposes its name, status, hint, and actions. The first explicit Open or Empty command asks for permission to automate Finder. DeeDock does not read the protected Trash directory directly. After permission exists, a serialized Finder item-count check every two seconds keeps the empty/full artwork synchronized with changes made by Finder or the system Dock.
 
 Drop one or more files, folders, or packages from Finder directly on the tile to move the complete batch to Trash through `NSWorkspace`. The exact tile highlights and shows **Move to Trash**. Security-scoped access remains alive until macOS completes the operation; failures are reported on the initiating dock. Internal pin drags cannot target Trash, and dropping onto Trash never alters DeeDock's pin configuration.
 
-The context menu and VoiceOver offer **Empty Trash…** only when Trash contains items. **Behavior → Trash → Confirm before emptying Trash** controls DeeDock's native destructive warning. Confirmation is on by default and can be overridden for each display. DeeDock then asks Finder to empty Trash. Finder owns the protected home and mounted-volume Trash locations. DeeDock's sandbox entitlements allow Apple events only for Finder, with the Finder Trash scripting access group plus a Finder-only compatibility exception for opening and counting. It receives no general home-directory access and uses no deprecated workspace operation, Finder UI scripting, or private API.
+The context menu and VoiceOver offer **Empty Trash…** only when Trash contains items. **Features → Trash → Confirm before emptying Trash** controls DeeDock's native destructive warning. Confirmation is on by default and applies to every display. DeeDock then asks Finder to empty Trash. Finder owns the protected home and mounted-volume Trash locations. DeeDock's sandbox entitlements allow Apple events only for Finder, with the Finder Trash scripting access group plus a Finder-only compatibility exception for opening and counting. It receives no general home-directory access and uses no deprecated workspace operation, Finder UI scripting, or private API.
 
 ## Open files and folders in an app
 
@@ -281,7 +311,7 @@ Compilation is checked separately from hands-on appearance and interaction. See 
 
 ## Displays and inheritance
 
-The Settings sidebar retains the appearance/position panes, search, cards, and live previews, and adds connected and remembered displays. **Defaults** changes the shared values. Selecting a display exposes **Show Dock** and the same controls. Editing a control creates an explicit override; **Use Default** restores inheritance for that control. **Use Defaults** clears all appearance, position, and behavior overrides on that display while preserving its pins and visibility.
+The Settings sidebar retains the appearance/position panes, search, cards, and live previews, and adds connected and remembered displays. App-wide General, Modes, and Features sit above them. **Defaults** changes the shared values. Selecting a display exposes **Show Dock** and the same controls. Editing a control creates an explicit override; **Use Default** restores inheritance for that control. **Use Defaults** clears all appearance, position, and behavior overrides on that display while preserving its pins and visibility.
 
 With multiple connected desktop displays, selecting a display in the active Settings window outlines that monitor and shows its name. The marker stays across settings categories, works when that display’s dock is disabled, and disappears on Defaults, disconnected profiles, or leaving Settings. Mirrored followers do not receive separate markers.
 
@@ -354,9 +384,12 @@ The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing t
 - `DeeDock/Dock/Windowing` owns each AppKit panel, native context menu, and local focus/handler lifecycle.
 - `DeeDock/Dock/Dragging` separates pin-editing policy, temporary insertion slots, native sessions, Finder validation, and drag feedback.
 - `DeeDock/Dock/Visibility` separates activation geometry, animation samples, visibility state, scheduling, and temporary zone outlines.
+- `DeeDock/Dock/Popover` owns the transient panel shell shared by folder stacks and the Shelf: its window, dismissal monitors, animation, inward placement geometry, and pointer shape, plus the presenter that keeps only one open.
+- `DeeDock/Dock/Shelf` holds the staged-item model, its repository, the shared controller, security-scoped access, the panel state and view, the native drag sources, and the coordinator.
+- `DeeDock/Dock/SemanticStacks` owns metadata-only grouping, streamed result repair, process-lifetime caching, and the Foundation Models adapter shared by folder stacks and the Shelf.
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
-- `DeeDock/Settings` groups shared settings, display profiles and persistence, sidebar navigation, and focused native controls. `General` contains the app-owned login-item controller, service boundary, and presentation.
+- `DeeDock/Settings` groups shared settings, display profiles and persistence, sidebar navigation, and focused native controls. `General` contains the app-owned login-item controller, service boundary, and presentation. `Features` holds the app-wide pane for the Shelf, Trash, and Window Peek.
 - `DeeDock/Onboarding` holds the first-launch tour: step and reservation models, the completion record, navigation and screen-observation state, its AppKit window, and views. The models stay free of SwiftUI so the test target does not pull in the settings view layer.
 - `DeeDockTests` contains the focused model tests. The Xcode **Test Model Sources** group references the app's source files for the unhosted test target; it does not contain copies.
 

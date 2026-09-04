@@ -11,7 +11,7 @@ final class DockCoordinator {
     /// One-shot navigation consumed by Settings, including when its window is first created.
     var settingsDisplayRequest: String?
     /// One-shot route used by Window Peek's permission fallback.
-    var settingsPreviewDisplayRequest: String?
+    var settingsFeaturesRequest = false
     /// One-shot route opened from the menu-bar mode submenu.
     var settingsModesRequest = false
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
@@ -23,10 +23,13 @@ final class DockCoordinator {
             && !panels.values.contains(where: \.isMenuTracking)
     }
     @ObservationIgnored private let dragging = DockDragCoordinator()
-    @ObservationIgnored private let folderStacks = FolderStackCoordinator()
+    @ObservationIgnored private let popovers = DockPopoverPresenter()
+    @ObservationIgnored private let folderStacks: FolderStackCoordinator
+    @ObservationIgnored private let shelves: ShelfCoordinator
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let trash = TrashController()
+    @ObservationIgnored private let shelf = ShelfController()
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
     @ObservationIgnored private let modePicker = DockModePickerCoordinator()
@@ -53,6 +56,9 @@ final class DockCoordinator {
         )
         applicationMenus = menus
         windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture)
+        let semanticStacks = FoundationModelsSemanticStackOrganizer()
+        folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
+        shelves = ShelfCoordinator(shelf: shelf, presenter: popovers, organizer: semanticStacks)
     }
 
     func start() {
@@ -63,18 +69,27 @@ final class DockCoordinator {
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)
         }
-        folderStacks.openChanged = { [weak self] open in
+        shelves.keyboardDismissed = { [weak self] displayID in
+            guard let self, focusedID == displayID else { return }
+            endFocus(restore: false)
+        }
+        popovers.openChanged = { [weak self] open in
             if open {
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
             }
-            self?.panels.values.forEach { $0.holdFolderStack(open) }
+            self?.panels.values.forEach { $0.holdPopover(open) }
         }
-        windowPeeks.prepareSettings = { [weak self] displayID in
-            self?.settingsPreviewDisplayRequest = displayID
+        windowPeeks.prepareSettings = { [weak self] _ in
+            self?.settingsFeaturesRequest = true
         }
         catalog.didChange = { [weak self] in self?.refreshPanels() }
         trash.didChange = { [weak self] in self?.refreshPanels() }
+        // One shared Shelf: an edit on any display re-renders every dock and the open panel.
+        shelf.didChange = { [weak self] in
+            self?.shelves.reload()
+            self?.refreshPanels()
+        }
         catalog.activated = { [weak self] app in
             guard app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return }
             if app.bundleIdentifier == "com.apple.finder" { self?.trash.refreshAfterFinderActivity() }
@@ -91,6 +106,7 @@ final class DockCoordinator {
         displayService.didChange = { [weak self] in self?.reconcile($0) }
         catalog.start()
         trash.start()
+        shelf.start()
         displayService.start()
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
@@ -101,7 +117,7 @@ final class DockCoordinator {
                 forName: name, object: nil, queue: .main
             ) { [weak self] _ in MainActor.assumeIsolated {
                 self?.dragging.cancel()
-                self?.folderStacks.close(returnFocus: false)
+                self?.popovers.closeAll()
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
                 self?.applicationMenus.cancelAllDiscoveries()
@@ -137,15 +153,16 @@ final class DockCoordinator {
         for id in Array(panels.keys) where !desired.contains(id) {
             filePicker.cancel(for: id)
             folderStacks.close(for: id, returnFocus: false)
+            shelves.close(for: id, returnFocus: false)
             if focusedID == id { endFocus(restore: true) }
             panels.removeValue(forKey: id)?.stop()
         }
         for display in enabledDisplays where panels[display.id] == nil {
-            let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles, trash: trash)
+            let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles, trash: trash, shelf: shelf)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
-                if focusedID == display.id, !folderStacks.isKeyboardActive, !windowPeeks.isKeyboardActive,
+                if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
                    !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
@@ -210,6 +227,19 @@ final class DockCoordinator {
                 NSWorkspace.shared.activateFileViewerSelecting([access.url])
                 withExtendedLifetime(access) {}
             }
+            store.openShelf = { [weak self, weak panel] in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                shelves.toggle(on: panel, keyboard: panel.store.keyboardFocus)
+            }
+            panel.interaction.openShelf = { [weak self, weak panel] in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                shelves.toggle(on: panel, keyboard: false)
+            }
+            panel.interaction.clearShelf = { [weak panel] in panel?.store.clearShelf() }
+            panel.interaction.beginShelfDrag = { [weak self, weak panel] view, event in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                shelves.beginTileDrag(from: view, event: event, on: panel)
+            }
             panel.interaction.prepareSettings = { [weak self] in
                 guard let self else { return }
                 settingsDisplayRequest = profiles.displays.count > 1
@@ -222,7 +252,7 @@ final class DockCoordinator {
                 }
             }
             panels[display.id] = panel
-            if folderStacks.isOpen { panel.holdFolderStack(true) }
+            if popovers.isOpen { panel.holdPopover(true) }
         }
         dragging.setPanels(panels)
         for (id, panel) in panels {
@@ -239,6 +269,7 @@ final class DockCoordinator {
             panel.update(display: display, settings: profiles.effectiveSettings(for: display.id), resetVisibility: resetVisibility)
         }
         folderStacks.reanchor()
+        shelves.reanchor()
         windowPeeks.refresh()
         if let id = zonePreview.displayID {
             if let geometry = panels[id]?.geometry { zonePreview.update(geometry) }
@@ -297,7 +328,7 @@ final class DockCoordinator {
     @discardableResult
     func activateMode(_ id: UUID) -> Bool {
         guard canSwitchModes else { return false }
-        folderStacks.close(returnFocus: false)
+        popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
         applicationMenus.cancelAllDiscoveries()
@@ -313,7 +344,7 @@ final class DockCoordinator {
     @discardableResult
     func deleteMode(_ id: UUID) -> Bool {
         guard canSwitchModes else { return false }
-        folderStacks.close(returnFocus: false)
+        popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
         applicationMenus.cancelAllDiscoveries()
@@ -339,11 +370,14 @@ final class DockCoordinator {
         zonePreview.stop()
         displayIndicator.stop()
         settingsDisplayRequest = nil
-        settingsPreviewDisplayRequest = nil
+        settingsFeaturesRequest = false
         settingsModesRequest = false
         filePicker.stop()
         dragging.stop()
         folderStacks.stop()
+        shelves.stop()
+        popovers.stop()
+        shelf.stop()
         windowPeeks.stop()
         modePicker.stop()
         applicationMenus.stop()

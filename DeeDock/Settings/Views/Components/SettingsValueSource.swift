@@ -26,11 +26,8 @@ struct SettingsValueSource {
         })
     }
 
+    /// Window Peek is app-wide, so a preset always writes the shared settings.
     func apply(_ preset: WindowPeekPreset) {
-        if let context {
-            context.profiles.update(context.id, fields: DockSettingField.windowPeekFields) { preset.apply(to: &$0) }
-        } else {
-            store.update { preset.apply(to: &$0) }
-        }
+        store.update { preset.apply(to: &$0) }
     }
 }

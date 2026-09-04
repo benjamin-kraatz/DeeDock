@@ -18,6 +18,12 @@
 		AB0100000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift */; };
 		AB0100000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift */; };
 		AB010000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB020000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift */; };
+		AB0400000000000000000000 /* DeeDock/Dock/Shelf/ShelfItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0300000000000000000000 /* DeeDock/Dock/Shelf/ShelfItem.swift */; };
+		AB0400000000000000000001 /* DeeDock/Dock/Shelf/ShelfRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0300000000000000000001 /* DeeDock/Dock/Shelf/ShelfRepository.swift */; };
+		AB0400000000000000000002 /* DeeDock/Dock/Shelf/ShelfResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0300000000000000000002 /* DeeDock/Dock/Shelf/ShelfResourceAccess.swift */; };
+		AB0400000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0300000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift */; };
+		AB0400000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0300000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift */; };
+		AB0500000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */; };
 		DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */; };
 		DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */; };
 		DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift */; };
@@ -73,7 +79,7 @@
 		DDF7000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */; };
 		DDF7000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */; };
 		DDF7000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */; };
-		DDF7000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */; };
+		DDF7000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift */; };
 		DDF7000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */; };
 		DDF7000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */; };
 		DDFA00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */; };
@@ -99,6 +105,12 @@
 		AB0200000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Peek/WindowThumbnailService.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift; sourceTree = SOURCE_ROOT; };
 		AB020000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Previews/ScreenCaptureAccessController.swift; sourceTree = SOURCE_ROOT; };
+		AB0300000000000000000000 /* DeeDock/Dock/Shelf/ShelfItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/ShelfItem.swift; sourceTree = SOURCE_ROOT; };
+		AB0300000000000000000001 /* DeeDock/Dock/Shelf/ShelfRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/ShelfRepository.swift; sourceTree = SOURCE_ROOT; };
+		AB0300000000000000000002 /* DeeDock/Dock/Shelf/ShelfResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/ShelfResourceAccess.swift; sourceTree = SOURCE_ROOT; };
+		AB0300000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/ShelfController.swift; sourceTree = SOURCE_ROOT; };
+		AB0300000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/ShelfSelection.swift; sourceTree = SOURCE_ROOT; };
+		AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/SemanticStacks/SemanticStackModels.swift; sourceTree = SOURCE_ROOT; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationReference.swift; sourceTree = SOURCE_ROOT; };
 		DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockOrdering.swift; sourceTree = SOURCE_ROOT; };
@@ -155,7 +167,7 @@
 		DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/FolderResourceAccess.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockPinImporter.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackEntry.swift; sourceTree = SOURCE_ROOT; };
-		DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackGeometry.swift; sourceTree = SOURCE_ROOT; };
+		DDF8000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Popover/DockPopoverGeometry.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackState.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationMenu.swift; sourceTree = SOURCE_ROOT; };
@@ -261,11 +273,17 @@
 				DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */,
 				DDF8000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift */,
 				DDF8000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift */,
+				AB0300000000000000000000 /* DeeDock/Dock/Shelf/ShelfItem.swift */,
+				AB0300000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift */,
+				AB0300000000000000000001 /* DeeDock/Dock/Shelf/ShelfRepository.swift */,
+				AB0300000000000000000002 /* DeeDock/Dock/Shelf/ShelfResourceAccess.swift */,
+				AB0300000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift */,
+				AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */,
 				DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */,
 				DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */,
 				DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */,
 				DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */,
-				DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */,
+				DDF8000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift */,
 				DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */,
 				DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */,
 				DDF6000000000000000000000 /* DeeDock/Onboarding/Models/OnboardingStep.swift */,
@@ -431,11 +449,17 @@
 				DDFC00000000000000000001 /* DeeDock/Dock/Services/TrashController.swift in Sources */,
 				DDF7000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift in Sources */,
 				DDF7000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift in Sources */,
+				AB0400000000000000000000 /* DeeDock/Dock/Shelf/ShelfItem.swift in Sources */,
+				AB0400000000000000000004 /* DeeDock/Dock/Shelf/ShelfSelection.swift in Sources */,
+				AB0400000000000000000001 /* DeeDock/Dock/Shelf/ShelfRepository.swift in Sources */,
+				AB0400000000000000000002 /* DeeDock/Dock/Shelf/ShelfResourceAccess.swift in Sources */,
+				AB0400000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift in Sources */,
+				AB0500000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift in Sources */,
 				DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */,
 				DDF7000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift in Sources */,
 				DDF7000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift in Sources */,
 				DDF7000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift in Sources */,
-				DDF7000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift in Sources */,
+				DDF7000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift in Sources */,
 				DDF7000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift in Sources */,
 				DDF7000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift in Sources */,
 				DDF5000000000000000000000 /* DeeDock/Onboarding/Models/OnboardingStep.swift in Sources */,

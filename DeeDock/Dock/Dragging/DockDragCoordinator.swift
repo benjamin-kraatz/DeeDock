@@ -18,6 +18,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var trackingID: String?
     private var destinationIndex: Int?
     private var trashDestinationID: String?
+    private var shelfDestinationID: String?
+    /// Non-empty while the active external drag came out of DeeDock's own Shelf.
+    private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
     private var importTask: Task<Void, Never>?
     private var cleanupTask: Task<Void, Never>?
@@ -52,7 +55,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard let panel = panels[displayID], panel.store.canEditPins else { return }
         cancel()
         active = true; sourceID = displayID; sourcePin = pin
-        payload = .selection(pins: [pin], documents: nil, trashItems: nil)
+        payload = .selection(pins: [pin], documents: nil, stageableItems: nil)
         token = UUID().uuidString; sourceBounds = panel.restingDragBounds
         completion = DockDragCompletion()
         let pasteboard = NSPasteboardItem()
@@ -91,6 +94,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard validates(info.draggingPasteboard) else { return [] }
         nativeDisplayID = displayID // Loading a new payload clears the preceding session.
         update(at: NSEvent.mouseLocation)
+        if shelfDestinationID == displayID { return .copy }
+        // Removing a staged reference is a discard, not a file operation, but the poof cursor is right.
         if trashDestinationID == displayID { return .delete }
         if documentDrag.displayID != nil {
             guard documentDrag.displayID == displayID else { return [] }
@@ -104,8 +109,22 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
-        if trashDestinationID == displayID, let access = payload.trashItems,
+        if shelfDestinationID == displayID, let access = payload.stageableItems,
            let panel = panels[displayID] {
+            completion.committed = true
+            panel.store.stageOnShelf(access)
+            cancel()
+            return true
+        }
+        if trashDestinationID == displayID, let panel = panels[displayID] {
+            // A Shelf item dropped on Trash gives up its reference. The file itself is untouched.
+            if !shelfSourceIDs.isEmpty {
+                completion.committed = true
+                panel.store.removeFromShelf(ids: Set(shelfSourceIDs))
+                cancel()
+                return true
+            }
+            guard let access = payload.stageableItems else { return false }
             completion.committed = true
             panel.store.recycleToTrash(access)
             cancel()
@@ -173,6 +192,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard let objects = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
               !objects.isEmpty else { return }
         pasteboardChange = pasteboard.changeCount; active = true; completion = DockDragCompletion(); importSession = DockSession()
+        shelfSourceIDs = (pasteboard.string(forType: ShelfDragSession.pasteboardType) ?? "")
+            .split(separator: ",").compactMap { UUID(uuidString: String($0)) }
         let generation = importSession.token
         let ownIdentifier = Bundle.main.bundleIdentifier ?? "de.benjaminkraatz.DeeDock"
         installMonitor()
@@ -194,6 +215,14 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         }
     }
 
+    /// Which trailing utility tile the pointer is over, if the current payload may target it.
+    /// Items already staged cannot be dropped back onto the Shelf, so that target is withheld.
+    private func utilityTarget(at point: CGPoint, on panel: DockPanelController) -> DockUtilityDropTarget? {
+        if panel.trashTarget(at: point) { return .trash }
+        if shelfSourceIDs.isEmpty, panel.shelfTarget(at: point) { return .shelf }
+        return nil
+    }
+
     private func installMonitor() {
         monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseUp, .keyDown]) { [weak self] event in
             guard let self else { return event }
@@ -211,26 +240,31 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard active, !updating, !completion.cancelled, !completion.committed else { return }
         updating = true
         defer { updating = false }
-        destinationID = nil; destinationIndex = nil; trashDestinationID = nil
+        destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
-        if sourceID == nil, payload.isReady, payload.trashItems != nil,
+        if sourceID == nil, payload.isReady, payload.stageableItems != nil,
            let candidate, candidate.store.displayID == nativeDisplayID,
-           candidate.trashTarget(at: point) {
-            trashDestinationID = candidate.store.displayID
+           let utility = utilityTarget(at: point, on: candidate) {
+            switch utility {
+            case .trash: trashDestinationID = candidate.store.displayID
+            case .shelf: shelfDestinationID = candidate.store.displayID
+            }
             documentDrag.clear()
             for panel in panels.values {
+                let targeted = panel === candidate
                 panel.updateSectionDragHover(at: point, valid: false)
                 panel.interaction.documentTargetID = nil
                 panel.interaction.springEmphasized = false
-                panel.interaction.trashTargeted = panel === candidate
-                panel.setDragPresentation(proposal: nil, source: nil, targeted: panel === candidate,
-                    message: panel === candidate ? .dragMoveToTrash : nil)
+                panel.interaction.trashTargeted = targeted && utility == .trash
+                panel.interaction.shelfTargeted = targeted && utility == .shelf
+                panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
+                    message: targeted ? utility.message(removingFromShelf: !shelfSourceIDs.isEmpty) : nil)
             }
             updateScrollTimer()
             return
         }
-        panels.values.forEach { $0.interaction.trashTargeted = false }
+        panels.values.forEach { $0.interaction.trashTargeted = false; $0.interaction.shelfTargeted = false }
         if payload.documents != nil {
             let documentOwnsPresentation = documentDrag.update(
                 at: point,
@@ -338,6 +372,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             $0.interaction.documentTargetID = nil
             $0.interaction.springEmphasized = false
             $0.interaction.trashTargeted = false
+            $0.interaction.shelfTargeted = false
             $0.setDragPresentation(proposal: nil, source: nil, targeted: false, message: nil)
             $0.endSectionDrag()
         }
@@ -356,7 +391,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
         nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; token = nil
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
-        trashDestinationID = nil
+        trashDestinationID = nil; shelfDestinationID = nil; shelfSourceIDs = []
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }
         pasteboardChange = nil
     }

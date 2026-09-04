@@ -12,7 +12,7 @@ final class DockPanelController {
     private var mouseHeld = false
     private var dragHeld = false
     private var pickerHeld = false
-    private var folderStackHeld = false
+    private var popoverHeld = false
     private var windowPeekHeld = false
     private var modePickerHeld = false
     private var lastDisplay: DisplaySnapshot?
@@ -96,6 +96,7 @@ final class DockPanelController {
         if lastSettings?.tooltipPreset != settings.tooltipPreset || edgeChanged || resetVisibility { interaction.tooltips.clear() }
         lastDisplay = display; lastSettings = settings
         store.sections.configure(settings.appVisibility)
+        store.configureShelf(settings.showShelf)
         store.configureTrash(settings.showTrash)
         interaction.confirmsTrashEmpty = settings.confirmBeforeEmptyingTrash
         interaction.tooltipPreset = settings.tooltipPreset
@@ -154,18 +155,18 @@ final class DockPanelController {
         panel.ignoresMouseEvents = !inside
         // An open stack makes every dock dismissal-only. Clearing the pointer settles
         // magnification and hover without changing the dock's visible hold region.
-        interaction.setPointer(inside && !folderStackHeld && !modePickerHeld ? sample.inverse(point) : nil)
+        interaction.setPointer(inside && !popoverHeld && !modePickerHeld ? sample.inverse(point) : nil)
         if let eventType {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
-        let suppress = pickerHeld || folderStackHeld || windowPeekHeld || modePickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+        let suppress = pickerHeld || popoverHeld || windowPeekHeld || modePickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
             || (visibility.phase != .visible && visibility.phase != .hideDelay)
         if suppress != interaction.suppressTooltips {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = pickerHeld || folderStackHeld || windowPeekHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
+        let held = pickerHeld || popoverHeld || windowPeekHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
         // Tooltips are absent from `rects`, so their transparent reservation stays excluded.
@@ -259,15 +260,22 @@ final class DockPanelController {
                                       mask: sample.mask, exposed: visibility.exposesContent)
     }
 
-    func trashTarget(at point: CGPoint) -> Bool {
+    /// Hit test for a trailing utility tile, using the same clipped content space as clicks.
+    func utilityTarget(_ entry: DockEntryID, at point: CGPoint) -> Bool {
         guard !stopped, panel.frame.contains(point), visibility.exposesContent else { return false }
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle,
             progress: visibility.progress, size: interaction.layout.viewportSize,
             reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
         let local = contentPoint(point)
         return sample.mask.contains(local)
-            && interaction.iconRects[DockEntryID.trash.hitID]?.contains(local) == true
+            && interaction.iconRects[entry.hitID]?.contains(local) == true
     }
+
+    /// Pixel density of the screen this dock is on, for artwork generated at native resolution.
+    var backingScaleFactor: CGFloat { panel.screen?.backingScaleFactor ?? 2 }
+
+    func trashTarget(at point: CGPoint) -> Bool { utilityTarget(.trash, at: point) }
+    func shelfTarget(at point: CGPoint) -> Bool { utilityTarget(.shelf, at: point) }
 
     /// Document drags can expose either group; application drags still expose only pins.
     func updateSectionDragHover(at point: CGPoint, valid: Bool, documents: Bool = false) {
@@ -287,9 +295,10 @@ final class DockPanelController {
         updatePointer()
     }
 
-    func holdFolderStack(_ held: Bool) {
+    /// Held while any dock popover (a folder stack or the Shelf) is showing over this display.
+    func holdPopover(_ held: Bool) {
         if held { exclusiveInteractionBegan?() }
-        folderStackHeld = held
+        popoverHeld = held
         if held { visibility.showImmediately(); interaction.tooltips.clear() }
         updatePointer()
     }
@@ -332,13 +341,14 @@ final class DockPanelController {
                                  settings: settings)
     }
 
-    func folderStackAnchor(for id: UUID) -> FolderStackAnchor? {
+    /// Screen-space anchor for a popover attached to one of this dock's tiles.
+    func popoverAnchor(for target: DockEntryID) -> DockPopoverAnchor? {
         guard !stopped, let display = lastDisplay, let settings = lastSettings,
-              let rect = interaction.iconRects[DockEntryID.folder(id).hitID] else { return nil }
+              let rect = interaction.iconRects[target.hitID] else { return nil }
         let screenRect = CGRect(x: panel.frame.minX + interaction.contentOrigin.x + rect.minX,
             y: panel.frame.maxY - interaction.contentOrigin.y - rect.maxY,
             width: rect.width, height: rect.height)
-        return FolderStackAnchor(icon: screenRect, edge: settings.edge, visibleFrame: display.visibleFrame)
+        return DockPopoverAnchor(icon: screenRect, edge: settings.edge, visibleFrame: display.visibleFrame)
     }
 
     func endSectionDrag() { store.sections.endDrag() }
@@ -446,7 +456,7 @@ final class DockPanelController {
         interaction.geometryDidChange = nil; interaction.menuTrackingChanged = nil; interaction.accessibilityFocusChanged = nil
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil; exclusiveInteractionBegan = nil
         modePickerRequested = nil
-        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; folderStackHeld = false; windowPeekHeld = false; modePickerHeld = false
+        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; modePickerHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }
 }

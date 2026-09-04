@@ -64,15 +64,15 @@ struct DisplayProfilesTests {
         let display = DisplayFixtures.screen("test", runtimeID: 1, primary: true)
         profiles.synchronize([display]) { [DisplayFixtures.app("pin")] }
         profiles.update(display.id, keyPath: \.iconSize, to: 48) // Explicit, even though equal to the default.
-        profiles.update(display.id, fields: DockSettingField.windowPeekFields) {
-            WindowPeekPreset.compact.apply(to: &$0)
-        }
+        profiles.update(display.id, keyPath: \.tooltipPreset, to: .off)
         defaults.update(\.iconSize, to: 80)
         defaults.update(\.edgeDistance, to: 40)
         #expect(profiles.effectiveSettings(for: display.id).iconSize == 48)
         #expect(profiles.effectiveSettings(for: display.id).edgeDistance == 40)
-        #expect(WindowPeekPreset.matching(profiles.effectiveSettings(for: display.id)) == .compact)
-        #expect(profiles.document.profiles[display.id]?.overrides.windowPeekLayout == .list)
+        #expect(profiles.document.profiles[display.id]?.overrides.tooltipPreset == .off)
+        // Features are app-wide: a display never holds its own copy of one.
+        defaults.update(\.windowPeekEnabled, to: false)
+        #expect(profiles.effectiveSettings(for: display.id).windowPeekEnabled == false)
         profiles.setEnabled(false, for: display.id)
         profiles.synchronize([]) { [] }
         profiles.update(display.id, keyPath: \.magnification, to: 2)
@@ -80,8 +80,8 @@ struct DisplayProfilesTests {
         #expect(profiles.effectiveSettings(for: display.id).magnification == 2)
         profiles.useDefault(.iconSize, for: display.id)
         #expect(profiles.document.profiles[display.id]?.overrides.iconSize == nil)
-        profiles.useDefault(.windowPeekLayout, for: display.id)
-        #expect(profiles.document.profiles[display.id]?.overrides.windowPeekLayout == nil)
+        profiles.useDefault(.tooltipPreset, for: display.id)
+        #expect(profiles.document.profiles[display.id]?.overrides.tooltipPreset == nil)
         profiles.useDefaults(for: display.id)
         #expect(profiles.effectiveSettings(for: display.id) == .defaults)
         #expect(profiles.document.profiles[display.id]?.enabled == false)

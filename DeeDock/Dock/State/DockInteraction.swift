@@ -24,6 +24,7 @@ final class DockInteraction {
     var dragMessage: LocalizedStringResource?
     var documentTargetID: String?
     var trashTargeted = false
+    var shelfTargeted = false
     var springEmphasized = false
     @ObservationIgnored var openFiles: ((DockItem) -> Void)?
     @ObservationIgnored var applicationMenuSnapshot: ((DockItem) -> ApplicationMenuSnapshot)?
@@ -38,6 +39,9 @@ final class DockInteraction {
     var confirmsTrashEmpty = DockSettings.defaults.confirmBeforeEmptyingTrash
     @ObservationIgnored var openTrash: (() -> Void)?
     @ObservationIgnored var emptyTrash: (() -> Void)?
+    @ObservationIgnored var openShelf: (() -> Void)?
+    @ObservationIgnored var clearShelf: (() -> Void)?
+    @ObservationIgnored var beginShelfDrag: ((NSView, NSEvent) -> Void)?
     @ObservationIgnored var removePin: ((String) -> Void)?
     @ObservationIgnored var setFolderPresentation: ((UUID, FolderStackPresentation) -> Void)?
     var scrollOffset: CGFloat = 0

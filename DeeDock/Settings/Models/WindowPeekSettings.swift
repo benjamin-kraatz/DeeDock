@@ -103,10 +103,3 @@ enum WindowPeekPreset: String, CaseIterable, Identifiable, Sendable {
         }
     }
 }
-
-extension DockSettingField {
-    static let windowPeekFields: [Self] = [
-        .windowPeekEnabled, .windowPeekSize, .windowPeekLayout, .windowPeekStyle,
-        .windowPeekIncludeMinimized, .windowPeekIncludeUntitled, .windowPeekHoverDelay,
-    ]
-}

@@ -16,13 +16,6 @@ struct BehaviorSettingsPane: View {
                 .disabled(!source.modeSettingsAvailable)
                 .settingsOverride(source.context, field: .appVisibility)
             }
-            SettingsCard(title: .settingsTrash, footnote: .settingsTrashHelp) {
-                SettingsToggleRow(title: .settingsShowTrash, isOn: source.binding(\.showTrash))
-                    .settingsOverride(source.context, field: .showTrash)
-                SettingsToggleRow(title: .settingsConfirmBeforeEmptyingTrash,
-                                  isOn: source.binding(\.confirmBeforeEmptyingTrash))
-                    .settingsOverride(source.context, field: .confirmBeforeEmptyingTrash)
-            }
             SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
                 SettingsToggleRow(title: .behaviorAutoHide, isOn: source.binding(\.behavior.autoHide))
                     .settingsOverride(source.context, field: .autoHide)

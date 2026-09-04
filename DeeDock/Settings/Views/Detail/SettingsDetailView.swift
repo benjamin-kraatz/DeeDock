@@ -12,14 +12,11 @@ struct SettingsDetailView: View {
     var context: SettingsOverrideContext? = nil
     var profileError: LocalizedStringResource? = nil
     var showZone: (() -> Void)?
-    let windowAccess: WindowAccessController?
-    let screenCapture: ScreenCaptureAccessController?
     @Binding var displayCategory: SettingsCategory
 
     init(store: DockSettingsStore, profiles: DisplayProfilesStore? = nil,
          category: SettingsCategory?, context: SettingsOverrideContext? = nil,
          profileError: LocalizedStringResource? = nil, showZone: (() -> Void)? = nil,
-         windowAccess: WindowAccessController? = nil, screenCapture: ScreenCaptureAccessController? = nil,
          displayCategory: Binding<SettingsCategory> = .constant(.appearance)) {
         self.store = store
         self.profiles = profiles
@@ -27,8 +24,6 @@ struct SettingsDetailView: View {
         self.context = context
         self.profileError = profileError
         self.showZone = showZone
-        self.windowAccess = windowAccess
-        self.screenCapture = screenCapture
         _displayCategory = displayCategory
     }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -43,7 +38,7 @@ struct SettingsDetailView: View {
                 VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
                     if let context { DisplaySettingsHeader(context: context, category: $displayCategory) }
                     pane(for: category)
-                        .disabled(settingsLocked && category != .previews)
+                        .disabled(settingsLocked)
                         .id(category)
                         .transition(transition)
                 }
@@ -107,12 +102,6 @@ struct SettingsDetailView: View {
                                  alignment: binding(\.alignment),
                                  alongEdgeOffset: binding(\.alongEdgeOffset),
                                  edgeDistance: binding(\.edgeDistance), overrideContext: context)
-        case .previews:
-            if let windowAccess, let screenCapture {
-                PreviewsSettingsPane(source: SettingsValueSource(store: store, profiles: profiles, context: context),
-                                     windowAccess: windowAccess, screenCapture: screenCapture,
-                                     persistentSettingsDisabled: settingsLocked)
-            }
         }
     }
 

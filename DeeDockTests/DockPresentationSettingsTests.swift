@@ -32,31 +32,42 @@ struct DockPresentationSettingsTests {
     @Test("Display overrides keep explicit presentation choices distinct from inheritance")
     func overrides() throws {
         var defaults = DockSettings.defaults
-        defaults.appVisibility = .hidePinned; defaults.showTrash = true
-        defaults.confirmBeforeEmptyingTrash = true; defaults.tooltipPreset = .spectrum
+        defaults.appVisibility = .hidePinned; defaults.tooltipPreset = .spectrum
         var overrides = DockSettingsOverrides()
-        #expect(overrides.resolving(defaults).appVisibility == .hidePinned && overrides.resolving(defaults).showTrash)
-        var explicit = defaults; explicit.appVisibility = .showAll; explicit.showTrash = false
-        explicit.confirmBeforeEmptyingTrash = false; explicit.tooltipPreset = .off
-        overrides.set(.appVisibility, from: explicit); overrides.set(.showTrash, from: explicit)
-        overrides.set(.confirmBeforeEmptyingTrash, from: explicit)
+        #expect(overrides.resolving(defaults).appVisibility == .hidePinned)
+        var explicit = defaults; explicit.appVisibility = .showAll; explicit.tooltipPreset = .off
+        overrides.set(.appVisibility, from: explicit)
         overrides.set(.tooltipPreset, from: explicit)
         let restored = try JSONDecoder().decode(DockSettingsOverrides.self, from: JSONEncoder().encode(overrides))
-        #expect(restored.contains(.appVisibility) && restored.contains(.showTrash))
-        #expect(restored.contains(.confirmBeforeEmptyingTrash) && restored.contains(.tooltipPreset))
+        #expect(restored.contains(.appVisibility) && restored.contains(.tooltipPreset))
         #expect(restored.resolving(defaults).appVisibility == .showAll)
-        #expect(!restored.resolving(defaults).showTrash)
-        #expect(!restored.resolving(defaults).confirmBeforeEmptyingTrash)
         #expect(restored.resolving(defaults).tooltipPreset == .off)
-        overrides.set(.appVisibility, from: nil); overrides.set(.showTrash, from: nil)
-        overrides.set(.confirmBeforeEmptyingTrash, from: nil)
+        overrides.set(.appVisibility, from: nil)
         overrides.set(.tooltipPreset, from: nil)
         #expect(overrides.resolving(defaults) == defaults)
-        #expect(!overrides.contains(.appVisibility) && !overrides.contains(.showTrash))
-        #expect(!overrides.contains(.confirmBeforeEmptyingTrash) && !overrides.contains(.tooltipPreset))
+        #expect(!overrides.contains(.appVisibility) && !overrides.contains(.tooltipPreset))
         for data in [Data(#"{"appVisibility":"unknown"}"#.utf8), Data(#"{"tooltipPreset":"unknown"}"#.utf8)] {
             #expect(throws: (any Error).self) { try JSONDecoder().decode(DockSettingsOverrides.self, from: data) }
         }
+    }
+
+    @Test("Feature settings are app-wide and cannot be overridden by a display")
+    func featuresAreAppWide() throws {
+        var defaults = DockSettings.defaults
+        defaults.showShelf = false; defaults.showTrash = false
+        defaults.confirmBeforeEmptyingTrash = false; defaults.windowPeekEnabled = false
+        // A display's overrides never carry these, so every dock resolves the shared value.
+        let resolved = DockSettingsOverrides().resolving(defaults)
+        #expect(!resolved.showShelf && !resolved.showTrash)
+        #expect(!resolved.confirmBeforeEmptyingTrash && !resolved.windowPeekEnabled)
+        #expect(!DockSettingField.allCases.contains { field in
+            [\DockSettings.showShelf, \.showTrash, \.confirmBeforeEmptyingTrash, \.windowPeekEnabled]
+                .contains { $0 == field.keyPath }
+        })
+        // Stored bytes naming a retired override are ignored rather than rejected.
+        let legacy = Data(#"{"showTrash":true,"windowPeekEnabled":true}"#.utf8)
+        let decoded = try JSONDecoder().decode(DockSettingsOverrides.self, from: legacy)
+        #expect(!decoded.resolving(defaults).showTrash)
     }
 
     @Test("Remembered displays persist independently and reset without altering pins")

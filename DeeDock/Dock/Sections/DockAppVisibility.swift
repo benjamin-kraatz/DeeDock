@@ -26,12 +26,13 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case app(String), folder(UUID), group(DockAppGroup), trash
+    case app(String), folder(UUID), group(DockAppGroup), shelf, trash
     var hitID: String {
         switch self {
         case .app(let id): "app:\(id)"
         case .folder(let id): "folder:\(id.uuidString)"
         case .group(let group): "group:\(group.rawValue)"
+        case .shelf: "shelf"
         case .trash: "trash"
         }
     }
@@ -56,7 +57,8 @@ struct DockGroupControl {
 /// Projects catalog snapshots without changing pins, running order, or resource ownership.
 enum DockSectionProjection {
     static func entries(items: [DockItem], folders: [FolderDockItem] = [], pins: [DockPin]? = nil,
-                        visibility: DockAppVisibility, expanded: Bool, trash: TrashDockItem? = nil) -> [DockRenderSlot] {
+                        visibility: DockAppVisibility, expanded: Bool,
+                        shelf: ShelfDockItem? = nil, trash: TrashDockItem? = nil) -> [DockRenderSlot] {
         let pinned: [DockRenderSlot]
         if let pins {
             let applications = Dictionary(uniqueKeysWithValues: items.filter(\.isFavorite).map { ($0.reference.id, $0) })
@@ -80,7 +82,8 @@ enum DockSectionProjection {
             }
             return entries
         }
-        return applications + (trash.map { [.trash($0)] } ?? [])
+        // Utility tiles trail every application, sharing one divider: Shelf, then Trash.
+        return applications + (shelf.map { [.shelf($0)] } ?? []) + (trash.map { [.trash($0)] } ?? [])
     }
 
     /// Retains identity, then the disappearing app's group control, then the nearest surviving entry.

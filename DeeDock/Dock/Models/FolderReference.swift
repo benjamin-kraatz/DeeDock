@@ -4,6 +4,7 @@ import Foundation
 nonisolated enum FolderStackPresentation: String, Codable, CaseIterable, Sendable {
     case grid
     case list
+    case smart
 }
 
 /// A persistable folder identity with user-granted read access.

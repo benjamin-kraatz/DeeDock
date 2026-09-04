@@ -45,6 +45,8 @@ nonisolated enum DockPinEditing {
 enum DockDragGeometry {
     static let startDistance: CGFloat = 5
     static let removalDistance: CGFloat = 64
+    /// Point size of the artwork carried by a native file drag out of the dock.
+    static let imageSize: CGFloat = 48
 
     static func distance(_ point: CGPoint, outside rect: CGRect) -> CGFloat {
         let dx = max(rect.minX - point.x, 0, point.x - rect.maxX)

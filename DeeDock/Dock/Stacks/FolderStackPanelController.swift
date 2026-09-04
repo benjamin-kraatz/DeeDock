@@ -1,82 +1,41 @@
 import AppKit
 import SwiftUI
 
-private final class FolderStackPanel: NSPanel {
-    var acceptsKeyboardFocus = false
-    var keyboardHandler: ((NSEvent) -> Bool)?
-    override var canBecomeKey: Bool { acceptsKeyboardFocus }
-    override var canBecomeMain: Bool { false }
-    override func keyDown(with event: NSEvent) {
-        if keyboardHandler?(event) != true { super.keyDown(with: event) }
-    }
-}
-
-private final class FolderStackHostingView<Content: View>: NSHostingView<Content> {
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
-}
-
+/// Folder-specific behavior for one open stack: what its keys mean and what opening a child does.
+/// The window, its dismissal monitors, and its animation belong to `DockPopoverPanelController`.
 @MainActor
 final class FolderStackPanelController {
     let state: FolderStackState
-    private let panel: FolderStackPanel
-    private var localMonitor: Any?
-    private var globalMonitor: Any?
-    private var stopped = false
+    private let popover: DockPopoverPanelController<FolderStackView>
     private let keyboard: Bool
-    private let reduceMotion: Bool
-    private var placement: FolderStackPlacement
-    var closed: ((Bool) -> Void)?
+    var closed: ((Bool) -> Void)? {
+        get { popover.closed }
+        set { popover.closed = newValue }
+    }
 
-    init(folder: FolderReference, anchor: FolderStackAnchor, keyboard: Bool) {
-        state = FolderStackState(folder: folder)
+    init(folder: FolderReference, anchor: DockPopoverAnchor, keyboard: Bool,
+         organizer: any SemanticStackOrganizing) {
+        let state = FolderStackState(folder: folder, organizer: organizer)
+        self.state = state
         self.keyboard = keyboard
-        reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        placement = FolderStackGeometry.placement(anchor: anchor)
-        panel = FolderStackPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
-                                 backing: .buffered, defer: false)
-        panel.isOpaque = false
-        panel.backgroundColor = .clear
-        panel.hasShadow = true
-        panel.level = .popUpMenu
-        panel.isReleasedWhenClosed = false
-        panel.hidesOnDeactivate = false
-        panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
-        panel.acceptsKeyboardFocus = keyboard
-        state.chrome = placement.chrome
-        panel.contentView = FolderStackHostingView(rootView: FolderStackView(state: state, keyboard: keyboard))
-        panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
-        panel.setFrame(placement.frame, display: false)
+        popover = DockPopoverPanelController(anchor: anchor, keyboard: keyboard) { chrome in
+            state.chrome = chrome
+        } content: {
+            FolderStackView(state: state, keyboard: keyboard)
+        }
+        popover.willClose = { [weak state] in state?.stop() }
+        popover.keyHandler = { [weak self] in self?.handleKey($0) ?? false }
     }
 
     func show() {
-        installMonitors()
-        if reduceMotion {
-            panel.alphaValue = 1
-            panel.setFrame(placement.frame, display: true)
-            panel.orderFrontRegardless()
-        } else {
-            panel.alphaValue = 0
-            panel.setFrame(FolderStackGeometry.dismissedFrame(from: placement.frame, edge: placement.chrome.edge), display: false)
-            panel.orderFrontRegardless()
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.18
-                context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                panel.animator().alphaValue = 1
-                panel.animator().setFrame(placement.frame, display: true)
-            }
-        }
-        if keyboard {
-            state.selectedID = state.entries.first?.id
-            panel.makeKeyAndOrderFront(nil)
-        }
+        if keyboard { state.selectedID = state.entries.first?.id }
+        popover.show()
         state.start()
     }
 
-    func update(_ anchor: FolderStackAnchor) {
-        placement = FolderStackGeometry.placement(anchor: anchor)
-        state.chrome = placement.chrome
-        panel.setFrame(placement.frame, display: true)
-    }
+    func update(_ anchor: DockPopoverAnchor) { popover.update(anchor) }
+
+    func close(returnFocus: Bool) { popover.close(returnFocus: returnFocus) }
 
     func open(_ entry: FolderStackEntryReference) {
         guard FileManager.default.fileExists(atPath: entry.url.path) else {
@@ -93,65 +52,20 @@ final class FolderStackPanelController {
         }
     }
 
-    func close(returnFocus: Bool) {
-        guard !stopped else { return }
-        stopped = true
-        if let localMonitor { NSEvent.removeMonitor(localMonitor) }
-        if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
-        localMonitor = nil; globalMonitor = nil
-        state.stop()
-        panel.keyboardHandler = nil
-        let callback = closed
-        closed = nil
-        callback?(returnFocus)
-        guard !reduceMotion, panel.isVisible else {
-            panel.orderOut(nil)
-            panel.contentView = nil
-            return
-        }
-        let panel = panel
-        let destination = FolderStackGeometry.dismissedFrame(from: placement.frame, edge: placement.chrome.edge)
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.14
-            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
-            panel.animator().alphaValue = 0
-            panel.animator().setFrame(destination, display: true)
-        } completionHandler: {
-            panel.orderOut(nil)
-            panel.contentView = nil
-        }
-    }
-
-    private func installMonitors() {
-        let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
-        localMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
-            guard let self else { return event }
-            guard event.window !== panel else { return event }
-            let consumesDockClick = event.window is DockPanel
-            close(returnFocus: false)
-            // A dock click dismisses the stack but must not reach the button underneath.
-            if consumesDockClick { return nil }
-            return event
-        }
-        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
-            self?.close(returnFocus: false)
-        }
-    }
-
     private func handleKey(_ event: NSEvent) -> Bool {
         switch event.keyCode {
         case 48:
             state.presentationFocused.toggle()
         case 49 where state.presentationFocused:
-            state.choose(state.presentation == .grid ? .list : .grid)
+            choosePresentation(by: 1)
         case 36 where !state.presentationFocused, 76 where !state.presentationFocused:
             state.openSelection()
         case 53:
             close(returnFocus: true)
         case 123 where state.presentationFocused:
-            state.choose(.grid)
+            choosePresentation(by: -1)
         case 124 where state.presentationFocused:
-            state.choose(.list)
+            choosePresentation(by: 1)
         case 123:
             state.select(by: -1)
         case 124:
@@ -164,5 +78,12 @@ final class FolderStackPanelController {
             return false
         }
         return true
+    }
+
+    private func choosePresentation(by distance: Int) {
+        let modes = FolderStackPresentation.allCases
+        guard let current = modes.firstIndex(of: state.presentation) else { return }
+        let next = min(max(current + distance, modes.startIndex), modes.index(before: modes.endIndex))
+        state.choose(modes[next])
     }
 }

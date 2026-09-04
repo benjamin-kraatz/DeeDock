@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 /// Classification is completed once per external drag, off the UI actor.
 nonisolated enum DockExternalPayload: Sendable {
     case checking
-    case selection(pins: [DockPin]?, documents: DocumentResourceAccess?, trashItems: DocumentResourceAccess?)
+    case selection(pins: [DockPin]?, documents: DocumentResourceAccess?, stageableItems: DocumentResourceAccess?)
     case documents(DocumentResourceAccess)
     case rejected
 
@@ -19,7 +19,9 @@ nonisolated enum DockExternalPayload: Sendable {
         default: return nil
         }
     }
-    var trashItems: DocumentResourceAccess? {
+    /// Any complete user-selected batch, whatever it contains: what Trash accepts and what the
+    /// Shelf stages. Applications route to pin insertion instead and never reach either tile.
+    var stageableItems: DocumentResourceAccess? {
         if case .selection(_, _, let access) = self { return access }
         if case .documents(let access) = self { return access }
         return nil
@@ -45,10 +47,10 @@ nonisolated enum DockExternalPayload: Sendable {
         }
         if allPinnable {
             let pins = try DockPinImporter.read(access.urls, kinds: kinds, excluding: ownIdentifier, bookmark: bookmark)
-            return .selection(pins: pins, documents: hasApplication ? nil : access, trashItems: access)
+            return .selection(pins: pins, documents: hasApplication ? nil : access, stageableItems: access)
         }
         guard !hasApplication else { throw DockDocumentValidationError.unsupportedSelection }
-        return .selection(pins: nil, documents: access, trashItems: access)
+        return .selection(pins: nil, documents: access, stageableItems: access)
     }
 
     /// Used again immediately before handoff and by the picker. Never traverses folder contents.

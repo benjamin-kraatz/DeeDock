@@ -801,3 +801,84 @@ Xcode's focused build-for-testing completed successfully in 4.747 seconds, compi
 - Switch with Window Peek and a folder stack open. Confirm both close, focus selection repairs to a stable surviving item or its nearest neighbor, and running-only app order remains unchanged.
 - Confirm switching is disabled during native menus, file selection, and cross-display or Finder drags. Cancel each operation and verify switching becomes available again.
 - Exercise long localized names, VoiceOver actions, Reduce Motion, Reduce Transparency, sleep/wake, display removal, and corrupt modes reset in a disposable preferences domain.
+
+## Shelf
+
+Implemented on 2026-09-04 as the first dock tile that owns content rather than pointing at an application. A shared `ShelfController` holds security-scoped references to user-dropped files; nothing is copied, moved, or deleted. The document is stored under `dock.shelf.v1`, independent of display profiles and of Dock Modes, and is injected into every `DockStore` beside the existing `TrashController` so one edit re-renders every dock.
+
+`FolderStackPanelController`'s window, dismissal monitors, and show/close animation were extracted into `DockPopoverPanelController`, with the placement math and pointer shape moved alongside it as `DockPopoverGeometry` and `DockPopoverShape`. `DockPopoverPresenter` keeps at most one popover open across features and displays. Folder stacks keep their own state, view, and key handling and were rebuilt on the shared shell; `DockPanelController.folderStackAnchor(for:)`, `holdFolderStack(_:)`, and its `folderStackHeld` flag became `popoverAnchor(for:)`, `holdPopover(_:)`, and `popoverHeld`.
+
+The tile renders after every application and before Trash. `DockRenderSlot.isUtility` now covers both, so `DockGeometry` continues to derive a single divider before the pair with no new layout code. `DockExternalPayload.trashItems` was renamed `stageableItems` and now feeds both drop targets.
+
+Dragging out writes plain `.fileURL` pasteboard items plus a private `…DeeDock.shelf-drag` type naming the staged ids. Other applications see ordinary file references; DeeDock uses the private type to distinguish a staged reference from a Finder batch, so a Shelf item dropped on Trash reports **Remove from Shelf** and discards only the reference, while a Finder batch still reports **Move to Trash** and still calls `NSWorkspace.recycle`. Items already staged cannot be dropped back onto the Shelf. Security scope is held for the whole session and released when AppKit reports it ended. A completed drag deliberately does not remove the item.
+
+Authored Swift Testing coverage: persistence round trip, corrupt storage reported without overwriting the stored bytes and blocking further writes until an explicit reset, an unknown document version failing rather than reading as empty, duplicate suppression and capacity reporting, explicit removal and clearing, drag-out leaving the item staged, a missing file staying listed as unavailable, security-scope release exactly once and only when acquired, and four-edge projection asserting Shelf-then-Trash order with a single divider before the pair. Deterministic SwiftUI previews cover the empty and badged tile plus the panel's populated, empty, error, and reduced-transparency states; none touch real preferences or resolve real bookmarks.
+
+`xcodebuild build` and `xcodebuild build-for-testing` both succeeded for the shared scheme, compiling the app and the unhosted `DeeDockTests` target. **No test cases were executed**, no preview was rendered, and the app was not launched.
+
+The panel list animates insertions and removals with a snappy spring, falls back to a plain fade under Reduce Motion, and transitions the header symbol and count. Selection follows Finder list conventions — replace, Command-toggle, Shift-extend, ⌘A — plus a rubber band swept over empty space. `ShelfSelection` holds that arithmetic as pure functions so it is testable without a window. The sweep overlay declines every point inside a row and the trailing `NSScroller.scrollerWidth` strip, so row presses and scroller drags are unaffected. A drag starting inside the selection carries all of it; one starting outside carries a single row.
+
+### Required hands-on acceptance
+
+- Drop a Finder selection on the tile. Confirm the badge updates on every display's dock and the files stay where they were on disk.
+- Open the panel from a second display and confirm identical contents.
+- Drag one row into a Finder window and into a full-screen app. Confirm the item remains staged both times.
+- Drag the tile itself into Finder and confirm every staged item arrives in one drop.
+- Drag a staged item onto Trash. Confirm the label reads **Remove from Shelf**, the item leaves, and the file is still on disk.
+- Drop the same batch from Finder onto Trash. Confirm it still reads **Move to Trash** and still trashes.
+- Quit and relaunch. Confirm items persist and still drag out, which exercises bookmark resolution across launches.
+- Move a staged file in Finder, reopen the panel, and confirm the item reads as unavailable, Remove still works, and nothing is purged automatically.
+- Turn Shelf off in shared defaults and on as a per-display override. Confirm the tile appears on that display only, the divider stays correct, and no layout jump occurs.
+- Exercise all four edges: the panel places inward and stays on screen, and the divider sits before the Shelf/Trash pair.
+- Focus Dock: arrow to the Shelf, Return to open, Up/Down to select, Delete to remove, Escape to return focus to the dock.
+- VoiceOver: tile label, count value, and actions; panel rows exposing Remove from Shelf and Show in Finder.
+- Reduce Motion (panel cross-fades without sliding) and Reduce Transparency (opaque panel).
+- Confirm folder stacks still open, place inward on four edges, dismiss on outside click, Escape, sleep, and display disconnect, and return focus. Opening a stack must close an open Shelf and the reverse.
+- With auto-hide on, confirm a Finder drag reveals the dock and holds it while the Shelf is targeted, then hides after the drag ends.
+- Fill the Shelf past 50 items and confirm the overflow is reported rather than silently dropped.
+- Sweep a rubber band across empty space and confirm it selects the rows it touches in both sweep directions, that it never starts on a row, and that the vertical scroller still drags normally.
+- Command-click, Shift-click, and ⌘A. Confirm a drag from inside a multiple selection carries every selected item in one drop, and a drag from an unselected row carries only that row.
+- Press inside a multiple selection and release without moving: the selection must collapse to that one row.
+- Delete with several rows selected removes all of them. Escape drops a multiple selection before it closes the panel.
+- Add and remove items with the panel open and confirm rows animate in and out, then repeat with Reduce Motion enabled and confirm the animation degrades to a fade.
+
+## Settings: Features
+
+Added on 2026-09-04. `SettingsSelection` gains a `features` case beside `general` and `modes`, so Features sits above the Defaults section with a `puzzlepiece.extension.fill` tile in pink-to-magenta, a hue no other pane uses. `FeaturesSettingsPane` carries the Shelf card, the Trash card moved out of Behavior, and the whole former Previews pane including its Window Access and Screen Recording permissions. `SettingsCategory.previews` is gone, and its two string-catalog entries with it.
+
+Everything in Features is app-wide by design, which is the reason it sits where it does: panes under Defaults describe how a dock looks and where it sits, so a display can override them; a feature is on or off for DeeDock as a whole. `showShelf`, `showTrash`, `confirmBeforeEmptyingTrash`, and the seven `windowPeek*` fields were removed from `DockSettingField` and `DockSettingsOverrides`. They remain on `DockSettings`, so `resolving(_:)` still carries them into every dock's effective settings — it simply copies the shared value instead of consulting an override. Stored bytes naming a retired override decode and are ignored rather than rejected. `DockSettingField.windowPeekFields` is gone, and a Window Peek preset now always writes shared settings.
+
+`settingsPreviewDisplayRequest` became `settingsFeaturesRequest`, a Bool: Window Peek's "open settings" action has no display to select any more, so it selects Features.
+
+## Shelf: list behavior
+
+Added on 2026-09-04, after the first Shelf slice.
+
+Quick Look replaces the generic type icon. `ShelfThumbnailLoader` asks `QLThumbnailGenerator` for each item's own artwork at the panel's backing scale while the item's security scope is held, caches it by item identity, and cancels every pending request when the panel closes. Items keep the workspace type icon until their thumbnail arrives, then cross-fade.
+
+`ShelfDocument` gained `sort` and `presentation`, both defaulted when absent, so the panel reopens the way it was left. Arrangement is Date Added (newest first), Name (natural order, A to Z), or Smart. Layout is a List or a Grid of thumbnails for the two flat arrangements. Smart temporarily uses a grouped list and preserves the stored List/Grid choice for later.
+
+Double-clicking an item opens it through `NSWorkspace.open(_:configuration:completionHandler:)`, holding its scope until the open completes and reporting a failure in the panel. The context menu adds Open, Show in Finder, Copy (file references, so pasting in Finder copies the files), Select All, Remove from Shelf, and Clear Shelf, each with an icon and each naming how many items it acts on. Keyboard gains Return to open, ⌘R to reveal, and ⌘C to copy.
+
+Subtitles now read as the enclosing folder and a relative staging time. In grid layout the remove button is layered after the drag source so it keeps its own clicks, the same fix the list row needed.
+
+## Semantic Stacks
+
+Implemented on 2026-09-04 for pinned folder stacks and the shared Shelf. `FoundationModelsSemanticStackOrganizer` uses `SystemLanguageModel.default`, typed `@Generable` output, `@Guide` constraints, greedy generation, and streamed partial snapshots. The prompt supplies numbered metadata records only. It never supplies file contents, URLs, bookmark data, or a request to produce JSON.
+
+Folder Smart is a third per-pin presentation. It groups up to 60 children ranked by modification date and adds the rest to More Items. Shelf Smart is a third persisted arrangement. It groups every available staged item and adds unresolved references to Unavailable. Groups preserve model order, items inside them use natural name order, and incomplete output is repaired so each item appears once. A live generation keeps unassigned items in Organizing; unavailable models and generation failures retain Smart, show an alphabetical fallback, and offer Retry.
+
+The organizer caches completed results for the process lifetime using source identity plus a metadata fingerprint. Folder changes and Shelf edits create a new request, cancel current work, and reject stale snapshots. Panel close and presentation changes also cancel generation. Reduce Motion removes section movement, and VoiceOver receives one completion or failure announcement rather than every streamed update.
+
+Authored Swift Testing coverage covers Smart persistence, metadata loading, output normalization, duplicate and unknown item numbers, omitted items, stable alphabetical repair, and a fake streamed organizer. Tests do not invoke Apple Intelligence. The focused unsigned DeeDock Debug build compiles against the macOS 27 Foundation Models SDK. Live generation, model-unavailable UI, keyboard movement across groups, multi-selection while groups stream, and VoiceOver announcements still need hands-on acceptance.
+
+### Required hands-on acceptance
+
+- Confirm screenshots, PDFs, and images show their real Quick Look thumbnails, and that an unpreviewable file falls back to its type icon without an empty gap.
+- Double-click an item and confirm it opens in the right application; double-click an unavailable one and confirm the panel reports it instead.
+- Exercise every context-menu command with one item selected and with several, confirming the counts read correctly and each command acts on the whole selection.
+- Switch Sort and Layout, close and reopen the panel, then restart DeeDock, confirming both choices persist.
+- Confirm Copy pastes real files in Finder, not text.
+- Confirm the grid layout's remove button is clickable and that rubber-band selection still works between grid tiles.
+- Open Settings and confirm Features sits below Modes, that Behavior no longer shows Shelf or Trash, that Previews is gone, and that searching for "shelf", "trash", "peek", or "permissions" finds Features.
+- Confirm a display's Use Defaults and the Customized pills no longer mention any feature, and that toggling a feature changes every display's dock at once.

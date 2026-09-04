@@ -29,6 +29,7 @@ final class DockStore {
     var pinDestinations: [DockPinDestination] = []
     @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
+    @ObservationIgnored var openShelf: (() -> Void)?
     var pins: [DockPin] { profiles.pinLists[displayID] ?? [] }
     var canEditPins: Bool {
         !profiles.requiresReset && !profiles.modes.requiresReset && profiles.pinErrors[displayID] == nil
@@ -36,16 +37,19 @@ final class DockStore {
 
     @ObservationIgnored private let profiles: DisplayProfilesStore
     @ObservationIgnored private let trash: TrashController?
+    @ObservationIgnored private let shelf: ShelfController?
     @ObservationIgnored private var showsTrash = true
+    @ObservationIgnored private var showsShelf = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
-         trash: TrashController? = nil) {
+         trash: TrashController? = nil, shelf: ShelfController? = nil) {
         self.displayID = displayID
         self.catalog = catalog
         self.profiles = profiles
         self.trash = trash
+        self.shelf = shelf
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
@@ -85,6 +89,7 @@ final class DockStore {
     private func refreshEntries() {
         let next = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
+                                                  shelf: showsShelf ? shelf?.item : nil,
                                                   trash: showsTrash ? trash?.item : nil)
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
@@ -94,6 +99,44 @@ final class DockStore {
         guard showsTrash != visible else { return }
         showsTrash = visible
         refreshEntries()
+    }
+
+    func configureShelf(_ visible: Bool) {
+        guard showsShelf != visible else { return }
+        showsShelf = visible
+        refreshEntries()
+    }
+
+    // MARK: - Shelf
+
+    /// Stages a user-supplied Finder batch. The files themselves are never moved or copied.
+    func stageOnShelf(_ access: DocumentResourceAccess) {
+        guard let shelf else {
+            errorMessage = .shelfUnavailable
+            return
+        }
+        do {
+            let rejected = try shelf.add(access.urls)
+            if rejected > 0 { errorMessage = .shelfFull(limit: ShelfDocument.capacity) }
+        } catch {
+            errorMessage = .errorSaveShelf(details: error.localizedDescription)
+        }
+    }
+
+    func removeFromShelf(ids: Set<UUID>) {
+        guard let shelf else {
+            errorMessage = .shelfUnavailable
+            return
+        }
+        do { try shelf.remove(ids: ids) } catch { errorMessage = .errorSaveShelf(details: error.localizedDescription) }
+    }
+
+    func clearShelf() {
+        guard let shelf else {
+            errorMessage = .shelfUnavailable
+            return
+        }
+        do { try shelf.clear() } catch { errorMessage = .errorSaveShelf(details: error.localizedDescription) }
     }
 
     func openTrash() {
@@ -231,11 +274,12 @@ final class DockStore {
         case .app(let item): open(item)
         case .folder(let folder): openFolder?(folder, keyboardFocus)
         case .group: sections.toggle()
+        case .shelf: openShelf?()
         case .trash: openTrash()
         case .gap: break
         }
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

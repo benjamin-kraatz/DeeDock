@@ -45,6 +45,8 @@ struct DockSettings: Codable, Equatable {
     /// Gap between adjacent Dock items in logical points.
     var itemSpacing: Double = 4
     var appVisibility: DockAppVisibility = .showAll
+    /// Whether each display dock includes the trailing Shelf tile.
+    var showShelf: Bool = true
     /// Whether each display dock includes the trailing system Trash tile.
     var showTrash: Bool = true
     /// Whether Empty Trash requires DeeDock's destructive confirmation alert.
@@ -125,7 +127,7 @@ struct DockSettings: Codable, Equatable {
 extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-        case appVisibility, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
+        case appVisibility, showShelf, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
@@ -145,6 +147,7 @@ extension DockSettings {
         fadeOutDuration = values.contains(.fadeOutDuration) ? try values.decode(Double.self, forKey: .fadeOutDuration) : 0.3
         restoreDuration = values.contains(.restoreDuration) ? try values.decode(Double.self, forKey: .restoreDuration) : 0.1
         appVisibility = values.contains(.appVisibility) ? try values.decode(DockAppVisibility.self, forKey: .appVisibility) : .showAll
+        showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true
         confirmBeforeEmptyingTrash = values.contains(.confirmBeforeEmptyingTrash)
             ? try values.decode(Bool.self, forKey: .confirmBeforeEmptyingTrash) : true

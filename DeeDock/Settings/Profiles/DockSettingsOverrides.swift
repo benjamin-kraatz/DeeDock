@@ -1,11 +1,12 @@
 import Foundation
 
-/// The independently inheritable settings; visibility and pins are always display-specific.
+/// The independently inheritable settings.
+///
+/// Pins and app visibility are always display-specific; the settings in Settings > Features are
+/// always app-wide, so neither appears here.
 enum DockSettingField: String, CaseIterable, Codable {
     case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-    case appVisibility, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
-    case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
-    case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
+    case appVisibility, tooltipPreset
     case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
@@ -24,15 +25,6 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .fadeOutDuration: \.fadeOutDuration
         case .restoreDuration: \.restoreDuration
         case .appVisibility: \.appVisibility
-        case .showTrash: \.showTrash
-        case .confirmBeforeEmptyingTrash: \.confirmBeforeEmptyingTrash
-        case .windowPeekEnabled: \.windowPeekEnabled
-        case .windowPeekSize: \.windowPeekSize
-        case .windowPeekLayout: \.windowPeekLayout
-        case .windowPeekStyle: \.windowPeekStyle
-        case .windowPeekIncludeMinimized: \.windowPeekIncludeMinimized
-        case .windowPeekIncludeUntitled: \.windowPeekIncludeUntitled
-        case .windowPeekHoverDelay: \.windowPeekHoverDelay
         case .tooltipPreset: \.tooltipPreset
         case .iconSize: \.iconSize
         case .magnification: \.magnification
@@ -69,15 +61,6 @@ struct DockSettingsOverrides: Codable, Equatable {
     var fadeOutDuration: Double?
     var restoreDuration: Double?
     var appVisibility: DockAppVisibility?
-    var showTrash: Bool?
-    var confirmBeforeEmptyingTrash: Bool?
-    var windowPeekEnabled: Bool?
-    var windowPeekSize: WindowPeekSize?
-    var windowPeekLayout: WindowPeekLayout?
-    var windowPeekStyle: WindowPeekStyle?
-    var windowPeekIncludeMinimized: Bool?
-    var windowPeekIncludeUntitled: Bool?
-    var windowPeekHoverDelay: Double?
     var tooltipPreset: DockTooltipPreset?
     var iconSize: Double?
     var magnification: Double?
@@ -103,9 +86,7 @@ struct DockSettingsOverrides: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-        case appVisibility, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
-        case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
-        case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
+        case appVisibility, tooltipPreset
         case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
@@ -120,15 +101,18 @@ struct DockSettingsOverrides: Codable, Equatable {
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
         result.animateIndicators = animateIndicators ?? defaults.animateIndicators
         result.appVisibility = appVisibility ?? defaults.appVisibility
-        result.showTrash = showTrash ?? defaults.showTrash
-        result.confirmBeforeEmptyingTrash = confirmBeforeEmptyingTrash ?? defaults.confirmBeforeEmptyingTrash
-        result.windowPeekEnabled = windowPeekEnabled ?? defaults.windowPeekEnabled
-        result.windowPeekSize = windowPeekSize ?? defaults.windowPeekSize
-        result.windowPeekLayout = windowPeekLayout ?? defaults.windowPeekLayout
-        result.windowPeekStyle = windowPeekStyle ?? defaults.windowPeekStyle
-        result.windowPeekIncludeMinimized = windowPeekIncludeMinimized ?? defaults.windowPeekIncludeMinimized
-        result.windowPeekIncludeUntitled = windowPeekIncludeUntitled ?? defaults.windowPeekIncludeUntitled
-        result.windowPeekHoverDelay = windowPeekHoverDelay ?? defaults.windowPeekHoverDelay
+        // Features are configured once for the whole app in Settings > Features. They still travel
+        // in the resolved settings each dock reads, but no display can hold its own value.
+        result.showShelf = defaults.showShelf
+        result.showTrash = defaults.showTrash
+        result.confirmBeforeEmptyingTrash = defaults.confirmBeforeEmptyingTrash
+        result.windowPeekEnabled = defaults.windowPeekEnabled
+        result.windowPeekSize = defaults.windowPeekSize
+        result.windowPeekLayout = defaults.windowPeekLayout
+        result.windowPeekStyle = defaults.windowPeekStyle
+        result.windowPeekIncludeMinimized = defaults.windowPeekIncludeMinimized
+        result.windowPeekIncludeUntitled = defaults.windowPeekIncludeUntitled
+        result.windowPeekHoverDelay = defaults.windowPeekHoverDelay
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground
         result.backgroundOpacity = backgroundOpacity ?? defaults.backgroundOpacity
@@ -162,15 +146,6 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .fadeOutDuration: fadeOutDuration != nil
         case .restoreDuration: restoreDuration != nil
         case .appVisibility: appVisibility != nil
-        case .showTrash: showTrash != nil
-        case .confirmBeforeEmptyingTrash: confirmBeforeEmptyingTrash != nil
-        case .windowPeekEnabled: windowPeekEnabled != nil
-        case .windowPeekSize: windowPeekSize != nil
-        case .windowPeekLayout: windowPeekLayout != nil
-        case .windowPeekStyle: windowPeekStyle != nil
-        case .windowPeekIncludeMinimized: windowPeekIncludeMinimized != nil
-        case .windowPeekIncludeUntitled: windowPeekIncludeUntitled != nil
-        case .windowPeekHoverDelay: windowPeekHoverDelay != nil
         case .tooltipPreset: tooltipPreset != nil
         case .iconSize: iconSize != nil
         case .magnification: magnification != nil
@@ -206,15 +181,6 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .fadeOutDuration: fadeOutDuration = value?.fadeOutDuration
         case .restoreDuration: restoreDuration = value?.restoreDuration
         case .appVisibility: appVisibility = value?.appVisibility
-        case .showTrash: showTrash = value?.showTrash
-        case .confirmBeforeEmptyingTrash: confirmBeforeEmptyingTrash = value?.confirmBeforeEmptyingTrash
-        case .windowPeekEnabled: windowPeekEnabled = value?.windowPeekEnabled
-        case .windowPeekSize: windowPeekSize = value?.windowPeekSize
-        case .windowPeekLayout: windowPeekLayout = value?.windowPeekLayout
-        case .windowPeekStyle: windowPeekStyle = value?.windowPeekStyle
-        case .windowPeekIncludeMinimized: windowPeekIncludeMinimized = value?.windowPeekIncludeMinimized
-        case .windowPeekIncludeUntitled: windowPeekIncludeUntitled = value?.windowPeekIncludeUntitled
-        case .windowPeekHoverDelay: windowPeekHoverDelay = value?.windowPeekHoverDelay
         case .tooltipPreset: tooltipPreset = value?.tooltipPreset
         case .iconSize: iconSize = value?.iconSize
         case .magnification: magnification = value?.magnification
@@ -268,15 +234,6 @@ extension DockSettingsOverrides {
         fadeOutDuration = try values.decodeIfPresent(Double.self, forKey: .fadeOutDuration)
         restoreDuration = try values.decodeIfPresent(Double.self, forKey: .restoreDuration)
         appVisibility = try values.decodeIfPresent(DockAppVisibility.self, forKey: .appVisibility)
-        showTrash = try values.decodeIfPresent(Bool.self, forKey: .showTrash)
-        confirmBeforeEmptyingTrash = try values.decodeIfPresent(Bool.self, forKey: .confirmBeforeEmptyingTrash)
-        windowPeekEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnabled)
-        windowPeekSize = try values.decodeIfPresent(WindowPeekSize.self, forKey: .windowPeekSize)
-        windowPeekLayout = try values.decodeIfPresent(WindowPeekLayout.self, forKey: .windowPeekLayout)
-        windowPeekStyle = try values.decodeIfPresent(WindowPeekStyle.self, forKey: .windowPeekStyle)
-        windowPeekIncludeMinimized = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeMinimized)
-        windowPeekIncludeUntitled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeUntitled)
-        windowPeekHoverDelay = try values.decodeIfPresent(Double.self, forKey: .windowPeekHoverDelay)
         tooltipPreset = try values.decodeIfPresent(DockTooltipPreset.self, forKey: .tooltipPreset)
         iconSize = try values.decodeIfPresent(Double.self, forKey: .iconSize)
         magnification = try values.decodeIfPresent(Double.self, forKey: .magnification)

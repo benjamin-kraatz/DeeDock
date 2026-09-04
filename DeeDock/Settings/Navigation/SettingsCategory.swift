@@ -8,7 +8,6 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
     case appearance
     case position
     case behavior
-    case previews
 
     var id: Self { self }
 
@@ -17,7 +16,6 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
         case .appearance: .settingsAppearance
         case .behavior: .settingsBehavior
         case .position: .settingsPosition
-        case .previews: .settingsPreviews
         }
     }
 
@@ -27,7 +25,6 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
         case .appearance: .symbol("paintbrush.pointed.fill")
         case .behavior: .symbol("sparkles")
         case .position: .dock
-        case .previews: .symbol("macwindow.on.rectangle")
         }
     }
 
@@ -37,7 +34,6 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
         case .appearance: Color(red: 0.52, green: 0.38, blue: 0.98)
         case .behavior: Color(red: 0.12, green: 0.62, blue: 0.47)
         case .position: Color(red: 0.16, green: 0.55, blue: 0.98)
-        case .previews: Color(red: 0.93, green: 0.46, blue: 0.22)
         }
     }
 
@@ -47,7 +43,6 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
         case .appearance: [Color(red: 0.85, green: 0.42, blue: 0.98), Color(red: 0.42, green: 0.30, blue: 0.96)]
         case .behavior: [.mint, .teal]
         case .position: [Color(red: 0.32, green: 0.78, blue: 1.0), Color(red: 0.06, green: 0.42, blue: 0.94)]
-        case .previews: [Color(red: 1.0, green: 0.67, blue: 0.28), Color(red: 0.91, green: 0.31, blue: 0.17)]
         }
     }
 
@@ -58,7 +53,6 @@ enum SettingsCategory: String, CaseIterable, Identifiable, Hashable {
         case .appearance: .settingsAppearanceKeywords
         case .behavior: .settingsBehaviorKeywords
         case .position: .settingsPositionKeywords
-        case .previews: .settingsPreviewsKeywords
         }
     }
 

@@ -46,7 +46,7 @@ struct FolderStackTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let folder = FolderReference(url: URL(fileURLWithPath: "/Fixtures"), name: "Fixtures",
-                                     bookmarkData: Data([1]), presentation: .list)
+                                     bookmarkData: Data([1]), presentation: .smart)
         let repository = DockPinsRepository(defaults: defaults, displayID: "display")
         try repository.save([.folder(folder)])
         #expect(try repository.load() == [.folder(folder)])
@@ -141,20 +141,86 @@ struct FolderStackTests {
         #expect(entries.firstIndex { $0.name == "item 2.txt" }! < entries.firstIndex { $0.name == "item 10.txt" }!)
         #expect(entries.first { $0.name == "Subfolder" }?.isFolder == true)
         #expect(entries.first { $0.name == "Document.rtfd" }?.isFolder == false)
+        #expect(entries.first { $0.name == "item 2.txt" }?.modifiedAt != nil)
     }
 
-    @Test("Panel geometry points inward and clamps to negative-origin visible frames", arguments: DockEdge.allCases)
+    @Test("Partial semantic groups repair duplicates, unknown numbers, and omissions")
+    func semanticNormalization() {
+        let candidates = ["item 10.txt", "alpha.pdf", "beta.pdf", "notes.md"].enumerated().map {
+            SemanticStackCandidate(id: "id-\($0.offset)", name: $0.element, kind: "file",
+                                   contentType: nil, isDirectory: false, byteCount: nil,
+                                   createdAt: nil, modifiedAt: nil, addedAt: nil)
+        }
+        let partial = SemanticStackNormalizer.snapshot(
+            candidates: candidates,
+            proposedGroups: [
+                SemanticStackProposedGroup(title: "Documents", itemNumbers: [1, 2, 99, 1]),
+                SemanticStackProposedGroup(title: "documents", itemNumbers: [3]),
+                SemanticStackProposedGroup(title: "Empty", itemNumbers: [2])
+            ],
+            isFinal: false,
+            otherTitle: "Other",
+            organizingTitle: "Organizing"
+        )
+
+        #expect(partial.sections.map(\.title) == ["Documents", "Organizing"])
+        #expect(partial.sections[0].itemIDs == ["id-1", "id-2", "id-0"])
+        #expect(partial.sections[1].itemIDs == ["id-3"])
+        #expect(Set(partial.sections.flatMap(\.itemIDs)) == Set(candidates.map(\.id)))
+    }
+
+    @Test("Final semantic groups put every omitted item in Other")
+    func semanticFinalization() {
+        let candidates = ["Charlie", "Alpha", "Bravo"].enumerated().map {
+            SemanticStackCandidate(id: "id-\($0.offset)", name: $0.element, kind: "file",
+                                   contentType: nil, isDirectory: false, byteCount: nil,
+                                   createdAt: nil, modifiedAt: nil, addedAt: nil)
+        }
+        let final = SemanticStackNormalizer.snapshot(
+            candidates: candidates,
+            proposedGroups: [SemanticStackProposedGroup(title: "Chosen", itemNumbers: [1])],
+            isFinal: true,
+            otherTitle: "Other",
+            organizingTitle: "Organizing"
+        )
+
+        #expect(final.isFinal)
+        #expect(final.sections.map(\.title) == ["Chosen", "Other"])
+        #expect(final.sections[1].itemIDs == ["id-1", "id-2"])
+    }
+
+    @Test("A fake organizer streams deterministic snapshots without a live model")
+    func semanticOrganizerBoundary() async throws {
+        struct FakeOrganizer: SemanticStackOrganizing {
+            let snapshot: SemanticStackSnapshot
+            func availability() async -> SemanticStackAvailability { .available }
+            func snapshots(for request: SemanticStackRequest) async -> AsyncThrowingStream<SemanticStackSnapshot, Error> {
+                AsyncThrowingStream { continuation in
+                    continuation.yield(snapshot)
+                    continuation.finish()
+                }
+            }
+        }
+        let expected = SemanticStackSnapshot(sections: [], isFinal: true)
+        let organizer = FakeOrganizer(snapshot: expected)
+        let request = SemanticStackRequest(source: .shelf, candidates: [], localeIdentifier: "en")
+        var received: [SemanticStackSnapshot] = []
+        for try await snapshot in await organizer.snapshots(for: request) { received.append(snapshot) }
+        #expect(received == [expected])
+    }
+
+    @Test("Popover geometry points inward and clamps to negative-origin visible frames", arguments: DockEdge.allCases)
     func geometry(edge: DockEdge) {
         let visible = CGRect(x: -1600, y: -120, width: 1200, height: 800)
         let icon = CGRect(x: -1580, y: 620, width: 48, height: 48)
-        let placement = FolderStackGeometry.placement(anchor: FolderStackAnchor(icon: icon, edge: edge, visibleFrame: visible))
+        let placement = DockPopoverGeometry.placement(anchor: DockPopoverAnchor(icon: icon, edge: edge, visibleFrame: visible))
         let frame = placement.frame
         #expect(frame.width == 560 && frame.height == 420)
         #expect(frame.minX >= visible.minX + 16 && frame.maxX <= visible.maxX - 16)
         #expect(frame.minY >= visible.minY + 16 && frame.maxY <= visible.maxY - 16)
         let length = edge.isVertical ? frame.height : frame.width
         #expect(placement.chrome.attachment >= 28 && placement.chrome.attachment <= length - 28)
-        let dismissed = FolderStackGeometry.dismissedFrame(from: frame, edge: edge)
+        let dismissed = DockPopoverGeometry.dismissedFrame(from: frame, edge: edge)
         switch edge {
         case .bottom: #expect(dismissed.minY < frame.minY)
         case .top: #expect(dismissed.minY > frame.minY)

@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// App-wide permission controls followed by inheritable Window Peek preferences.
+/// App-wide permission controls followed by the Window Peek preferences.
+///
+/// Presented inside Settings > Features; every value here applies to every display.
 struct PreviewsSettingsPane: View {
     let source: SettingsValueSource
     let windowAccess: WindowAccessController
@@ -8,7 +10,6 @@ struct PreviewsSettingsPane: View {
     let persistentSettingsDisabled: Bool
 
     private var settings: DockSettings { source.value }
-    private var context: SettingsOverrideContext? { source.context }
 
     var body: some View {
         PreviewPermissionsSettingsCard(windowAccess: windowAccess, screenCapture: screenCapture)
@@ -16,22 +17,18 @@ struct PreviewsSettingsPane: View {
             SettingsCard(title: .windowPeekTitle, footnote: .windowPeekHelp) {
                 SettingsToggleRow(title: .windowPeekEnabled,
                                   isOn: source.binding(\.windowPeekEnabled))
-                    .settingsOverride(context, field: .windowPeekEnabled)
                 WindowPeekPresetPicker(settings: settings) { source.apply($0) }
             }
             SettingsCard(title: .windowPeekDesignTitle) {
                 SettingsPickerRow(title: .windowPeekSize,
                                   options: WindowPeekSize.settingsOptions,
                                   selection: source.binding(\.windowPeekSize))
-                    .settingsOverride(context, field: .windowPeekSize)
                 SettingsPickerRow(title: .windowPeekLayout,
                                   options: WindowPeekLayout.settingsOptions,
                                   selection: source.binding(\.windowPeekLayout))
-                    .settingsOverride(context, field: .windowPeekLayout)
                 SettingsPickerRow(title: .windowPeekStyle,
                                   options: WindowPeekStyle.settingsOptions,
                                   selection: source.binding(\.windowPeekStyle))
-                    .settingsOverride(context, field: .windowPeekStyle)
                 SettingsStackedRow(title: .windowPeekExample) {
                     WindowPeekDesignSample(size: settings.windowPeekSize, layout: settings.windowPeekLayout,
                                            style: settings.windowPeekStyle)
@@ -40,16 +37,13 @@ struct PreviewsSettingsPane: View {
             SettingsCard(title: .windowPeekFiltersTitle) {
                 SettingsToggleRow(title: .windowPeekIncludeMinimized,
                                   isOn: source.binding(\.windowPeekIncludeMinimized))
-                    .settingsOverride(context, field: .windowPeekIncludeMinimized)
                 SettingsToggleRow(title: .windowPeekIncludeUntitled,
                                   isOn: source.binding(\.windowPeekIncludeUntitled))
-                    .settingsOverride(context, field: .windowPeekIncludeUntitled)
             }
             SettingsCard(title: .windowPeekTimingTitle) {
                 SettingsSliderRow(title: .windowPeekHoverDelay, unit: .settingsSeconds,
                                   value: source.binding(\.windowPeekHoverDelay), range: 0.2...1, step: 0.1,
                                   minimumSymbol: "hare.fill", maximumSymbol: "tortoise.fill")
-                    .settingsOverride(context, field: .windowPeekHoverDelay)
             }
         }
         .disabled(persistentSettingsDisabled)

@@ -34,6 +34,17 @@ struct SettingsSidebar: View {
                     .padding(.vertical, 3)
                     .tag(SettingsSelection.modes)
                 }
+
+                if SettingsSelection.featuresMatches(searchText) {
+                    Label {
+                        Text(.settingsFeatures)
+                    } icon: {
+                        SettingsIconTile(glyph: .symbol("puzzlepiece.extension.fill"),
+                                         colors: SettingsSelection.featuresTileColors)
+                    }
+                    .padding(.vertical, 3)
+                    .tag(SettingsSelection.features)
+                }
             }
             Section {
                 ForEach(matches) { category in
@@ -57,6 +68,7 @@ struct SettingsSidebar: View {
             }
             if !SettingsSelection.generalMatches(searchText)
                 && !SettingsSelection.modesMatches(searchText)
+                && !SettingsSelection.featuresMatches(searchText)
                 && matches.isEmpty
                 && !profiles.document.profiles.values.contains(where: matches)
             {

@@ -31,3 +31,12 @@ struct TrashDockItem: Identifiable {
     let icon: NSImage
     var id: String { "system-trash" }
 }
+
+/// A snapshot of the shared Shelf used by every display dock.
+struct ShelfDockItem: Identifiable {
+    /// Drives the badge. Zero renders the empty tray without a badge.
+    let count: Int
+    let icon: NSImage
+    var id: String { "shelf" }
+    var isEmpty: Bool { count == 0 }
+}

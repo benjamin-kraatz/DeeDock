@@ -4,6 +4,7 @@ import Foundation
 enum SettingsSelection: Hashable {
     case general
     case modes
+    case features
     case defaults(SettingsCategory)
     case display(String)
 
@@ -18,6 +19,13 @@ enum SettingsSelection: Hashable {
     static func modesMatches(_ query: String) -> Bool {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         return query.isEmpty || [LocalizedStringResource.dockModesTitle, .dockModesKeywords]
+            .contains { String(localized: $0).localizedStandardContains(query) }
+    }
+
+    /// Features is found by the name of anything it contains, not only by the word "features".
+    static func featuresMatches(_ query: String) -> Bool {
+        let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        return query.isEmpty || [LocalizedStringResource.settingsFeatures, .settingsFeaturesKeywords]
             .contains { String(localized: $0).localizedStandardContains(query) }
     }
 }
