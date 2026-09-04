@@ -86,6 +86,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		000000000000000000000120 /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Models/WindowPeekSettings.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Models/DockMode.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Persistence/DockModesRepository.swift; sourceTree = SOURCE_ROOT; };
@@ -97,8 +99,6 @@
 		AB0200000000000000000008 /* DeeDock/Dock/Peek/WindowThumbnailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Peek/WindowThumbnailService.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000009 /* DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ScreenCaptureAccessServicing.swift; sourceTree = SOURCE_ROOT; };
 		AB020000000000000000000A /* DeeDock/Settings/Previews/ScreenCaptureAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Previews/ScreenCaptureAccessController.swift; sourceTree = SOURCE_ROOT; };
-		000000000000000000000120 /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationReference.swift; sourceTree = SOURCE_ROOT; };
 		DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockOrdering.swift; sourceTree = SOURCE_ROOT; };
@@ -631,7 +631,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = U7H5KA9MG4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -685,7 +685,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = U7H5KA9MG4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
