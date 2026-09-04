@@ -5,6 +5,8 @@ struct DockModesSettingsPane: View {
     let store: DockModesStore
     var activateMode: ((UUID) -> Bool)?
     var deleteMode: ((UUID) -> Bool)?
+    var startFocus: ((DockMode) -> Void)?
+    var canStartFocus = false
     @State private var draftName = ""
     @State private var namingAction: NamingAction?
     @State private var deletingMode: DockMode?
@@ -80,6 +82,11 @@ struct DockModesSettingsPane: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer(minLength: 10)
+            if let startFocus {
+                Button(.focusStart, systemImage: "timer") { startFocus(mode) }
+                    .labelStyle(.iconOnly).disabled(!canStartFocus)
+                    .help(Text(.focusStartHelp))
+            }
             Button(.dockModesActivate) { _ = activate(mode.id) }
                 .disabled(!store.canEdit || mode.id == store.document.activeModeID)
             Menu {

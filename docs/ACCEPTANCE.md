@@ -934,3 +934,22 @@ Implemented app-wide shortcut pins, explicit discovery, ordering, one active run
 Xcode MCP `BuildProject`, with `buildForTesting: false`, built the app successfully with no errors. Shortcut listing was inspected to confirm identifier parsing; no shortcut was executed. No tests or native UI acceptance were run.
 
 Remaining hands-on acceptance: pin and reorder shortcuts, restart, rename or remove a shortcut externally, exercise one and multiple dropped files from Finder and the Shelf, concurrent runs of different tiles, duplicate activation of a busy tile, helper errors, interactive shortcut prompts, cancellation, shutdown, keyboard navigation, VoiceOver, four dock edges, auto-hide, and reduced accessibility effects. Cancellation stops the CLI but cannot undo shortcut side effects. Sandbox support remains limited by the project's existing configuration.
+
+## Focus Sessions
+
+Implemented one shared, persisted focus timer started from an existing Dock Mode through Settings or the menu bar. Starting the already-active mode works without requiring a redundant mode activation. Switching to another mode must save successfully before its timer starts. Running or paused sessions prevent a second start. Timers retain the starting mode's identity and name independently of later mode edits.
+
+A dock tile shows a remaining-time ring and opens controls for pause, resume, five-minute extension, and early completion. Running visible tiles and an open timer panel update once per second; hidden, paused, and completed tiles schedule no view ticks. The controller owns one deadline task plus a wake observer, cancels old tasks on every transition, and releases both at shutdown. Running wall-clock deadlines include sleep and app downtime; paused durations do not. The versioned document under `dock.focus-sessions.v1` includes the default duration and optional completion animation. Invalid data blocks edits pending an explicit reset.
+
+Completion leaves a checkmark and offers the existing Session Capsule creation flow. Capture remains user-initiated, with normal window selection, permission handling, draft review, and explicit Save. The optional checkmark bounce respects Reduce Motion. No notifications, streaks, or system Focus settings are changed.
+
+Xcode MCP `BuildProject`, with `buildForTesting: false`, built the feature successfully with no errors. No tests were run. Paused and completed SwiftUI previews use inert sample documents; previews were not rendered.
+
+Remaining hands-on acceptance: start from the active and an inactive mode, pause/resume, extend, finish early, wait for expiry, reopen during a running or paused session, reopen after expiry, sleep/wake, mode rename/delete, display disconnect, four dock edges and auto-hide, keyboard focus return, optional completion animation, VoiceOver, Reduce Motion/Transparency, and Session Capsule permission denial and approval. System clock changes affect the saved wall-clock deadline; this is not a monotonic elapsed-time recorder.
+
+
+### Action Tiles and Focus Sessions localization correction
+
+The initial feature strings had English values only. In the user's German interface this exposed catalog keys such as `focusTitle`, `focusDuration`, and `actionsRun`. All 39 Action Tiles and Focus Sessions keys now have German translations, including errors, confirmations, and accessibility text. The duration label uses a minutes abbreviation so one minute does not produce an incorrect plural.
+
+Inspection of the built app's English and German `Localizable.strings` confirmed that all 39 values match the source catalog, with matching interpolation placeholders. This checks the packaged strings; the app was not launched for another visual check. A follow-up Xcode MCP app build passed after replacing unsupported preview accessibility-environment writes with the existing explicit opaque-background preview pattern.

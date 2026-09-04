@@ -16,6 +16,9 @@ struct DockEntryView: View {
 
     var body: some View {
         switch slot {
+        case .focus(let item):
+            DockFocusButton(item: item, size: size, selected: selected, interaction: interaction,
+                accessibilityFocus: { accessibilityFocus(DockEntryID.focus.hitID, $0) })
         case .action(let item):
             DockActionButton(item: item, size: size, selected: selected, interaction: interaction,
                 accessibilityFocus: { accessibilityFocus(DockEntryID.action(item.tile.id).hitID, $0) })

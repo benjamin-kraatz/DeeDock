@@ -26,9 +26,10 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, trash
+    case focus, action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, trash
     var hitID: String {
         switch self {
+        case .focus: "focus"
         case .action(let id): "action:\(id.uuidString)"
         case .app(let id): "app:\(id)"
         case .folder(let id): "folder:\(id.uuidString)"
@@ -61,7 +62,7 @@ struct DockGroupControl {
 enum DockSectionProjection {
     static func entries(items: [DockItem], folders: [FolderDockItem] = [], pins: [DockPin]? = nil,
                         visibility: DockAppVisibility, expanded: Bool,
-                        actions: [ActionDockItem] = [],
+                        actions: [ActionDockItem] = [], focus: FocusDockItem? = nil,
                         sessionCapsules: [SessionCapsuleDockItem] = [],
                         capsules: CapsuleDockItem? = nil, shelf: ShelfDockItem? = nil,
                         trash: TrashDockItem? = nil) -> [DockRenderSlot] {
@@ -89,7 +90,7 @@ enum DockSectionProjection {
             return entries
         }
         // Utility tiles trail every application, sharing one divider.
-        return applications + actions.map(DockRenderSlot.action) + sessionCapsules.map(DockRenderSlot.sessionCapsule)
+        return applications + actions.map(DockRenderSlot.action) + (focus.map { [.focus($0)] } ?? []) + sessionCapsules.map(DockRenderSlot.sessionCapsule)
             + (capsules.map { [.sessionCapsules($0)] } ?? [])
             + (shelf.map { [.shelf($0)] } ?? []) + (trash.map { [.trash($0)] } ?? [])
     }

@@ -1,6 +1,420 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "focusTitle" : {
+      "comment" : "Feature name for a shared focus timer started from a Dock Mode.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus Sessions"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzungen"
+          }
+        }
+      }
+    },
+    "focusStart" : {
+      "comment" : "Start a timer and activate the selected Dock Mode.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Focus Session"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzung starten"
+          }
+        }
+      }
+    },
+    "focusStorageFailed" : {
+      "comment" : "Recovery message for corrupt or unsupported focus data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Focus Sessions could not be read or saved. Reset them to allow changes."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Fokus-Sitzungen konnten nicht gelesen oder gespeichert werden. Setze sie zurück, um Änderungen zu ermöglichen."
+          }
+        }
+      }
+    },
+    "focusRunning" : {
+      "comment" : "Status of a running focus timer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focusing"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus läuft"
+          }
+        }
+      }
+    },
+    "focusPaused" : {
+      "comment" : "Status of a paused focus timer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausiert"
+          }
+        }
+      }
+    },
+    "focusCompleted" : {
+      "comment" : "Status of a completed focus timer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session finished"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitzung abgeschlossen"
+          }
+        }
+      }
+    },
+    "focusTileName" : {
+      "comment" : "Accessibility label followed by the saved Dock Mode name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus: %1$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus: %1$@"
+          }
+        }
+      }
+    },
+    "focusTileHint" : {
+      "comment" : "Accessibility hint for the focus timer tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open timer controls."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timer-Steuerung öffnen."
+          }
+        }
+      }
+    },
+    "focusFinishedHelp" : {
+      "comment" : "Optional next step after finishing a focus session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anything left to pick up later? Save it in a Session Capsule."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch etwas offen? Halte es in einer Sitzungs-Kapsel fest."
+          }
+        }
+      }
+    },
+    "focusSaveCapsule" : {
+      "comment" : "Open the existing capsule creation flow; does not capture or save automatically.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Session Capsule"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitzungs-Kapsel speichern"
+          }
+        }
+      }
+    },
+    "focusDismiss" : {
+      "comment" : "Remove the completed timer tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss Session"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitzung schließen"
+          }
+        }
+      }
+    },
+    "focusPause" : {
+      "comment" : "Pause a focus timer without losing time remaining.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausieren"
+          }
+        }
+      }
+    },
+    "focusResume" : {
+      "comment" : "Resume a paused focus timer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzen"
+          }
+        }
+      }
+    },
+    "focusExtend" : {
+      "comment" : "Extend the current focus session by five minutes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add 5 Minutes"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Minuten hinzufügen"
+          }
+        }
+      }
+    },
+    "focusFinish" : {
+      "comment" : "Finish a focus session early and offer a Session Capsule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finish"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abschließen"
+          }
+        }
+      }
+    },
+    "focusSettingsHelp" : {
+      "comment" : "Explains timer entry points, shared ownership, and clock behavior.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start from Dock Modes in Settings or the menu bar. One timer is shared by every display. Running time includes sleep and app downtime; paused time does not. Changing these defaults affects your next session."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte eine Sitzung unter Modes in den Einstellungen oder über die Menüleiste. Alle Displays teilen sich einen Timer. Die Zeit läuft im Ruhezustand und bei geschlossener App weiter, während einer Pause nicht. Änderungen an diesen Vorgaben gelten für die nächste Sitzung."
+          }
+        }
+      }
+    },
+    "focusDuration" : {
+      "comment" : "Default focus duration in minutes, from 1 to 180.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duration: %1$lld min"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dauer: %1$lld Min."
+          }
+        }
+      }
+    },
+    "focusCelebrate" : {
+      "comment" : "Optional short checkmark animation, disabled by Reduce Motion.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animate session completion"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitzungsabschluss animieren"
+          }
+        }
+      }
+    },
+    "focusCurrentMode" : {
+      "comment" : "Name of the mode that started the timer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current session: %1$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Sitzung: %1$@"
+          }
+        }
+      }
+    },
+    "focusReset" : {
+      "comment" : "Recovery action for unreadable focus settings and session state.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Focus Sessions"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzungen zurücksetzen"
+          }
+        }
+      }
+    },
+    "focusResetHelp" : {
+      "comment" : "Confirmation before resetting focus data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear the saved timer and restore focus defaults? Dock Modes and Session Capsules will remain."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den gespeicherten Timer löschen und die Fokus-Vorgaben wiederherstellen? Modes und Sitzungs-Kapseln bleiben erhalten."
+          }
+        }
+      }
+    },
+    "focusStartBlocked" : {
+      "comment" : "Explains why another timer cannot start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finish the current focus session before starting another."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließe die aktuelle Fokus-Sitzung ab, bevor du eine neue startest."
+          }
+        }
+      }
+    },
+    "focusStartHelp" : {
+      "comment" : "Help text for the Start Focus Session button on a mode row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate this mode and start a focus timer."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diesen Modus aktivieren und einen Fokus-Timer starten."
+          }
+        }
+      }
+    },
     "actionsTitle" : {
       "comment" : "Settings card for pinned Apple Shortcuts.",
       "extractionState" : "manual",
@@ -9,6 +423,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Action Tiles"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionskacheln"
           }
         }
       }
@@ -22,6 +442,12 @@
             "state" : "translated",
             "value" : "Pin shortcuts on every display. Click a tile to run it, or drop files onto it as input. Configure the shortcut to save or show its output. Cancel stops waiting; it cannot undo actions already performed."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinne Kurzbefehle auf allen Displays an. Klicke auf eine Kachel, um den Kurzbefehl auszuführen, oder ziehe Dateien darauf, um sie als Eingabe zu übergeben. Lege im Kurzbefehl fest, wie das Ergebnis gespeichert oder angezeigt wird. Abbrechen beendet das Warten, macht bereits ausgeführte Aktionen aber nicht rückgängig."
+          }
         }
       }
     },
@@ -33,6 +459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The shortcut could not finish."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kurzbefehl konnte nicht abgeschlossen werden."
           }
         }
       }
@@ -46,6 +478,12 @@
             "state" : "translated",
             "value" : "Ready"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereit"
+          }
         }
       }
     },
@@ -57,6 +495,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Running…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird ausgeführt…"
           }
         }
       }
@@ -70,6 +514,12 @@
             "state" : "translated",
             "value" : "Finished"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgeschlossen"
+          }
         }
       }
     },
@@ -81,6 +531,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saved Action Tiles could not be read or saved. Reset them to allow changes."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Aktionskacheln konnten nicht gelesen oder gespeichert werden. Setze sie zurück, um Änderungen zu ermöglichen."
           }
         }
       }
@@ -94,6 +550,12 @@
             "state" : "translated",
             "value" : "Could not load shortcuts: %1$@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle konnten nicht geladen werden: %1$@"
+          }
         }
       }
     },
@@ -105,6 +567,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stopped waiting. Actions already performed were not undone."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warten beendet. Bereits ausgeführte Aktionen wurden nicht rückgängig gemacht."
           }
         }
       }
@@ -118,6 +586,12 @@
             "state" : "translated",
             "value" : "Run"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausführen"
+          }
         }
       }
     },
@@ -129,6 +603,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Load Shortcuts"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle laden"
           }
         }
       }
@@ -142,6 +622,12 @@
             "state" : "translated",
             "value" : "Pin Shortcut"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl anpinnen"
+          }
         }
       }
     },
@@ -153,6 +639,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset Action Tiles"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionskacheln zurücksetzen"
           }
         }
       }
@@ -166,6 +658,12 @@
             "state" : "translated",
             "value" : "Remove saved Action Tiles? Your shortcuts in the Shortcuts app will remain."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Aktionskacheln entfernen? Deine Kurzbefehle in der App Kurzbefehle bleiben erhalten."
+          }
         }
       }
     },
@@ -178,6 +676,12 @@
             "state" : "translated",
             "value" : "Run this shortcut, or drop files here to use them as input."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Führe diesen Kurzbefehl aus oder ziehe Dateien hierher, um sie als Eingabe zu verwenden."
+          }
         }
       }
     },
@@ -189,6 +693,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Run Shortcut with Files"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl mit Dateien ausführen"
           }
         }
       }

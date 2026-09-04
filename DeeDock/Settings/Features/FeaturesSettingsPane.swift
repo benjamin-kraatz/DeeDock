@@ -6,6 +6,7 @@ import SwiftUI
 /// configured once for the whole app. Unlike the panes under Defaults, nothing here can be
 /// overridden per display.
 struct FeaturesSettingsPane: View {
+    var focus: FocusSessionController? = nil
     var actions: ActionTilesController? = nil
     let store: DockSettingsStore
     let profiles: DisplayProfilesStore?
@@ -21,6 +22,7 @@ struct FeaturesSettingsPane: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+                if let focus { FocusSessionSettingsCard(controller: focus) }
                 if let actions { ActionTilesSettingsCard(controller: actions) }
                 SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {
                     SettingsToggleRow(title: .settingsShowCapsules,

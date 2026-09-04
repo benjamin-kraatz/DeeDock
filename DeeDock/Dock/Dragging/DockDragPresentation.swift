@@ -8,6 +8,7 @@ struct DockDragProposal: Equatable {
 
 /// A stable render identity for either an application or one place in a multi-app insertion gap.
 enum DockRenderSlot: Identifiable {
+    case focus(FocusDockItem)
     case action(ActionDockItem)
     case app(DockItem)
     case folder(FolderDockItem)
@@ -20,6 +21,7 @@ enum DockRenderSlot: Identifiable {
 
     var id: String {
         switch self {
+        case .focus: return DockEntryID.focus.hitID
         case .action(let item): return DockEntryID.action(item.tile.id).hitID
         case .app(let item): return "app:\(item.id)"
         case .folder(let item): return item.id
@@ -36,7 +38,7 @@ enum DockRenderSlot: Identifiable {
         case .app(let item): return item.isFavorite
         case .folder, .gap: return true
         case .group(let control): return control.group == .pinned
-        case .action, .sessionCapsule, .sessionCapsules, .shelf, .trash: return false
+        case .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash: return false
         }
     }
     var item: DockItem? { if case .app(let item) = self { return item }; return nil }
@@ -47,13 +49,14 @@ enum DockRenderSlot: Identifiable {
     var capsule: SessionCapsuleDockItem? { if case .sessionCapsule(let item) = self { return item }; return nil }
     /// Trailing tiles that are neither pins nor running applications, and share one divider.
     var action: ActionDockItem? { if case .action(let item) = self { return item }; return nil }
-    var isUtility: Bool { action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil }
+    var focus: FocusDockItem? { if case .focus(let item) = self { return item }; return nil }
+    var isUtility: Bool { focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil }
     var appGroup: DockAppGroup? {
         switch self {
         case .app(let item): item.isFavorite ? .pinned : .running
         case .folder: .pinned
         case .group(let control): control.group
-        case .action, .sessionCapsule, .sessionCapsules, .shelf, .trash, .gap: nil
+        case .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash, .gap: nil
         }
     }
     var pin: DockPin? {
@@ -66,6 +69,7 @@ enum DockRenderSlot: Identifiable {
     var icon: NSImage? { item?.icon ?? folder?.icon ?? capsule?.icon ?? capsules?.icon ?? shelf?.icon ?? trash?.icon }
     var name: String {
         switch self {
+        case .focus(let item): String(localized: .focusTileName(item.session.modeName))
         case .action(let item): item.tile.name
         case .app(let item): item.reference.name
         case .folder(let item): item.reference.name
@@ -80,6 +84,7 @@ enum DockRenderSlot: Identifiable {
 
     var target: DockEntryID? {
         switch self {
+        case .focus: .focus
         case .action(let item): .action(item.tile.id)
         case .app(let item): .app(item.id)
         case .folder(let item): .folder(item.reference.id)

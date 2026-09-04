@@ -98,6 +98,14 @@ final class SessionCapsuleCoordinator {
         next.show()
     }
 
+    /// The user explicitly chooses this from a finished focus session. Discovery and approval
+    /// use the normal capsule flow, including its existing permission choices.
+    func beginFromFocus(on panel: DockPanelController) {
+        close(returnFocus: false)
+        toggle(on: panel, anchorTarget: .focus)
+        state?.beginNewCapsule()
+    }
+
     func show(_ capsuleID: UUID, on panel: DockPanelController) {
         close(returnFocus: false)
         toggle(on: panel, anchorTarget: .sessionCapsule(capsuleID), initialCapsuleID: capsuleID)

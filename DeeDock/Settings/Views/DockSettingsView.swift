@@ -24,9 +24,10 @@ struct DockSettingsView: View {
             case .modes:
                 DockModesSettingsPane(store: profiles.modes,
                                       activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
-                                      deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) })
+                                      deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
+                                      startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true)
             case .features:
-                FeaturesSettingsPane(actions: coordinator?.actionTiles, store: store, profiles: profiles,
+                FeaturesSettingsPane(focus: coordinator?.focusSession, actions: coordinator?.actionTiles, store: store, profiles: profiles,
                                      windowAccess: windowAccess, screenCapture: screenCapture)
             case .defaults(let category):
                 SettingsDetailView(store: store, profiles: profiles, category: category,

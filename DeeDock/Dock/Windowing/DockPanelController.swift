@@ -464,6 +464,7 @@ final class DockPanelController {
         interaction.sourceTrackingChanged = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil
         interaction.openTrash = nil; interaction.emptyTrash = nil
+        interaction.openFocusSession = nil
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
         interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil
         interaction.windowPeekHoverChanged = nil; interaction.openWindowPeek = nil

@@ -422,3 +422,13 @@ Open **Settings → Features → Action Tiles**, choose **Load Shortcuts**, and 
 Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DeeDock never retries a run automatically.
 
 Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DeeDock does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.
+
+## Focus Sessions
+
+Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or use the timer button beside a mode in **Settings → Modes**. DeeDock activates that mode and starts a shared timer. You can also start from the already-active mode. Only one session can run or pause at a time; switching modes later does not replace its timer.
+
+The timer tile appears on every display. Its ring shows time remaining. Click it for **Pause**, **Resume**, **Add 5 Minutes**, and **Finish**. A finished session keeps a checkmark tile until dismissed or replaced by a new session. **Save Session Capsule** opens the usual window-selection and draft-review flow; finishing never captures or saves anything automatically.
+
+Set the next session's duration, from 1 to 180 minutes, in **Settings → Features → Focus Sessions**. The default is 25 minutes. Completion animation is optional and off by default, and Reduce Motion suppresses it. There are no streaks or history scores.
+
+Running timers use a saved wall-clock deadline, so sleep and app downtime count. Paused timers retain their remaining duration. Reopening DeeDock after the deadline marks the session finished without replaying a celebration. Changing focus defaults does not restart the current session. Renaming or deleting a Dock Mode does not erase a timer already started from it.

@@ -4,6 +4,8 @@ import Observation
 /// Application lifetime owner for display reconciliation, global pointer events, and exclusive keyboard focus.
 @MainActor @Observable
 final class DockCoordinator {
+    let focusSession = FocusSessionController()
+    @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
@@ -63,6 +65,7 @@ final class DockCoordinator {
         let semanticStacks = CoalescingSemanticStackOrganizer(
             base: FoundationModelsSemanticStackOrganizer()
         )
+        focusPopover = FocusSessionCoordinator(focus: focusSession, presenter: popovers)
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
         shelves = ShelfCoordinator(shelf: shelf, presenter: popovers, organizer: semanticStacks)
         sessionCapsules = SessionCapsuleCoordinator(capsules: capsules, presenter: popovers,
@@ -86,6 +89,13 @@ final class DockCoordinator {
         started = true
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
+        focusSession.changed = { [weak self] in self?.refreshPanels() }
+        focusPopover.saveCapsule = { [weak self] panel in self?.sessionCapsules.beginFromFocus(on: panel) }
+        focusPopover.keyboardDismissed = { [weak self] id in
+            guard let self, focusedID == id else { return }
+            endFocus(restore: false)
+        }
+        focusSession.start()
         rememberExternal(NSWorkspace.shared.frontmostApplication)
         dragging.openSpringFolder = { [weak self] folder, panel in
             self?.folderStacks.show(folder, on: panel, keyboard: false, spring: true)
@@ -198,19 +208,25 @@ final class DockCoordinator {
             filePicker.cancel(for: id)
             folderStacks.close(for: id, returnFocus: false)
             shelves.close(for: id, returnFocus: false)
+            focusPopover.close(for: id)
             sessionCapsules.close(for: id, returnFocus: false)
             if focusedID == id { endFocus(restore: true) }
             panels.removeValue(forKey: id)?.stop()
         }
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
-                                  trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles)
+                                  trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles, focusSession: focusSession)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.interaction.actionTiles = actionTiles
+            store.openFocusSession = { [weak self, weak panel] in
+                guard let self, let panel else { return }
+                focusPopover.toggle(on: panel)
+            }
+            panel.interaction.openFocusSession = store.openFocusSession
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
-                   !sessionCapsules.isOpen, !modePicker.isKeyboardActive {
+                   !sessionCapsules.isOpen, !focusPopover.isOpen, !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
             }
@@ -341,6 +357,7 @@ final class DockCoordinator {
         }
         folderStacks.reanchor()
         shelves.reanchor()
+        focusPopover.reanchor()
         sessionCapsules.reanchor()
         windowPeeks.refresh()
         if let id = zonePreview.displayID {
@@ -403,6 +420,15 @@ final class DockCoordinator {
         panel.focus()
     }
 
+    var canStartFocus: Bool { canSwitchModes && !focusSession.isActive && !focusSession.requiresReset }
+
+    func startFocus(_ mode: DockMode) {
+        guard canStartFocus, let current = profiles.modes.modes.first(where: { $0.id == mode.id }) else { return }
+        // Activating the already-active mode is a no-op in DockModesStore, not a failed start.
+        if current.id != profiles.modes.document.activeModeID, !activateMode(current.id) { return }
+        focusSession.begin(modeID: current.id, name: current.name)
+    }
+
     @discardableResult
     func activateMode(_ id: UUID) -> Bool {
         guard canSwitchModes else { return false }
@@ -454,6 +480,8 @@ final class DockCoordinator {
         dragging.stop()
         folderStacks.stop()
         shelves.stop()
+        focusPopover.stop()
+        focusSession.stop()
         actionTiles.stop()
         sessionCapsules.stop()
         shelfSemanticWarmup.stop()
