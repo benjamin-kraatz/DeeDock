@@ -175,11 +175,6 @@ struct CapsuleEmptyState<Mark: View>: View {
     var body: some View {
         VStack(spacing: 14) {
             mark
-                .phaseAnimator([false, true]) { content, lifted in
-                    content.offset(y: lifted ? -4 : 4)
-                } animation: { _ in
-                    motion.enabled ? .easeInOut(duration: 2.4) : nil
-                }
             VStack(spacing: 6) {
                 Text(title).font(.headline)
                 Text(message)

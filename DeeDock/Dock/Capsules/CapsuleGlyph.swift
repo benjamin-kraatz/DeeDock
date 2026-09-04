@@ -151,22 +151,26 @@ struct TwinedAppIconStack: View {
 ///
 /// A capsule is identified by what it contains, so the tile shows real application artwork rather than
 /// a generic mark. The front card stands upright and the ones behind it turn alternately left and
-/// right — +7°, -7°, +14° — so their corners emerge on *both* sides of the upright card. Turning them
+/// right — +10°, -10°, +20° — so their corners emerge on *both* sides of the upright card. Turning them
 /// all the same way, which is the obvious reading of a twisted stack, does not work: the cards hide
 /// behind the front one and the little that escapes on a single side makes the front icon itself look
 /// crooked. A capsule holding one application would be indistinguishable from that application's own
-/// tile, so a lone icon gets a blank card on each side instead.
+/// tile, so a lone icon gets a blank card on each side instead. The widest turn is what sets
+/// `cardSize`: rotation grows a card's bounding box, and the fan has to stay clear of its neighbours.
 struct SessionCapsuleStack: View {
     let icons: [NSImage]
     let size: CGFloat
     /// Beyond four cards the fan stops adding depth and starts adding clutter.
     var maximum = 4
     /// Turn added by each pair of cards behind the front one.
-    var step: Angle = .degrees(7)
+    var step: Angle = .degrees(10)
 
     /// Cards are drawn a little under the tile's full size because rotation grows their bounding box.
-    private var cardSize: CGFloat { size * 0.86 }
+    private var cardSize: CGFloat { size * 0.92 }
     private var corner: CGFloat { cardSize * 0.22 }
+
+    /// Cards grow as they go back, so each one shows along a whole edge and not only at the corners.
+    private func cardSize(depth: Int) -> CGFloat { cardSize * (1 + 0.05 * CGFloat(depth)) }
     private var shown: [NSImage] { Array(icons.prefix(maximum)) }
     private var overflow: Int { max(0, icons.count - maximum) }
 
@@ -188,12 +192,16 @@ struct SessionCapsuleStack: View {
     }
 
     private func card(_ icon: NSImage, depth: Int) -> some View {
-        Image(nsImage: icon).resizable().interpolation(.high)
-            .frame(width: cardSize, height: cardSize)
-            // Cards recede as they turn, so the front application stays the one being read.
-            .brightness(-0.1 * Double(depth))
-            .saturation(1 - 0.14 * Double(depth))
+        let side = cardSize(depth: depth)
+        return Image(nsImage: icon).resizable().interpolation(.high)
+            .frame(width: side, height: side)
+            // Lifted, not dimmed: a dark icon dimmed behind a dark icon disappears into it.
+            .brightness(0.05 * Double(depth))
+            .saturation(1 - 0.08 * Double(depth))
             .shadow(color: .black.opacity(0.45), radius: cardSize * 0.045, y: cardSize * 0.015)
+            // A pale halo traces the artwork's own alpha, so same-coloured cards still separate.
+            // The front card is left clean: its silhouette is the one that should read as an icon.
+            .shadow(color: depth > 0 ? .white.opacity(0.3) : .clear, radius: cardSize * 0.02)
             .rotationEffect(angle(depth))
     }
 

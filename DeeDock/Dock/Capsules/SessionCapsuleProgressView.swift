@@ -85,7 +85,7 @@ struct SessionCapsuleProgressView: View {
                 .background(Color.accentColor, in: .circle)
                 .overlay { Circle().strokeBorder(.background.opacity(0.6), lineWidth: 1) }
                 .offset(x: 26, y: 24)
-                .symbolEffect(.pulse, options: .repeating, isActive: !reduceMotion)
+                .symbolEffect(.breathe, isActive: !reduceMotion)
         }
         .frame(height: 92)
         .accessibilityHidden(true)

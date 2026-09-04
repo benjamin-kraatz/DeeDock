@@ -201,6 +201,7 @@ struct SessionCapsulePanelView: View {
                     .font(.system(size: 40, weight: .light)).foregroundStyle(
                         .tint
                     )
+                    .symbolEffect(.pulse.byLayer, options: .repeat(.continuous))
             }
         } else if state.candidates.isEmpty {
             CapsuleEmptyState(
