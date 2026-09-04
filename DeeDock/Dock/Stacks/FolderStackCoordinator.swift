@@ -8,6 +8,8 @@ final class FolderStackCoordinator {
     private var folderID: UUID?
     private weak var sourcePanel: DockPanelController?
     var keyboardDismissed: ((String) -> Void)?
+    var openChanged: ((Bool) -> Void)?
+    var isOpen: Bool { controller != nil }
     var isKeyboardActive: Bool { controller != nil && sourcePanel?.store.keyboardFocus == true }
 
     func show(_ folder: FolderDockItem, on panel: DockPanelController, keyboard: Bool) {
@@ -36,12 +38,14 @@ final class FolderStackCoordinator {
         sourcePanel = panel
         controller = next
         panel.holdFolderStack(true)
+        openChanged?(true)
         next.state.openEntry = { [weak next] in next?.open($0) }
         next.state.presentationChanged = { [weak panel] in panel?.store.setFolderPresentation($0, for: reference.id) == true }
         next.state.dragCompleted = { [weak next] accepted in if accepted { next?.close(returnFocus: false) } }
         next.closed = { [weak self, weak panel] returnFocus in
             let sourceID = panel?.store.displayID
             panel?.holdFolderStack(false)
+            self?.openChanged?(false)
             self?.controller = nil; self?.displayID = nil; self?.folderID = nil; self?.sourcePanel = nil
             if returnFocus { panel?.focus() }
             else if keyboard, let sourceID { self?.keyboardDismissed?(sourceID) }
@@ -63,5 +67,5 @@ final class FolderStackCoordinator {
         controller?.close(returnFocus: returnFocus)
     }
 
-    func stop() { close(returnFocus: false); keyboardDismissed = nil }
+    func stop() { close(returnFocus: false); keyboardDismissed = nil; openChanged = nil }
 }

@@ -36,6 +36,8 @@ struct DockAppButton: View {
     }
     @Environment(\.openSettings) private var openSettings
     @AccessibilityFocusState private var accessibilityFocused: Bool
+    @State private var accessibilityWindows: [ApplicationWindowSummary] = []
+    @State private var accessibilityDiscoveryID: UUID?
 
     var body: some View {
         Button(action: primaryAction) {
@@ -83,8 +85,13 @@ struct DockAppButton: View {
         .accessibilityFocused($accessibilityFocused)
         .onChange(of: accessibilityFocused) { _, focused in
             accessibilityFocus(focused)
+            if focused { discoverAccessibilityWindows() }
+            else { cancelAccessibilityWindowDiscovery() }
         }
-        .onDisappear { accessibilityFocus(false) }
+        .onDisappear {
+            accessibilityFocus(false)
+            cancelAccessibilityWindowDiscovery()
+        }
         .accessibilityLabel(Text(verbatim: item.reference.name))
         .accessibilityValue(
             Text(
@@ -102,6 +109,26 @@ struct DockAppButton: View {
         .accessibilityActions {
             if item.isAvailable {
                 Button(.actionOpenFiles) { interaction?.openFiles?(item) }
+                Button(.applicationMenuShowInFinder) { interaction?.performApplicationMenuAction?(.showInFinder, item) }
+            }
+            if item.isRunning {
+                let allHidden = interaction?.applicationMenuSnapshot?(item).allProcessesHidden == true
+                Button(allHidden ? .applicationMenuShow : .applicationMenuHide) {
+                    interaction?.performApplicationMenuAction?(.setHidden(!allHidden), item)
+                }
+                Button(.applicationMenuBringAllToFront) { interaction?.performApplicationMenuAction?(.bringAllToFront, item) }
+                Button(.applicationMenuQuit) { interaction?.performApplicationMenuAction?(.quit, item) }
+            }
+            ForEach(accessibilityWindows) { window in
+                Button(.applicationMenuOpenWindow(
+                    title: ApplicationContextMenuProjection.windowTitle(
+                        window,
+                        untitled: String(localized: .applicationMenuUntitledWindow)
+                    )
+                )) {
+                    accessibilityDiscoveryID = nil
+                    interaction?.performApplicationMenuAction?(.selectWindow(window.token), item)
+                }
             }
             if item.isFavorite {
                 Button {
@@ -125,6 +152,31 @@ struct DockAppButton: View {
                 }
             }
         }
+    }
+
+    private func discoverAccessibilityWindows() {
+        guard accessibilityDiscoveryID == nil,
+              let snapshot = interaction?.applicationMenuSnapshot?(item),
+              snapshot.windowState == .loading else {
+            accessibilityWindows = []
+            return
+        }
+        accessibilityDiscoveryID = interaction?.beginApplicationWindowDiscovery?(item, snapshot) { state in
+            guard case .loaded(let windows) = state else {
+                accessibilityWindows = []
+                accessibilityDiscoveryID = nil
+                return
+            }
+            accessibilityWindows = windows
+        }
+    }
+
+    private func cancelAccessibilityWindowDiscovery() {
+        if let accessibilityDiscoveryID {
+            interaction?.cancelApplicationWindowDiscovery?(accessibilityDiscoveryID)
+        }
+        accessibilityDiscoveryID = nil
+        accessibilityWindows = []
     }
 }
 

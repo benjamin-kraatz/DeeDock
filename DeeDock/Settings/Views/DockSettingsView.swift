@@ -5,6 +5,7 @@ struct DockSettingsView: View {
     let store: DockSettingsStore
     let profiles: DisplayProfilesStore
     let loginItems: LoginItemController
+    let windowAccess: WindowAccessController
     var coordinator: DockCoordinator? = nil
     @State private var selection: SettingsSelection? = .defaults(.appearance)
     @State private var settingsActive = false
@@ -18,7 +19,7 @@ struct DockSettingsView: View {
         } detail: {
             switch selection {
             case .general:
-                GeneralSettingsPane(controller: loginItems)
+                GeneralSettingsPane(controller: loginItems, windowAccess: windowAccess)
             case .defaults(let category):
                 SettingsDetailView(store: store, category: category, profileError: profiles.errorMessage)
             case .display(let id):
@@ -36,7 +37,10 @@ struct DockSettingsView: View {
                 coordinator?.displayIndicator.stop()
             }, activityChanged: {
                 settingsActive = $0
-                if $0 { loginItems.refresh() }
+                if $0 {
+                    loginItems.refresh()
+                    windowAccess.refresh()
+                }
                 updateDisplayIndicator(active: $0)
             })
         }
@@ -93,10 +97,12 @@ struct DockSettingsView: View {
 #if DEBUG
 #Preview("Multiple displays") {
     let profiles = DisplaySettingsPreview.make()
-    DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller())
+    DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller(),
+                     windowAccess: WindowAccessPreview.controller())
 }
 #Preview("Multiple displays — dark") {
     let profiles = DisplaySettingsPreview.make()
-    DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller()).preferredColorScheme(.dark)
+    DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller(),
+                     windowAccess: WindowAccessPreview.controller()).preferredColorScheme(.dark)
 }
 #endif

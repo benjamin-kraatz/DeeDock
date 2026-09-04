@@ -25,7 +25,6 @@ final class FolderStackPanelController {
     private let keyboard: Bool
     private let reduceMotion: Bool
     private var placement: FolderStackPlacement
-    private var sourceIcon: CGRect
     var closed: ((Bool) -> Void)?
 
     init(folder: FolderReference, anchor: FolderStackAnchor, keyboard: Bool) {
@@ -33,7 +32,6 @@ final class FolderStackPanelController {
         self.keyboard = keyboard
         reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         placement = FolderStackGeometry.placement(anchor: anchor)
-        sourceIcon = anchor.icon
         panel = FolderStackPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
                                  backing: .buffered, defer: false)
         panel.isOpaque = false
@@ -76,7 +74,6 @@ final class FolderStackPanelController {
 
     func update(_ anchor: FolderStackAnchor) {
         placement = FolderStackGeometry.placement(anchor: anchor)
-        sourceIcon = anchor.icon
         state.chrome = placement.chrome
         panel.setFrame(placement.frame, display: true)
     }
@@ -129,14 +126,15 @@ final class FolderStackPanelController {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
             guard let self else { return event }
-            if event.window !== panel, !sourceIcon.insetBy(dx: -4, dy: -4).contains(NSEvent.mouseLocation) {
-                close(returnFocus: false)
-            }
+            guard event.window !== panel else { return event }
+            let consumesDockClick = event.window is DockPanel
+            close(returnFocus: false)
+            // A dock click dismisses the stack but must not reach the button underneath.
+            if consumesDockClick { return nil }
             return event
         }
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
-            guard let self, !sourceIcon.insetBy(dx: -4, dy: -4).contains(NSEvent.mouseLocation) else { return }
-            close(returnFocus: false)
+            self?.close(returnFocus: false)
         }
     }
 

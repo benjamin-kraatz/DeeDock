@@ -25,6 +25,10 @@ final class DockInteraction {
     var documentTargetID: String?
     var springEmphasized = false
     @ObservationIgnored var openFiles: ((DockItem) -> Void)?
+    @ObservationIgnored var applicationMenuSnapshot: ((DockItem) -> ApplicationMenuSnapshot)?
+    @ObservationIgnored var beginApplicationWindowDiscovery: ((DockItem, ApplicationMenuSnapshot, @escaping (ApplicationWindowMenuState) -> Void) -> UUID?)?
+    @ObservationIgnored var cancelApplicationWindowDiscovery: ((UUID) -> Void)?
+    @ObservationIgnored var performApplicationMenuAction: ((ApplicationMenuAction, DockItem) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var revealFolder: ((FolderDockItem) -> Void)?
     @ObservationIgnored var removePin: ((String) -> Void)?

@@ -29,7 +29,8 @@ struct DeeDockApp: App {
         }
         Settings {
             DockSettingsView(store: delegate.coordinator.settings, profiles: delegate.coordinator.profiles,
-                             loginItems: delegate.loginItems, coordinator: delegate.coordinator)
+                             loginItems: delegate.loginItems, windowAccess: delegate.windowAccess,
+                             coordinator: delegate.coordinator)
         }
     }
 }

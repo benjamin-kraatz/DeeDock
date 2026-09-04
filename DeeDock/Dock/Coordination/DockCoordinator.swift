@@ -18,6 +18,7 @@ final class DockCoordinator {
     @ObservationIgnored private let folderStacks = FolderStackCoordinator()
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     @ObservationIgnored private let catalog: ApplicationCatalog
+    @ObservationIgnored private let applicationMenus: ApplicationMenuController
     @ObservationIgnored private let displayService = DisplayService()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
     @ObservationIgnored private var monitors: [Any] = []
@@ -27,11 +28,17 @@ final class DockCoordinator {
     @ObservationIgnored private var started = false
     @ObservationIgnored private var reconciling = false
 
-    init() {
+    init(windowAccess: WindowAccessController) {
         let settings = DockSettingsStore(repository: DockSettingsRepository())
         self.settings = settings
         profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository())
-        catalog = ApplicationCatalog(service: ApplicationService())
+        let applicationService = ApplicationService()
+        catalog = ApplicationCatalog(service: applicationService)
+        applicationMenus = ApplicationMenuController(
+            access: windowAccess,
+            applications: ApplicationMenuService(applications: applicationService),
+            windows: AccessibilityApplicationWindowService()
+        )
     }
 
     func start() {
@@ -41,6 +48,9 @@ final class DockCoordinator {
         folderStacks.keyboardDismissed = { [weak self] displayID in
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)
+        }
+        folderStacks.openChanged = { [weak self] open in
+            self?.panels.values.forEach { $0.holdFolderStack(open) }
         }
         catalog.didChange = { [weak self] in self?.refreshPanels() }
         catalog.activated = { [weak self] app in
@@ -65,6 +75,7 @@ final class DockCoordinator {
         ) { [weak self] _ in MainActor.assumeIsolated {
             self?.dragging.cancel()
             self?.folderStacks.close(returnFocus: false)
+            self?.applicationMenus.cancelAllDiscoveries()
             self?.panels.values.forEach { $0.suspendIdleFading() }
         } }
         let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
@@ -112,6 +123,24 @@ final class DockCoordinator {
                 guard let self, let panel else { return }
                 self.openFiles(for: item, on: panel)
             }
+            panel.interaction.applicationMenuSnapshot = { [weak self] item in
+                self?.applicationMenus.snapshot(for: item)
+                    ?? ApplicationMenuSnapshot(processes: [], windowState: .hidden)
+            }
+            panel.interaction.beginApplicationWindowDiscovery = { [weak self] item, snapshot, completion in
+                self?.applicationMenus.beginDiscovery(for: item, snapshot: snapshot, completion: completion)
+            }
+            panel.interaction.cancelApplicationWindowDiscovery = { [weak self] sessionID in
+                self?.applicationMenus.cancelDiscovery(sessionID)
+            }
+            panel.interaction.performApplicationMenuAction = { [weak self, weak panel] action, item in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                applicationMenus.perform(action, for: item) { [weak self, weak panel] error in
+                    guard let self, let panel, panels[display.id] === panel else { return }
+                    if let error { panel.store.errorMessage = error }
+                    else if action.activatesApplication { panel.store.applicationOpened?() }
+                }
+            }
             panel.interaction.openFolder = { [weak self, weak panel] folder, keyboard in
                 guard let self, let panel, panels[display.id] === panel else { return }
                 folderStacks.show(folder, on: panel, keyboard: keyboard)
@@ -138,6 +167,7 @@ final class DockCoordinator {
                 }
             }
             panels[display.id] = panel
+            if folderStacks.isOpen { panel.holdFolderStack(true) }
         }
         dragging.setPanels(panels)
         for (id, panel) in panels {
@@ -225,6 +255,7 @@ final class DockCoordinator {
         filePicker.stop()
         dragging.stop()
         folderStacks.stop()
+        applicationMenus.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil
         if let suspensionObserver { NSWorkspace.shared.notificationCenter.removeObserver(suspensionObserver) }

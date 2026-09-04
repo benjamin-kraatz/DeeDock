@@ -140,7 +140,9 @@ final class DockPanelController {
         let rects = [interaction.surfaceRect, interaction.errorRect] + Array(interaction.iconRects.values)
         let inside = visibility.exposesContent && panel.frame.contains(NSEvent.mouseLocation) && rects.contains { sample.paintedRect($0).contains(point) }
         panel.ignoresMouseEvents = !inside
-        interaction.setPointer(inside ? sample.inverse(point) : nil)
+        // An open stack makes every dock dismissal-only. Clearing the pointer settles
+        // magnification and hover without changing the dock's visible hold region.
+        interaction.setPointer(inside && !folderStackHeld ? sample.inverse(point) : nil)
         if let eventType {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }

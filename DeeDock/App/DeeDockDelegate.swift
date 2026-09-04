@@ -3,7 +3,8 @@ import AppKit
 /// Composition root; all docks and application-wide resources share this explicit lifetime.
 @MainActor
 final class DeeDockDelegate: NSObject, NSApplicationDelegate {
-    let coordinator = DockCoordinator()
+    let windowAccess = WindowAccessController(service: SystemWindowAccessService())
+    private(set) lazy var coordinator = DockCoordinator(windowAccess: windowAccess)
     let loginItems = LoginItemController(service: SystemLoginItemService())
     private(set) lazy var onboarding = OnboardingWindowController(
         loginItems: loginItems, settings: coordinator.settings,
@@ -12,6 +13,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         loginItems.refresh()
+        windowAccess.refresh()
         coordinator.start()
         // After the docks exist, so a first-time reader sees the real thing behind the tour
         // rather than an empty desktop and a description of one.
@@ -21,6 +23,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         onboarding.stop()
         loginItems.stop()
+        windowAccess.stop()
         coordinator.stop()
     }
 }

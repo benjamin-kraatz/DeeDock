@@ -2897,7 +2897,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "general login startup automatic launch launch at login"
+            "value": "general login startup automatic launch launch at login window windows accessibility permission access"
           }
         }
       }
@@ -3946,6 +3946,96 @@
         }
       }
     },
+    "applicationMenuActionFailed": {
+      "comment": "Dock error after an application or window menu command fails. appName is provided by macOS; details is a localized action description.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t control %1$(appName)@: %2$(details)@" } } }
+    },
+    "applicationMenuBringAllFailed": {
+      "comment": "Detail for a failed Bring All to Front command.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Bring All to Front was rejected by one or more application instances." } } }
+    },
+    "applicationMenuBringAllToFront": {
+      "comment": "Application context-menu and VoiceOver command.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Bring All to Front" } } }
+    },
+    "applicationMenuHide": {
+      "comment": "Application context-menu and VoiceOver command.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Hide" } } }
+    },
+    "applicationMenuHideFailed": {
+      "comment": "Detail for a failed Hide command.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Hide was rejected by one or more application instances." } } }
+    },
+    "applicationMenuMinimized": {
+      "comment": "Accessibility description for a minimized window marker.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Minimized" } } }
+    },
+    "applicationMenuNoWindows": {
+      "comment": "Disabled context-menu row when a running app exposes no selectable windows.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "No Windows" } } }
+    },
+    "applicationMenuOpenWindow": {
+      "comment": "VoiceOver action for a specific window. title is supplied by the target application.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Open window %1$(title)@" } } }
+    },
+    "applicationMenuQuit": {
+      "comment": "Cooperative quit command for the application represented by a dock icon.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Quit" } } }
+    },
+    "applicationMenuQuitFailed": {
+      "comment": "Detail for a failed cooperative Quit command.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Quit was rejected by one or more application instances." } } }
+    },
+    "applicationMenuShow": {
+      "comment": "Application context-menu command shown when every represented process is hidden.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show" } } }
+    },
+    "applicationMenuShowFailed": {
+      "comment": "Detail for a failed Show command.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show was rejected by one or more application instances." } } }
+    },
+    "applicationMenuShowInFinder": {
+      "comment": "Application context-menu and VoiceOver command that reveals the app bundle.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show in Finder" } } }
+    },
+    "applicationMenuShowInFinderFailed": {
+      "comment": "Detail for a failed Show in Finder command.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Show in Finder was unavailable." } } }
+    },
+    "applicationMenuUntitledWindow": {
+      "comment": "Fallback menu title for a selectable window without a title.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Untitled Window" } } }
+    },
+    "applicationMenuWindowFailed": {
+      "comment": "Detail for a failed individual-window selection.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "The window is no longer available." } } }
+    },
+    "applicationMenuWindowsLoading": {
+      "comment": "Disabled menu row while Accessibility window discovery is in progress.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Loading Windows…" } } }
+    },
+    "applicationMenuWindowsUnavailable": {
+      "comment": "Disabled menu row when Accessibility window discovery failed.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Windows Unavailable" } } }
+    },
     "visibilityShowAll": {
       "comment": "Show both app sections.",
       "extractionState": "manual",
@@ -3957,6 +4047,46 @@
           }
         }
       }
+    },
+    "windowAccessCheckAgain": {
+      "comment": "Button that rereads Accessibility authorization from macOS.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Check Again" } } }
+    },
+    "windowAccessEnable": {
+      "comment": "Explicit button that requests macOS Accessibility authorization.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Enable Window Access" } } }
+    },
+    "windowAccessExplanation": {
+      "comment": "General Settings explanation of optional individual-window access.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Allow DeeDock to list and select another app’s windows. App actions such as Hide, Quit, and Show in Finder work without this access. DeeDock never captures window contents." } } }
+    },
+    "windowAccessOpenSettings": {
+      "comment": "Button opening the Accessibility pane in System Settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Open System Settings…" } } }
+    },
+    "windowAccessStatusEnabled": {
+      "comment": "Window access status in General Settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window access is enabled." } } }
+    },
+    "windowAccessStatusNotEnabled": {
+      "comment": "Window access status in General Settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window access is not enabled." } } }
+    },
+    "windowAccessStatusUnavailable": {
+      "comment": "Window access status when macOS cannot report or provide Accessibility access.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window access is unavailable in this build." } } }
+    },
+    "windowAccessTitle": {
+      "comment": "Heading for optional Accessibility controls in General Settings.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Window access" } } }
     }
   },
   "version": "1.3"

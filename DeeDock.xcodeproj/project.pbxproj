@@ -65,6 +65,12 @@
 		DDF7000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */; };
 		DDF7000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */; };
 		DDF7000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */; };
+		DDFA00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */; };
+		DDFA00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift */; };
+		DDFA00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift */; };
+		DDFA00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift */; };
+		DDFA00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */; };
+		DDFA00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -128,6 +134,12 @@
 		DDF8000000000000000000006 /* DeeDock/Dock/Stacks/FolderStackGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackGeometry.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackState.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift; sourceTree = SOURCE_ROOT; };
+		DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationMenu.swift; sourceTree = SOURCE_ROOT; };
+		DDFB00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationMenuServicing.swift; sourceTree = SOURCE_ROOT; };
+		DDFB00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationWindowServicing.swift; sourceTree = SOURCE_ROOT; };
+		DDFB00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/WindowAccessServicing.swift; sourceTree = SOURCE_ROOT; };
+		DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/ApplicationMenuController.swift; sourceTree = SOURCE_ROOT; };
+		DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/General/WindowAccessController.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -195,6 +207,12 @@
 		DD3000000000000000000000 /* Test Model Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */,
+				DDFB00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift */,
+				DDFB00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift */,
+				DDFB00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift */,
+				DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */,
+				DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */,
 				DDF8000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift */,
 				DDF8000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift */,
 				DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */,
@@ -347,6 +365,12 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				DDFA00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift in Sources */,
+				DDFA00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift in Sources */,
+				DDFA00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift in Sources */,
+				DDFA00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift in Sources */,
+				DDFA00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift in Sources */,
+				DDFA00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift in Sources */,
 				DDF7000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift in Sources */,
 				DDF7000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift in Sources */,
 				DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */,
@@ -549,7 +573,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = U7H5KA9MG4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -602,7 +626,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = U7H5KA9MG4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;

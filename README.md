@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -59,7 +59,7 @@ Current configuration:
 | App Sandbox | Enabled |
 | External package dependencies | None |
 
-Use Xcode 27 and macOS 27. The app retains the original Swift language mode, App Sandbox, and signing configuration. Distribution and broader OS support are not part of this slice. DeeDock does not request Accessibility access or change the system Dock’s preferences.
+Use Xcode 27 and macOS 27. The app retains the original Swift language mode, App Sandbox, and signing configuration. Distribution and broader OS support are not part of this slice. DeeDock requests Accessibility access only when you explicitly choose **Enable Window Access** in Settings; it never requests access at startup or from an application menu. DeeDock does not change the system Dock’s preferences.
 
 ## Working in this repository
 
@@ -75,7 +75,7 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 - Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Target Lock, Orbit, Stardust, Power Badge, Glitch, Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
 - Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, and Glitch are Metal layer effects that read the app's own artwork: the light follows the icon's real silhouette and borrows its colours, and each app draws a different figure from a seed derived from its bundle identifier, so the same app always looks the same. Lava Chrome melts the icon's own corners and edges, Singularity puts an orbiting black hole that lenses and swallows part of the artwork, and Glitch slips its rows sideways and separates its colour channels. **Animate indicators** switches motion on for those seven and for Stardust; it is on by default, honours Reduce Motion, and stops while a dock is hidden or has faded out.
 - Neon and Aura were withdrawn. A saved preference naming either migrates to Plasma and Solar Flare respectively, rather than failing to load.
-- Right-click an app for **Open**, **Pin**, or **Unpin**. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
+- Right-click an app for opening and Finder commands, running-app commands, and **Pin** or **Unpin**. Running-app commands include Hide or Show, Bring All to Front, and cooperative Quit. One icon represents every matching regular process, so those commands apply to all matching instances. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
 - Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
 - Choose **Quit DeeDock** from the menu-bar item or app menu to close it.
@@ -93,6 +93,18 @@ The toggle reflects macOS’s registration status. It stays off until approval i
 Turning off Launch at Login prevents future automatic launches and leaves DeeDock running. Login startup follows normal startup: configured docks and the menu-bar item appear without opening Settings or deliberately taking foreground focus. General remains usable if display settings have a storage error, and Restore Defaults does not change login registration.
 
 The implementation uses `SMAppService.mainApp`; it stores no duplicate preference and installs no helper or launch-agent plist. Registration is opt-in. Real registration and logout/login acceptance require a consistently signed installed copy; see [acceptance notes](docs/ACCEPTANCE.md#launch-at-login).
+
+## Window-aware application menus
+
+Open **Settings → General → Window access** to opt into individual window rows in application context menus. The card reports Enabled, Not Enabled, or Unavailable. **Enable Window Access** is the only action that asks macOS for Accessibility consent; **Open System Settings…** and **Check Again** let you manage and refresh the external grant. DeeDock stores no copy of the permission state.
+
+Application-level actions do not need Accessibility access. For a running app, its context menu can Hide or Show every matching instance, Bring All to Front, or request a cooperative Quit. Available app bundles also offer Open, Open Files, and Show in Finder. These commands remain available when window access is off.
+
+When window access is enabled, a menu opens immediately with **Loading Windows…**, then replaces that row with the app's top-level standard windows and dialogs. Select a row to restore a minimized window when supported, activate its owning app, and raise that exact window. Main windows are marked, untitled windows receive a localized fallback, and duplicate titles stay separate. The same commands are exposed as VoiceOver actions.
+
+Window discovery and selection use the public macOS Accessibility API. DeeDock remains sandboxed and does not use AppleScript, private window-server APIs, or ScreenCaptureKit. Moving between Spaces and full-screen transitions is best-effort because public APIs do not expose complete Space ownership or guarantee activation. Windows owned by unusual helper processes may not appear under the regular app represented by the icon.
+
+Window thumbnails are deliberately deferred. They require a separate capture and Screen Recording permission design and are not part of window access. The signed, sandboxed runtime checkpoint for permission grant, revocation, minimization, and raising remains part of hands-on acceptance rather than compile-time validation.
 
 ## First launch
 
