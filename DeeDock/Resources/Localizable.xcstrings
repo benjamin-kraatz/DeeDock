@@ -1,6 +1,198 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "actionsTitle" : {
+      "comment" : "Settings card for pinned Apple Shortcuts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action Tiles"
+          }
+        }
+      }
+    },
+    "actionsHelp" : {
+      "comment" : "Explains shared shortcut tiles, input, output, and cancellation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin shortcuts on every display. Click a tile to run it, or drop files onto it as input. Configure the shortcut to save or show its output. Cancel stops waiting; it cannot undo actions already performed."
+          }
+        }
+      }
+    },
+    "actionsRunFailed" : {
+      "comment" : "Fallback error when the Shortcuts helper fails without details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shortcut could not finish."
+          }
+        }
+      }
+    },
+    "actionsReady" : {
+      "comment" : "Shortcut status before a run.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready"
+          }
+        }
+      }
+    },
+    "actionsRunning" : {
+      "comment" : "Shortcut status while waiting for completion.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running…"
+          }
+        }
+      }
+    },
+    "actionsSucceeded" : {
+      "comment" : "Shortcut completed successfully.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished"
+          }
+        }
+      }
+    },
+    "actionsStorageFailed" : {
+      "comment" : "Preserves corrupt stored bytes until an explicit reset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Action Tiles could not be read or saved. Reset them to allow changes."
+          }
+        }
+      }
+    },
+    "actionsDiscoveryFailed" : {
+      "comment" : "Shortcut discovery failure, followed by system details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load shortcuts: %1$@"
+          }
+        }
+      }
+    },
+    "actionsCancelled" : {
+      "comment" : "Cancellation may not undo shortcut side effects.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped waiting. Actions already performed were not undone."
+          }
+        }
+      }
+    },
+    "actionsRun" : {
+      "comment" : "Run a user-selected shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run"
+          }
+        }
+      }
+    },
+    "actionsLoad" : {
+      "comment" : "Read installed shortcut names and identifiers without executing them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Shortcuts"
+          }
+        }
+      }
+    },
+    "actionsPin" : {
+      "comment" : "Menu for pinning a shortcut on every display.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin Shortcut"
+          }
+        }
+      }
+    },
+    "actionsReset" : {
+      "comment" : "Explicit recovery from unreadable saved action tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Action Tiles"
+          }
+        }
+      }
+    },
+    "actionsResetHelp" : {
+      "comment" : "Reset confirmation affects DeeDock pins only.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove saved Action Tiles? Your shortcuts in the Shortcuts app will remain."
+          }
+        }
+      }
+    },
+    "actionsTileHint" : {
+      "comment" : "Accessible action tile hint.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run this shortcut, or drop files here to use them as input."
+          }
+        }
+      }
+    },
+    "actionsDrop" : {
+      "comment" : "Native drag feedback before executing a shortcut with file inputs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run Shortcut with Files"
+          }
+        }
+      }
+    },
     "filePreview.action" : {
       "comment" : "Command to preview a selected file without opening an application.",
       "extractionState" : "manual",

@@ -19,6 +19,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var destinationIndex: Int?
     private var trashDestinationID: String?
     private var shelfDestinationID: String?
+    private var actionDestination: (String, UUID)?
     private var folderDestination: (String, FolderDockItem)?
     var openSpringFolder: ((FolderDockItem, DockPanelController) -> Void)?
     var dropInFolder: ((NSDraggingInfo, FolderDockItem, DockPanelController) -> Bool)?
@@ -98,6 +99,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard validates(info.draggingPasteboard) else { return [] }
         nativeDisplayID = displayID // Loading a new payload clears the preceding session.
         update(at: NSEvent.mouseLocation)
+        if actionDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if shelfDestinationID == displayID { return .copy }
         // Removing a staged reference is a discard, not a file operation, but the poof cursor is right.
@@ -114,6 +116,13 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
+        if let (id, actionID) = actionDestination, id == displayID,
+           info.draggingSourceOperationMask.contains(.copy), let files = payload.stageableItems,
+           panels[id]?.store.actions?.run(actionID, files: files) == true {
+            completion.committed = true
+            cancel()
+            return true
+        }
         if let (id, folder) = folderDestination, id == displayID, let panel = panels[id] {
             let accepted = dropInFolder?(info, folder, panel) ?? false
             if accepted { completion.committed = true; cancel() }
@@ -253,9 +262,26 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard active, !updating, !completion.cancelled, !completion.committed else { return }
         updating = true
         defer { updating = false }
-        destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil
+        destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
+        if sourceID == nil, payload.isReady, payload.stageableItems != nil,
+           let candidate, candidate.store.displayID == nativeDisplayID,
+           let action = candidate.actionTarget(at: point) {
+            actionDestination = (candidate.store.displayID, action.tile.id)
+            documentDrag.clear()
+            for panel in panels.values {
+                let targeted = panel === candidate
+                panel.interaction.documentTargetID = nil
+                panel.interaction.trashTargeted = false; panel.interaction.shelfTargeted = false
+                panel.interaction.springEmphasized = false
+                panel.updateSectionDragHover(at: point, valid: false)
+                panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
+                                          message: targeted ? .actionsDrop : nil)
+            }
+            updateScrollTimer()
+            return
+        }
         if sourceID == nil, payload.isReady, payload.stageableItems != nil,
            let candidate, candidate.store.displayID == nativeDisplayID,
            let folder = candidate.folderTarget(at: point) {
@@ -422,7 +448,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
         nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; token = nil
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
-        trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; shelfSourceIDs = []
+        trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; shelfSourceIDs = []
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }
         pasteboardChange = nil
     }

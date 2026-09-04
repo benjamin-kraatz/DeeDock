@@ -286,6 +286,12 @@ final class DockPanelController {
     /// Pixel density of the screen this dock is on, for artwork generated at native resolution.
     var backingScaleFactor: CGFloat { panel.screen?.backingScaleFactor ?? 2 }
 
+    func actionTarget(at point: CGPoint) -> ActionDockItem? {
+        store.entries.compactMap(\.action).first {
+            !$0.status.busy && utilityTarget(.action($0.tile.id), at: point)
+        }
+    }
+
     func trashTarget(at point: CGPoint) -> Bool { utilityTarget(.trash, at: point) }
     func shelfTarget(at point: CGPoint) -> Bool { utilityTarget(.shelf, at: point) }
 

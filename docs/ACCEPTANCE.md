@@ -926,3 +926,11 @@ Required hands-on acceptance:
 - Exercise nested browsing, Back, Delete, Grid, List, and Smart while directory contents change. Confirm older directory loads and semantic results never replace the current directory.
 - Close the popover during a large copy, remove its display, and exercise sleep/wake. Confirm the accepted copy completes or reports its error, and transient monitors and preview leases are released.
 - Check Reduce Motion and Reduce Transparency, including drag feedback, keyboard selection, and the embedded Quick Look view.
+
+## Action Tiles
+
+Implemented app-wide shortcut pins, explicit discovery, ordering, one active run per tile, file-drop input, and keyboard activation. Pins store stable Shortcuts UUIDs under `dock.action-tiles.v1`. Corrupt or unknown documents block edits until an explicit reset. Execution state is transient and is never replayed after launch. Native source grants are retained until the helper exits. CLI output uses temporary files to avoid pipe backpressure; ordinary shortcut output is discarded, so the shortcut owns saving or displaying results.
+
+Xcode MCP `BuildProject`, with `buildForTesting: false`, built the app successfully with no errors. Shortcut listing was inspected to confirm identifier parsing; no shortcut was executed. No tests or native UI acceptance were run.
+
+Remaining hands-on acceptance: pin and reorder shortcuts, restart, rename or remove a shortcut externally, exercise one and multiple dropped files from Finder and the Shelf, concurrent runs of different tiles, duplicate activation of a busy tile, helper errors, interactive shortcut prompts, cancellation, shutdown, keyboard navigation, VoiceOver, four dock edges, auto-hide, and reduced accessibility effects. Cancellation stops the CLI but cannot undo shortcut side effects. Sandbox support remains limited by the project's existing configuration.

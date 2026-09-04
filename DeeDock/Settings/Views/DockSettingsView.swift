@@ -26,7 +26,7 @@ struct DockSettingsView: View {
                                       activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
                                       deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) })
             case .features:
-                FeaturesSettingsPane(store: store, profiles: profiles,
+                FeaturesSettingsPane(actions: coordinator?.actionTiles, store: store, profiles: profiles,
                                      windowAccess: windowAccess, screenCapture: screenCapture)
             case .defaults(let category):
                 SettingsDetailView(store: store, profiles: profiles, category: category,

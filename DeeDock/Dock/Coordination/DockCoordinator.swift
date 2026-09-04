@@ -4,6 +4,7 @@ import Observation
 /// Application lifetime owner for display reconciliation, global pointer events, and exclusive keyboard focus.
 @MainActor @Observable
 final class DockCoordinator {
+    let actionTiles = ActionTilesController()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
     let zonePreview = DockZonePreviewController()
@@ -83,6 +84,8 @@ final class DockCoordinator {
     func start() {
         guard !started else { return }
         started = true
+        actionTiles.changed = { [weak self] in self?.refreshPanels() }
+        actionTiles.start()
         rememberExternal(NSWorkspace.shared.frontmostApplication)
         dragging.openSpringFolder = { [weak self] folder, panel in
             self?.folderStacks.show(folder, on: panel, keyboard: false, spring: true)
@@ -201,8 +204,9 @@ final class DockCoordinator {
         }
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
-                                  trash: trash, shelf: shelf, capsules: capsules)
+                                  trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
+            panel.interaction.actionTiles = actionTiles
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
@@ -450,6 +454,7 @@ final class DockCoordinator {
         dragging.stop()
         folderStacks.stop()
         shelves.stop()
+        actionTiles.stop()
         sessionCapsules.stop()
         shelfSemanticWarmup.stop()
         popovers.stop()

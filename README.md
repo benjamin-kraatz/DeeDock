@@ -414,3 +414,11 @@ Useful previews live beside their views: pinned/running/unavailable apps, launch
 All app-owned UI copy lives in [Localizable.xcstrings](DeeDock/Resources/Localizable.xcstrings): menu commands, Pin/Unpin actions, accessibility text, empty-state guidance, and errors. Edit the English values there and add translations in Xcode. Stable keys generate typed Swift symbols automatically; translator comments explain each string and named placeholder.
 
 Use generated `LocalizedStringResource` symbols in SwiftUI and defer error-message localization until display. Use `String(localized:)` for AppKit APIs that require a resolved string. Application names and underlying system error descriptions are supplied by macOS and are displayed as provided. Keep persistent storage keys separate from translated UI copy.
+
+## Action Tiles
+
+Open **Settings → Features → Action Tiles**, choose **Load Shortcuts**, and pin a shortcut. Tiles appear in the same order on every display, independently of Dock Modes. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
+
+Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DeeDock never retries a run automatically.
+
+Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DeeDock does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.

@@ -6,6 +6,7 @@ import Observation
 @MainActor @Observable
 final class DockInteraction {
     /// Owns this panel's idle deadline and artwork opacity.
+    @ObservationIgnored var actionTiles: ActionTilesController?
     let tooltips = DockTooltipController()
     var tooltipPreset: DockTooltipPreset = .classic
     var suppressTooltips = false

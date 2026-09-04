@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC7100000000000000000001 /* DeeDock/Dock/Actions/ActionTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7100000000000000000002 /* DeeDock/Dock/Actions/ActionTile.swift */; };
 		AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */; };
 		AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */; };
 		AB0100000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */; };
@@ -98,6 +99,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AC7100000000000000000002 /* DeeDock/Dock/Actions/ActionTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Actions/ActionTile.swift; sourceTree = SOURCE_ROOT; };
 		000000000000000000000120 /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Models/WindowPeekSettings.swift; sourceTree = SOURCE_ROOT; };
@@ -293,6 +295,7 @@
 				AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */,
 				AB0600000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift */,
 				AB0800000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift */,
+				AC7100000000000000000002 /* DeeDock/Dock/Actions/ActionTile.swift */,
 				AB0800000000000000000001 /* DeeDock/Dock/Capsules/SessionCapsuleRepository.swift */,
 				AB0800000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift */,
 				AB0800000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift */,
@@ -475,6 +478,7 @@
 				AB0500000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift in Sources */,
 				AB0500000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift in Sources */,
 				AB0700000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift in Sources */,
+				AC7100000000000000000001 /* DeeDock/Dock/Actions/ActionTile.swift in Sources */,
 				AB0700000000000000000001 /* DeeDock/Dock/Capsules/SessionCapsuleRepository.swift in Sources */,
 				AB0700000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift in Sources */,
 				AB0700000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift in Sources */,
