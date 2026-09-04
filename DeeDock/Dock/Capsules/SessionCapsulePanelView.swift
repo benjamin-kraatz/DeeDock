@@ -387,8 +387,10 @@ struct SessionCapsulePanelView: View {
                     } label: {
                         Label(.capsulesDelete, systemImage: "trash")
                     }
-                    .buttonStyle(.glass)
-                    
+                    .tint(.red)
+                    .buttonStyle(.glassProminent)
+                    .controlSize(.large)
+
                     Spacer(minLength: 12)
                     Button(.capsulesResume, systemImage: "play.fill") {
                         state.resumeCapsule?(capsule)
