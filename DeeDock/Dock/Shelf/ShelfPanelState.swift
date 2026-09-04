@@ -36,12 +36,14 @@ final class ShelfPanelState {
     var band: CGRect?
     /// Item rectangles in that same space, republished as the list scrolls or resizes.
     var rowFrames: [UUID: CGRect] = [:]
+    var preview: DockFilePreviewItem?
     var error: String?
     var chrome = DockPopoverChrome(
         edge: .bottom,
         attachment: DockPopoverGeometry.idealSize.width / 2
     )
     @ObservationIgnored var removeItems: ((Set<UUID>) -> Void)?
+    @ObservationIgnored var previewItems: (([ShelfItem]) -> Void)?
     @ObservationIgnored var openItems: (([ShelfItem]) -> Void)?
     @ObservationIgnored var revealItems: (([ShelfItem]) -> Void)?
     @ObservationIgnored var copyItems: (([ShelfItem]) -> Void)?
@@ -101,6 +103,9 @@ final class ShelfPanelState {
             withAnimation(.snappy(duration: 0.24)) { entries = next }
         } else {
             entries = next
+        }
+        if let preview, !accesses.contains(where: { $0.url == preview.url && $0.isAvailable }) {
+            self.preview = nil
         }
         let live = Set(entries.map(\.id))
         selection = selection.intersection(live)
@@ -253,6 +258,8 @@ final class ShelfPanelState {
         band = nil
         thumbnails.removeAll()
         removeItems = nil
+        preview = nil
+        previewItems = nil
         openItems = nil
         revealItems = nil
         copyItems = nil

@@ -43,7 +43,7 @@ final class ShelfCoordinator {
         if let failure = shelf.loadFailure {
             state.report(failure) { [weak self] in self?.reloadFromStorage() }
         }
-        let next = DockPopoverPanelController(anchor: anchor, keyboard: keyboard,
+        let next = DockPopoverPanelController(anchor: anchor, keyboard: keyboard, clickFocus: true,
                                               ideal: CGSize(width: 420, height: 380)) { chrome in
             state.chrome = chrome
         } content: {
@@ -62,6 +62,7 @@ final class ShelfCoordinator {
             guard let panel, self?.confirmClear() == true else { return }
             panel.store.clearShelf()
         }
+        state.previewItems = { [weak self] in self?.preview($0) }
         state.openItems = { [weak self] items in self?.open(items) }
         state.revealItems = { [weak self] items in self?.reveal(items) }
         state.copyItems = { [weak self] items in self?.copy(items) }
@@ -169,6 +170,14 @@ final class ShelfCoordinator {
         close(returnFocus: false)
     }
 
+    private func preview(_ items: [ShelfItem]) {
+        guard let item = items.first, let access = shelf.resolve(item.id), access.isAvailable else {
+            state?.report(String(localized: .shelfUnavailableItems)) { [weak self] in self?.reload() }
+            return
+        }
+        state?.preview = DockFilePreviewItem(url: access.url, leases: [access])
+    }
+
     private func reveal(_ items: [ShelfItem]) {
         let resolved = items.compactMap { shelf.resolve($0.id) }
         guard !resolved.isEmpty else {
@@ -245,17 +254,23 @@ final class ShelfCoordinator {
             }
         }
         switch event.keyCode {
+        case 49:
+            if state.preview != nil { state.preview = nil }
+            else { preview(state.selectedItems) }
         case 53:
+            if state.preview != nil { state.preview = nil; return true }
             // Escape drops a multiple selection first, then closes the panel.
-            if state.selection.count > 1 { state.clearSelection() } else { close(returnFocus: true) }
+            if state.selection.count > 1 { state.clearSelection() } else { close(returnFocus: sourcePanel?.store.keyboardFocus == true) }
         case 36, 76:
             state.openSelection()
         case 51, 117:
             state.removeSelection()
         case 125:
             state.select(by: 1)
+            if state.preview != nil { preview(state.selectedItems) }
         case 126:
             state.select(by: -1)
+            if state.preview != nil { preview(state.selectedItems) }
         default:
             return false
         }

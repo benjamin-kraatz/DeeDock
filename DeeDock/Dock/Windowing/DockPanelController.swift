@@ -171,11 +171,13 @@ final class DockPanelController {
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
         // Tooltips are absent from `rects`, so their transparent reservation stays excluded.
-        visibility.update(activation: geometry.activation.zone.contains(NSEvent.mouseLocation),
+        let activationHovered = geometry.activation.zone.contains(NSEvent.mouseLocation)
+        visibility.update(activation: activationHovered,
                           retained: inside || geometry.activation.retention.contains(NSEvent.mouseLocation),
                           held: held)
-        // Idle fading retains these hit regions even when their artwork is fully transparent.
-        interaction.idleFade.update(interacting: inside || held,
+        // The activation zone also restores idle opacity, including when auto-hide is off.
+        // Keep fading suspended while hovered, even when the artwork is fully transparent.
+        interaction.idleFade.update(interacting: inside || activationHovered || held,
             fullyVisible: !idleSuspended && (visibility.phase == .visible || visibility.phase == .hideDelay))
     }
 
@@ -270,6 +272,15 @@ final class DockPanelController {
         let local = contentPoint(point)
         return sample.mask.contains(local)
             && interaction.iconRects[entry.hitID]?.contains(local) == true
+    }
+
+    /// Uses the same animation mask and icon rectangles as native click handling.
+    func folderTarget(at point: CGPoint) -> FolderDockItem? {
+        store.entries.compactMap { entry -> FolderDockItem? in
+            guard case .folder(let folder) = entry, folder.isAvailable,
+                  utilityTarget(.folder(folder.reference.id), at: point) else { return nil }
+            return folder
+        }.first
     }
 
     /// Pixel density of the screen this dock is on, for artwork generated at native resolution.

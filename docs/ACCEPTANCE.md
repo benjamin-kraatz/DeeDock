@@ -904,3 +904,25 @@ Authored Swift Testing coverage covers Smart persistence, metadata loading, outp
 - Confirm the grid layout's remove button is clickable and that rubber-band selection still works between grid tiles.
 - Open Settings and confirm Features sits below Modes, that Behavior no longer shows Shelf or Trash, that Previews is gone, and that searching for "shelf", "trash", "peek", or "permissions" finds Features.
 - Confirm a display's Use Defaults and the Customized pills no longer mention any feature, and that toggling a feature changes every display's dock at once.
+
+
+## Spring-loaded folders and file previews
+
+Implemented on 2026-09-04. Pinned folders accept native spring loading for file URL drags. Folder rows use the same AppKit protocol to descend through real subfolders inside the existing popover. Back and Delete return through the browsing history. Opening a stack by drag does not grant keyboard focus; an explicit click inside a folder or Shelf panel enables its keyboard commands.
+
+File drops copy into the targeted folder. Private pin drags remain pin edits, and unsupported file promises remain rejected. The copy worker retains source and destination access through completion and does not overwrite existing entries. It preflights the batch for collisions and recursive destinations, then copies serially. Filesystem changes can still cause a later item to fail; the reported error includes the number already copied. Dismissal does not cancel an accepted filesystem operation. The destination dock receives copy errors even after the popover closes.
+
+Folder stacks and the Shelf embed `QLPreviewView`. Select a file and press Space, or use the Quick Look context-menu or accessibility action. Space and Escape return to the list; arrow navigation updates the preview. The preview retains its file-access lease until the native view closes. Movie previews do not autoplay. Folder stack clicks now select, and double-click or Return opens. Aliases and packages remain leaf items.
+
+The focused unsigned Debug app build succeeded against the macOS 27 SDK. The first sandboxed attempt could not access the installed Metal toolchain; the build succeeded outside the command sandbox. No tests, previews, automated visual checks, or app launch were performed. The existing Xcode configurations have `ENABLE_APP_SANDBOX = NO`; sandboxed filesystem acceptance is not established by this build, and those settings were not changed.
+
+Required hands-on acceptance:
+
+- Drag files from Finder over a pinned folder, wait for spring loading, descend at least two subfolders, and copy onto a folder row and into empty background space. Confirm the originals remain and the target files are correct.
+- Repeat from the Shelf, from another folder stack, across displays, and with all four dock edges and auto-hide enabled. Confirm spring loading does not activate DeeDock and that dragging out retains readable file access after the source popover closes.
+- Leave a target before it springs open, cancel with Escape, and drop outside DeeDock. Confirm no late open, abandoned preview, or held dock remains. A manually opened stack stays open after a cancelled outgoing drag.
+- Copy a mixed batch with an existing destination name, a recursive folder destination, an unreadable source, and a read-only destination. Confirm existing files are not replaced and partial failures identify the completed count.
+- Preview images, PDFs, text, movies, an unpreviewable file, and a missing Shelf reference. Exercise Space, Escape, arrow navigation, context menus, and VoiceOver. Confirm a preview closes before its owning list and no application opens merely to preview.
+- Exercise nested browsing, Back, Delete, Grid, List, and Smart while directory contents change. Confirm older directory loads and semantic results never replace the current directory.
+- Close the popover during a large copy, remove its display, and exercise sleep/wake. Confirm the accepted copy completes or reports its error, and transient monitors and preview leases are released.
+- Check Reduce Motion and Reduce Transparency, including drag feedback, keyboard selection, and the embedded Quick Look view.

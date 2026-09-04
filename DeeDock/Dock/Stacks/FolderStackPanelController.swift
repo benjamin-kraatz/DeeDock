@@ -18,12 +18,24 @@ final class FolderStackPanelController {
         let state = FolderStackState(folder: folder, organizer: organizer)
         self.state = state
         self.keyboard = keyboard
-        popover = DockPopoverPanelController(anchor: anchor, keyboard: keyboard) { chrome in
+        popover = DockPopoverPanelController(anchor: anchor, keyboard: keyboard, clickFocus: true) { chrome in
             state.chrome = chrome
         } content: {
             FolderStackView(state: state, keyboard: keyboard)
         }
         popover.willClose = { [weak state] in state?.stop() }
+        popover.enableFileDrops()
+        popover.dragEntered = { [weak state] info in
+            guard let state, !state.copying, state.preview == nil,
+                  FolderFileDrop.urls(info) != nil else { return [] }
+            state.dropTargeted = true
+            return .copy
+        }
+        popover.dragExited = { [weak state] in state?.dropTargeted = false }
+        popover.dragPerformed = { [weak state] info in
+            state?.dropTargeted = false
+            return state?.receive(info) ?? false
+        }
         popover.keyHandler = { [weak self] in self?.handleKey($0) ?? false }
     }
 
@@ -43,8 +55,7 @@ final class FolderStackPanelController {
             return
         }
         if entry.isFolder {
-            NSWorkspace.shared.activateFileViewerSelecting([entry.url])
-            close(returnFocus: false)
+            state.navigate(to: entry.url)
         } else if NSWorkspace.shared.open(entry.url) {
             close(returnFocus: false)
         } else {
@@ -53,15 +64,21 @@ final class FolderStackPanelController {
     }
 
     private func handleKey(_ event: NSEvent) -> Bool {
+        guard event.modifierFlags.intersection([.command, .control]).isEmpty else { return false }
         switch event.keyCode {
         case 48:
             state.presentationFocused.toggle()
         case 49 where state.presentationFocused:
             choosePresentation(by: 1)
+        case 49:
+            state.previewSelection()
         case 36 where !state.presentationFocused, 76 where !state.presentationFocused:
             state.openSelection()
         case 53:
-            close(returnFocus: true)
+            if state.preview != nil { state.preview = nil }
+            else { close(returnFocus: keyboard) }
+        case 51:
+            state.back()
         case 123 where state.presentationFocused:
             choosePresentation(by: -1)
         case 124 where state.presentationFocused:

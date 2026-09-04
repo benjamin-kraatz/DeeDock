@@ -84,6 +84,13 @@ final class DockCoordinator {
         guard !started else { return }
         started = true
         rememberExternal(NSWorkspace.shared.frontmostApplication)
+        dragging.openSpringFolder = { [weak self] folder, panel in
+            self?.folderStacks.show(folder, on: panel, keyboard: false, spring: true)
+        }
+        dragging.dropInFolder = { [weak self] info, folder, panel in
+            self?.folderStacks.receive(info, folder: folder, on: panel) ?? false
+        }
+        dragging.springDragEnded = { [weak self] in self?.folderStacks.dragEnded() }
         folderStacks.keyboardDismissed = { [weak self] displayID in
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)

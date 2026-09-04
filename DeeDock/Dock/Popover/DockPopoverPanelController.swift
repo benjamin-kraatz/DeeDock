@@ -11,10 +11,6 @@ private final class DockPopoverPanel: NSPanel {
     }
 }
 
-private final class DockPopoverHostingView<Content: View>: NSHostingView<Content> {
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
-}
-
 /// The transient panel every dock tile popover shares: a borderless non-activating window placed
 /// inward from its tile, dismissed by an outside click, and animated along the dock's edge.
 ///
@@ -25,6 +21,7 @@ private final class DockPopoverHostingView<Content: View>: NSHostingView<Content
 final class DockPopoverPanelController<Content: View> {
     private let panel: DockPopoverPanel
     private let keyboard: Bool
+    private let clickFocus: Bool
     private let reduceMotion: Bool
     private let ideal: CGSize
     private let chromeChanged: (DockPopoverChrome) -> Void
@@ -32,6 +29,19 @@ final class DockPopoverPanelController<Content: View> {
     private var localMonitor: Any?
     private var globalMonitor: Any?
     private var stopped = false
+    private var hosting: DockHostingView<Content>?
+    var dragEntered: ((NSDraggingInfo) -> NSDragOperation)?
+    var dragPerformed: ((NSDraggingInfo) -> Bool)?
+    var dragExited: (() -> Void)?
+
+    /// Enables file drops without changing keyboard eligibility during a spring-loaded reveal.
+    func enableFileDrops() {
+        hosting?.registerForDraggedTypes([.fileURL])
+        hosting?.dragEntered = { [weak self] in self?.dragEntered?($0) ?? [] }
+        hosting?.dragPerformed = { [weak self] in self?.dragPerformed?($0) ?? false }
+        hosting?.dragExited = { [weak self] in self?.dragExited?() }
+        hosting?.dragEnded = { [weak self] in self?.dragExited?() }
+    }
 
     /// Feature-owned teardown, invoked once before the panel animates away.
     var willClose: (() -> Void)?
@@ -44,9 +54,10 @@ final class DockPopoverPanelController<Content: View> {
     ///   - chromeChanged: Receives the resolved chrome before the content is built, and again on
     ///     every re-anchor, so the content view can draw its pointer in the right place.
     ///   - content: Built once, after the initial chrome has been published.
-    init(anchor: DockPopoverAnchor, keyboard: Bool, ideal: CGSize = DockPopoverGeometry.idealSize,
+    init(anchor: DockPopoverAnchor, keyboard: Bool, clickFocus: Bool = false, ideal: CGSize = DockPopoverGeometry.idealSize,
          chromeChanged: @escaping (DockPopoverChrome) -> Void, content: () -> Content) {
         self.keyboard = keyboard
+        self.clickFocus = clickFocus
         self.ideal = ideal
         self.chromeChanged = chromeChanged
         reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
@@ -62,7 +73,9 @@ final class DockPopoverPanelController<Content: View> {
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
         panel.acceptsKeyboardFocus = keyboard
         chromeChanged(placement.chrome)
-        panel.contentView = DockPopoverHostingView(rootView: content())
+        let hosting = DockHostingView(rootView: content())
+        self.hosting = hosting
+        panel.contentView = hosting
         panel.keyboardHandler = { [weak self] in self?.keyHandler?($0) ?? false }
         panel.setFrame(placement.frame, display: false)
     }
@@ -100,6 +113,10 @@ final class DockPopoverPanelController<Content: View> {
         if let localMonitor { NSEvent.removeMonitor(localMonitor) }
         if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
         localMonitor = nil; globalMonitor = nil
+        hosting?.unregisterDraggedTypes()
+        hosting?.dragEntered = nil; hosting?.dragPerformed = nil
+        hosting?.dragExited = nil; hosting?.dragEnded = nil
+        dragEntered = nil; dragPerformed = nil; dragExited = nil
         willClose?()
         willClose = nil
         panel.keyboardHandler = nil
@@ -127,9 +144,23 @@ final class DockPopoverPanelController<Content: View> {
 
     private func installMonitors() {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
-        localMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
+        // File panels route navigation before Quick Look's responder consumes Space/Escape.
+        // Other popovers keep their original responder chain, including editable text fields.
+        let localMask = clickFocus ? mask.union(.keyDown) : mask
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: localMask) { [weak self] event in
             guard let self else { return event }
-            guard event.window !== panel else { return event }
+            if event.type == .keyDown {
+                guard event.window === panel else { return event }
+                return keyHandler?(event) == true ? nil : event
+            }
+            guard event.window !== panel else {
+                // Only an explicit click grants focus. Drag hover never reaches this path.
+                if clickFocus {
+                    panel.acceptsKeyboardFocus = true
+                    panel.makeKeyAndOrderFront(nil)
+                }
+                return event
+            }
             let consumesDockClick = event.window is DockPanel
             close(returnFocus: false)
             // A dock click dismisses the popover but must not reach the button underneath.

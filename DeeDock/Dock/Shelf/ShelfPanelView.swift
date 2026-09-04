@@ -25,7 +25,11 @@ struct ShelfPanelView: View {
                 semanticErrorBanner(error)
                 Divider()
             }
-            content
+            if let preview = state.preview {
+                DockFilePreview(item: preview) { state.preview = nil }
+            } else {
+                content
+            }
         }
         .dockPopoverChrome(state.chrome, opaque: reduceTransparency || forceOpaqueBackground)
         .accessibilityElement(children: .contain)
@@ -356,6 +360,8 @@ private struct ShelfItemBehavior: ViewModifier {
                 state.rowFrames[entry.id] = frame
             }
             .contextMenu {
+                Button(.filePreviewAction) { state.previewItems?(targets) }
+                    .disabled(!entry.isAvailable)
                 Button {
                     state.press(entry.id, command: false, shift: false)
                     state.openItems?(targets)
@@ -390,6 +396,7 @@ private struct ShelfItemBehavior: ViewModifier {
             .accessibilityAddTraits(selected ? .isSelected : [])
             .accessibilityActions {
                 if entry.isAvailable {
+                    Button(.filePreviewAction) { state.previewItems?([entry.item]) }
                     Button(.shelfOpenItem(count: 1)) { state.openItems?([entry.item]) }
                     Button(.shelfRevealInFinder) { state.revealItems?([entry.item]) }
                 }

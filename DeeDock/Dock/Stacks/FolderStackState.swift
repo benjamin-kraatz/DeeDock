@@ -4,6 +4,17 @@ import Observation
 @MainActor @Observable
 final class FolderStackState {
     let folder: FolderReference
+    private(set) var directory: URL
+    private(set) var history: [URL] = []
+    var preview: DockFilePreviewItem?
+    var copying = false
+    private(set) var receivedDrop = false
+    var rootURL: URL { access?.url ?? folder.url }
+    /// A native source must retain this lease even when another popover replaces its view.
+    func dragLease() -> FolderResourceAccess? { access }
+    var dropTargeted = false
+    @ObservationIgnored var copyFailed: ((String) -> Void)?
+    var directoryName: String { history.isEmpty ? folder.name : directory.lastPathComponent }
     private(set) var entries: [FolderStackEntry] = []
     private(set) var loading = false
     private(set) var semanticSections: [SemanticStackSection] = []
@@ -31,6 +42,7 @@ final class FolderStackState {
          error: String? = nil,
          organizer: any SemanticStackOrganizing = UnavailableSemanticStackOrganizer()) {
         self.folder = folder
+        directory = folder.url
         self.organizer = organizer
         presentation = folder.presentation
         self.entries = entries
@@ -50,7 +62,9 @@ final class FolderStackState {
             report(String(localized: .folderStackUnavailable)) { [weak self] in self?.start() }
             return
         }
-        installMonitor(for: access.url)
+        directory = access.url
+        history = []
+        installMonitor(for: directory)
         reload()
     }
 
@@ -59,12 +73,14 @@ final class FolderStackState {
         loadTask?.cancel()
         semanticGeneration = UUID()
         semanticTask?.cancel()
+        generation = UUID()
         let token = generation
+        let directory = directory
         loading = true
         error = nil
         retryAction = nil
         loadTask = Task { [weak self] in
-            let worker = Task.detached { Result { try FolderStackLoader.contents(of: access) } }
+            let worker = Task.detached { Result { try FolderStackLoader.contents(of: access, directory: directory) } }
             let result = await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
             guard let self, !Task.isCancelled, generation == token else { return }
             loading = false
@@ -78,12 +94,79 @@ final class FolderStackState {
                 if self.selectedID == nil || !entries.contains(where: { $0.id == self.selectedID }) {
                     self.selectedID = entries.first?.id
                 }
+                if let preview, !entries.contains(where: { $0.reference.url == preview.url }) {
+                    self.preview = nil
+                }
                 refreshSemanticOrganization()
             case .failure(let error):
                 report(error.localizedDescription) { [weak self] in self?.reload() }
             }
             loadTask = nil
         }
+    }
+
+    /// Keeps the root bookmark alive while browsing only real descendants, never aliases or packages.
+    func navigate(to url: URL) {
+        guard !copying, entries.contains(where: { $0.reference.url == url && $0.reference.isFolder }) else { return }
+        history.append(directory)
+        changeDirectory(url)
+    }
+
+    func back() {
+        guard !copying, let previous = history.popLast() else { return }
+        changeDirectory(previous)
+    }
+
+    private func changeDirectory(_ url: URL) {
+        preview = nil
+        directory = url
+        entries = []
+        selectedID = nil
+        debounceTask?.cancel()
+        cancelSemanticOrganization(clearError: true)
+        installMonitor(for: url)
+        reload()
+    }
+
+    func previewSelection() {
+        if preview != nil { preview = nil; return }
+        guard let entry = entries.first(where: { $0.id == selectedID }), let access else { return }
+        showPreview(entry.reference, access: access)
+    }
+
+    func showPreview(_ entry: FolderStackEntryReference) {
+        guard let access else { return }
+        selectedID = entry.id
+        showPreview(entry, access: access)
+    }
+
+    private func showPreview(_ entry: FolderStackEntryReference, access: FolderResourceAccess) {
+        guard FileManager.default.fileExists(atPath: entry.url.path) else {
+            report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.reload() }
+            return
+        }
+        preview = DockFilePreviewItem(url: entry.url, leases: [access])
+    }
+
+    /// Copies into the current directory or an immediate folder child; never alters the source.
+    func receive(_ info: NSDraggingInfo, into url: URL? = nil) -> Bool {
+        guard !copying, let urls = FolderFileDrop.urls(info), let access else { return false }
+        let destination = url ?? directory
+        guard destination == rootURL || destination == directory || entries.contains(where: {
+            $0.reference.url == destination && $0.reference.isFolder
+        }) else { return false }
+        receivedDrop = true
+        copying = true
+        let failure = copyFailed
+        FolderFileDrop.copy(urls, to: destination, lease: access) { [weak self] error in
+            self?.copying = false
+            self?.reload()
+            if let error {
+                failure?(error)
+                self?.report(error) { [weak self] in self?.reload() }
+            }
+        }
+        return true
     }
 
     func choose(_ value: FolderStackPresentation) {
@@ -126,7 +209,9 @@ final class FolderStackState {
         let navigable = displayedEntries
         guard !navigable.isEmpty else { return }
         let current = selectedID.flatMap { id in navigable.firstIndex { $0.id == id } } ?? 0
-        selectedID = navigable[(current + distance + navigable.count) % navigable.count].id
+        let index = ((current + distance) % navigable.count + navigable.count) % navigable.count
+        selectedID = navigable[index].id
+        if preview != nil { preview = nil; previewSelection() }
     }
 
     func openSelection() {
@@ -270,6 +355,8 @@ final class FolderStackState {
         cancelSemanticOrganization(clearError: true)
         access = nil
         retryAction = nil
+        preview = nil
+        copyFailed = nil
         openEntry = nil; presentationChanged = nil; dragCompleted = nil
     }
 }

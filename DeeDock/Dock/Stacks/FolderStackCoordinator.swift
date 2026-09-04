@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 
 /// App-wide owner for the single transient folder stack.
 @MainActor
@@ -8,6 +8,8 @@ final class FolderStackCoordinator {
     private var controller: FolderStackPanelController?
     private var displayID: String?
     private var folderID: UUID?
+    private var springOpened = false
+    private var springCleanup: Task<Void, Never>?
     private weak var sourcePanel: DockPanelController?
     var keyboardDismissed: ((String) -> Void)?
     var isOpen: Bool { controller != nil }
@@ -19,8 +21,10 @@ final class FolderStackCoordinator {
         presenter.register(.folderStack) { [weak self] in self?.close(returnFocus: false) }
     }
 
-    func show(_ folder: FolderDockItem, on panel: DockPanelController, keyboard: Bool) {
+    func show(_ folder: FolderDockItem, on panel: DockPanelController, keyboard: Bool, spring: Bool = false) {
+        springCleanup?.cancel()
         if folderID == folder.reference.id, displayID == panel.store.displayID {
+            if spring { return }
             close(returnFocus: keyboard)
             return
         }
@@ -46,11 +50,15 @@ final class FolderStackCoordinator {
         folderID = reference.id
         sourcePanel = panel
         controller = next
+        springOpened = spring
+        next.state.copyFailed = { [weak panel] message in panel?.store.errorMessage = .folderDropError(message) }
         panel.holdPopover(true)
         presenter.didOpen(.folderStack)
         next.state.openEntry = { [weak next] in next?.open($0) }
         next.state.presentationChanged = { [weak panel] in panel?.store.setFolderPresentation($0, for: reference.id) == true }
-        next.state.dragCompleted = { [weak next] accepted in if accepted { next?.close(returnFocus: false) } }
+        next.state.dragCompleted = { [weak next] accepted in
+            if accepted, next?.state.copying != true { next?.close(returnFocus: false) }
+        }
         next.closed = { [weak self, weak panel] returnFocus in
             let sourceID = panel?.store.displayID
             panel?.holdPopover(false)
@@ -60,6 +68,24 @@ final class FolderStackCoordinator {
             else if keyboard, let sourceID { self?.keyboardDismissed?(sourceID) }
         }
         next.show()
+    }
+
+    func receive(_ info: NSDraggingInfo, folder: FolderDockItem, on panel: DockPanelController) -> Bool {
+        show(folder, on: panel, keyboard: false, spring: true)
+        return controller?.state.receive(info, into: controller?.state.rootURL) ?? false
+    }
+
+    /// A spring-opened stack survives a successful copy so progress and failures stay visible.
+    func dragEnded() {
+        guard springOpened, let current = controller else { return }
+        springCleanup?.cancel()
+        // Native destination callbacks may end before another destination commits its drop.
+        springCleanup = Task { [weak self, weak current] in
+            do { try await Task.sleep(for: .milliseconds(100)) } catch { return }
+            guard let self, let current, controller === current,
+                  !current.state.copying, !current.state.receivedDrop else { return }
+            close(returnFocus: false)
+        }
     }
 
     func reanchor() {
@@ -73,6 +99,7 @@ final class FolderStackCoordinator {
 
     func close(for displayID: String? = nil, returnFocus: Bool = false) {
         guard displayID == nil || self.displayID == displayID else { return }
+        springCleanup?.cancel(); springCleanup = nil
         controller?.close(returnFocus: returnFocus)
     }
 

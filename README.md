@@ -151,13 +151,17 @@ Selecting multiple pins within DeeDock remains outside this slice. File and fold
 
 Click a pinned folder to open one transient stack inward from its dock icon. Only one stack can be open across all displays. The header shows the Finder folder name and a per-pin Grid/List/Smart choice. Grid and List sort visible children by localized name. Smart uses Apple Intelligence on file metadata to build a grouped list without reading file contents. It organizes the 60 most recently modified children and keeps any remainder in More Items.
 
-The stack shows immediate children only. Click a regular file, package, or alias to open it with its default application. Click a subfolder to reveal it in Finder. Drag one child to Finder or another app through the native file-drag session; the destination and modifier keys negotiate copy or move, and DeeDock never changes the filesystem itself. A cancelled drag leaves the stack open.
+The stack shows the current folder's immediate children. Click a child to select it, then press Space for Quick Look without opening an app. Space or Escape closes the preview; arrow keys switch the preview to another child. Double-click or press Return to open a file, package, or alias. Opening a subfolder browses it inside the same stack. Use Back or Delete to return to its parent. The context menu also provides Quick Look and Show in Finder.
+
+Hold a dragged file over a pinned folder to spring-open its stack, then hover over subfolders to browse deeper. Drop onto a subfolder or the current folder's background to copy the files there. The copy cursor identifies the operation; source files stay in place. Existing names cause an error, with no replacement, and a failure reports how many items were copied before it occurred. Copies run off the main actor and keep their file access until completion, even if the panel closes. Packages, aliases, symbolic links, and file promises are not spring-loaded folders.
+
+Drag one child to Finder or another app through the native file-drag session; that destination and modifier keys negotiate copy or move. A cancelled outgoing drag leaves a manually opened stack open. A stack opened by a drag closes when that drag ends without a drop into it.
 
 The source dock stays revealed and suppresses fading and tooltips while its stack is open. The panel closes after a successful open or drag, outside click, Escape, another stack opening, source removal/hiding, display removal, sleep, or shutdown. Failed opens remain visible with a retryable inline error. Directory changes are watched only while the panel is open.
 
-Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Escape returns focus to the source folder, and Tab reaches the Grid/List/Smart control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
+Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Space previews, Delete goes back, and Escape closes the preview before returning focus to the source folder. Tab reaches the Grid/List/Smart control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
 
-Fan and Automatic presentations, nested browsing, search, Quick Look, multi-selection, file promises, dropping into a folder, and persistent utility windows remain planned.
+Fan and Automatic presentations, search, multi-selection, file promises, move operations into stacks, and persistent utility windows remain planned.
 
 ## Features
 
@@ -195,7 +199,9 @@ The Shelf holds at most 50 items; a larger drop is accepted up to the limit and 
 
 Keyboard, while the panel is open: Up and Down select, Return shows the selected item in Finder, Delete removes it, and Escape returns focus to the dock. Only one dock popover is open at a time, so opening the Shelf closes an open folder stack and the reverse.
 
-Quick Look, multi-selection, reordering, auto-expiry, and multiple named shelves remain planned.
+Select a Shelf item and press Space, or choose Quick Look from its context menu, to preview it inside the panel. Space or Escape returns to the list. Up and Down preview the previous or next item. A preview holds the file access until its native view closes.
+
+Reordering, auto-expiry, and multiple named shelves remain planned.
 
 ## Trash
 

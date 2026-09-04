@@ -33,11 +33,25 @@ struct FolderStackView: View {
                 .background(.quaternary)
                 Divider()
             }
-            content
+            if state.copying {
+                HStack { ProgressView().controlSize(.small); Text(.folderDropCopying) }.padding(8)
+            }
+            if let preview = state.preview {
+                DockFilePreview(item: preview) { state.preview = nil }
+            } else {
+                content
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if state.dropTargeted {
+                Text(.folderDropCopyHere).font(.callout)
+                    .padding(8).background(.regularMaterial, in: .capsule)
+                    .padding(12).allowsHitTesting(false)
+            }
         }
         .dockPopoverChrome(state.chrome, opaque: reduceTransparency || forceOpaqueBackground)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(Text(.folderStackAccessibilityLabel(folderName: state.folder.name)))
+        .accessibilityLabel(Text(.folderStackAccessibilityLabel(folderName: state.directoryName)))
         .accessibilityValue(Text(.folderStackItemCount(
             count: state.entries.count,
             mode: String(localized: modeTitle(state.presentation))
@@ -46,8 +60,13 @@ struct FolderStackView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
+            if !state.history.isEmpty {
+                Button(.folderStackBack, systemImage: "chevron.left") { state.back() }
+                    .labelStyle(.iconOnly)
+                    .disabled(state.copying)
+            }
             Image(systemName: "folder.fill").foregroundStyle(.tint).accessibilityHidden(true)
-            Text(verbatim: state.folder.name).font(.headline).lineLimit(1)
+            Text(verbatim: state.directoryName).font(.headline).lineLimit(1)
             Spacer(minLength: 8)
             HStack(spacing: 2) {
                 modeButton(.grid, symbol: "square.grid.2x2")
@@ -175,13 +194,23 @@ struct FolderStackView: View {
         .buttonStyle(.plain)
         .overlay {
             FolderStackDragSourceView(entry: entry, open: { state.openEntry?(entry.reference) },
-                                      completed: { state.dragCompleted?($0) })
+                                      completed: { state.dragCompleted?($0) },
+                                      lease: { state.dragLease() },
+                                      select: { state.selectedID = entry.id; state.presentationFocused = false },
+                                      navigate: { state.navigate(to: entry.reference.url) },
+                                      receive: { state.receive($0, into: entry.reference.url) },
+                                      acceptsDrop: { !state.copying })
         }
         .accessibilityLabel(Text(verbatim: entry.reference.name))
-        .accessibilityHint(Text(entry.reference.isFolder ? .folderStackRevealHint : .folderStackOpenHint))
+        .accessibilityHint(Text(entry.reference.isFolder ? .folderStackBrowseHint : .folderStackOpenHint))
         .accessibilityAddTraits(state.selectedID == entry.id ? .isSelected : [])
+        .contextMenu {
+            Button(.filePreviewAction) { state.showPreview(entry.reference) }
+            Button(.folderStackShowInFinder) { NSWorkspace.shared.activateFileViewerSelecting([entry.reference.url]) }
+        }
         .accessibilityActions {
-            Button(entry.reference.isFolder ? .folderStackShowInFinder : .actionOpen) {
+            Button(.filePreviewAction) { state.showPreview(entry.reference) }
+            Button(.actionOpen) {
                 state.openEntry?(entry.reference)
             }
         }

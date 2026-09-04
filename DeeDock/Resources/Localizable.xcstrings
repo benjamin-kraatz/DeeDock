@@ -1,6 +1,102 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "filePreview.action" : {
+      "comment" : "Command to preview a selected file without opening an application.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Look"
+          }
+        }
+      }
+    },
+    "filePreview.close" : {
+      "comment" : "Button that returns from Quick Look to the file list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Preview"
+          }
+        }
+      }
+    },
+    "folderStack.back" : {
+      "comment" : "Return to the previous folder in the stack.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "folderStack.browseHint" : {
+      "comment" : "Accessibility hint for a browsable subfolder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open this folder in the stack."
+          }
+        }
+      }
+    },
+    "folderDrop.copyHere" : {
+      "comment" : "File drag feedback; the source files stay in their original locations.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy into Folder"
+          }
+        }
+      }
+    },
+    "folderDrop.copying" : {
+      "comment" : "Progress while a dropped batch is copied into a folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copying files…"
+          }
+        }
+      }
+    },
+    "folderDrop.failed" : {
+      "comment" : "File copy failure, including the number already copied and the system error.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied %1$lld items. %2$@"
+          }
+        }
+      }
+    },
+    "folderDrop.error" : {
+      "comment" : "Error from a dropped file batch, including the system details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@"
+          }
+        }
+      }
+    },
     "" : {
 
     },

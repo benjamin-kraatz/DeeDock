@@ -47,14 +47,14 @@ struct FolderStackEntry: Identifiable {
 
 nonisolated enum FolderStackLoader {
     /// Reads only immediate, visible children. Packages and aliases remain leaf items.
-    static func contents(of access: FolderResourceAccess) throws -> [FolderStackEntryReference] {
+    static func contents(of access: FolderResourceAccess, directory: URL? = nil) throws -> [FolderStackEntryReference] {
         guard access.isAvailable else { throw CocoaError(.fileNoSuchFile) }
         let keys: Set<URLResourceKey> = [
             .isDirectoryKey, .isPackageKey, .isAliasFileKey, .isSymbolicLinkKey,
             .isHiddenKey, .localizedNameKey, .typeIdentifierKey, .fileSizeKey,
             .creationDateKey, .contentModificationDateKey
         ]
-        let urls = try FileManager.default.contentsOfDirectory(at: access.url,
+        let urls = try FileManager.default.contentsOfDirectory(at: directory ?? access.url,
             includingPropertiesForKeys: Array(keys), options: [.skipsHiddenFiles])
         return try urls.compactMap { url in
             try Task.checkCancellation()
