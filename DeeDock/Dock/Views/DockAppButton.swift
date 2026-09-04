@@ -30,7 +30,7 @@ struct DockAppButton: View {
                              accent: DockIconAccent.accent(for: item.icon, identity: item.id))
     }
     /// A dock nobody can see, or one that has already faded out, schedules no frames.
-    private var indicatorAnimated: Bool {
+    private var indicatorAnimated: Bool { 
         guard let interaction else { return false }
         return interaction.animateIndicators && interaction.exposesContent && interaction.idleFade.fraction == 0
     }

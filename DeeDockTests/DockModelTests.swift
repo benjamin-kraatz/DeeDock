@@ -71,6 +71,19 @@ struct DockModelTests {
         #expect(overflow.canvasLength > overflow.viewportLength)
     }
 
+    @Test("Utility entries receive a divider independent of the pinned and running divider")
+    func utilityDividers() {
+        let divided = DockGeometry.layout(count: 6, favoriteCount: 3, utilityCount: 1,
+                                          availableLength: 1400)
+        #expect(divided.separatorIndices == [3, 5])
+        let pinnedOnly = DockGeometry.layout(count: 4, favoriteCount: 3, utilityCount: 1,
+                                             availableLength: 1400)
+        #expect(pinnedOnly.separatorIndices == [3])
+        let utilityOnly = DockGeometry.layout(count: 1, favoriteCount: 0, utilityCount: 1,
+                                              availableLength: 1400)
+        #expect(utilityOnly.separatorIndices.isEmpty)
+    }
+
     @Test("Running apps deduplicate and retain order across launch and termination")
     func ordering() {
         let a = app("a", name: "Alpha")

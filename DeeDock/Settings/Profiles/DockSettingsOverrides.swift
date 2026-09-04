@@ -3,7 +3,7 @@ import Foundation
 /// The independently inheritable settings; visibility and pins are always display-specific.
 enum DockSettingField: String, CaseIterable, Codable {
     case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-    case appVisibility, tooltipPreset
+    case appVisibility, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
     case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
@@ -22,6 +22,8 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .fadeOutDuration: \.fadeOutDuration
         case .restoreDuration: \.restoreDuration
         case .appVisibility: \.appVisibility
+        case .showTrash: \.showTrash
+        case .confirmBeforeEmptyingTrash: \.confirmBeforeEmptyingTrash
         case .tooltipPreset: \.tooltipPreset
         case .iconSize: \.iconSize
         case .magnification: \.magnification
@@ -58,6 +60,8 @@ struct DockSettingsOverrides: Codable, Equatable {
     var fadeOutDuration: Double?
     var restoreDuration: Double?
     var appVisibility: DockAppVisibility?
+    var showTrash: Bool?
+    var confirmBeforeEmptyingTrash: Bool?
     var tooltipPreset: DockTooltipPreset?
     var iconSize: Double?
     var magnification: Double?
@@ -83,7 +87,7 @@ struct DockSettingsOverrides: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-        case appVisibility, tooltipPreset
+        case appVisibility, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
@@ -98,6 +102,8 @@ struct DockSettingsOverrides: Codable, Equatable {
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
         result.animateIndicators = animateIndicators ?? defaults.animateIndicators
         result.appVisibility = appVisibility ?? defaults.appVisibility
+        result.showTrash = showTrash ?? defaults.showTrash
+        result.confirmBeforeEmptyingTrash = confirmBeforeEmptyingTrash ?? defaults.confirmBeforeEmptyingTrash
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground
         result.backgroundOpacity = backgroundOpacity ?? defaults.backgroundOpacity
@@ -131,6 +137,8 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .fadeOutDuration: fadeOutDuration != nil
         case .restoreDuration: restoreDuration != nil
         case .appVisibility: appVisibility != nil
+        case .showTrash: showTrash != nil
+        case .confirmBeforeEmptyingTrash: confirmBeforeEmptyingTrash != nil
         case .tooltipPreset: tooltipPreset != nil
         case .iconSize: iconSize != nil
         case .magnification: magnification != nil
@@ -166,6 +174,8 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .fadeOutDuration: fadeOutDuration = value?.fadeOutDuration
         case .restoreDuration: restoreDuration = value?.restoreDuration
         case .appVisibility: appVisibility = value?.appVisibility
+        case .showTrash: showTrash = value?.showTrash
+        case .confirmBeforeEmptyingTrash: confirmBeforeEmptyingTrash = value?.confirmBeforeEmptyingTrash
         case .tooltipPreset: tooltipPreset = value?.tooltipPreset
         case .iconSize: iconSize = value?.iconSize
         case .magnification: magnification = value?.magnification
@@ -219,6 +229,8 @@ extension DockSettingsOverrides {
         fadeOutDuration = try values.decodeIfPresent(Double.self, forKey: .fadeOutDuration)
         restoreDuration = try values.decodeIfPresent(Double.self, forKey: .restoreDuration)
         appVisibility = try values.decodeIfPresent(DockAppVisibility.self, forKey: .appVisibility)
+        showTrash = try values.decodeIfPresent(Bool.self, forKey: .showTrash)
+        confirmBeforeEmptyingTrash = try values.decodeIfPresent(Bool.self, forKey: .confirmBeforeEmptyingTrash)
         tooltipPreset = try values.decodeIfPresent(DockTooltipPreset.self, forKey: .tooltipPreset)
         iconSize = try values.decodeIfPresent(Double.self, forKey: .iconSize)
         magnification = try values.decodeIfPresent(Double.self, forKey: .magnification)

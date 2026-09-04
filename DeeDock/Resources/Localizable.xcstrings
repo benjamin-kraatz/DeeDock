@@ -1573,6 +1573,18 @@
         }
       }
     },
+    "dragMoveToTrash": {
+      "comment": "Valid Finder drop target over the system Trash tile.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move to Trash"
+          }
+        }
+      }
+    },
     "dragOpenIn": {
       "comment": "Valid document drop target. appName is the application name provided by macOS.",
       "extractionState": "manual",
@@ -2682,6 +2694,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pinned apps stay in the pinned section while running. Collapse replaces one section with a button. Expansion lasts until clicked again or the dock is recreated."
+          }
+        }
+      }
+    },
+    "settingsConfirmBeforeEmptyingTrash": {
+      "comment": "Toggle that requires DeeDock's warning before it asks Finder to empty Trash.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm before emptying Trash"
+          }
+        }
+      }
+    },
+    "settingsShowTrash": {
+      "comment": "Toggle that includes the trailing system Trash tile in a dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Trash"
+          }
+        }
+      }
+    },
+    "settingsTrash": {
+      "comment": "Behavior settings card for the system Trash tile.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trash"
+          }
+        }
+      }
+    },
+    "settingsTrashHelp": {
+      "comment": "Help for the optional system Trash tile.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adds Trash after a divider. You can also choose whether DeeDock asks before emptying it."
           }
         }
       }
@@ -4047,6 +4107,91 @@
           }
         }
       }
+    },
+    "trashAutomationActionFailed": {
+      "comment": "Dock error when Finder rejects an Open Trash or Empty Trash automation command. details is supplied by Finder or macOS.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Finder couldn’t complete the Trash command. %1$(details)@" } } }
+    },
+    "trashAutomationFailed": {
+      "comment": "Fallback error when Finder automation produces no detailed failure.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Finder couldn’t complete the Trash command." } } }
+    },
+    "trashEmpty": {
+      "comment": "VoiceOver value when the system Trash contains no visible items.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Empty" } } }
+    },
+    "trashEmptyAction": {
+      "comment": "Destructive Trash context-menu and VoiceOver action that opens a confirmation alert.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Empty Trash…" } } }
+    },
+    "trashEmptyCancel": {
+      "comment": "Cancel button in the Empty Trash confirmation alert.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Cancel" } } }
+    },
+    "trashEmptyConfirm": {
+      "comment": "Destructive confirmation button that permanently deletes the user's Trash contents.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Empty Trash" } } }
+    },
+    "trashEmptyConfirmationMessage": {
+      "comment": "Explanation in the Empty Trash confirmation alert.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "The items in Trash will be permanently deleted. This action can’t be undone." } } }
+    },
+    "trashEmptyConfirmationTitle": {
+      "comment": "Title of the Empty Trash confirmation alert.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Empty Trash?" } } }
+    },
+    "trashEmptyFailed": {
+      "comment": "Dock error when DeeDock cannot permanently delete one or more Trash items. details is supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t empty Trash. %1$(details)@" } } }
+    },
+    "trashFull": {
+      "comment": "VoiceOver value when the system Trash contains one or more items.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Contains items" } } }
+    },
+    "trashMoveFailed": {
+      "comment": "Dock error after macOS fails to move one or more dropped items to Trash. details is supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t move the items to Trash. %1$(details)@" } } }
+    },
+    "trashName": {
+      "comment": "Name of the system Trash tile.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Trash" } } }
+    },
+    "trashOpen": {
+      "comment": "Action that opens Trash in Finder.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Open Trash" } } }
+    },
+    "trashOpenFailed": {
+      "comment": "Dock error when macOS cannot open Trash in Finder.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Couldn’t open Trash." } } }
+    },
+    "trashOpenHint": {
+      "comment": "VoiceOver hint for the system Trash tile.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Opens Trash in Finder" } } }
+    },
+    "trashStatusUnknown": {
+      "comment": "VoiceOver value when the sandbox cannot inspect Trash contents but opening and dropping remain available.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Status unavailable" } } }
+    },
+    "trashUnavailable": {
+      "comment": "VoiceOver value or dock error when the system Trash location cannot be reached.",
+      "extractionState": "manual",
+      "localizations": { "en": { "stringUnit": { "state": "translated", "value": "Trash is unavailable." } } }
     },
     "windowAccessCheckAgain": {
       "comment": "Button that rereads Accessibility authorization from macOS.",

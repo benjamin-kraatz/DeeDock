@@ -49,7 +49,8 @@ struct DockSurfaceView: View {
                     .minimumScaleFactor(0.7)
                     .position(x: surface.midX, y: surface.midY)
             }
-            if let index = layout.separatorIndex, index < centers.count {
+            ForEach(layout.separatorIndices.sorted(), id: \.self) { index in
+                if index < centers.count {
                 let icon = layout.iconFrame(centerAlong: centers[index], size: layout.iconSize)
                 let position = centers[index] - sizes[index] / 2 - 12
                 Rectangle().fill(.primary.opacity(0.18))
@@ -59,6 +60,7 @@ struct DockSurfaceView: View {
                     .position(x: layout.edge.isVertical ? icon.midX : position,
                               y: layout.edge.isVertical ? position : icon.midY + (layout.edge == .top ? -3 : 3))
                     .accessibilityHidden(true)
+                }
             }
             ForEach(Array(slots.enumerated()), id: \.element.id) {
                 index,

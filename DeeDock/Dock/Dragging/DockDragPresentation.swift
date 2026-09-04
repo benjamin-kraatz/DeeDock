@@ -11,6 +11,7 @@ enum DockRenderSlot: Identifiable {
     case app(DockItem)
     case folder(FolderDockItem)
     case group(DockGroupControl)
+    case trash(TrashDockItem)
     case gap(String)
 
     var id: String {
@@ -19,6 +20,7 @@ enum DockRenderSlot: Identifiable {
         case .folder(let item): return item.id
         case .gap(let id): return "gap:\(id)"
         case .group(let control): return DockEntryID.group(control.group).hitID
+        case .trash(let item): return item.id
         }
     }
     var isPinned: Bool {
@@ -26,10 +28,21 @@ enum DockRenderSlot: Identifiable {
         case .app(let item): return item.isFavorite
         case .folder, .gap: return true
         case .group(let control): return control.group == .pinned
+        case .trash: return false
         }
     }
     var item: DockItem? { if case .app(let item) = self { return item }; return nil }
     var folder: FolderDockItem? { if case .folder(let item) = self { return item }; return nil }
+    var trash: TrashDockItem? { if case .trash(let item) = self { return item }; return nil }
+    var isUtility: Bool { trash != nil }
+    var appGroup: DockAppGroup? {
+        switch self {
+        case .app(let item): item.isFavorite ? .pinned : .running
+        case .folder: .pinned
+        case .group(let control): control.group
+        case .trash, .gap: nil
+        }
+    }
     var pin: DockPin? {
         switch self {
         case .app(let item) where item.isFavorite: .application(item.reference)
@@ -37,12 +50,13 @@ enum DockRenderSlot: Identifiable {
         default: nil
         }
     }
-    var icon: NSImage? { item?.icon ?? folder?.icon }
+    var icon: NSImage? { item?.icon ?? folder?.icon ?? trash?.icon }
     var name: String {
         switch self {
         case .app(let item): item.reference.name
         case .folder(let item): item.reference.name
         case .group(let control): String(localized: control.title)
+        case .trash: String(localized: .trashName)
         case .gap: ""
         }
     }
@@ -52,6 +66,7 @@ enum DockRenderSlot: Identifiable {
         case .app(let item): .app(item.id)
         case .folder(let item): .folder(item.reference.id)
         case .group(let control): .group(control.group)
+        case .trash: .trash
         case .gap: nil
         }
     }

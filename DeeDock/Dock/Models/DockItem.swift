@@ -20,3 +20,14 @@ struct FolderDockItem: Identifiable {
     let isAvailable: Bool
     var id: String { "folder:\(reference.id.uuidString)" }
 }
+
+/// A snapshot of the system Trash used by every display dock.
+struct TrashDockItem: Identifiable {
+    enum State: Equatable {
+        case empty, full, unknown, unavailable
+    }
+
+    let state: State
+    let icon: NSImage
+    var id: String { "system-trash" }
+}

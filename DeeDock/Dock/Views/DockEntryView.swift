@@ -30,6 +30,10 @@ struct DockEntryView: View {
         case .group(let control):
             DockGroupButton(control: control, size: size, selected: selected, interaction: interaction,
                             reduceTransparency: reduceTransparency)
+        case .trash(let item):
+            DockTrashButton(item: item, size: size, selected: selected, interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: { accessibilityFocus(DockEntryID.trash.hitID, $0) })
         case .gap:
             RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.12))
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.tint, style: StrokeStyle(lineWidth: 1, dash: [3, 3])))

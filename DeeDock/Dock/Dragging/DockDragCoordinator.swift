@@ -17,6 +17,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var destinationID: String?
     private var trackingID: String?
     private var destinationIndex: Int?
+    private var trashDestinationID: String?
     private var sourceBounds = CGRect.zero
     private var importTask: Task<Void, Never>?
     private var cleanupTask: Task<Void, Never>?
@@ -51,7 +52,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard let panel = panels[displayID], panel.store.canEditPins else { return }
         cancel()
         active = true; sourceID = displayID; sourcePin = pin
-        payload = .selection(pins: [pin], documents: nil); token = UUID().uuidString; sourceBounds = panel.restingDragBounds
+        payload = .selection(pins: [pin], documents: nil, trashItems: nil)
+        token = UUID().uuidString; sourceBounds = panel.restingDragBounds
         completion = DockDragCompletion()
         let pasteboard = NSPasteboardItem()
         pasteboard.setString(token!, forType: Self.pasteboardType)
@@ -89,6 +91,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard validates(info.draggingPasteboard) else { return [] }
         nativeDisplayID = displayID // Loading a new payload clears the preceding session.
         update(at: NSEvent.mouseLocation)
+        if trashDestinationID == displayID { return .delete }
         if documentDrag.displayID != nil {
             guard documentDrag.displayID == displayID else { return [] }
             return DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask)
@@ -101,6 +104,13 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
+        if trashDestinationID == displayID, let access = payload.trashItems,
+           let panel = panels[displayID] {
+            completion.committed = true
+            panel.store.recycleToTrash(access)
+            cancel()
+            return true
+        }
         if let documents = payload.documents, documentDrag.displayID != nil {
             guard documentDrag.displayID == displayID, let item = documentDrag.item,
                   let panel = panels[displayID],
@@ -201,9 +211,26 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard active, !updating, !completion.cancelled, !completion.committed else { return }
         updating = true
         defer { updating = false }
-        destinationID = nil; destinationIndex = nil
+        destinationID = nil; destinationIndex = nil; trashDestinationID = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
+        if sourceID == nil, payload.isReady, payload.trashItems != nil,
+           let candidate, candidate.store.displayID == nativeDisplayID,
+           candidate.trashTarget(at: point) {
+            trashDestinationID = candidate.store.displayID
+            documentDrag.clear()
+            for panel in panels.values {
+                panel.updateSectionDragHover(at: point, valid: false)
+                panel.interaction.documentTargetID = nil
+                panel.interaction.springEmphasized = false
+                panel.interaction.trashTargeted = panel === candidate
+                panel.setDragPresentation(proposal: nil, source: nil, targeted: panel === candidate,
+                    message: panel === candidate ? .dragMoveToTrash : nil)
+            }
+            updateScrollTimer()
+            return
+        }
+        panels.values.forEach { $0.interaction.trashTargeted = false }
         if payload.documents != nil {
             let documentOwnsPresentation = documentDrag.update(
                 at: point,
@@ -310,6 +337,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         panels.values.forEach {
             $0.interaction.documentTargetID = nil
             $0.interaction.springEmphasized = false
+            $0.interaction.trashTargeted = false
             $0.setDragPresentation(proposal: nil, source: nil, targeted: false, message: nil)
             $0.endSectionDrag()
         }
@@ -328,6 +356,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
         nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; token = nil
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
+        trashDestinationID = nil
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }
         pasteboardChange = nil
     }

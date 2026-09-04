@@ -26,12 +26,13 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case app(String), folder(UUID), group(DockAppGroup)
+    case app(String), folder(UUID), group(DockAppGroup), trash
     var hitID: String {
         switch self {
         case .app(let id): "app:\(id)"
         case .folder(let id): "folder:\(id.uuidString)"
         case .group(let group): "group:\(group.rawValue)"
+        case .trash: "trash"
         }
     }
 }
@@ -55,7 +56,7 @@ struct DockGroupControl {
 /// Projects catalog snapshots without changing pins, running order, or resource ownership.
 enum DockSectionProjection {
     static func entries(items: [DockItem], folders: [FolderDockItem] = [], pins: [DockPin]? = nil,
-                        visibility: DockAppVisibility, expanded: Bool) -> [DockRenderSlot] {
+                        visibility: DockAppVisibility, expanded: Bool, trash: TrashDockItem? = nil) -> [DockRenderSlot] {
         let pinned: [DockRenderSlot]
         if let pins {
             let applications = Dictionary(uniqueKeysWithValues: items.filter(\.isFavorite).map { ($0.reference.id, $0) })
@@ -70,7 +71,7 @@ enum DockSectionProjection {
             pinned = items.filter(\.isFavorite).map(DockRenderSlot.app)
         }
         let running = items.filter { !$0.isFavorite }.map(DockRenderSlot.app)
-        return [DockAppGroup.pinned, .running].flatMap { group -> [DockRenderSlot] in
+        let applications = [DockAppGroup.pinned, .running].flatMap { group -> [DockRenderSlot] in
             let entries = group == .pinned ? pinned : running
             if visibility.hiddenGroup == group { return [] }
             if visibility.collapsedGroup == group {
@@ -79,6 +80,7 @@ enum DockSectionProjection {
             }
             return entries
         }
+        return applications + (trash.map { [.trash($0)] } ?? [])
     }
 
     /// Retains identity, then the disappearing app's group control, then the nearest surviving entry.
@@ -86,8 +88,8 @@ enum DockSectionProjection {
         guard let selection else { return nil }
         if current.contains(where: { $0.target == selection }) { return selection }
         let oldIndex = previous.firstIndex { $0.target == selection } ?? 0
-        if let old = previous.first(where: { $0.target == selection }) {
-            let group = DockEntryID.group(old.isPinned ? .pinned : .running)
+        if let old = previous.first(where: { $0.target == selection }), let appGroup = old.appGroup {
+            let group = DockEntryID.group(appGroup)
             if current.contains(where: { $0.target == group }) { return group }
         }
         return current.isEmpty ? nil : current[min(oldIndex, current.count - 1)].target

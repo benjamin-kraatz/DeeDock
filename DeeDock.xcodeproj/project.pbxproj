@@ -71,10 +71,12 @@
 		DDFA00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift */; };
 		DDFA00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */; };
 		DDFA00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */; };
+		DDFC00000000000000000001 /* DeeDock/Dock/Services/TrashController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationReference.swift; sourceTree = SOURCE_ROOT; };
 		DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/DockOrdering.swift; sourceTree = SOURCE_ROOT; };
@@ -140,6 +142,7 @@
 		DDFB00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/WindowAccessServicing.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/ApplicationMenuController.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/General/WindowAccessController.swift; sourceTree = SOURCE_ROOT; };
+		DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/TrashController.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -177,6 +180,7 @@
 				DD3000000000000000000000 /* Test Model Sources */,
 				000000000000000000000020 /* Products */,
 				33DEF2FA3049A63A007D87CE /* Recovered References */,
+				33DE04A8304AA89B007D87CE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -187,6 +191,14 @@
 				DD0000000000000000000003 /* DeeDockTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		33DE04A8304AA89B007D87CE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				33DE04A9304AA89B007D87CE /* FoundationModels.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		33DEF2FA3049A63A007D87CE /* Recovered References */ = {
@@ -213,6 +225,7 @@
 				DDFB00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift */,
 				DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */,
 				DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */,
+				DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */,
 				DDF8000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift */,
 				DDF8000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift */,
 				DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */,
@@ -371,6 +384,7 @@
 				DDFA00000000000000000003 /* DeeDock/Dock/Services/WindowAccessServicing.swift in Sources */,
 				DDFA00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift in Sources */,
 				DDFA00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift in Sources */,
+				DDFC00000000000000000001 /* DeeDock/Dock/Services/TrashController.swift in Sources */,
 				DDF7000000000000000000000 /* DeeDock/Dock/Models/FolderReference.swift in Sources */,
 				DDF7000000000000000000001 /* DeeDock/Dock/Models/DockPin.swift in Sources */,
 				DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */,
@@ -587,11 +601,12 @@
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -640,11 +655,12 @@
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

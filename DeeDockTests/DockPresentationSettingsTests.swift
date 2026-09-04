@@ -7,9 +7,12 @@ struct DockPresentationSettingsTests {
     func persistence() throws {
         let encoder = JSONEncoder(), decoder = JSONDecoder()
         var legacy = try #require(JSONSerialization.jsonObject(with: encoder.encode(DockSettings.defaults)) as? [String: Any])
-        legacy.removeValue(forKey: "appVisibility"); legacy.removeValue(forKey: "tooltipPreset")
+        legacy.removeValue(forKey: "appVisibility"); legacy.removeValue(forKey: "showTrash")
+        legacy.removeValue(forKey: "confirmBeforeEmptyingTrash")
+        legacy.removeValue(forKey: "tooltipPreset")
         let decoded = try decoder.decode(DockSettings.self, from: JSONSerialization.data(withJSONObject: legacy))
-        #expect(decoded.appVisibility == .showAll && decoded.tooltipPreset == .classic)
+        #expect(decoded.appVisibility == .showAll && decoded.showTrash)
+        #expect(decoded.confirmBeforeEmptyingTrash && decoded.tooltipPreset == .classic)
         for mode in DockAppVisibility.allCases {
             for preset in DockTooltipPreset.allCases {
                 var settings = decoded; settings.appVisibility = mode; settings.tooltipPreset = preset
@@ -17,7 +20,7 @@ struct DockPresentationSettingsTests {
                 #expect(settings.normalized == settings)
             }
         }
-        for key in ["appVisibility", "tooltipPreset"] {
+        for key in ["appVisibility", "confirmBeforeEmptyingTrash", "tooltipPreset"] {
             for invalid in ["unknown" as Any, NSNull(), 3] {
                 var malformed = legacy; malformed[key] = invalid
                 let data = try JSONSerialization.data(withJSONObject: malformed)
@@ -26,21 +29,31 @@ struct DockPresentationSettingsTests {
         }
     }
 
-    @Test("Display overrides keep explicit Show all and Off distinct from inheritance")
+    @Test("Display overrides keep explicit presentation choices distinct from inheritance")
     func overrides() throws {
         var defaults = DockSettings.defaults
-        defaults.appVisibility = .hidePinned; defaults.tooltipPreset = .spectrum
+        defaults.appVisibility = .hidePinned; defaults.showTrash = true
+        defaults.confirmBeforeEmptyingTrash = true; defaults.tooltipPreset = .spectrum
         var overrides = DockSettingsOverrides()
-        #expect(overrides.resolving(defaults).appVisibility == .hidePinned)
-        var explicit = defaults; explicit.appVisibility = .showAll; explicit.tooltipPreset = .off
-        overrides.set(.appVisibility, from: explicit); overrides.set(.tooltipPreset, from: explicit)
+        #expect(overrides.resolving(defaults).appVisibility == .hidePinned && overrides.resolving(defaults).showTrash)
+        var explicit = defaults; explicit.appVisibility = .showAll; explicit.showTrash = false
+        explicit.confirmBeforeEmptyingTrash = false; explicit.tooltipPreset = .off
+        overrides.set(.appVisibility, from: explicit); overrides.set(.showTrash, from: explicit)
+        overrides.set(.confirmBeforeEmptyingTrash, from: explicit)
+        overrides.set(.tooltipPreset, from: explicit)
         let restored = try JSONDecoder().decode(DockSettingsOverrides.self, from: JSONEncoder().encode(overrides))
-        #expect(restored.contains(.appVisibility) && restored.contains(.tooltipPreset))
+        #expect(restored.contains(.appVisibility) && restored.contains(.showTrash))
+        #expect(restored.contains(.confirmBeforeEmptyingTrash) && restored.contains(.tooltipPreset))
         #expect(restored.resolving(defaults).appVisibility == .showAll)
+        #expect(!restored.resolving(defaults).showTrash)
+        #expect(!restored.resolving(defaults).confirmBeforeEmptyingTrash)
         #expect(restored.resolving(defaults).tooltipPreset == .off)
-        overrides.set(.appVisibility, from: nil); overrides.set(.tooltipPreset, from: nil)
+        overrides.set(.appVisibility, from: nil); overrides.set(.showTrash, from: nil)
+        overrides.set(.confirmBeforeEmptyingTrash, from: nil)
+        overrides.set(.tooltipPreset, from: nil)
         #expect(overrides.resolving(defaults) == defaults)
-        #expect(!overrides.contains(.appVisibility) && !overrides.contains(.tooltipPreset))
+        #expect(!overrides.contains(.appVisibility) && !overrides.contains(.showTrash))
+        #expect(!overrides.contains(.confirmBeforeEmptyingTrash) && !overrides.contains(.tooltipPreset))
         for data in [Data(#"{"appVisibility":"unknown"}"#.utf8), Data(#"{"tooltipPreset":"unknown"}"#.utf8)] {
             #expect(throws: (any Error).self) { try JSONDecoder().decode(DockSettingsOverrides.self, from: data) }
         }

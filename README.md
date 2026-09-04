@@ -6,7 +6,7 @@ Familiar by default. Precise when you want control.
 
 ## Status
 
-The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, and ten reveal/hide animation styles. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
+The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, a Trash tile, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Each display has independent pins and optional overrides of shared defaults, including auto-hide, activation zones, Trash visibility, and ten reveal/hide animation styles. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
 ## What we are building
 
@@ -82,7 +82,7 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks are implemented. Trash and window previews are not implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks and Trash are implemented. Window previews are not implemented.
 
 ## Launch at login
 
@@ -102,7 +102,7 @@ Application-level actions do not need Accessibility access. For a running app, i
 
 When window access is enabled, a menu opens immediately with **Loading Windows…**, then replaces that row with the app's top-level standard windows and dialogs. Select a row to restore a minimized window when supported, activate its owning app, and raise that exact window. Main windows are marked, untitled windows receive a localized fallback, and duplicate titles stay separate. The same commands are exposed as VoiceOver actions.
 
-Window discovery and selection use the public macOS Accessibility API. DeeDock remains sandboxed and does not use AppleScript, private window-server APIs, or ScreenCaptureKit. Moving between Spaces and full-screen transitions is best-effort because public APIs do not expose complete Space ownership or guarantee activation. Windows owned by unusual helper processes may not appear under the regular app represented by the icon.
+Window discovery and selection use the public macOS Accessibility API. This window-menu feature does not use AppleScript, private window-server APIs, or ScreenCaptureKit. Moving between Spaces and full-screen transitions is best-effort because public APIs do not expose complete Space ownership or guarantee activation. Windows owned by unusual helper processes may not appear under the regular app represented by the icon.
 
 Window thumbnails are deliberately deferred. They require a separate capture and Screen Recording permission design and are not part of window access. The signed, sandboxed runtime checkpoint for permission grant, revocation, minimization, and raising remains part of hands-on acceptance rather than compile-time validation.
 
@@ -131,7 +131,7 @@ The illustrations use production code, not artwork. Placement runs the same `Doc
 
 Right-click a pin for **Move Left** and **Move Right** on a top or bottom dock, or **Move Up** and **Move Down** on a side dock. **Pin on Display…** works with every edge. With **Focus Dock** active, hold Option with the corresponding arrow key to reorder the selected pin; ordinary arrows navigate. VoiceOver exposes equivalent move and destination actions. The Pin on Display menu appends a new pin and leaves an existing destination pin in place.
 
-Finder imports retain read-only security-scoped bookmarks so user-selected application bundles and folders can remain accessible after restart. Application-only lists migrate once to typed v3 pins; the older bytes remain untouched for rollback and recovery. DeeDock adds only the app-scoped bookmark capability to its existing sandbox configuration; no Accessibility grant or system Dock preference changes are involved. Missing applications and unresolved folders remain visible as unavailable pins.
+Finder imports retain read-only security-scoped bookmarks so user-selected application bundles and folders can remain accessible after restart. Application-only lists migrate once to typed v3 pins; the older bytes remain untouched for rollback and recovery. DeeDock uses app-scoped bookmarks for persistent pins; the separate Trash drop path requests read/write access only to items the user explicitly supplies. No Accessibility grant or system Dock preference changes are involved. Trash commands use a separate Finder Automation grant described below. Missing applications and unresolved folders remain visible as unavailable pins.
 
 Selecting multiple pins within DeeDock remains outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
 
@@ -145,7 +145,17 @@ The source dock stays revealed and suppresses fading and tooltips while its stac
 
 Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Escape returns focus to the source folder, and Tab reaches the Grid/List control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
 
-Trash, Fan and Automatic presentations, nested browsing, search, Quick Look, multi-selection, file promises, dropping into a folder, and persistent utility windows remain planned.
+Fan and Automatic presentations, nested browsing, search, Quick Look, multi-selection, file promises, dropping into a folder, and persistent utility windows remain planned.
+
+## Trash
+
+Trash appears as the final tile after its own divider and is enabled by default. Under **Behavior → Trash**, turn it off in shared defaults or override that choice for any display. The tile is independent of the pinned and running sections, including their hidden and collapsed states.
+
+Click Trash, press Return while it is selected in Focus Dock, or choose **Open Trash** from its menu to open Trash in Finder. VoiceOver exposes its name, status, hint, and actions. The first explicit Open or Empty command asks for permission to automate Finder. DeeDock does not read the protected Trash directory directly. After permission exists, a serialized Finder item-count check every two seconds keeps the empty/full artwork synchronized with changes made by Finder or the system Dock.
+
+Drop one or more files, folders, or packages from Finder directly on the tile to move the complete batch to Trash through `NSWorkspace`. The exact tile highlights and shows **Move to Trash**. Security-scoped access remains alive until macOS completes the operation; failures are reported on the initiating dock. Internal pin drags cannot target Trash, and dropping onto Trash never alters DeeDock's pin configuration.
+
+The context menu and VoiceOver offer **Empty Trash…** only when Trash contains items. **Behavior → Trash → Confirm before emptying Trash** controls DeeDock's native destructive warning. Confirmation is on by default and can be overridden for each display. DeeDock then asks Finder to empty Trash. Finder owns the protected home and mounted-volume Trash locations. DeeDock's sandbox entitlements allow Apple events only for Finder, with the Finder Trash scripting access group plus a Finder-only compatibility exception for opening and counting. It receives no general home-directory access and uses no deprecated workspace operation, Finder UI scripting, or private API.
 
 ## Open files and folders in an app
 

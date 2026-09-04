@@ -49,8 +49,8 @@ enum DockGeometry {
         let canvasLength: CGFloat
         /// Stable canvas-space along-axis positions; never replace these with animated positions.
         let restingCenters: [CGFloat]
-        /// Index of the first running-only item, or nil when one section is empty.
-        let separatorIndex: Int?
+        /// Entry indices preceded by a divider, for app-section and trailing utility boundaries.
+        let separatorIndices: Set<Int>
 
         /// Computes icon dimensions from a canvas-space pointer along-axis coordinate.
         /// A nil pointer or Reduce Motion returns resting sizes.
@@ -71,7 +71,7 @@ enum DockGeometry {
             let width = contentLength(sizes: sizes)
             var x = (canvasLength - width) / 2 + DockGeometry.padding
             return sizes.enumerated().map { index, size in
-                if index == separatorIndex { x += DockGeometry.separatorLength }
+                if separatorIndices.contains(index) { x += DockGeometry.separatorLength }
                 let center = x + size / 2
                 x += size + itemSpacing
                 return center
@@ -114,7 +114,7 @@ enum DockGeometry {
         /// Length of the painted surface, including padding, spacing, and any section gap.
         func contentLength(sizes: [CGFloat]) -> CGFloat {
             max(64, sizes.reduce(0, +) + CGFloat(max(0, sizes.count - 1)) * itemSpacing
-                + DockGeometry.padding * 2 + (separatorIndex == nil ? 0 : DockGeometry.separatorLength))
+                + DockGeometry.padding * 2 + CGFloat(separatorIndices.count) * DockGeometry.separatorLength)
         }
     }
 
@@ -122,16 +122,21 @@ enum DockGeometry {
     /// - Parameters:
     ///   - count: Total item count.
     ///   - favoriteCount: Number of leading pinned items, between zero and `count`.
+    ///   - utilityCount: Number of trailing utility items separated from application sections.
     ///   - availableLength: Chosen reference frame length along the selected edge, in logical points.
     ///   - availableDepth: Reference frame dimension perpendicular to the selected edge.
     ///   - settings: Requested appearance; invalid values fall back to defaults.
-    static func layout(count: Int, favoriteCount: Int, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults) -> Layout {
+    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults) -> Layout {
         let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableLength - 16)
-        let separator: Int? = favoriteCount > 0 && favoriteCount < count ? favoriteCount : nil
+        let utilityCount = min(max(0, utilityCount), count)
+        let appCount = count - utilityCount
+        var separators = Set<Int>()
+        if favoriteCount > 0 && favoriteCount < appCount { separators.insert(favoriteCount) }
+        if utilityCount > 0 && appCount > 0 { separators.insert(appCount) }
         let itemSpacing = CGFloat(settings.itemSpacing)
         let extra = padding * 2 + CGFloat(max(0, count - 1)) * itemSpacing
-            + (separator == nil ? 0 : separatorLength)
+            + CGFloat(separators.count) * separatorLength
         // Reserve the magnification envelope, rather than resizing the window on every mouse move.
         let size = min(CGFloat(settings.iconSize), max(32, (viewportLimit - extra) / CGFloat(max(1, count) + 2)))
         let restingWidth = max(64, CGFloat(count) * size + extra)
@@ -140,9 +145,9 @@ enum DockGeometry {
         let canvas = restingWidth + size * 2
         let viewport = min(viewportLimit, canvas)
         let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), viewportLength: viewport, canvasLength: canvas,
-                             restingCenters: [], separatorIndex: separator)
+                             restingCenters: [], separatorIndices: separators)
         let centers = initial.centers(sizes: Array(repeating: size, count: count))
         return Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), viewportLength: viewport, canvasLength: canvas,
-                      restingCenters: centers, separatorIndex: separator)
+                      restingCenters: centers, separatorIndices: separators)
     }
 }

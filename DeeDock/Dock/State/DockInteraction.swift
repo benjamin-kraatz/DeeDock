@@ -23,6 +23,7 @@ final class DockInteraction {
     var dragSourceID: String?
     var dragMessage: LocalizedStringResource?
     var documentTargetID: String?
+    var trashTargeted = false
     var springEmphasized = false
     @ObservationIgnored var openFiles: ((DockItem) -> Void)?
     @ObservationIgnored var applicationMenuSnapshot: ((DockItem) -> ApplicationMenuSnapshot)?
@@ -31,6 +32,10 @@ final class DockInteraction {
     @ObservationIgnored var performApplicationMenuAction: ((ApplicationMenuAction, DockItem) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var revealFolder: ((FolderDockItem) -> Void)?
+    /// Per-display policy for DeeDock's own Empty Trash warning.
+    var confirmsTrashEmpty = DockSettings.defaults.confirmBeforeEmptyingTrash
+    @ObservationIgnored var openTrash: (() -> Void)?
+    @ObservationIgnored var emptyTrash: (() -> Void)?
     @ObservationIgnored var removePin: ((String) -> Void)?
     @ObservationIgnored var setFolderPresentation: ((UUID, FolderStackPresentation) -> Void)?
     var scrollOffset: CGFloat = 0

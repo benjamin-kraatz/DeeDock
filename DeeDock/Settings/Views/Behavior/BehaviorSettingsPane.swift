@@ -13,6 +13,17 @@ struct BehaviorSettingsPane: View {
                 } label: { Text(.settingsAppVisibility) }
                 .padding(14).settingsOverride(source.context, field: .appVisibility)
             }
+            SettingsCard(title: .settingsTrash, footnote: .settingsTrashHelp) {
+                VStack(spacing: 0) {
+                    Toggle(isOn: source.binding(\.showTrash)) { Text(.settingsShowTrash) }
+                        .padding(14).settingsOverride(source.context, field: .showTrash)
+                    Divider()
+                    Toggle(isOn: source.binding(\.confirmBeforeEmptyingTrash)) {
+                        Text(.settingsConfirmBeforeEmptyingTrash)
+                    }
+                    .padding(14).settingsOverride(source.context, field: .confirmBeforeEmptyingTrash)
+                }
+            }
             SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
                 Toggle(isOn: source.binding(\.behavior.autoHide)) { Text(.behaviorAutoHide) }
                     .padding(14).settingsOverride(source.context, field: .autoHide)

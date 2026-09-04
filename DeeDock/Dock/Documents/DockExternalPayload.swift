@@ -4,20 +4,25 @@ import UniformTypeIdentifiers
 /// Classification is completed once per external drag, off the UI actor.
 nonisolated enum DockExternalPayload: Sendable {
     case checking
-    case selection(pins: [DockPin]?, documents: DocumentResourceAccess?)
+    case selection(pins: [DockPin]?, documents: DocumentResourceAccess?, trashItems: DocumentResourceAccess?)
     case documents(DocumentResourceAccess)
     case rejected
 
     var pins: [DockPin] {
-        if case .selection(let pins, _) = self { return pins ?? [] }
+        if case .selection(let pins, _, _) = self { return pins ?? [] }
         return []
     }
     var documents: DocumentResourceAccess? {
         switch self {
-        case .selection(_, let access): return access
+        case .selection(_, let access, _): return access
         case .documents(let access): return access
         default: return nil
         }
+    }
+    var trashItems: DocumentResourceAccess? {
+        if case .selection(_, _, let access) = self { return access }
+        if case .documents(let access) = self { return access }
+        return nil
     }
     var isRejected: Bool { if case .rejected = self { return true }; return false }
     var isChecking: Bool { if case .checking = self { return true }; return false }
@@ -40,10 +45,10 @@ nonisolated enum DockExternalPayload: Sendable {
         }
         if allPinnable {
             let pins = try DockPinImporter.read(access.urls, kinds: kinds, excluding: ownIdentifier, bookmark: bookmark)
-            return .selection(pins: pins, documents: hasApplication ? nil : access)
+            return .selection(pins: pins, documents: hasApplication ? nil : access, trashItems: access)
         }
         guard !hasApplication else { throw DockDocumentValidationError.unsupportedSelection }
-        return .selection(pins: nil, documents: access)
+        return .selection(pins: nil, documents: access, trashItems: access)
     }
 
     /// Used again immediately before handoff and by the picker. Never traverses folder contents.

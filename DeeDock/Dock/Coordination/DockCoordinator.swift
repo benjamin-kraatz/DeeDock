@@ -18,6 +18,7 @@ final class DockCoordinator {
     @ObservationIgnored private let folderStacks = FolderStackCoordinator()
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     @ObservationIgnored private let catalog: ApplicationCatalog
+    @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     @ObservationIgnored private let displayService = DisplayService()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
@@ -53,8 +54,10 @@ final class DockCoordinator {
             self?.panels.values.forEach { $0.holdFolderStack(open) }
         }
         catalog.didChange = { [weak self] in self?.refreshPanels() }
+        trash.didChange = { [weak self] in self?.refreshPanels() }
         catalog.activated = { [weak self] app in
             guard app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return }
+            if app.bundleIdentifier == "com.apple.finder" { self?.trash.refreshAfterFinderActivity() }
             self?.rememberExternal(app)
             self?.endFocus(restore: false)
         }
@@ -66,6 +69,7 @@ final class DockCoordinator {
         settings.settingsDidChange = { [weak self] in self?.refreshPanels() }
         displayService.didChange = { [weak self] in self?.reconcile($0) }
         catalog.start()
+        trash.start()
         displayService.start()
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
@@ -108,7 +112,7 @@ final class DockCoordinator {
             panels.removeValue(forKey: id)?.stop()
         }
         for display in enabledDisplays where panels[display.id] == nil {
-            let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles)
+            let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles, trash: trash)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
@@ -267,5 +271,6 @@ final class DockCoordinator {
         panels.removeAll()
         enabledDisplays = []
         catalog.stop()
+        trash.stop()
     }
 }

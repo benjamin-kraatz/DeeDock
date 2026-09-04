@@ -54,6 +54,26 @@ struct DockSectionTests {
         #expect(DockSectionProjection.repairedSelection(.app("pin"), previous: expanded, current: []) == nil)
     }
 
+    @Test("Trash stays trailing and outside application visibility policies")
+    func trashProjection() throws {
+        let trash = TrashDockItem(state: .empty,
+                                  icon: NSImage(size: CGSize(width: 48, height: 48)))
+        for mode in DockAppVisibility.allCases {
+            let entries = DockSectionProjection.entries(items: items, visibility: mode,
+                                                        expanded: false, trash: trash)
+            #expect(entries.last?.target == .trash)
+            #expect(entries.filter(\.isUtility).count == 1)
+        }
+        let withoutTrash = DockSectionProjection.entries(items: items, visibility: .showAll,
+                                                         expanded: false)
+        #expect(!withoutTrash.contains { $0.target == .trash })
+        let trashOnly = DockSectionProjection.entries(items: [], visibility: .hidePinned,
+                                                      expanded: false, trash: trash)
+        #expect(trashOnly.map(\.target) == [.trash])
+        #expect(DockSectionProjection.repairedSelection(.trash, previous: trashOnly,
+                                                       current: []) == nil)
+    }
+
     @Test("Expansion is independent and resets only for a new policy or session")
     func sessions() {
         let a = DockSectionState(), b = DockSectionState()

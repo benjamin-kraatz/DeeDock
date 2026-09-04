@@ -658,7 +658,56 @@ Deterministic previews cover Grid and List, populated, loading, empty, unavailab
 - Check all four dock edges, negative origins, visible-frame clamping, small displays, overflow, collapsed and hidden pins, auto-hide, multiple displays, display removal, Spaces, full-screen apps, and sleep/wake.
 - Exercise pointer focus passthrough, Focus Dock keyboard transfer and return, Tab routing, VoiceOver labels/actions/counts, long names, dark appearance, Reduce Motion, and Reduce Transparency.
 
-Trash, Fan and Automatic modes, recursive navigation, search, Quick Look, multi-selection, file promises, two-way folder drops, and persistent utility windows remain planned.
+Fan and Automatic modes, recursive navigation, search, Quick Look, multi-selection, file promises, two-way folder drops, and persistent utility windows remain planned.
+
+## Trash
+
+Implemented on 2026-09-04 on `main`. The existing uncommitted project-file change for `FoundationModels.framework` and a concurrent `DockAppButton.swift` edit were preserved. No branch switch, staging, commit, or push was performed.
+
+### Behavior and boundaries
+
+- One app-wide controller supplies the same Finder-owned Trash snapshot to every display. AppKit's named empty/full Trash artwork remains the fallback if inspection is unavailable.
+- Trash is a trailing utility entry after its own divider. The pinned/running divider remains independent, including with hidden and collapsed sections. Geometry counts utility entries explicitly, so horizontal and vertical docks share the same spacing model.
+- **Show Trash** and **Confirm before emptying Trash** default on under Behavior. Both participate in the shared-default and nullable per-display override system, including inherited-state UI and backward-compatible decoding of settings saved before either field existed.
+- Click, Focus Dock Return, the context menu, and VoiceOver open Trash in Finder. The context menu also opens DeeDock Settings. Keyboard selection repair treats Trash as its own stable identity instead of assigning it to an application section.
+- An external Finder batch can target only the exact Trash tile. Feedback uses the delete cursor, a tile outline, and **Move to Trash**. DeeDock retains the batch's temporary security-scoped access through `NSWorkspace.recycle`; success refreshes shared state and a partial or failed operation reports an error on the initiating dock. Internal pin drags cannot target Trash.
+- User-selected file access is read/write because recycling changes the location of explicitly dropped items. Persistent app and folder pins continue to create read-only security-scoped bookmarks. DeeDock receives no general home-folder or Accessibility permission.
+- Open and Empty use Finder's Trash scripting commands through a user-approved Automation grant. The sandbox restricts scripting to Finder's `com.apple.finder.trash` access group and includes a Finder-only temporary Apple-event exception needed by the open/count compatibility path. DeeDock does not automate Finder UI or use private APIs.
+- **Empty Trash…** appears in the context menu and as a VoiceOver action only when Finder reports that Trash is full. When the initiating display's confirmation setting is on, a native warning requires explicit destructive confirmation. When it is off, the command goes directly to Finder. Finder then empties the home and mounted-volume Trash locations it owns.
+- Finder exposes no public Trash-change notification. After Automation access has been granted, a two-second serialized item-count read keeps the shared state synchronized with Finder and system-Dock operations. Activation and action-result reads provide faster updates around direct interaction. No background query asks for permission.
+
+### Compilation evidence
+
+The string catalog parsed with `jq empty`, the Xcode project parsed with `plutil -lint`, and a feature-scoped `git diff --check` reported no whitespace errors. The focused unsigned Debug app build used:
+
+```sh
+xcodebuild -quiet -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -derivedDataPath /tmp/deedock-trash-derived-data \
+  CODE_SIGNING_ALLOWED=NO EXCLUDED_SOURCE_FILE_NAMES=RunningIndicatorShaders.metal \
+  ENABLE_DEBUG_DYLIB=NO build
+```
+
+It completed successfully after the Finder-routing correction. The Metal source was excluded because this command environment lacks the optional Metal toolchain; this proves Swift and project compilation, not shader compilation or native interaction quality.
+
+A subsequent signed Debug build in `/tmp/deedock-trash-automation-derived` completed successfully after the Finder Automation and synchronization changes. `codesign -d --entitlements` confirmed that the built app contains App Sandbox, read/write user-selected files, app-scoped bookmarks, the normal Debug `get-task-allow`, Finder Automation, the Finder Trash scripting access group, and the Finder-only temporary Apple-event exception. The generated Info.plist contains the Automation usage description.
+
+A user checkpoint of the first draft found that opening `~/.Trash` as an ordinary URL produced a sandbox permission alert and its unknown-state icon fell back to generic folder artwork. AppKit's named Trash artwork fixed the icon. A second checkpoint showed that direct Finder routing still failed. Runtime diagnostics then proved that macOS privacy protection denied direct `~/.Trash` access even when the signed app carried a Trash-only home-relative sandbox exception. The implementation therefore removed direct filesystem access and delegates open, count, and empty operations to Finder.
+
+The signed sandboxed build was launched and exercised with native UI automation after granting its one-time Finder Automation request. Clicking DeeDock opened Finder's **Papierkorb** window. DeeDock's context action showed its destructive confirmation, emptied two existing items after explicit approval, and immediately changed its accessibility value to **Empty**. A separate disposable Desktop file was moved to Trash through Finder; DeeDock changed to **Contains items** within the monitoring interval. Emptying that one disposable item outside DeeDock changed DeeDock back to **Empty** on the next interval. Apple's Dock process did not expose an automation surface, so the final external mutation was initiated in Finder; both entry points use Finder's Trash operation, but the system-Dock menu itself was not clicked by the tool.
+
+The confirmation preference was then added and checked in a signed Debug build. Defaults showed the new toggle on. A connected display showed it as **Following default**, switching it off created only that display's **Customized** override, and **Use Default** restored inheritance. With the override off, DeeDock emptied one disposable test item without presenting its alert and returned the Trash state to **Empty**. Verification restored the display to the enabled shared default.
+
+**No test suite or preview was run. The focused signed Debug target built successfully, and the Trash open, DeeDock empty, Finder fill, external empty, and artwork/accessibility-state transitions above were exercised in the running app.**
+
+### Required hands-on acceptance
+
+- Verify the trailing divider and hit region on all four edges with pinned-only, running-only, collapsed, hidden, empty-app, crowded, magnified, scrolled, and auto-hidden docks.
+- Exercise shared-default and per-display Trash visibility, inheritance restoration, disconnected-display persistence, and settings saved before the new field existed.
+- Open Trash by click, context menu, Focus Dock, and VoiceOver. Confirm focus passthrough, selection repair, menu visibility holds, accessible empty/full/unknown values, and unavailable behavior.
+- From Finder, drop one item and ordered mixed batches of files, folders, and packages. Exercise success, cancellation, partial failure, inaccessible input, consecutive drops, display removal during completion, and a drop while Trash is already changing.
+- Use a consistently signed sandboxed build to verify dropped-item access and Automation revocation/regrant behavior. Confirm rejected and cancelled recycle operations do not move items and DeeDock cannot read protected home-relative paths directly.
+- Empty from the system Dock itself. Verify cancellation, Finder failures, hidden Trash items, repeated fill/empty cycles, mounted-volume Trash, sleep/wake, and the monitoring cost over an extended run.
+- Confirm Reduce Motion, Reduce Transparency, idle fading, tooltip behavior, dark appearance, different backing scales, negative display origins, Spaces, and full-screen apps do not regress the tile.
 
 ## Window-aware application menus
 

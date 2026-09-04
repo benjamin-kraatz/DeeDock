@@ -42,6 +42,8 @@ final class DockPanelController {
         interaction.copyPin = { [weak store] reference, displayID in store?.copyPin?(reference, displayID) }
         interaction.removePin = { [weak store] id in _ = store?.removePin(id) }
         interaction.setFolderPresentation = { [weak store] id, value in _ = store?.setFolderPresentation(value, for: id) }
+        interaction.openTrash = { [weak store] in store?.openTrash() }
+        interaction.emptyTrash = { [weak store] in store?.emptyTrash() }
         interaction.geometryDidChange = { [weak self] in self?.updatePointer() }
         interaction.menuTrackingChanged = { [weak self] tracking in
             self?.menuHeld = tracking
@@ -88,6 +90,8 @@ final class DockPanelController {
         if lastSettings?.tooltipPreset != settings.tooltipPreset || edgeChanged || resetVisibility { interaction.tooltips.clear() }
         lastDisplay = display; lastSettings = settings
         store.sections.configure(settings.appVisibility)
+        store.configureTrash(settings.showTrash)
+        interaction.confirmsTrashEmpty = settings.confirmBeforeEmptyingTrash
         interaction.tooltipPreset = settings.tooltipPreset
         let exposedIDs = Set(store.entries.compactMap(\.target).map(\.hitID))
         interaction.retainHitRegions(exposedIDs)
@@ -104,11 +108,13 @@ final class DockPanelController {
         if resetVisibility && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
         let reference = DockGeometry.referenceFrame(screenFrame: display.frame, visibleFrame: display.visibleFrame, settings: settings)
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
+                                         utilityCount: store.entries.filter(\.isUtility).count,
                                          availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
+                                                 utilityCount: slots.filter(\.isUtility).count,
                                                  availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings)
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
@@ -247,6 +253,16 @@ final class DockPanelController {
                                       mask: sample.mask, exposed: visibility.exposesContent)
     }
 
+    func trashTarget(at point: CGPoint) -> Bool {
+        guard !stopped, panel.frame.contains(point), visibility.exposesContent else { return false }
+        let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle,
+            progress: visibility.progress, size: interaction.layout.viewportSize,
+            reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
+        let local = contentPoint(point)
+        return sample.mask.contains(local)
+            && interaction.iconRects[DockEntryID.trash.hitID]?.contains(local) == true
+    }
+
     /// Document drags can expose either group; application drags still expose only pins.
     func updateSectionDragHover(at point: CGPoint, valid: Bool, documents: Bool = false) {
         let local = contentPoint(point)
@@ -364,6 +380,7 @@ final class DockPanelController {
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil
+        interaction.openTrash = nil; interaction.emptyTrash = nil
         interaction.removePin = nil; interaction.setFolderPresentation = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
         interaction.beginFolderDrag = nil

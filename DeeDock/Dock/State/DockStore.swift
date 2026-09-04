@@ -33,13 +33,17 @@ final class DockStore {
     var canEditPins: Bool { !profiles.requiresReset && profiles.pinErrors[displayID] == nil }
 
     @ObservationIgnored private let profiles: DisplayProfilesStore
+    @ObservationIgnored private let trash: TrashController?
+    @ObservationIgnored private var showsTrash = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
 
-    init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore) {
+    init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
+         trash: TrashController? = nil) {
         self.displayID = displayID
         self.catalog = catalog
         self.profiles = profiles
+        self.trash = trash
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
@@ -78,9 +82,52 @@ final class DockStore {
 
     private func refreshEntries() {
         let next = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
-                                                  visibility: sections.visibility, expanded: sections.isExpanded)
+                                                  visibility: sections.visibility, expanded: sections.isExpanded,
+                                                  trash: showsTrash ? trash?.item : nil)
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
+    }
+
+    func configureTrash(_ visible: Bool) {
+        guard showsTrash != visible else { return }
+        showsTrash = visible
+        refreshEntries()
+    }
+
+    func openTrash() {
+        let token = session.token
+        guard let trash else {
+            errorMessage = .trashUnavailable
+            return
+        }
+        trash.open { [weak self] errorDescription in
+            guard let self, session.accepts(token), let errorDescription else { return }
+            errorMessage = .trashAutomationActionFailed(details: errorDescription)
+        }
+    }
+
+    func emptyTrash() {
+        let token = session.token
+        guard let trash else {
+            errorMessage = .trashUnavailable
+            return
+        }
+        trash.empty { [weak self] errorDescription in
+            guard let self, session.accepts(token), let errorDescription else { return }
+            errorMessage = .trashAutomationActionFailed(details: errorDescription)
+        }
+    }
+
+    func recycleToTrash(_ access: DocumentResourceAccess) {
+        let token = session.token
+        guard let trash else {
+            errorMessage = .trashUnavailable
+            return
+        }
+        trash.recycle(access) { [weak self] error in
+            guard let self, session.accepts(token), let error else { return }
+            errorMessage = .trashMoveFailed(details: error.localizedDescription)
+        }
     }
 
     /// Saves this display's pins; the coordinator refreshes panels only after the write succeeds.
@@ -182,6 +229,7 @@ final class DockStore {
         case .app(let item): open(item)
         case .folder(let folder): openFolder?(folder, keyboardFocus)
         case .group: sections.toggle()
+        case .trash: openTrash()
         case .gap: break
         }
     }
