@@ -1,6 +1,30 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "secondaryDockTitle" : {
+      "comment" : "Heading for the app-wide multi-monitor dock policy.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Docks auf mehreren Monitoren" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Multi-monitor docks" } }
+      }
+    },
+    "secondaryDockToggle" : {
+      "comment" : "Opt-in filter for docks on secondary displays.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Laufende Apps auf weiteren Monitoren nach sichtbaren Fenstern filtern" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Filter running apps on secondary displays by visible windows" } }
+      }
+    },
+    "secondaryDockHelp" : {
+      "comment" : "Explains primary-dock behavior, permission fallback, and visible-window limitations without promising minimized-window placement.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Filtert auf weiteren Monitoren die Liste der nicht angepinnten, laufenden Apps. Finder erscheint dort auch angepinnt nur mit einem sichtbaren Finder-Fenster; der Schreibtisch zählt nicht. Andere Pins, Ordner, weitere Kacheln und die App-Sichtbarkeit unter Verhalten bleiben unverändert. Dafür ist die Bildschirmaufnahme-Berechtigung unten erforderlich. Fehlt sie oder ist das Hauptdock deaktiviert, entfällt der Filter. Minimierte, ausgeblendete und auf anderen Spaces liegende Fenster werden nicht zuverlässig zugeordnet. Änderungen können einige Sekunden dauern." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Filters unpinned running apps on secondary displays. Finder appears there only with a visible Finder window, even when pinned; the desktop does not count. Other pins, folders, utility tiles, and Behavior → App Visibility keep their normal behavior. This requires the Screen Recording permission below. Without access, or with the primary dock disabled, the filter is inactive. Minimized, hidden, and other-Space windows cannot be assigned reliably. Changes can take a few seconds." } }
+      }
+    },
   "updatesDownloadedBody": {
     "comment": "An update was already downloaded by Sparkle and needs user approval to begin installation.",
     "extractionState": "manual",

@@ -40,6 +40,7 @@ final class DockCoordinator {
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
     @ObservationIgnored private let modePicker = DockModePickerCoordinator()
     @ObservationIgnored private let displayService = DisplayService()
+    @ObservationIgnored private let occupancy = DisplayApplicationOccupancy()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
     @ObservationIgnored private var monitors: [Any] = []
     @ObservationIgnored private var focusedID: String?
@@ -47,6 +48,7 @@ final class DockCoordinator {
     @ObservationIgnored private var lastExternalApplication: NSRunningApplication?
     @ObservationIgnored private var started = false
     @ObservationIgnored private var reconciling = false
+    @ObservationIgnored private var occupancySuspended = false
 
     init(windowAccess: WindowAccessController, screenCapture: ScreenCaptureAccessController) {
         let settings = DockSettingsStore(repository: DockSettingsRepository())
@@ -87,6 +89,7 @@ final class DockCoordinator {
     func start() {
         guard !started else { return }
         started = true
+        occupancy.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
         focusSession.changed = { [weak self] in self?.refreshPanels() }
@@ -126,7 +129,7 @@ final class DockCoordinator {
         windowPeeks.prepareSettings = { [weak self] _ in
             self?.settingsFeaturesRequest = true
         }
-        catalog.didChange = { [weak self] in self?.refreshPanels() }
+        catalog.didChange = { [weak self] in self?.occupancy.invalidate(); self?.refreshPanels() }
         trash.didChange = { [weak self] in self?.refreshPanels() }
         // One shared Shelf: an edit on any display re-renders every dock and the open panel.
         shelf.didChange = { [weak self] in
@@ -142,6 +145,7 @@ final class DockCoordinator {
             guard app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return }
             if app.bundleIdentifier == "com.apple.finder" { self?.trash.refreshAfterFinderActivity() }
             self?.rememberExternal(app)
+            self?.occupancy.invalidate()
             self?.windowPeeks.close(returnFocus: false)
             self?.endFocus(restore: false)
         }
@@ -154,7 +158,10 @@ final class DockCoordinator {
             self?.scheduleShelfSemanticWarmup()
             self?.refreshPanels()
         }
-        displayService.didChange = { [weak self] in self?.reconcile($0) }
+        displayService.didChange = { [weak self] in
+            self?.occupancySuspended = false
+            self?.reconcile($0)
+        }
         catalog.start()
         trash.start()
         shelf.start()
@@ -169,6 +176,8 @@ final class DockCoordinator {
             suspensionObservers.append(NSWorkspace.shared.notificationCenter.addObserver(
                 forName: name, object: nil, queue: .main
             ) { [weak self] _ in MainActor.assumeIsolated {
+                self?.occupancySuspended = true
+                self?.occupancy.stop()
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
                 self?.popovers.closeAll()
@@ -195,6 +204,7 @@ final class DockCoordinator {
 
     private func reconcile(_ displays: [DisplaySnapshot], resetVisibility: Bool = true) {
         guard started, !reconciling else { return }
+        occupancy.invalidate()
         if resetVisibility {
             dragging.cancel()
             modePicker.close(returnFocus: false)
@@ -350,8 +360,14 @@ final class DockCoordinator {
 
     private func refreshPanels(resetVisibility: Bool = false) {
         guard started else { return }
+        // If the primary dock is disabled, keep the remaining docks complete.
+        let satelliteMode = settings.value.secondaryDisplayAppsOnly
+            && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
+        occupancy.configure(enabled: satelliteMode && !occupancySuspended)
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
+            panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
+                ? occupancy.applications?[display.runtimeID] : nil
             panel.store.refresh()
             panel.update(display: display, settings: profiles.effectiveSettings(for: display.id), resetVisibility: resetVisibility)
         }
@@ -468,6 +484,8 @@ final class DockCoordinator {
     func stop() {
         guard started else { return }
         started = false
+        occupancy.stop()
+        occupancy.changed = nil
         endFocus(restore: true)
         monitors.forEach { NSEvent.removeMonitor($0) }
         monitors.removeAll()

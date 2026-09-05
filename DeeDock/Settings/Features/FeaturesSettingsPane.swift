@@ -22,6 +22,11 @@ struct FeaturesSettingsPane: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+                SettingsCard(title: .secondaryDockTitle, footnote: .secondaryDockHelp) {
+                    SettingsToggleRow(title: .secondaryDockToggle,
+                                      isOn: source.binding(\.secondaryDisplayAppsOnly))
+                }
+                .disabled(locked)
                 if let focus { FocusSessionSettingsCard(controller: focus) }
                 if let actions { ActionTilesSettingsCard(controller: actions) }
                 SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {

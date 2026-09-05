@@ -989,3 +989,26 @@ Release notes render as native attributed text, including emphasis, lists, and H
 The custom direct and TestFlight Release app builds succeeded with signing disabled. Inspection of the direct executable's undefined symbols found `SPUUpdater` and no `SPUStandardUpdaterController` or `SPUStandardUserDriver`. TestFlight still has no Sparkle load command, bundle resources, updater Info.plist keys, or custom-driver/window symbols. All 61 packaged update strings match the English and German source catalog in both targets. Build logs for this revision are `/tmp/dee4-custom-direct.log` and `/tmp/dee4-custom-testflight.log`.
 
 No tests, previews, native UI checks, or signed installations were run. Added deterministic previews cover permission, a German download, release notes, ready-to-install, and failure. Remaining acceptance includes every driver phase through a staging feed, close/cancel/reopen behavior, stale and repeated actions, resumed installations, rejected signatures, unavailable release notes, incompatible macOS/hardware, delayed termination, background focus, window resizing, German text, keyboard use, VoiceOver, and reduced accessibility effects. Compilation and source inspection do not establish these runtime behaviors.
+## DEE-2: primary dock and visible-window satellites
+
+An opt-in, app-wide Features setting filters secondary docks' running-only app lists to apps
+with visible layer-zero windows. Pins, folders, utility tiles, and all App Visibility choices
+retain their normal behavior on every display, including the primary.
+Finder is the one pin exception on filtered secondary docks: it requires a visible Finder
+window on that display. Desktop windows are excluded and its saved pin is preserved. ScreenCaptureKit supplies metadata
+only; largest frame overlap in Quartz coordinates selects a display. Saved pins and Dock
+Mode preferences are preserved. Missing permission or enumeration failure restores ordinary
+dock contents; a disabled primary also restores ordinary contents everywhere.
+
+One shared task refreshes at a three-second interval while multiple enabled docks and an
+enabled primary make filtering useful. Workspace/display changes invalidate results. Sleep,
+session suspension, disabling the feature, and shutdown cancel the task. Helper processes
+inside a regular application's bundle map to that application; unrelated helper arrangements
+remain unsupported. No screenshots, titles, or persistent window history are collected.
+
+Native acceptance remains pending: window movement and spanning, app hide/minimize/restore,
+Helium helper ownership, permission denial/revocation, empty satellites, primary reassignment,
+mirroring, disabled primary, negative origins/scaling, Spaces, sleep/wake, and reconnects.
+Finder window tiles and minimized-window home-display guarantees are outside this slice.
+The focused Debug DeeDock app build succeeded on 2026-09-05 using derived data at
+`/tmp/DeeDock-dee2-build`. Tests and automated visual checks were not run.
