@@ -8,6 +8,8 @@ import Sparkle
 @Observable
 final class AppUpdater {
     private(set) var automaticallyChecksForUpdates = false
+    private(set) var automaticallyInstallsUpdates = false
+    private(set) var allowsAutomaticUpdates = false
     private(set) var startupFailed = false
     private var engineCanCheck = false
     private let driver = UpdateUserDriver()
@@ -32,6 +34,12 @@ final class AppUpdater {
         updater.publisher(for: \.automaticallyChecksForUpdates)
             .sink { [weak self] in self?.automaticallyChecksForUpdates = $0 }
             .store(in: &observations)
+        updater.publisher(for: \.automaticallyDownloadsUpdates)
+            .sink { [weak self] in self?.automaticallyInstallsUpdates = $0 }
+            .store(in: &observations)
+        updater.publisher(for: \.allowsAutomaticUpdates)
+            .sink { [weak self] in self?.allowsAutomaticUpdates = $0 }
+            .store(in: &observations)
         do {
             try updater.start()
         } catch {
@@ -49,6 +57,11 @@ final class AppUpdater {
     /// Sparkle owns preference persistence and rescheduling.
     func setAutomaticallyChecksForUpdates(_ enabled: Bool) {
         updater?.automaticallyChecksForUpdates = enabled
+    }
+
+    /// Sparkle persists this preference and uses its silent driver for scheduled checks.
+    func setAutomaticallyInstallsUpdates(_ enabled: Bool) {
+        updater?.automaticallyDownloadsUpdates = enabled
     }
 
     /// Process termination releases presentation, pending responses, and UI observers.

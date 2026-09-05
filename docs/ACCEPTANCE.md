@@ -964,7 +964,7 @@ Direct builds include Sparkle 2.9.6, manual update commands in both menus, and a
 
 A new EdDSA key was generated in the local Keychain under account `de.benjaminkraatz.DeeDock`. Only the public key is in the project. No private-key export, release publication, or feed upload was performed. The configured GitHub Latest feed needs an `appcast.xml` asset in the first Sparkle-enabled release. Existing v0.1.1 installations require a manual upgrade to that release. See [release instructions](UPDATES.md).
 
-Validation on 2026-09-05:
+Initial validation on 2026-09-05:
 
 - `xcodebuild` Release builds of the `DeeDock` and `DeeDock-TestFlight` schemes succeeded with `CODE_SIGNING_ALLOWED=NO`, using Xcode 27. No tests, app launches, or previews were run.
 - The direct bundle links and embeds `Sparkle.framework`. Its generated Info.plist contains the expected HTTPS feed, public key, and `SUAutomaticallyUpdate = false`.
@@ -978,7 +978,7 @@ Remaining acceptance requires an authorized signed older-to-newer update through
 
 ### DeeDock-owned update UI
 
-The direct app now constructs `SPUUpdater` with a complete `SPUUserDriver` implementation. The standard Sparkle controller and user driver are not instantiated. The custom SwiftUI window uses DeeDock artwork, a tinted header, native release notes, progress, and phase-specific actions. All app-owned copy is in the English and German string catalog.
+The direct app now constructs `SPUUpdater` with a complete `SPUUserDriver` implementation. The standard Sparkle controller and user driver are not instantiated. The custom SwiftUI window uses DeeDock artwork, a tinted header, native release notes, progress, and phase-specific actions. General Settings shows the installed version and build number, plus separate automatic-check and automatic-installation controls. Automatic installation defaults to on. All app-owned copy is in the English and German string catalog.
 
 The driver covers automatic-check consent, manual checking and cancellation, scheduled and user-initiated offers, informational-only updates, already downloaded or installing updates, critical and major upgrades, release-note download failures, no-compatible-update reasons, download and extraction progress, errors, restart decisions, termination retries, and completion. A pending response is consumed before invoking Sparkle. Action generations reject stale clicks, and release-note tasks discard cancelled results.
 
@@ -987,6 +987,8 @@ Closing a check cancels it. Closing download or extraction progress hides the wi
 Release notes render as native attributed text, including emphasis, lists, and HTTPS links. HTML does not load scripts, remote styles, media, or external entities. Parsing has a 512 KiB input limit and runs off the main actor. Unsupported content can be opened through the original HTTPS release-note link. System-profile sharing is disabled through Sparkle's API.
 
 The custom direct and TestFlight Release app builds succeeded with signing disabled. Inspection of the direct executable's undefined symbols found `SPUUpdater` and no `SPUStandardUpdaterController` or `SPUStandardUserDriver`. TestFlight still has no Sparkle load command, bundle resources, updater Info.plist keys, or custom-driver/window symbols. All 61 packaged update strings match the English and German source catalog in both targets. Build logs for this revision are `/tmp/dee4-custom-direct.log` and `/tmp/dee4-custom-testflight.log`.
+
+Follow-up validation on 2026-09-05: unsigned Debug builds of both schemes succeeded after adding the version display and automatic-installation preference. The direct bundle reports version `0.1.3`, build `9`, and `SUAutomaticallyUpdate = true`; the TestFlight bundle reports the same version and build with no Sparkle update keys. The built English and German resources contain the new Settings copy and version-aware up-to-date messages. `jq empty`, `plutil -lint`, and `git diff --check` also passed. No tests, previews, app launch, or staged-feed update was run.
 
 No tests, previews, native UI checks, or signed installations were run. Added deterministic previews cover permission, a German download, release notes, ready-to-install, and failure. Remaining acceptance includes every driver phase through a staging feed, close/cancel/reopen behavior, stale and repeated actions, resumed installations, rejected signatures, unavailable release notes, incompatible macOS/hardware, delayed termination, background focus, window resizing, German text, keyboard use, VoiceOver, and reduced accessibility effects. Compilation and source inspection do not establish these runtime behaviors.
 ## DEE-2: primary dock and visible-window satellites

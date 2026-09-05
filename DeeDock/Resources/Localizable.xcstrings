@@ -98,19 +98,19 @@
     }
   },
   "updatesPermissionBody": {
-    "comment": "Custom DeeDock update window: May DeeDock check for new versions automatically? You decide when to download and install them. You can change this in General Settings.",
+    "comment": "Custom DeeDock update window: May DeeDock check automatically? Automatic installation defaults to on and remains configurable in General Settings.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "May DeeDock check for new versions automatically? You decide when to download and install them. You can change this in General Settings."
+          "value": "May DeeDock check for new versions automatically? Automatic installation is on by default. You can change both options in General Settings."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Darf DeeDock automatisch nach neuen Versionen suchen? Du entscheidest, wann sie geladen und installiert werden. Du kannst das in den allgemeinen Einstellungen ändern."
+          "value": "Darf DeeDock automatisch nach neuen Versionen suchen? Die automatische Installation ist standardmäßig aktiviert. Du kannst beide Optionen in den allgemeinen Einstellungen ändern."
         }
       }
     }
@@ -422,37 +422,37 @@
     }
   },
   "updatesOnLatest": {
-    "comment": "Custom DeeDock update window: You are using the latest available version of DeeDock.",
+    "comment": "Custom DeeDock update window. The placeholder is the currently installed marketing version.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "You are using the latest available version of DeeDock."
+          "value": "DeeDock %1$(currentVersion)@ is up to date."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Du verwendest die neueste verfügbare Version von DeeDock."
+          "value": "DeeDock %1$(currentVersion)@ ist auf dem neuesten Stand."
         }
       }
     }
   },
   "updatesOnNewer": {
-    "comment": "Custom DeeDock update window: This copy of DeeDock is newer than the latest published version.",
+    "comment": "Custom DeeDock update window. The placeholder is the currently installed marketing version.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "This copy of DeeDock is newer than the latest published version."
+          "value": "You are using DeeDock %1$(currentVersion)@, which is newer than the latest published version."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Diese Version von DeeDock ist neuer als die zuletzt veröffentlichte Version."
+          "value": "Du verwendest DeeDock %1$(currentVersion)@. Diese Version ist neuer als die zuletzt veröffentlichte Version."
         }
       }
     }
@@ -1094,13 +1094,103 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Check for new versions of DeeDock. Updates are installed with your approval."
+          "value": "Check for new versions of DeeDock automatically."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Nach neuen Versionen von DeeDock suchen. Updates werden mit deiner Zustimmung installiert."
+          "value": "Automatisch nach neuen Versionen von DeeDock suchen."
+        }
+      }
+    }
+  },
+  "updatesAutomaticInstallation": {
+    "comment": "App-wide Sparkle preference for automatic background download and installation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatically install updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Updates automatisch installieren"
+        }
+      }
+    }
+  },
+  "updatesAutomaticInstallationDescription": {
+    "comment": "Explains automatic update installation and the possible macOS authorization exception.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Download updates in the background and install them when DeeDock quits. macOS may still ask for administrator approval."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Updates im Hintergrund laden und beim Beenden von DeeDock installieren. macOS kann weiterhin eine Administratorfreigabe verlangen."
+        }
+      }
+    }
+  },
+  "updatesAutomaticInstallationRequiresChecks": {
+    "comment": "Explains why the automatic installation toggle is disabled.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Turn on automatic update checks to use this option."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiviere die automatische Update-Suche, um diese Option zu verwenden."
+        }
+      }
+    }
+  },
+  "updatesCurrentVersion": {
+    "comment": "General Settings row showing the installed app version and build number.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Current version"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktuelle Version"
+        }
+      }
+    }
+  },
+  "updatesSectionTitle": {
+    "comment": "General Settings heading for version and app update controls.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Updates"
         }
       }
     }

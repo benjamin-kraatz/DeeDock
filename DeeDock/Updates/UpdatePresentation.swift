@@ -28,6 +28,7 @@ enum UpdateAction: Hashable {
 @MainActor
 @Observable
 final class UpdatePresentation {
+    let currentVersion: String
     var phase: UpdatePhase = .idle
     var offer: UpdateOffer?
     var receivedBytes: UInt64 = 0
@@ -41,6 +42,10 @@ final class UpdatePresentation {
     var canRetryTermination = false
     /// Invalidates a button rendered for an earlier callback, including queued double-clicks.
     var actionToken = UUID()
+
+    init(currentVersion: String? = nil) {
+        self.currentVersion = currentVersion ?? AppVersionInfo.current.version
+    }
 
     var isActive: Bool { phase != .idle }
     var updateAvailable: Bool { phase == .available || phase == .ready }

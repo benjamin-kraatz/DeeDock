@@ -13,7 +13,7 @@ enum SettingsSelection: Hashable {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         var terms: [LocalizedStringResource] = [.settingsGeneral, .settingsGeneralKeywords]
         #if DIRECT_DISTRIBUTION
-        terms += [.updatesAutomatic, .updatesCheck]
+        terms += [.updatesAutomatic, .updatesAutomaticInstallation, .updatesCheck]
         #endif
         return query.isEmpty || terms.contains { String(localized: $0).localizedStandardContains(query) }
     }

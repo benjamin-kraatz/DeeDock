@@ -3,5 +3,5 @@
 <plist version="1.0"><dict>
     <key>SUFeedURL</key><string>$(SPARKLE_FEED_URL)</string>
     <key>SUPublicEDKey</key><string>$(SPARKLE_PUBLIC_ED_KEY)</string>
-    <key>SUAutomaticallyUpdate</key><false/>
+    <key>SUAutomaticallyUpdate</key><true/>
 </dict></plist>

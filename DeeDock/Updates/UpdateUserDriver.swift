@@ -81,8 +81,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         let error = error as NSError
         if let value = error.userInfo[SPUNoUpdateFoundReasonKey] as? NSNumber {
             switch SPUNoUpdateFoundReason(rawValue: value.int32Value) {
-            case .onLatestVersion: presentation.message = .updatesOnLatest
-            case .onNewerThanLatestVersion: presentation.message = .updatesOnNewer
+            case .onLatestVersion:
+                presentation.message = .updatesOnLatest(currentVersion: presentation.currentVersion)
+            case .onNewerThanLatestVersion:
+                presentation.message = .updatesOnNewer(currentVersion: presentation.currentVersion)
             case .systemIsTooOld, .systemIsTooNew: presentation.message = .updatesOSIncompatible
             case .hardwareDoesNotSupportARM64: presentation.message = .updatesHardwareIncompatible
             default: presentation.message = .updatesNoCompatibleUpdate
@@ -208,7 +210,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         switch (response, action) {
         case (.permission(let reply), .allowChecks), (.permission(let reply), .declineChecks):
             dismissUpdateInstallation()
-            reply(SUUpdatePermissionResponse(automaticUpdateChecks: action == .allowChecks, sendSystemProfile: false))
+            reply(SUUpdatePermissionResponse(automaticUpdateChecks: action == .allowChecks,
+                                             sendSystemProfile: false))
         case (.choice(let reply), .install):
             // Installing an already-prepared offer may immediately restart the app.
             transition(presentation.phase == .ready || presentation.offer?.stage == .installing ? .installing : .extracting)
