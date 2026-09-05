@@ -9,6 +9,8 @@ final class DockStore {
     @ObservationIgnored var openFocusSession: (() -> Void)?
     let actions: ActionTilesController?
     let displayID: String
+    /// Filters running-only apps and Finder, including its pin. Other pins and section visibility remain independent.
+    var visibleApplicationIDs: Set<String>?
     /// Ordered render snapshots: this display's pins, followed by shared running applications.
     private(set) var items: [DockItem] = []
     private(set) var folders: [FolderDockItem] = []
@@ -72,7 +74,12 @@ final class DockStore {
         let pinnedApplications = pins.compactMap(\.application)
         let running = Dictionary(uniqueKeysWithValues: catalog.running.map { ($0.id, $0) })
         let favorites = Dictionary(uniqueKeysWithValues: pinnedApplications.map { ($0.id, $0) })
-        items = DockOrdering.itemOrder(favorites: pinnedApplications, runningIDs: catalog.runningIDs).compactMap { id in
+        let runningIDs = catalog.runningIDs.filter { visibleApplicationIDs?.contains($0) ?? true }
+        items = DockOrdering.itemOrder(favorites: pinnedApplications, runningIDs: runningIDs).compactMap { id in
+            // Finder stays running for the desktop. On filtered secondary docks its saved
+            // pin appears only with an actual visible window; persistence is untouched.
+            if id == "com.apple.finder", let visibleApplicationIDs,
+               !visibleApplicationIDs.contains(id) { return nil }
             guard let reference = favorites[id] ?? running[id] else { return nil }
             let access = ApplicationResourceAccess(reference)
             defer { withExtendedLifetime(access) {} }

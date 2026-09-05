@@ -107,6 +107,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         // Features are configured once for the whole app in Settings > Features. They still travel
         // in the resolved settings each dock reads, but no display can hold its own value.
         result.showShelf = defaults.showShelf
+        result.secondaryDisplayAppsOnly = defaults.secondaryDisplayAppsOnly
         result.showSessionCapsules = defaults.showSessionCapsules
         result.showTrash = defaults.showTrash
         result.confirmBeforeEmptyingTrash = defaults.confirmBeforeEmptyingTrash

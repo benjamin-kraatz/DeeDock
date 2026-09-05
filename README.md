@@ -88,6 +88,23 @@ Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folde
 
 ## Dock Modes
 
+In **Settings → Features → Multi-monitor docks**, enable secondary docks to show only apps
+with visible windows on their display in the running section. Only the running-only app list
+is filtered; pins, folders, utility tiles, and Behavior → App Visibility keep their normal
+behavior on every display. The primary dock's running list is unchanged.
+Finder is the exception: on filtered secondary docks, even its pin appears only when a
+visible Finder window occupies that display. The desktop does not count; the pin stays saved.
+Screen Recording access is required through the permission controls in Features. If access
+or window enumeration is unavailable, docks show their ordinary contents. Disabling the
+primary dock also restores ordinary contents on the remaining docks.
+
+Window metadata refreshes every three seconds while this mode has multiple enabled displays.
+A spanning window belongs to the display with the largest overlap. Apps with windows on
+several displays appear on each relevant dock. Minimized, hidden, and other-Space windows
+have no guaranteed assignment; the primary dock keeps their apps available. Finder is an
+app icon, not a separate tile per Finder window. This feature does not redirect minimize
+animations or provide system Dock minimize targets.
+
 Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DeeDock keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
 
 Each mode owns the ordered app and folder pins for every remembered display, plus the shared App Visibility choice and any display-specific App Visibility overrides. Pinning, unpinning, reordering, folder presentation changes, and App Visibility edits apply directly to the active mode. Appearance, placement, auto-hide, Trash, Window Peek, and other controls remain independent.
