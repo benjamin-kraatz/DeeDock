@@ -1,0 +1,5 @@
+// Shared by direct and TestFlight app targets.
+CURRENT_PROJECT_VERSION = 7
+MARKETING_VERSION = 0.1.1
+PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock
+PRODUCT_NAME = DeeDock

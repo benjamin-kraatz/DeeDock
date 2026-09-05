@@ -11,8 +11,11 @@ enum SettingsSelection: Hashable {
     /// Localized synonyms let users find General by login and startup terminology.
     static func generalMatches(_ query: String) -> Bool {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        return query.isEmpty || [LocalizedStringResource.settingsGeneral, .settingsGeneralKeywords]
-            .contains { String(localized: $0).localizedStandardContains(query) }
+        var terms: [LocalizedStringResource] = [.settingsGeneral, .settingsGeneralKeywords]
+        #if DIRECT_DISTRIBUTION
+        terms += [.updatesAutomatic, .updatesCheck]
+        #endif
+        return query.isEmpty || terms.contains { String(localized: $0).localizedStandardContains(query) }
     }
 
 

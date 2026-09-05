@@ -12,6 +12,9 @@ struct DeeDockApp: App {
             DockModesMenu(coordinator: delegate.coordinator)
             OpenDockSettingsButton()
             Button(.onboardingShowWelcome) { delegate.onboarding.present() }
+            #if DIRECT_DISTRIBUTION
+            CheckForUpdatesButton(updater: delegate.updater)
+            #endif
             Divider()
             Button(.actionQuit) { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
@@ -23,6 +26,9 @@ struct DeeDockApp: App {
                 OpenDockSettingsButton().keyboardShortcut(",")
             }
             CommandGroup(after: .appInfo) {
+                #if DIRECT_DISTRIBUTION
+                CheckForUpdatesButton(updater: delegate.updater)
+                #endif
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
@@ -33,6 +39,9 @@ struct DeeDockApp: App {
                              loginItems: delegate.loginItems, windowAccess: delegate.windowAccess,
                              screenCapture: delegate.screenCapture,
                              coordinator: delegate.coordinator)
+            #if DIRECT_DISTRIBUTION
+            .environment(\.appUpdater, delegate.updater)
+            #endif
         }
     }
 }

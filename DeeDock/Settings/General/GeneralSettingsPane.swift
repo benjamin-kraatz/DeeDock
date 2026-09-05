@@ -3,6 +3,9 @@ import SwiftUI
 /// App-wide preferences remain usable even when display configuration cannot be loaded.
 struct GeneralSettingsPane: View {
     let controller: LoginItemController
+    #if DIRECT_DISTRIBUTION
+    @Environment(\.appUpdater) private var updater
+    #endif
 
     var body: some View {
         ScrollView {
@@ -13,6 +16,15 @@ struct GeneralSettingsPane: View {
                                       cancelRequest: { controller.cancelRequest() },
                                       refresh: controller.refresh, openSettings: controller.openSystemSettings,
                                       dismissError: controller.dismissError)
+                #if DIRECT_DISTRIBUTION
+                if let updater {
+                    UpdateSettingsCard(automaticallyChecks: updater.automaticallyChecksForUpdates,
+                                       canCheck: updater.canCheckForUpdates, updateAvailable: updater.updateAvailable,
+                                       startupFailed: updater.startupFailed, updateInProgress: updater.updateInProgress,
+                                       setAutomaticallyChecks: updater.setAutomaticallyChecksForUpdates,
+                                       check: updater.checkForUpdates)
+                }
+                #endif
             }
                 .frame(maxWidth: 620, alignment: .leading)
                 .frame(maxWidth: .infinity)
