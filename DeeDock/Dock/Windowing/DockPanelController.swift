@@ -100,6 +100,8 @@ final class DockPanelController {
         store.configureSessionCapsules(settings.showSessionCapsules)
         store.configureTrash(settings.showTrash)
         interaction.confirmsTrashEmpty = settings.confirmBeforeEmptyingTrash
+        interaction.windowGroupsEnabled = settings.windowGroupsEnabled
+        interaction.windowGroupsExpanded = settings.windowGroupsExpanded
         interaction.tooltipPreset = settings.tooltipPreset
         let exposedIDs = Set(store.entries.compactMap(\.target).map(\.hitID))
         interaction.retainHitRegions(exposedIDs)
@@ -441,6 +443,8 @@ final class DockPanelController {
             if case .app(let id) = store.selectedTarget,
                let item = store.items.first(where: { $0.id == id }) { interaction.openWindowPeek?(item) }
             else if case .group = store.selectedTarget { store.openSelection() }
+            else if case .windowGroup = store.selectedTarget { store.openSelection() }
+            else if case .window = store.selectedTarget { store.openSelection() }
         case 53: escape?()
         default: return false
         }
@@ -468,6 +472,8 @@ final class DockPanelController {
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
         interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil
         interaction.windowPeekHoverChanged = nil; interaction.openWindowPeek = nil
+        interaction.toggleWindowGroup = nil; interaction.selectDockWindow = nil
+        interaction.toggleWindowGroupsEnabled = nil; interaction.toggleWindowGroupsExpanded = nil
         interaction.removePin = nil; interaction.setFolderPresentation = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
         interaction.beginFolderDrag = nil

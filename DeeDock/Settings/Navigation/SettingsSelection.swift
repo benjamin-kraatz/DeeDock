@@ -28,7 +28,8 @@ enum SettingsSelection: Hashable {
     /// Features is found by the name of anything it contains, not only by the word "features".
     static func featuresMatches(_ query: String) -> Bool {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        return query.isEmpty || [LocalizedStringResource.settingsFeatures, .settingsFeaturesKeywords]
+        return query.isEmpty || [LocalizedStringResource.settingsFeatures, .settingsFeaturesKeywords,
+                                .windowGroupsTitle, .windowGroupsEnabled, .windowGroupsExpanded]
             .contains { String(localized: $0).localizedStandardContains(query) }
     }
 }

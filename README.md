@@ -101,8 +101,8 @@ primary dock also restores ordinary contents on the remaining docks.
 Window metadata refreshes every three seconds while this mode has multiple enabled displays.
 A spanning window belongs to the display with the largest overlap. Apps with windows on
 several displays appear on each relevant dock. Minimized, hidden, and other-Space windows
-have no guaranteed assignment; the primary dock keeps their apps available. Finder is an
-app icon, not a separate tile per Finder window. This feature does not redirect minimize
+have no guaranteed assignment; the primary dock keeps their apps available. Finder remains an
+app icon unless the optional Window groups feature is enabled. This feature does not redirect minimize
 animations or provide system Dock minimize targets.
 
 Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DeeDock keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
@@ -112,6 +112,35 @@ Each mode owns the ordered app and folder pins for every remembered display, plu
 The menu-bar **Dock Mode** submenu switches configurations across all connected docks after the new choice has saved successfully. **Previous Mode** toggles between the last two configurations. During Focus Dock, press M, use Up or Down, then Return; Escape closes the picker without switching. Switching is unavailable while a native menu, file picker, or drag operation is active, and closes open Window Peek and folder panels before changing the docks.
 
 Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DeeDock continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
+
+## Window groups
+
+Enable **Settings → Features → Window groups → Show window groups** to display a window count
+beside each app that has open windows on that monitor. Click the count to expand or collapse
+the group. Individual window tiles show the app icon and window title; hover reveals the full
+title. A shared outline connects the app, count, and window tiles.
+
+Turn on **Keep window groups expanded** to keep every group open. Both switches are also
+available by right-clicking any app in the Dock. They apply to all docks and persist across
+restart. With the keep-expanded switch off, each display remembers its clicked-open groups
+for that panel session. The feature starts disabled on existing and new installations.
+
+Window tiles appear on the display with the largest overlap with the window, while the primary
+Dock keeps its ordinary app overview. Window groups respect App Visibility and the existing
+secondary-display app filter. Finder windows become individual tiles when their group is open.
+The existing shared metadata refresh updates window titles and display assignments within a
+few seconds. Window tiles are not pins and cannot be dragged into the pinned app list.
+
+Enable **Screen Recording** and **Window Access** in Features. Screen Recording supplies window
+metadata without taking screenshots. Selecting a tile resolves its current Accessibility handle
+and brings that exact window forward. A closed or ambiguous window, or unavailable permission,
+produces an error. There is no fallback to activating a different window. Minimization targets,
+hidden and minimized window assignment, and reliable cross-Space or full-screen activation are
+not provided by this feature.
+
+In Focus Dock, use the existing arrow keys to select counts or windows. Return or Space toggles
+a count or selects a window. VoiceOver receives the app name and full window title. Reduce Motion
+and Reduce Transparency use the existing Dock presentation rules.
 
 ## Launch at login
 

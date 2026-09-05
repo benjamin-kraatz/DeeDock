@@ -1,56 +1,69 @@
 import AppKit
 import ScreenCaptureKit
 
-/// Enumerates metadata only. Window titles, screenshots, and native handles are never retained.
+/// Enumerates metadata only; no screenshots or native handles leave this actor.
 actor DisplayApplicationOccupancyService {
-    func applicationsByDisplay(identities: [pid_t: String]) async throws -> [UInt32: Set<String>] {
+    struct Snapshot: Equatable, Sendable {
+        let applications: [UInt32: Set<String>]
+        let windows: [DockWindowSnapshot]
+    }
+
+    func snapshot(identities: [pid_t: String], includeWindows: Bool) async throws -> Snapshot {
         guard CGPreflightScreenCaptureAccess() else { throw WindowThumbnailServiceError.permissionRequired }
         let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: true)
         try Task.checkCancellation()
         var result: [UInt32: Set<String>] = [:]
+        var windows: [DockWindowSnapshot] = []
         for display in content.displays { result[display.displayID] = [] }
-        let displays = content.displays.sorted { $0.displayID < $1.displayID }
+        let displays = Dictionary(uniqueKeysWithValues: content.displays.map { ($0.displayID, $0.frame) })
         for window in content.windows {
             guard window.isOnScreen, window.windowLayer == 0,
                   window.frame.width > 1, window.frame.height > 1,
                   let owner = window.owningApplication else { continue }
-            // Both frames use Quartz coordinates. Largest overlap assigns a spanning window
-            // once; display ID breaks equal-area ties deterministically.
-            let display = displays.max {
-                Self.area(window.frame.intersection($0.frame)) < Self.area(window.frame.intersection($1.frame))
-            }
-            guard let display, Self.area(window.frame.intersection(display.frame)) > 0 else { continue }
+            guard let displayID = DockWindowDisplayAssignment.display(for: window.frame, among: displays) else { continue }
             if let identity = identities[owner.processID] {
-                result[display.displayID, default: []].insert(identity)
+                result[displayID, default: []].insert(identity)
+                if includeWindows {
+                    windows.append(DockWindowSnapshot(id: window.windowID, processIdentifier: owner.processID,
+                        applicationID: identity, displayID: displayID,
+                        title: (window.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines), frame: window.frame))
+                }
             }
         }
-        return result
+        // Window-server stacking order changes on activation. Stable IDs prevent reshuffling
+        // the group every time its user selects another window.
+        return Snapshot(applications: result, windows: windows.sorted { $0.id < $1.id })
     }
-
-    private static func area(_ frame: CGRect) -> CGFloat { frame.isNull ? 0 : frame.width * frame.height }
 }
 
-/// One shared refresh loop, active only while satellite filtering is useful.
+/// One shared refresh loop for satellite filtering and optional window groups.
 /// Workspace events request a refresh; a three-second bound also catches window moves
 /// without requiring Accessibility. Cancellation rejects results after disabling or teardown.
 @MainActor
 final class DisplayApplicationOccupancy {
     var changed: (() -> Void)?
     private(set) var applications: [UInt32: Set<String>]?
+    private(set) var windows: [DockWindowSnapshot] = []
+    private var includesWindows = false
     private let service = DisplayApplicationOccupancyService()
     private var task: Task<Void, Never>?
     private var generation = UUID()
 
-    func configure(enabled: Bool) {
+    func configure(enabled: Bool, includeWindows: Bool = false) {
         if !enabled { stop(); return }
+        if includesWindows != includeWindows { stop(); includesWindows = includeWindows }
         guard task == nil else { return }
         let generation = generation
         task = Task { [weak self, service] in
             while !Task.isCancelled {
                 guard let identities = self?.processIdentities() else { return }
-                let snapshot = try? await service.applicationsByDisplay(identities: identities)
+                let snapshot = try? await service.snapshot(identities: identities, includeWindows: self?.includesWindows == true)
                 guard !Task.isCancelled, let self, self.generation == generation else { return }
-                if applications != snapshot { applications = snapshot; changed?() }
+                if applications != snapshot?.applications || windows != (snapshot?.windows ?? []) {
+                    applications = snapshot?.applications
+                    windows = snapshot?.windows ?? []
+                    changed?()
+                }
                 do { try await Task.sleep(for: .seconds(3)) } catch { return }
             }
         }
@@ -78,11 +91,13 @@ final class DisplayApplicationOccupancy {
     func invalidate() {
         let active = task != nil
         let previous = applications
+        let previousWindows = windows
         stop()
         // Keep the published snapshot until its replacement arrives. A failed replacement
         // must transition from that snapshot to nil and notify the docks to restore fallback.
         applications = previous
-        configure(enabled: active)
+        windows = previousWindows
+        configure(enabled: active, includeWindows: includesWindows)
     }
 
     func stop() {
@@ -90,5 +105,6 @@ final class DisplayApplicationOccupancy {
         task?.cancel()
         task = nil
         applications = nil
+        windows = []
     }
 }

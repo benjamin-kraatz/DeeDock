@@ -5,7 +5,7 @@ import AppKit
 enum FolderFileDrop {
     static func urls(_ info: NSDraggingInfo) -> [URL]? {
         guard info.draggingSourceOperationMask.contains(.copy),
-              info.draggingPasteboard.string(forType: DockDragCoordinator.pasteboardType) == nil,
+              info.draggingPasteboard.string(forType: DockPinDragPasteboard.type) == nil,
               let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self],
                 options: [.urlReadingFileURLsOnly: true]) as? [URL], !urls.isEmpty,
               urls.count == info.draggingPasteboard.pasteboardItems?.count else { return nil }

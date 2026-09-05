@@ -27,6 +27,14 @@ struct FeaturesSettingsPane: View {
                                       isOn: source.binding(\.secondaryDisplayAppsOnly))
                 }
                 .disabled(locked)
+                SettingsCard(title: .windowGroupsTitle, footnote: .windowGroupsHelp) {
+                    SettingsToggleRow(title: .windowGroupsEnabled,
+                                      isOn: source.binding(\.windowGroupsEnabled))
+                    SettingsToggleRow(title: .windowGroupsExpanded,
+                                      isOn: source.binding(\.windowGroupsExpanded))
+                        .disabled(!store.value.windowGroupsEnabled)
+                }
+                .disabled(locked)
                 if let focus { FocusSessionSettingsCard(controller: focus) }
                 if let actions { ActionTilesSettingsCard(controller: actions) }
                 SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {

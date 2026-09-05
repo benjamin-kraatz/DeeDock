@@ -43,6 +43,7 @@ struct DockSurfaceView: View {
                 .animation(interaction.idleFade.animation, value: opacity.background)
                 .frame(width: surface.width, height: surface.height)
                 .position(x: surface.midX, y: surface.midY)
+            DockWindowGroupBackgrounds(slots: slots, layout: layout, sizes: sizes, opacity: opacity.background)
             if slots.isEmpty {
                 Text(.dockEmptyState)
                     .font(.caption).foregroundStyle(.secondary)

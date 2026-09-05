@@ -49,6 +49,10 @@ struct DockSettings: Codable, Equatable {
     var appVisibility: DockAppVisibility = .showAll
     /// Filters secondary docks' running-only apps by visible windows; preserves section settings.
     var secondaryDisplayAppsOnly = false
+    /// Shows window groups on the display containing each window.
+    var windowGroupsEnabled = false
+    /// Keeps every window group open; otherwise expansion belongs to the panel session.
+    var windowGroupsExpanded = false
     /// Whether each display dock includes the trailing Shelf tile.
     var showShelf: Bool = true
     /// Whether each display dock includes the shared Session Capsules tile.
@@ -135,6 +139,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
+        case windowGroupsEnabled, windowGroupsExpanded
         case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
@@ -156,6 +161,8 @@ extension DockSettings {
         appVisibility = values.contains(.appVisibility) ? try values.decode(DockAppVisibility.self, forKey: .appVisibility) : .showAll
         secondaryDisplayAppsOnly = values.contains(.secondaryDisplayAppsOnly)
             ? try values.decode(Bool.self, forKey: .secondaryDisplayAppsOnly) : false
+        windowGroupsEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowGroupsEnabled) ?? false
+        windowGroupsExpanded = try values.decodeIfPresent(Bool.self, forKey: .windowGroupsExpanded) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
         showSessionCapsules = try values.decodeIfPresent(Bool.self, forKey: .showSessionCapsules) ?? true
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true

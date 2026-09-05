@@ -26,9 +26,12 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
+    case window(UInt32), windowGroup(String)
     case focus, action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, trash
     var hitID: String {
         switch self {
+        case .window(let id): "window:\(id)"
+        case .windowGroup(let id): "window-group:\(id)"
         case .focus: "focus"
         case .action(let id): "action:\(id.uuidString)"
         case .app(let id): "app:\(id)"
@@ -99,6 +102,10 @@ enum DockSectionProjection {
     static func repairedSelection(_ selection: DockEntryID?, previous: [DockRenderSlot], current: [DockRenderSlot]) -> DockEntryID? {
         guard let selection else { return nil }
         if current.contains(where: { $0.target == selection }) { return selection }
+        if let owner = previous.first(where: { $0.target == selection })?.windowOwner {
+            if current.contains(where: { $0.target == .windowGroup(owner.id) }) { return .windowGroup(owner.id) }
+            if current.contains(where: { $0.target == .app(owner.id) }) { return .app(owner.id) }
+        }
         let oldIndex = previous.firstIndex { $0.target == selection } ?? 0
         if let old = previous.first(where: { $0.target == selection }), let appGroup = old.appGroup {
             let group = DockEntryID.group(appGroup)

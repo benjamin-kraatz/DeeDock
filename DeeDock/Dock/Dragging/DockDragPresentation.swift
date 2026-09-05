@@ -1,5 +1,10 @@
 import AppKit
 
+/// Shared pin-drag marker. Payload readers do not need the native drag coordinator.
+enum DockPinDragPasteboard {
+    static let type = NSPasteboard.PasteboardType("de.benjaminkraatz.DeeDock.application-drag")
+}
+
 /// A temporary insertion proposal; it never changes the store or writes preferences.
 struct DockDragProposal: Equatable {
     let pins: [DockPin]
@@ -8,6 +13,8 @@ struct DockDragProposal: Equatable {
 
 /// A stable render identity for either an application or one place in a multi-app insertion gap.
 enum DockRenderSlot: Identifiable {
+    case window(DockWindowItem)
+    case windowGroup(DockWindowGroup)
     case focus(FocusDockItem)
     case action(ActionDockItem)
     case app(DockItem)
@@ -21,6 +28,8 @@ enum DockRenderSlot: Identifiable {
 
     var id: String {
         switch self {
+        case .window(let item): return DockEntryID.window(item.window.id).hitID
+        case .windowGroup(let group): return DockEntryID.windowGroup(group.app.id).hitID
         case .focus: return DockEntryID.focus.hitID
         case .action(let item): return DockEntryID.action(item.tile.id).hitID
         case .app(let item): return "app:\(item.id)"
@@ -35,6 +44,8 @@ enum DockRenderSlot: Identifiable {
     }
     var isPinned: Bool {
         switch self {
+        case .window(let item): return item.app.isFavorite
+        case .windowGroup(let group): return group.app.isFavorite
         case .app(let item): return item.isFavorite
         case .folder, .gap: return true
         case .group(let control): return control.group == .pinned
@@ -42,6 +53,10 @@ enum DockRenderSlot: Identifiable {
         }
     }
     var item: DockItem? { if case .app(let item) = self { return item }; return nil }
+    var window: DockWindowItem? { if case .window(let item) = self { return item }; return nil }
+    var windowGroup: DockWindowGroup? { if case .windowGroup(let group) = self { return group }; return nil }
+    /// Child entries stay with their parent during pin insertion previews.
+    var windowOwner: DockItem? { window?.app ?? windowGroup?.app }
     var folder: FolderDockItem? { if case .folder(let item) = self { return item }; return nil }
     var trash: TrashDockItem? { if case .trash(let item) = self { return item }; return nil }
     var shelf: ShelfDockItem? { if case .shelf(let item) = self { return item }; return nil }
@@ -53,6 +68,8 @@ enum DockRenderSlot: Identifiable {
     var isUtility: Bool { focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil }
     var appGroup: DockAppGroup? {
         switch self {
+        case .window(let item): item.app.isFavorite ? .pinned : .running
+        case .windowGroup(let group): group.app.isFavorite ? .pinned : .running
         case .app(let item): item.isFavorite ? .pinned : .running
         case .folder: .pinned
         case .group(let control): control.group
@@ -66,9 +83,11 @@ enum DockRenderSlot: Identifiable {
         default: nil
         }
     }
-    var icon: NSImage? { item?.icon ?? folder?.icon ?? capsule?.icon ?? capsules?.icon ?? shelf?.icon ?? trash?.icon }
+    var icon: NSImage? { windowOwner?.icon ?? item?.icon ?? folder?.icon ?? capsule?.icon ?? capsules?.icon ?? shelf?.icon ?? trash?.icon }
     var name: String {
         switch self {
+        case .window(let item): item.title
+        case .windowGroup(let group): String(localized: group.title)
         case .focus(let item): String(localized: .focusTileName(item.session.modeName))
         case .action(let item): item.tile.name
         case .app(let item): item.reference.name
@@ -84,6 +103,8 @@ enum DockRenderSlot: Identifiable {
 
     var target: DockEntryID? {
         switch self {
+        case .window(let item): .window(item.window.id)
+        case .windowGroup(let group): .windowGroup(group.app.id)
         case .focus: .focus
         case .action(let item): .action(item.tile.id)
         case .app(let item): .app(item.id)
@@ -109,9 +130,15 @@ enum DockRenderSlot: Identifiable {
         // Collapsed and hidden pins must never leak into a gap preview.
         if entries.contains(where: { if case .group(let c) = $0 { return c.group == .pinned && !c.expanded }; return false }) { return entries }
         let boundary = pins.prefix(max(0, proposal.index)).filter { !ids.contains($0.id) }.count
-        var result = entries.filter { slot in slot.pin.map { !ids.contains($0.id) } ?? true }
-        let controlCount = result.prefix { if case .group(let c) = $0 { return c.group == .pinned }; return false }.count
-        result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: min(controlCount + boundary, result.count))
+        var result = entries.filter { slot in
+            if let owner = slot.windowOwner, ids.contains(owner.id) { return false }
+            return slot.pin.map { !ids.contains($0.id) } ?? true
+        }
+        let pinIndices = result.indices.filter { result[$0].pin != nil }
+        let insertion: Int
+        if boundary < pinIndices.count { insertion = pinIndices[boundary] }
+        else { insertion = result.firstIndex(where: { !$0.isPinned }) ?? result.count }
+        result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: insertion)
         return result
     }
 }

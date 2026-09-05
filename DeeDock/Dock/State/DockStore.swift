@@ -11,6 +11,11 @@ final class DockStore {
     let displayID: String
     /// Filters running-only apps and Finder, including its pin. Other pins and section visibility remain independent.
     var visibleApplicationIDs: Set<String>?
+    private var windowSnapshots: [DockWindowSnapshot] = []
+    private var windowGroupsEnabled = false
+    private var keepWindowGroupsExpanded = false
+    private var expandedWindowApps: Set<String> = []
+    @ObservationIgnored private let windowSelection = DockWindowSelection()
     /// Ordered render snapshots: this display's pins, followed by shared running applications.
     private(set) var items: [DockItem] = []
     private(set) var folders: [FolderDockItem] = []
@@ -105,16 +110,47 @@ final class DockStore {
     }
 
     private func refreshEntries() {
-        let next = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
+        let base = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
                                                   actions: actions?.dockItems ?? [], focus: focusSession?.item,
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
                                                   trash: showsTrash ? trash?.item : nil)
+        let next = DockWindowProjection.entries(base, windows: windowSnapshots, enabled: windowGroupsEnabled,
+            keepExpanded: keepWindowGroupsExpanded, expandedApps: expandedWindowApps)
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
     }
+
+    /// The coordinator supplies only windows assigned to this display.
+    func configureWindowGroups(_ windows: [DockWindowSnapshot], enabled: Bool, expanded: Bool) {
+        if !enabled || expanded != keepWindowGroupsExpanded { expandedWindowApps.removeAll() }
+        if !enabled { windowSelection.stop() }
+        windowSnapshots = windows
+        windowGroupsEnabled = enabled
+        keepWindowGroupsExpanded = expanded
+        expandedWindowApps.formIntersection(Set(windows.map(\.applicationID)))
+    }
+
+    func toggleWindowGroup(_ applicationID: String) {
+        guard windowGroupsEnabled, !keepWindowGroupsExpanded else { return }
+        if !expandedWindowApps.insert(applicationID).inserted { expandedWindowApps.remove(applicationID) }
+        refreshEntries()
+        presentationDidChange?()
+    }
+
+    func selectWindow(_ item: DockWindowItem) {
+        guard windowGroupsEnabled, windowSnapshots.contains(where: { $0.id == item.window.id }) else { return }
+        windowSelection.select(item.window) { [weak self] succeeded in
+            guard let self else { return }
+            if succeeded { applicationOpened?() }
+            else { errorMessage = .windowGroupsSelectionFailed }
+        }
+    }
+
+    /// Sleep and session resignation cancel an in-flight request before it can raise a window.
+    func cancelWindowSelection() { windowSelection.stop() }
 
     func configureTrash(_ visible: Bool) {
         guard showsTrash != visible else { return }
@@ -298,6 +334,8 @@ final class DockStore {
     func openSelection() {
         guard let entry = entries.first(where: { $0.target == selectedTarget }) else { return }
         switch entry {
+        case .window(let item): selectWindow(item)
+        case .windowGroup(let group): toggleWindowGroup(group.app.id)
         case .focus: openFocusSession?()
         case .action(let item): actions?.run(item.tile.id)
         case .app(let item): open(item)
@@ -312,5 +350,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { windowSelection.stop(); openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

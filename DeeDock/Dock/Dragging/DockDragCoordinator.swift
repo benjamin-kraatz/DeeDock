@@ -3,7 +3,7 @@ import AppKit
 /// Owns the one native drag session shared by all docks. Panels retain only transient destination UI.
 @MainActor
 final class DockDragCoordinator: NSObject, NSDraggingSource {
-    static let pasteboardType = NSPasteboard.PasteboardType("de.benjaminkraatz.DeeDock.application-drag")
+    static let pasteboardType = DockPinDragPasteboard.type
     private var panels: [String: DockPanelController] = [:]
     private var sourceID: String?
     private var sourcePin: DockPin?

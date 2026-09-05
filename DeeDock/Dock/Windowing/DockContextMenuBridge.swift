@@ -137,6 +137,12 @@ struct DockContextMenuBridge: NSViewRepresentable {
 
             menu.addItem(.separator())
             addItem(.actionSettings, symbol: "gear", action: #selector(showSettings), to: menu)
+            let groups = addItem(.windowGroupsEnabled, action: #selector(toggleWindowGroups), to: menu)
+            groups.state = interaction?.windowGroupsEnabled == true ? .on : .off
+            groups.isEnabled = interaction?.canEditWindowGroups == true
+            let expanded = addItem(.windowGroupsExpanded, action: #selector(toggleExpandedWindows), to: menu)
+            expanded.state = interaction?.windowGroupsExpanded == true ? .on : .off
+            expanded.isEnabled = interaction?.canEditWindowGroups == true && interaction?.windowGroupsEnabled == true
         }
 
         private func addWindows(_ state: ApplicationWindowMenuState, to menu: NSMenu) {
@@ -224,6 +230,14 @@ struct DockContextMenuBridge: NSViewRepresentable {
             if let item, let id = sender.representedObject as? String { interaction?.copyPin?(.application(item.reference), id) }
         }
         @objc private func showSettings() { openSettings?() }
+        @objc private func toggleWindowGroups() {
+            let action = interaction?.toggleWindowGroupsEnabled
+            DispatchQueue.main.async { action?() }
+        }
+        @objc private func toggleExpandedWindows() {
+            let action = interaction?.toggleWindowGroupsExpanded
+            DispatchQueue.main.async { action?() }
+        }
 
         private func finishTracking() {
             if selectedWindowToken == nil, let discoveryID {
