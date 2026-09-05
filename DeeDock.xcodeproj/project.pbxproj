@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC7700000000000000000000 /* Dock/FilePreview/DockFilePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7800000000000000000000 /* Dock/FilePreview/DockFilePreview.swift */; };
+		AC7700000000000000000001 /* Dock/Stacks/FolderFileDrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7800000000000000000001 /* Dock/Stacks/FolderFileDrop.swift */; };
+		AC7500000000000000000000 /* Dock/WindowGroups/DockWindowDisplayAssignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7600000000000000000000 /* Dock/WindowGroups/DockWindowDisplayAssignment.swift */; };
+		AC7500000000000000000001 /* Dock/Actions/ActionTilesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7600000000000000000001 /* Dock/Actions/ActionTilesController.swift */; };
+		AC7500000000000000000002 /* Dock/Actions/ShortcutProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7600000000000000000002 /* Dock/Actions/ShortcutProcess.swift */; };
+		AC7500000000000000000003 /* Dock/Focus/FocusSessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7600000000000000000003 /* Dock/Focus/FocusSessionController.swift */; };
+		AC7300000000000000000000 /* DockWindowItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7400000000000000000000 /* DockWindowItem.swift */; };
+		AC7300000000000000000001 /* DockWindowSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7400000000000000000001 /* DockWindowSelection.swift */; };
+		AC7300000000000000000002 /* DockWindowProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7400000000000000000002 /* DockWindowProjection.swift */; };
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */; };
 		AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */; };
@@ -102,6 +111,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AC7800000000000000000000 /* Dock/FilePreview/DockFilePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/FilePreview/DockFilePreview.swift; sourceTree = SOURCE_ROOT; };
+		AC7800000000000000000001 /* Dock/Stacks/FolderFileDrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderFileDrop.swift; sourceTree = SOURCE_ROOT; };
+		AC7600000000000000000000 /* Dock/WindowGroups/DockWindowDisplayAssignment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/WindowGroups/DockWindowDisplayAssignment.swift; sourceTree = SOURCE_ROOT; };
+		AC7600000000000000000001 /* Dock/Actions/ActionTilesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Actions/ActionTilesController.swift; sourceTree = SOURCE_ROOT; };
+		AC7600000000000000000002 /* Dock/Actions/ShortcutProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Actions/ShortcutProcess.swift; sourceTree = SOURCE_ROOT; };
+		AC7600000000000000000003 /* Dock/Focus/FocusSessionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Focus/FocusSessionController.swift; sourceTree = SOURCE_ROOT; };
+		AC7400000000000000000000 /* DockWindowItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/WindowGroups/DockWindowItem.swift; sourceTree = SOURCE_ROOT; };
+		AC7400000000000000000001 /* DockWindowSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/WindowGroups/DockWindowSelection.swift; sourceTree = SOURCE_ROOT; };
+		AC7400000000000000000002 /* DockWindowProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/WindowGroups/DockWindowProjection.swift; sourceTree = SOURCE_ROOT; };
 		000000000000000000000120 /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
@@ -519,6 +537,15 @@
 		DD0000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AC7700000000000000000000 /* Dock/FilePreview/DockFilePreview.swift in Sources */,
+				AC7700000000000000000001 /* Dock/Stacks/FolderFileDrop.swift in Sources */,
+				AC7500000000000000000000 /* Dock/WindowGroups/DockWindowDisplayAssignment.swift in Sources */,
+				AC7500000000000000000001 /* Dock/Actions/ActionTilesController.swift in Sources */,
+				AC7500000000000000000002 /* Dock/Actions/ShortcutProcess.swift in Sources */,
+				AC7500000000000000000003 /* Dock/Focus/FocusSessionController.swift in Sources */,
+				AC7300000000000000000000 /* DockWindowItem.swift in Sources */,
+				AC7300000000000000000001 /* DockWindowSelection.swift in Sources */,
+				AC7300000000000000000002 /* DockWindowProjection.swift in Sources */,
 				AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */,
 				AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */,
 				AB0100000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift in Sources */,

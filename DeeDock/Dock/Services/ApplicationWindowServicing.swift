@@ -79,6 +79,7 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
     }
 
     func selectWindow(_ token: ApplicationWindowToken) async throws {
+        try Task.checkCancellation()
         guard AXIsProcessTrusted() else { throw ApplicationWindowServiceError.permissionRequired }
         guard let handle = handles[token] else {
             throw ApplicationWindowServiceError.windowUnavailable

@@ -178,6 +178,7 @@ final class DockCoordinator {
             ) { [weak self] _ in MainActor.assumeIsolated {
                 self?.occupancySuspended = true
                 self?.occupancy.stop()
+                self?.panels.values.forEach { $0.store.cancelWindowSelection() }
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
                 self?.popovers.closeAll()
@@ -228,6 +229,18 @@ final class DockCoordinator {
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles, focusSession: focusSession)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             panel.interaction.actionTiles = actionTiles
+            panel.interaction.toggleWindowGroup = { [weak store] id in store?.toggleWindowGroup(id) }
+            panel.interaction.selectDockWindow = { [weak store] item in store?.selectWindow(item) }
+            panel.interaction.toggleWindowGroupsEnabled = { [weak self, weak store] in
+                guard let self else { return }
+                settings.update(\.windowGroupsEnabled, to: !settings.value.windowGroupsEnabled)
+                if let error = settings.errorMessage { store?.errorMessage = error }
+            }
+            panel.interaction.toggleWindowGroupsExpanded = { [weak self, weak store] in
+                guard let self else { return }
+                settings.update(\.windowGroupsExpanded, to: !settings.value.windowGroupsExpanded)
+                if let error = settings.errorMessage { store?.errorMessage = error }
+            }
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
                 focusPopover.toggle(on: panel)
@@ -363,11 +376,16 @@ final class DockCoordinator {
         // If the primary dock is disabled, keep the remaining docks complete.
         let satelliteMode = settings.value.secondaryDisplayAppsOnly
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
-        occupancy.configure(enabled: satelliteMode && !occupancySuspended)
+        occupancy.configure(enabled: (satelliteMode || settings.value.windowGroupsEnabled)
+                            && !occupancySuspended && !enabledDisplays.isEmpty,
+                            includeWindows: settings.value.windowGroupsEnabled)
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil
+            panel.store.configureWindowGroups(occupancy.windows.filter { $0.displayID == display.runtimeID },
+                enabled: settings.value.windowGroupsEnabled, expanded: settings.value.windowGroupsExpanded)
+            panel.interaction.canEditWindowGroups = !settings.requiresReset
             panel.store.refresh()
             panel.update(display: display, settings: profiles.effectiveSettings(for: display.id), resetVisibility: resetVisibility)
         }

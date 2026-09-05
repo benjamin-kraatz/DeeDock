@@ -5,6 +5,13 @@ import Observation
 /// Per-panel geometry shared between SwiftUI presentation and AppKit pointer handling.
 @MainActor @Observable
 final class DockInteraction {
+    var windowGroupsEnabled = false
+    var windowGroupsExpanded = false
+    var canEditWindowGroups = true
+    @ObservationIgnored var toggleWindowGroupsEnabled: (() -> Void)?
+    @ObservationIgnored var toggleWindowGroupsExpanded: (() -> Void)?
+    @ObservationIgnored var toggleWindowGroup: ((String) -> Void)?
+    @ObservationIgnored var selectDockWindow: ((DockWindowItem) -> Void)?
     /// Owns this panel's idle deadline and artwork opacity.
     @ObservationIgnored var openFocusSession: (() -> Void)?
     @ObservationIgnored var actionTiles: ActionTilesController?

@@ -1014,3 +1014,56 @@ mirroring, disabled primary, negative origins/scaling, Spaces, sleep/wake, and r
 Finder window tiles and minimized-window home-display guarantees are outside this slice.
 The focused Debug DeeDock app build succeeded on 2026-09-05 using derived data at
 `/tmp/DeeDock-dee2-build`. Tests and automated visual checks were not run.
+
+## Window groups per monitor · DEE-7
+
+Implemented on 2026-09-05. The feature is off by default. Settings → Features and every app's
+native context menu expose the same persisted Show window groups and Keep window groups expanded
+switches. Otherwise, clicking a window count toggles that app's group in the current panel session.
+The app icon, count, and title-bearing window tiles share an outline. Tiles use the existing
+four-edge layout, overflow scrolling, pointer regions, tooltips, idle fading, keyboard selection,
+and accessibility focus. Full titles remain available through tooltips and VoiceOver.
+
+Window groups extend the existing shared ScreenCaptureKit metadata refresh, with no screenshots
+or disk history. Titles are retained in memory only while groups are enabled. Global Quartz
+bounds determine the display by largest overlap; equal areas choose the lowest runtime display
+ID. Window IDs stabilize ordering independently of activation and duplicate titles. Primary app
+contents, pin persistence, and existing section policies remain unchanged. Pin insertion previews
+keep window children with their parent, and child entries never become persisted pins.
+
+Selection re-enumerates the chosen process's windows and uses the existing conservative
+ScreenCaptureKit/Accessibility matcher. It requires one matching AX handle. Closed windows,
+ambiguous matches, or unavailable permissions report a localized error instead of choosing a
+sibling or falling back to whole-app activation. Selection tasks cancel on replacement, feature
+disable, panel teardown, and sleep/session resignation. The metadata task stops during suspension,
+shutdown, or when neither window groups nor satellite filtering needs it.
+
+The focused unsigned Debug app build succeeded. A final `build-for-testing` with the DeeDock
+scheme, Debug configuration, macOS destination, and `CODE_SIGNING_ALLOWED=NO` also exited 0.
+The latter compiled tests without executing them. Existing missing source memberships for Action
+Tiles, Focus Sessions, and folder preview/drop helpers were repaired in the test target. The
+shared pin-drag pasteboard marker now lives beside the drag models so payload readers do not
+require the native coordinator. Xcode still reports the existing missing DeeDock test dependency
+warning. String Catalog JSON, project plist, and diff whitespace checks passed. Built German
+resources include the new labels, hints, error, and positional placeholders.
+
+Authored regression cases cover duplicate titles and stable window identity, selection repair
+on collapse, respect for parent visibility, pin insertion around expanded groups, legacy preference
+decoding and round trips, and negative-origin, spanning, tied, and off-screen display assignment.
+No tests, app launch, preview, or automated visual check was performed for this feature.
+
+Native acceptance remains pending:
+
+- Open multiple Finder windows across three monitors. Expand groups and select each exact window.
+- Move, resize, close, hide, and minimize windows; unplug and reconnect displays, including a
+  display with negative coordinates. Check the documented minimized/hidden/other-Space limits.
+- Toggle both controls from Settings and app context menus, then restart to verify persistence.
+- Check all four edges, overflow, magnification, auto-hide, menu holds, pin drag insertion, and
+  disappearing entries under a stationary pointer.
+- Use Focus Dock and VoiceOver, including collapse while a child is selected. Check long German
+  titles, light/dark appearance, Reduce Motion, and Reduce Transparency.
+- Deny and revoke each permission, try duplicate-title/identical-frame windows, and close a window
+  during selection. Check that failure never selects a different window.
+- Exercise Spaces, full-screen apps, helper-owned windows, sleep/wake, and session switching.
+
+No signing, entitlements, system Dock settings, or permission grants were changed.

@@ -1,6 +1,204 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "windowGroupsTitle" : {
+      "comment": "Heading for individual windows grouped beside their owning app.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Window groups"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenstergruppen"
+          }
+        }
+      }
+    },
+    "windowGroupsEnabled" : {
+      "comment": "App-wide switch, also available in app context menus.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show window groups"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenstergruppen anzeigen"
+          }
+        }
+      }
+    },
+    "windowGroupsExpanded" : {
+      "comment": "Persisted app-wide switch for always-expanded window groups.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep window groups expanded"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenstergruppen aufgeklappt lassen"
+          }
+        }
+      }
+    },
+    "windowGroupsHelp" : {
+      "comment": "Feature behavior and public API permission and window-assignment limits.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shows open windows beside their app on the monitor containing each window. Click the window count to expand a group. Screen Recording lists windows; Window Access selects an exact window. Enable both permissions below. Minimized, hidden, and other-Space windows are not included reliably. Changes can take a few seconds."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeigt offene Fenster neben ihrer App auf dem Monitor an, auf dem sie liegen. Klicke auf die Fensteranzahl, um eine Gruppe aufzuklappen. Die Bildschirmaufnahme-Berechtigung ermöglicht die Fensterliste; der Fensterzugriff ermöglicht die Auswahl eines bestimmten Fensters. Aktiviere beide Berechtigungen unten. Minimierte, ausgeblendete und auf anderen Spaces liegende Fenster werden nicht zuverlässig erfasst. Änderungen können einige Sekunden dauern."
+          }
+        }
+      }
+    },
+    "windowGroupsExpand" : {
+      "comment": "Disclosure action. Placeholder is the macOS-supplied app name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show windows for %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenster von %@ anzeigen"
+          }
+        }
+      }
+    },
+    "windowGroupsCollapse" : {
+      "comment": "Disclosure action. Placeholder is the macOS-supplied app name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse windows for %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenster von %@ einklappen"
+          }
+        }
+      }
+    },
+    "windowGroupsWindowLabel" : {
+      "comment": "VoiceOver window label: app name then window title, both supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "windowGroupsSelectHint" : {
+      "comment": "VoiceOver hint for an individual window entry.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brings this window to the front."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bringt dieses Fenster in den Vordergrund."
+          }
+        }
+      }
+    },
+    "windowGroupsDisclosureHint" : {
+      "comment": "VoiceOver hint for the window-count disclosure button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expands or collapses this app’s windows on this monitor."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klappt die Fenster dieser App auf diesem Monitor auf oder ein."
+          }
+        }
+      }
+    },
+    "windowGroupsPinnedHint" : {
+      "comment": "Explains why the disclosure is disabled in always-expanded mode.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Window groups stay expanded. Change this in Settings or an app’s context menu."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenstergruppen bleiben aufgeklappt. Du kannst das in den Einstellungen oder im Kontextmenü einer App ändern."
+          }
+        }
+      }
+    },
+    "windowGroupsSelectionFailed" : {
+      "comment": "Error shown rather than activating a different window or silently falling back to app activation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This window could not be selected. Check Window Access and Screen Recording in Settings → Features. The window may have closed or could not be identified unambiguously."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Fenster konnte nicht ausgewählt werden. Prüfe Fensterzugriff und Bildschirmaufnahme unter Einstellungen → Funktionen. Möglicherweise wurde das Fenster geschlossen oder konnte nicht eindeutig zugeordnet werden."
+          }
+        }
+      }
+    },
     "secondaryDockTitle" : {
       "comment" : "Heading for the app-wide multi-monitor dock policy.",
       "extractionState" : "manual",
