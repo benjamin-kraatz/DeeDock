@@ -31,8 +31,7 @@ struct UpdateWindowDetails: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text(.updatesReleaseNotes).font(.headline).accessibilityAddTraits(.isHeader)
                     if let notes = presentation.notes {
-                        Text(notes).textSelection(.enabled)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        UpdateReleaseNotesView(blocks: notes)
                     } else if presentation.loadingNotes {
                         ProgressView { Text(.updatesLoadingNotes) }.controlSize(.small)
                     } else {

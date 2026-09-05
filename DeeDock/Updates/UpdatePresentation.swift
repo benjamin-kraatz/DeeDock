@@ -33,7 +33,7 @@ final class UpdatePresentation {
     var receivedBytes: UInt64 = 0
     var expectedBytes: UInt64 = 0
     var extractionProgress: Double?
-    var notes: AttributedString?
+    var notes: [UpdateReleaseNoteBlock]?
     var loadingNotes = false
     var notesUnavailable = false
     var message: LocalizedStringResource?

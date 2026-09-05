@@ -16,7 +16,7 @@ The permission window offers automatic checks or manual checks. System-profile s
 
 `UpdateWindowView` and `UpdateWindowDetails` own the layout, colors, typography, progress, and controls. `UpdatePresentation` contains the display state and action labels. `UpdateUserDriver` owns Sparkle's reply blocks and consumes each reply once before calling the engine. Buttons carry a callback generation so a stale click cannot accept a later prompt. The termination retry callback is deliberately reusable, as Sparkle specifies.
 
-Release notes use native text for plain text, Markdown, and HTML. HTML is converted into text, emphasis, lists, and HTTPS links. Remote styling, scripts, embedded media, and external entities are not loaded. Parsing is bounded to 512 KiB and runs off the main actor; dismissal or another offer cancels its result. An HTTPS release-note link remains available for the original document. Publishers should use text, headings, and lists for notes that read well in the app.
+Release notes use native text for plain text, Markdown, and HTML. HTML is parsed directly into native headings, paragraphs, lists, emphasis, and HTTPS links. Block spacing and hanging list indents are controlled by SwiftUI; HTML whitespace is collapsed before display. Remote styling, scripts, embedded media, and external entities are not loaded. Parsing is bounded to 512 KiB and runs off the main actor; dismissal or another offer cancels its result. An HTTPS release-note link remains available for the original document. Publishers should use text, headings, and lists for notes that read well in the app.
 
 ## Prepare the release
 

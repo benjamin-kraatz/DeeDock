@@ -138,7 +138,11 @@ private struct UpdateWindowActions: View {
     model.phase = .available
     model.offer = UpdateOffer(version: "0.2.0", stage: .notDownloaded, critical: false, major: false,
                               informational: false, informationURL: nil, releaseNotesURL: nil)
-    model.notes = AttributedString("A quieter dock.\n\n• Improved display placement\n• More precise activation zones")
+    model.notes = [
+        UpdateReleaseNoteBlock(id: 0, style: .heading(2), text: AttributedString("A quieter dock.")),
+        UpdateReleaseNoteBlock(id: 1, text: AttributedString("Improved display placement across multiple monitors."), marker: "•"),
+        UpdateReleaseNoteBlock(id: 2, text: AttributedString("More precise activation zones"), marker: "•")
+    ]
     return UpdateWindowView(presentation: model).frame(width: 580, height: 600)
 }
 

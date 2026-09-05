@@ -1,8 +1,17 @@
 #if DIRECT_DISTRIBUTION
 import Foundation
 
-/// Converts release text into native attributed text. HTML is parsed as an inert document,
-/// never executed or displayed in a browser, and external entities and non-HTTPS links are rejected.
+/// A semantic text block gives SwiftUI control of spacing, typography and hanging list indents.
+nonisolated struct UpdateReleaseNoteBlock: Identifiable, Sendable {
+    enum Style: Sendable { case paragraph, heading(Int), code }
+    var id = 0
+    var style: Style = .paragraph
+    var text: AttributedString
+    var marker: String? = nil
+    var indentation = 0
+}
+
+/// Parses release notes without executing HTML or loading remote resources.
 enum UpdateReleaseNotes {
     nonisolated static let maximumBytes = 512 * 1024
 
@@ -23,63 +32,85 @@ enum UpdateReleaseNotes {
     }
 
     /// Parsing stays off the main actor; the driver cancels/discards results from older offers.
-    @concurrent static func render(_ text: String, format: String) async -> AttributedString? {
+    @concurrent static func render(_ text: String, format: String) async -> [UpdateReleaseNoteBlock]? {
         guard text.utf8.count <= maximumBytes, !Task.isCancelled else { return nil }
-        let format = format.lowercased()
-        let markdown: String
-        if format.contains("html") {
-            guard let document = try? XMLDocument(xmlString: text,
-                options: [.documentTidyHTML, .nodeLoadExternalEntitiesNever]),
-                  let root = document.rootElement() else { return nil }
-            markdown = htmlText(root)
-        } else if format.contains("markdown") {
-            // Preserve paragraph breaks while giving Markdown headings and lists native emphasis.
-            markdown = text.replacingOccurrences(of: "(?m)^#{1,6} +(.+?) *#* *$", with: "**$1**", options: .regularExpression)
-                .replacingOccurrences(of: "(?m)^[-+*] +", with: "• ", options: .regularExpression)
+        let blocks: [UpdateReleaseNoteBlock]
+        if format.lowercased().contains("html") {
+            blocks = HTMLReleaseNotesParser.parse(text)
         } else {
-            return AttributedString(text)
+            blocks = textBlocks(text, markdown: format.lowercased().contains("markdown"))
         }
-        guard !Task.isCancelled, !markdown.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              var result = try? AttributedString(markdown: markdown,
-                  options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) else { return nil }
-        // Native Text only exposes explicitly safe external links, including in Markdown feeds.
+        guard !Task.isCancelled, !blocks.isEmpty else { return nil }
+        return blocks.enumerated().map { index, block in
+            var block = block
+            block.id = index
+            return block
+        }
+    }
+
+    /// Trims block boundaries without removing inline formatting or explicit line breaks.
+    nonisolated static func trimmed(_ text: AttributedString) -> AttributedString {
+        var text = text
+        while text.characters.first?.isWhitespace == true {
+            text.removeSubrange(text.startIndex..<text.characters.index(after: text.startIndex))
+        }
+        while text.characters.last?.isWhitespace == true {
+            text.removeSubrange(text.characters.index(before: text.endIndex)..<text.endIndex)
+        }
+        return text
+    }
+
+    nonisolated private static func inlineMarkdown(_ text: String) -> AttributedString {
+        var result = (try? AttributedString(markdown: text,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(text)
         for run in result.runs {
             if let link = run.link, safeLink(link) == nil { result[run.range].link = nil }
         }
         return result
     }
 
-    nonisolated private static func htmlText(_ node: XMLNode, depth: Int = 0) -> String {
-        guard depth < 64, !Task.isCancelled else { return "" }
-        if node.kind == .text { return escape(node.stringValue ?? "") }
-        let name = node.name?.lowercased() ?? ""
-        if ["script", "style", "head", "iframe", "object", "embed", "svg", "form"].contains(name) { return "" }
-        let content = (node.children ?? []).map { htmlText($0, depth: depth + 1) }.joined()
-        switch name {
-        case "br": return "\n"
-        case "p", "div", "section", "ul", "ol", "blockquote", "pre", "table": return "\n\n" + content + "\n\n"
-        case "li": return "\n• " + content.trimmingCharacters(in: .whitespacesAndNewlines) + "\n"
-        case "h1", "h2", "h3", "h4", "h5", "h6": return "\n\n**" + content + "**\n\n"
-        case "strong", "b": return "**" + content + "**"
-        case "em", "i": return "*" + content + "*"
-        case "tr": return "\n" + content + "\n"
-        case "td", "th": return content + "  "
-        case "a":
-            guard let raw = (node as? XMLElement)?.attribute(forName: "href")?.stringValue,
-                  let url = safeLink(URL(string: raw)) else { return content }
-            // Encoding delimiters keeps a remote URL from introducing Markdown syntax.
-            let destination = url.absoluteString.replacingOccurrences(of: "(", with: "%28")
-                .replacingOccurrences(of: ")", with: "%29")
-            return "[" + content + "](" + destination + ")"
-        default: return content
+    nonisolated private static func textBlocks(_ text: String, markdown: Bool) -> [UpdateReleaseNoteBlock] {
+        var blocks: [UpdateReleaseNoteBlock] = []
+        var paragraph: [String] = []
+        var code: [String]? = nil
+        func flush() {
+            let value = paragraph.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+            if !value.isEmpty {
+                blocks.append(UpdateReleaseNoteBlock(text: markdown ? inlineMarkdown(value) : AttributedString(value)))
+            }
+            paragraph.removeAll()
         }
-    }
-
-    nonisolated private static func escape(_ text: String) -> String {
-        text.reduce(into: "") { result, character in
-            if "\\`*_{}[]<>".contains(character) { result.append("\\") }
-            result.append(character)
+        for rawLine in text.components(separatedBy: .newlines) {
+            guard !Task.isCancelled else { return [] }
+            let line = rawLine.trimmingCharacters(in: .whitespaces)
+            if markdown, line.hasPrefix("```") || line.hasPrefix("~~~") {
+                flush()
+                if let contents = code {
+                    blocks.append(UpdateReleaseNoteBlock(style: .code, text: AttributedString(contents.joined(separator: "\n"))))
+                    code = nil
+                } else { code = [] }
+            } else if code != nil {
+                code?.append(rawLine)
+            } else if line.isEmpty {
+                flush()
+            } else if markdown, let range = line.range(of: "^#{1,6} +", options: .regularExpression) {
+                flush()
+                let level = line[range].filter { $0 == "#" }.count
+                let value = String(line[range.upperBound...])
+                blocks.append(UpdateReleaseNoteBlock(style: .heading(level), text: inlineMarkdown(value)))
+            } else if markdown, let range = line.range(of: "^([-+*]|[0-9]+[.)]) +", options: .regularExpression) {
+                flush()
+                let prefix = line[range].trimmingCharacters(in: .whitespaces)
+                let marker = prefix.first?.isNumber == true ? prefix : "•"
+                blocks.append(UpdateReleaseNoteBlock(text: inlineMarkdown(String(line[range.upperBound...])),
+                    marker: marker, indentation: min(8, rawLine.prefix(while: { $0 == " " }).count / 2)))
+            } else {
+                paragraph.append(rawLine)
+            }
         }
+        flush()
+        if let code { blocks.append(UpdateReleaseNoteBlock(style: .code, text: AttributedString(code.joined(separator: "\n")))) }
+        return blocks
     }
 }
 #endif
