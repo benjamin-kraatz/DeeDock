@@ -957,3 +957,35 @@ Inspection of the built app's English and German `Localizable.strings` confirmed
 ## Individual numeric setting resets, DEE-5
 
 All 17 Settings sliders, their direct numeric fields, and the Focus Session duration stepper offer factory reset when their value differs from the model default. Display factory reset preserves an explicit override; Use Shared Setting removes it. See the [numeric settings inventory](NUMERIC-SETTINGS.md) for coverage, deliberate exclusions, persistence paths, and pending hands-on acceptance. No tests or native UI checks were run for this issue.
+
+## Sparkle updater, DEE-4
+
+Direct builds include Sparkle 2.9.6, manual update commands in both menus, and an automatic-check preference in General. Sparkle owns consent, scheduling, and preference persistence. Scheduled discoveries remain available through the menu without activating the app. TestFlight uses a separate target and shared scheme, with updater code behind `DIRECT_DISTRIBUTION` and no Sparkle dependency. Both targets share version and identity settings in `Configuration/App.xcconfig`.
+
+A new EdDSA key was generated in the local Keychain under account `de.benjaminkraatz.DeeDock`. Only the public key is in the project. No private-key export, release publication, or feed upload was performed. The configured GitHub Latest feed needs an `appcast.xml` asset in the first Sparkle-enabled release. Existing v0.1.1 installations require a manual upgrade to that release. See [release instructions](UPDATES.md).
+
+Validation on 2026-09-05:
+
+- `xcodebuild` Release builds of the `DeeDock` and `DeeDock-TestFlight` schemes succeeded with `CODE_SIGNING_ALLOWED=NO`, using Xcode 27. No tests, app launches, or previews were run.
+- The direct bundle links and embeds `Sparkle.framework`. Its generated Info.plist contains the expected HTTPS feed, public key, and `SUAutomaticallyUpdate = false`.
+- The TestFlight bundle has no Sparkle framework, helpers, executable load command, or updater Info.plist keys. Both bundles report `de.benjaminkraatz.DeeDock`, version `0.1.1`, build `7`.
+- All five new English and German packaged strings match the source catalog. The shared catalog also contains these strings in TestFlight, but its updater views and controller are compiled out.
+- The builds emitted the App Intents metadata notice that extraction was skipped because there is no AppIntents.framework dependency. This did not fail compilation.
+
+Local artifacts are under `/tmp/DeeDock-DEE4-Build/Build/Products/Release/`: `DeeDock.app` and `TestFlight/DeeDock.app`. Build logs are `/tmp/dee4-direct-build.log` and `/tmp/dee4-testflight-build.log`. These unsigned products prove compilation and bundle separation, not Developer ID signing, notarization, or TestFlight upload acceptance. The existing sandbox and entitlement settings were preserved.
+
+Remaining acceptance requires an authorized signed older-to-newer update through a staging feed: download, signature verification, installation, relaunch, saved configuration, user consent, automatic-check persistence, offline failures, invalid signatures, read-only locations, menu availability during an active check, and background focus behavior. Exercise English and German UI, keyboard operation, and VoiceOver. Verify the TestFlight archive separately before an App Store Connect upload. No end-to-end update or hosted acceptance is claimed.
+
+### DeeDock-owned update UI
+
+The direct app now constructs `SPUUpdater` with a complete `SPUUserDriver` implementation. The standard Sparkle controller and user driver are not instantiated. The custom SwiftUI window uses DeeDock artwork, a tinted header, native release notes, progress, and phase-specific actions. All app-owned copy is in the English and German string catalog.
+
+The driver covers automatic-check consent, manual checking and cancellation, scheduled and user-initiated offers, informational-only updates, already downloaded or installing updates, critical and major upgrades, release-note download failures, no-compatible-update reasons, download and extraction progress, errors, restart decisions, termination retries, and completion. A pending response is consumed before invoking Sparkle. Action generations reject stale clicks, and release-note tasks discard cancelled results.
+
+Closing a check cancels it. Closing download or extraction progress hides the window and keeps the menu action available. Closing a ready installation uses the explicitly explained Install on Quit behavior; its Cancel action instead stops that installation. Scheduled offers never activate DeeDock. User-initiated checks and reopening the window do activate it. macOS may still present an administrator authorization dialog during installation.
+
+Release notes render as native attributed text, including emphasis, lists, and HTTPS links. HTML does not load scripts, remote styles, media, or external entities. Parsing has a 512 KiB input limit and runs off the main actor. Unsupported content can be opened through the original HTTPS release-note link. System-profile sharing is disabled through Sparkle's API.
+
+The custom direct and TestFlight Release app builds succeeded with signing disabled. Inspection of the direct executable's undefined symbols found `SPUUpdater` and no `SPUStandardUpdaterController` or `SPUStandardUserDriver`. TestFlight still has no Sparkle load command, bundle resources, updater Info.plist keys, or custom-driver/window symbols. All 61 packaged update strings match the English and German source catalog in both targets. Build logs for this revision are `/tmp/dee4-custom-direct.log` and `/tmp/dee4-custom-testflight.log`.
+
+No tests, previews, native UI checks, or signed installations were run. Added deterministic previews cover permission, a German download, release notes, ready-to-install, and failure. Remaining acceptance includes every driver phase through a staging feed, close/cancel/reopen behavior, stale and repeated actions, resumed installations, rejected signatures, unavailable release notes, incompatible macOS/hardware, delayed termination, background focus, window resizing, German text, keyboard use, VoiceOver, and reduced accessibility effects. Compilation and source inspection do not establish these runtime behaviors.

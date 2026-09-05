@@ -97,6 +97,8 @@
 		DDFA00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */; };
 		DDFA00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */; };
 		DDFC00000000000000000001 /* DeeDock/Dock/Services/TrashController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */; };
+		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
+		DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = DEE400000000000000000002 /* Sparkle-LICENSE.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -193,6 +195,9 @@
 		DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/ApplicationMenuController.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/General/WindowAccessController.swift; sourceTree = SOURCE_ROOT; };
 		DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/TrashController.swift; sourceTree = SOURCE_ROOT; };
+		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
+		525BD98535225C6EE024849D /* DeeDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeeDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DEE400000000000000000002 /* Sparkle-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Sparkle-LICENSE.txt"; path = "ThirdParty/Sparkle-LICENSE.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -212,9 +217,15 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */,
 			);
 		};
 		DD0000000000000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		14FA4413957E93FAAFDD77B6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -231,6 +242,8 @@
 				000000000000000000000020 /* Products */,
 				33DEF2FA3049A63A007D87CE /* Recovered References */,
 				33DE04A8304AA89B007D87CE /* Frameworks */,
+				0EE3B5E31B6358B0F2F32162 /* App.xcconfig */,
+				DEE400000000000000000002 /* Sparkle-LICENSE.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -239,6 +252,7 @@
 			children = (
 				000000000000000000000120 /* DeeDock.app */,
 				DD0000000000000000000003 /* DeeDockTests.xctest */,
+				525BD98535225C6EE024849D /* DeeDock.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -365,6 +379,7 @@
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
 				000000000000000140000000 /* Resources */,
+				A5A968D9636D387DCD7B9F33 /* Validate direct updater configuration */,
 			);
 			buildRules = (
 			);
@@ -372,6 +387,9 @@
 				000000000000000000000010 /* DeeDock */,
 			);
 			name = DeeDock;
+			packageProductDependencies = (
+				C7F376D8610F320F205B46E7 /* Sparkle */,
+			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* DeeDock.app */;
 			productType = "com.apple.product-type.application";
@@ -393,6 +411,24 @@
 			productName = DeeDockTests;
 			productReference = DD0000000000000000000003 /* DeeDockTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7C2885433F43592EF492D80F /* DeeDock-TestFlight */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A699A85E4BEDB630913E6016 /* Build configuration list for PBXNativeTarget "DeeDock-TestFlight" */;
+			buildPhases = (
+				09C4672B70E9497ED199B2DF /* Sources */,
+				14FA4413957E93FAAFDD77B6 /* Frameworks */,
+				0DAD087831ADC2A21667D035 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				000000000000000000000010 /* DeeDock */,
+			);
+			name = "DeeDock-TestFlight";
+			productName = "DeeDock-TestFlight";
+			productReference = 525BD98535225C6EE024849D /* DeeDock.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -419,6 +455,9 @@
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				81630C8DE54D7D27B0AA3138 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
@@ -426,6 +465,7 @@
 			targets = (
 				000000000000000100000000 /* DeeDock */,
 				DD0000000000000000000006 /* DeeDockTests */,
+				7C2885433F43592EF492D80F /* DeeDock-TestFlight */,
 			);
 		};
 /* End PBXProject section */
@@ -434,12 +474,18 @@
 		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */,
 			);
 		};
 		DD8000000000000000000002 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 				DD8000000000000000000000 /* DeeDock/Resources/Localizable.xcstrings in Resources */,
+			);
+		};
+		0DAD087831ADC2A21667D035 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -542,6 +588,11 @@
 				DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */,
 				DD1000000000000000000002 /* DeeDock/Dock/Persistence/FavoritesRepository.swift in Sources */,
 				DD1000000000000000000003 /* DeeDock/Dock/Layout/DockGeometry.swift in Sources */,
+			);
+		};
+		09C4672B70E9497ED199B2DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
 			);
 		};
 /* End PBXSourcesBuildPhase section */
@@ -681,20 +732,21 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "DeeDock" */ = {
+		000000000000000111000000 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = U7H5KA9MG4;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -711,9 +763,6 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 0.1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
@@ -723,9 +772,12 @@
 				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
 				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = auto;
+				SPARKLE_FEED_URL = "https://github.com/benjamin-kraatz/DeeDock/releases/latest/download/appcast.xml";
+				SPARKLE_PUBLIC_ED_KEY = "42BS1szAgeLMEKx7q01Hky2ophd9aWLcs+P+zYAk3Gg=";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -734,20 +786,21 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "DeeDock" */ = {
+		000000000000000112000000 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = U7H5KA9MG4;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -764,9 +817,6 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 0.1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
@@ -776,9 +826,12 @@
 				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
 				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = auto;
+				SPARKLE_FEED_URL = "https://github.com/benjamin-kraatz/DeeDock/releases/latest/download/appcast.xml";
+				SPARKLE_PUBLIC_ED_KEY = "42BS1szAgeLMEKx7q01Hky2ophd9aWLcs+P+zYAk3Gg=";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -833,6 +886,110 @@
 			};
 			name = Release;
 		};
+		A418A470147009CA5A39EDDB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
+			buildSettings = {
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/TestFlight";
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TESTFLIGHT";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9E514861E6355270C243C974 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
+			buildSettings = {
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/TestFlight";
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = DeeDock;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TESTFLIGHT";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -860,7 +1017,57 @@
 			);
 			defaultConfigurationName = Release;
 		};
+		A699A85E4BEDB630913E6016 /* Build configuration list for PBXNativeTarget "DeeDock-TestFlight" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E514861E6355270C243C974 /* Release */,
+				A418A470147009CA5A39EDDB /* Debug */,
+			);
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C7F376D8610F320F205B46E7 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81630C8DE54D7D27B0AA3138 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		81630C8DE54D7D27B0AA3138 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.9.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A5A968D9636D387DCD7B9F33 /* Validate direct updater configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/validate-updater-configuration.sh",
+			);
+			name = "Validate direct updater configuration";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"${SRCROOT}/scripts/validate-updater-configuration.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 	};
 	rootObject = 000000000000000000000000 /* Project object */;
 }

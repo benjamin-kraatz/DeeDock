@@ -1,6 +1,1104 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "updatesDownloadedBody": {
+    "comment": "An update was already downloaded by Sparkle and needs user approval to begin installation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This update has already been downloaded. Choose Install Update to continue. macOS may ask for administrator approval."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieses Update wurde bereits geladen. Wähle Update installieren, um fortzufahren. macOS kann eine Administratorfreigabe verlangen."
+        }
+      }
+    }
+  },
+  "updatesResumedReadyBody": {
+    "comment": "An already prepared update is offered again; dismissing keeps install-on-quit active.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This update is already prepared. Restart DeeDock now, or choose Install on Quit to finish later. Closing this window also keeps installation on quit enabled."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieses Update ist bereits vorbereitet. Starte DeeDock jetzt neu oder wähle Beim Beenden installieren, um es später abzuschließen. Auch beim Schließen dieses Fensters bleibt die Installation beim Beenden aktiviert."
+        }
+      }
+    }
+  },
+  "updatesWindowTitle": {
+    "comment": "Custom DeeDock update window: App Updates",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App Updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App-Updates"
+        }
+      }
+    }
+  },
+  "updatesPermissionTitle": {
+    "comment": "Custom DeeDock update window: Keep DeeDock up to date",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keep DeeDock up to date"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DeeDock aktuell halten"
+        }
+      }
+    }
+  },
+  "updatesPermissionBody": {
+    "comment": "Custom DeeDock update window: May DeeDock check for new versions automatically? You decide when to download and install them. You can change this in General Settings.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "May DeeDock check for new versions automatically? You decide when to download and install them. You can change this in General Settings."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Darf DeeDock automatisch nach neuen Versionen suchen? Du entscheidest, wann sie geladen und installiert werden. Du kannst das in den allgemeinen Einstellungen ändern."
+        }
+      }
+    }
+  },
+  "updatesPermissionPrivacy": {
+    "comment": "Custom DeeDock update window: No system profile is sent with update checks.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No system profile is sent with update checks."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bei der Update-Suche wird kein Systemprofil gesendet."
+        }
+      }
+    }
+  },
+  "updatesCheckingTitle": {
+    "comment": "Custom DeeDock update window: Looking for an update",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Looking for an update"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach einem Update suchen"
+        }
+      }
+    }
+  },
+  "updatesCheckingBody": {
+    "comment": "Custom DeeDock update window: Checking whether a newer version of DeeDock is available.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Checking whether a newer version of DeeDock is available."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Es wird geprüft, ob eine neuere Version von DeeDock verfügbar ist."
+        }
+      }
+    }
+  },
+  "updatesInformationTitle": {
+    "comment": "Custom DeeDock update window: An update needs your attention",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "An update needs your attention"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein Update braucht deine Aufmerksamkeit"
+        }
+      }
+    }
+  },
+  "updatesInformationBody": {
+    "comment": "Custom DeeDock update window: This version cannot be installed here. Open the release information to see how to update.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This version cannot be installed here. Open the release information to see how to update."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Version kann hier nicht installiert werden. Öffne die Informationen zur Veröffentlichung, um zu erfahren, wie du aktualisieren kannst."
+        }
+      }
+    }
+  },
+  "updatesFoundTitle": {
+    "comment": "Custom DeeDock update window: A new DeeDock is here",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A new DeeDock is here"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eine neue Version von DeeDock ist da"
+        }
+      }
+    }
+  },
+  "updatesFoundBody": {
+    "comment": "Custom DeeDock update window: See what has changed, then download the update when you are ready. macOS may ask for administrator approval during installation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "See what has changed, then download the update when you are ready. macOS may ask for administrator approval during installation."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sieh dir die Änderungen an und lade das Update, wenn du bereit bist. macOS kann bei der Installation eine Administratorfreigabe verlangen."
+        }
+      }
+    }
+  },
+  "updatesDownloadingTitle": {
+    "comment": "Custom DeeDock update window: Downloading your update",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Downloading your update"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dein Update wird geladen"
+        }
+      }
+    }
+  },
+  "updatesDownloadingBody": {
+    "comment": "Custom DeeDock update window: You can keep using DeeDock. Hiding this window keeps the download running; Cancel stops it.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "You can keep using DeeDock. Hiding this window keeps the download running; Cancel stops it."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Du kannst DeeDock weiter verwenden. Wenn du dieses Fenster ausblendest, läuft der Download weiter. Mit Abbrechen stoppst du ihn."
+        }
+      }
+    }
+  },
+  "updatesPreparingTitle": {
+    "comment": "Custom DeeDock update window: Preparing the update",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preparing the update"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Update wird vorbereitet"
+        }
+      }
+    }
+  },
+  "updatesPreparingBody": {
+    "comment": "Custom DeeDock update window: The download is being unpacked and verified. This step cannot be cancelled. macOS may request administrator approval.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The download is being unpacked and verified. This step cannot be cancelled. macOS may request administrator approval."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Download wird entpackt und überprüft. Dieser Schritt kann nicht abgebrochen werden. macOS kann eine Administratorfreigabe anfordern."
+        }
+      }
+    }
+  },
+  "updatesReadyTitle": {
+    "comment": "Custom DeeDock update window: Ready when you are",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ready when you are"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bereit, wenn du es bist"
+        }
+      }
+    }
+  },
+  "updatesReadyBody": {
+    "comment": "Custom DeeDock update window: Restart DeeDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DeeDock quits. Cancel stops this installation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restart DeeDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DeeDock quits. Cancel stops this installation."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Starte DeeDock neu, um das Update abzuschließen. Bei Installation beim Beenden oder beim Schließen dieses Fensters bleibt das Update bis zum nächsten Beenden bereit. Abbrechen stoppt diese Installation."
+        }
+      }
+    }
+  },
+  "updatesInstallingTitle": {
+    "comment": "Custom DeeDock update window: Finishing the update",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Finishing the update"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Update wird abgeschlossen"
+        }
+      }
+    }
+  },
+  "updatesInstallingBody": {
+    "comment": "Custom DeeDock update window: DeeDock is being updated. Please wait for the installation to finish.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DeeDock is being updated. Please wait for the installation to finish."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DeeDock wird aktualisiert. Bitte warte, bis die Installation abgeschlossen ist."
+        }
+      }
+    }
+  },
+  "updatesWaitingToQuit": {
+    "comment": "Custom DeeDock update window: Waiting for DeeDock to quit. If it remains open, you can ask it to quit again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Waiting for DeeDock to quit. If it remains open, you can ask it to quit again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Es wird darauf gewartet, dass DeeDock beendet wird. Falls es geöffnet bleibt, kannst du das Beenden erneut anfordern."
+        }
+      }
+    }
+  },
+  "updatesNoUpdateTitle": {
+    "comment": "Custom DeeDock update window: Update check complete",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update check complete"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update-Suche abgeschlossen"
+        }
+      }
+    }
+  },
+  "updatesOnLatest": {
+    "comment": "Custom DeeDock update window: You are using the latest available version of DeeDock.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "You are using the latest available version of DeeDock."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Du verwendest die neueste verfügbare Version von DeeDock."
+        }
+      }
+    }
+  },
+  "updatesOnNewer": {
+    "comment": "Custom DeeDock update window: This copy of DeeDock is newer than the latest published version.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This copy of DeeDock is newer than the latest published version."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Version von DeeDock ist neuer als die zuletzt veröffentlichte Version."
+        }
+      }
+    }
+  },
+  "updatesOSIncompatible": {
+    "comment": "Custom DeeDock update window: The available update does not support this version of macOS.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The available update does not support this version of macOS."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das verfügbare Update unterstützt diese macOS-Version nicht."
+        }
+      }
+    }
+  },
+  "updatesHardwareIncompatible": {
+    "comment": "Custom DeeDock update window: The available update requires a Mac with Apple silicon.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The available update requires a Mac with Apple silicon."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das verfügbare Update benötigt einen Mac mit Apple-Chip."
+        }
+      }
+    }
+  },
+  "updatesNoCompatibleUpdate": {
+    "comment": "Custom DeeDock update window: No compatible update is currently available for this Mac.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No compatible update is currently available for this Mac."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Für diesen Mac ist derzeit kein kompatibles Update verfügbar."
+        }
+      }
+    }
+  },
+  "updatesFailedTitle": {
+    "comment": "Custom DeeDock update window: The update could not continue",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The update could not continue"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Update konnte nicht fortgesetzt werden"
+        }
+      }
+    }
+  },
+  "updatesFailureBody": {
+    "comment": "Custom DeeDock update window: Review the details below, then close this window. You can check for updates again from the DeeDock menu.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review the details below, then close this window. You can check for updates again from the DeeDock menu."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sieh dir die Details unten an und schließe dann dieses Fenster. Du kannst im DeeDock-Menü erneut nach Updates suchen."
+        }
+      }
+    }
+  },
+  "updatesInstalledTitle": {
+    "comment": "Custom DeeDock update window: Update installed",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update installed"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update installiert"
+        }
+      }
+    }
+  },
+  "updatesInstalledBody": {
+    "comment": "Custom DeeDock update window: The new version of DeeDock has been installed.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The new version of DeeDock has been installed."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die neue Version von DeeDock wurde installiert."
+        }
+      }
+    }
+  },
+  "updatesAllowChecks": {
+    "comment": "Custom DeeDock update window: Check Automatically",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Check Automatically"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatisch suchen"
+        }
+      }
+    }
+  },
+  "updatesManualChecks": {
+    "comment": "Custom DeeDock update window: Check Manually",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Check Manually"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manuell suchen"
+        }
+      }
+    }
+  },
+  "updatesInstallRestart": {
+    "comment": "Custom DeeDock update window: Install and Restart",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Install and Restart"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Installieren und neu starten"
+        }
+      }
+    }
+  },
+  "updatesInstall": {
+    "comment": "Custom DeeDock update window: Install Update",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Install Update"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update installieren"
+        }
+      }
+    }
+  },
+  "updatesDownload": {
+    "comment": "Custom DeeDock update window: Download Update",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Download Update"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update laden"
+        }
+      }
+    }
+  },
+  "updatesSkipUpgrade": {
+    "comment": "Custom DeeDock update window: Skip This Upgrade",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Skip This Upgrade"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieses Upgrade überspringen"
+        }
+      }
+    }
+  },
+  "updatesSkipVersion": {
+    "comment": "Custom DeeDock update window: Skip This Version",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Skip This Version"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Version überspringen"
+        }
+      }
+    }
+  },
+  "updatesInstallOnQuit": {
+    "comment": "Custom DeeDock update window: Install on Quit",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Install on Quit"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beim Beenden installieren"
+        }
+      }
+    }
+  },
+  "updatesLater": {
+    "comment": "Custom DeeDock update window: Later",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Later"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Später"
+        }
+      }
+    }
+  },
+  "updatesCancel": {
+    "comment": "Custom DeeDock update window: Cancel",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cancel"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abbrechen"
+        }
+      }
+    }
+  },
+  "updatesHide": {
+    "comment": "Custom DeeDock update window: Hide",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hide"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ausblenden"
+        }
+      }
+    }
+  },
+  "updatesRetryQuit": {
+    "comment": "Custom DeeDock update window: Try Quitting Again",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Try Quitting Again"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erneut beenden"
+        }
+      }
+    }
+  },
+  "updatesDone": {
+    "comment": "Custom DeeDock update window: Done",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Done"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fertig"
+        }
+      }
+    }
+  },
+  "updatesLearnMore": {
+    "comment": "Custom DeeDock update window: Learn More…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Learn More…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mehr erfahren …"
+        }
+      }
+    }
+  },
+  "updatesVersion": {
+    "comment": "Custom DeeDock update window: New version",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "New version"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Neue Version"
+        }
+      }
+    }
+  },
+  "updatesCritical": {
+    "comment": "Custom DeeDock update window: This release contains a critical update.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This release contains a critical update."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Veröffentlichung enthält ein kritisches Update."
+        }
+      }
+    }
+  },
+  "updatesMajorUpgrade": {
+    "comment": "Custom DeeDock update window: This is a major upgrade. Skipping it also skips its future minor releases.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This is a major upgrade. Skipping it also skips its future minor releases."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dies ist ein größeres Upgrade. Wenn du es überspringst, werden auch nachfolgende kleinere Veröffentlichungen dieses Upgrades übersprungen."
+        }
+      }
+    }
+  },
+  "updatesReleaseNotes": {
+    "comment": "Custom DeeDock update window: What has changed",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What has changed"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Was sich geändert hat"
+        }
+      }
+    }
+  },
+  "updatesLoadingNotes": {
+    "comment": "Custom DeeDock update window: Loading release notes…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Loading release notes…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Änderungen werden geladen …"
+        }
+      }
+    }
+  },
+  "updatesNotesFailed": {
+    "comment": "Custom DeeDock update window: Release notes could not be displayed.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Release notes could not be displayed."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Änderungen konnten nicht angezeigt werden."
+        }
+      }
+    }
+  },
+  "updatesNoNotes": {
+    "comment": "Custom DeeDock update window: No release notes were provided for this update.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No release notes were provided for this update."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Für dieses Update wurden keine Änderungen angegeben."
+        }
+      }
+    }
+  },
+  "updatesReadReleaseNotes": {
+    "comment": "Custom DeeDock update window: Read Release Notes…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Read Release Notes…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Änderungen lesen …"
+        }
+      }
+    }
+  },
+  "updatesErrorDetails": {
+    "comment": "Custom DeeDock update window: Error details",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Error details"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fehlerdetails"
+        }
+      }
+    }
+  },
+  "updatesDownloadedAmount": {
+    "comment": "Custom DeeDock update window: Downloaded",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Downloaded"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Geladen"
+        }
+      }
+    }
+  },
+  "updatesShowProgress": {
+    "comment": "Custom DeeDock update window: Show App Update…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show App Update…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App-Update anzeigen …"
+        }
+      }
+    }
+  },
+  "updatesCheck": {
+    "comment": "Menu and Settings action to check for app updates.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Check for Updates…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach Updates suchen …"
+        }
+      }
+    }
+  },
+  "updatesAvailable": {
+    "comment": "Action opening an update found by a scheduled check.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update Available…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Update verfügbar …"
+        }
+      }
+    }
+  },
+  "updatesAutomatic": {
+    "comment": "App-wide Sparkle scheduling preference.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatically check for updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatisch nach Updates suchen"
+        }
+      }
+    }
+  },
+  "updatesAutomaticDescription": {
+    "comment": "Explains the automatic update check toggle.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Check for new versions of DeeDock. Updates are installed with your approval."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach neuen Versionen von DeeDock suchen. Updates werden mit deiner Zustimmung installiert."
+        }
+      }
+    }
+  },
+  "updatesStartupFailed": {
+    "comment": "Recovery text when Sparkle initialization fails.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The updater could not start. Quit and reopen DeeDock. If this continues, download the latest version from GitHub."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Updater konnte nicht gestartet werden. Beende DeeDock und öffne es erneut. Falls das Problem weiterhin auftritt, lade die neueste Version von GitHub herunter."
+        }
+      }
+    }
+  },
     "focusTitle" : {
       "comment" : "Feature name for a shared focus timer started from a Dock Mode.",
       "extractionState" : "manual",
