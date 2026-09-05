@@ -45,15 +45,18 @@ struct AppearanceSettingsPane: View {
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,
                                   value: $iconSize, range: 32...96, step: 1,
-                                  minimumSymbol: "square", maximumSymbol: "square.fill")
+                                  minimumSymbol: "square", maximumSymbol: "square.fill",
+                                  defaultValue: DockSettings.defaults.iconSize)
                     .settingsOverride(overrideContext, field: .iconSize)
                 SettingsSliderRow(title: .settingsMagnification, unit: .settingsMultiplier,
                                   value: $magnification, range: 1...2, step: 0.05,
-                                  minimumSymbol: "magnifyingglass", maximumSymbol: "plus.magnifyingglass")
+                                  minimumSymbol: "magnifyingglass", maximumSymbol: "plus.magnifyingglass",
+                                  defaultValue: DockSettings.defaults.magnification)
                     .settingsOverride(overrideContext, field: .magnification)
                 SettingsSliderRow(title: .settingsItemSpacing, unit: .settingsPoints,
                                   value: $itemSpacing, range: 0...24, step: 1,
-                                  minimumSymbol: "arrow.left.and.right", maximumSymbol: "arrow.left.and.right")
+                                  minimumSymbol: "arrow.left.and.right", maximumSymbol: "arrow.left.and.right",
+                                  defaultValue: DockSettings.defaults.itemSpacing)
                     .settingsOverride(overrideContext, field: .itemSpacing)
             }
         }

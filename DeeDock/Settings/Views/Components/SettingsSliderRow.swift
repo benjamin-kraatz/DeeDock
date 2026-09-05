@@ -30,14 +30,10 @@ struct SettingsSliderRow: View {
                 Text(title)
                 Spacer(minLength: 8)
                 if let defaultValue, value != defaultValue {
-                    Button {
-                        snapped.wrappedValue = defaultValue
-                    } label: {
-                        Label(.settingsResetSliderDefault, systemImage: "arrow.counterclockwise")
+                    SettingsResetButton(title: title) {
+                        // Preserve the model's exact default; the existing binding owns persistence.
+                        value = defaultValue
                     }
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(.borderless)
-                    .help(Text(.settingsResetSliderDefault))
                 }
                 SettingsValueField(title: title, unit: unit, value: $value, range: range, step: step)
             }

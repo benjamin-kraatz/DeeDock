@@ -9,9 +9,20 @@ struct FocusSessionSettingsCard: View {
         SettingsCard(title: .focusTitle, footnote: .focusSettingsHelp) {
             SettingsStackedRow {
                 VStack(alignment: .leading, spacing: 12) {
-                    Stepper(value: Binding(get: { controller.document.minutes },
-                                           set: { controller.configure(minutes: $0) }), in: 1...180) {
+                    HStack {
                         Text(.focusDuration(controller.document.minutes))
+                        if controller.document.minutes != FocusSessionsDocument().minutes {
+                            SettingsResetButton(title: .focusDuration(controller.document.minutes)) {
+                                controller.configure(minutes: FocusSessionsDocument().minutes)
+                            }
+                        }
+                        Spacer()
+                        Stepper(value: Binding(get: { controller.document.minutes },
+                                               set: { controller.configure(minutes: $0) }), in: 1...180) {
+                            Text(.focusDuration(controller.document.minutes))
+                        }
+                        .labelsHidden()
+                        .accessibilityLabel(Text(.focusDuration(controller.document.minutes)))
                     }.disabled(controller.requiresReset)
                     Toggle(.focusCelebrate, isOn: Binding(get: { controller.document.celebrates },
                                                          set: { controller.configure(celebrates: $0) }))
