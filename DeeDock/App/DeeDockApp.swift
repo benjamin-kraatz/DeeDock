@@ -10,11 +10,13 @@ struct DeeDockApp: App {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
             DockModesMenu(coordinator: delegate.coordinator)
+            Divider()
             OpenDockSettingsButton()
-            Button(.onboardingShowWelcome) { delegate.onboarding.present() }
+                .keyboardShortcut(",")
             #if DIRECT_DISTRIBUTION
             CheckForUpdatesButton(updater: delegate.updater)
             #endif
+            Button(.onboardingShowWelcome) { delegate.onboarding.present() }
             Divider()
             Button(.actionQuit) { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
