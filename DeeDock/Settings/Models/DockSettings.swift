@@ -44,6 +44,8 @@ struct DockSettings: Codable, Equatable {
     var magnification: Double = 1.4
     /// Gap between adjacent Dock items in logical points.
     var itemSpacing: Double = 4
+    /// Requested background corner radius in points; rendering caps it to half the shortest side.
+    var cornerRadius: Double = 22
     var appVisibility: DockAppVisibility = .showAll
     /// Whether each display dock includes the trailing Shelf tile.
     var showShelf: Bool = true
@@ -99,10 +101,10 @@ struct DockSettings: Codable, Equatable {
             && (0...0.5).contains(restoreDuration)
             && [backgroundOpacity, idleOpacity, idleDelay, fadeOutDuration, restoreDuration].allSatisfy(\.isFinite)
             && behavior.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
-            && (0...24).contains(itemSpacing)
+            && (0...24).contains(itemSpacing) && (0...100).contains(cornerRadius)
             && (0.2...1).contains(windowPeekHoverDelay)
             && (-1000...1000).contains(alongEdgeOffset) && (0...300).contains(edgeDistance)
-            && [iconSize, magnification, itemSpacing, windowPeekHoverDelay, alongEdgeOffset, edgeDistance].allSatisfy(\.isFinite)
+            && [iconSize, magnification, itemSpacing, cornerRadius, windowPeekHoverDelay, alongEdgeOffset, edgeDistance].allSatisfy(\.isFinite)
     }
 
     /// Snaps valid values to the controls' precision. Invalid values have no normalized result.
@@ -118,6 +120,7 @@ struct DockSettings: Codable, Equatable {
         result.iconSize = iconSize.rounded()
         result.magnification = (magnification * 20).rounded() / 20
         result.itemSpacing = itemSpacing.rounded()
+        result.cornerRadius = cornerRadius.rounded()
         result.windowPeekHoverDelay = (windowPeekHoverDelay * 10).rounded() / 10
         result.alongEdgeOffset = alongEdgeOffset.rounded()
         result.edgeDistance = edgeDistance.rounded()
@@ -132,7 +135,7 @@ extension DockSettings {
         case appVisibility, showShelf, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
-        case iconSize, magnification, itemSpacing, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -165,6 +168,7 @@ extension DockSettings {
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing) ?? 4
+        cornerRadius = values.contains(.cornerRadius) ? try values.decode(Double.self, forKey: .cornerRadius) : 22
         runningIndicatorStyle = values.contains(.runningIndicatorStyle)
             ? try values.decode(RunningIndicatorStyle.self, forKey: .runningIndicatorStyle) : .dot
         animateIndicators = values.contains(.animateIndicators)
