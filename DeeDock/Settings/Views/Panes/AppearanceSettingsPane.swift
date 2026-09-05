@@ -6,11 +6,18 @@ struct AppearanceSettingsPane: View {
     @Binding var iconSize: Double
     @Binding var magnification: Double
     @Binding var itemSpacing: Double
+    @Binding var cornerRadius: Double
     @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
     @Binding var animateIndicators: Bool
 
     var appearanceSettings = DockSettings.defaults
     var overrideContext: SettingsOverrideContext? = nil
+
+    private var previewSettings: DockSettings {
+        var settings = appearanceSettings
+        settings.cornerRadius = cornerRadius
+        return settings
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
@@ -18,7 +25,7 @@ struct AppearanceSettingsPane: View {
                 SettingsStackedRow {
                     DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification,
                                           itemSpacing: itemSpacing, runningIndicatorStyle: runningIndicatorStyle,
-                                          appearanceSettings: appearanceSettings)
+                                          appearanceSettings: previewSettings)
                 }
             }
             SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
@@ -27,6 +34,13 @@ struct AppearanceSettingsPane: View {
                 SettingsToggleRow(title: .settingsAnimateIndicators, isOn: $animateIndicators)
                     .disabled(!runningIndicatorStyle.animates)
                     .settingsOverride(overrideContext, field: .animateIndicators)
+            }
+            SettingsCard(title: .settingsCornerRadius, footnote: .settingsCornerRadiusHelp) {
+                SettingsSliderRow(title: .settingsCornerRadius, unit: .settingsPoints,
+                                  value: $cornerRadius, range: 0...100, step: 1,
+                                  minimumSymbol: "square", maximumSymbol: "capsule",
+                                  defaultValue: DockSettings.defaults.cornerRadius)
+                    .settingsOverride(overrideContext, field: .cornerRadius)
             }
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,
@@ -51,10 +65,11 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var iconSize: Double = 48
     @Previewable @State var magnification: Double = 1.4
     @Previewable @State var itemSpacing: Double = 4
+    @Previewable @State var cornerRadius: Double = 22
     @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .plasma
     @Previewable @State var animate = true
     ScrollView {
-        AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing,
+        AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,
                                runningIndicatorStyle: $indicator, animateIndicators: $animate)
             .padding(24)
     }

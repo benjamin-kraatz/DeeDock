@@ -13,6 +13,8 @@ struct SettingsSliderRow: View {
     /// Optional glyphs marking the low and high ends of the range.
     var minimumSymbol: String?
     var maximumSymbol: String?
+    /// When supplied, offers a reset after the value differs from this factory default.
+    var defaultValue: Double? = nil
 
     private var snapped: Binding<Double> {
         Binding(get: { value },
@@ -27,6 +29,16 @@ struct SettingsSliderRow: View {
             HStack(spacing: 12) {
                 Text(title)
                 Spacer(minLength: 8)
+                if let defaultValue, value != defaultValue {
+                    Button {
+                        snapped.wrappedValue = defaultValue
+                    } label: {
+                        Label(.settingsResetSliderDefault, systemImage: "arrow.counterclockwise")
+                    }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.borderless)
+                    .help(Text(.settingsResetSliderDefault))
+                }
                 SettingsValueField(title: title, unit: unit, value: $value, range: range, step: step)
             }
             HStack(spacing: 9) {

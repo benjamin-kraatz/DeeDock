@@ -7354,6 +7354,60 @@
         }
       }
     },
+    "settingsResetSliderDefault" : {
+      "comment" : "Accessible label and tooltip for resetting one slider to its factory default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Standardwert zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset to default"
+          }
+        }
+      }
+    },
+    "settingsCornerRadius" : {
+      "comment": "Label for the dock background corner radius, measured in points.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Corner radius"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eckenradius"
+          }
+        }
+      }
+    },
+    "settingsCornerRadiusHelp" : {
+      "comment": "Help for dock corner radius. Zero produces square corners; larger values are capped by the dock size.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose square or rounded dock corners. The radius is limited to half the dock’s shortest side."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle eckige oder abgerundete Dock-Ecken. Der Radius ist auf die Hälfte der kürzesten Dock-Seite begrenzt."
+          }
+        }
+      }
+    },
     "settingsAlignBottom" : {
       "comment" : "Align a vertical dock near the bottom of the display.",
       "extractionState" : "manual",

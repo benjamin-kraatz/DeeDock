@@ -26,7 +26,9 @@ struct DockSampleView: View {
         let centers = layout.centers(sizes: sizes)
         let glass = layout.surfaceFrame(sizes: sizes)
         ZStack(alignment: .topLeading) {
-            DockBackgroundView(reduceTransparency: reduceTransparency, idleOpacity: opacity.background)
+            DockBackgroundView(reduceTransparency: reduceTransparency,
+                cornerRadius: min(appearanceSettings.cornerRadius, min(glass.width, glass.height) / 2),
+                idleOpacity: opacity.background)
                 .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
             ForEach(centers.indices, id: \.self) { index in
                 let rect = layout.iconFrame(centerAlong: centers[index], size: sizes[index])

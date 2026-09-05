@@ -92,6 +92,7 @@ struct SettingsDetailView: View {
         case .appearance:
             AppearanceSettingsPane(edge: SettingsValueSource(store: store, profiles: profiles, context: context).value.edge, iconSize: binding(\.iconSize),
                                    magnification: binding(\.magnification), itemSpacing: binding(\.itemSpacing),
+                                   cornerRadius: binding(\.cornerRadius),
                                    runningIndicatorStyle: binding(\.runningIndicatorStyle),
                                    animateIndicators: binding(\.animateIndicators),
                                    appearanceSettings: SettingsValueSource(store: store, profiles: profiles, context: context).value, overrideContext: context)

@@ -43,9 +43,10 @@ final class DockIdleFadeController {
             target: settings.fadeTarget, showBackground: settings.showBackground,
             backgroundOpacity: settings.backgroundOpacity, reduceMotion: reduceMotion,
             reduceTransparency: reduceTransparency)
+        // Drawing also reads appearance values that do not restart the idle timer.
+        self.settings = settings
         guard configuration != next else { return }
         configuration = next
-        self.settings = settings
         self.reduceMotion = reduceMotion
         self.reduceTransparency = reduceTransparency
         reset()

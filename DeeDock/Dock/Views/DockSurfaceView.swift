@@ -38,6 +38,7 @@ struct DockSurfaceView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             DockBackgroundView(reduceTransparency: reduceTransparency,
+                cornerRadius: min(interaction.idleFade.settings.cornerRadius, min(surface.width, surface.height) / 2),
                 idleOpacity: opacity.background)
                 .animation(interaction.idleFade.animation, value: opacity.background)
                 .frame(width: surface.width, height: surface.height)
