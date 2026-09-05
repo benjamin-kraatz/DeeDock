@@ -52,12 +52,14 @@ struct PositionSettingsPane: View {
                 SettingsSliderRow(title: .settingsAlongEdgeOffset, unit: .settingsPoints,
                                   value: $alongEdgeOffset, range: -1000...1000, step: 1,
                                   minimumSymbol: edge.isVertical ? "arrow.up" : "arrow.left",
-                                  maximumSymbol: edge.isVertical ? "arrow.down" : "arrow.right")
+                                  maximumSymbol: edge.isVertical ? "arrow.down" : "arrow.right",
+                                  defaultValue: DockSettings.defaults.alongEdgeOffset)
                     .settingsOverride(overrideContext, field: .alongEdgeOffset)
                 SettingsSliderRow(title: .settingsEdgeDistance, unit: .settingsPoints,
                                   value: $edgeDistance, range: 0...300, step: 1,
                                   minimumSymbol: edge.outwardSymbol,
-                                  maximumSymbol: edge.inwardSymbol)
+                                  maximumSymbol: edge.inwardSymbol,
+                                  defaultValue: DockSettings.defaults.edgeDistance)
                     .settingsOverride(overrideContext, field: .edgeDistance)
             }
         }

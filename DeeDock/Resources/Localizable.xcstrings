@@ -4607,13 +4607,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standard verwenden"
+            "value" : "Gemeinsame Einstellung verwenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Default"
+            "value" : "Use Shared Setting"
           }
         }
       }
@@ -7350,6 +7350,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "settingsResetValue": {
+      "comment": "Accessible factory reset action naming the numeric setting.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset %1$(title)@ to default"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(title)@ auf Standardwert zurücksetzen"
+          }
+        }
+      }
+    },
+    "settingsResetValueHelp": {
+      "comment": "Help for numeric factory reset, distinct from removing a display override.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restores the factory value. For a display, this remains a custom setting."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stellt den werkseitigen Wert wieder her. Für einen Bildschirm bleibt dies eine eigene Einstellung."
+          }
+        }
+      }
+    },
+    "displayUseSharedHelp": {
+      "comment": "Help for removing one display override.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removes this override and follows the shared setting."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entfernt diese eigene Einstellung und übernimmt die gemeinsame Einstellung."
           }
         }
       }

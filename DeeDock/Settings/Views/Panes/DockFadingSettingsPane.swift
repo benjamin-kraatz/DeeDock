@@ -33,22 +33,26 @@ struct DockFadingSettingsPane: View {
                 .settingsOverride(source.context, field: .fadeTarget)
             Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceIdleOpacity, unit: .settingsPercent,
-                value: source.binding(\.idleOpacity), range: 0...100, step: 5)
+                value: source.binding(\.idleOpacity), range: 0...100, step: 5,
+                defaultValue: DockSettings.defaults.idleOpacity)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .idleOpacity)
             Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceIdleDelay, unit: .settingsSeconds,
-                value: source.binding(\.idleDelay), range: 0...30, step: 1)
+                value: source.binding(\.idleDelay), range: 0...30, step: 1,
+                defaultValue: DockSettings.defaults.idleDelay)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .idleDelay)
             Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceFadeOutDuration, unit: .settingsSeconds,
-                value: source.binding(\.fadeOutDuration), range: 0...2, step: 0.05)
+                value: source.binding(\.fadeOutDuration), range: 0...2, step: 0.05,
+                defaultValue: DockSettings.defaults.fadeOutDuration)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .fadeOutDuration)
             Divider().padding(.leading, SettingsMetrics.rowInset)
             SettingsSliderRow(title: .appearanceRestoreDuration, unit: .settingsSeconds,
-                value: source.binding(\.restoreDuration), range: 0...0.5, step: 0.05)
+                value: source.binding(\.restoreDuration), range: 0...0.5, step: 0.05,
+                defaultValue: DockSettings.defaults.restoreDuration)
                 .disabled(!source.value.fadeWhenIdle || reduceTransparency)
                 .settingsOverride(source.context, field: .restoreDuration)
         }

@@ -43,7 +43,8 @@ struct PreviewsSettingsPane: View {
             SettingsCard(title: .windowPeekTimingTitle) {
                 SettingsSliderRow(title: .windowPeekHoverDelay, unit: .settingsSeconds,
                                   value: source.binding(\.windowPeekHoverDelay), range: 0.2...1, step: 0.1,
-                                  minimumSymbol: "hare.fill", maximumSymbol: "tortoise.fill")
+                                  minimumSymbol: "hare.fill", maximumSymbol: "tortoise.fill",
+                                  defaultValue: DockSettings.defaults.windowPeekHoverDelay)
             }
         }
         .disabled(persistentSettingsDisabled)

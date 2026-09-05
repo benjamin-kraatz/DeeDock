@@ -43,7 +43,8 @@ struct BehaviorSettingsPane: View {
                 BehaviorAnimationPicker(edge: source.value.edge, selection: source.binding(\.behavior.animationStyle))
                     .settingsOverride(source.context, field: .animationStyle)
                 SettingsSliderRow(title: .behaviorDuration, unit: .settingsSeconds,
-                                  value: source.binding(\.behavior.animationDuration), range: 0...1, step: 0.05)
+                                  value: source.binding(\.behavior.animationDuration), range: 0...1, step: 0.05,
+                                  defaultValue: DockSettings.defaults.behavior.animationDuration)
                     .settingsOverride(source.context, field: .animationDuration)
             }
         }

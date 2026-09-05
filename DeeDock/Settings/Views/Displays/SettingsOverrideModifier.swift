@@ -29,6 +29,7 @@ private struct SettingsOverrideModifier: ViewModifier {
                         .foregroundStyle(.secondary)
                     Button(.displayUseDefault) { context.profiles.useDefault(field, for: context.id) }
                         .buttonStyle(.link)
+                        .help(Text(.displayUseSharedHelp))
                         .font(.caption)
                 }
                 .padding(.horizontal, SettingsMetrics.rowInset)

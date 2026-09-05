@@ -953,3 +953,7 @@ Remaining hands-on acceptance: start from the active and an inactive mode, pause
 The initial feature strings had English values only. In the user's German interface this exposed catalog keys such as `focusTitle`, `focusDuration`, and `actionsRun`. All 39 Action Tiles and Focus Sessions keys now have German translations, including errors, confirmations, and accessibility text. The duration label uses a minutes abbreviation so one minute does not produce an incorrect plural.
 
 Inspection of the built app's English and German `Localizable.strings` confirmed that all 39 values match the source catalog, with matching interpolation placeholders. This checks the packaged strings; the app was not launched for another visual check. A follow-up Xcode MCP app build passed after replacing unsupported preview accessibility-environment writes with the existing explicit opaque-background preview pattern.
+
+## Individual numeric setting resets, DEE-5
+
+All 17 Settings sliders, their direct numeric fields, and the Focus Session duration stepper offer factory reset when their value differs from the model default. Display factory reset preserves an explicit override; Use Shared Setting removes it. See the [numeric settings inventory](NUMERIC-SETTINGS.md) for coverage, deliberate exclusions, persistence paths, and pending hands-on acceptance. No tests or native UI checks were run for this issue.
