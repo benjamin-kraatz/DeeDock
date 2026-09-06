@@ -9311,13 +9311,85 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "general login startup automatic launch launch at login window windows accessibility permission access"
+            "value" : "general login startup automatic launch launch at login window windows accessibility permission access menüleiste symbol wortmarke icon wordmark menu bar"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "general login startup automatic launch launch at login window windows accessibility permission access"
+            "value" : "general login startup automatic launch launch at login window windows accessibility permission access menu bar icon wordmark menubar"
+          }
+        }
+      }
+    },
+    "menuBarIconTitle" : {
+      "comment" : "General setting for the artwork shown in the macOS menu bar extra.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menüleisten-Symbol"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu Bar Icon"
+          }
+        }
+      }
+    },
+    "menuBarIconHelp" : {
+      "comment" : "Explains that the choice applies to the menu-bar extra and that the wordmark is wider.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheint in der Menüleiste. Die Wortmarke braucht mehr Platz als das Symbol."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shown in the menu bar. The wordmark takes more room than the icon."
+          }
+        }
+      }
+    },
+    "menuBarIconIcon" : {
+      "comment" : "Segmented choice that uses the dock-mark icon in the menu bar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbol"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon"
+          }
+        }
+      }
+    },
+    "menuBarIconWordmark" : {
+      "comment" : "Segmented choice that uses the DDOCK lettering in the menu bar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wortmarke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordmark"
           }
         }
       }

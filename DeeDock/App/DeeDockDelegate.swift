@@ -10,6 +10,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let updater = AppUpdater()
     #endif
     let loginItems = LoginItemController(service: SystemLoginItemService())
+    let menuBarIcon = MenuBarIconController()
     private(set) lazy var onboarding = OnboardingWindowController(
         loginItems: loginItems, settings: coordinator.settings)
 

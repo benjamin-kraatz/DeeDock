@@ -21,8 +21,7 @@ struct DeeDockApp: App {
             Button(.actionQuit) { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
         } label: {
-            // Template mark, not the wordmark: 18-pt menu-bar space cannot carry both.
-            Label { Text(.appName) } icon: { Image("DDockMark") }
+            MenuBarExtraLabel(controller: delegate.menuBarIcon)
         }
         .commands {
             CommandGroup(replacing: .appSettings) {
@@ -39,12 +38,23 @@ struct DeeDockApp: App {
         }
         Settings {
             DockSettingsView(store: delegate.coordinator.settings, profiles: delegate.coordinator.profiles,
-                             loginItems: delegate.loginItems, windowAccess: delegate.windowAccess,
+                             loginItems: delegate.loginItems, menuBarIcon: delegate.menuBarIcon,
+                             windowAccess: delegate.windowAccess,
                              screenCapture: delegate.screenCapture,
                              coordinator: delegate.coordinator)
             #if DIRECT_DISTRIBUTION
             .environment(\.appUpdater, delegate.updater)
             #endif
         }
+    }
+}
+
+/// Isolated so Observation tracks the controller when the extra's label refreshes.
+private struct MenuBarExtraLabel: View {
+    let controller: MenuBarIconController
+
+    var body: some View {
+        Image(nsImage: DDockMenuBarMark.image(for: controller.style))
+            .accessibilityLabel(Text(.appName))
     }
 }

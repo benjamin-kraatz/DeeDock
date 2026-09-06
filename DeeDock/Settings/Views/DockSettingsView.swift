@@ -5,6 +5,7 @@ struct DockSettingsView: View {
     let store: DockSettingsStore
     let profiles: DisplayProfilesStore
     let loginItems: LoginItemController
+    let menuBarIcon: MenuBarIconController
     let windowAccess: WindowAccessController
     let screenCapture: ScreenCaptureAccessController
     var coordinator: DockCoordinator? = nil
@@ -20,7 +21,7 @@ struct DockSettingsView: View {
         } detail: {
             switch selection {
             case .general:
-                GeneralSettingsPane(controller: loginItems)
+                GeneralSettingsPane(controller: loginItems, menuBarIcon: menuBarIcon)
             case .modes:
                 DockModesSettingsPane(store: profiles.modes,
                                       activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
@@ -123,11 +124,13 @@ struct DockSettingsView: View {
 #Preview("Multiple displays") {
     let profiles = DisplaySettingsPreview.make()
     DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller(),
+                     menuBarIcon: MenuBarIconController(defaults: UserDefaults(suiteName: "SettingsMenuBarPreview") ?? .standard),
                      windowAccess: WindowAccessPreview.controller(), screenCapture: ScreenCaptureAccessPreview.controller())
 }
 #Preview("Multiple displays — dark") {
     let profiles = DisplaySettingsPreview.make()
     DockSettingsView(store: profiles.defaults, profiles: profiles, loginItems: LoginItemPreview.controller(),
+                     menuBarIcon: MenuBarIconController(defaults: UserDefaults(suiteName: "SettingsMenuBarPreviewDark") ?? .standard),
                      windowAccess: WindowAccessPreview.controller(), screenCapture: ScreenCaptureAccessPreview.controller()).preferredColorScheme(.dark)
 }
 #endif

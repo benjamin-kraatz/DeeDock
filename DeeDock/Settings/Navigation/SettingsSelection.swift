@@ -8,7 +8,7 @@ enum SettingsSelection: Hashable {
     case defaults(SettingsCategory)
     case display(String)
 
-    /// Localized synonyms let users find General by login and startup terminology.
+    /// Localized synonyms let users find General by login, startup, and menu-bar terminology.
     static func generalMatches(_ query: String) -> Bool {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         var terms: [LocalizedStringResource] = [.settingsGeneral, .settingsGeneralKeywords]

@@ -3,6 +3,7 @@ import SwiftUI
 /// App-wide preferences remain usable even when display configuration cannot be loaded.
 struct GeneralSettingsPane: View {
     let controller: LoginItemController
+    let menuBarIcon: MenuBarIconController
     #if DIRECT_DISTRIBUTION
     @Environment(\.appUpdater) private var updater
     #endif
@@ -10,6 +11,7 @@ struct GeneralSettingsPane: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+                MenuBarIconSettingsCard(controller: menuBarIcon)
                 LoginItemSettingsCard(status: controller.status, pendingOperation: controller.pendingOperation,
                                       errorMessage: controller.errorMessage,
                                       setEnabled: { controller.setEnabled($0) },
@@ -119,7 +121,8 @@ enum ScreenCaptureAccessPreview {
 }
 
 #Preview("General") {
-    GeneralSettingsPane(controller: LoginItemPreview.controller())
+    GeneralSettingsPane(controller: LoginItemPreview.controller(),
+                        menuBarIcon: MenuBarIconController(defaults: UserDefaults(suiteName: "GeneralPreview") ?? .standard))
         .frame(width: 560, height: 520)
 }
 #endif
