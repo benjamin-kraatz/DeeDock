@@ -1,8 +1,8 @@
-# DeeDock contributor guidance
+# DDock contributor guidance
 
 ## Product intent
 
-DeeDock is a native macOS Dock alternative. Read `README.md` first. Match the system Dock's familiarity, visual quality, interaction, and responsiveness, then add precise configuration for displays, positioning, activation zones, size, fade, and behavior.
+DDock is a native macOS Dock alternative. Read `README.md` first. Match the system Dock's familiarity, visual quality, interaction, and responsiveness, then add precise configuration for displays, positioning, activation zones, size, fade, and behavior.
 
 Treat look, behavior, and feel as separate acceptance criteria. A visually similar row of icons alone does not satisfy the product goal.
 
@@ -84,4 +84,4 @@ Keep upstream skill files intact. Sources and licenses are recorded in `.agents/
 - Hands-on acceptance should cover the relevant display arrangement, focus behavior, appearance, and OS interactions. State limitations honestly when a scenario cannot be exercised.
 - Preserve existing staged and unstaged work. Never reset, stash, switch, or rewrite unrelated changes.
 - Do not stage, commit, or push unless requested. Use Conventional Commits when a commit is authorized, and the `codex/` prefix for new branches unless the user specifies another name.
-- Keep changes focused. Do not add a release pipeline, signing changes, entitlements, dependencies, or a license for DeeDock itself as incidental setup work.
+- Keep changes focused. Do not add a release pipeline, signing changes, entitlements, dependencies, or a license for DDock itself as incidental setup work.

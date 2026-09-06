@@ -533,7 +533,7 @@ private struct WindowChoiceRow: View {
         SessionCapsulePanelView(
             state: SessionCapsulePanelState(capsules: [
                 SessionCapsule(
-                    title: "Continue DeeDock settings work",
+                    title: "Continue DDock settings work",
                     summary:
                         "The Features pane and Dock behavior are ready for review.",
                     unfinishedTasks: ["Review the permission fallback"],
@@ -541,7 +541,7 @@ private struct WindowChoiceRow: View {
                         .init(
                             applicationName: "Xcode",
                             bundleIdentifier: "com.apple.dt.Xcode",
-                            windowTitle: "DeeDock"
+                            windowTitle: "DDock"
                         )
                     ],
                     note: "Check on the external display."

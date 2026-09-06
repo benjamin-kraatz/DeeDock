@@ -1,4 +1,4 @@
-# DeeDock
+# DDock
 
 A native macOS Dock alternative. It should look like the Dock, behave like the Dock, and feel like the Dock—with the flexibility macOS should have shipped.
 
@@ -10,7 +10,7 @@ The native dock and the first three customization slices are implemented for mac
 
 ## What we are building
 
-The macOS Dock is the reference for visual quality, interaction, and responsiveness. DeeDock should earn its place through everyday use: recognizable app icons, predictable activation, clear running state, natural hover and motion, and reliable drag interactions.
+The macOS Dock is the reference for visual quality, interaction, and responsiveness. DDock should earn its place through everyday use: recognizable app icons, predictable activation, clear running state, natural hover and motion, and reliable drag interactions.
 
 The product roadmap includes:
 
@@ -59,7 +59,7 @@ Current configuration:
 | App Sandbox | Disabled in the current targets |
 | External package dependencies | Sparkle 2.9.6 for direct distribution |
 
-Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For direct updates and the separate TestFlight build, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DeeDock requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DeeDock does not change the system Dock’s preferences.
+Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For direct updates and the separate TestFlight build, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DDock requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DDock does not change the system Dock’s preferences.
 
 ## Working in this repository
 
@@ -67,9 +67,9 @@ Read [AGENTS.md](AGENTS.md) for implementation guidance, scope boundaries, and v
 
 Three project-local agent skills are installed under `.agents/skills`: SwiftUI Expert, Swift Concurrency, and Swift Testing. See [docs/SKILLS.md](docs/SKILLS.md) for their purpose, pinned sources, and update instructions. They add development guidance, not app dependencies.
 
-## Using DeeDock
+## Using DDock
 
-DeeDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DeeDock; dedicated coexistence controls are future work.
+DDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DDock; dedicated coexistence controls are future work.
 
 - Click an icon to open or activate its application. Click the foreground application's icon to hide all of its windows; click again to show and activate it.
 - Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Target Lock, Orbit, Stardust, Power Badge, Glitch, Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
@@ -78,9 +78,9 @@ DeeDock starts as a menu-bar app, without a normal document window or a second i
 - Neon and Aura were withdrawn. A saved preference naming either migrates to Plasma and Solar Flare respectively, rather than failing to load.
 - Right-click an app for opening and Finder commands, running-app commands, and **Pin** or **Unpin**. Running-app commands include Hide or Show, Bring All to Front, and cooperative Quit. One icon represents every matching regular process, so those commands apply to all matching instances. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
-- Choose **Focus Dock** from the DeeDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, Space opens Window Peek for a running app, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
+- Choose **Focus Dock** from the DDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, Space opens Window Peek for a running app, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
 - Choose a named configuration from **Dock Mode** in the menu-bar item, or press M in Focus Dock to open the keyboard mode picker. A mode changes every display's pins and App Visibility together; it does not launch, quit, hide, or reorder running-only apps.
-- Choose **Quit DeeDock** from the menu-bar item or app menu to close it.
+- Choose **Quit DDock** from the menu-bar item or app menu to close it.
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
@@ -105,27 +105,27 @@ have no guaranteed assignment; the primary dock keeps their apps available. Find
 app icon, not a separate tile per Finder window. This feature does not redirect minimize
 animations or provide system Dock minimize targets.
 
-Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DeeDock keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
+Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DDock keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
 
 Each mode owns the ordered app and folder pins for every remembered display, plus the shared App Visibility choice and any display-specific App Visibility overrides. Pinning, unpinning, reordering, folder presentation changes, and App Visibility edits apply directly to the active mode. Appearance, placement, auto-hide, Trash, Window Peek, and other controls remain independent.
 
 The menu-bar **Dock Mode** submenu switches configurations across all connected docks after the new choice has saved successfully. **Previous Mode** toggles between the last two configurations. During Focus Dock, press M, use Up or Down, then Return; Escape closes the picker without switching. Switching is unavailable while a native menu, file picker, or drag operation is active, and closes open Window Peek and folder panels before changing the docks.
 
-Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DeeDock continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
+Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DDock continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
 
 ## Launch at login
 
-Open **Settings → General → Launch at Login** to start DeeDock automatically when you sign in. General sits above Shared Defaults and applies to the whole app. Appearance remains the initial Settings pane. Search for login, startup, or automatic launch to find General.
+Open **Settings → General → Launch at Login** to start DDock automatically when you sign in. General sits above Shared Defaults and applies to the whole app. Appearance remains the initial Settings pane. Search for login, startup, or automatic launch to find General.
 
-The toggle reflects macOS’s registration status. It stays off until approval is granted. If approval is required, use **Open System Settings…** to open Login Items, or **Cancel Request** to withdraw the registration. Returning to the Settings window refreshes the status, including changes made outside DeeDock. An unavailable status provides Refresh and the System Settings link. Errors appear in General without automatic retries.
+The toggle reflects macOS’s registration status. It stays off until approval is granted. If approval is required, use **Open System Settings…** to open Login Items, or **Cancel Request** to withdraw the registration. Returning to the Settings window refreshes the status, including changes made outside DDock. An unavailable status provides Refresh and the System Settings link. Errors appear in General without automatic retries.
 
-Turning off Launch at Login prevents future automatic launches and leaves DeeDock running. Login startup follows normal startup: configured docks and the menu-bar item appear without opening Settings or deliberately taking foreground focus. General remains usable if display settings have a storage error, and Restore Defaults does not change login registration.
+Turning off Launch at Login prevents future automatic launches and leaves DDock running. Login startup follows normal startup: configured docks and the menu-bar item appear without opening Settings or deliberately taking foreground focus. General remains usable if display settings have a storage error, and Restore Defaults does not change login registration.
 
 The implementation uses `SMAppService.mainApp`; it stores no duplicate preference and installs no helper or launch-agent plist. Registration is opt-in. Real registration and logout/login acceptance require a consistently signed installed copy; see [acceptance notes](docs/ACCEPTANCE.md#launch-at-login).
 
 ## Window-aware application menus
 
-Open **Settings → Features → Permissions** to manage Window Access and Screen Recording. Each row reports Enabled, Not Enabled, or Unavailable. The Enable buttons are the only actions that ask macOS for consent; **Open System Settings…** and **Check Again** manage and refresh the external grants. Permissions and the Window Peek controls below them apply to the app as a whole. DeeDock stores no copy of permission state.
+Open **Settings → Features → Permissions** to manage Window Access and Screen Recording. Each row reports Enabled, Not Enabled, or Unavailable. The Enable buttons are the only actions that ask macOS for consent; **Open System Settings…** and **Check Again** manage and refresh the external grants. Permissions and the Window Peek controls below them apply to the app as a whole. DDock stores no copy of permission state.
 
 Application-level actions do not need Accessibility access. For a running app, its context menu can Hide or Show every matching instance, Bring All to Front, or request a cooperative Quit. Available app bundles also offer Open, Open Files, and Show in Finder. These commands remain available when window access is off.
 
@@ -137,32 +137,32 @@ Window Peek uses one-shot ScreenCaptureKit screenshots only while a Peek is visi
 
 ## First launch
 
-The first time DeeDock runs, a tour opens over the desktop. The docks are already live behind it, so every page describes something you can see. Seven pages: what DeeDock is, a guide to hiding the macOS Dock, placement, running indicators, auto-hide, one dock per display, and a closing page with the launch-at-login toggle.
+The first time DDock runs, a tour opens over the desktop. The docks are already live behind it, so every page describes something you can see. Seven pages: what DDock is, a guide to hiding the macOS Dock, placement, running indicators, auto-hide, one dock per display, and a closing page with the launch-at-login toggle.
 
-Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DeeDock** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
+Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DDock** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
 
 One page changes a setting; the rest only demonstrate. **Put it where you want it** lets you click a screen edge, which sets **Edge** in shared defaults and moves the docks immediately. It writes shared defaults only and leaves per-display overrides alone, so a display already overriding that control keeps its own value, and the change is reversible in Settings.
 
 That page carries a prompt line under its illustration and its handles respond to the pointer. The prompt is the only signal that a page is interactive; pages without one do nothing when clicked.
 
-The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DeeDock never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames, because an App Sandbox cannot read another application's preferences: turning on *Automatically hide and show the Dock* releases the space and clears the status, while moving the Dock to another edge does not. The page can be skipped.
+The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DDock never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames, because an App Sandbox cannot read another application's preferences: turning on *Automatically hide and show the Dock* releases the space and clears the status, while moving the Dock to another edge does not. The page can be skipped.
 
 The illustrations use production code, not artwork. Placement runs the same `DockPlacement` calculation as a real dock, the running indicators are drawn by `DockIconIndicator` and `DockRunningIndicator`, and the auto-hide page is driven by the real `DockVisibilityController`. Reduce Motion holds a single frame on every page and cross-fades between them instead of sliding; Reduce Transparency uses opaque backgrounds. Only the visible page animates.
 
 ## Arrange pins with drag-and-drop
 
 - Drag a pinned app along the dock to reorder it. Drag a running app into the pinned section to pin it at that position. Running-only order remains automatic.
-- Drop one or more application bundles or ordinary folders from Finder into the pinned section. Mixed app-and-folder batches are accepted in Finder order. The whole batch must be pinnable: plain files, packages, aliases, unreadable items, and DeeDock itself reject the pin operation. Existing pins move into the dropped block; duplicate app identities and resolved folder locations appear only once.
-- Drag an app onto another display’s DeeDock to pin it there without removing the source pin. An existing destination pin moves to the chosen position.
-- Drag a pin at least 64 points outside its dock to see **Unpin**, then release to unpin it. Returning closer or pressing Escape cancels removal. Releasing over another DeeDock that rejects the drop keeps the source pin. Running apps remain in the running section after unpinning; applications are never quit or deleted.
+- Drop one or more application bundles or ordinary folders from Finder into the pinned section. Mixed app-and-folder batches are accepted in Finder order. The whole batch must be pinnable: plain files, packages, aliases, unreadable items, and DDock itself reject the pin operation. Existing pins move into the dropped block; duplicate app identities and resolved folder locations appear only once.
+- Drag an app onto another display’s DDock to pin it there without removing the source pin. An existing destination pin moves to the chosen position.
+- Drag a pin at least 64 points outside its dock to see **Unpin**, then release to unpin it. Returning closer or pressing Escape cancels removal. Releasing over another DDock that rejects the drop keeps the source pin. Running apps remain in the running section after unpinning; applications are never quit or deleted.
 - During dragging, magnification settles to resting icon sizes and a live gap shows insertion. Overflowing docks scroll near their viewport edges. A hidden dock uses its existing activation zone and reveal delay; the source and revealed destination stay visible during the relevant interaction.
 - Pin edits save only when a drop completes. Cancelled drags restore the saved arrangement. Invalid batches are rejected together, and save errors appear on the affected dock.
 
 Right-click a pin for **Move Left** and **Move Right** on a top or bottom dock, or **Move Up** and **Move Down** on a side dock. **Pin on Display…** works with every edge. With **Focus Dock** active, hold Option with the corresponding arrow key to reorder the selected pin; ordinary arrows navigate. VoiceOver exposes equivalent move and destination actions. The Pin on Display menu appends a new pin and leaves an existing destination pin in place.
 
-Finder imports retain read-only security-scoped bookmarks so user-selected application bundles and folders can remain accessible after restart. Application-only lists migrate once to typed v3 pins; the older bytes remain untouched for rollback and recovery. DeeDock uses app-scoped bookmarks for persistent pins; the separate Trash drop path requests read/write access only to items the user explicitly supplies. No Accessibility grant or system Dock preference changes are involved. Trash commands use a separate Finder Automation grant described below. Missing applications and unresolved folders remain visible as unavailable pins.
+Finder imports retain read-only security-scoped bookmarks so user-selected application bundles and folders can remain accessible after restart. Application-only lists migrate once to typed v3 pins; the older bytes remain untouched for rollback and recovery. DDock uses app-scoped bookmarks for persistent pins; the separate Trash drop path requests read/write access only to items the user explicitly supplies. No Accessibility grant or system Dock preference changes are involved. Trash commands use a separate Finder Automation grant described below. Missing applications and unresolved folders remain visible as unavailable pins.
 
-Selecting multiple pins within DeeDock remains outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
+Selecting multiple pins within DDock remains outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
 
 ## Folder stacks
 
@@ -182,13 +182,13 @@ Fan and Automatic presentations, search, multi-selection, file promises, move op
 
 ## Features
 
-**Settings → Features** collects DeeDock's opt-in capabilities: Session Capsules, the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
+**Settings → Features** collects DDock's opt-in capabilities: Session Capsules, the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
 
-That is the distinction the sidebar draws. Panes under **Defaults** describe how a dock looks and where it sits, so each display can override them individually. A feature is either on or off for DeeDock as a whole; no display holds its own copy. Appearance, Position, and Behavior keep their per-display overrides exactly as before.
+That is the distinction the sidebar draws. Panes under **Defaults** describe how a dock looks and where it sits, so each display can override them individually. A feature is either on or off for DDock as a whole; no display holds its own copy. Appearance, Position, and Behavior keep their per-display overrides exactly as before.
 
 ## Session Capsules
 
-Session Capsules save mental context without restoring window geometry. Open the shared Capsules tile, choose up to twelve visible windows, and create a draft. DeeDock captures those windows once with ScreenCaptureKit, runs on-device Vision OCR, and gives the images plus window metadata to the system default Apple Intelligence model. Foundation Models produces typed structured output for the title, summary, and unfinished tasks; the prompt never asks for JSON. If the model is unavailable or generation fails, DeeDock creates a plain editable draft from the selected window metadata instead.
+Session Capsules save mental context without restoring window geometry. Open the shared Capsules tile, choose up to twelve visible windows, and create a draft. DDock captures those windows once with ScreenCaptureKit, runs on-device Vision OCR, and gives the images plus window metadata to the system default Apple Intelligence model. Foundation Models produces typed structured output for the title, summary, and unfinished tasks; the prompt never asks for JSON. If the model is unavailable or generation fails, DDock creates a plain editable draft from the selected window metadata instead.
 
 Nothing is saved until you review the draft and choose **Save Capsule**. Raw screenshots and recognized text remain in memory only for draft creation and are discarded afterward. Each saved checkpoint then appears beside the collection tile as its own temporary, title-bearing Dock item until you delete it. The persisted capsule contains the approved text, optional personal note, application bundle identities, and window titles. **Resume** reopens missing applications and uses Accessibility to raise the first exact title match when available, otherwise it activates a referenced app. It deliberately does not move, resize, or rearrange windows.
 
@@ -210,7 +210,7 @@ Keyboard, while the panel is open: Up and Down select, Return opens, ⌘R shows 
 
 Select items the way a Finder list does: click to replace the selection, Command-click to toggle one, Shift-click to extend from the last, and drag across empty space to sweep a rubber band. The band never starts on an item or over the scroller, so pressing an item still drags it and the list still scrolls. Dragging any selected item carries the whole selection at once; dragging an unselected one carries just that item.
 
-Removal is always explicit. Use a row's Remove, **Clear Shelf…** from the tile menu or the panel header, or drag an item onto the dock's Trash tile — that drop reads **Remove from Shelf**, discards the reference, and leaves the file on disk. A Finder batch dropped on Trash still reads **Move to Trash** and still trashes; the two paths stay distinct because a Shelf drag also carries a private pasteboard type that only DeeDock reads.
+Removal is always explicit. Use a row's Remove, **Clear Shelf…** from the tile menu or the panel header, or drag an item onto the dock's Trash tile — that drop reads **Remove from Shelf**, discards the reference, and leaves the file on disk. A Finder batch dropped on Trash still reads **Move to Trash** and still trashes; the two paths stay distinct because a Shelf drag also carries a private pasteboard type that only DDock reads.
 
 The Shelf holds at most 50 items; a larger drop is accepted up to the limit and reports the rest on the initiating dock. A file that is moved or deleted stays listed as unavailable rather than disappearing, so you can see what happened and remove it yourself. Unreadable stored bytes are reported and never overwritten.
 
@@ -224,15 +224,15 @@ Reordering, auto-expiry, and multiple named shelves remain planned.
 
 Trash appears as the final tile after its own divider and is enabled by default. Under **Features → Trash**, turn it off for the whole app. The tile is independent of the pinned and running sections, including their hidden and collapsed states.
 
-Click Trash, press Return while it is selected in Focus Dock, or choose **Open Trash** from its menu to open Trash in Finder. VoiceOver exposes its name, status, hint, and actions. The first explicit Open or Empty command asks for permission to automate Finder. DeeDock does not read the protected Trash directory directly. After permission exists, a serialized Finder item-count check every two seconds keeps the empty/full artwork synchronized with changes made by Finder or the system Dock.
+Click Trash, press Return while it is selected in Focus Dock, or choose **Open Trash** from its menu to open Trash in Finder. VoiceOver exposes its name, status, hint, and actions. The first explicit Open or Empty command asks for permission to automate Finder. DDock does not read the protected Trash directory directly. After permission exists, a serialized Finder item-count check every two seconds keeps the empty/full artwork synchronized with changes made by Finder or the system Dock.
 
-Drop one or more files, folders, or packages from Finder directly on the tile to move the complete batch to Trash through `NSWorkspace`. The exact tile highlights and shows **Move to Trash**. Security-scoped access remains alive until macOS completes the operation; failures are reported on the initiating dock. Internal pin drags cannot target Trash, and dropping onto Trash never alters DeeDock's pin configuration.
+Drop one or more files, folders, or packages from Finder directly on the tile to move the complete batch to Trash through `NSWorkspace`. The exact tile highlights and shows **Move to Trash**. Security-scoped access remains alive until macOS completes the operation; failures are reported on the initiating dock. Internal pin drags cannot target Trash, and dropping onto Trash never alters DDock's pin configuration.
 
-The context menu and VoiceOver offer **Empty Trash…** only when Trash contains items. **Features → Trash → Confirm before emptying Trash** controls DeeDock's native destructive warning. Confirmation is on by default and applies to every display. DeeDock then asks Finder to empty Trash. Finder owns the protected home and mounted-volume Trash locations. DeeDock's sandbox entitlements allow Apple events only for Finder, with the Finder Trash scripting access group plus a Finder-only compatibility exception for opening and counting. It receives no general home-directory access and uses no deprecated workspace operation, Finder UI scripting, or private API.
+The context menu and VoiceOver offer **Empty Trash…** only when Trash contains items. **Features → Trash → Confirm before emptying Trash** controls DDock's native destructive warning. Confirmation is on by default and applies to every display. DDock then asks Finder to empty Trash. Finder owns the protected home and mounted-volume Trash locations. DDock's sandbox entitlements allow Apple events only for Finder, with the Finder Trash scripting access group plus a Finder-only compatibility exception for opening and counting. It receives no general home-directory access and uses no deprecated workspace operation, Finder UI scripting, or private API.
 
 ## Open files and folders in an app
 
-Drag files, document packages, or folders from Finder onto an available app icon. The outlined target shows **Open in {app}**. Releasing sends the complete batch to that app. DeeDock lets the receiving app decide which document types it supports. Files are opened in place; DeeDock does not move, copy, or save them.
+Drag files, document packages, or folders from Finder onto an available app icon. The outlined target shows **Open in {app}**. Releasing sends the complete batch to that app. DDock lets the receiving app decide which document types it supports. Files are opened in place; DDock does not move, copy, or save them.
 
 Application bundles still use the pinning behavior above. Mixing applications and documents rejects the whole batch. Web links, pasted content, and promised files are not supported. While **Checking items…** is visible, the batch is not yet ready to drop. Missing or inaccessible items reject the batch before handoff.
 
@@ -240,15 +240,15 @@ Hover over a collapsed pinned or running section for half a second to expose its
 
 Spring-loading uses the macOS hover and Force Click preferences. Dwelling on an app can activate it or launch it if closed, without sending the files. You can then continue dragging into its window. Leaving an icon cancels pending activation, but a launch already submitted to macOS cannot be undone. A completed spring activation does not quit or hide the app when the drag ends.
 
-Known limitation on the development Mac: Escape cancels a Finder drag before switching apps, but did not cancel after spring activation. The same failure occurred when switching with Command-Tab without using DeeDock. Escape cancellation after an app switch is therefore not guaranteed in this environment.
+Known limitation on the development Mac: Escape cancels a Finder drag before switching apps, but did not cancel after spring activation. The same failure occurred when switching with Command-Tab without using DDock. Escape cancellation after an app switch is therefore not guaranteed in this environment.
 
-Right-click an available app and choose **Open Files…** to select files and folders in a native picker. VoiceOver exposes the same action. With **Focus Dock**, select an app and press **⌘O**. One picker is shared by all displays; it retains the app selected when it opened. Cancelling restores the originating dock selection or previous app when DeeDock still owns focus.
+Right-click an available app and choose **Open Files…** to select files and folders in a native picker. VoiceOver exposes the same action. With **Focus Dock**, select an app and press **⌘O**. One picker is shared by all displays; it retains the app selected when it opened. Cancelling restores the originating dock selection or previous app when DDock still owns focus.
 
 Each completed drop or picker confirmation submits its own batch, including consecutive drops onto an app that is still launching. Failures appear on the initiating dock. A successful macOS handoff does not prove that the receiving app displayed every item. Document access is temporary, with no saved bookmarks or document history. See the [acceptance record](docs/ACCEPTANCE.md) for build evidence and outstanding runtime checks.
 
 ## Position and appearance settings
 
-Choose **Settings…** from the menu-bar item or app menu (⌘, while DeeDock is active). The single native Settings window applies valid edits immediately and saves them automatically.
+Choose **Settings…** from the menu-bar item or app menu (⌘, while DDock is active). The single native Settings window applies valid edits immediately and saves them automatically.
 
 | Control | Range / options | Default |
 | --- | --- | --- |
@@ -401,7 +401,7 @@ Auto-hide does not inspect overlapping app windows, use pressure gestures, modif
 
 One application catalog owns workspace observation, running order, icon caching, and duplicate-suppressed launches. A coordinator reconciles display snapshots and owns global pointer monitoring and exclusive keyboard focus. Each panel keeps its own pins, selection, hover, scroll state, geometry, and error feedback. Removing a dock invalidates its launch callbacks without cancelling shared work; quitting cancels pending tasks and removes observers, monitors, and panels. Geometry, identity resolution, ordering, focus routing, and visibility policy are independent of native windows. Each panel owns a cancellable visibility controller with monotonic deadlines and finite animation ticks; idle settled docks schedule no visibility work. Drawing and native click passthrough share the same animation sample, while context-menu tracking is scoped to the owning dock.
 
-The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing target compiling the same model, ordering, persistence, and geometry sources used by the app. Its tests cover geometry, magnification, overflow, ordering, favorites persistence, display identity and focus policy, migration, empty-pin seeding, per-setting inheritance, stale launch/cancellation behavior, auto-hide deadlines and reversals, ten animation styles and masks, behavior migration, and temporary preview lifetimes without launching DeeDock. Drag coverage adds batch insertion, cross-display pin independence, deliberate unpinning, cancellation, insertion geometry, import validation, bookmark compatibility, blocked writes, and visibility holds. Tests have been compiled, but not executed. Follow `AGENTS.md` before running them.
+The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing target compiling the same model, ordering, persistence, and geometry sources used by the app. Its tests cover geometry, magnification, overflow, ordering, favorites persistence, display identity and focus policy, migration, empty-pin seeding, per-setting inheritance, stale launch/cancellation behavior, auto-hide deadlines and reversals, ten animation styles and masks, behavior migration, and temporary preview lifetimes without launching DDock. Drag coverage adds batch insertion, cross-display pin independence, deliberate unpinning, cancellation, insertion geometry, import validation, bookmark compatibility, blocked writes, and visibility holds. Tests have been compiled, but not executed. Follow `AGENTS.md` before running them.
 
 ## Source organization
 
@@ -436,20 +436,20 @@ Use generated `LocalizedStringResource` symbols in SwiftUI and defer error-messa
 
 Open **Settings → Features → Action Tiles**, choose **Load Shortcuts**, and pin a shortcut. Tiles appear in the same order on every display, independently of Dock Modes. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
 
-Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DeeDock never retries a run automatically.
+Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DDock never retries a run automatically.
 
-Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DeeDock does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.
+Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DDock does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.
 
 ## Focus Sessions
 
-Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or use the timer button beside a mode in **Settings → Modes**. DeeDock activates that mode and starts a shared timer. You can also start from the already-active mode. Only one session can run or pause at a time; switching modes later does not replace its timer.
+Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or use the timer button beside a mode in **Settings → Modes**. DDock activates that mode and starts a shared timer. You can also start from the already-active mode. Only one session can run or pause at a time; switching modes later does not replace its timer.
 
 The timer tile appears on every display. Its ring shows time remaining. Click it for **Pause**, **Resume**, **Add 5 Minutes**, and **Finish**. A finished session keeps a checkmark tile until dismissed or replaced by a new session. **Save Session Capsule** opens the usual window-selection and draft-review flow; finishing never captures or saves anything automatically.
 
 Set the next session's duration, from 1 to 180 minutes, in **Settings → Features → Focus Sessions**. The default is 25 minutes. Completion animation is optional and off by default, and Reduce Motion suppresses it. There are no streaks or history scores.
 
-Running timers use a saved wall-clock deadline, so sleep and app downtime count. Paused timers retain their remaining duration. Reopening DeeDock after the deadline marks the session finished without replaying a celebration. Changing focus defaults does not restart the current session. Renaming or deleting a Dock Mode does not erase a timer already started from it.
+Running timers use a saved wall-clock deadline, so sleep and app downtime count. Paused timers retain their remaining duration. Reopening DDock after the deadline marks the session finished without replaying a celebration. Changing focus defaults does not restart the current session. Renaming or deleting a Dock Mode does not erase a timer already started from it.
 
 ## App updates
 
-Direct builds use Sparkle’s update engine with a DeeDock-owned native update window. Consent, release notes, download progress, errors, and installation choices use DeeDock’s UI. Choose **Check for Updates…** from the DeeDock menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DeeDock quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. See [release instructions](docs/UPDATES.md) for signing, publishing, and the required archive scheme.
+Direct builds use Sparkle’s update engine with a DDock-owned native update window. Consent, release notes, download progress, errors, and installation choices use DDock’s UI. Choose **Check for Updates…** from the DDock menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DDock quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. See [release instructions](docs/UPDATES.md) for signing, publishing, and the required archive scheme.

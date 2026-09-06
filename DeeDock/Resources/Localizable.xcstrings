@@ -50,19 +50,19 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "This update is already prepared. Restart DeeDock now, or choose Install on Quit to finish later. Closing this window also keeps installation on quit enabled."
+          "value": "This update is already prepared. Restart DDock now, or choose Install on Quit to finish later. Closing this window also keeps installation on quit enabled."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Dieses Update ist bereits vorbereitet. Starte DeeDock jetzt neu oder wähle Beim Beenden installieren, um es später abzuschließen. Auch beim Schließen dieses Fensters bleibt die Installation beim Beenden aktiviert."
+          "value": "Dieses Update ist bereits vorbereitet. Starte DDock jetzt neu oder wähle Beim Beenden installieren, um es später abzuschließen. Auch beim Schließen dieses Fensters bleibt die Installation beim Beenden aktiviert."
         }
       }
     }
   },
   "updatesWindowTitle": {
-    "comment": "Custom DeeDock update window: App Updates",
+    "comment": "Custom DDock update window: App Updates",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -80,43 +80,43 @@
     }
   },
   "updatesPermissionTitle": {
-    "comment": "Custom DeeDock update window: Keep DeeDock up to date",
+    "comment": "Custom DDock update window: Keep DDock up to date",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Keep DeeDock up to date"
+          "value": "Keep DDock up to date"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "DeeDock aktuell halten"
+          "value": "DDock aktuell halten"
         }
       }
     }
   },
   "updatesPermissionBody": {
-    "comment": "Custom DeeDock update window: May DeeDock check automatically? Automatic installation defaults to on and remains configurable in General Settings.",
+    "comment": "Custom DDock update window: May DDock check automatically? Automatic installation defaults to on and remains configurable in General Settings.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "May DeeDock check for new versions automatically? Automatic installation is on by default. You can change both options in General Settings."
+          "value": "May DDock check for new versions automatically? Automatic installation is on by default. You can change both options in General Settings."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Darf DeeDock automatisch nach neuen Versionen suchen? Die automatische Installation ist standardmäßig aktiviert. Du kannst beide Optionen in den allgemeinen Einstellungen ändern."
+          "value": "Darf DDock automatisch nach neuen Versionen suchen? Die automatische Installation ist standardmäßig aktiviert. Du kannst beide Optionen in den allgemeinen Einstellungen ändern."
         }
       }
     }
   },
   "updatesPermissionPrivacy": {
-    "comment": "Custom DeeDock update window: No system profile is sent with update checks.",
+    "comment": "Custom DDock update window: No system profile is sent with update checks.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -134,7 +134,7 @@
     }
   },
   "updatesCheckingTitle": {
-    "comment": "Custom DeeDock update window: Looking for an update",
+    "comment": "Custom DDock update window: Looking for an update",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -152,25 +152,25 @@
     }
   },
   "updatesCheckingBody": {
-    "comment": "Custom DeeDock update window: Checking whether a newer version of DeeDock is available.",
+    "comment": "Custom DDock update window: Checking whether a newer version of DDock is available.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Checking whether a newer version of DeeDock is available."
+          "value": "Checking whether a newer version of DDock is available."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Es wird geprüft, ob eine neuere Version von DeeDock verfügbar ist."
+          "value": "Es wird geprüft, ob eine neuere Version von DDock verfügbar ist."
         }
       }
     }
   },
   "updatesInformationTitle": {
-    "comment": "Custom DeeDock update window: An update needs your attention",
+    "comment": "Custom DDock update window: An update needs your attention",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -188,7 +188,7 @@
     }
   },
   "updatesInformationBody": {
-    "comment": "Custom DeeDock update window: This version cannot be installed here. Open the release information to see how to update.",
+    "comment": "Custom DDock update window: This version cannot be installed here. Open the release information to see how to update.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -206,25 +206,25 @@
     }
   },
   "updatesFoundTitle": {
-    "comment": "Custom DeeDock update window: A new DeeDock is here",
+    "comment": "Custom DDock update window: A new DDock is here",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "A new DeeDock is here"
+          "value": "A new DDock is here"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Eine neue Version von DeeDock ist da"
+          "value": "Eine neue Version von DDock ist da"
         }
       }
     }
   },
   "updatesFoundBody": {
-    "comment": "Custom DeeDock update window: See what has changed, then download the update when you are ready. macOS may ask for administrator approval during installation.",
+    "comment": "Custom DDock update window: See what has changed, then download the update when you are ready. macOS may ask for administrator approval during installation.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -242,7 +242,7 @@
     }
   },
   "updatesDownloadingTitle": {
-    "comment": "Custom DeeDock update window: Downloading your update",
+    "comment": "Custom DDock update window: Downloading your update",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -260,25 +260,25 @@
     }
   },
   "updatesDownloadingBody": {
-    "comment": "Custom DeeDock update window: You can keep using DeeDock. Hiding this window keeps the download running; Cancel stops it.",
+    "comment": "Custom DDock update window: You can keep using DDock. Hiding this window keeps the download running; Cancel stops it.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "You can keep using DeeDock. Hiding this window keeps the download running; Cancel stops it."
+          "value": "You can keep using DDock. Hiding this window keeps the download running; Cancel stops it."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Du kannst DeeDock weiter verwenden. Wenn du dieses Fenster ausblendest, läuft der Download weiter. Mit Abbrechen stoppst du ihn."
+          "value": "Du kannst DDock weiter verwenden. Wenn du dieses Fenster ausblendest, läuft der Download weiter. Mit Abbrechen stoppst du ihn."
         }
       }
     }
   },
   "updatesPreparingTitle": {
-    "comment": "Custom DeeDock update window: Preparing the update",
+    "comment": "Custom DDock update window: Preparing the update",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -296,7 +296,7 @@
     }
   },
   "updatesPreparingBody": {
-    "comment": "Custom DeeDock update window: The download is being unpacked and verified. This step cannot be cancelled. macOS may request administrator approval.",
+    "comment": "Custom DDock update window: The download is being unpacked and verified. This step cannot be cancelled. macOS may request administrator approval.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -314,7 +314,7 @@
     }
   },
   "updatesReadyTitle": {
-    "comment": "Custom DeeDock update window: Ready when you are",
+    "comment": "Custom DDock update window: Ready when you are",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -332,25 +332,25 @@
     }
   },
   "updatesReadyBody": {
-    "comment": "Custom DeeDock update window: Restart DeeDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DeeDock quits. Cancel stops this installation.",
+    "comment": "Custom DDock update window: Restart DDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DDock quits. Cancel stops this installation.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Restart DeeDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DeeDock quits. Cancel stops this installation."
+          "value": "Restart DDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DDock quits. Cancel stops this installation."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Starte DeeDock neu, um das Update abzuschließen. Bei Installation beim Beenden oder beim Schließen dieses Fensters bleibt das Update bis zum nächsten Beenden bereit. Abbrechen stoppt diese Installation."
+          "value": "Starte DDock neu, um das Update abzuschließen. Bei Installation beim Beenden oder beim Schließen dieses Fensters bleibt das Update bis zum nächsten Beenden bereit. Abbrechen stoppt diese Installation."
         }
       }
     }
   },
   "updatesInstallingTitle": {
-    "comment": "Custom DeeDock update window: Finishing the update",
+    "comment": "Custom DDock update window: Finishing the update",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -368,43 +368,43 @@
     }
   },
   "updatesInstallingBody": {
-    "comment": "Custom DeeDock update window: DeeDock is being updated. Please wait for the installation to finish.",
+    "comment": "Custom DDock update window: DDock is being updated. Please wait for the installation to finish.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "DeeDock is being updated. Please wait for the installation to finish."
+          "value": "DDock is being updated. Please wait for the installation to finish."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "DeeDock wird aktualisiert. Bitte warte, bis die Installation abgeschlossen ist."
+          "value": "DDock wird aktualisiert. Bitte warte, bis die Installation abgeschlossen ist."
         }
       }
     }
   },
   "updatesWaitingToQuit": {
-    "comment": "Custom DeeDock update window: Waiting for DeeDock to quit. If it remains open, you can ask it to quit again.",
+    "comment": "Custom DDock update window: Waiting for DDock to quit. If it remains open, you can ask it to quit again.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Waiting for DeeDock to quit. If it remains open, you can ask it to quit again."
+          "value": "Waiting for DDock to quit. If it remains open, you can ask it to quit again."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Es wird darauf gewartet, dass DeeDock beendet wird. Falls es geöffnet bleibt, kannst du das Beenden erneut anfordern."
+          "value": "Es wird darauf gewartet, dass DDock beendet wird. Falls es geöffnet bleibt, kannst du das Beenden erneut anfordern."
         }
       }
     }
   },
   "updatesNoUpdateTitle": {
-    "comment": "Custom DeeDock update window: Update check complete",
+    "comment": "Custom DDock update window: Update check complete",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -422,43 +422,43 @@
     }
   },
   "updatesOnLatest": {
-    "comment": "Custom DeeDock update window. The placeholder is the currently installed marketing version.",
+    "comment": "Custom DDock update window. The placeholder is the currently installed marketing version.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "DeeDock %1$(currentVersion)@ is up to date."
+          "value": "DDock %1$(currentVersion)@ is up to date."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "DeeDock %1$(currentVersion)@ ist auf dem neuesten Stand."
+          "value": "DDock %1$(currentVersion)@ ist auf dem neuesten Stand."
         }
       }
     }
   },
   "updatesOnNewer": {
-    "comment": "Custom DeeDock update window. The placeholder is the currently installed marketing version.",
+    "comment": "Custom DDock update window. The placeholder is the currently installed marketing version.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "You are using DeeDock %1$(currentVersion)@, which is newer than the latest published version."
+          "value": "You are using DDock %1$(currentVersion)@, which is newer than the latest published version."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Du verwendest DeeDock %1$(currentVersion)@. Diese Version ist neuer als die zuletzt veröffentlichte Version."
+          "value": "Du verwendest DDock %1$(currentVersion)@. Diese Version ist neuer als die zuletzt veröffentlichte Version."
         }
       }
     }
   },
   "updatesOSIncompatible": {
-    "comment": "Custom DeeDock update window: The available update does not support this version of macOS.",
+    "comment": "Custom DDock update window: The available update does not support this version of macOS.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -476,7 +476,7 @@
     }
   },
   "updatesHardwareIncompatible": {
-    "comment": "Custom DeeDock update window: The available update requires a Mac with Apple silicon.",
+    "comment": "Custom DDock update window: The available update requires a Mac with Apple silicon.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -494,7 +494,7 @@
     }
   },
   "updatesNoCompatibleUpdate": {
-    "comment": "Custom DeeDock update window: No compatible update is currently available for this Mac.",
+    "comment": "Custom DDock update window: No compatible update is currently available for this Mac.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -512,7 +512,7 @@
     }
   },
   "updatesFailedTitle": {
-    "comment": "Custom DeeDock update window: The update could not continue",
+    "comment": "Custom DDock update window: The update could not continue",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -530,25 +530,25 @@
     }
   },
   "updatesFailureBody": {
-    "comment": "Custom DeeDock update window: Review the details below, then close this window. You can check for updates again from the DeeDock menu.",
+    "comment": "Custom DDock update window: Review the details below, then close this window. You can check for updates again from the DDock menu.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Review the details below, then close this window. You can check for updates again from the DeeDock menu."
+          "value": "Review the details below, then close this window. You can check for updates again from the DDock menu."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Sieh dir die Details unten an und schließe dann dieses Fenster. Du kannst im DeeDock-Menü erneut nach Updates suchen."
+          "value": "Sieh dir die Details unten an und schließe dann dieses Fenster. Du kannst im DDock-Menü erneut nach Updates suchen."
         }
       }
     }
   },
   "updatesInstalledTitle": {
-    "comment": "Custom DeeDock update window: Update installed",
+    "comment": "Custom DDock update window: Update installed",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -566,25 +566,25 @@
     }
   },
   "updatesInstalledBody": {
-    "comment": "Custom DeeDock update window: The new version of DeeDock has been installed.",
+    "comment": "Custom DDock update window: The new version of DDock has been installed.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "The new version of DeeDock has been installed."
+          "value": "The new version of DDock has been installed."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Die neue Version von DeeDock wurde installiert."
+          "value": "Die neue Version von DDock wurde installiert."
         }
       }
     }
   },
   "updatesAllowChecks": {
-    "comment": "Custom DeeDock update window: Check Automatically",
+    "comment": "Custom DDock update window: Check Automatically",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -602,7 +602,7 @@
     }
   },
   "updatesManualChecks": {
-    "comment": "Custom DeeDock update window: Check Manually",
+    "comment": "Custom DDock update window: Check Manually",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -620,7 +620,7 @@
     }
   },
   "updatesInstallRestart": {
-    "comment": "Custom DeeDock update window: Install and Restart",
+    "comment": "Custom DDock update window: Install and Restart",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -638,7 +638,7 @@
     }
   },
   "updatesInstall": {
-    "comment": "Custom DeeDock update window: Install Update",
+    "comment": "Custom DDock update window: Install Update",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -656,7 +656,7 @@
     }
   },
   "updatesDownload": {
-    "comment": "Custom DeeDock update window: Download Update",
+    "comment": "Custom DDock update window: Download Update",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -674,7 +674,7 @@
     }
   },
   "updatesSkipUpgrade": {
-    "comment": "Custom DeeDock update window: Skip This Upgrade",
+    "comment": "Custom DDock update window: Skip This Upgrade",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -692,7 +692,7 @@
     }
   },
   "updatesSkipVersion": {
-    "comment": "Custom DeeDock update window: Skip This Version",
+    "comment": "Custom DDock update window: Skip This Version",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -710,7 +710,7 @@
     }
   },
   "updatesInstallOnQuit": {
-    "comment": "Custom DeeDock update window: Install on Quit",
+    "comment": "Custom DDock update window: Install on Quit",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -728,7 +728,7 @@
     }
   },
   "updatesLater": {
-    "comment": "Custom DeeDock update window: Later",
+    "comment": "Custom DDock update window: Later",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -746,7 +746,7 @@
     }
   },
   "updatesCancel": {
-    "comment": "Custom DeeDock update window: Cancel",
+    "comment": "Custom DDock update window: Cancel",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -764,7 +764,7 @@
     }
   },
   "updatesHide": {
-    "comment": "Custom DeeDock update window: Hide",
+    "comment": "Custom DDock update window: Hide",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -782,7 +782,7 @@
     }
   },
   "updatesRetryQuit": {
-    "comment": "Custom DeeDock update window: Try Quitting Again",
+    "comment": "Custom DDock update window: Try Quitting Again",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -800,7 +800,7 @@
     }
   },
   "updatesDone": {
-    "comment": "Custom DeeDock update window: Done",
+    "comment": "Custom DDock update window: Done",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -818,7 +818,7 @@
     }
   },
   "updatesLearnMore": {
-    "comment": "Custom DeeDock update window: Learn More…",
+    "comment": "Custom DDock update window: Learn More…",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -836,7 +836,7 @@
     }
   },
   "updatesVersion": {
-    "comment": "Custom DeeDock update window: New version",
+    "comment": "Custom DDock update window: New version",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -854,7 +854,7 @@
     }
   },
   "updatesCritical": {
-    "comment": "Custom DeeDock update window: This release contains a critical update.",
+    "comment": "Custom DDock update window: This release contains a critical update.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -872,7 +872,7 @@
     }
   },
   "updatesMajorUpgrade": {
-    "comment": "Custom DeeDock update window: This is a major upgrade. Skipping it also skips its future minor releases.",
+    "comment": "Custom DDock update window: This is a major upgrade. Skipping it also skips its future minor releases.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -890,7 +890,7 @@
     }
   },
   "updatesReleaseNotes": {
-    "comment": "Custom DeeDock update window: What has changed",
+    "comment": "Custom DDock update window: What has changed",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -908,7 +908,7 @@
     }
   },
   "updatesLoadingNotes": {
-    "comment": "Custom DeeDock update window: Loading release notes…",
+    "comment": "Custom DDock update window: Loading release notes…",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -926,7 +926,7 @@
     }
   },
   "updatesNotesFailed": {
-    "comment": "Custom DeeDock update window: Release notes could not be displayed.",
+    "comment": "Custom DDock update window: Release notes could not be displayed.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -944,7 +944,7 @@
     }
   },
   "updatesNoNotes": {
-    "comment": "Custom DeeDock update window: No release notes were provided for this update.",
+    "comment": "Custom DDock update window: No release notes were provided for this update.",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -962,7 +962,7 @@
     }
   },
   "updatesReadReleaseNotes": {
-    "comment": "Custom DeeDock update window: Read Release Notes…",
+    "comment": "Custom DDock update window: Read Release Notes…",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -980,7 +980,7 @@
     }
   },
   "updatesErrorDetails": {
-    "comment": "Custom DeeDock update window: Error details",
+    "comment": "Custom DDock update window: Error details",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -998,7 +998,7 @@
     }
   },
   "updatesDownloadedAmount": {
-    "comment": "Custom DeeDock update window: Downloaded",
+    "comment": "Custom DDock update window: Downloaded",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -1016,7 +1016,7 @@
     }
   },
   "updatesShowProgress": {
-    "comment": "Custom DeeDock update window: Show App Update…",
+    "comment": "Custom DDock update window: Show App Update…",
     "extractionState": "manual",
     "localizations": {
       "en": {
@@ -1094,13 +1094,13 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Check for new versions of DeeDock automatically."
+          "value": "Check for new versions of DDock automatically."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Automatisch nach neuen Versionen von DeeDock suchen."
+          "value": "Automatisch nach neuen Versionen von DDock suchen."
         }
       }
     }
@@ -1130,13 +1130,13 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Download updates in the background and install them when DeeDock quits. macOS may still ask for administrator approval."
+          "value": "Download updates in the background and install them when DDock quits. macOS may still ask for administrator approval."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Updates im Hintergrund laden und beim Beenden von DeeDock installieren. macOS kann weiterhin eine Administratorfreigabe verlangen."
+          "value": "Updates im Hintergrund laden und beim Beenden von DDock installieren. macOS kann weiterhin eine Administratorfreigabe verlangen."
         }
       }
     }
@@ -1202,13 +1202,13 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "The updater could not start. Quit and reopen DeeDock. If this continues, download the latest version from GitHub."
+          "value": "The updater could not start. Quit and reopen DDock. If this continues, download the latest version from GitHub."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Der Updater konnte nicht gestartet werden. Beende DeeDock und öffne es erneut. Falls das Problem weiterhin auftritt, lade die neueste Version von GitHub herunter."
+          "value": "Der Updater konnte nicht gestartet werden. Beende DDock und öffne es erneut. Falls das Problem weiterhin auftritt, lade die neueste Version von GitHub herunter."
         }
       }
     }
@@ -1862,7 +1862,7 @@
       }
     },
     "actionsResetHelp" : {
-      "comment" : "Reset confirmation affects DeeDock pins only.",
+      "comment" : "Reset confirmation affects DDock pins only.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2231,19 +2231,19 @@
       }
     },
     "actionQuit" : {
-      "comment" : "Menu command that exits DeeDock.",
+      "comment" : "Menu command that exits DDock.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock beenden"
+            "value" : "DDock beenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quit DeeDock"
+            "value" : "Quit DDock"
           }
         }
       }
@@ -3731,13 +3731,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock"
+            "value" : "DDock"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock"
+            "value" : "DDock"
           }
         }
       }
@@ -5171,13 +5171,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock erstellt einmalig temporäre Bilder von Fenstern. Diese Bilder sind lediglich im Arbeitsspeicher vorhanden und werden anschließend verworfen."
+            "value" : "DDock erstellt einmalig temporäre Bilder von Fenstern. Diese Bilder sind lediglich im Arbeitsspeicher vorhanden und werden anschließend verworfen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock uses one-time window images to create the draft. Captures are not saved."
+            "value" : "DDock uses one-time window images to create the draft. Captures are not saved."
           }
         }
       }
@@ -5855,13 +5855,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffne eine app, um sie in DeeDock anzuzeigen. Pinne sie an, um sie dauerhaft in Reichweite zu behalten."
+            "value" : "Öffne eine app, um sie in DDock anzuzeigen. Pinne sie an, um sie dauerhaft in Reichweite zu behalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open an app to see it in DeeDock. Pin it to keep it here."
+            "value" : "Open an app to see it in DDock. Pin it to keep it here."
           }
         }
       }
@@ -6695,7 +6695,7 @@
       }
     },
     "errorHideApp" : {
-      "comment" : "Error banner shown when the foreground application rejects DeeDock's request to hide it. appName is the application name.",
+      "comment" : "Error banner shown when the foreground application rejects DDock's request to hide it. appName is the application name.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -7253,7 +7253,7 @@
       }
     },
     "loginLaunchAtLogin" : {
-      "comment" : "Toggle for starting DeeDock automatically when the current user signs in. On only when macOS approval is granted.",
+      "comment" : "Toggle for starting DDock automatically when the current user signs in. On only when macOS approval is granted.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -7367,13 +7367,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock launches automatically when you sign in, restoring your docks and menu-bar item."
+            "value" : "DDock launches automatically when you sign in, restoring your docks and menu-bar item."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock launches automatically when you sign in, restoring your docks and menu-bar item."
+            "value" : "DDock launches automatically when you sign in, restoring your docks and menu-bar item."
           }
         }
       }
@@ -7385,13 +7385,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS couldn’t find DeeDock’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
+            "value" : "macOS couldn’t find DDock’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS couldn’t find DeeDock’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
+            "value" : "macOS couldn’t find DDock’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
           }
         }
       }
@@ -7403,13 +7403,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock won’t launch automatically when you sign in."
+            "value" : "DDock won’t launch automatically when you sign in."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock won’t launch automatically when you sign in."
+            "value" : "DDock won’t launch automatically when you sign in."
           }
         }
       }
@@ -7421,13 +7421,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatic launch is inactive. Allow DeeDock in Login Items in System Settings, or cancel the request."
+            "value" : "Automatic launch is inactive. Allow DDock in Login Items in System Settings, or cancel the request."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatic launch is inactive. Allow DeeDock in Login Items in System Settings, or cancel the request."
+            "value" : "Automatic launch is inactive. Allow DDock in Login Items in System Settings, or cancel the request."
           }
         }
       }
@@ -7457,13 +7457,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start DeeDock automatically when you sign in. Turning this off keeps DeeDock running now."
+            "value" : "Start DDock automatically when you sign in. Turning this off keeps DDock running now."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start DeeDock automatically when you sign in. Turning this off keeps DeeDock running now."
+            "value" : "Start DDock automatically when you sign in. Turning this off keeps DDock running now."
           }
         }
       }
@@ -7619,13 +7619,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start Using DeeDock"
+            "value" : "Start Using DDock"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start Using DeeDock"
+            "value" : "Start Using DDock"
           }
         }
       }
@@ -7685,7 +7685,7 @@
       }
     },
     "onboardingOpenSettings" : {
-      "comment" : "Button on the last page of the tour that opens DeeDock's Settings window.",
+      "comment" : "Button on the last page of the tour that opens DDock's Settings window.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -7865,7 +7865,7 @@
       }
     },
     "onboardingReadyKeyboard" : {
-      "comment" : "Hint on tour page 7. 'Focus Dock' is a DeeDock menu command; keep it consistent with the command's own translation.",
+      "comment" : "Hint on tour page 7. 'Focus Dock' is a DDock menu command; keep it consistent with the command's own translation.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -7889,19 +7889,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock lives in the menu bar. Its icon is where you find Settings and Quit."
+            "value" : "DDock lives in the menu bar. Its icon is where you find Settings and Quit."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock lives in the menu bar. Its icon is where you find Settings and Quit."
+            "value" : "DDock lives in the menu bar. Its icon is where you find Settings and Quit."
           }
         }
       }
     },
     "onboardingReadyPinning" : {
-      "comment" : "Hint on tour page 7. Keep the Pin/Unpin terminology used throughout DeeDock.",
+      "comment" : "Hint on tour page 7. Keep the Pin/Unpin terminology used throughout DDock.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -7961,13 +7961,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Willkommen bei DeeDock"
+            "value" : "Willkommen bei DDock"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to DeeDock"
+            "value" : "Welcome to DDock"
           }
         }
       }
@@ -8069,13 +8069,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DeeDock the space."
+            "value" : "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DDock the space."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DeeDock the space."
+            "value" : "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DDock the space."
           }
         }
       }
@@ -8105,13 +8105,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
+            "value" : "DDock is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DeeDock is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
+            "value" : "DDock is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
           }
         }
       }
@@ -8141,13 +8141,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to DeeDock"
+            "value" : "Welcome to DDock"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to DeeDock"
+            "value" : "Welcome to DDock"
           }
         }
       }
@@ -9107,7 +9107,7 @@
       }
     },
     "settingsConfirmBeforeEmptyingTrash" : {
-      "comment" : "Toggle that requires DeeDock's warning before it asks Finder to empty Trash.",
+      "comment" : "Toggle that requires DDock's warning before it asks Finder to empty Trash.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -9959,13 +9959,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DeeDock menu to see the independent keyboard selection outline."
+            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DDock menu to see the independent keyboard selection outline."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DeeDock menu to see the independent keyboard selection outline."
+            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DDock menu to see the independent keyboard selection outline."
           }
         }
       }
@@ -10193,13 +10193,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adds Trash after a divider. You can also choose whether DeeDock asks before emptying it."
+            "value" : "Adds Trash after a divider. You can also choose whether DDock asks before emptying it."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adds Trash after a divider. You can also choose whether DeeDock asks before emptying it."
+            "value" : "Adds Trash after a divider. You can also choose whether DDock asks before emptying it."
           }
         }
       }
@@ -11663,7 +11663,7 @@
       }
     },
     "trashEmptyFailed" : {
-      "comment" : "Dock error when DeeDock cannot permanently delete one or more Trash items. details is supplied by macOS.",
+      "comment" : "Dock error when DDock cannot permanently delete one or more Trash items. details is supplied by macOS.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -11957,13 +11957,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow DeeDock to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images."
+            "value" : "Allow DDock to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow DeeDock to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images."
+            "value" : "Allow DDock to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images."
           }
         }
       }
@@ -12119,13 +12119,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but DeeDock could not read this app's windows. You can still show the app."
+            "value" : "Window Access is enabled, but DDock could not read this app's windows. You can still show the app."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but DeeDock could not read this app's windows. You can still show the app."
+            "value" : "Window Access is enabled, but DDock could not read this app's windows. You can still show the app."
           }
         }
       }
@@ -12191,13 +12191,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hover over a running app, or press Space while using Focus Dock. DeeDock never asks for permission from the dock itself."
+            "value" : "Hover over a running app, or press Space while using Focus Dock. DDock never asks for permission from the dock itself."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hover over a running app, or press Space while using Focus Dock. DeeDock never asks for permission from the dock itself."
+            "value" : "Hover over a running app, or press Space while using Focus Dock. DDock never asks for permission from the dock itself."
           }
         }
       }
@@ -12443,13 +12443,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "These macOS permissions apply to every DeeDock display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings."
+            "value" : "These macOS permissions apply to every DDock display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "These macOS permissions apply to every DeeDock display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings."
+            "value" : "These macOS permissions apply to every DDock display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings."
           }
         }
       }
@@ -12569,13 +12569,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but this sandboxed DeeDock build cannot read other apps' windows. You can still show the app."
+            "value" : "Window Access is enabled, but this sandboxed DDock build cannot read other apps' windows. You can still show the app."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but this sandboxed DeeDock build cannot read other apps' windows. You can still show the app."
+            "value" : "Window Access is enabled, but this sandboxed DDock build cannot read other apps' windows. You can still show the app."
           }
         }
       }

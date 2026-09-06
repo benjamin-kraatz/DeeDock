@@ -1,0 +1,171 @@
+{
+  "features" : [
+    "refractivity",
+    "specular-location"
+  ],
+  "fill" : {
+    "solid" : "display-p3:0.72142,0.69265,0.57348,1.00000"
+  },
+  "groups" : [
+    {
+      "blend-mode" : "normal",
+      "blur-material" : 0.64,
+      "layers" : [
+        {
+          "blend-mode" : "plus-darker",
+          "fill" : {
+            "solid" : "display-p3:0.96783,0.26437,0.00000,1.00000"
+          },
+          "image-name" : "DDock-ImgOnly.svg",
+          "name" : "DDock-ImgOnly",
+          "opacity" : 0.51,
+          "position-specializations" : [
+            {
+              "idiom" : "square",
+              "value" : {
+                "scale" : 2.65,
+                "translation-in-points" : [
+                  -4.92140436463535,
+                  192.02359155960482
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "fill" : {
+            "solid" : "display-p3:0.86817,0.29716,0.96783,1.00000"
+          },
+          "image-name" : "DDock-ImgOnly.svg",
+          "name" : "DDock-ImgOnly",
+          "opacity" : 1,
+          "position-specializations" : [
+            {
+              "idiom" : "square",
+              "value" : {
+                "scale" : 2.65,
+                "translation-in-points" : [
+                  -4.92140436463535,
+                  192.02359155960482
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "hidden" : true,
+          "image-name" : "DDock-ImgOnly.svg",
+          "name" : "DDock-ImgOnly"
+        }
+      ],
+      "lighting" : "individual",
+      "position-specializations" : [
+        {
+          "idiom" : "square",
+          "value" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -46
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.321015625,
+        "enabled" : true,
+        "strength" : 0.4944921875
+      },
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.39
+      },
+      "specular" : "inside",
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.71
+      }
+    },
+    {
+      "blend-mode" : "plus-darker",
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.86817,0.29716,0.96783,0.48618",
+              "display-p3:0.81877,0.27758,0.92826,0.53906"
+            ],
+            "orientation" : {
+              "start" : {
+                "x" : 0,
+                "y" : 0.5
+              },
+              "stop" : {
+                "x" : 1,
+                "y" : 0.5
+              }
+            }
+          },
+          "image-name" : "DDock-Wordmark.svg",
+          "name" : "DDock-Wordmark",
+          "position-specializations" : [
+            {
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  2.016855727910638,
+                  196
+                ]
+              }
+            },
+            {
+              "idiom" : "square",
+              "value" : {
+                "scale" : 1.16,
+                "translation-in-points" : [
+                  0.18527752627176142,
+                  19
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "lighting" : "individual",
+      "opacity" : 1,
+      "position-specializations" : [
+        {
+          "idiom" : "square",
+          "value" : {
+            "scale" : 1.14,
+            "translation-in-points" : [
+              0,
+              98
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.5094921875,
+        "enabled" : true,
+        "strength" : 0.5134765625
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.57
+      },
+      "specular" : "outside",
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.6
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

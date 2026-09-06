@@ -1,7 +1,7 @@
 #if DIRECT_DISTRIBUTION
 import SwiftUI
 
-/// DeeDock's update window composition. Rendering never starts a check or acknowledges a callback.
+/// DDock's update window composition. Rendering never starts a check or acknowledges a callback.
 struct UpdateWindowView: View {
     let presentation: UpdatePresentation
     var icon: NSImage? = nil
@@ -56,7 +56,7 @@ private struct UpdateWindowHeader: View {
             HStack(spacing: 16) {
                 Group {
                     if let icon { Image(nsImage: icon).resizable() }
-                    else { Image(systemName: "dock.rectangle").resizable().scaledToFit().padding(12) }
+                    else { Image("DDockMark").resizable().scaledToFit().padding(12) }
                 }
                 .frame(width: 70, height: 70)
                 .accessibilityHidden(true)

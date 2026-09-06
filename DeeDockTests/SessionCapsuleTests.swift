@@ -45,14 +45,14 @@ struct SessionCapsuleTests {
     @Test("A draft trims editable content before becoming a saved capsule")
     func draftApproval() {
         let draft = SessionCapsuleDraft(
-            title: "  Continue DeeDock  ", summary: "  Review the capsule flow. \n",
+            title: "  Continue DDock  ", summary: "  Review the capsule flow. \n",
             unfinishedTasks: ["  Check VoiceOver  ", "   "],
             windows: [.init(applicationName: "Xcode", bundleIdentifier: "com.apple.dt.Xcode",
-                            windowTitle: "DeeDock")], note: "  Use two displays.  "
+                            windowTitle: "DDock")], note: "  Use two displays.  "
         )
 
         let capsule = draft.capsule()
-        #expect(capsule.title == "Continue DeeDock")
+        #expect(capsule.title == "Continue DDock")
         #expect(capsule.summary == "Review the capsule flow.")
         #expect(capsule.unfinishedTasks == ["Check VoiceOver"])
         #expect(capsule.note == "Use two displays.")

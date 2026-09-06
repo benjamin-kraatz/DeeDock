@@ -6,7 +6,7 @@ import Foundation
 /// forward/back navigation, so inserting a case is the only change a new page needs here.
 /// Adding a case also means adding its copy to the string catalog.
 enum OnboardingStep: String, CaseIterable, Identifiable, Hashable {
-    /// What DeeDock is and where it lives.
+    /// What DDock is and where it lives.
     case welcome
     /// Guidance for hiding the macOS Dock, the one step a person can reasonably skip.
     case systemDock

@@ -4,7 +4,7 @@ import Testing
 /// Bundle fixtures live only in a temporary directory and never request persistent sandbox access.
 @MainActor
 struct DockApplicationImportTests {
-    @Test("Finder validation rejects mixed batches and DeeDock itself before any pin commit")
+    @Test("Finder validation rejects mixed batches and DDock itself before any pin commit")
     func batchValidation() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

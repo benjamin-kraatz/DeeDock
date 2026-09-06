@@ -1,6 +1,6 @@
 # Project skills
 
-These skills are installed in `.agents/skills` so they travel with DeeDock. Codex discovers repository skills there; see the [official skill documentation](https://learn.chatgpt.com/docs/build-skills). They should be available on the next turn. If they do not appear, reopen the task or restart Codex.
+These skills are installed in `.agents/skills` so they travel with DDock. Codex discovers repository skills there; see the [official skill documentation](https://learn.chatgpt.com/docs/build-skills). They should be available on the next turn. If they do not appear, reopen the task or restart Codex.
 
 | Skill | Purpose | Upstream |
 | --- | --- | --- |
@@ -14,7 +14,7 @@ These skills are installed in `.agents/skills` so they travel with DeeDock. Code
 | `technical-writing` | Docs, RFCs, READMEs, PR descriptions, and commit messages | [backnotprop/pstack](https://github.com/backnotprop/pstack) |
 | `writing-for-agents` | Writing skills, `AGENTS.md`, and other documents agents consume | [mattpocock/skills](https://github.com/mattpocock/skills) |
 
-Swift skills were installed on 2026-09-02; pstack and `writing-for-agents` on 2026-09-03. All are pinned to commit revisions. The exact repository, revision, upstream folder, and license are recorded in [sources.json](../.agents/skills/sources.json). Each skill includes its upstream MIT license. These licenses apply to the vendored skill material; they do not select a license for DeeDock.
+Swift skills were installed on 2026-09-02; pstack and `writing-for-agents` on 2026-09-03. All are pinned to commit revisions. The exact repository, revision, upstream folder, and license are recorded in [sources.json](../.agents/skills/sources.json). Each skill includes its upstream MIT license. These licenses apply to the vendored skill material; they do not select a license for DDock.
 
 Use a skill when its scope matches the task, and load only relevant references. The SwiftUI skill includes macOS guidance, but AppKit windowing and Dock integration still require direct Apple API research and runtime evidence. The testing skill is guidance for test design, not permission to run tests; follow `AGENTS.md`.
 

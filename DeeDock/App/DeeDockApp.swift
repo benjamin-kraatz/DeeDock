@@ -21,7 +21,8 @@ struct DeeDockApp: App {
             Button(.actionQuit) { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
         } label: {
-            Label { Text(.appName) } icon: { Image(systemName: "dock.rectangle") }
+            // Template mark, not the wordmark: 18-pt menu-bar space cannot carry both.
+            Label { Text(.appName) } icon: { Image("DDockMark") }
         }
         .commands {
             CommandGroup(replacing: .appSettings) {

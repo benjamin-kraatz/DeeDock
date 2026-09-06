@@ -280,7 +280,7 @@ private extension View {
         windows: [.init(applicationName: "Ghostty", bundleIdentifier: "com.mitchellh.ghostty",
                         windowTitle: "Claude Code"),
                   .init(applicationName: "Xcode", bundleIdentifier: "com.apple.dt.Xcode",
-                        windowTitle: "DeeDock")],
+                        windowTitle: "DDock")],
         note: "")
     SessionCapsuleDraftForm(draft: $draft, save: {}).frame(width: 560, height: 560)
 }

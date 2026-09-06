@@ -1,4 +1,4 @@
-# Publish a DeeDock update
+# Publish a DDock update
 
 Use the `DeeDock` scheme for direct distribution. Its resources include the unchanged third-party notices from `ThirdParty/Sparkle-LICENSE.txt`. It includes Sparkle 2.9.6 and uses the public GitHub Releases feed:
 
@@ -8,11 +8,11 @@ The `DeeDock-TestFlight` scheme compiles the same app with `TESTFLIGHT` instead 
 
 ## Custom update window
 
-DeeDock constructs `SPUUpdater` with its own `SPUUserDriver`. It does not instantiate `SPUStandardUpdaterController` or use Sparkle's standard windows. Sparkle still owns feed selection, downloads, verification, installation, and preference persistence. macOS owns any administrator authorization dialog required by installation.
+DDock constructs `SPUUpdater` with its own `SPUUserDriver`. It does not instantiate `SPUStandardUpdaterController` or use Sparkle's standard windows. Sparkle still owns feed selection, downloads, verification, installation, and preference persistence. macOS owns any administrator authorization dialog required by installation.
 
 The custom driver handles permission, checking, available and informational updates, release-note failures, incompatible updates, download and extraction progress, errors, restart decisions, delayed termination, and completion. Scheduled discoveries stay in the menu until the user opens them. Closing a check cancels it. Closing a download or extraction hides progress, which remains reachable from the menu. At the ready screen, closing the window has the documented Install on Quit behavior; Cancel stops that installation instead.
 
-The permission window offers automatic checks or manual checks. System-profile sharing is disabled. Automatic installation is on by default when automatic checks are enabled. Sparkle downloads scheduled updates in the background and installs them when DeeDock quits without a DeeDock confirmation. macOS may still require administrator authorization. General Settings shows the installed version and build number, and keeps separate controls for automatic checks and automatic installation.
+The permission window offers automatic checks or manual checks. System-profile sharing is disabled. Automatic installation is on by default when automatic checks are enabled. Sparkle downloads scheduled updates in the background and installs them when DDock quits without a DDock confirmation. macOS may still require administrator authorization. General Settings shows the installed version and build number, and keeps separate controls for automatic checks and automatic installation.
 
 `UpdateWindowView` and `UpdateWindowDetails` own the layout, colors, typography, progress, and controls. `UpdatePresentation` contains the display state and action labels. `UpdateUserDriver` owns Sparkle's reply blocks and consumes each reply once before calling the engine. Buttons carry a callback generation so a stale click cannot accept a later prompt. The termination retry callback is deliberately reusable, as Sparkle specifies.
 
@@ -22,7 +22,7 @@ Release notes use native text for plain text, Markdown, and HTML. HTML is parsed
 
 1. Increase `CURRENT_PROJECT_VERSION` in `Configuration/App.xcconfig` for every distributed build. Set `MARKETING_VERSION` there too. Both targets share these values and the bundle identifier. Sparkle compares build numbers, not Git tags.
 2. Resolve packages in Xcode. The pinned Sparkle tools are under the resolved packages directory at `artifacts/sparkle/Sparkle/bin`.
-3. Confirm the release machine has the DeeDock signing key. Run the following command with the actual tools path:
+3. Confirm the release machine has the DDock signing key. Run the following command with the actual tools path:
 
    ```sh
    SPARKLE_BIN='/absolute/path/to/SourcePackages/artifacts/sparkle/Sparkle/bin'
@@ -36,8 +36,8 @@ For command-line archives, run:
 
 ```sh
 xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Release \
-  -archivePath /absolute/path/to/DeeDock.xcarchive archive
-xcodebuild -exportArchive -archivePath /absolute/path/to/DeeDock.xcarchive \
+  -archivePath /absolute/path/to/DDock.xcarchive archive
+xcodebuild -exportArchive -archivePath /absolute/path/to/DDock.xcarchive \
   -exportPath /absolute/path/to/export \
   -exportOptionsPlist /absolute/path/to/DeveloperID-ExportOptions.plist
 ```
@@ -51,21 +51,21 @@ Use a fresh staging directory containing only this release's exported app archiv
 ```sh
 RELEASE_TAG='v0.1.2'
 UPDATE_DIR='/absolute/path/to/update-staging'
-EXPORTED_APP='/absolute/path/to/export/DeeDock.app'
+EXPORTED_APP='/absolute/path/to/export/DDock.app'
 mkdir -p "$UPDATE_DIR"
 codesign --verify --deep --strict --verbose=2 "$EXPORTED_APP"
 xcrun stapler validate "$EXPORTED_APP"
 /usr/bin/ditto -c -k --sequesterRsrc --keepParent \
-  "$EXPORTED_APP" "$UPDATE_DIR/DeeDock.zip"
+  "$EXPORTED_APP" "$UPDATE_DIR/DDock.zip"
 "$SPARKLE_BIN/generate_appcast" \
   --account de.benjaminkraatz.DeeDock \
   --download-url-prefix "https://github.com/benjamin-kraatz/DeeDock/releases/download/$RELEASE_TAG/" \
   --maximum-deltas 0 "$UPDATE_DIR"
 ```
 
-Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DeeDock.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
+Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DDock.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
 
-Create a draft GitHub release with `DeeDock.zip` and `appcast.xml` as assets. Verify both assets before publishing the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
+Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. Verify both assets before publishing the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
 
 A feed containing only the newest version is sufficient while supported OS and architecture requirements remain the same. If those requirements change, retain compatible older appcast entries and their original asset URLs so existing users still receive the last compatible build. Do not rewrite older enclosures to point at the newest release tag.
 
@@ -85,7 +85,7 @@ Keep an encrypted backup. On another release machine, use the same account with 
 
 ## Archive for TestFlight
 
-Select `DeeDock-TestFlight` and archive that target. Its app still has the product name `DeeDock.app`, with ordinary build products isolated under `TestFlight`. Inspect the archive before upload: there must be no `Sparkle.framework`, Sparkle helpers, Sparkle load command, `SUFeedURL`, or `SUPublicEDKey`.
+Select `DeeDock-TestFlight` and archive that target. Its app still has the product name `DDock.app`, with ordinary build products isolated under `TestFlight`. Inspect the archive before upload: there must be no `Sparkle.framework`, Sparkle helpers, Sparkle load command, `SUFeedURL`, or `SUPublicEDKey`.
 
 This target preserves the existing signing and sandbox settings. It establishes updater exclusion, not App Store Connect acceptance. Address any TestFlight entitlement or sandbox requirements separately rather than exporting the direct target as TestFlight.
 

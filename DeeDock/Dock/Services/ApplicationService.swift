@@ -9,7 +9,7 @@ final class ApplicationService: ApplicationServicing {
     /// Uses the supplied workspace; constructing the service does not enumerate or launch apps.
     init(workspace: NSWorkspace = .shared) { self.workspace = workspace }
 
-    /// Returns regular, bundle-backed apps, excluding DeeDock and background/accessory processes.
+    /// Returns regular, bundle-backed apps, excluding DDock and background/accessory processes.
     func runningApplications() -> [ApplicationReference] {
         workspace.runningApplications.compactMap { app in
             guard app.activationPolicy == .regular,
