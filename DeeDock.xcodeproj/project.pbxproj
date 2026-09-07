@@ -1235,7 +1235,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				000000000000000011000000 /* Debug configuration for PBXProject "DeeDock" */,
-				DDCA00000000000000000000 /* Preview */,
+				DDCA00000000000000000000 /* Preview configuration for PBXProject "DeeDock" */,
 				000000000000000012000000 /* Release configuration for PBXProject "DeeDock" */,
 			);
 			defaultConfigurationName = Release;
@@ -1244,7 +1244,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				000000000000000111000000 /* Debug configuration for PBXNativeTarget "DeeDock" */,
-				DDCA00000000000000000001 /* Preview */,
+				DDCA00000000000000000001 /* Preview configuration for PBXNativeTarget "DeeDock" */,
 				000000000000000112000000 /* Release configuration for PBXNativeTarget "DeeDock" */,
 			);
 			defaultConfigurationName = Release;
@@ -1254,7 +1254,7 @@
 			buildConfigurations = (
 				9E514861E6355270C243C974 /* Release configuration for PBXNativeTarget "DeeDock-TestFlight" */,
 				A418A470147009CA5A39EDDB /* Debug configuration for PBXNativeTarget "DeeDock-TestFlight" */,
-				DDCA00000000000000000002 /* Preview */,
+				DDCA00000000000000000002 /* Preview configuration for PBXNativeTarget "DeeDock-TestFlight" */,
 			);
 			defaultConfigurationName = Release;
 		};
@@ -1262,7 +1262,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DD0000000000000000000009 /* Debug configuration for PBXNativeTarget "DeeDockTests" */,
-				DDCA00000000000000000003 /* Preview */,
+				DDCA00000000000000000003 /* Preview configuration for PBXNativeTarget "DeeDockTests" */,
 				DD000000000000000000000A /* Release configuration for PBXNativeTarget "DeeDockTests" */,
 			);
 			defaultConfigurationName = Release;

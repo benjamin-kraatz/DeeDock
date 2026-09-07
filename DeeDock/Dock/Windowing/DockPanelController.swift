@@ -450,6 +450,7 @@ final class DockPanelController {
         visibility.update(activation: false, retained: true, held: true)
         launcherPresentation.open(origin: origin,
             target: LauncherGeometry.frame(visibleFrame: display.visibleFrame, origin: origin, edge: settings.edge),
+            dockWindow: geometry?.windowFrame ?? origin,
             pins: store.pins.compactMap(\.application), previousApplication: previousApplication)
     }
 

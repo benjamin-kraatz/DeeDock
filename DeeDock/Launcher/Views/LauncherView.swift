@@ -3,6 +3,9 @@ import SwiftUI
 /// Native launcher content. The containing dock window owns focus, frame morphing, and dismissal.
 struct LauncherView: View {
     @Bindable var state: LauncherState
+    /// The resting dock's own radius, so the surface starts the morph as exactly the shape the
+    /// dock was drawing and the growth is the only thing that changes.
+    var dockCornerRadius: CGFloat = 22
     @FocusState private var searchFocused: Bool
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -12,32 +15,46 @@ struct LauncherView: View {
     var body: some View {
         let groups = state.groups
         GeometryReader { geometry in
-            VStack(spacing: 16) {
-                header
-                LauncherToolbar(state: state)
-                status
-                LauncherResultsView(state: state, columns: columns, groups: groups)
-                footer(count: groups.reduce(0) { $0 + $1.applications.count })
+            // Presented, the panel's window is fixed at a frame that covers both ends of the morph
+            // and the content lays out once at the rect it lands on. The morph is the glass rect
+            // growing from the dock's rect to that one: nothing inside it ever changes position,
+            // which is what kept the hosted controls trailing behind the old window resize.
+            let presenting = state.contentRect != .zero
+            let landing = presenting ? state.contentRect : CGRect(origin: .zero, size: geometry.size)
+            let morphing = presenting && !state.expanded
+            let rect = morphing ? state.dockRect : landing
+            let radius: CGFloat = morphing
+                ? min(dockCornerRadius, min(state.dockRect.width, state.dockRect.height) / 2)
+                : 28
+            ZStack(alignment: .topLeading) {
+                panel(radius: radius)
+                    .frame(width: rect.width, height: rect.height)
+                    .offset(x: rect.minX, y: rect.minY)
+                VStack(spacing: 16) {
+                    header
+                    LauncherToolbar(state: state)
+                    status
+                    LauncherResultsView(state: state, columns: columns, groups: groups)
+                    footer(count: groups.reduce(0) { $0 + $1.applications.count })
+                }
+                .padding(20)
+                .frame(width: landing.width, height: landing.height)
+                .offset(x: landing.minX, y: landing.minY)
+                .modifier(LauncherMorphFade(phase: presenting && !reduceMotion ? state.morph : 1))
+                .allowsHitTesting(state.contentVisible)
+                .accessibilityHidden(!state.contentVisible)
             }
-            .padding(20)
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .opacity(state.contentVisible ? 1 : 0)
-            .allowsHitTesting(state.contentVisible)
-            .accessibilityHidden(!state.contentVisible)
-            .onChange(of: geometry.size.width, initial: true) { _, width in
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
+            .mask(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: radius)
+                    .frame(width: rect.width, height: rect.height)
+                    .offset(x: rect.minX, y: rect.minY)
+            }
+            .onChange(of: landing.width, initial: true) { _, width in
                 columns = max(1, Int((width - 56 + 12) / 148))
                 state.navigationColumns = columns
             }
         }
-        .background {
-            if reduceTransparency {
-                RoundedRectangle(cornerRadius: 28).fill(Color(nsColor: .windowBackgroundColor))
-            } else {
-                RoundedRectangle(cornerRadius: 28).fill(.clear)
-                    .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 28))
-            }
-        }
-        .clipShape(.rect(cornerRadius: 28))
         .onChange(of: state.contentVisible) { _, visible in searchFocused = visible }
         .onExitCommand { state.close?() }
         .onKeyPress(.downArrow) {
@@ -57,6 +74,16 @@ struct LauncherView: View {
         .confirmationDialog(Text(.launcherClearHistory), isPresented: $confirmClear) {
             Button(role: .destructive) { state.history.clear() } label: { Text(.launcherClearHistory) }
         } message: { Text(.launcherClearHistoryDetail) }
+    }
+
+    /// The launcher's own material, drawn at whatever rect the morph currently holds.
+    @ViewBuilder private func panel(radius: CGFloat) -> some View {
+        if reduceTransparency {
+            RoundedRectangle(cornerRadius: radius).fill(Color(nsColor: .windowBackgroundColor))
+        } else {
+            RoundedRectangle(cornerRadius: radius).fill(.clear)
+                .glassEffect(.regular, in: .rect(cornerRadius: radius))
+        }
     }
 
     private var header: some View {

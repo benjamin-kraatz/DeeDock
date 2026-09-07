@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import SwiftUI
 
 /// One presentation's search, selection, and cancellable intelligence, sharing discovery and history across displays.
 @MainActor @Observable
@@ -9,6 +10,19 @@ final class LauncherState {
     var history: LauncherHistory { catalog.launcherHistory }
     var isPresented = false
     var contentVisible = false
+    /// Drives the morph: false draws the panel at the dock's rect, true at the expanded rect.
+    var expanded = false
+    /// The expanded panel, in the presentation window's coordinates. The content lays out here for
+    /// the whole morph and never moves, so nothing has to chase a changing layout.
+    var contentRect = CGRect.zero
+    /// The dock's own rect, in the same coordinates. The morph starts from this shape.
+    var dockRect = CGRect.zero
+    /// The morph's progress, 0 at the dock's rect and 1 at the expanded one. Both sets of contents
+    /// fade against this rather than on timers of their own, so they move with the glass.
+    var morph = 0.0
+    /// Shifts the dock's contents from its own window's origin to the presentation window's, so
+    /// they keep the position they had while they fade.
+    var dockContentOffset = CGSize.zero
     var query = "" { didSet { if oldValue != query { cancelRobi() }; selectedID = nil; keyboardNavigationActive = false } }
     var filter: LauncherFilter = .all {
         didSet {

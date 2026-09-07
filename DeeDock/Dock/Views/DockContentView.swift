@@ -11,6 +11,8 @@ struct DockContentView: View {
     let interaction: DockInteraction
     let reduceMotion: Bool
     let reduceTransparency: Bool
+    /// False while the dock's contents are crossfading inside the launcher's own material.
+    var drawsBackground = true
     let primaryAppAction: (DockItem) -> Void
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
@@ -82,6 +84,7 @@ struct DockContentView: View {
                                 for: id
                             )
                         },
+                        drawsBackground: drawsBackground,
                         menuTracking: { interaction.menuTrackingChanged?($0) },
                         accessibilityFocus: {
                             interaction.accessibilityFocusChanged?($0, $1)

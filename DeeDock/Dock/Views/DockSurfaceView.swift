@@ -25,6 +25,9 @@ struct DockSurfaceView: View {
     /// Reports actual button geometry, including during animation, for native click passthrough.
     let iconFrameChanged: (String, CGRect?) -> Void
 
+    /// The launcher's glass stands in for the dock's while the two crossfade. Drawing both would
+    /// stack two translucent materials, which reads as every surface brightening.
+    var drawsBackground = true
     var menuTracking: (Bool) -> Void = { _ in }
     var accessibilityFocus: (String, Bool) -> Void = { _, _ in }
 
@@ -40,20 +43,22 @@ struct DockSurfaceView: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            DockBackgroundView(
-                reduceTransparency: reduceTransparency,
-                cornerRadius: min(
-                    interaction.idleFade.settings.cornerRadius,
-                    min(surface.width, surface.height) / 2
-                ),
-                idleOpacity: opacity.background
-            )
-            .animation(
-                interaction.idleFade.animation,
-                value: opacity.background
-            )
-            .frame(width: surface.width, height: surface.height)
-            .position(x: surface.midX, y: surface.midY)
+            if drawsBackground {
+                DockBackgroundView(
+                    reduceTransparency: reduceTransparency,
+                    cornerRadius: min(
+                        interaction.idleFade.settings.cornerRadius,
+                        min(surface.width, surface.height) / 2
+                    ),
+                    idleOpacity: opacity.background
+                )
+                .animation(
+                    interaction.idleFade.animation,
+                    value: opacity.background
+                )
+                .frame(width: surface.width, height: surface.height)
+                .position(x: surface.midX, y: surface.midY)
+            }
             if slots.isEmpty {
                 Text(.dockEmptyState)
                     .font(.caption).foregroundStyle(.secondary)

@@ -14,14 +14,25 @@ struct DockView: View {
 
     var body: some View {
         if launcher.isPresented {
-            LauncherView(state: launcher)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            ZStack(alignment: .topLeading) {
+                LauncherView(state: launcher, dockCornerRadius: interaction.idleFade.settings.cornerRadius)
+                // The dock's own contents keep their screen position inside the launcher's larger
+                // window while they fade, so the two sides of the morph cross over in place. They
+                // sit above the launcher's material: drawn underneath it they would be seen
+                // through the glass, which frosts them into a glow instead of a fade.
+                dock(drawsBackground: false)
+                    .offset(x: launcher.dockContentOffset.width, y: launcher.dockContentOffset.height)
+                    .modifier(DockMorphFade(phase: launcher.morph))
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         } else {
-            dock
+            dock()
         }
     }
 
-    @ViewBuilder private var dock: some View {
+    @ViewBuilder private func dock(drawsBackground: Bool = true) -> some View {
         let size = interaction.layout.viewportSize
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
                                                   size: size, reduceMotion: reduceMotion, edge: interaction.layout.edge)
@@ -35,6 +46,7 @@ struct DockView: View {
             interaction: interaction,
             reduceMotion: reduceMotion,
             reduceTransparency: reduceTransparency,
+            drawsBackground: drawsBackground,
             primaryAppAction: store.performPrimaryAction,
             openApp: store.open,
             togglePin: store.toggleFavorite,

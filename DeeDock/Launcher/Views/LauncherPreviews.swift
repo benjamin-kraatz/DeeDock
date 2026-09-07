@@ -49,11 +49,65 @@ private enum LauncherPreviewData {
     }
 }
 
+/// Keeps the launcher transition interactive in the canvas without creating a real dock panel.
+private struct LauncherTransitionPreview: View {
+    private let openSpring = Animation.spring(response: 0.42, dampingFraction: 0.72)
+    private let closeSpring = Animation.spring(response: 0.28, dampingFraction: 0.86)
+    @State private var launcher = LauncherPreviewData.state()
+
+    init() {
+        launcher.isPresented = false
+        launcher.contentVisible = false
+        launcher.expanded = false
+    }
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            if launcher.isPresented {
+                LauncherView(state: launcher)
+            } else {
+                DockPreviewContent(showsLauncher: true, openLauncher: open)
+            }
+        }
+        .frame(width: 900, height: 640)
+        .onAppear { launcher.close = close }
+        .onDisappear { launcher.close = nil }
+    }
+
+    private func open() {
+        launcher.dockRect = CGRect(x: 230, y: 526, width: 440, height: 94)
+        launcher.contentRect = CGRect(x: 20, y: 20, width: 860, height: 580)
+        launcher.isPresented = true
+        launcher.contentVisible = false
+        launcher.expanded = false
+        launcher.close = close
+        withAnimation(openSpring) { launcher.expanded = true }
+        withAnimation(.smooth(duration: 0.3).delay(0.1)) {
+            launcher.contentVisible = true
+        }
+    }
+
+    private func close() {
+        withAnimation(.easeIn(duration: 0.14)) {
+            launcher.contentVisible = false
+        }
+        withAnimation(closeSpring) {
+            launcher.expanded = false
+        } completion: {
+            launcher.isPresented = false
+        }
+    }
+}
+
 #Preview("Launcher grid") {
     LauncherView(state: LauncherPreviewData.state()).frame(
         width: 900,
         height: 640
     )
+}
+
+#Preview("Dock to launcher transition") {
+    LauncherTransitionPreview()
 }
 
 #Preview("Launcher list, German, dark") {

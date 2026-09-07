@@ -13,11 +13,16 @@ final class LauncherPresentationController {
     private var monitors: [Any] = []
     private var generation = UUID()
     private var closing = false
-    private var duration: Double { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? 0 : 0.32 }
+    private var reduceMotion: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
+    /// Expanding passes the expanded rect by a few percent and settles back onto it.
+    private let openSpring = Animation.spring(response: 0.42, dampingFraction: 0.72)
+    /// Collapsing is quicker and lands on the dock's rect with only a trace of a bounce.
+    private let closeSpring = Animation.spring(response: 0.28, dampingFraction: 0.86)
 
     init(panel: DockPanel, state: LauncherState) { self.panel = panel; self.state = state }
 
-    func open(origin: CGRect, target: CGRect, pins: [ApplicationReference], previousApplication: NSRunningApplication?) {
+    func open(origin: CGRect, target: CGRect, dockWindow: CGRect, pins: [ApplicationReference],
+              previousApplication: NSRunningApplication?) {
         guard !state.isPresented else { close(); return }
         generation = UUID(); closing = false
         let token = generation
@@ -27,8 +32,18 @@ final class LauncherPresentationController {
         state.begin(pins: pins)
         state.close = { [weak self] in self?.close() }
         state.didOpen = { [weak self] in self?.close(restoreFocus: false) }
-        state.isPresented = true; state.contentVisible = false
-        panel.setFrame(origin, display: true)
+        state.isPresented = true; state.contentVisible = false; state.expanded = false
+        // The panel takes its final frame up front and never resizes again while it is open. The
+        // window is transparent outside the glass, so its size is not what the morph shows: the
+        // glass rect grows inside it instead, which leaves every control laid out where it lands.
+        let window = LauncherPanelFrame.presentation(origin: origin, target: target,
+                                                     screen: panel.screen?.visibleFrame ?? origin.union(target))
+        state.dockRect = Self.local(origin, in: window)
+        state.contentRect = Self.local(target, in: window)
+        let dock = Self.local(dockWindow, in: window)
+        state.dockContentOffset = CGSize(width: dock.minX, height: dock.minY)
+        state.morph = 0
+        LauncherPanelFrame.set(window, on: panel)
         panel.acceptsKeyboardFocus = true
         // The passive dock only becomes key for views that request it. A searchable panel
         // needs ordinary field-editor focus, including after application activation settles.
@@ -37,17 +52,16 @@ final class LauncherPresentationController {
         NSApp.activate()
         panel.makeKeyAndOrderFront(nil)
         installMonitors()
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = duration
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            panel.animator().setFrame(target, display: true)
-        } completionHandler: { [weak self] in
-            MainActor.assumeIsolated {
-                guard let self, self.generation == token, !self.closing else { return }
-                self.panel.makeKeyAndOrderFront(nil)
-                withAnimation(self.duration == 0 ? nil : .easeOut(duration: 0.16)) { self.state.contentVisible = true }
-            }
+        if reduceMotion {
+            state.expanded = true; state.morph = 1
+            state.contentVisible = true
+            return
         }
+        // Shape and contents share one animation. The dock's contents dissolve over its first
+        // third and the launcher's resolve over its second half, so neither is a fade running
+        // beside the morph - both are the morph.
+        state.contentVisible = true
+        withAnimation(openSpring) { state.expanded = true; state.morph = 1 }
     }
 
     func close(animated: Bool = true, restoreFocus: Bool = true) {
@@ -71,12 +85,13 @@ final class LauncherPresentationController {
             }
             previousApplication = nil
         }
-        if !animated || duration == 0 { finish(); return }
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = duration
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            panel.animator().setFrame(origin, display: true)
-        } completionHandler: { MainActor.assumeIsolated { finish() } }
+        if !animated || reduceMotion { state.expanded = false; state.morph = 0; finish(); return }
+        withAnimation(closeSpring) { state.expanded = false; state.morph = 0 } completion: { finish() }
+    }
+
+    /// Converts a screen rect into the presentation window's top-left origin, y-down coordinates.
+    private static func local(_ rect: CGRect, in window: CGRect) -> CGRect {
+        CGRect(x: rect.minX - window.minX, y: window.maxY - rect.maxY, width: rect.width, height: rect.height)
     }
 
     private func installMonitors() {
@@ -91,6 +106,13 @@ final class LauncherPresentationController {
                 return event // Input-method candidates own arrows, Return, and Escape until composition ends.
             }
             if event.type == .keyDown, event.window === panel, event.keyCode == 53 { close(); return nil }
+            // The window is larger than the glass while the launcher is open, so a click on the
+            // transparent margin has to dismiss the way a click outside the window would.
+            if mouse.contains(NSEvent.EventTypeMask(rawValue: 1 << event.type.rawValue)), event.window === panel,
+               state.contentRect != .zero {
+                let point = CGPoint(x: event.locationInWindow.x, y: panel.frame.height - event.locationInWindow.y)
+                if !state.contentRect.contains(point) { close(restoreFocus: false); return nil }
+            }
             if event.type == .keyDown, event.window === panel, event.keyCode == 48 {
                 state.keyboardNavigationActive = false; state.selectedID = nil
             }
@@ -127,7 +149,8 @@ final class LauncherPresentationController {
 
     func stop() {
         generation = UUID(); removeMonitors()
-        state.isPresented = false; state.contentVisible = false; state.end()
+        state.isPresented = false; state.contentVisible = false; state.expanded = false
+        state.morph = 0; state.end()
         state.didOpen = nil; didClose = nil; previousApplication = nil
     }
 }
