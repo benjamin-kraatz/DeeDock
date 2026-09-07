@@ -7,6 +7,7 @@ import SwiftUI
 /// transition: the header, which is the part that actually changes between them, carries the motion.
 struct SessionCapsulePanelView: View {
     let state: SessionCapsulePanelState
+    var sourceNavigator: SessionCapsuleSourceNavigator? = nil
     var forceOpaqueBackground = false
     @Environment(\.accessibilityReduceTransparency) private
         var reduceTransparency
@@ -73,7 +74,7 @@ struct SessionCapsulePanelView: View {
     private var pageTitle: Text {
         switch state.page {
         case .collection: Text(.capsulesName)
-        case .selection: Text(.capsulesChooseWindows)
+        case .selection: Text(state.isBreadcrumb ? .breadcrumbLeave : .capsulesChooseWindows)
         case .draft: Text(.capsulesReviewDraft)
         case .detail:
             state.detail.map { Text(verbatim: $0.title) }
@@ -118,12 +119,17 @@ struct SessionCapsulePanelView: View {
 
     @ViewBuilder private var collection: some View {
         if state.capsules.isEmpty {
-            CapsuleEmptyState(
-                title: .capsulesEmptyTitle,
-                message: .capsulesEmptyMessage,
-                action: .capsulesNew,
-                actionSymbol: "plus"
-            ) { state.beginNewCapsule() }
+            VStack(spacing: 0) {
+                CapsuleEmptyState(
+                    title: .capsulesEmptyTitle,
+                    message: .capsulesEmptyMessage,
+                    action: .capsulesNew,
+                    actionSymbol: "plus"
+                ) { state.beginNewCapsule() }
+                Button(.breadcrumbLeave, systemImage: "bookmark") { state.beginNewCapsule(breadcrumb: true) }
+                    .keyboardShortcut("b", modifiers: .command)
+                    .padding(.bottom, 16)
+            }
         } else {
             VStack(spacing: 0) {
                 ScrollView {
@@ -166,8 +172,8 @@ struct SessionCapsulePanelView: View {
                     .animation(motion.pop, value: state.capsules.map(\.id))
                 }
                 HStack(spacing: 10) {
-                    Label(.capsulesCollectionHint, systemImage: "hand.tap")
-                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    Button(.breadcrumbLeave, systemImage: "bookmark") { state.beginNewCapsule(breadcrumb: true) }
+                        .keyboardShortcut("b", modifiers: .command)
                     Spacer(minLength: 12)
                     Button(.capsulesNew, systemImage: "plus") {
                         state.beginNewCapsule()
@@ -183,7 +189,20 @@ struct SessionCapsulePanelView: View {
 
     // MARK: - Window selection
 
-    @ViewBuilder private var selection: some View {
+    private var selection: some View {
+        VStack(spacing: 0) {
+            selectionContent
+            HStack {
+                Button(.breadcrumbWriteManually) { state.writeBreadcrumb() }
+                    .keyboardShortcut("m", modifiers: .command)
+                Spacer()
+                Text(.breadcrumbManualHint).font(.caption).foregroundStyle(.secondary)
+            }
+            .capsuleFooterBar()
+        }
+    }
+
+    @ViewBuilder private var selectionContent: some View {
         if state.busy {
             SessionCapsuleProgressView(
                 headline: .capsulesFindingWindows,
@@ -201,7 +220,7 @@ struct SessionCapsulePanelView: View {
                     .font(.system(size: 40, weight: .light)).foregroundStyle(
                         .tint
                     )
-                    .symbolEffect(.pulse.byLayer, options: .repeat(.continuous))
+                    .symbolEffect(.pulse.byLayer, options: .repeat(.continuous), isActive: !reduceMotion)
             }
         } else if state.candidates.isEmpty {
             CapsuleEmptyState(
@@ -210,7 +229,7 @@ struct SessionCapsulePanelView: View {
                 action: .capsulesRetry,
                 actionSymbol: "arrow.clockwise"
             ) {
-                state.beginNewCapsule()
+                state.beginNewCapsule(breadcrumb: state.isBreadcrumb)
             } mark: {
                 Image(systemName: "macwindow.badge.plus")
                     .font(.system(size: 40, weight: .light)).foregroundStyle(
@@ -258,8 +277,9 @@ struct SessionCapsulePanelView: View {
                             .transition(.opacity)
                     }
                     Spacer(minLength: 12)
-                    Button(.capsulesCreateDraft, systemImage: "sparkles") {
-                        state.compose()
+                    Button(state.isBreadcrumb ? .breadcrumbContinue : .capsulesCreateDraft,
+                           systemImage: state.isBreadcrumb ? "arrow.forward" : "sparkles") {
+                        if state.isBreadcrumb { state.writeBreadcrumb() } else { state.compose() }
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
@@ -304,7 +324,13 @@ struct SessionCapsulePanelView: View {
             SessionCapsuleProgressView(
                 headline: .capsulesReadingContext,
                 symbol: "sparkles"
-            ) { state.back() }
+            ) {
+                if state.draft?.breadcrumb != nil { state.cancelCapture() } else { state.back() }
+            }
+        } else if state.draft?.breadcrumb != nil {
+            SessionBreadcrumbEditor(draft: draftBinding,
+                canCapture: !state.captureCandidates.isEmpty,
+                capture: { state.generateBreadcrumb() }, save: { state.save() })
         } else {
             SessionCapsuleDraftForm(draft: draftBinding) { state.save() }
         }
@@ -327,114 +353,14 @@ struct SessionCapsulePanelView: View {
         )
     }
 
-    // MARK: - Detail
-
-    @ViewBuilder private var detail: some View {
-        if let capsule = state.detail {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: CapsuleMetrics.section)
-                    {
-                        detailHeader(capsule)
-                        SessionCapsuleFormSection(
-                            .capsulesSummary,
-                            symbol: "text.alignleft"
-                        ) {
-                            Text(capsule.summary).textSelection(.enabled)
-                                .capsuleReadingCard()
-                        }
-                        if !capsule.unfinishedTasks.isEmpty {
-                            SessionCapsuleFormSection(
-                                .capsulesUnfinished,
-                                symbol: "checklist.unchecked"
-                            ) {
-                                VStack(spacing: 6) {
-                                    ForEach(capsule.unfinishedTasks, id: \.self)
-                                    { task in
-                                        HStack(
-                                            alignment: .firstTextBaseline,
-                                            spacing: 9
-                                        ) {
-                                            Image(systemName: "circle").font(
-                                                .caption
-                                            )
-                                            .foregroundStyle(.tertiary)
-                                            .accessibilityHidden(true)
-                                            Text(task).textSelection(.enabled)
-                                            Spacer(minLength: 0)
-                                        }
-                                        .capsuleReadingCard()
-                                    }
-                                }
-                            }
-                        }
-                        if !capsule.note.isEmpty {
-                            SessionCapsuleFormSection(
-                                .capsulesNoteHeading,
-                                symbol: "bookmark"
-                            ) {
-                                Text(capsule.note).textSelection(.enabled)
-                                    .capsuleReadingCard()
-                            }
-                        }
-                        SessionCapsuleWindowList(windows: capsule.windows)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(CapsuleMetrics.page)
-                }
-                HStack(spacing: 10) {
-                    Button(role: .destructive) {
-                        state.deleteCapsule?(capsule.id)
-                    } label: {
-                        Label(.capsulesDelete, systemImage: "trash")
-                    }
-                    .tint(.red)
-                    .buttonStyle(.glassProminent)
-                    .controlSize(.large)
-
-                    Spacer(minLength: 12)
-                    Button(.capsulesResume, systemImage: "play.fill") {
-                        state.resumeCapsule?(capsule)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .keyboardShortcut(.defaultAction)
-                }
-                .capsuleFooterBar()
+    private var detail: some View {
+        Group {
+            if let capsule = state.detail {
+                SessionCapsuleDetailView(capsule: capsule, state: state, sourceNavigator: sourceNavigator)
             }
         }
     }
 
-    /// The saved counterpart of the draft's title field: the same weight and rhythm, read-only, with
-    /// the capsule's applications shown alongside the timestamp so the checkpoint is placeable at a glance.
-    private func detailHeader(_ capsule: SessionCapsule) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(capsule.title)
-                .font(.title3.weight(.semibold))
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            HStack(spacing: 8) {
-                Image(systemName: "clock").font(.caption2).foregroundStyle(
-                    .secondary
-                )
-                .accessibilityHidden(true)
-                Text(
-                    capsule.createdAt,
-                    format: .dateTime.year().month().day().hour().minute()
-                )
-                .font(.caption).foregroundStyle(.secondary)
-                Spacer(minLength: 8)
-                TwinedAppIconStack(
-                    icons: SessionCapsuleApplicationIcons.icons(
-                        for: capsule.windows
-                    ),
-                    size: 20
-                )
-            }
-        }
-        .padding(.horizontal, 14).padding(.vertical, 12)
-        .capsuleSelectionCard(selected: false, emphasized: true)
-    }
 }
 
 // MARK: - Rows
@@ -455,7 +381,7 @@ private struct SessionCapsuleRow: View {
             )
             VStack(alignment: .leading, spacing: 3) {
                 Text(capsule.title).font(.headline).lineLimit(1)
-                Text(capsule.summary).font(.caption).foregroundStyle(.secondary)
+                Text(capsule.summary.isEmpty ? (capsule.note.isEmpty ? capsule.breadcrumb?.nextStep ?? "" : capsule.note) : capsule.summary).font(.caption).foregroundStyle(.secondary)
                     .lineLimit(2)
             }
             Spacer(minLength: 8)
@@ -481,6 +407,7 @@ private struct WindowChoiceRow: View {
     /// The capsule already holds as many windows as it may; unselected rows cannot be added.
     let blocked: Bool
     let toggle: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Button(action: toggle) {
@@ -502,7 +429,7 @@ private struct WindowChoiceRow: View {
                             ? AnyShapeStyle(Color.accentColor)
                             : AnyShapeStyle(.tertiary)
                     )
-                    .symbolEffect(.bounce, value: selected)
+                    .symbolEffect(.bounce, value: reduceMotion ? false : selected)
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, 10).padding(.vertical, 9)

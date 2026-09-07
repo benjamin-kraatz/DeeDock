@@ -104,12 +104,13 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: nil, recognizedText: ""))
                     continue
                 }
+                let capturedAt = Date()
                 do {
                     let image = try await Self.capture(window)
                     try Task.checkCancellation()
                     let text = try await Self.recognizeText(in: image)
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: image,
-                                                           recognizedText: text))
+                                                           recognizedText: text, capturedAt: capturedAt))
                 } catch is CancellationError {
                     throw CancellationError()
                 } catch {

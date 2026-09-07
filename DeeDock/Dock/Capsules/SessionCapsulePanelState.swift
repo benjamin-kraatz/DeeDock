@@ -9,6 +9,7 @@ final class SessionCapsulePanelState {
     private(set) var capsules: [SessionCapsule]
     private(set) var candidates: [WindowContextCandidate] = []
     var selectedWindowIDs: Set<CGWindowID> = []
+    var isBreadcrumb = false
     var draft: SessionCapsuleDraft?
     var page: Page = .collection
     private(set) var busy = false
@@ -16,8 +17,10 @@ final class SessionCapsulePanelState {
     var error: String?
     var chrome = DockPopoverChrome(edge: .bottom, attachment: DockPopoverGeometry.idealSize.width / 2)
 
+    @ObservationIgnored private var captureReferenceIDs: [CGWindowID: UUID] = [:]
     @ObservationIgnored var discover: (() -> Void)?
     @ObservationIgnored var createDraft: (([WindowContextCandidate]) -> Void)?
+    @ObservationIgnored var captureBreadcrumb: (([WindowContextCandidate]) -> Void)?
     @ObservationIgnored var saveDraft: ((SessionCapsuleDraft) -> Void)?
     @ObservationIgnored var deleteCapsule: ((UUID) -> Void)?
     @ObservationIgnored var resumeCapsule: ((SessionCapsule) -> Void)?
@@ -30,12 +33,24 @@ final class SessionCapsulePanelState {
         candidates.filter { selectedWindowIDs.contains($0.id) }
     }
 
+    var captureCandidates: [WindowContextCandidate] {
+        let included = Set(draft?.windows.map(\.id) ?? [])
+        return selectedCandidates.filter { candidate in
+            captureReferenceIDs[candidate.id].map(included.contains) == true
+        }
+    }
+
+    func referenceID(for candidateID: CGWindowID) -> UUID? { captureReferenceIDs[candidateID] }
+
     var detail: SessionCapsule? {
         guard case .detail(let id) = page else { return nil }
         return capsules.first { $0.id == id }
     }
 
-    func beginNewCapsule() {
+    func beginNewCapsule(breadcrumb: Bool = false) {
+        cancelWork?()
+        draft = nil
+        isBreadcrumb = breadcrumb
         page = .selection
         candidates = []
         selectedWindowIDs = []
@@ -62,6 +77,76 @@ final class SessionCapsulePanelState {
         }
     }
 
+    /// Manual editing uses selected metadata only, and remains available without any permission.
+    func writeBreadcrumb() {
+        cancelWork?()
+        busy = false
+        isBreadcrumb = true
+        captureReferenceIDs = [:]
+        let references = selectedCandidates.prefix(SessionCapsuleDocument.maximumWindowsPerCapsule).map {
+            var reference = SessionCapsuleWindowReference(applicationName: $0.applicationName,
+                bundleIdentifier: $0.bundleIdentifier, windowTitle: $0.title)
+            reference.observedAt = Date()
+            captureReferenceIDs[$0.id] = reference.id
+            return reference
+        }
+        draft = SessionCapsuleDraft(title: String(localized: .breadcrumbDefaultTitle), summary: "",
+            unfinishedTasks: [], windows: references, note: "", breadcrumb: SessionCapsuleBreadcrumb())
+        error = nil
+        page = .draft
+    }
+
+    func generateBreadcrumb() {
+        guard !busy, draft?.breadcrumb != nil, !captureCandidates.isEmpty else { return }
+        busy = true
+        error = nil
+        captureBreadcrumb?(captureCandidates)
+    }
+
+    func finishBreadcrumbCapture(references: [SessionCapsuleWindowReference], generated: SessionCapsuleDraft?) {
+        busy = false
+        guard var draft, draft.breadcrumb != nil else { return }
+        // Preserve user-entered notes, next steps, links, and bookmarks across capture and failure.
+        draft.windows = draft.windows.map { original in
+            guard let captured = references.first(where: { $0.id == original.id }) else { return original }
+            var merged = original
+            merged.capturedAt = captured.capturedAt
+            merged.textPreview = captured.textPreview
+            return merged
+        }
+        if let generated {
+            draft.summary = String(generated.summary.prefix(8_000))
+            draft.unfinishedTasks = Array(generated.unfinishedTasks.prefix(6)).map { String($0.prefix(2_000)) }
+            draft.breadcrumb?.generatedAt = Date()
+        } else {
+            error = String(localized: .breadcrumbManualFallback)
+        }
+        self.draft = draft
+    }
+
+    func cancelCapture() {
+        cancelWork?()
+        busy = false
+    }
+
+    func captureFailed() {
+        busy = false
+        error = String(localized: .breadcrumbManualFallback)
+    }
+
+    func edit(_ capsule: SessionCapsule) {
+        cancelWork?()
+        selectedWindowIDs = []
+        candidates = []
+        busy = false
+        isBreadcrumb = capsule.breadcrumb != nil
+        draft = SessionCapsuleDraft(title: capsule.title, summary: capsule.summary,
+            unfinishedTasks: capsule.unfinishedTasks, windows: capsule.windows, note: capsule.note,
+            breadcrumb: capsule.breadcrumb, editingID: capsule.id, originalCreatedAt: capsule.createdAt)
+        page = .draft
+        error = nil
+    }
+
     func compose() {
         let selected = selectedCandidates
         guard !selected.isEmpty else { return }
@@ -75,7 +160,9 @@ final class SessionCapsulePanelState {
         busy = false
         switch result {
         case .success(let draft): self.draft = draft; page = .draft
-        case .failure: error = String(localized: .capsulesCaptureUnavailable)
+        case .failure:
+            page = .selection
+            error = String(localized: .capsulesCaptureUnavailable)
         }
     }
 
@@ -87,11 +174,20 @@ final class SessionCapsulePanelState {
     func didSave(_ capsules: [SessionCapsule]) {
         self.capsules = capsules
         draft = nil
+        candidates = []
+        selectedWindowIDs = []
+        captureReferenceIDs = [:]
         page = .collection
         error = nil
     }
 
     func didDelete(_ capsules: [SessionCapsule]) {
+        cancelWork?()
+        draft = nil
+        candidates = []
+        selectedWindowIDs = []
+        captureReferenceIDs = [:]
+        busy = false
         self.capsules = capsules
         page = .collection
         error = nil
@@ -107,12 +203,13 @@ final class SessionCapsulePanelState {
         permissionRequired = false
         candidates = []
         selectedWindowIDs = []
+        captureReferenceIDs = [:]
         draft = nil
         error = nil
     }
 
     func stop() {
-        discover = nil; createDraft = nil; saveDraft = nil; deleteCapsule = nil
+        discover = nil; createDraft = nil; captureBreadcrumb = nil; saveDraft = nil; deleteCapsule = nil
         resumeCapsule = nil; requestPermission = nil
         cancelWork = nil
     }

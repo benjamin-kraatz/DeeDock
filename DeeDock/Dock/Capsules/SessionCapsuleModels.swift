@@ -75,8 +75,10 @@ nonisolated struct SessionCapsule: Codable, Equatable, Identifiable, Sendable {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && (breadcrumb == nil ? !summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 : !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    || !(breadcrumb?.nextStep.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true))
+                    || !(breadcrumb?.nextStep.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+                    || (breadcrumb?.generatedAt != nil && !summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
             && windows.count <= SessionCapsuleDocument.maximumWindowsPerCapsule
+            && Set(windows.map(\.id)).count == windows.count
             && windows.allSatisfy(\.isValid)
             && (breadcrumb == nil || (title.count <= 200 && summary.count <= 8_000
                 && note.count <= 8_000 && (breadcrumb?.nextStep.count ?? 0) <= 2_000

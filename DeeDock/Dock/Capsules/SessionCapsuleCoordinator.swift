@@ -9,6 +9,7 @@ final class SessionCapsuleCoordinator {
     private let contexts: any WindowContextCapturing
     private let composer: any SessionCapsuleComposing
     private let windows: any ApplicationWindowServicing
+    private let sourceNavigator = SessionCapsuleSourceNavigator()
     private var controller: DockPopoverPanelController<SessionCapsulePanelView>?
     private var state: SessionCapsulePanelState?
     private var task: Task<Void, Never>?
@@ -54,8 +55,8 @@ final class SessionCapsuleCoordinator {
         let next = DockPopoverPanelController(anchor: anchor, keyboard: true,
                                               ideal: CGSize(width: 560, height: 500)) { chrome in
             state.chrome = chrome
-        } content: {
-            SessionCapsulePanelView(state: state)
+        } content: { [sourceNavigator] in
+            SessionCapsulePanelView(state: state, sourceNavigator: sourceNavigator)
         }
         self.state = state
         controller = next
@@ -67,18 +68,23 @@ final class SessionCapsuleCoordinator {
 
         state.discover = { [weak self, weak state] in self?.discover(for: state) }
         state.createDraft = { [weak self, weak state] selected in self?.createDraft(selected, for: state) }
+        state.captureBreadcrumb = { [weak self, weak state] selected in self?.captureBreadcrumb(selected, for: state) }
+        sourceNavigator.failure = { [weak state] in state?.error = $0 }
         state.saveDraft = { [weak self, weak state] draft in self?.save(draft, for: state) }
         state.deleteCapsule = { [weak self, weak state] id in self?.delete(id, for: state) }
         state.resumeCapsule = { [weak self] capsule in self?.resume(capsule) }
         state.requestPermission = { [weak self, weak state] in
             guard let self, let state else { return }
             screenCapture.requestAccess()
-            if screenCapture.status == .enabled { state.beginNewCapsule() }
+            if screenCapture.status == .enabled { state.beginNewCapsule(breadcrumb: state.isBreadcrumb) }
             else { screenCapture.openSystemSettings() }
         }
-        state.cancelWork = { [weak self] in self?.task?.cancel(); self?.task = nil }
+        state.cancelWork = { [weak self] in
+            self?.task?.cancel(); self?.task = nil
+            self?.sourceNavigator.cancel()
+        }
         next.willClose = { [weak self, weak state] in
-            self?.task?.cancel(); self?.task = nil; state?.stop()
+            self?.task?.cancel(); self?.task = nil; self?.sourceNavigator.stop(); state?.stop()
         }
         next.keyHandler = { [weak self] event in
             guard event.keyCode == 53 else { return false }
@@ -163,6 +169,7 @@ final class SessionCapsuleCoordinator {
             } catch is CancellationError {
                 return
             } catch {
+                guard !Task.isCancelled else { return }
                 state.applyDiscovery(.failure(error))
             }
             task = nil
@@ -190,7 +197,38 @@ final class SessionCapsuleCoordinator {
             } catch is CancellationError {
                 return
             } catch {
+                guard !Task.isCancelled else { return }
                 state.applyDraft(.failure(error))
+            }
+            task = nil
+        }
+    }
+
+    private func captureBreadcrumb(_ selected: [WindowContextCandidate], for state: SessionCapsulePanelState?) {
+        task?.cancel()
+        task = Task { [weak self, weak state] in
+            guard let self, let state else { return }
+            do {
+                let snapshots = try await contexts.capture(selected)
+                try Task.checkCancellation()
+                let references = snapshots.map { snapshot in
+                    var reference = SessionCapsuleWindowReference(id: state.referenceID(for: snapshot.candidate.id) ?? UUID(),
+                        applicationName: snapshot.candidate.applicationName,
+                        bundleIdentifier: snapshot.candidate.bundleIdentifier, windowTitle: snapshot.candidate.title)
+                    reference.capturedAt = snapshot.capturedAt
+                    let excerpt = String(snapshot.recognizedText.prefix(2_000))
+                    reference.textPreview = excerpt.isEmpty ? nil : excerpt
+                    return reference
+                }
+                var generated: SessionCapsuleDraft?
+                if await composer.availability() == .available {
+                    generated = try? await composer.compose(from: snapshots)
+                }
+                try Task.checkCancellation()
+                state.finishBreadcrumbCapture(references: references, generated: generated)
+            } catch {
+                guard !Task.isCancelled else { return }
+                state.captureFailed()
             }
             task = nil
         }
@@ -228,8 +266,9 @@ final class SessionCapsuleCoordinator {
                 guard let id = $0.bundleIdentifier, identifiers.contains(id) else { return nil }
                 return (id, $0)
             }
-            let runningBefore = Dictionary(uniqueKeysWithValues: runningPairs)
+            let runningBefore = Dictionary(runningPairs, uniquingKeysWith: { first, _ in first })
             for identifier in identifiers where runningBefore[identifier] == nil {
+                guard !Task.isCancelled else { return }
                 guard let url = workspace.urlForApplication(withBundleIdentifier: identifier) else { continue }
                 let configuration = NSWorkspace.OpenConfiguration()
                 configuration.activates = false
@@ -253,11 +292,12 @@ final class SessionCapsuleCoordinator {
             let sessionID = UUID()
             if let summaries = try? await windows.discover(processes: processes, sessionID: sessionID),
                let match = capsule.windows.compactMap({ reference -> ApplicationWindowSummary? in
-                   guard let title = reference.windowTitle,
-                         let application = running.first(where: { $0.bundleIdentifier == reference.bundleIdentifier }) else { return nil }
-                   return summaries.first { $0.processIdentifier == application.processIdentifier && $0.title == title }
+                   guard let title = reference.windowTitle else { return nil }
+                   let owners = Set(running.filter { $0.bundleIdentifier == reference.bundleIdentifier }.map(\.processIdentifier))
+                   let matches = summaries.filter { owners.contains($0.processIdentifier) && $0.title == title }
+                   return matches.count == 1 ? matches.first : nil
                }).first,
-               (try? await windows.selectWindow(match.token)) != nil {
+               !Task.isCancelled, (try? await windows.selectWindow(match.token)) != nil {
                 close(returnFocus: false)
                 return
             }
