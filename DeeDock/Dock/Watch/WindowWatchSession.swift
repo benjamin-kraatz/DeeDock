@@ -127,6 +127,7 @@ final class WindowWatchSession {
     /// Opening the source is always an explicit action; monitoring, Stop and Dismiss never activate it.
     func showWindow() {
         guard sourceTask == nil else { return }
+        sourceMessage = nil
         guard let process = try? validateProcess() else { sourceMessage = .watchClosed; return }
         sourceTask = Task { [weak self] in
             guard let self else { return }
@@ -217,7 +218,7 @@ final class WindowWatchSession {
         let expected = generation
         staleTask = Task { [weak self] in
             do { try await Task.sleep(for: .seconds(15)) } catch { return }
-            guard let self, generation == expected, !finished else { return }
+            guard let self, !Task.isCancelled, generation == expected, !finished, active || !ready else { return }
             message = .watchStale
         }
     }

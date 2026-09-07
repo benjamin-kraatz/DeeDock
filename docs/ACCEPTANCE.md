@@ -1264,3 +1264,9 @@ slow capture, hidden-window closure, setup restore, display placement, and keybo
 The final focused build passed after resolving the Peek anchor at click time, rather than retaining
 an earlier display frame. Log: `/tmp/DeeDock-dee11-review-final-build.log`. All 38 compiled English
 and German watch strings matched the catalog after merging App Fusion. `git diff --check` passed.
+
+GPT-5.6 Luna reviewed the implementation at Extra High reasoning. Its reported setup, identity,
+region, control-visibility, placement, and cancellation findings were addressed. Follow-up fixes
+also reject a cancelled stale-status timeout and clear old exact-window errors before retrying.
+The focused Debug build passed again at `/tmp/DeeDock-dee11-review-status-build.log`; it reported
+only the App Intents metadata-extraction notice. Review was static; native acceptance is still pending.
