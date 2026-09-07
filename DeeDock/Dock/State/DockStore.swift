@@ -255,8 +255,8 @@ final class DockStore {
         let token = session.token
         catalog.performPrimaryAction(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
-            if let error { errorMessage = error }
-            else { applicationOpened?() }
+            errorMessage = error
+            if error == nil { applicationOpened?() }
         }
     }
 
@@ -265,8 +265,8 @@ final class DockStore {
         let token = session.token
         catalog.open(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
-            if let error { errorMessage = error }
-            else { applicationOpened?() }
+            errorMessage = error
+            if error == nil { applicationOpened?() }
         }
     }
 
