@@ -1,6 +1,1212 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "fusionStepSelect": {
+    "comment": "App Fusion: flow step 1, choosing the two windows",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wählen"
+        }
+      }
+    }
+  },
+  "fusionStepReview": {
+    "comment": "App Fusion: flow step 2, reviewing the captured input",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prüfen"
+        }
+      }
+    }
+  },
+  "fusionStepResult": {
+    "comment": "App Fusion: flow step 3, the generated result",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Result"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ergebnis"
+        }
+      }
+    }
+  },
+  "fusionSlotEmptyTitle": {
+    "comment": "App Fusion: title of an empty source slot",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No window yet"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Noch kein Fenster"
+        }
+      }
+    }
+  },
+  "fusionSlotEmptyHint": {
+    "comment": "App Fusion: hint inside an empty source slot",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose a visible window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle ein sichtbares Fenster"
+        }
+      }
+    }
+  },
+  "fusionSlotLabel": {
+    "comment": "App Fusion: slot label. number is 1 or 2.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source %1$(number)lld"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelle %1$(number)lld"
+        }
+      }
+    }
+  },
+  "fusionPickerTitle": {
+    "comment": "App Fusion: heading of the window picker list",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbare Fenster"
+        }
+      }
+    }
+  },
+  "fusionPickerSelected": {
+    "comment": "App Fusion: a window that is already one of the two sources",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Already chosen"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bereits gewählt"
+        }
+      }
+    }
+  },
+  "fusionSourceOptions": {
+    "comment": "App Fusion: menu holding Replace and Remove for one source",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source options"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Optionen für die Quelle"
+        }
+      }
+    }
+  },
+  "fusionCharacterCount": {
+    "comment": "App Fusion: characters used of the 6,000 per-source limit. count is the current length.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld of 6,000 characters"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld von 6.000 Zeichen"
+        }
+      }
+    }
+  },
+  "fusionInstructionCount": {
+    "comment": "App Fusion: characters used of the 500-character instruction limit. count is the current length.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld of 500 characters"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld von 500 Zeichen"
+        }
+      }
+    }
+  },
+  "fusionInstructionLabel": {
+    "comment": "App Fusion: label of the optional instruction field",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Instruction"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Anweisung"
+        }
+      }
+    }
+  },
+  "fusionSelectionTitle": {
+    "comment": "App Fusion: heading of the window selection step",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Two windows to fuse"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zwei Fenster zum Verbinden"
+        }
+      }
+    }
+  },
+  "fusionLimitationsTitle": {
+    "comment": "App Fusion: heading of the disclosure holding the limitations text",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What this result is based on"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Worauf das Ergebnis beruht"
+        }
+      }
+    }
+  },
+  "fusionOptionsTitle": {
+    "comment": "App Fusion: heading of the action and instruction section",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What to generate"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Was erstellt werden soll"
+        }
+      }
+    }
+  },
+  "fusionSelectionFull": {
+    "comment": "App Fusion selection tray already contains two windows; replace or remove one before adding another.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Two windows are already selected. Remove or replace a source to choose another."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Es sind bereits zwei Fenster ausgewählt. Entferne oder ersetze eine Quelle, um ein anderes Fenster auszuwählen."
+        }
+      }
+    }
+  },
+  "fusionTitle": {
+    "comment": "App Fusion: App Fusion",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App Fusion"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App Fusion"
+        }
+      }
+    }
+  },
+  "fusionAdd": {
+    "comment": "App Fusion: Add to Fusion",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Add to Fusion"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zu Fusion hinzufügen"
+        }
+      }
+    }
+  },
+  "fusionCompare": {
+    "comment": "App Fusion: Compare",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Compare"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vergleichen"
+        }
+      }
+    }
+  },
+  "fusionDifferences": {
+    "comment": "App Fusion: Summarize differences",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Summarize differences"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unterschiede zusammenfassen"
+        }
+      }
+    }
+  },
+  "fusionChecklist": {
+    "comment": "App Fusion: Create checklist",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Create checklist"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Checkliste erstellen"
+        }
+      }
+    }
+  },
+  "fusionNotCaptured": {
+    "comment": "App Fusion: Not captured",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Not captured"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Noch nicht erfasst"
+        }
+      }
+    }
+  },
+  "fusionVisibleText": {
+    "comment": "App Fusion: Visible text only; partial context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible text only; partial context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nur sichtbarer Text; unvollständiger Kontext"
+        }
+      }
+    }
+  },
+  "fusionTruncated": {
+    "comment": "App Fusion: Visible text shortened to 6,000 characters",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible text shortened to 6,000 characters"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbarer Text auf 6.000 Zeichen gekürzt"
+        }
+      }
+    }
+  },
+  "fusionUnreadable": {
+    "comment": "App Fusion: No readable text; you can supply notes",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No readable text; you can supply notes"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kein lesbarer Text; eigene Notizen sind möglich"
+        }
+      }
+    }
+  },
+  "fusionSourceUnavailable": {
+    "comment": "App Fusion: Window closed, changed, or capture failed",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Window closed, changed, or capture failed"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster geschlossen, geändert oder Erfassung fehlgeschlagen"
+        }
+      }
+    }
+  },
+  "fusionModelUnavailable": {
+    "comment": "App Fusion: Apple Intelligence is unavailable. Check that it is enabled and the on-device model has finished downloading, then retry. Your reviewed input stays available until it expires.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence is unavailable. Check that it is enabled and the on-device model has finished downloading, then retry. Your reviewed input stays available until it expires."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence ist nicht verfügbar. Prüfe, ob es aktiviert und das Modell vollständig geladen ist. Versuche es dann erneut. Deine geprüften Eingaben bleiben bis zum Ablauf verfügbar."
+        }
+      }
+    }
+  },
+  "fusionContextLimit": {
+    "comment": "App Fusion: The reviewed input exceeds the model’s context budget. Shorten the text or instruction, review it again, and retry.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The reviewed input exceeds the model’s context budget. Shorten the text or instruction, review it again, and retry."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die geprüften Eingaben sind für das Modell zu lang. Kürze den Text oder die Anweisung, prüfe die Eingaben erneut und versuche es noch einmal."
+        }
+      }
+    }
+  },
+  "fusionRefused": {
+    "comment": "App Fusion: The model declined this request. Review your input and instruction before retrying. No result was created.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The model declined this request. Review your input and instruction before retrying. No result was created."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Modell hat die Anfrage abgelehnt. Prüfe die Eingaben und die Anweisung vor einem erneuten Versuch. Es wurde kein Ergebnis erstellt."
+        }
+      }
+    }
+  },
+  "fusionGenerationFailed": {
+    "comment": "App Fusion: Generation failed or returned an invalid result. Your reviewed input is retained for a retry until it expires.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Generation failed or returned an invalid result. Your reviewed input is retained for a retry until it expires."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Erstellung ist fehlgeschlagen oder das Ergebnis war ungültig. Deine geprüften Eingaben bleiben bis zum Ablauf für einen erneuten Versuch erhalten."
+        }
+      }
+    }
+  },
+  "fusionTimeout": {
+    "comment": "App Fusion: This attempt timed out and was cancelled. You can retry with the retained input.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This attempt timed out and was cancelled. You can retry with the retained input."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Versuch wurde wegen Zeitüberschreitung abgebrochen. Du kannst es mit den erhaltenen Eingaben erneut versuchen."
+        }
+      }
+    }
+  },
+  "fusionCaptureDenied": {
+    "comment": "App Fusion: Screen Recording access is required. Enable it in DDock Settings → Features → Permissions, then choose the windows again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Screen Recording access is required. Enable it in DDock Settings → Features → Permissions, then choose the windows again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Zugriff auf die Bildschirmaufnahme ist erforderlich. Aktiviere ihn in den DDock-Einstellungen unter Funktionen → Berechtigungen und wähle die Fenster erneut aus."
+        }
+      }
+    }
+  },
+  "fusionCaptureFailed": {
+    "comment": "App Fusion: Windows could not be read. Check that they are open and visible, then retry. Screen Recording access may need to be enabled in Settings.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Windows could not be read. Check that they are open and visible, then retry. Screen Recording access may need to be enabled in Settings."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Fenster konnten nicht gelesen werden. Prüfe, ob sie geöffnet und sichtbar sind, und versuche es erneut. Möglicherweise fehlt die Berechtigung für die Bildschirmaufnahme."
+        }
+      }
+    }
+  },
+  "fusionSaveFailed": {
+    "comment": "App Fusion: The artifact could not be added to Shelf. Your draft is retained. Check available disk space and whether Shelf is full or needs recovery, then retry.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The artifact could not be added to Shelf. Your draft is retained. Check available disk space and whether Shelf is full or needs recovery, then retry."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Ergebnis konnte nicht zur Ablage hinzugefügt werden. Dein Entwurf bleibt erhalten. Prüfe den freien Speicherplatz und ob die Ablage voll ist oder wiederhergestellt werden muss. Versuche es dann erneut."
+        }
+      }
+    }
+  },
+  "fusionSaveRecovery": {
+    "comment": "App Fusion: Shelf could not save the reference. Your draft and the artifact file are retained. Recover the file at the artifact file path.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Shelf could not save the reference. Your draft and the artifact file are retained. Recover the file at %1$(path)@."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Ablage konnte den Verweis nicht speichern. Dein Entwurf und die Ergebnisdatei bleiben erhalten. Du findest die Datei unter %1$(path)@."
+        }
+      }
+    }
+  },
+  "fusionEditedInput": {
+    "comment": "App Fusion: Input edited or supplied by you",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Input edited or supplied by you"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eingabe von dir bearbeitet oder ergänzt"
+        }
+      }
+    }
+  },
+  "fusionLimitations": {
+    "comment": "App Fusion: Based only on reviewed text from captured visible windows and any notes you supply. Hidden content, other pages, images, and layout are not compared. This is not a complete document comparison. AI output may contain errors; review before use.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Based only on reviewed text from captured visible windows and any notes you supply. Hidden content, other pages, images, and layout are not compared. This is not a complete document comparison. AI output may contain errors; review before use."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Grundlage sind nur der geprüfte Text aus erfassten sichtbaren Fenstern und deine ergänzten Notizen. Verdeckte Inhalte, weitere Seiten, Bilder und Layout werden nicht verglichen. Dies ist kein vollständiger Dokumentvergleich. KI-Ergebnisse können Fehler enthalten; prüfe sie vor der Verwendung."
+        }
+      }
+    }
+  },
+  "fusionGeneratedOn": {
+    "comment": "App Fusion: Generated on",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Generated on"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erstellt am"
+        }
+      }
+    }
+  },
+  "fusionSources": {
+    "comment": "App Fusion: Sources and capture times",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sources and capture times"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quellen und Erfassungszeiten"
+        }
+      }
+    }
+  },
+  "fusionChooseExactWindow": {
+    "comment": "App Fusion: The Peek card could not be matched to one visible window. Choose the exact window below.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The Peek card could not be matched to one visible window. Choose the exact window below."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Vorschau konnte keinem eindeutigen sichtbaren Fenster zugeordnet werden. Wähle unten das gewünschte Fenster aus."
+        }
+      }
+    }
+  },
+  "fusionExpired": {
+    "comment": "App Fusion: Captured input expired after 15 minutes and was released. Capture the windows again to continue.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captured input expired after 15 minutes and was released. Capture the windows again to continue."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die erfassten Eingaben wurden nach 15 Minuten verworfen. Erfasse die Fenster erneut, um fortzufahren."
+        }
+      }
+    }
+  },
+  "fusionHide": {
+    "comment": "App Fusion: Hide tray",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hide tray"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Auswahl ausblenden"
+        }
+      }
+    }
+  },
+  "fusionCancelWork": {
+    "comment": "App Fusion: Cancel attempt",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cancel attempt"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Versuch abbrechen"
+        }
+      }
+    }
+  },
+  "fusionDiscard": {
+    "comment": "App Fusion: Discard and start over",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Discard and start over"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verwerfen und neu beginnen"
+        }
+      }
+    }
+  },
+  "fusionCapture": {
+    "comment": "App Fusion: Capture selected windows",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture selected windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ausgewählte Fenster erfassen"
+        }
+      }
+    }
+  },
+  "fusionSelectionHelp": {
+    "comment": "App Fusion: Choose two distinct windows here or use Add to Fusion in Window Peek. The tray stays open across apps and displays. Hide or Escape releases captured text but keeps your selection and any generated draft.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose two distinct windows here or use Add to Fusion in Window Peek. The tray stays open across apps and displays. Hide or Escape releases captured text but keeps your selection and any generated draft."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle hier zwei verschiedene Fenster oder nutze „Zu Fusion hinzufügen“ in der Fenstervorschau. Die Auswahl bleibt über Apps und Bildschirme hinweg geöffnet. Ausblenden oder Escape verwirft erfassten Text, behält aber die Auswahl und einen bereits erstellten Entwurf."
+        }
+      }
+    }
+  },
+  "fusionChooseWindows": {
+    "comment": "App Fusion: Choose or refresh windows",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose or refresh windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster wählen oder aktualisieren"
+        }
+      }
+    }
+  },
+  "fusionClosePicker": {
+    "comment": "App Fusion: Close picker",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close picker"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fensterauswahl schließen"
+        }
+      }
+    }
+  },
+  "fusionReplace": {
+    "comment": "App Fusion: Replace",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Replace"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ersetzen"
+        }
+      }
+    }
+  },
+  "fusionRemove": {
+    "comment": "App Fusion: Remove",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entfernen"
+        }
+      }
+    }
+  },
+  "fusionReviewInput": {
+    "comment": "App Fusion: Review captured input",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review captured input"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erfasste Eingaben prüfen"
+        }
+      }
+    }
+  },
+  "fusionReviewHelp": {
+    "comment": "App Fusion: Only the text below will be sent to the on-device model. Correct OCR errors or supply notes, up to 6,000 characters per source. Input stays in memory for up to 15 minutes. Compare and differences need text for both sources; a checklist can use one.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Only the text below will be sent to the on-device model. Correct OCR errors or supply notes, up to 6,000 characters per source. Input stays in memory for up to 15 minutes. Compare and differences need text for both sources; a checklist can use one."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nur der Text unten wird an das lokale Modell übergeben. Korrigiere Erkennungsfehler oder ergänze Notizen, bis zu 6.000 Zeichen je Quelle. Die Eingaben bleiben höchstens 15 Minuten im Arbeitsspeicher. Vergleich und Unterschiede benötigen Text aus beiden Quellen; für eine Checkliste genügt eine."
+        }
+      }
+    }
+  },
+  "fusionInputFor": {
+    "comment": "App Fusion: Reviewed input for the source window title",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reviewed input for %1$(title)@"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Geprüfte Eingabe für %1$(title)@"
+        }
+      }
+    }
+  },
+  "fusionOperation": {
+    "comment": "App Fusion: Action",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Action"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktion"
+        }
+      }
+    }
+  },
+  "fusionInstruction": {
+    "comment": "App Fusion: Optional instruction, up to 500 characters",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Optional instruction, up to 500 characters"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Optionale Anweisung, bis zu 500 Zeichen"
+        }
+      }
+    }
+  },
+  "fusionReviewed": {
+    "comment": "App Fusion: I reviewed the available input and its limitations",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "I reviewed the available input and its limitations"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ich habe die verfügbaren Eingaben und ihre Einschränkungen geprüft"
+        }
+      }
+    }
+  },
+  "fusionGenerate": {
+    "comment": "App Fusion: Generate with Apple Intelligence",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Generate with Apple Intelligence"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mit Apple Intelligence erstellen"
+        }
+      }
+    }
+  },
+  "fusionReviewResult": {
+    "comment": "App Fusion: Review and edit result",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review and edit result"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ergebnis prüfen und bearbeiten"
+        }
+      }
+    }
+  },
+  "fusionArtifactTitle": {
+    "comment": "App Fusion: Artifact title",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Artifact title"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Titel des Ergebnisses"
+        }
+      }
+    }
+  },
+  "fusionArtifactBody": {
+    "comment": "App Fusion: Editable artifact content",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Editable artifact content"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bearbeitbarer Inhalt des Ergebnisses"
+        }
+      }
+    }
+  },
+  "fusionSaved": {
+    "comment": "App Fusion: Saved to Shelf as a text file. Removing the Shelf item keeps the file.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Saved to Shelf as a text file. Removing the Shelf item keeps the file."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Als Textdatei in der Ablage gespeichert. Beim Entfernen aus der Ablage bleibt die Datei erhalten."
+        }
+      }
+    }
+  },
+  "fusionOpenArtifact": {
+    "comment": "App Fusion: Open saved file",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open saved file"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gespeicherte Datei öffnen"
+        }
+      }
+    }
+  },
+  "fusionSave": {
+    "comment": "App Fusion: Save to Shelf",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Save to Shelf"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In der Ablage speichern"
+        }
+      }
+    }
+  },
+  "fusionDiscovering": {
+    "comment": "App Fusion: Finding visible windows…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Finding visible windows…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbare Fenster werden gesucht …"
+        }
+      }
+    }
+  },
+  "fusionCapturing": {
+    "comment": "App Fusion: Capturing and reading visible text…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capturing and reading visible text…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbarer Text wird erfasst und gelesen …"
+        }
+      }
+    }
+  },
+  "fusionGenerating": {
+    "comment": "App Fusion: Generating with Apple Intelligence…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Generating with Apple Intelligence…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence erstellt das Ergebnis …"
+        }
+      }
+    }
+  },
+  "fusionSaving": {
+    "comment": "App Fusion: Saving artifact…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Saving artifact…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ergebnis wird gespeichert …"
+        }
+      }
+    }
+  },
   "settingsLauncherPosition": {
     "comment": "Launcher placement setting; directions refer to physical dock ends.",
     "extractionState": "manual",
