@@ -1270,3 +1270,13 @@ region, control-visibility, placement, and cancellation findings were addressed.
 also reject a cancelled stale-status timeout and clear old exact-window errors before retrying.
 The focused Debug build passed again at `/tmp/DeeDock-dee11-review-status-build.log`; it reported
 only the App Intents metadata-extraction notice. Review was static; native acceptance is still pending.
+
+## DEE-15: window search
+
+Implemented on `feature/dee-15`. Find a Window searches live titles/app names, explicitly captured text, and saved capsule history in separate scopes. Image search is an explicit on-device model action and labels its output as inferred. Captured context stays in memory and supports clear, expiry, and close cleanup. Global/app shortcuts and Focus Dock `/` open the search window.
+
+See [Window search](WINDOW_SEARCH.md) for evidence rules, resource bounds, SDK investigation, model/state cases, and the manual acceptance checklist. Focused unsigned Debug app builds passed. Tests, previews, automated visual checks, runtime capture/model inference, and native acceptance were not executed. Visual-attribute accuracy, focus/accessibility, stale navigation, permissions, and multi-display/Space behavior remain unverified. This issue is not Done based on compilation.
+
+A second main update brought in DEE-15 during review delivery. Its String Catalog and acceptance
+notes were preserved alongside DEE-11. The focused Debug app build passed after resolving those
+conflicts, with log `/tmp/DeeDock-dee11-latest-main-build.log`. Native acceptance remains pending.

@@ -193,7 +193,7 @@ private struct WindowPeekActionButton: View {
     }
 }
 
-private struct WindowPeekCardView: View {
+struct WindowPeekCardView: View {
     let card: WindowPeekCard
     let appIcon: NSImage
     let settings: DockSettings

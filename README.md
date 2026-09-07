@@ -476,3 +476,9 @@ Enable **Settings → Features → App badges → Show app badges**, then allow 
 DDock mirrors badge text exposed by application items in the system Dock, matched by application URL. Apps absent from the system Dock and custom-drawn badges may not provide readable text. AX changes trigger a refresh where supported; a fallback five seconds after each completed scan covers missing notifications and permission changes. Long labels are visually truncated, with their full text available to VoiceOver.
 
 AX reads run outside the main actor and do not depend on pointer movement or animation frames. Disabling badges, disabling all docks, sleep, and shutdown clear badge state and stop the reader. Permission loss clears badges on the next refresh. Compilation is verified; live badge coverage and performance still need native acceptance. See [the acceptance record](docs/ACCEPTANCE.md#app-badges-dee-10).
+
+## Find a window
+
+Choose **Find a Window** from the DDock menu, press Command-Shift-Space globally, or press `/` in Focus Dock. Search live window titles and app names without AI. Use **Choose Windows…** and **Capture Selected** to search visible text from up to four selected windows. **Search Images with AI** separately checks those screenshots and labels matches as model suggestions. Captures stay in memory for at most ten minutes and are cleared when search closes.
+
+**Saved Capsules** searches historical checkpoints and supports deletion. “Yesterday” requires a capsule saved yesterday; DDock does not collect a continuous screen history. See the [window search reference](docs/WINDOW_SEARCH.md) for limits, keyboard controls, and pending acceptance.

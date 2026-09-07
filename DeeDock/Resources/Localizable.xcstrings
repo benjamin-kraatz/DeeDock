@@ -686,6 +686,1052 @@
     }
   }
 ,
+
+  "windowSearchShortcutHelp": {
+    "comment": "Window search: Global shortcut: ⌘⇧Space",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Global shortcut: ⌘⇧Space"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Globales Tastenkürzel: ⌘⇧Leertaste"
+        }
+      }
+    }
+  },
+  "windowSearchShortcutUnavailable": {
+    "comment": "Window search: Global shortcut unavailable. Use Find a Window here.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Global shortcut unavailable. Use Find a Window here."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Globales Tastenkürzel nicht verfügbar. Nutze hier „Fenster suchen“."
+        }
+      }
+    }
+  },
+  "windowSearchTimedOut": {
+    "comment": "Window search: This operation took too long and was canceled. Title search remains available.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This operation took too long and was canceled. Title search remains available."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieser Vorgang hat zu lange gedauert und wurde abgebrochen. Die Titelsuche bleibt verfügbar."
+        }
+      }
+    }
+  },
+  "windowSearchTitle": {
+    "comment": "Window search: Find a Window",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Find a Window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster suchen"
+        }
+      }
+    }
+  },
+  "windowSearchPlaceholder": {
+    "comment": "Window search: Search titles, apps, or chosen context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Search titles, apps, or chosen context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Titel, Apps oder ausgewählten Kontext suchen"
+        }
+      }
+    }
+  },
+  "windowSearchLive": {
+    "comment": "Window search: Current windows",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Current windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktuelle Fenster"
+        }
+      }
+    }
+  },
+  "windowSearchCaptured": {
+    "comment": "Window search: Captured context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captured context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erfasster Kontext"
+        }
+      }
+    }
+  },
+  "windowSearchSaved": {
+    "comment": "Window search: Saved capsules",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Saved capsules"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gespeicherte Kapseln"
+        }
+      }
+    }
+  },
+  "windowSearchScope": {
+    "comment": "Window search: Search in",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Search in"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Suchen in"
+        }
+      }
+    }
+  },
+  "windowSearchRefresh": {
+    "comment": "Window search: Refresh titles",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Refresh titles"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Titel aktualisieren"
+        }
+      }
+    }
+  },
+  "windowSearchMetadataHelp": {
+    "comment": "Window search: Showing up to 200 windows from 64 apps. Some apps expose no window titles. Their cards open the app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Showing up to 200 windows from 64 apps. Some apps expose no window titles. Their cards open the app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bis zu 200 Fenster aus 64 Apps. Manche Apps geben keine Fenstertitel frei. Ihre Karten öffnen die App."
+        }
+      }
+    }
+  },
+  "windowSearchLiveHelp": {
+    "comment": "Window search: Searches available window titles and app names. No content capture or AI is needed.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Searches available window titles and app names. No content capture or AI is needed."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Durchsucht verfügbare Fenstertitel und App-Namen. Dafür werden weder Inhalte erfasst noch KI benötigt."
+        }
+      }
+    }
+  },
+  "windowSearchRetention": {
+    "comment": "Window search: Searches selected titles and up to 6,000 recognized characters per window. Images and text stay in memory for 10 minutes or until you close search or clear context. Nothing is saved.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Searches selected titles and up to 6,000 recognized characters per window. Images and text stay in memory for 10 minutes or until you close search or clear context. Nothing is saved."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Durchsucht ausgewählte Titel und bis zu 6.000 erkannte Zeichen pro Fenster. Bilder und Text bleiben höchstens 10 Minuten im Arbeitsspeicher. Schließen der Suche oder Löschen des Kontexts entfernt sie früher. Es wird nichts gespeichert."
+        }
+      }
+    }
+  },
+  "windowSearchSavedHelp": {
+    "comment": "Window search: Searches saved capsule titles, summaries, notes, tasks, and window references. These are historical checkpoints, not current windows or a recording.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Searches saved capsule titles, summaries, notes, tasks, and window references. These are historical checkpoints, not current windows or a recording."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Durchsucht Titel, Zusammenfassungen, Notizen, Aufgaben und Fensterverweise gespeicherter Kapseln. Das sind frühere Momentaufnahmen, keine aktuellen Fenster oder laufenden Aufzeichnungen."
+        }
+      }
+    }
+  },
+  "windowSearchChooseCapture": {
+    "comment": "Window search: Choose windows…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose windows…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster auswählen …"
+        }
+      }
+    }
+  },
+  "windowSearchCaptureHelp": {
+    "comment": "Window search: Choose up to four visible windows. Capture Selected takes one screenshot per window and recognizes visible text. Image search is a separate action.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose up to four visible windows. Capture Selected takes one screenshot per window and recognizes visible text. Image search is a separate action."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle bis zu vier sichtbare Fenster. „Auswahl erfassen“ erstellt je einen Screenshot und erkennt sichtbaren Text. Die Bildsuche startest du separat."
+        }
+      }
+    }
+  },
+  "windowSearchCaptureSelected": {
+    "comment": "Window search: Capture Selected",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture Selected"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Auswahl erfassen"
+        }
+      }
+    }
+  },
+  "windowSearchImages": {
+    "comment": "Window search: Search images with AI",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Search images with AI"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bilder mit KI durchsuchen"
+        }
+      }
+    }
+  },
+  "windowSearchClear": {
+    "comment": "Window search: Clear captured context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear captured context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erfassten Kontext löschen"
+        }
+      }
+    }
+  },
+  "windowSearchCancel": {
+    "comment": "Window search: Cancel",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cancel"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abbrechen"
+        }
+      }
+    }
+  },
+  "windowSearchWorking": {
+    "comment": "Window search: Searching",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Searching"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Suche läuft"
+        }
+      }
+    }
+  },
+  "windowSearchCapturedAt": {
+    "comment": "Window search: Captured at",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captured at"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erfasst am"
+        }
+      }
+    }
+  },
+  "windowSearchMetadataEvidence": {
+    "comment": "Window search: Title or app-name match",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Title or app-name match"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Treffer im Titel oder App-Namen"
+        }
+      }
+    }
+  },
+  "windowSearchTextEvidence": {
+    "comment": "Window search: Recognized text match",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recognized text match"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Treffer im erkannten Text"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleEvidence": {
+    "comment": "Window search: Saved capsule text · historical",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Saved capsule text · historical"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text einer gespeicherten Kapsel · historisch"
+        }
+      }
+    }
+  },
+  "windowSearchImageEvidence": {
+    "comment": "Window search: Image interpretation · AI suggestion",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image interpretation · AI suggestion"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bildinterpretation · KI-Vorschlag"
+        }
+      }
+    }
+  },
+  "windowSearchNoMatches": {
+    "comment": "Window search: No matches in this scope",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No matches in this scope"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine Treffer in diesem Bereich"
+        }
+      }
+    }
+  },
+  "windowSearchNoMatchesHelp": {
+    "comment": "Window search: Try another phrase or choose a different search scope. Only available evidence is searched.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Try another phrase or choose a different search scope. Only available evidence is searched."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Versuche einen anderen Suchbegriff oder wähle einen anderen Suchbereich. Nur verfügbare Inhalte werden durchsucht."
+        }
+      }
+    }
+  },
+  "windowSearchYesterdayHelp": {
+    "comment": "Window search: “Yesterday” searches only capsules saved yesterday. Choose Saved Capsules. Without a saved checkpoint, there is no history to search.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "“Yesterday” searches only capsules saved yesterday. Choose Saved Capsules. Without a saved checkpoint, there is no history to search."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "„Gestern“ durchsucht nur gestern gespeicherte Kapseln. Wähle „Gespeicherte Kapseln“. Ohne gespeicherte Momentaufnahme gibt es keinen Verlauf zu durchsuchen."
+        }
+      }
+    }
+  },
+  "windowSearchUnavailable": {
+    "comment": "Window search: Window discovery is unavailable. Refresh titles or search saved capsules.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Window discovery is unavailable. Refresh titles or search saved capsules."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster lassen sich gerade nicht ermitteln. Aktualisiere die Titel oder durchsuche gespeicherte Kapseln."
+        }
+      }
+    }
+  },
+  "windowSearchCaptureUnavailable": {
+    "comment": "Window search: Capture is unavailable or there are no visible windows. Check Screen Recording access in Settings. Title search remains available.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture is unavailable or there are no visible windows. Check Screen Recording access in Settings. Title search remains available."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Inhalte lassen sich gerade nicht erfassen oder es sind keine Fenster sichtbar. Prüfe den Zugriff auf Bildschirmaufnahmen in den Einstellungen. Die Titelsuche bleibt verfügbar."
+        }
+      }
+    }
+  },
+  "windowSearchModelUnavailable": {
+    "comment": "Window search: Image search was unavailable or incomplete. Title and recognized-text search remain available.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image search was unavailable or incomplete. Title and recognized-text search remain available."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Bildsuche war nicht verfügbar oder blieb unvollständig. Titel und erkannter Text lassen sich weiterhin durchsuchen."
+        }
+      }
+    }
+  },
+  "windowSearchImageCaution": {
+    "comment": "Window search: Image matches are AI suggestions, not verified facts. Check the captured image. OCR alone does not establish colors or chart appearance.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image matches are AI suggestions, not verified facts. Check the captured image. OCR alone does not establish colors or chart appearance."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bildtreffer sind KI-Vorschläge, keine bestätigten Fakten. Prüfe das erfasste Bild. Texterkennung allein belegt weder Farben noch das Aussehen eines Diagramms."
+        }
+      }
+    }
+  },
+  "windowSearchExpired": {
+    "comment": "Window search: Captured context expired and was cleared. Choose windows again to capture fresh context.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captured context expired and was cleared. Choose windows again to capture fresh context."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der erfasste Kontext ist abgelaufen und wurde gelöscht. Wähle erneut Fenster aus, um aktuelle Inhalte zu erfassen."
+        }
+      }
+    }
+  },
+  "windowSearchStale": {
+    "comment": "Window search: This source changed, closed, or cannot be reached. Refresh titles or capture it again. No other window was substituted.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This source changed, closed, or cannot be reached. Refresh titles or capture it again. No other window was substituted."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Quelle wurde geändert, geschlossen oder ist nicht erreichbar. Aktualisiere die Titel oder erfasse sie erneut. Es wurde kein anderes Fenster als Ersatz gewählt."
+        }
+      }
+    }
+  },
+  "windowSearchContentUnavailable": {
+    "comment": "Window search: Image and text unavailable",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image and text unavailable"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bild und Text nicht verfügbar"
+        }
+      }
+    }
+  },
+  "windowSearchNoText": {
+    "comment": "Window search: Image captured · no text recognized",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image captured · no text recognized"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bild erfasst · kein Text erkannt"
+        }
+      }
+    }
+  },
+  "windowSearchTextAvailable": {
+    "comment": "Window search: Image and recognized text captured",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image and recognized text captured"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bild und erkannter Text erfasst"
+        }
+      }
+    }
+  },
+  "windowSearchAppOnly": {
+    "comment": "Window search: Opens the app; exact window access is unavailable.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Opens the app; exact window access is unavailable."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Öffnet die App. Dieses Fenster lässt sich nicht gezielt aktivieren."
+        }
+      }
+    }
+  },
+  "windowSearchKeyboardHelp": {
+    "comment": "Window search: ↑↓ Select · Return Open · Esc Close and clear capture",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "↑↓ Select · Return Open · Esc Close and clear capture"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "↑↓ Auswählen · Eingabe Öffnen · Esc Schließen und Erfassung löschen"
+        }
+      }
+    }
+  },
+  "windowSearchBack": {
+    "comment": "Window search: Back to results",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Back to results"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zurück zu den Treffern"
+        }
+      }
+    }
+  },
+  "windowSearchDeleteCapsule": {
+    "comment": "Window search: Delete saved capsule",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete saved capsule"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gespeicherte Kapsel löschen"
+        }
+      }
+    }
+  },
+  "windowSearchDeleteConfirmation": {
+    "comment": "Window search: Delete this capsule and its searchable context?",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete this capsule and its searchable context?"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Kapsel und ihren durchsuchbaren Kontext löschen?"
+        }
+      }
+    }
+  },
+  "windowSearchDeleteFailed": {
+    "comment": "Window search: The capsule could not be deleted. Its saved context is unchanged.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The capsule could not be deleted. Its saved context is unchanged."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Kapsel konnte nicht gelöscht werden. Ihr gespeicherter Kontext ist unverändert."
+        }
+      }
+    }
+  },
+  "windowSearchClearQuery": {
+    "comment": "Window search: Clear search",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear search"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Suche löschen"
+        }
+      }
+    }
+  },
+  "windowSearchOpenSettings": {
+    "comment": "Window search: Settings…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Settings…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einstellungen …"
+        }
+      }
+    }
+  },
+  "windowSearchScopeDetails": {
+    "comment": "Window search: About this scope",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "About this scope"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Über diesen Bereich"
+        }
+      }
+    }
+  },
+  "windowSearchHintSelect": {
+    "comment": "Window search: Select",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Select"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Auswählen"
+        }
+      }
+    }
+  },
+  "windowSearchHintOpen": {
+    "comment": "Window search: Open",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Öffnen"
+        }
+      }
+    }
+  },
+  "windowSearchHintClose": {
+    "comment": "Window search: Close",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schließen"
+        }
+      }
+    }
+  },
+  "windowSearchCaptureTitle": {
+    "comment": "Window search: Choose windows to capture",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose windows to capture"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster zum Erfassen auswählen"
+        }
+      }
+    }
+  },
+  "windowSearchNoCapture": {
+    "comment": "Window search: No captured context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No captured context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kein erfasster Kontext"
+        }
+      }
+    }
+  },
+  "windowSearchNoCapsules": {
+    "comment": "Window search: No saved capsules",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No saved capsules"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine gespeicherten Kapseln"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleSummary": {
+    "comment": "Window search: Summary",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Summary"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zusammenfassung"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleNote": {
+    "comment": "Window search: Note",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Note"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notiz"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleTasks": {
+    "comment": "Window search: Open tasks",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open tasks"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Offene Aufgaben"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleWindows": {
+    "comment": "Window search: Windows",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster"
+        }
+      }
+    }
+  },
+  "windowSearchCapturedContext": {
+    "comment": "Window search: Captured context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captured context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erfasster Kontext"
+        }
+      }
+    }
+  }
+,
   "fusionStepSelect": {
     "comment": "App Fusion: flow step 1, choosing the two windows",
     "extractionState": "manual",
