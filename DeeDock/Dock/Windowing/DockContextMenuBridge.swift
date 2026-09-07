@@ -78,6 +78,10 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 snapshot: snapshot
             )
             menu.removeAllItems()
+            if interaction?.openBadgeMemory != nil {
+                addItem(.badgeMemoryDetails, symbol: "app.badge", action: #selector(showBadgeMemory), to: menu)
+                menu.addItem(.separator())
+            }
             addWindows(snapshot.windowState, to: menu)
 
             if item.isAvailable {
@@ -189,6 +193,12 @@ struct DockContextMenuBridge: NSViewRepresentable {
 
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
         func menuDidClose(_ menu: NSMenu) { finishTracking() }
+
+        @objc private func showBadgeMemory() {
+            guard let item else { return }
+            let action = interaction?.openBadgeMemory
+            DispatchQueue.main.async { action?(item) }
+        }
 
         @objc private func openApplication() { open?() }
 

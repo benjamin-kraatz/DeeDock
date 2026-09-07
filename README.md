@@ -489,3 +489,7 @@ AX reads run outside the main actor and do not depend on pointer movement or ani
 Choose **Find a Window** from the DDock menu, press Command-Shift-Space globally, or press `/` in Focus Dock. Search live window titles and app names without AI. Use **Choose Windows…** and **Capture Selected** to search visible text from up to four selected windows. **Search Images with AI** separately checks those screenshots and labels matches as model suggestions. Captures stay in memory for at most ten minutes and are cleared when search closes.
 
 **Saved Capsules** searches historical checkpoints and supports deletion. “Yesterday” requires a capsule saved yesterday; DDock does not collect a continuous screen history. See the [window search reference](docs/WINDOW_SEARCH.md) for limits, keyboard controls, and pending acceptance.
+
+## Badge memory
+
+Click an app badge, choose **Badge details** from its context menu, or press **B** in Focus Dock to review observed changes. **Mark checked** explicitly sets the comparison baseline; opening an app leaves it unchanged. Optional Focus Session collection provides a digest of net badge changes. History, baseline and digest deletion controls are available in **Settings → Features → App badges → Review badge history**. See [Badge memory](docs/BADGE_MEMORY.md) for retention limits and observation gaps.
