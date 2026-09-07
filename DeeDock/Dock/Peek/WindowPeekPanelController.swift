@@ -77,6 +77,7 @@ final class WindowPeekPanelController {
         if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
         localMonitor = nil
         globalMonitor = nil
+        state.pinPortal = nil
         state.addToFusion = nil
         state.choose = nil
         state.showApp = nil
@@ -106,6 +107,10 @@ final class WindowPeekPanelController {
 
     private func handleKey(_ event: NSEvent) -> Bool {
         switch event.keyCode {
+        case 35 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
+            if let card = state.cards.first(where: { $0.id == state.selectedID }) {
+                state.pinPortal?(card.window)
+            }
         case 3 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
             if let card = state.cards.first(where: { $0.id == state.selectedID }) {
                 state.addToFusion?(card.window)

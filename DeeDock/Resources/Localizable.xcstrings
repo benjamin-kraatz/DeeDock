@@ -811,6 +811,366 @@
       }
     }
   },
+  "portalFocusNext": {
+    "comment": "Window portal: menu command to focus each existing portal in turn",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Focus next portal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nächstes Portal fokussieren"
+        }
+      }
+    }
+  },
+  "portalPin": {
+    "comment": "Window portal: Pin window portal",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin window portal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fensterportal anpinnen"
+        }
+      }
+    }
+  },
+  "portalConnecting": {
+    "comment": "Window portal: Connecting…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Connecting…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verbindung wird hergestellt …"
+        }
+      }
+    }
+  },
+  "portalLive": {
+    "comment": "Window portal: Live",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Live"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Live"
+        }
+      }
+    }
+  },
+  "portalPaused": {
+    "comment": "Window portal: Paused",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Paused"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pausiert"
+        }
+      }
+    }
+  },
+  "portalUnavailable": {
+    "comment": "Window portal: Source unavailable",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source unavailable"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelle nicht verfügbar"
+        }
+      }
+    }
+  },
+  "portalStale": {
+    "comment": "Window portal: Stale frame",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stale frame"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Veraltetes Bild"
+        }
+      }
+    }
+  },
+  "portalPermission": {
+    "comment": "Window portal: Screen Recording access required",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Screen Recording access required"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bildschirmaufnahme erlauben"
+        }
+      }
+    }
+  },
+  "portalResume": {
+    "comment": "Window portal: Resume updates",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Resume updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktualisierung fortsetzen"
+        }
+      }
+    }
+  },
+  "portalPause": {
+    "comment": "Window portal: Pause updates",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pause updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktualisierung pausieren"
+        }
+      }
+    }
+  },
+  "portalJump": {
+    "comment": "Window portal: Show source",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show source"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelle anzeigen"
+        }
+      }
+    }
+  },
+  "portalJumpHelp": {
+    "comment": "Window portal: Show the source window. If Window Access is unavailable, show its app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show the source window. If Window Access is unavailable, show its app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quellfenster anzeigen. Ohne Fensterzugriff wird die App angezeigt."
+        }
+      }
+    }
+  },
+  "portalJumpFallback": {
+    "comment": "Window portal: Exact window unavailable. Opened its app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exact window unavailable. Opened its app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster nicht erreichbar. Die App wurde geöffnet."
+        }
+      }
+    }
+  },
+  "portalClose": {
+    "comment": "Window portal: Close portal",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close portal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Portal schließen"
+        }
+      }
+    }
+  },
+  "portalMoveLeft": {
+    "comment": "Window portal: Move left",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move left"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach links bewegen"
+        }
+      }
+    }
+  },
+  "portalMoveRight": {
+    "comment": "Window portal: Move right",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move right"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach rechts bewegen"
+        }
+      }
+    }
+  },
+  "portalMoveUp": {
+    "comment": "Window portal: Move up",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move up"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach oben bewegen"
+        }
+      }
+    }
+  },
+  "portalMoveDown": {
+    "comment": "Window portal: Move down",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move down"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach unten bewegen"
+        }
+      }
+    }
+  },
+  "portalKeyboardHelp": {
+    "comment": "Window portal: Arrow keys move the portal. Return shows the source. Space pauses updates. Escape closes.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arrow keys move the portal. Return shows the source. Space pauses updates. Escape closes."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pfeiltasten bewegen das Portal. Eingabe zeigt die Quelle. Leertaste pausiert. Escape schließt."
+        }
+      }
+    }
+  },
+  "portalLimit": {
+    "comment": "Window portal: Close a portal before pinning another. You can keep up to four.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close a portal before pinning another. You can keep up to four."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schließe ein Portal, bevor du ein weiteres anpinnst. Du kannst bis zu vier behalten."
+        }
+      }
+    }
+  },
 
   "windowSearchShortcutHelp": {
     "comment": "Window search: Global shortcut: ⌘⇧Space",

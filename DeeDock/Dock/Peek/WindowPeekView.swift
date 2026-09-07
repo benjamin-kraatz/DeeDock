@@ -89,7 +89,8 @@ struct WindowPeekView: View {
             WindowPeekCardSlot(card: card, appIcon: state.appIcon, settings: state.settings,
                                selected: keyboard && state.selectedID == card.id, size: size,
                                choose: { state.choose?(card.id) },
-                               addToFusion: { state.addToFusion?(card.window) })
+                               addToFusion: { state.addToFusion?(card.window) },
+                               pinPortal: { state.pinPortal?(card.window) })
                 .onAppear { state.thumbnailNeeded?(card.id) }
         }
     }
@@ -135,15 +136,18 @@ private struct WindowPeekCardSlot: View {
     let size: CGSize
     let choose: () -> Void
     let addToFusion: () -> Void
+    let pinPortal: () -> Void
     @State private var hovering = false
 
     var body: some View {
         WindowPeekCardView(card: card, appIcon: appIcon, settings: settings,
                            selected: selected, action: choose)
             .contextMenu {
+                Button(.portalPin, systemImage: "pin", action: pinPortal)
                 Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
             }
             .accessibilityAction(named: Text(.fusionAdd), addToFusion)
+            .accessibilityAction(named: Text(.portalPin), pinPortal)
             .overlay(alignment: .topTrailing) {
                 WindowPeekFusionButton(revealed: hovering || selected, action: addToFusion)
                     .padding(7)
