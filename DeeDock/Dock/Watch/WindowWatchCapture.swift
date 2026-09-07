@@ -53,7 +53,7 @@ actor WindowWatchCapture {
         return token
     }
 
-    func sample(region: WindowWatchRegion, recognizeText: Bool) async throws -> WindowWatchFrame {
+    func sample(region: WindowWatchRegion, recognizeText: Bool, isAppHidden: Bool = false) async throws -> WindowWatchFrame {
         guard CGPreflightScreenCaptureAccess() else { throw WindowWatchFailure.permission }
         guard let window, let pid else { throw WindowWatchFailure.closed }
         let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
@@ -61,7 +61,7 @@ actor WindowWatchCapture {
         guard let current = content.windows.first(where: { $0.windowID == window.windowID && $0.owningApplication?.processID == pid }) else {
             throw WindowWatchFailure.closed
         }
-        guard current.isOnScreen else { throw WindowWatchFailure.offscreen }
+        guard current.isOnScreen, !isAppHidden else { throw WindowWatchFailure.offscreen }
         let filter = SCContentFilter(desktopIndependentWindow: current)
         let scale = min(Double(filter.pointPixelScale), 1600 / max(current.frame.width, current.frame.height, 1))
         let config = SCStreamConfiguration()

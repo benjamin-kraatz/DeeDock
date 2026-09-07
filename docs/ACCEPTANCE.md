@@ -1246,3 +1246,21 @@ not render the previews or exercise native interaction.
 xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
   -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee11-build build
 ```
+
+
+### DEE-11 review follow-up
+
+Merged current `main` into `feature/dee-11` without checking out `main`. Peek now preserves both
+Watch and App Fusion actions and their W/F shortcuts. The merged String Catalog preserves both
+features' entries.
+
+Review fixes cover offscreen setup retry, process identity around capture, clamped region controls,
+source-display panel placement, a fixed Stop/Dismiss footer, and serialization between dismissed and
+replacement sessions. Closed-window detection also continues while the source app is hidden.
+The focused Debug build passed at `/tmp/DeeDock-dee11-review-build.log`. Tests and automated visual
+checks were not run. Native acceptance remains pending, especially rapid dismiss/reopen during a
+slow capture, hidden-window closure, setup restore, display placement, and keyboard region editing.
+
+The final focused build passed after resolving the Peek anchor at click time, rather than retaining
+an earlier display frame. Log: `/tmp/DeeDock-dee11-review-final-build.log`. All 38 compiled English
+and German watch strings matched the catalog after merging App Fusion. `git diff --check` passed.

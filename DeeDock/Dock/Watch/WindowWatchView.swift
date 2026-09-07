@@ -5,24 +5,31 @@ struct WindowWatchView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                Label { Text(.watchTitle) } icon: { Image(systemName: session.active ? "eye.circle.fill" : "eye") }
-                    .font(.headline)
-                Text(verbatim: session.title).lineLimit(2)
-                if let image = session.image {
-                    WindowWatchRegionView(image: image, region: $session.region, editable: session.ready)
-                        .frame(height: 210)
-                    if session.finished {
-                        Button(.watchShowWindow) { session.showWindow() }
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label { Text(.watchTitle) } icon: { Image(systemName: session.active ? "eye.circle.fill" : "eye") }
+                        .font(.headline)
+                    Text(verbatim: session.title).lineLimit(2)
+                    if let image = session.image {
+                        WindowWatchRegionView(image: image, region: $session.region, editable: session.ready)
+                            .frame(height: 210)
+                        if session.finished {
+                            Button(.watchShowWindow) { session.showWindow() }
+                        }
                     }
+                    Text(session.message).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.updatesFrequently)
+                    if let date = session.lastSample {
+                        HStack { Text(.watchLastSample); Text(date, style: .time) }.font(.caption).foregroundStyle(.secondary)
+                    }
+                    if session.ready { setup }
+                    if let message = session.sourceMessage { Text(message).font(.caption) }
                 }
-                Text(session.message).fixedSize(horizontal: false, vertical: true)
-                    .accessibilityAddTraits(.updatesFrequently)
-                if let date = session.lastSample {
-                    HStack { Text(.watchLastSample); Text(date, style: .time) }.font(.caption).foregroundStyle(.secondary)
-                }
-                if session.ready { setup }
+                .padding(16)
+            }
+            Divider()
+            VStack(alignment: .leading, spacing: 8) {
                 if session.active {
                     HStack { ProgressView().controlSize(.small); Text(.watchIndeterminate) }
                     Button(.watchStop) { session.stop() }.keyboardShortcut(".", modifiers: .command)
@@ -30,13 +37,13 @@ struct WindowWatchView: View {
                 if session.finished {
                     Button(.watchShowSource) { session.showSource() }
                 }
-                if let message = session.sourceMessage { Text(message).font(.caption) }
                 Button(.watchDismiss) { session.close() }.keyboardShortcut(.cancelAction)
             }
-            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
         }
         .background(reduceTransparency ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor)) : AnyShapeStyle(.regularMaterial))
-        .frame(width: 460)
+        .frame(maxWidth: .infinity)
         .frame(maxHeight: .infinity)
     }
 
@@ -45,10 +52,10 @@ struct WindowWatchView: View {
             Button(.watchWholeWindow) { session.region = WindowWatchRegion() }
             Text(.watchRegionHelp).font(.caption)
             Grid(alignment: .leading) {
-                regionControl(.watchRegionX, value: $session.region.x, range: 0...0.95)
-                regionControl(.watchRegionY, value: $session.region.y, range: 0...0.95)
-                regionControl(.watchRegionWidth, value: $session.region.width, range: 0.05...1)
-                regionControl(.watchRegionHeight, value: $session.region.height, range: 0.05...1)
+                regionControl(.watchRegionX, value: regionBinding(\.x), range: 0...0.95)
+                regionControl(.watchRegionY, value: regionBinding(\.y), range: 0...0.95)
+                regionControl(.watchRegionWidth, value: regionBinding(\.width), range: 0.05...1)
+                regionControl(.watchRegionHeight, value: regionBinding(\.height), range: 0.05...1)
             }
             Picker(.watchCondition, selection: $session.usesPhrase) {
                 Text(.watchVisibleChange).tag(false)
@@ -63,6 +70,16 @@ struct WindowWatchView: View {
             Button(.watchStart) { session.start() }
                 .keyboardShortcut(.defaultAction)
                 .disabled(session.usesPhrase && session.phrase.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+    }
+
+    private func regionBinding(_ keyPath: WritableKeyPath<WindowWatchRegion, Double>) -> Binding<Double> {
+        Binding {
+            session.region.clamped[keyPath: keyPath]
+        } set: { value in
+            var region = session.region.clamped
+            region[keyPath: keyPath] = value
+            session.region = region.clamped
         }
     }
 
@@ -101,7 +118,7 @@ private struct WindowWatchRegionView: View {
                 let y = max(0, min(value.startLocation.y, value.location.y) / size.height)
                 region = WindowWatchRegion(x: x, y: y,
                                            width: abs(value.location.x - value.startLocation.x) / size.width,
-                                           height: abs(value.location.y - value.startLocation.y) / size.height)
+                                           height: abs(value.location.y - value.startLocation.y) / size.height).clamped
             })
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

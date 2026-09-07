@@ -138,10 +138,12 @@ final class WindowPeekCoordinator {
             self?.panelHovered = hovered
             if hovered { self?.closeTask?.cancel() } else { self?.scheduleClose() }
         }
-        next.state.watch = { [weak self] token in
-            guard let self, let summary = allWindows.first(where: { $0.token == token }) else { return }
+        next.state.watch = { [weak self, weak panel] token in
+            guard let self, let panel,
+                  let summary = allWindows.first(where: { $0.token == token }),
+                  let currentContext = panel.windowPeekContext(for: item.id) else { return }
             close(returnFocus: false)
-            watches.show(summary)
+            watches.show(summary, visibleFrame: currentContext.anchor.visibleFrame)
         }
         next.state.addToFusion = { [weak self, weak panel] window in
             guard let self, let panel else { return }

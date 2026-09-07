@@ -30,20 +30,41 @@ final class WindowWatchSession {
     @ObservationIgnored private var pixelSize: CGSize?
     @ObservationIgnored var dismiss: (() -> Void)?
 
-    init(summary: ApplicationWindowSummary) {
+    init(summary: ApplicationWindowSummary, after previousWork: Task<Void, Never>? = nil) {
         title = summary.title ?? String(localized: .applicationMenuUntitledWindow)
         process = NSRunningApplication(processIdentifier: summary.processIdentifier)
         launchDate = process?.launchDate
         observeLifecycle()
         task = Task { [weak self] in
-            guard let self else { return }
+            await previousWork?.value
+            guard let self, !Task.isCancelled else { return }
+            defer { staleTask?.cancel() }
             do {
+                _ = try validateProcess()
+                watchForStaleCapture()
                 try await capture.prepare(summary)
-                let frame = try await capture.sample(region: region, recognizeText: false)
-                guard !Task.isCancelled else { return }
-                image = frame.image
-                ready = true
-                message = .watchSetupHelp
+                _ = try validateProcess()
+                while !Task.isCancelled {
+                    do {
+                        let process = try validateProcess()
+                        watchForStaleCapture()
+                        let frame = try await capture.sample(region: region, recognizeText: false,
+                                                             isAppHidden: process.isHidden)
+                        try Task.checkCancellation()
+                        _ = try validateProcess()
+                        image = frame.image
+                        ready = true
+                        message = .watchSetupHelp
+                        return
+                    } catch {
+                        staleTask?.cancel()
+                        guard !Task.isCancelled else { return }
+                        fail(error)
+                        guard case .offscreen = error as? WindowWatchFailure else { return }
+                        // Keep the fixed identity while setup waits for the selected window to become visible.
+                        try await Task.sleep(for: .seconds(3))
+                    }
+                }
             } catch {
                 guard !Task.isCancelled else { return }
                 fail(error)
@@ -76,7 +97,11 @@ final class WindowWatchSession {
         run()
     }
 
-    func stop() {
+    /// Returns a drain barrier so a replacement watch cannot overlap an in-flight OS request.
+    @discardableResult
+    func stop() -> Task<Void, Never> {
+        let pendingCapture = task
+        let pendingSource = sourceTask
         generation = UUID()
         task?.cancel()
         sourceTask?.cancel()
@@ -86,6 +111,10 @@ final class WindowWatchSession {
         finished = true
         message = .watchStopped
         removeObservers()
+        return Task {
+            await pendingCapture?.value
+            await pendingSource?.value
+        }
     }
 
     func close() {
@@ -97,7 +126,8 @@ final class WindowWatchSession {
 
     /// Opening the source is always an explicit action; monitoring, Stop and Dismiss never activate it.
     func showWindow() {
-        guard sourceTask == nil, let process, !process.isTerminated, process.launchDate == launchDate else { return }
+        guard sourceTask == nil else { return }
+        guard let process = try? validateProcess() else { sourceMessage = .watchClosed; return }
         sourceTask = Task { [weak self] in
             guard let self else { return }
             let windows = AccessibilityApplicationWindowService()
@@ -107,6 +137,7 @@ final class WindowWatchSession {
                     processIdentifier: process.processIdentifier, isHidden: process.isHidden, isActive: process.isActive)], sessionID: id)
                 let token = try await capture.sourceToken(in: summaries)
                 try Task.checkCancellation()
+                _ = try validateProcess()
                 try await windows.selectWindow(token)
             } catch {
                 if !Task.isCancelled { sourceMessage = .watchSourceUnavailable }
@@ -117,7 +148,7 @@ final class WindowWatchSession {
     }
 
     func showSource() {
-        guard let process, !process.isTerminated, process.launchDate == launchDate else {
+        guard let process = try? validateProcess() else {
             message = .watchClosed
             return
         }
@@ -137,19 +168,13 @@ final class WindowWatchSession {
             guard let self, !Task.isCancelled, generation == expected else { return }
             while active && !Task.isCancelled && generation == expected {
                 do {
-                    guard let process, !process.isTerminated, process.launchDate == launchDate else {
-                        throw WindowWatchFailure.closed
-                    }
-                    guard !process.isHidden else { throw WindowWatchFailure.offscreen }
+                    let process = try validateProcess()
                     message = .watchSampling
-                    staleTask = Task { [weak self] in
-                        do { try await Task.sleep(for: .seconds(15)) } catch { return }
-                        guard let self, generation == expected, active else { return }
-                        message = .watchStale
-                    }
-                    let frame = try await capture.sample(region: watchedRegion, recognizeText: !watchedPhrase.isEmpty)
+                    watchForStaleCapture()
+                    let frame = try await capture.sample(region: watchedRegion, recognizeText: !watchedPhrase.isEmpty, isAppHidden: process.isHidden)
                     staleTask?.cancel()
                     guard !Task.isCancelled, generation == expected else { return }
+                    _ = try validateProcess()
                     // Geometry changes invalidate evidence. A resized layout requires a new baseline.
                     if size != frame.size || pixelSize != frame.pixelSize {
                         detector = WindowWatchDetector()
@@ -177,6 +202,23 @@ final class WindowWatchSession {
                 }
                 do { try await Task.sleep(for: .seconds(3)) } catch { return }
             }
+        }
+    }
+
+    private func validateProcess() throws -> NSRunningApplication {
+        guard let process, let launchDate, !process.isTerminated, process.launchDate == launchDate else {
+            throw WindowWatchFailure.closed
+        }
+        return process
+    }
+
+    private func watchForStaleCapture() {
+        staleTask?.cancel()
+        let expected = generation
+        staleTask = Task { [weak self] in
+            do { try await Task.sleep(for: .seconds(15)) } catch { return }
+            guard let self, generation == expected, !finished else { return }
+            message = .watchStale
         }
     }
 
@@ -217,7 +259,9 @@ final class WindowWatchSession {
         if suspended { suspensionReasons.insert(reason) } else { suspensionReasons.remove(reason) }
         guard active else {
             if !finished {
+                generation = UUID()
                 task?.cancel()
+                staleTask?.cancel()
                 ready = false
                 image = nil
                 message = .watchSetupInterrupted
