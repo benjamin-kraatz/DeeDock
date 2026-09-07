@@ -38,7 +38,9 @@ struct BossFightSettingsView: View {
                       allowsMultipleSelection: true) { result in
             switch result {
             case .success(let urls): controller.addPartyApps(urls)
-            case .failure: controller.error = String(localized: .bossFightPickerFailed)
+            case .failure(let error):
+                guard (error as? CocoaError)?.code != .userCancelled else { return }
+                controller.error = String(localized: .bossFightPickerFailed)
             }
         }
     }

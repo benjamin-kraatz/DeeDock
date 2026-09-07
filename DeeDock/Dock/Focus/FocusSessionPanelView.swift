@@ -53,14 +53,21 @@ struct FocusSessionPanelView: View {
 
     private func time(_ session: FocusSession, date: Date) -> some View {
         VStack {
-            if controller.bossFight.enabled && session.phase != .completed {
+            if controller.bossFight.enabled && (session.phase != .completed || controller.bossVictoryID != nil) {
                 BossFightStatusView(session: session, date: date, controller: controller)
             }
             Text(verbatim: session.timeLabel(at: date)).font(.system(size: 46, weight: .light)).monospacedDigit()
-                .accessibilityLabel(Text(.bossFightTimeRemaining(session.timeLabel(at: date))))
+                .accessibilityLabel(timerLabel(session, date: date))
             Text(session.phase == .completed ? .focusCompleted : session.phase == .paused ? .focusPaused : .focusRunning)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private func timerLabel(_ session: FocusSession, date: Date) -> Text {
+        guard controller.bossFight.enabled else { return Text(verbatim: session.timeLabel(at: date)) }
+        return session.phase == .completed
+            ? Text(.focusCompleted)
+            : Text(.bossFightTimeRemaining(session.timeLabel(at: date)))
     }
 }
 

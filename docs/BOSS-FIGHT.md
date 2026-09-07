@@ -2,7 +2,8 @@
 
 Boss Fight is an optional skin for Focus Sessions. Enable it in Settings > Features >
 Focus Sessions, choose up to eight work apps, then start a Focus Session from a Dock Mode
-as usual. The party appears in the timer panel. The dock tile shows a boss portrait,
+as usual. The party appears in the timer panel during the session and its brief victory.
+The dock tile shows a boss portrait,
 remaining-time health bar, and timer; a pause symbol replaces the portrait while paused.
 
 Health is the existing timer's remaining fraction. It does not measure productivity or
@@ -15,7 +16,8 @@ paused time. Party changes apply immediately. An empty party is allowed; unavail
 retain their saved name and use a system app symbol until they can be resolved again.
 
 Completion shows a silent trophy in the existing dock tile for three seconds. Open the
-timer panel and choose Dismiss celebration to end it sooner. The ordinary completed timer
+timer panel and choose Dismiss celebration to end it sooner. The victory panel retains
+the party and zero health until the ornament ends. The ordinary completed timer
 and Save as Session Capsule action remain after the ornament expires. Finishing early
 uses the same completion behavior. Cancel session removes the timer without celebrating
 or capturing anything. Starting another session, disabling the skin, resetting storage,
@@ -43,8 +45,9 @@ after three seconds and is owned, cancelled, and checked against its event ID.
 
 Reduce Motion prevents trophy movement. Health changes have no ornamental animation.
 Reduce Transparency retains the existing opaque panel and dock appearance handling.
-The timer panel exposes phase, remaining time, health percentage, party names, and native
-buttons to VoiceOver without posting per-tick announcements. It scrolls when its contents
+The timer panel exposes phase, remaining time, and native buttons to VoiceOver without
+posting per-tick announcements. Health percentage and party names remain available during
+the active session and brief victory. It scrolls when its contents
 exceed available space, including when enabled while a smaller normal panel is open.
 
 ## Model and state cases worth testing

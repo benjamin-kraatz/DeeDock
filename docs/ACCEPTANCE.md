@@ -963,6 +963,12 @@ The catalog parses, and all 15 new keys match the built English and German resou
 No tests, previews, app launches, automated visual checks, or hands-on acceptance were run.
 Compilation is not native acceptance; DEE-18 must remain open for the documented checks.
 
+A GPT 5.6 Luna review at Extra High prompted follow-up fixes for picker cancellation,
+normal-timer accessibility copy, and party/zero-health visibility during victory. The
+focused app build passed again on 2026-09-08 after those changes. The latest main branch
+was merged on this feature branch; the catalog conflict preserves both Window Watch
+and Boss Fight entries. No native acceptance was performed as part of the review.
+
 ### Original timer implementation
 
 Implemented one shared, persisted focus timer started from an existing Dock Mode through Settings or the menu bar. Starting the already-active mode works without requiring a redundant mode activation. Switching to another mode must save successfully before its timer starts. Running or paused sessions prevent a second start. Timers retain the starting mode's identity and name independently of later mode edits.
