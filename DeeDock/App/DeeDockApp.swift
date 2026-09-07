@@ -37,6 +37,7 @@ struct DeeDockApp: App {
             Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
                 .keyboardShortcut("f", modifiers: [.command, .shift])
             Text(delegate.coordinator.searchShortcutAvailable ? .windowSearchShortcutHelp : .windowSearchShortcutUnavailable)
+            Button(.fusionTitle) { delegate.coordinator.showFusion() }
             DockModesMenu(coordinator: delegate.coordinator)
             Divider()
             OpenDockSettingsButton()
