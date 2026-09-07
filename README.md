@@ -69,6 +69,12 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 ## Using DDock
 
+The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes
+grid and list views, filters, sorting, grouping, and a history of apps opened through DDock.
+**Ask Robi** uses on-device Apple Intelligence to suggest apps for a task you describe.
+See the [launcher reference](docs/LAUNCHER.md) for controls and discovery limits, and the
+[acceptance notes](docs/ACCEPTANCE.md#dee-8-app-launcher) for validation status.
+
 DDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DDock; dedicated coexistence controls are future work.
 
 - Click an icon to open or activate its application. Click the foreground application's icon to hide all of its windows; click again to show and activate it.

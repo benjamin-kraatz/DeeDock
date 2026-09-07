@@ -25,42 +25,74 @@ struct DockSurfaceView: View {
     /// Reports actual button geometry, including during animation, for native click passthrough.
     let iconFrameChanged: (String, CGRect?) -> Void
 
+    /// The launcher's glass stands in for the dock's while the two crossfade. Drawing both would
+    /// stack two translucent materials, which reads as every surface brightening.
+    var drawsBackground = true
     var menuTracking: (Bool) -> Void = { _ in }
     var accessibilityFocus: (String, Bool) -> Void = { _, _ in }
 
     private var opacity: DockAppearanceOpacity {
-        DockAppearanceOpacity(settings: interaction.idleFade.settings,
-            idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency)
+        DockAppearanceOpacity(
+            settings: interaction.idleFade.settings,
+            idleFraction: interaction.idleFade.fraction,
+            reduceTransparency: reduceTransparency
+        )
     }
 
     private var centers: [CGFloat] { layout.centers(sizes: sizes) }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            DockBackgroundView(reduceTransparency: reduceTransparency,
-                cornerRadius: min(interaction.idleFade.settings.cornerRadius, min(surface.width, surface.height) / 2),
-                idleOpacity: opacity.background)
-                .animation(interaction.idleFade.animation, value: opacity.background)
+            if drawsBackground {
+                DockBackgroundView(
+                    reduceTransparency: reduceTransparency,
+                    cornerRadius: min(
+                        interaction.idleFade.settings.cornerRadius,
+                        min(surface.width, surface.height) / 2
+                    ),
+                    idleOpacity: opacity.background
+                )
+                .animation(
+                    interaction.idleFade.animation,
+                    value: opacity.background
+                )
                 .frame(width: surface.width, height: surface.height)
                 .position(x: surface.midX, y: surface.midY)
+            }
             if slots.isEmpty {
                 Text(.dockEmptyState)
                     .font(.caption).foregroundStyle(.secondary)
-                    .frame(width: max(1, surface.width - 8), height: max(1, surface.height - 8))
+                    .frame(
+                        width: max(1, surface.width - 8),
+                        height: max(1, surface.height - 8)
+                    )
                     .minimumScaleFactor(0.7)
                     .position(x: surface.midX, y: surface.midY)
             }
             ForEach(layout.separatorIndices.sorted(), id: \.self) { index in
                 if index < centers.count {
-                let icon = layout.iconFrame(centerAlong: centers[index], size: layout.iconSize)
-                let position = centers[index] - sizes[index] / 2 - 12
-                Rectangle().fill(.primary.opacity(0.18))
-                    .animation(interaction.idleFade.animation) { $0.opacity(opacity.background) }
-                    .frame(width: layout.edge.isVertical ? layout.iconSize * 0.65 : 1,
-                           height: layout.edge.isVertical ? 1 : layout.iconSize * 0.65)
-                    .position(x: layout.edge.isVertical ? icon.midX : position,
-                              y: layout.edge.isVertical ? position : icon.midY + (layout.edge == .top ? -3 : 3))
-                    .accessibilityHidden(true)
+                    let icon = layout.iconFrame(
+                        centerAlong: centers[index],
+                        size: layout.iconSize
+                    )
+                    let position = centers[index] - sizes[index] / 2 - 12
+                    Rectangle().fill(.primary.opacity(0.18))
+                        .animation(interaction.idleFade.animation) {
+                            $0.opacity(opacity.background)
+                        }
+                        .frame(
+                            width: layout.edge.isVertical
+                                ? layout.iconSize * 0.65 : 1,
+                            height: layout.edge.isVertical
+                                ? 1 : layout.iconSize * 0.65
+                        )
+                        .position(
+                            x: layout.edge.isVertical ? icon.midX : position,
+                            y: layout.edge.isVertical
+                                ? position
+                                : icon.midY + (layout.edge == .top ? -3 : 3)
+                        )
+                        .accessibilityHidden(true)
                 }
             }
             ForEach(Array(slots.enumerated()), id: \.element.id) {
@@ -75,38 +107,65 @@ struct DockSurfaceView: View {
                         centerAlong: centers[index],
                         size: sizes[index]
                     )
-                    DockEntryView(slot: slot, size: sizes[index],
-                        launching: slot.item.map { launchingIDs.contains($0.id) } ?? false,
-                        selected: keyboardFocus && selectedTarget == slot.target,
-                        interaction: interaction, reduceTransparency: reduceTransparency,
-                        primaryAppAction: primaryAppAction, openApp: openApp,
-                        togglePin: togglePin, menuTracking: menuTracking,
-                        accessibilityFocus: accessibilityFocus)
-                        .onHover { inside in
-                            if inside { hoveredID = slot.target }
-                            else if hoveredID == slot.target { hoveredID = nil }
+                    DockEntryView(
+                        slot: slot,
+                        size: sizes[index],
+                        launching: slot.item.map {
+                            launchingIDs.contains($0.id)
+                        } ?? false,
+                        selected: keyboardFocus
+                            && selectedTarget == slot.target,
+                        interaction: interaction,
+                        reduceTransparency: reduceTransparency,
+                        primaryAppAction: primaryAppAction,
+                        openApp: openApp,
+                        togglePin: togglePin,
+                        menuTracking: menuTracking,
+                        accessibilityFocus: accessibilityFocus
+                    )
+                    .onHover { inside in
+                        if inside {
+                            hoveredID = slot.target
+                        } else if hoveredID == slot.target {
+                            hoveredID = nil
                         }
-                        .onGeometryChange(for: DockEntryFrames.self) {
-                            DockEntryFrames(root: $0.frame(in: .named("dockRoot")), canvas: $0.frame(in: .named("dockCanvas")))
-                        } action: { frames in
-                            guard let target = slot.target else { return }
-                            iconFrameChanged(target.hitID, frames.root)
-                            interaction.setRenderedFrame(frames.canvas, for: target)
-                        }
-                        .onDisappear {
-                            guard let target = slot.target else { return }
-                            iconFrameChanged(target.hitID, nil)
-                            interaction.setRenderedFrame(nil, for: target)
-                        }
-                        .id(slot.id)
-                        .position(x: slot.item == nil && slot.target == nil ? iconFrame.midX : frame.midX,
-                                  y: slot.item == nil && slot.target == nil ? iconFrame.midY : frame.midY)
+                    }
+                    .onGeometryChange(for: DockEntryFrames.self) {
+                        DockEntryFrames(
+                            root: $0.frame(in: .named("dockRoot")),
+                            canvas: $0.frame(in: .named("dockCanvas"))
+                        )
+                    } action: { frames in
+                        guard let target = slot.target else { return }
+                        iconFrameChanged(target.hitID, frames.root)
+                        interaction.setRenderedFrame(frames.canvas, for: target)
+                    }
+                    .onDisappear {
+                        guard let target = slot.target else { return }
+                        iconFrameChanged(target.hitID, nil)
+                        interaction.setRenderedFrame(nil, for: target)
+                    }
+                    .id(slot.id)
+                    .position(
+                        x: slot.item == nil && slot.target == nil
+                            ? iconFrame.midX : frame.midX,
+                        y: slot.item == nil && slot.target == nil
+                            ? iconFrame.midY : frame.midY
+                    )
                 }
             }
-            DockTooltipsOverlay(slots: slots, frames: interaction.renderedFrames, hovered: hoveredID,
-                selected: keyboardFocus ? selectedTarget : nil, enabled: showsLabel,
-                layout: layout, viewport: viewport, interaction: interaction,
-                reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
+            DockTooltipsOverlay(
+                slots: slots,
+                frames: interaction.renderedFrames,
+                hovered: hoveredID,
+                selected: keyboardFocus ? selectedTarget : nil,
+                enabled: showsLabel,
+                layout: layout,
+                viewport: viewport,
+                interaction: interaction,
+                reduceMotion: reduceMotion,
+                reduceTransparency: reduceTransparency
+            )
         }
         .frame(width: layout.canvasSize.width, height: layout.canvasSize.height)
         .coordinateSpace(name: "dockCanvas")

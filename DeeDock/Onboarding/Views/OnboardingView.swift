@@ -66,7 +66,7 @@ struct OnboardingView: View {
     private var pageAnimation: Animation? { reduceMotion ? nil : .smooth(duration: 0.32) }
 
     /// Content leaves the way it came: forward moves push the page left, back moves push right.
-    /// Reduce Motion crossfades instead, matching `SettingsDetailView`.
+    /// Reduce Motion crossfades instead, matching the settings detail column.
     private var transition: AnyTransition {
         guard !reduceMotion else { return .opacity }
         let distance: CGFloat = store.isMovingForward ? 22 : -22

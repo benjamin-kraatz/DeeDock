@@ -7,7 +7,7 @@ struct DockFolderButton: View {
     let interaction: DockInteraction
     let menuTracking: (Bool) -> Void
     let accessibilityFocus: (Bool) -> Void
-    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
@@ -44,7 +44,7 @@ struct DockFolderButton: View {
         }
         .overlay {
             FolderContextMenuBridge(item: item, interaction: interaction, openSettings: {
-                interaction.prepareSettings?(); NSApp.activate(); openSettings()
+                interaction.prepareSettings?(); NSApp.activate(); openWindow(id: "settings")
             }, tracking: menuTracking)
         }
         .accessibilityFocused($accessibilityFocused)

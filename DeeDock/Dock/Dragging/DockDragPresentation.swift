@@ -8,6 +8,7 @@ struct DockDragProposal: Equatable {
 
 /// A stable render identity for either an application or one place in a multi-app insertion gap.
 enum DockRenderSlot: Identifiable {
+    case launcher
     case focus(FocusDockItem)
     case action(ActionDockItem)
     case app(DockItem)
@@ -21,6 +22,7 @@ enum DockRenderSlot: Identifiable {
 
     var id: String {
         switch self {
+        case .launcher: return DockEntryID.launcher.hitID
         case .focus: return DockEntryID.focus.hitID
         case .action(let item): return DockEntryID.action(item.tile.id).hitID
         case .app(let item): return "app:\(item.id)"
@@ -38,7 +40,7 @@ enum DockRenderSlot: Identifiable {
         case .app(let item): return item.isFavorite
         case .folder, .gap: return true
         case .group(let control): return control.group == .pinned
-        case .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash: return false
+        case .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash: return false
         }
     }
     var item: DockItem? { if case .app(let item) = self { return item }; return nil }
@@ -50,13 +52,13 @@ enum DockRenderSlot: Identifiable {
     /// Trailing tiles that are neither pins nor running applications, and share one divider.
     var action: ActionDockItem? { if case .action(let item) = self { return item }; return nil }
     var focus: FocusDockItem? { if case .focus(let item) = self { return item }; return nil }
-    var isUtility: Bool { focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil }
+    var isUtility: Bool { target == .launcher || focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil }
     var appGroup: DockAppGroup? {
         switch self {
         case .app(let item): item.isFavorite ? .pinned : .running
         case .folder: .pinned
         case .group(let control): control.group
-        case .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash, .gap: nil
+        case .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash, .gap: nil
         }
     }
     var pin: DockPin? {
@@ -69,6 +71,7 @@ enum DockRenderSlot: Identifiable {
     var icon: NSImage? { item?.icon ?? folder?.icon ?? capsule?.icon ?? capsules?.icon ?? shelf?.icon ?? trash?.icon }
     var name: String {
         switch self {
+        case .launcher: String(localized: .launcherTitle)
         case .focus(let item): String(localized: .focusTileName(item.session.modeName))
         case .action(let item): item.tile.name
         case .app(let item): item.reference.name
@@ -84,6 +87,7 @@ enum DockRenderSlot: Identifiable {
 
     var target: DockEntryID? {
         switch self {
+        case .launcher: .launcher
         case .focus: .focus
         case .action(let item): .action(item.tile.id)
         case .app(let item): .app(item.id)
@@ -110,7 +114,7 @@ enum DockRenderSlot: Identifiable {
         if entries.contains(where: { if case .group(let c) = $0 { return c.group == .pinned && !c.expanded }; return false }) { return entries }
         let boundary = pins.prefix(max(0, proposal.index)).filter { !ids.contains($0.id) }.count
         var result = entries.filter { slot in slot.pin.map { !ids.contains($0.id) } ?? true }
-        let controlCount = result.prefix { if case .group(let c) = $0 { return c.group == .pinned }; return false }.count
+        let controlCount = result.prefix { if case .launcher = $0 { return true }; if case .group(let c) = $0 { return c.group == .pinned }; return false }.count
         result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: min(controlCount + boundary, result.count))
         return result
     }

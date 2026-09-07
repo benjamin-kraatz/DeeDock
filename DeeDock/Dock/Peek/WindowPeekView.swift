@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WindowPeekView: View {
+    @Environment(\.openWindow) private var openWindow
     let state: WindowPeekState
     let keyboard: Bool
     var reduceTransparencyOverride: Bool? = nil
@@ -99,10 +100,11 @@ struct WindowPeekView: View {
             HStack {
                 Button(.windowPeekShowApp) { state.showApp?() }
                 if settings {
-                    SettingsLink {
-                        Text(.windowPeekOpenSettings)
+                    Button(.windowPeekOpenSettings) {
+                        state.settingsSelected?()
+                        NSApp.activate()
+                        openWindow(id: "settings")
                     }
-                    .simultaneousGesture(TapGesture().onEnded { state.settingsSelected?() })
                 }
             }
         }

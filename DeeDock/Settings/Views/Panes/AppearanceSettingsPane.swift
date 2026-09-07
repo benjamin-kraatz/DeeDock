@@ -28,13 +28,6 @@ struct AppearanceSettingsPane: View {
                                           appearanceSettings: previewSettings)
                 }
             }
-            SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
-                RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle, animated: animateIndicators)
-                    .settingsOverride(overrideContext, field: .runningIndicatorStyle)
-                SettingsToggleRow(title: .settingsAnimateIndicators, isOn: $animateIndicators)
-                    .disabled(!runningIndicatorStyle.animates)
-                    .settingsOverride(overrideContext, field: .animateIndicators)
-            }
             SettingsCard(title: .settingsCornerRadius, footnote: .settingsCornerRadiusHelp) {
                 SettingsSliderRow(title: .settingsCornerRadius, unit: .settingsPoints,
                                   value: $cornerRadius, range: 0...100, step: 1,
@@ -59,6 +52,13 @@ struct AppearanceSettingsPane: View {
                                   defaultValue: DockSettings.defaults.itemSpacing)
                     .settingsOverride(overrideContext, field: .itemSpacing)
             }
+            SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
+                RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle, animated: animateIndicators)
+                    .settingsOverride(overrideContext, field: .runningIndicatorStyle)
+                SettingsToggleRow(title: .settingsAnimateIndicators, isOn: $animateIndicators)
+                    .disabled(!runningIndicatorStyle.animates)
+                    .settingsOverride(overrideContext, field: .animateIndicators)
+            }
         }
     }
 }
@@ -76,7 +76,7 @@ struct AppearanceSettingsPane: View {
                                runningIndicatorStyle: $indicator, animateIndicators: $animate)
             .padding(24)
     }
-    .tint(SettingsCategory.appearance.tint)
+    .tint(SettingsPage.appearance.tint)
     .frame(width: 560, height: 520)
 }
 #endif

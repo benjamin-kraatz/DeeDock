@@ -14,7 +14,15 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     private(set) lazy var onboarding = OnboardingWindowController(
         loginItems: loginItems, settings: coordinator.settings)
 
+    /// Xcode 27's JIT canvas uses the playground flag, while older preview hosts use the preview flag.
+    private var isRunningForCanvasPreview: Bool {
+        let environment = ProcessInfo.processInfo.environment
+        return environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+            || environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        guard !isRunningForCanvasPreview else { return }
         NSApp.setActivationPolicy(.accessory)
         loginItems.refresh()
         windowAccess.refresh()
@@ -29,6 +37,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        guard !isRunningForCanvasPreview else { return }
         #if DIRECT_DISTRIBUTION
         updater.stop()
         #endif

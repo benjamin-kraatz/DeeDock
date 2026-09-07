@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Retains the redesigned sidebar, pane previews, cards, and search while adding display scope.
+/// Sidebar sections with a native navigation stack for each section’s pages.
 struct DockSettingsView: View {
     let store: DockSettingsStore
     let profiles: DisplayProfilesStore
@@ -9,39 +9,33 @@ struct DockSettingsView: View {
     let windowAccess: WindowAccessController
     let screenCapture: ScreenCaptureAccessController
     var coordinator: DockCoordinator? = nil
-    @State private var selection: SettingsSelection? = .defaults(.appearance)
+    @State private var selection: SettingsSection? = .dock
+    /// An empty path shows the selected section’s overview.
+    @State private var path: [SettingsPage] = []
     @State private var settingsActive = false
     @State private var searchText = ""
-    @State private var displayCategory: SettingsCategory = .appearance
+
+    private var context: SettingsContext {
+        SettingsContext(store: store, profiles: profiles, loginItems: loginItems, menuBarIcon: menuBarIcon,
+                        windowAccess: windowAccess, screenCapture: screenCapture, coordinator: coordinator)
+    }
+
+    /// The display being edited, when the sidebar has one selected.
+    private var override: SettingsOverrideContext? {
+        guard case .display(let id) = selection else { return nil }
+        return SettingsOverrideContext(profiles: profiles, id: id)
+    }
 
     var body: some View {
         NavigationSplitView {
-            SettingsSidebar(selection: $selection, searchText: $searchText, profiles: profiles)
+            SettingsSidebar(selection: Binding(get: { selection }, set: {
+                path = []
+                selection = $0
+            }), searchText: $searchText, profiles: profiles)
                 .navigationSplitViewColumnWidth(min: 200, ideal: 235, max: 300)
         } detail: {
-            switch selection {
-            case .general:
-                GeneralSettingsPane(controller: loginItems, menuBarIcon: menuBarIcon)
-            case .modes:
-                DockModesSettingsPane(store: profiles.modes,
-                                      activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
-                                      deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
-                                      startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true)
-            case .features:
-                FeaturesSettingsPane(focus: coordinator?.focusSession, actions: coordinator?.actionTiles, store: store, profiles: profiles,
-                                     windowAccess: windowAccess, screenCapture: screenCapture)
-            case .defaults(let category):
-                SettingsDetailView(store: store, profiles: profiles, category: category,
-                                   profileError: profiles.errorMessage ?? profiles.modes.errorMessage)
-            case .display(let id):
-                SettingsDetailView(store: store, profiles: profiles, category: displayCategory,
-                                   context: SettingsOverrideContext(profiles: profiles, id: id),
-                                   profileError: profiles.errorMessage ?? profiles.modes.errorMessage ?? profiles.pinErrors[id], showZone: zoneAction(for: id),
-                                   displayCategory: $displayCategory)
-                    .id(id)
-            case nil:
-                SettingsDetailView(store: store, profiles: profiles, category: nil)
-            }
+            detail
+                .safeAreaInset(edge: .bottom, spacing: 0) { footer }
         }
         .background {
             SettingsWindowLifecycle(closed: {
@@ -59,7 +53,7 @@ struct DockSettingsView: View {
         }
         .onChange(of: profiles.displays) { _, _ in updateDisplayIndicator() }
         .onChange(of: selectedDisplayDockEdge) { _, _ in updateDisplayIndicator() }
-        .onChange(of: displayCategory) { _, _ in coordinator?.zonePreview.stop() }
+        .onChange(of: path) { _, _ in coordinator?.zonePreview.stop() }
         .onChange(of: selection) { _, _ in
             coordinator?.zonePreview.stop()
             updateDisplayIndicator()
@@ -71,21 +65,18 @@ struct DockSettingsView: View {
             // Connectivity may have changed between the menu action and scene creation.
             guard profiles.displays.count > 1,
                   profiles.displays.contains(where: { $0.id == requestedID }) else { return }
-            searchText = ""
-            selection = .display(requestedID)
+            select(.display(requestedID))
         }
         .onChange(of: coordinator?.settingsModesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsModesRequest = false
-            searchText = ""
-            selection = .modes
+            select(.modes)
         }
         .onChange(of: coordinator?.settingsFeaturesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false
-            searchText = ""
             // Window Peek and its permissions are app-wide, so there is no display to select.
-            selection = .features
+            select(.features, page: .windowPeek)
         }
         .onDisappear {
             settingsActive = false
@@ -95,9 +86,91 @@ struct DockSettingsView: View {
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 740, idealWidth: 820, minHeight: 540, idealHeight: 650)
         .onChange(of: profiles.document.profiles.keys.sorted()) { _, ids in
-            if case .display(let id) = selection, !ids.contains(id) { selection = .defaults(.appearance) }
+            if case .display(let id) = selection, !ids.contains(id) { select(.dock) }
         }
     }
+
+    private var detail: some View {
+        NavigationStack(path: $path) {
+            overview
+                .navigationDestination(for: SettingsPage.self) { page in
+                    SettingsPageView(page: page, context: context, override: override,
+                                     showZone: override.flatMap { zoneAction(for: $0.id) })
+                }
+        }
+    }
+
+    @ViewBuilder private var overview: some View {
+        switch selection {
+        case .general:
+            SettingsOverviewView(section: .general, open: open)
+        case .features:
+            SettingsOverviewView(section: .features, isAvailable: isAvailable, open: open)
+        case .dock:
+            SettingsOverviewView(section: .dock, open: open)
+        case .modes:
+            DockModesSettingsPane(store: profiles.modes,
+                                  activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
+                                  deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
+                                  startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true)
+        case .display(let id):
+            displayOverview(SettingsOverrideContext(profiles: profiles, id: id)).id(id)
+        case nil:
+            ContentUnavailableView {
+                Label { Text(.settingsSelectSection) } icon: { Image(systemName: "slider.horizontal.3") }
+            }
+        }
+    }
+
+    private func displayOverview(_ context: SettingsOverrideContext) -> some View {
+        let name = context.profiles.document.profiles[context.id]?.name
+        return SettingsOverviewView(section: .display(context.id),
+                                    title: name.map { Text(verbatim: $0) } ?? Text(.displayUnnamed),
+                                    open: open) {
+            DisplaySettingsHeader(context: context)
+        }
+    }
+
+    private func open(_ page: SettingsPage) { path.append(page) }
+
+    /// A page the build or this machine cannot offer is left out of its overview entirely.
+    private func isAvailable(_ page: SettingsPage) -> Bool {
+        switch page {
+        case .focusSessions: coordinator?.focusSession != nil
+        case .actionTiles: coordinator?.actionTiles != nil
+        default: true
+        }
+    }
+
+    /// General and Modes own no dock preferences, so they carry no reset action.
+    @ViewBuilder private var footer: some View {
+        switch selection {
+        case .dock, .features, .display:
+            SettingsFooterBar(errorMessage: context.errorMessage(override),
+                              resetTitle: override == nil ? .settingsRestoreDefaults : .displayUseDefaults,
+                              resetDisabled: override != nil && profiles.requiresReset,
+                              restoreDefaults: restoreDefaults)
+        default:
+            EmptyView()
+        }
+    }
+
+    private func restoreDefaults() {
+        if let override { profiles.useDefaults(for: override.id) }
+        else {
+            store.restoreDefaults()
+            profiles.restoreDefaultVisibility()
+        }
+    }
+
+    /// A request from outside the window always lands where it was asked for, never mid-navigation.
+    private func select(_ section: SettingsSection, page: SettingsPage? = nil) {
+        searchText = ""
+        selection = section
+        // Set both together so external requests can open a specific destination.
+        path = page.map { [$0] } ?? []
+    }
+
     private func updateDisplayIndicator(active: Bool? = nil) {
         let id: String?
         if case .display(let selectedID) = selection { id = selectedID } else { id = nil }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A continuous setting: a labeled slider with a precise, editable value pill.
+/// A continuous setting: a labeled slider with an adjacent standard numeric field.
 ///
 /// The slider is unstepped so macOS does not draw a tick rail across wide ranges; values are
 /// snapped to `step` in the binding instead, matching the precision that gets persisted.
@@ -25,23 +25,17 @@ struct SettingsSliderRow: View {
     }
 
     var body: some View {
-        SettingsStackedRow {
+        SettingsStackedRow(title: title) {
             HStack(spacing: 12) {
-                Text(title)
-                Spacer(minLength: 8)
-                if let defaultValue, value != defaultValue {
-                    SettingsResetButton(title: title) {
-                        // Preserve the model's exact default; the existing binding owns persistence.
-                        value = defaultValue
-                    }
-                }
-                SettingsValueField(title: title, unit: unit, value: $value, range: range, step: step)
-            }
-            HStack(spacing: 9) {
                 endcap(minimumSymbol)
                 Slider(value: snapped, in: range) { Text(title) }
                     .labelsHidden()
                 endcap(maximumSymbol)
+                SettingsValueField(title: title, unit: unit, value: $value, range: range, step: step)
+                if let defaultValue {
+                    SettingsResetButton(title: title) { value = defaultValue }
+                        .disabled(value == defaultValue)
+                }
             }
         }
     }

@@ -58,7 +58,7 @@ final class DockCoordinator {
         profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository(),
                                          modesRepository: DockModesRepository())
         let applicationService = ApplicationService()
-        catalog = ApplicationCatalog(service: applicationService)
+        catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory())
         let menus = ApplicationMenuController(
             access: windowAccess,
             applications: ApplicationMenuService(applications: applicationService),
@@ -254,6 +254,16 @@ final class DockCoordinator {
                     endFocus(restore: false)
                 }
             }
+            panel.launcherWillOpen = { [weak self, weak panel] in
+                guard let self, let panel else { return nil }
+                let previous = previousApplication ?? lastExternalApplication
+                popovers.closeAll()
+                windowPeeks.close(returnFocus: false)
+                modePicker.close(returnFocus: false)
+                endFocus(restore: false)
+                for other in panels.values where other !== panel { other.closeLauncher() }
+                return previous
+            }
             panel.exclusiveInteractionBegan = { [weak self] in
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
@@ -355,6 +365,11 @@ final class DockCoordinator {
                 guard let self else { return }
                 settingsDisplayRequest = profiles.displays.count > 1
                     && profiles.displays.contains(where: { $0.id == display.id }) ? display.id : nil
+            }
+            panel.launcher.createCapsule = { [weak self, weak panel] application in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                panel.closeLauncher()
+                sessionCapsules.beginFromApplication(application, on: panel)
             }
             store.copyPin = { [weak self] pin, targetID in
                 guard let self, let target = panels[targetID] else { return }

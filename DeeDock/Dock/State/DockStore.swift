@@ -5,6 +5,8 @@ import UniformTypeIdentifiers
 /// One display's pins and transient selection/error state; workspace work belongs to the shared catalog.
 @MainActor @Observable
 final class DockStore {
+    @ObservationIgnored var openLauncher: (() -> Void)?
+    var launcherCatalog: ApplicationCatalog { catalog }
     let focusSession: FocusSessionController?
     @ObservationIgnored var openFocusSession: (() -> Void)?
     let actions: ActionTilesController?
@@ -104,14 +106,23 @@ final class DockStore {
         refreshEntries()
     }
 
+    private var launcherAtStart = true
+
+    func configureLauncherPosition(_ atStart: Bool) {
+        guard launcherAtStart != atStart else { return }
+        launcherAtStart = atStart
+        refreshEntries()
+    }
+
     private func refreshEntries() {
-        let next = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
+        let content = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
                                                   actions: actions?.dockItems ?? [], focus: focusSession?.item,
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
                                                   trash: showsTrash ? trash?.item : nil)
+        let next: [DockRenderSlot] = launcherAtStart ? [.launcher] + content : content + [.launcher]
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
     }
@@ -255,8 +266,8 @@ final class DockStore {
         let token = session.token
         catalog.performPrimaryAction(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
-            if let error { errorMessage = error }
-            else { applicationOpened?() }
+            errorMessage = error
+            if error == nil { applicationOpened?() }
         }
     }
 
@@ -265,8 +276,8 @@ final class DockStore {
         let token = session.token
         catalog.open(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
-            if let error { errorMessage = error }
-            else { applicationOpened?() }
+            errorMessage = error
+            if error == nil { applicationOpened?() }
         }
     }
 
@@ -298,6 +309,7 @@ final class DockStore {
     func openSelection() {
         guard let entry = entries.first(where: { $0.target == selectedTarget }) else { return }
         switch entry {
+        case .launcher: openLauncher?()
         case .focus: openFocusSession?()
         case .action(let item): actions?.run(item.tile.id)
         case .app(let item): open(item)
@@ -312,5 +324,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

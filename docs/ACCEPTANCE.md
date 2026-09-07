@@ -1099,3 +1099,97 @@ UserDefaults durability contract. A crash between writing a file and adding its 
 leave an unreferenced artifact. No runtime performance or model-quality claim is established.
 
 Issue: [DEE-16](https://linear.app/d-zwei/issue/DEE-16), synced to [GitHub #20](https://github.com/benjamin-kraatz/DeeDock/issues/20).
+## Settings restructure — sections and pages
+
+Implemented on 2026-09-07. The Settings window follows the System Settings shape: the sidebar selects a section, the section's overview lists its pages without a duplicate header, and a page holds the controls. The detail column is a `NavigationStack`, so pushes get the window's own back button and title, and the stack empties whenever the sidebar selection changes.
+
+Navigation model:
+
+- `SettingsSection` replaces `SettingsSelection`: `general`, `dock`, `features`, `modes`, and `display(id)`. It owns the section's title, summary, artwork, tint, page groups, and search terms.
+- `SettingsPage` replaces `SettingsCategory` and covers every leaf screen. `SettingsPage.dockGroups` is the display-scopable set, so the Dock section and a display profile offer exactly the same pages.
+- Search matches a section when its own copy matches or when any page under it does, so a control two levels down still surfaces the way to reach it.
+
+Regrouping (values, defaults, and persistence are unchanged):
+
+- General → About, Updates (direct distribution only), Menu Bar Icon, Login & Startup.
+- Dock → Appearance, App names, Background & Fading, Position, Behavior, App visibility. App visibility left the Behavior pane for a page of its own; background and idle fading left Appearance.
+- Features → Shelf & Trash, Session Capsules, App badges, Window Peek, Focus Sessions, Action Tiles, Multi-monitor docks, Permissions. The Window Peek permissions card became its own page so it stays reachable when unreadable settings freeze the rest.
+- A display's overview puts its name in the window title and its connection state beside the Show Dock switch.
+
+Focus Sessions and Action Tiles are omitted from the overview when no coordinator provides them, rather than shown disabled.
+
+New shared views: `SettingsPageScaffold` (the shared content column), `SettingsLinkRow`/`SettingsLinkCard`, `SettingsOverviewView`, `SettingsPageView`, and `SettingsContext`, which carries the stores and controllers a page needs. `GeneralSettingsPane`, `FeaturesSettingsPane`, `SettingsDetailView`, and `SettingsCategoryRow` are gone; `PreviewsSettingsPane` is now `WindowPeekSettingsPane`.
+
+Navigation labels and Features subtitles were added with English and German values; `settingsSelectCategory` was removed.
+
+The Debug app build succeeded with `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug build`. The `DeeDockTests` target does not build in this checkout for reasons unrelated to this change: it fails the same way before and after, on `ActionTilesController`, `DockBadgeController`, `DockFilePreviewItem`, and `FolderFileDrop` being out of the test target's scope.
+
+Remaining native acceptance:
+
+- Launch the app and walk every section and page: back button, window title, keyboard navigation, and the search field filtering sections by a page-level term.
+- Confirm a display overview edits only that display, that overridden rows still show their inheritance status and per-field reset, and that Use Defaults still clears a profile.
+- Check Reduce Motion and Reduce Transparency, VoiceOver over the overview rows, long translated titles, and light/dark appearance.
+
+The final settings window uses a singleton SwiftUI `Window` scene, native `NavigationStack` back navigation, and the standard sidebar toggle to keep the toolbar height consistent. All app Settings entry points open this window. Native menus, segmented controls, and numeric text fields replace custom capsule controls. Repeating overview headers and custom row hover fills are removed. The user accepted the final appearance and toolbar height on 2026-09-07. The final Debug app build and diff checks passed; no tests or automated visual checks ran during this polish pass. The broader accessibility and display-specific checks above remain unverified.
+
+## DEE-8: App Launcher
+
+Implemented from DEE-8 and its September 7 clarification. A permanent utility tile expands
+its existing dock panel on the source display and reverses the transition on dismissal. The
+launcher includes ordinary app search, grid and list views, running/pinned/recent filters,
+name/recency/frequency sorting, category/initial grouping, persistent DDock launch history,
+explicit on-device Robi suggestions, and the `do a barrel roll` Easter egg. The
+[launcher reference](LAUNCHER.md) records controls, data sources, and discovery limits.
+
+Validation on 2026-09-07:
+
+- The focused Debug app build succeeded with Xcode 27, macOS SDK 27, Swift 5 language mode,
+  MainActor default isolation, and Approachable Concurrency. Command:
+  `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -derivedDataPath /tmp/DeeDock-dee8-build build`.
+  Log: `/tmp/DeeDock-dee8-build.log`. The final build reports only the skipped App Intents
+  metadata extraction warning.
+- `git diff --check`, String Catalog JSON parsing, and project-file plist validation passed.
+  All 53 launcher keys are present in the packaged English and German resources. Plain values
+  match the catalog, and the count entry has correct singular/plural variants and `lld` values.
+- Regression test cases were added for search normalization, aliases, typo matching, ranking,
+  display bounds, history persistence, corrupt-history preservation, and excluding hide actions
+  from recent opens. Existing service fakes now return the primary action's outcome.
+- `build-for-testing` was attempted solely to compile the app and test sources; no test was
+  executed. The test target remains blocked by existing source membership omissions:
+  `FolderStackState` refers to `DockFilePreviewItem` and `FolderFileDrop`, but their files are
+  absent from the test target. Those references and omissions also exist in the starting
+  commit `8454d4d`. The existing missing-dependency warning for `DeeDockTests` → `DeeDock`
+  remains. Log: `/tmp/DeeDock-dee8-test-compile.log`.
+
+Computer-based native checks were subsequently authorized and performed on the built app:
+
+- Opened the launcher, typed `calculator`, selected with Down, and launched Calculator with
+  Return. Confirmed Calculator's native window. Repeated keyboard input after a clean restart.
+  Fixed the panel's key-window handoff and hosting view's keyboard-focus eligibility.
+- Inspected grid and list layouts, category grouping, pinned and recent filters, empty results,
+  and the Easter egg. Corrected cramped grid labels and invisible formatting in localized search.
+- Removed helper bundles, cache bundles, and incompatible device builds from discovery. The
+  observed collection changed from 233 entries to 153 user-facing apps.
+- Confirmed Calculator appears in Recent after restarting DDock, alongside existing history.
+- Exercised on-device Robi. Tightened overly broad suggestions with a final candidate review;
+  `edit photos` returned Photos in the final build. Editing an active request cancelled it and
+  returned to ordinary search. The busy control exposes a Cancel button to accessibility.
+
+Tests were not executed. These checks do not establish complete search coverage or all native
+accessibility/display combinations. Remaining hands-on acceptance includes:
+
+- Open and close from all four dock edges, including secondary displays with negative origins.
+  Check the material and frame transition against the intended macOS launcher reference.
+- Exercise search-field focus, arrows, Return, Command-F, Tab, Escape, input-method composition,
+  menu selection, clicking outside, failed opens, and restoration of the previous app.
+- Check discovery with Spotlight disabled, apps outside standard directories, aliases, moved
+  apps, duplicate bundle identifiers, uninstalls, and a large application collection. Measure
+  discovery time and search latency before claiming performance.
+- Verify successful opens appear in Recent across restart while hide actions and failed opens
+  do not. Exercise the history-clear confirmation and corrupt-history recovery.
+- Check Robi on an eligible Mac with Apple Intelligence enabled, unavailable, and not ready.
+  Confirm cancellation after typing and dismissal, and assess suggestions for several tasks.
+- Exercise VoiceOver, Reduce Motion, Reduce Transparency, light/dark appearance, Spaces,
+  full-screen apps, display disconnection, and sleep/wake during an open or closing launcher.
+
+Changes are uncommitted. The issue has not been closed or marked accepted.

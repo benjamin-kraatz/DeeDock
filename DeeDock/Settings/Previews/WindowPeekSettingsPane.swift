@@ -1,18 +1,17 @@
 import SwiftUI
 
-/// App-wide permission controls followed by the Window Peek preferences.
+/// Window Peek preferences: what a hover shows, how it looks, and how long it waits.
 ///
-/// Presented inside Settings > Features; every value here applies to every display.
-struct PreviewsSettingsPane: View {
+/// Presented inside Settings › Features › Window Peek; every value here applies to every display.
+/// The macOS permissions it depends on live on their own page, so they stay reachable even when
+/// unreadable settings freeze everything below.
+struct WindowPeekSettingsPane: View {
     let source: SettingsValueSource
-    let windowAccess: WindowAccessController
-    let screenCapture: ScreenCaptureAccessController
     let persistentSettingsDisabled: Bool
 
     private var settings: DockSettings { source.value }
 
     var body: some View {
-        PreviewPermissionsSettingsCard(windowAccess: windowAccess, screenCapture: screenCapture)
         Group {
             SettingsCard(title: .windowPeekTitle, footnote: .windowPeekHelp) {
                 SettingsToggleRow(title: .windowPeekEnabled,
@@ -145,3 +144,16 @@ private extension WindowPeekStyle {
          .init(value: .captioned, title: .windowPeekStyleCaptioned, symbol: "text.below.photo")]
     }
 }
+
+#if DEBUG
+#Preview("Window Peek") {
+    ScrollView {
+        VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+            WindowPeekSettingsPane(source: SettingsValueSource(store: DockSettingsStore(repository: nil), context: nil),
+                                   persistentSettingsDisabled: false)
+        }
+        .padding(24)
+    }
+    .frame(width: 620, height: 700)
+}
+#endif

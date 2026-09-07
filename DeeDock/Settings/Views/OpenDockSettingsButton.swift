@@ -2,12 +2,12 @@ import SwiftUI
 
 /// Opening settings is an explicit focus action; passive dock interactions never call it.
 struct OpenDockSettingsButton: View {
-    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Button(.actionSettings) {
             NSApp.activate()
-            openSettings()
+            openWindow(id: "settings")
         }
     }
 }

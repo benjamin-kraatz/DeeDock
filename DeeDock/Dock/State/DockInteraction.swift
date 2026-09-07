@@ -6,6 +6,7 @@ import Observation
 @MainActor @Observable
 final class DockInteraction {
     /// Owns this panel's idle deadline and artwork opacity.
+    @ObservationIgnored var openLauncher: (() -> Void)?
     @ObservationIgnored var openFocusSession: (() -> Void)?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?

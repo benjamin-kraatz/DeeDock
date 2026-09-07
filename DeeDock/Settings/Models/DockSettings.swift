@@ -54,6 +54,7 @@ struct DockSettings: Codable, Equatable {
     /// Whether each display dock includes the trailing Shelf tile.
     var showShelf: Bool = true
     /// Whether each display dock includes the shared Session Capsules tile.
+    var launcherAtStart: Bool = true
     var showSessionCapsules: Bool = true
     /// Whether each display dock includes the trailing system Trash tile.
     var showTrash: Bool = true
@@ -137,7 +138,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges
-        case appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
+        case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
@@ -161,6 +162,7 @@ extension DockSettings {
             ? try values.decode(Bool.self, forKey: .secondaryDisplayAppsOnly) : false
         showAppBadges = try values.decodeIfPresent(Bool.self, forKey: .showAppBadges) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
+        launcherAtStart = try values.decodeIfPresent(Bool.self, forKey: .launcherAtStart) ?? true
         showSessionCapsules = try values.decodeIfPresent(Bool.self, forKey: .showSessionCapsules) ?? true
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true
         confirmBeforeEmptyingTrash = values.contains(.confirmBeforeEmptyingTrash)

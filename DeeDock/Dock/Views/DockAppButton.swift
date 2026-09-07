@@ -34,7 +34,7 @@ struct DockAppButton: View {
         guard let interaction else { return false }
         return interaction.animateIndicators && interaction.exposesContent && interaction.idleFade.fraction == 0
     }
-    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
     @AccessibilityFocusState private var accessibilityFocused: Bool
     @State private var accessibilityWindows: [ApplicationWindowSummary] = []
     @State private var accessibilityDiscoveryID: UUID?
@@ -83,7 +83,7 @@ struct DockAppButton: View {
                 openSettings: {
                     interaction?.prepareSettings?()
                     NSApp.activate()
-                    openSettings()
+                    openWindow(id: "settings")
                 },
                 tracking: menuTracking
             )
