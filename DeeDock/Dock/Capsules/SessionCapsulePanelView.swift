@@ -330,7 +330,8 @@ struct SessionCapsulePanelView: View {
         } else if state.draft?.breadcrumb != nil {
             SessionBreadcrumbEditor(draft: draftBinding,
                 canCapture: !state.captureCandidates.isEmpty,
-                capture: { state.generateBreadcrumb() }, save: { state.save() })
+                capture: { state.generateBreadcrumb() }, save: { state.save() },
+                documentPickerPresented: { state.documentPickerPresented = $0 })
         } else {
             SessionCapsuleDraftForm(draft: draftBinding) { state.save() }
         }

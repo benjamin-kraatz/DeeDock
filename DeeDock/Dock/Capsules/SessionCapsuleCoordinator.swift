@@ -83,6 +83,7 @@ final class SessionCapsuleCoordinator {
             self?.task?.cancel(); self?.task = nil
             self?.sourceNavigator.cancel()
         }
+        next.canDismissForOutsideClick = { [weak state] in state?.documentPickerPresented != true }
         next.willClose = { [weak self, weak state] in
             self?.task?.cancel(); self?.task = nil; self?.sourceNavigator.stop(); state?.stop()
         }
@@ -298,10 +299,14 @@ final class SessionCapsuleCoordinator {
                    return matches.count == 1 ? matches.first : nil
                }).first,
                !Task.isCancelled, (try? await windows.selectWindow(match.token)) != nil {
+                await windows.discard(sessionID: sessionID)
+                guard !Task.isCancelled else { return }
                 close(returnFocus: false)
                 return
             }
             await windows.discard(sessionID: sessionID)
+            // Discovery and handle cleanup can suspend past Back, a new action, or panel teardown.
+            guard !Task.isCancelled else { return }
             guard let application = running.first else {
                 state?.error = String(localized: .capsulesResumeUnavailable)
                 return

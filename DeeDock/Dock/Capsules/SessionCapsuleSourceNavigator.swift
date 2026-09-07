@@ -9,16 +9,19 @@ final class SessionCapsuleSourceNavigator {
     private(set) var statuses: [UUID: Status] = [:]
     @ObservationIgnored var failure: ((String) -> Void)?
     @ObservationIgnored private let windows: any ApplicationWindowServicing
-    @ObservationIgnored private var task: Task<Void, Never>?
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
+    @ObservationIgnored private var actionTask: Task<Void, Never>?
 
     init(windows: any ApplicationWindowServicing = AccessibilityApplicationWindowService()) {
         self.windows = windows
     }
 
     func refresh(_ references: [SessionCapsuleWindowReference]) {
-        task?.cancel()
+        actionTask?.cancel()
+        refreshTask?.cancel()
         statuses = Dictionary(uniqueKeysWithValues: references.map { ($0.id, .checking) })
-        task = Task { [weak self] in
+        // Window actions must not interrupt availability checks for the remaining source cards.
+        refreshTask = Task { [weak self] in
             guard let self else { return }
             for reference in references {
                 guard !Task.isCancelled else { return }
@@ -30,8 +33,8 @@ final class SessionCapsuleSourceNavigator {
     }
 
     func showWindow(_ reference: SessionCapsuleWindowReference) {
-        task?.cancel()
-        task = Task { [weak self] in
+        actionTask?.cancel()
+        actionTask = Task { [weak self] in
             guard let self else { return }
             let result = await resolve(reference, show: true)
             guard !Task.isCancelled else { return }
@@ -41,12 +44,12 @@ final class SessionCapsuleSourceNavigator {
     }
 
     func openApp(_ reference: SessionCapsuleWindowReference) {
-        task?.cancel()
+        actionTask?.cancel()
         guard let identifier = reference.bundleIdentifier,
               let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: identifier) else {
             failure?(String(localized: .breadcrumbAppUnavailable)); return
         }
-        task = Task { [weak self] in
+        actionTask = Task { [weak self] in
             let configuration = NSWorkspace.OpenConfiguration()
             configuration.createsNewApplicationInstance = false
             do {
@@ -60,15 +63,16 @@ final class SessionCapsuleSourceNavigator {
     }
 
     func openLink(_ reference: SessionCapsuleWindowReference) {
+        actionTask?.cancel()
         guard let url = reference.reopeningURL, NSWorkspace.shared.open(url) else {
             failure?(String(localized: .breadcrumbLinkUnavailable)); return
         }
     }
 
     func openDocument(_ reference: SessionCapsuleWindowReference) {
-        task?.cancel()
+        actionTask?.cancel()
         guard let data = reference.documentBookmark else { return }
-        task = Task { [weak self] in
+        actionTask = Task { [weak self] in
             do {
                 var stale = false
                 let url = try URL(resolvingBookmarkData: data, options: [.withSecurityScope, .withoutUI],
@@ -88,8 +92,10 @@ final class SessionCapsuleSourceNavigator {
     }
 
     func cancel() {
-        task?.cancel()
-        task = nil
+        actionTask?.cancel()
+        refreshTask?.cancel()
+        actionTask = nil
+        refreshTask = nil
         statuses = [:]
     }
 

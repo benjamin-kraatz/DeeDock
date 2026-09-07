@@ -9,6 +9,7 @@ final class SessionCapsulePanelState {
     private(set) var capsules: [SessionCapsule]
     private(set) var candidates: [WindowContextCandidate] = []
     var selectedWindowIDs: Set<CGWindowID> = []
+    var documentPickerPresented = false
     var isBreadcrumb = false
     var draft: SessionCapsuleDraft?
     var page: Page = .collection
@@ -209,6 +210,7 @@ final class SessionCapsulePanelState {
     }
 
     func stop() {
+        documentPickerPresented = false
         discover = nil; createDraft = nil; captureBreadcrumb = nil; saveDraft = nil; deleteCapsule = nil
         resumeCapsule = nil; requestPermission = nil
         cancelWork = nil

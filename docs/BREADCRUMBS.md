@@ -26,7 +26,7 @@ Removing a source and saving removes its excerpt, link, and bookmark from the re
 
 Document reopening requires an explicitly selected saved file. Stale bookmarks or missing files produce an error and require selection again in Edit. Arbitrary URL schemes and URLs containing credentials are rejected. Window actions use public Accessibility APIs and may be unavailable because of permissions, App Sandbox policy, Spaces, or full-screen behavior. DDock does not restore unsaved documents, exact geometry, or Space membership.
 
-Capture and generation run on their existing actors, outside pointer and rendering paths. The coordinator owns cancellation through Back, Cancel, panel close, and display teardown. Source navigation owns a separate cancellable task; every discovery session discards its AX handles. User notes and next steps never pass through the model. No idle, app-switch, or break-return observer captures content.
+Capture and generation run on their existing actors, outside pointer and rendering paths. The coordinator owns cancellation through Back, Cancel, panel close, and display teardown. Source navigation owns separate cancellable tasks for availability checks and foreground actions, so using one source does not strand the remaining cards in a checking state. Every discovery session discards its AX handles. Window selection checks cancellation inside the Accessibility actor before mutations, including when a request waited in its queue. User notes and next steps never pass through the model. No idle, app-switch, or break-return observer captures content.
 
 ## Model and state cases worth testing
 
@@ -41,6 +41,9 @@ These are specifications for future tests. No tests were run for this implementa
 - Validate HTTP(S) schemes, hosts, credentials, length bounds, missing files, oversized bookmarks, and stale bookmarks. Never derive a reopening URL from generated output.
 - Match source navigation across multiple running instances. Zero matches are unavailable; duplicate titles are ambiguous. Recheck on Show window and discard every AX session on failure, cancellation, or success.
 - Delete the capsule after saving captured text and bookmarks. Verify the serialized record is absent, no sidecar exists, and source files remain unchanged. Check existing capacity eviction.
+- Start a slow source-availability refresh, then use Show window, Open app, or Open saved document on another source. Remaining cards must finish their availability checks. Open link must cancel an older pending foreground action.
+- Cancel Resume during discovery or handle cleanup, then open another panel. It must not activate the fallback app or close the new panel. Cancel a queued AX selection before it starts and verify no minimize, activate, or raise operation runs.
+- Keep the breadcrumb draft open while the native document picker handles clicks. Picker navigation, confirmation, and cancellation must not trigger outside-click dismissal. Explicit panel/display teardown must still release the presentation.
 - Verify original New Capsule, app checkpoint creation, focus completion handoff, Resume menus, and corruption/reset behavior.
 
 ## Manual acceptance checklist
@@ -50,6 +53,7 @@ All items below remain untested. Use a signed installed build for TCC and sandbo
 - [ ] Save a manual next step without Screen Recording or Apple Intelligence. Restart DDock, edit it, save, restart again, and confirm there is one updated capsule.
 - [ ] Capture two sources deliberately, review previews and AI interpretation, and save. Close one source window, restart DDock, and inspect the recap. The closed source is unavailable or unverified; every preview remains historical.
 - [ ] Use Show window, then rename or close that window and retry. Check duplicate titles and multiple processes sharing a bundle ID. Open app must not promise restoration of an unsaved document.
+- [ ] Open the document picker, navigate using mouse and keyboard, then confirm or cancel. The breadcrumb draft must stay open and unchanged until a document is chosen. Check normal outside-click dismissal again after closing the picker.
 - [ ] Add a real web link and selected saved document. Open both after restart. Move or delete the file, revoke access, and check the actionable error. Reject invalid links without disabling manual writing.
 - [ ] Remove a source before capture. Confirm only remaining selected sources are processed. Remove captured text and save; reopen and verify it is gone.
 - [ ] Turn off Apple Intelligence or use an unavailable model. Exercise unreadable/protected content, model failure, cancellation, retry, and denied capture. Notes and next steps remain usable, with no invented tasks from missing text.

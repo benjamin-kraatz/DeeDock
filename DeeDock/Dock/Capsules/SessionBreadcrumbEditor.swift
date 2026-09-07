@@ -7,6 +7,7 @@ struct SessionBreadcrumbEditor: View {
     let canCapture: Bool
     let capture: () -> Void
     let save: () -> Void
+    var documentPickerPresented: (Bool) -> Void = { _ in }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -44,7 +45,7 @@ struct SessionBreadcrumbEditor: View {
                         Button(.breadcrumbCaptureDraft, systemImage: "sparkles", action: capture)
                     }
                     ForEach($draft.windows) { $reference in
-                        SessionBreadcrumbSourceEditor(reference: $reference) {
+                        SessionBreadcrumbSourceEditor(reference: $reference, documentPickerPresented: documentPickerPresented) {
                             draft.windows.removeAll { $0.id == reference.id }
                         }
                     }
@@ -90,6 +91,7 @@ struct SessionBreadcrumbEditor: View {
 /// Links come from the user; document access comes from an explicit native file selection.
 private struct SessionBreadcrumbSourceEditor: View {
     @Binding var reference: SessionCapsuleWindowReference
+    let documentPickerPresented: (Bool) -> Void
     let remove: () -> Void
     @State private var choosingDocument = false
     @State private var documentError: String?
@@ -110,7 +112,10 @@ private struct SessionBreadcrumbSourceEditor: View {
                 Text(.breadcrumbInvalidLink).font(.caption).foregroundStyle(.red)
             }
             HStack {
-                Button(.breadcrumbChooseDocument) { choosingDocument = true }
+                Button(.breadcrumbChooseDocument) {
+                    documentPickerPresented(true)
+                    choosingDocument = true
+                }
                 if let name = reference.documentName {
                     Text(verbatim: name).lineLimit(1)
                     Button(.breadcrumbRemoveDocument) {
@@ -130,6 +135,8 @@ private struct SessionBreadcrumbSourceEditor: View {
             }
         }
         .capsuleReadingCard()
+        .onChange(of: choosingDocument) { _, presented in documentPickerPresented(presented) }
+        .onDisappear { documentPickerPresented(false) }
         .fileImporter(isPresented: $choosingDocument, allowedContentTypes: [.data], allowsMultipleSelection: false) { result in
             do {
                 guard let url = try result.get().first else { return }
