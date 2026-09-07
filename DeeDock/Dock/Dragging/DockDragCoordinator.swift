@@ -25,7 +25,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var dropInFolder: ((NSDraggingInfo, FolderDockItem, DockPanelController) -> Bool)?
     var springDragEnded: (() -> Void)?
     var documentHoverChanged: ((DockItem?, DockPanelController?, DocumentResourceAccess?) -> Void)?
-    var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Bool)?
+    var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Void)?
     /// Non-empty while the active external drag came out of DeeDock's own Shelf.
     private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
@@ -159,8 +159,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                   let panel = panels[displayID],
                   !DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask).isEmpty else { return false }
             completion.committed = true
-            // The catalog retains the leases before clearing this drag's temporary state.
-            if chooseDocumentDestination?(documents, item, panel) != true {
+            // Honor the operation advertised during this target visit even if the app quits
+            // or Peek is disabled before release. An unavailable route must never open files.
+            if documentDrag.requiresWindowChoice {
+                if let chooseDocumentDestination { chooseDocumentDestination(documents, item, panel) }
+                else { panel.store.errorMessage = .fileRouteDestinationUnavailable }
+            } else {
                 panel.store.openDocuments(documents, with: item.reference)
             }
             cancel()

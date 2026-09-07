@@ -87,10 +87,10 @@ coverage when test execution is authorized:
 
 - Same drag entering dock, crossing the panel gap, selecting different cards, and returning to dock, including re-entry after an expired dwell.
 - New pasteboard generations, private pin payloads, non-copy source masks, and cancelled imports rejected by Peek. Copy-only outgoing drags rejected by real Trash.
-- Dwell cancellation, Escape, native end, changed app target, and late discovery results after dismissal.
+- Dwell cancellation on every exit, full-delay re-entry, Escape, native end, changed app target, and late discovery results after dismissal.
 - Picker cancellation and selected files retaining their immutable app destination across focus changes.
 - Parent-folder and Shelf scope transfer, source dismissal before handoff, and exactly-once scope release.
-- A closed AX window, terminated app, reused PID, lost Accessibility permission, and capture-only cards.
+- A closed AX window, terminated app, reused PID, lost Accessibility permission, and capture-only cards. Disabling Peek or terminating the app during an advertised window-selection visit must report an error instead of opening files.
 - Ordered deduplication, empty and over-limit batches, unreadable files, and deletion after initial validation.
 - Serial app-open requests with mixed success, cancellation between files, no automatic retries, and accurate counts.
 - One transferred discovery session released after activation or cancellation, including an action queued behind AX work.

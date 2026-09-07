@@ -1330,3 +1330,18 @@ See [Badge memory](BADGE_MEMORY.md) for observation reliability, identity, reten
 DEE-17 validation after integrating `origin/main`: the focused unsigned Debug app build passed, including the scan-boundary fix. Command: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee17-build CODE_SIGNING_ALLOWED=NO build`. Log: `/tmp/DeeDock-dee17-build.log`. All 43 badge-memory keys matched the compiled English and German `Localizable.strings` resources. No tests or native checks were run.
 
 GPT 5.6 Luna at Extra High reviewed DEE-17 and found five defects. Corrections prevent first samples after relaunch from recreating deleted app history, retain per-session exclusions for deleted digest rows, seed first Focus observations without counting a change, cover the full possible badge width with the details hit target, retain the Focus deadline through startup completion, and enforce the 4 MB limit before writing. The review did not run tests or native checks. A focused unsigned Debug app build passed after the corrections.
+
+### DEE-12 review and main integration
+
+GPT 5.6 Luna at Extra High reviewed the file-routing implementation. Follow-up changes cancel an
+unfinished dwell on every icon exit and retain the operation advertised during each target visit.
+If a window-selection destination becomes unavailable before release, the drop reports an error
+instead of opening files at app level. The Peek affordance now checks running state explicitly.
+The review also inspected exact AX token transfer, source grants, ordering, native destination
+registration, and outgoing copy-only drags. This was static review, not native acceptance.
+
+Merged `origin/main` into `feature/dee-12` in the same worktree and resolved the String Catalog and
+acceptance-note conflicts. Every catalog entry from both branches was preserved. The merged Debug
+build passed at `/tmp/dee12-merge-build.log`. The build after review fixes passed at
+`/tmp/dee12-review-build.log`, with only the App Intents metadata-extraction notice in that final
+incremental build. Tests and automated visual checks were not run.

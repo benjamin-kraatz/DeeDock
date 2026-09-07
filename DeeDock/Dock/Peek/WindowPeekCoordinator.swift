@@ -46,7 +46,7 @@ final class WindowPeekCoordinator {
 
     func hover(_ item: DockItem?, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {
         guard let item else {
-            if sourcePanel === panel { sourceHovered = false; scheduleClose() }
+            if sourcePanel === panel { leaveSource(); scheduleClose() }
             return
         }
         guard item.isRunning, item.isAvailable,
@@ -94,10 +94,18 @@ final class WindowPeekCoordinator {
            documents.urls.count <= WindowFileHandoffController.maximumFiles {
             hover(item, on: panel, documents: documents)
         } else if fileDrag {
-            sourceHovered = false
+            leaveSource()
             updatePointer()
             if !panelHovered { scheduleClose() }
         }
+    }
+
+    /// Every exit invalidates an unfinished dwell. Re-entry must satisfy the full delay,
+    /// while an already-visible panel retains its separate pointer-travel grace period.
+    private func leaveSource() {
+        sourceHovered = false
+        dwellTask?.cancel()
+        dwellTask = nil
     }
 
     func endFileDrag() { if fileDrag { close(returnFocus: false) } }

@@ -126,13 +126,15 @@ final class DockCoordinator {
         }
         dragging.chooseDocumentDestination = { [weak self] documents, item, panel in
             guard let self, item.isRunning,
-                  panel.windowPeekContext(for: item.id)?.settings.windowPeekEnabled == true else { return false }
+                  panel.windowPeekContext(for: item.id)?.settings.windowPeekEnabled == true else {
+                panel.store.errorMessage = .fileRouteDestinationUnavailable
+                return
+            }
             guard documents.urls.count <= WindowFileHandoffController.maximumFiles else {
                 panel.store.errorMessage = .fileRouteInvalid
-                return true
+                return
             }
             windowPeeks.showKeyboard(item, on: panel, documents: documents)
-            return true
         }
         dragging.springDragEnded = { [weak self] in
             self?.folderStacks.dragEnded()
