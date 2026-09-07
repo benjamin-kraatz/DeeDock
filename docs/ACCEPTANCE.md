@@ -1139,3 +1139,56 @@ accessibility/display combinations. Remaining hands-on acceptance includes:
   full-screen apps, display disconnection, and sleep/wake during an open or closing launcher.
 
 Changes are uncommitted. The issue has not been closed or marked accepted.
+
+## DEE-11: Watch this
+
+Implementation and limits are described in [Watch a window](WINDOW-WATCH.md). The focused Debug
+DeeDock app build passed with Xcode 27, macOS deployment target 27, Swift 5 language mode, MainActor
+default isolation, and approachable concurrency. Tests, automated visual checks, app launch,
+permission changes, and resource profiling were not run. This is compilation evidence only.
+
+Model/state cases worth testing when authorized:
+
+- Initial baseline, transient image changes, steady changed image, persistent animation, small noise,
+  and a return to baseline before the third confirmation.
+- Phrase present initially, absent-to-present transition, three consecutive matches, interrupted
+  matches, case/diacritic normalization, and unrelated lines containing the phrase as a substring.
+- Region boundary clamping, reverse drag, letterboxing, resize, backing-scale changes, and negative
+  global origins. Pixel coordinate correctness needs asymmetric real source content.
+- Closed window, process restart, initial ambiguous match, permission revocation, capture error,
+  slow request, cancellation during OCR, and late results after Stop or Dismiss.
+- Overlapping sleep/display/session suspension reasons, no overlapping requests across wake,
+  stopped/completed observer cleanup, and duplicate suppression.
+
+Manual acceptance, all pending:
+
+- Watch a changing timer. It must never claim completion. Compare a timer-only region with a larger
+  noisy window, then watch an export whose exact completion line appears after Start.
+- Close the selected window mid-watch. Open another window with the same title; do not switch sources.
+- Resize and move between Retina and non-Retina displays. Inspect selected region boundaries and
+  ensure geometry changes do not produce a false detection.
+- Check minimized, hidden, occluded, protected, other-Space, full-screen, display removal, reconnect,
+  screen sleep, system sleep, lock/session return, and interrupted setup behavior.
+- Check all four dock edges and multiple display arrangements. Hover must not steal focus. Explicit
+  Watch opens its controls. Stop, Dismiss, and completion do not activate the source.
+- Use W from keyboard Peek, sliders, Return to Start, Command-period to Stop, Escape, and VoiceOver
+  card actions. Check English/German layout, a small screen, Reduce Motion, and Reduce Transparency.
+- Check exact-window jump and its Window Access/ambiguous-match failure. Confirm app fallback is
+  labeled separately. Check silent delivery and opt-in sound, including duplicate suppression.
+- Measure idle resources before selection, during watch, after Stop/Dismiss/completion, and across
+  wake. Confirm that a delayed OS capture never causes overlapping periodic requests.
+
+Build logs: `/tmp/DeeDock-dee11-build.log` and `/tmp/DeeDock-dee11-build-2.log`. The initial build
+reported existing Launcher and Dock Badges warnings; the second reported only the App Intents
+metadata-extraction notice. No native acceptance result is claimed. Keep DEE-11 out of Done until
+its required manual acceptance is reviewed.
+
+The final focused Debug build also passed after adding display repositioning and deterministic
+previews; log: `/tmp/DeeDock-dee11-build-3.log`. All 38 watch keys matched their compiled English
+and German `.lproj/Localizable.strings` values. `git diff --check` passed. These inspections did
+not render the previews or exercise native interaction.
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee11-build build
+```
