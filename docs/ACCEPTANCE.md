@@ -1048,6 +1048,60 @@ GPT-5.6 Luna reviewed the PR with Extra High reasoning. Follow-up fixes also app
 
 A second review pass identified cancellation overlap and all-or-nothing expiry for slow but valid scans. Replacement readers now wait for the previous task to release its observer. Complete scans use batches of 16 items with a cancellable 25 ms pause between batches, retaining per-handle timeouts without an overall data-scan cutoff. The fallback timer starts after completion, so slow scans do not queue periodic work. Observer registration retains its separate one-second budget and can fall back without discarding valid badge data.
 
+
+## App Fusion (DEE-16)
+
+Implementation on `feature/dee-16` adds an app-wide Fusion tray, Window Peek card and keyboard
+actions, an accessible picker, explicit capture and text review, typed on-device generation,
+and editable drafts saved as text files through Shelf's existing reference contract.
+See [App Fusion](APP_FUSION.md) for API boundaries, retention rules, and model/state cases worth testing.
+
+The user resumed implementation on 2026-09-07. Compilation does not establish native acceptance
+and this issue must not be marked Done from the build result alone.
+
+### Validation evidence
+
+The focused Debug app build uses the existing `DeeDock` scheme, macOS 27 SDK and deployment
+target, Swift 5 language mode, MainActor default isolation, and approachable concurrency.
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-dee16-build build
+```
+
+The initial, review, and final corrected builds succeeded. A build of the new deterministic
+preview data failed because its file lacked a CoreGraphics import. Adding the import resolved
+that compiler error. Logs are `/tmp/DeeDock-dee16-build.log`,
+`/tmp/DeeDock-dee16-review-build.log`, `/tmp/DeeDock-dee16-final-build.log` for the failed attempt,
+and `/tmp/DeeDock-dee16-final-build-2.log` for the successful final build.
+
+Catalog JSON and the diff passed structural checks. All 52 Fusion strings in the packaged
+English and German resources match the catalog; named interpolation symbols were inspected.
+The final build emitted only the App Intents metadata warning for a target without that framework. No tests, app launch, previews, automated visual checks,
+permission changes, or real model/capture/save operations were run. Deterministic previews
+cover input review and a retained draft after save failure; they were not rendered.
+
+### Manual acceptance still required
+
+- Compare two visible drafts; verify similarities/differences against the supplied text and check source citations.
+- Create a checklist from notes and a reference; try one unreadable source with supplied notes and inspect the edit markers.
+- Select two windows of one app, two apps, identical titles, overlapping windows, and windows on different displays. Reject duplicate selection and exercise remove/replace.
+- Navigate through Peek while the tray stays open. Use the F shortcut, picker, Tab navigation, VoiceOver actions, and Escape. Verify focus returns to keyboard dock navigation or the previous app as appropriate, and hover never steals focus.
+- Cancel discovery, capture, and generation; retry immediately; hide or discard during work; verify late results do not reappear. Check input expiry, sleep/wake, display sleep, and session lock.
+- Close, rename, hide, or replace a source before capture. Deny/revoke Screen Recording access and exercise recovery in Settings.
+- Disable Apple Intelligence, make the model unavailable, provoke a refusal, exceed the context budget, and exercise timeout/failure. Verify no fallback result appears and reviewed text remains available for intentional retry.
+- Fail file writing, fill Shelf, use unrecoverable Shelf storage, and fail bookmark/reference saving. Verify the draft remains editable and any rollback failure provides the file location.
+- Save, open the artifact, restart DDock, and reopen it from Shelf. Check the edited result, provenance, limitations, and native readability. Removing its Shelf reference must keep the file.
+- Check bottom, top, left, and right dock edges, auto-hide, negative display origins, scaling, rearrangement, unplug/replug, Spaces, and full-screen apps.
+- Check long English/German text, keyboard and VoiceOver operation, Reduce Motion's static equivalent, and Reduce Transparency's opaque background.
+
+Known limits include OCR-only model input, incomplete visible context, title changes requiring
+reselection, Apple API cancellation that may finish asynchronously, and Shelf's existing
+UserDefaults durability contract. A crash between writing a file and adding its reference can
+leave an unreferenced artifact. No runtime performance or model-quality claim is established.
+
+Issue: [DEE-16](https://linear.app/d-zwei/issue/DEE-16), synced to [GitHub #20](https://github.com/benjamin-kraatz/DeeDock/issues/20).
 ## Settings restructure — sections and pages
 
 Implemented on 2026-09-07. The Settings window follows the System Settings shape: the sidebar selects a section, the section's overview lists its pages without a duplicate header, and a page holds the controls. The detail column is a `NavigationStack`, so pushes get the window's own back button and title, and the stack empties whenever the sidebar selection changes.

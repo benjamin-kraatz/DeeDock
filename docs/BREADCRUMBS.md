@@ -61,7 +61,7 @@ All items below remain untested. Use a signed installed build for TCC and sandbo
 
 ## Compilation and delivery
 
-The focused Debug app build uses Xcode 27.0, build 27A5252f, the macOS 27.0 SDK and deployment target, Swift 5 language mode, and MainActor default isolation. The final focused build succeeded on 2026-09-07. The initial clean build reported existing unused-value warnings in `LauncherPresentationController.swift` and `DockBadgeController.swift`. The final incremental build reported only the App Intents metadata notice for a target without that framework dependency. There were no build failures.
+The focused Debug app build uses Xcode 27.0, build 27A5252f, the macOS 27.0 SDK and deployment target, Swift 5 language mode, and MainActor default isolation. The final focused build succeeded on 2026-09-07 after merging the updated `origin/main`, including App Fusion. It reported existing unused-value warnings in `LauncherPresentationController.swift` and `DockBadgeController.swift`, plus the App Intents metadata notice for a target without that framework dependency. There were no build failures.
 
 `jq empty DeeDock/Resources/Localizable.xcstrings` and `git diff --check` passed. All 45 breadcrumb keys matched their intended values in both compiled `en.lproj/Localizable.strings` and `de.lproj/Localizable.strings`, inspected with `plutil -convert json -o -`. This verifies resource contents, not native presentation or translation acceptance.
 

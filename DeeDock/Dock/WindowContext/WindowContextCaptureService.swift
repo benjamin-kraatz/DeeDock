@@ -100,7 +100,7 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
                 guard let window = windows[candidate.id],
                       window.owningApplication?.processID == candidate.processIdentifier,
                       window.owningApplication?.bundleIdentifier == candidate.bundleIdentifier,
-                      Self.normalized(window.title) == candidate.title else {
+                      Self.normalized(window.title) == Self.normalized(candidate.title) else {
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: nil, recognizedText: ""))
                     continue
                 }

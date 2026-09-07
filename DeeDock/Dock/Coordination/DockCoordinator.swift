@@ -29,6 +29,7 @@ final class DockCoordinator {
     @ObservationIgnored private let popovers = DockPopoverPresenter()
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
     @ObservationIgnored private let shelves: ShelfCoordinator
+    @ObservationIgnored private let fusion: FusionCoordinator
     @ObservationIgnored private let sessionCapsules: SessionCapsuleCoordinator
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
@@ -70,6 +71,7 @@ final class DockCoordinator {
         )
         focusPopover = FocusSessionCoordinator(focus: focusSession, presenter: popovers)
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
+        fusion = FusionCoordinator(shelf: shelf)
         shelves = ShelfCoordinator(shelf: shelf, presenter: popovers, organizer: semanticStacks)
         sessionCapsules = SessionCapsuleCoordinator(capsules: capsules, presenter: popovers,
                                                     screenCapture: screenCapture)
@@ -127,6 +129,16 @@ final class DockCoordinator {
             }
             self?.panels.values.forEach { $0.holdPopover(open) }
         }
+        windowPeeks.addToFusion = { [weak self] window, panel, keyboard in
+            self?.fusion.show(from: panel, keyboard: keyboard, matching: window)
+        }
+        fusion.restoreDockFocus = { [weak self] panel in
+            guard let self, panels[panel.store.displayID] === panel else { return }
+            endFocus(restore: false)
+            previousApplication = lastExternalApplication
+            focusedID = panel.store.displayID
+            panel.focus()
+        }
         windowPeeks.prepareSettings = { [weak self] _ in
             self?.settingsFeaturesRequest = true
         }
@@ -181,6 +193,7 @@ final class DockCoordinator {
                 self?.occupancy.stop()
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
+                self?.fusion.suspend()
                 self?.popovers.closeAll()
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
@@ -499,6 +512,8 @@ final class DockCoordinator {
         if restore, let previous, !previous.isTerminated { previous.activate(options: []) }
     }
 
+    func showFusion() { fusion.show() }
+
     func stop() {
         guard started else { return }
         started = false
@@ -519,6 +534,7 @@ final class DockCoordinator {
         focusPopover.stop()
         focusSession.stop()
         actionTiles.stop()
+        fusion.stop()
         sessionCapsules.stop()
         shelfSemanticWarmup.stop()
         popovers.stop()
