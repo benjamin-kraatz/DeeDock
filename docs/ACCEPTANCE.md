@@ -1197,6 +1197,83 @@ accessibility/display combinations. Remaining hands-on acceptance includes:
 
 Changes are uncommitted. The issue has not been closed or marked accepted.
 
+## DEE-11: Watch this
+
+Implementation and limits are described in [Watch a window](WINDOW-WATCH.md). The focused Debug
+DeeDock app build passed with Xcode 27, macOS deployment target 27, Swift 5 language mode, MainActor
+default isolation, and approachable concurrency. Tests, automated visual checks, app launch,
+permission changes, and resource profiling were not run. This is compilation evidence only.
+
+Model/state cases worth testing when authorized:
+
+- Initial baseline, transient image changes, steady changed image, persistent animation, small noise,
+  and a return to baseline before the third confirmation.
+- Phrase present initially, absent-to-present transition, three consecutive matches, interrupted
+  matches, case/diacritic normalization, and unrelated lines containing the phrase as a substring.
+- Region boundary clamping, reverse drag, letterboxing, resize, backing-scale changes, and negative
+  global origins. Pixel coordinate correctness needs asymmetric real source content.
+- Closed window, process restart, initial ambiguous match, permission revocation, capture error,
+  slow request, cancellation during OCR, and late results after Stop or Dismiss.
+- Overlapping sleep/display/session suspension reasons, no overlapping requests across wake,
+  stopped/completed observer cleanup, and duplicate suppression.
+
+Manual acceptance, all pending:
+
+- Watch a changing timer. It must never claim completion. Compare a timer-only region with a larger
+  noisy window, then watch an export whose exact completion line appears after Start.
+- Close the selected window mid-watch. Open another window with the same title; do not switch sources.
+- Resize and move between Retina and non-Retina displays. Inspect selected region boundaries and
+  ensure geometry changes do not produce a false detection.
+- Check minimized, hidden, occluded, protected, other-Space, full-screen, display removal, reconnect,
+  screen sleep, system sleep, lock/session return, and interrupted setup behavior.
+- Check all four dock edges and multiple display arrangements. Hover must not steal focus. Explicit
+  Watch opens its controls. Stop, Dismiss, and completion do not activate the source.
+- Use W from keyboard Peek, sliders, Return to Start, Command-period to Stop, Escape, and VoiceOver
+  card actions. Check English/German layout, a small screen, Reduce Motion, and Reduce Transparency.
+- Check exact-window jump and its Window Access/ambiguous-match failure. Confirm app fallback is
+  labeled separately. Check silent delivery and opt-in sound, including duplicate suppression.
+- Measure idle resources before selection, during watch, after Stop/Dismiss/completion, and across
+  wake. Confirm that a delayed OS capture never causes overlapping periodic requests.
+
+Build logs: `/tmp/DeeDock-dee11-build.log` and `/tmp/DeeDock-dee11-build-2.log`. The initial build
+reported existing Launcher and Dock Badges warnings; the second reported only the App Intents
+metadata-extraction notice. No native acceptance result is claimed. Keep DEE-11 out of Done until
+its required manual acceptance is reviewed.
+
+The final focused Debug build also passed after adding display repositioning and deterministic
+previews; log: `/tmp/DeeDock-dee11-build-3.log`. All 38 watch keys matched their compiled English
+and German `.lproj/Localizable.strings` values. `git diff --check` passed. These inspections did
+not render the previews or exercise native interaction.
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee11-build build
+```
+
+
+### DEE-11 review follow-up
+
+Merged current `main` into `feature/dee-11` without checking out `main`. Peek now preserves both
+Watch and App Fusion actions and their W/F shortcuts. The merged String Catalog preserves both
+features' entries.
+
+Review fixes cover offscreen setup retry, process identity around capture, clamped region controls,
+source-display panel placement, a fixed Stop/Dismiss footer, and serialization between dismissed and
+replacement sessions. Closed-window detection also continues while the source app is hidden.
+The focused Debug build passed at `/tmp/DeeDock-dee11-review-build.log`. Tests and automated visual
+checks were not run. Native acceptance remains pending, especially rapid dismiss/reopen during a
+slow capture, hidden-window closure, setup restore, display placement, and keyboard region editing.
+
+The final focused build passed after resolving the Peek anchor at click time, rather than retaining
+an earlier display frame. Log: `/tmp/DeeDock-dee11-review-final-build.log`. All 38 compiled English
+and German watch strings matched the catalog after merging App Fusion. `git diff --check` passed.
+
+GPT-5.6 Luna reviewed the implementation at Extra High reasoning. Its reported setup, identity,
+region, control-visibility, placement, and cancellation findings were addressed. Follow-up fixes
+also reject a cancelled stale-status timeout and clear old exact-window errors before retrying.
+The focused Debug build passed again at `/tmp/DeeDock-dee11-review-status-build.log`; it reported
+only the App Intents metadata-extraction notice. Review was static; native acceptance is still pending.
+
 ## DEE-14 window portals
 
 The implementation adds up to four session-only floating window portals, detached through Window Peek's
@@ -1214,3 +1291,12 @@ acceptance and must not be marked Done based on this build.
 Implemented on `feature/dee-15`. Find a Window searches live titles/app names, explicitly captured text, and saved capsule history in separate scopes. Image search is an explicit on-device model action and labels its output as inferred. Captured context stays in memory and supports clear, expiry, and close cleanup. Global/app shortcuts and Focus Dock `/` open the search window.
 
 See [Window search](WINDOW_SEARCH.md) for evidence rules, resource bounds, SDK investigation, model/state cases, and the manual acceptance checklist. Focused unsigned Debug app builds passed. Tests, previews, automated visual checks, runtime capture/model inference, and native acceptance were not executed. Visual-attribute accuracy, focus/accessibility, stale navigation, permissions, and multi-display/Space behavior remain unverified. This issue is not Done based on compilation.
+
+A second main update brought in DEE-15 during review delivery. Its String Catalog and acceptance
+notes were preserved alongside DEE-11. The focused Debug app build passed after resolving those
+conflicts, with log `/tmp/DeeDock-dee11-latest-main-build.log`. Native acceptance remains pending.
+
+DEE-11 integration with DEE-14: resolved the latest main conflicts while preserving Watch, App
+Fusion, and Portal actions, keyboard shortcuts, localization, and acceptance notes. The focused
+Debug app build passed at `/tmp/DeeDock-dee11-portals-merge-build.log`. Tests and native acceptance
+were not run.
