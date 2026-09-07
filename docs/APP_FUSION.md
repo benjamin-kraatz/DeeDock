@@ -6,9 +6,9 @@ not modify source applications, send messages, or read complete documents.
 
 ## Create an artifact
 
-1. Choose **Add to Fusion** on a Window Peek card. In keyboard Peek, press **F** for the selected card.
+1. Choose **Add to Fusion** on a Window Peek card: the round button appears on the card under the pointer, and the card's context menu holds the same action. In keyboard Peek, press **F** for the selected card.
 2. Add another window from Peek, or use **Choose or refresh windows** in the tray. You can also open **App Fusion** from the DDock menu-bar item to start with the picker.
-3. Check the two source cards. Use **Remove** or **Replace** to correct the selection.
+3. Check the two source slots. Each filled slot's **Source options** menu holds **Replace** and **Remove**.
 4. Choose **Capture selected windows**. Screen Recording permission must already be enabled through Settings.
 5. Review the recognized text. Correct OCR errors or supply your own notes, then choose an action and optionally add an instruction.
 6. Confirm that you reviewed the available input and its limitations. Choose **Generate with Apple Intelligence**.
@@ -17,6 +17,9 @@ not modify source applications, send messages, or read complete documents.
 Compare and Summarize differences require nonempty reviewed text for both sources. Create
 checklist can use one source when the other is unreadable. Supplied or edited text is marked
 in the artifact's provenance. An empty source cannot support a generated point's citation.
+
+The tray header shows the three steps — choose, review, result — and the footer always holds that
+step's primary action.
 
 The tray stays open while you navigate other apps, dock previews, displays, and Spaces.
 **Hide tray**, Escape, and the window close button release captured input but preserve the

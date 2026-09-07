@@ -1,6 +1,276 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "fusionStepSelect": {
+    "comment": "App Fusion: flow step 1, choosing the two windows",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wählen"
+        }
+      }
+    }
+  },
+  "fusionStepReview": {
+    "comment": "App Fusion: flow step 2, reviewing the captured input",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prüfen"
+        }
+      }
+    }
+  },
+  "fusionStepResult": {
+    "comment": "App Fusion: flow step 3, the generated result",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Result"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ergebnis"
+        }
+      }
+    }
+  },
+  "fusionSlotEmptyTitle": {
+    "comment": "App Fusion: title of an empty source slot",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No window yet"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Noch kein Fenster"
+        }
+      }
+    }
+  },
+  "fusionSlotEmptyHint": {
+    "comment": "App Fusion: hint inside an empty source slot",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose a visible window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle ein sichtbares Fenster"
+        }
+      }
+    }
+  },
+  "fusionSlotLabel": {
+    "comment": "App Fusion: slot label. number is 1 or 2.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source %1$(number)lld"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelle %1$(number)lld"
+        }
+      }
+    }
+  },
+  "fusionPickerTitle": {
+    "comment": "App Fusion: heading of the window picker list",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbare Fenster"
+        }
+      }
+    }
+  },
+  "fusionPickerSelected": {
+    "comment": "App Fusion: a window that is already one of the two sources",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Already chosen"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bereits gewählt"
+        }
+      }
+    }
+  },
+  "fusionSourceOptions": {
+    "comment": "App Fusion: menu holding Replace and Remove for one source",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source options"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Optionen für die Quelle"
+        }
+      }
+    }
+  },
+  "fusionCharacterCount": {
+    "comment": "App Fusion: characters used of the 6,000 per-source limit. count is the current length.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld of 6,000 characters"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld von 6.000 Zeichen"
+        }
+      }
+    }
+  },
+  "fusionInstructionCount": {
+    "comment": "App Fusion: characters used of the 500-character instruction limit. count is the current length.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld of 500 characters"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(count)lld von 500 Zeichen"
+        }
+      }
+    }
+  },
+  "fusionInstructionLabel": {
+    "comment": "App Fusion: label of the optional instruction field",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Instruction"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Anweisung"
+        }
+      }
+    }
+  },
+  "fusionSelectionTitle": {
+    "comment": "App Fusion: heading of the window selection step",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Two windows to fuse"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zwei Fenster zum Verbinden"
+        }
+      }
+    }
+  },
+  "fusionLimitationsTitle": {
+    "comment": "App Fusion: heading of the disclosure holding the limitations text",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What this result is based on"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Worauf das Ergebnis beruht"
+        }
+      }
+    }
+  },
+  "fusionOptionsTitle": {
+    "comment": "App Fusion: heading of the action and instruction section",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What to generate"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Was erstellt werden soll"
+        }
+      }
+    }
+  },
   "fusionSelectionFull": {
     "comment": "App Fusion selection tray already contains two windows; replace or remove one before adding another.",
     "extractionState": "manual",

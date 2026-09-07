@@ -282,7 +282,9 @@ final class FusionState {
 #if DEBUG
 extension FusionState {
     /// Deterministic preview state; does not discover windows or touch stored preferences.
-    static func preview(failedSave: Bool = false) -> FusionState {
+    ///
+    /// `captured: false` shows the first step instead: one filled slot, one waiting, picker open.
+    static func preview(captured: Bool = true, failedSave: Bool = false) -> FusionState {
         let state = FusionState(shelf: ShelfController())
         let date = Date(timeIntervalSince1970: 1_783_000_000)
         state.sources = (1...2).map { index in
@@ -290,10 +292,21 @@ extension FusionState {
                 id: UInt32(index), processIdentifier: 42, applicationName: "Preview App",
                 bundleIdentifier: nil, title: "Draft \(index)",
                 frame: CGRect(x: 0, y: 0, width: 800, height: 600)))
+            guard captured else { return source }
             source.capturedAt = date
             source.captureState = index == 1 ? .visibleText : .truncated
             source.text = "Review the draft. Confirm the proposed schedule with the team."
             return source
+        }
+        if !captured {
+            state.sources = Array(state.sources.prefix(1))
+            state.candidates = (10...14).map { index in
+                WindowContextCandidate(id: UInt32(index), processIdentifier: pid_t(index),
+                                       applicationName: "Preview App \(index - 9)",
+                                       bundleIdentifier: nil, title: "Visible window \(index - 9)",
+                                       frame: CGRect(x: 0, y: 0, width: 800, height: 600))
+            }
+            state.showingPicker = true
         }
         if failedSave {
             state.draft = FusionDraft(title: "Review schedule changes",
