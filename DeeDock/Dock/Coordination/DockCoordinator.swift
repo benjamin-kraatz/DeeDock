@@ -457,7 +457,7 @@ final class DockCoordinator {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         endFocus(restore: false)
-        windowSearch.show()
+        windowSearch.show(returningTo: lastExternalApplication)
     }
 
     func focusDock() {

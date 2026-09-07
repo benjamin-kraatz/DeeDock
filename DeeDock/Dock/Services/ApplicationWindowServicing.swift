@@ -82,8 +82,13 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
     }
 
     func selectWindow(_ token: ApplicationWindowToken) async throws {
+        try Task.checkCancellation()
         guard AXIsProcessTrusted() else { throw ApplicationWindowServiceError.permissionRequired }
         guard let handle = handles[token] else {
+            throw ApplicationWindowServiceError.windowUnavailable
+        }
+        // A closed AX element must fail before app activation can bring an unrelated window forward.
+        guard string(handle.element, attribute: kAXRoleAttribute as CFString) == kAXWindowRole else {
             throw ApplicationWindowServiceError.windowUnavailable
         }
         // Every token is scoped to one menu presentation. Taking any row invalidates its siblings.

@@ -61,7 +61,7 @@ nonisolated enum WindowSearchMatcher {
     }
 
     static func terms(_ query: String) -> [String] {
-        let ignored: Set<String> = ["the", "a", "an", "with", "window", "with", "der", "die", "das", "mit", "fenster", "yesterday", "gestern"]
+        let ignored: Set<String> = ["the", "a", "an", "with", "window", "der", "die", "das", "mit", "fenster", "yesterday", "gestern"]
         return words(String(query.prefix(maximumQuery))).filter { !ignored.contains($0) }
     }
 

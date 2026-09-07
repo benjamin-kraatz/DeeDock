@@ -6,7 +6,9 @@ actor WindowSearchService {
     private let thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService()
 
     func discover() async throws -> [WindowSearchSource] {
+        try Task.checkCancellation()
         await windows.stop()
+        try Task.checkCancellation()
         let apps = await MainActor.run {
             Array(NSWorkspace.shared.runningApplications.filter {
                 $0.activationPolicy == .regular && !$0.isTerminated
@@ -68,13 +70,14 @@ actor WindowSearchService {
                 throw ApplicationWindowServiceError.windowUnavailable
             }
             let session = UUID()
-            defer { Task { await windows.discard(sessionID: session) } }
-            let summaries = try await windows.discover(processes: [ApplicationProcessSnapshot(
+            let navigation = AccessibilityApplicationWindowService(maximumWindows: WindowSearchMatcher.maximumSources)
+            defer { Task { await navigation.stop() } }
+            let summaries = try await navigation.discover(processes: [ApplicationProcessSnapshot(
                 processIdentifier: source.processIdentifier, isHidden: false, isActive: false)], sessionID: session)
             let matches = summaries.filter { $0.title == candidate.title && $0.frame == candidate.frame }
             guard matches.count == 1, let match = matches.first else { throw ApplicationWindowServiceError.windowUnavailable }
             try Task.checkCancellation()
-            try await windows.selectWindow(match.token)
+            try await navigation.selectWindow(match.token)
         } else {
             try Task.checkCancellation()
             let activated = await MainActor.run {

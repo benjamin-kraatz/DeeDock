@@ -12,9 +12,9 @@ final class WindowSearchController: NSObject, NSWindowDelegate {
 
     init(capsules: SessionCapsuleController) { self.capsules = capsules }
 
-    func show() {
+    func show(returningTo application: NSRunningApplication? = nil) {
         if let window { NSApp.activate(); window.makeKeyAndOrderFront(nil); return }
-        previousApplication = NSWorkspace.shared.frontmostApplication
+        previousApplication = application ?? NSWorkspace.shared.frontmostApplication
         restoresFocus = true
         let state = WindowSearchState(capsules: capsules)
         let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 760, height: 640),

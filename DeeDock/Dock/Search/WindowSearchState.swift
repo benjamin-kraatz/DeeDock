@@ -6,9 +6,9 @@ import Observation
 final class WindowSearchState {
     var query = "" { didSet {
         if query.count > WindowSearchMatcher.maximumQuery { query = String(query.prefix(WindowSearchMatcher.maximumQuery)) }
-        invalidateImageSearch(); rank()
+        invalidateImageSearch(); results = []; selectedID = nil; rank()
     } }
-    var scope = WindowSearchScope.live { didSet { invalidateImageSearch(); rank() } }
+    var scope = WindowSearchScope.live { didSet { invalidateImageSearch(); results = []; selectedID = nil; rank() } }
     var selectedID: UUID?
     var captureSelection: Set<CGWindowID> = []
     private(set) var sources: [WindowSearchSource] = []
@@ -40,6 +40,7 @@ final class WindowSearchState {
 
     func refresh() {
         cancelWork(); busy = true; message = nil
+        sources = []; results = []; selectedID = nil
         let generation = self.generation
         setDeadline()
         work = Task { [weak self] in
@@ -149,6 +150,7 @@ final class WindowSearchState {
     }
 
     func clearCaptured() {
+        if scope == .captured { results = []; selectedID = nil }
         cancelWork(); expiration?.cancel(); expiration = nil
         snapshots = []; capturedSources = [:]; capturedAt = nil; imageResults = []
         candidates = []; captureSelection = []; choosingCapture = false
@@ -167,6 +169,7 @@ final class WindowSearchState {
     }
 
     func activateSelection() {
+        guard !choosingCapture, openedCapsule == nil, !busy else { return }
         guard let result = results.first(where: { $0.id == selectedID }) else { return }
         activate(result)
     }

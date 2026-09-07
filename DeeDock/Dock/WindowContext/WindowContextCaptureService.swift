@@ -84,6 +84,7 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
     }
 
     func capture(_ candidates: [WindowContextCandidate]) async throws -> [WindowContextSnapshot] {
+        try Task.checkCancellation()
         guard CGPreflightScreenCaptureAccess() else { throw WindowContextCaptureError.permissionRequired }
         let selected = Array(candidates.prefix(SessionCapsuleDocument.maximumWindowsPerCapsule))
         guard !selected.isEmpty else { throw WindowContextCaptureError.noWindows }
