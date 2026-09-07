@@ -90,7 +90,8 @@ struct WindowPeekView: View {
                                selected: keyboard && state.selectedID == card.id, size: size,
                                choose: { state.choose?(card.id) },
                                watch: { state.watch?(card.id) },
-                               addToFusion: { state.addToFusion?(card.window) })
+                               addToFusion: { state.addToFusion?(card.window) },
+                               pinPortal: { state.pinPortal?(card.window) })
                 .onAppear { state.thumbnailNeeded?(card.id) }
         }
     }
@@ -137,6 +138,7 @@ private struct WindowPeekCardSlot: View {
     let choose: () -> Void
     let watch: () -> Void
     let addToFusion: () -> Void
+    let pinPortal: () -> Void
     @State private var hovering = false
 
     var body: some View {
@@ -144,10 +146,12 @@ private struct WindowPeekCardSlot: View {
                            selected: selected, action: choose)
             .contextMenu {
                 Button(.watchTitle, systemImage: "eye", action: watch)
+                Button(.portalPin, systemImage: "pin", action: pinPortal)
                 Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
             }
             .accessibilityAction(named: Text(.watchTitle), watch)
             .accessibilityAction(named: Text(.fusionAdd), addToFusion)
+            .accessibilityAction(named: Text(.portalPin), pinPortal)
             .overlay(alignment: .topTrailing) {
                 HStack(spacing: 4) {
                     WindowPeekActionButton(revealed: hovering || selected, label: .watchTitle,

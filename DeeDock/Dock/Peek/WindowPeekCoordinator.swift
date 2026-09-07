@@ -4,6 +4,7 @@ import AppKit
 @MainActor
 final class WindowPeekCoordinator {
     private let watches = WindowWatchController()
+    private let portals = WindowPortalCoordinator()
     private let menus: ApplicationMenuController
     private let screenCapture: ScreenCaptureAccessController
     private let thumbnails: any WindowThumbnailServicing
@@ -120,7 +121,10 @@ final class WindowPeekCoordinator {
         if returnFocus { panel?.focus() }
     }
 
+    func focusNextPortal() { portals.focusNext() }
+
     func stop() {
+        portals.stop()
         close(returnFocus: false)
         watches.stop()
         prepareSettings = nil
@@ -150,6 +154,14 @@ final class WindowPeekCoordinator {
             let action = addToFusion
             close(returnFocus: false)
             action?(window, panel, keyboard)
+        }
+        next.state.pinPortal = { [weak self, weak panel] window in
+            guard let self else { return }
+            guard portals.pin(window, appName: item.reference.name, keyboard: keyboard) else {
+                panel?.store.errorMessage = .portalLimit
+                return
+            }
+            close(returnFocus: false)
         }
         next.state.choose = { [weak self] token in self?.choose(token) }
         next.state.showApp = { [weak self] in self?.showApp() }

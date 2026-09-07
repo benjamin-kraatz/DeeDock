@@ -1271,6 +1271,18 @@ also reject a cancelled stale-status timeout and clear old exact-window errors b
 The focused Debug build passed again at `/tmp/DeeDock-dee11-review-status-build.log`; it reported
 only the App Intents metadata-extraction notice. Review was static; native acceptance is still pending.
 
+## DEE-14 window portals
+
+The implementation adds up to four session-only floating window portals, detached through Window Peek's
+menu, VoiceOver action, or P shortcut. Portals own capture independently of Peek, preserve image aspect
+ratio, and expose pause, source navigation, close, and keyboard movement. See the
+[window portal reference and acceptance checklist](WINDOW-PORTALS.md) for capture bounds, lifecycle
+states, display/Spaces behavior, SDK limitations, and model cases worth testing.
+
+Focused app compilation passed after repairing intermediate compiler errors. Tests, automated visual
+checks, native acceptance, and energy measurements were not run. DEE-14 remains awaiting native
+acceptance and must not be marked Done based on this build.
+
 ## DEE-15: window search
 
 Implemented on `feature/dee-15`. Find a Window searches live titles/app names, explicitly captured text, and saved capsule history in separate scopes. Image search is an explicit on-device model action and labels its output as inferred. Captured context stays in memory and supports clear, expiry, and close cleanup. Global/app shortcuts and Focus Dock `/` open the search window.
@@ -1280,3 +1292,8 @@ See [Window search](WINDOW_SEARCH.md) for evidence rules, resource bounds, SDK i
 A second main update brought in DEE-15 during review delivery. Its String Catalog and acceptance
 notes were preserved alongside DEE-11. The focused Debug app build passed after resolving those
 conflicts, with log `/tmp/DeeDock-dee11-latest-main-build.log`. Native acceptance remains pending.
+
+DEE-11 integration with DEE-14: resolved the latest main conflicts while preserving Watch, App
+Fusion, and Portal actions, keyboard shortcuts, localization, and acceptance notes. The focused
+Debug app build passed at `/tmp/DeeDock-dee11-portals-merge-build.log`. Tests and native acceptance
+were not run.
