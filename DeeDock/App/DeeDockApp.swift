@@ -34,6 +34,9 @@ struct DeeDockApp: App {
         MenuBarExtra {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
+            Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
+                .keyboardShortcut("f", modifiers: [.command, .shift])
+            Text(delegate.coordinator.searchShortcutAvailable ? .windowSearchShortcutHelp : .windowSearchShortcutUnavailable)
             DockModesMenu(coordinator: delegate.coordinator)
             Divider()
             OpenDockSettingsButton()
@@ -57,6 +60,8 @@ struct DeeDockApp: App {
                 CheckForUpdatesButton(updater: delegate.updater)
                 #endif
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
+                Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
+                    .keyboardShortcut("f", modifiers: [.command, .shift])
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
             }

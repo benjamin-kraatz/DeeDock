@@ -96,7 +96,10 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
 
             for candidate in selected {
                 try Task.checkCancellation()
-                guard let window = windows[candidate.id] else {
+                guard let window = windows[candidate.id],
+                      window.owningApplication?.processID == candidate.processIdentifier,
+                      Self.normalized(window.title) == candidate.title,
+                      window.frame == candidate.frame else {
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: nil, recognizedText: ""))
                     continue
                 }
@@ -144,7 +147,8 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
         request.automaticallyDetectsLanguage = true
         request.usesLanguageCorrection = true
         let observations = try await request.perform(on: image)
-        return observations.map(\.transcript).joined(separator: "\n")
+        try Task.checkCancellation()
+        return String(observations.lazy.map(\.transcript).joined(separator: "\n").prefix(6_000))
     }
 
     private nonisolated static func normalized(_ value: String?) -> String? {
