@@ -27,7 +27,7 @@ Collection is off by default. Enable **Collect badge changes in future Focus Ses
 
 The existing Focus Session ID, phase and deadline define the collection interval. Each app's first and last observations produce a net change, independently of its checked baseline. Identical samples do not add history or persist redundant values. Only rows with an observed state change appear in the digest.
 
-Pauses exclude samples and mark coverage incomplete. Sleep, permission loss and unavailable scans mark missing coverage. After DDock restarts, saved endpoints remain historical and current observations start unknown. A persisted active digest can continue for the same unexpired session, with a gap marker. A completed or expired session closes before another sample is accepted. Relaunching DDock does not start collection for an existing session that has no active digest.
+Pauses exclude samples and mark coverage incomplete. Sleep, permission loss and unavailable scans mark missing coverage. After DDock restarts, saved endpoints remain historical and current observations start unknown. A persisted active digest can continue for the same unexpired session, with a gap marker. A completed or expired session closes before another sample is accepted. A scan begun before a start or resume boundary updates current details but is excluded from the digest. Relaunching DDock does not start collection for an existing session that has no active digest.
 
 Open **Focus badge digest** from the timer panel, including after completion, or **Review badge history** in Settings. Dismissing the timer does not delete completed digests. Each digest offers source-app activation and a delete control. Deleting an active digest stops its collection for that session.
 

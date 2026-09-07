@@ -76,9 +76,10 @@ final class DockBadgeController {
                 self?.timer?.invalidate()
                 self?.timer = nil
                 let pid = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first?.processIdentifier
+                let scanStarted = Date()
                 let next = await reader.read(pid: pid)
                 guard !Task.isCancelled, let self, generation == session else { break }
-                memory.observe(next, session: focusSession?())
+                memory.observe(next, session: focusSession?(), scanStarted: scanStarted)
                 let nextLabels = next.compactMapValues(\.label)
                 if labels != nextLabels { labels = nextLabels }
                 scheduleFallback()

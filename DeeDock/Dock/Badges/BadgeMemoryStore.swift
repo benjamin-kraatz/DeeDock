@@ -11,6 +11,7 @@ final class BadgeMemoryStore {
     private(set) var storageFailed = false
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var session: FocusSession?
+    @ObservationIgnored private var collectionNotBefore = Date.distantPast
     private static let key = "dock.badge-memory.v1"
     private static let retention: TimeInterval = 7 * 86400
 
@@ -30,7 +31,7 @@ final class BadgeMemoryStore {
     }
 
     /// Called for actual snapshots, including unavailable scans. Identical samples do not persist.
-    func observe(_ observations: [String: BadgeObservation], session: FocusSession?, at date: Date = .now) {
+    func observe(_ observations: [String: BadgeObservation], session: FocusSession?, at date: Date = .now, scanStarted: Date? = nil) {
         synchronize(session: session, at: date)
         let previous = current
         if current != observations { current = observations }
@@ -51,7 +52,10 @@ final class BadgeMemoryStore {
                     document.apps[path] = BadgeAppMemory(changes: [BadgeChange(value: value, date: date)], touched: date)
                 }
             }
-            if document.active?.rows[path] != nil || previous[path] != value {
+            // AX scans can outlive a start or resume action. They update current presentation,
+            // but must not import pre-boundary observations into the session digest.
+            if (scanStarted ?? date) >= collectionNotBefore,
+               document.active?.rows[path] != nil || previous[path] != value {
                 collect(path: path, value: value)
             }
         }
@@ -61,6 +65,9 @@ final class BadgeMemoryStore {
 
     /// A session's deadline is checked before accepting a sample, even if its timer task is delayed.
     func synchronize(session: FocusSession?, at date: Date = .now, allowStart: Bool = true) {
+        if session?.id != self.session?.id || session?.phase != self.session?.phase {
+            collectionNotBefore = date
+        }
         self.session = session
         guard !requiresReset else { return }
         let before = document
