@@ -21,6 +21,7 @@ final class WindowPeekCoordinator {
     private var generation = UUID()
     private var sourceHovered = false
     private var panelHovered = false
+    var addToFusion: ((ApplicationWindowSummary, DockPanelController, Bool) -> Void)?
     var prepareSettings: ((String) -> Void)?
     var isOpen: Bool { controller != nil }
     var isKeyboardActive: Bool { controller != nil && sourcePanel?.store.keyboardFocus == true }
@@ -123,6 +124,7 @@ final class WindowPeekCoordinator {
         close(returnFocus: false)
         watches.stop()
         prepareSettings = nil
+        addToFusion = nil
     }
 
     private func present(_ item: DockItem, on panel: DockPanelController, keyboard: Bool) {
@@ -140,6 +142,12 @@ final class WindowPeekCoordinator {
             guard let self, let summary = allWindows.first(where: { $0.token == token }) else { return }
             close(returnFocus: false)
             watches.show(summary)
+        }
+        next.state.addToFusion = { [weak self, weak panel] window in
+            guard let self, let panel else { return }
+            let action = addToFusion
+            close(returnFocus: false)
+            action?(window, panel, keyboard)
         }
         next.state.choose = { [weak self] token in self?.choose(token) }
         next.state.showApp = { [weak self] in self?.showApp() }

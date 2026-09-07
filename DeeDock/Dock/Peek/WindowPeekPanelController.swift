@@ -78,6 +78,7 @@ final class WindowPeekPanelController {
         localMonitor = nil
         globalMonitor = nil
         state.watch = nil
+        state.addToFusion = nil
         state.choose = nil
         state.showApp = nil
         state.settingsSelected = nil
@@ -106,7 +107,11 @@ final class WindowPeekPanelController {
 
     private func handleKey(_ event: NSEvent) -> Bool {
         switch event.keyCode {
-        case 13: if let id = state.selectedID { state.watch?(id) }
+        case 13 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: if let id = state.selectedID { state.watch?(id) }
+        case 3 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
+            if let card = state.cards.first(where: { $0.id == state.selectedID }) {
+                state.addToFusion?(card.window)
+            }
         case 36, 76: state.chooseSelection()
         case 53: close(returnFocus: true)
         case 123, 126: state.select(by: -1)

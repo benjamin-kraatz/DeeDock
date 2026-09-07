@@ -201,6 +201,14 @@ Nothing is saved until you review the draft and choose **Save Capsule**. Raw scr
 
 The underlying window-context service is feature-neutral: its public values contain current window identity, application identity, bounds, one-time imagery, and OCR. The planned Window Scout can reuse that capture boundary without depending on the Capsules repository or UI.
 
+## App Fusion
+
+Choose **Add to Fusion** on a Window Peek card, then select a second window from the same or another app. In keyboard Peek, **F** adds the selected card. **App Fusion** in the menu-bar item opens an accessible picker. The app-wide tray keeps the selection while you navigate other previews and displays.
+
+Capture the selected windows, review or correct their visible text, and choose Compare, Summarize differences, or Create checklist. Apple Intelligence generates an editable draft from the reviewed text only. Save explicitly to create a native text artifact in Shelf with source attribution, capture times, and limitations. Errors retain reviewed input or the draft where practical; unavailable AI never produces a substitute result. This is a partial visible-context analysis, not a complete document comparison.
+
+See [App Fusion](docs/APP_FUSION.md) for input lifetime, save recovery, and storage behavior. Compilation is separate from [pending native acceptance](docs/ACCEPTANCE.md#app-fusion-dee-16).
+
 ## Shelf
 
 The Shelf is a staging area for files you are carrying somewhere else. Drop files on it, walk to another Space, display, or full-screen app, and drag them back out. It appears before Trash in the trailing utility area, shares that divider, and is enabled by default. Under **Features → Shelf**, turn it off for the whole app.
