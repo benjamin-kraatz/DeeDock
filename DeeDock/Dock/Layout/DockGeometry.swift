@@ -126,14 +126,15 @@ enum DockGeometry {
     ///   - availableLength: Chosen reference frame length along the selected edge, in logical points.
     ///   - availableDepth: Reference frame dimension perpendicular to the selected edge.
     ///   - settings: Requested appearance; invalid values fall back to defaults.
-    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults) -> Layout {
+    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults) -> Layout {
         let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableLength - 16)
         let utilityCount = min(max(0, utilityCount), count)
-        let appCount = count - utilityCount
+        let leading = min(max(0, leadingUtilityCount), count - utilityCount)
+        let appCount = count - utilityCount - leading
         var separators = Set<Int>()
-        if favoriteCount > 0 && favoriteCount < appCount { separators.insert(favoriteCount) }
-        if utilityCount > 0 && appCount > 0 { separators.insert(appCount) }
+        if favoriteCount > 0 && favoriteCount < appCount { separators.insert(leading + favoriteCount) }
+        if utilityCount > 0 && appCount > 0 { separators.insert(leading + appCount) }
         let itemSpacing = CGFloat(settings.itemSpacing)
         let extra = padding * 2 + CGFloat(max(0, count - 1)) * itemSpacing
             + CGFloat(separators.count) * separatorLength

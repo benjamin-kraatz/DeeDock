@@ -106,6 +106,15 @@ final class SessionCapsuleCoordinator {
         state?.beginNewCapsule()
     }
 
+    /// Opens an editable app checkpoint without capturing windows or saving until the user confirms.
+    func beginFromApplication(_ application: ApplicationReference, on panel: DockPanelController) {
+        close(returnFocus: false)
+        toggle(on: panel, anchorTarget: .launcher)
+        state?.applyDraft(.success(SessionCapsuleDraft(title: application.name, summary: "",
+            unfinishedTasks: [], windows: [SessionCapsuleWindowReference(applicationName: application.name,
+                bundleIdentifier: application.bundleIdentifier, windowTitle: nil)], note: "")))
+    }
+
     func show(_ capsuleID: UUID, on panel: DockPanelController) {
         close(returnFocus: false)
         toggle(on: panel, anchorTarget: .sessionCapsule(capsuleID), initialCapsuleID: capsuleID)

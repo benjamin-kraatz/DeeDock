@@ -4,6 +4,7 @@ import SwiftUI
 ///
 /// Preview `DockContentView` with sample values instead of constructing a live workspace store.
 struct DockView: View {
+    let launcher: LauncherState
     let store: DockStore
     let interaction: DockInteraction
     let visibility: DockVisibilityController
@@ -12,6 +13,15 @@ struct DockView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
+        if launcher.isPresented {
+            LauncherView(state: launcher)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            dock
+        }
+    }
+
+    @ViewBuilder private var dock: some View {
         let size = interaction.layout.viewportSize
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
                                                   size: size, reduceMotion: reduceMotion, edge: interaction.layout.edge)

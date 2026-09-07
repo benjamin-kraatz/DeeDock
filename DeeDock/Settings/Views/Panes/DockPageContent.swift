@@ -38,6 +38,14 @@ struct DockPageContent: View {
                                      alignment: binding(\.alignment),
                                      alongEdgeOffset: binding(\.alongEdgeOffset),
                                      edgeDistance: binding(\.edgeDistance), overrideContext: override)
+                SettingsCard(title: .launcherTitle, footnote: .settingsLauncherPositionHelp) {
+                    Picker(selection: binding(\.launcherAtStart)) {
+                        Text(source.value.edge.isVertical ? .settingsLauncherTop : .settingsLauncherLeft).tag(true)
+                        Text(source.value.edge.isVertical ? .settingsLauncherBottom : .settingsLauncherRight).tag(false)
+                    } label: { Text(.settingsLauncherPosition) }
+                    .pickerStyle(.segmented)
+                    .settingsOverride(override, field: .launcherAtStart)
+                }
             case .behavior:
                 BehaviorSettingsPane(source: source, showZone: showZone)
             case .shownApps:

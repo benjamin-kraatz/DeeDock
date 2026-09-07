@@ -66,11 +66,32 @@ struct ApplicationCatalogTests {
         #expect(!delivered)
         #expect(service.wasCancelled)
     }
+
+    @Test("Hiding the foreground app does not create a recent-open entry")
+    func hideDoesNotRecordHistory() async {
+        let service = ControlledApplicationService()
+        service.primaryOutcome = .hidden
+        let catalog = ApplicationCatalog(service: service)
+        let reference = DisplayFixtures.app("app")
+        await withCheckedContinuation { completed in
+            catalog.performPrimaryAction(reference) { error in
+                #expect(error == nil)
+                completed.resume()
+            }
+            Task {
+                await service.waitForRequest()
+                service.finishSuccessfully()
+            }
+        }
+        #expect(catalog.launcherHistory.visits.isEmpty)
+        catalog.stop()
+    }
 }
 
 /// A manually completed launch: no NSWorkspace access, live icons, timers, or real apps.
 @MainActor
 private final class ControlledApplicationService: ApplicationServicing {
+    var primaryOutcome: ApplicationPrimaryActionOutcome = .opened
     var primaryRequests = 0
     var openRequests = 0
     var requests: Int { primaryRequests + openRequests }
@@ -85,10 +106,11 @@ private final class ControlledApplicationService: ApplicationServicing {
     func icon(for url: URL?) -> NSImage { NSImage(size: NSSize(width: 48, height: 48)) }
     func pruneIcons(keeping urls: Set<URL>) {}
     func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws { Issue.record("Unexpected document open") }
-    func performPrimaryAction(_ reference: ApplicationReference) async throws {
+    func performPrimaryAction(_ reference: ApplicationReference) async throws -> ApplicationPrimaryActionOutcome {
         primaryRequests += 1
         resumeRequestWaiters()
         try await request()
+        return primaryOutcome
     }
     func open(_ reference: ApplicationReference) async throws {
         openRequests += 1

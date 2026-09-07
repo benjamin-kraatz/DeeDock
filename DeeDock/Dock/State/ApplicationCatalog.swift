@@ -4,6 +4,8 @@ import Observation
 /// Application-wide workspace observation, icon cache, running order, and launch ownership.
 @MainActor @Observable
 final class ApplicationCatalog {
+    let launcherLibrary: LauncherLibrary
+    let launcherHistory: LauncherHistory
     private(set) var running: [ApplicationReference] = []
     private(set) var runningIDs: [String] = []
     private(set) var launching: Set<String> = []
@@ -17,7 +19,11 @@ final class ApplicationCatalog {
     @ObservationIgnored private var documentTasks: [UUID: Task<Void, Never>] = [:]
     @ObservationIgnored private var generation = UUID()
 
-    init(service: any ApplicationServicing) { self.service = service }
+    init(service: any ApplicationServicing, launcherHistory: LauncherHistory? = nil, launcherLibrary: LauncherLibrary? = nil) {
+        self.service = service
+        self.launcherHistory = launcherHistory ?? LauncherHistory(defaults: nil)
+        self.launcherLibrary = launcherLibrary ?? LauncherLibrary()
+    }
 
     func start() {
         guard observers.isEmpty else { return }
@@ -48,7 +54,7 @@ final class ApplicationCatalog {
     /// Owns app-icon toggle work so all display docks share duplicate suppression and teardown.
     func performPrimaryAction(_ reference: ApplicationReference,
                               completion: @escaping (LocalizedStringResource?) -> Void) {
-        submit(reference, operation: { service in try await service.performPrimaryAction(reference) }) { error in
+        submit(reference, operation: { service in try await service.performPrimaryAction(reference) == .opened }) { error in
             if error is ApplicationPrimaryActionError {
                 completion(.errorHideApp(appName: reference.name))
             } else {
@@ -62,13 +68,13 @@ final class ApplicationCatalog {
     /// Only this catalog owns cancellation. The initiating dock supplies a weak, session-checked callback.
     func open(_ reference: ApplicationReference, ifCurrent: @escaping () -> Bool = { true },
               completion: @escaping (LocalizedStringResource?) -> Void) {
-        submit(reference, ifCurrent: ifCurrent, operation: { service in try await service.open(reference) }) { error in
+        submit(reference, ifCurrent: ifCurrent, operation: { service in try await service.open(reference); return true }) { error in
             completion(.errorOpenApp(appName: reference.name, details: error.localizedDescription))
         } completion: { completion(nil) }
     }
 
     private func submit(_ reference: ApplicationReference, ifCurrent: @escaping () -> Bool = { true },
-                        operation: @escaping (any ApplicationServicing) async throws -> Void,
+                        operation: @escaping (any ApplicationServicing) async throws -> Bool,
                         failure: @escaping (any Error) -> Void,
                         completion: @escaping () -> Void) {
         guard tasks[reference.id] == nil else { return }
@@ -82,8 +88,9 @@ final class ApplicationCatalog {
             do {
                 try Task.checkCancellation()
                 guard ifCurrent() else { return }
-                try await operation(service)
+                let opened = try await operation(service)
                 guard !Task.isCancelled, generation == currentGeneration else { return }
+                if opened { launcherHistory.record(reference) }
                 completion()
                 refresh()
             } catch {
@@ -134,6 +141,7 @@ final class ApplicationCatalog {
                 try Task.checkCancellation()
                 try await service.openDocuments(documents.urls, with: reference)
                 guard !Task.isCancelled, generation == currentGeneration else { return }
+                launcherHistory.record(reference)
                 completion(nil)
                 refresh()
             } catch {
@@ -144,6 +152,7 @@ final class ApplicationCatalog {
     }
 
     func stop() {
+        launcherLibrary.stop()
         generation = UUID()
         observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
         observers.removeAll()

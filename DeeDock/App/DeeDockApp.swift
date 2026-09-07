@@ -1,7 +1,32 @@
 import SwiftUI
 
-/// SwiftUI entry point exposing menu commands; the delegate owns the native dock lifecycle.
+/// Selects an isolated scene host for canvas builds and the menu-bar app for normal launches.
 @main
+private enum DeeDockEntryPoint {
+    /// Canvas hosts must not construct the menu-bar app or its live service graph.
+    static func main() {
+        #if DDOCK_CANVAS_HOST
+        DeeDockPreviewApp.main()
+        #else
+        let environment = ProcessInfo.processInfo.environment
+        if environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+            || environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1" {
+            DeeDockPreviewApp.main()
+        } else {
+            DeeDockApp.main()
+        }
+        #endif
+    }
+}
+
+/// Gives Xcode a normal scene to host previews without constructing the production delegate.
+private struct DeeDockPreviewApp: App {
+    var body: some Scene {
+        WindowGroup { EmptyView() }
+    }
+}
+
+/// Menu-bar scenes; the delegate owns the native dock lifecycle.
 struct DeeDockApp: App {
     @NSApplicationDelegateAdaptor(DeeDockDelegate.self) private var delegate
 
