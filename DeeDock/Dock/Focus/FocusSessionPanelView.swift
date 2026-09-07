@@ -15,34 +15,49 @@ struct FocusSessionPanelView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
-        VStack(spacing: 18) {
-            if let session = controller.session {
-                Text(verbatim: session.modeName).font(.title2.bold()).lineLimit(2)
-                if session.phase == .running {
-                    TimelineView(.periodic(from: .now, by: 1)) { context in time(session, date: context.date) }
-                } else { time(session, date: .now) }
-                if session.phase == .completed {
-                    Text(.focusFinishedHelp).multilineTextAlignment(.center)
-                    Button(.focusSaveCapsule, systemImage: "square.stack.3d.up") { saveCapsule() }
-                    Button(.focusDismiss) { controller.dismiss(); close() }
-                } else {
-                    HStack {
-                        if session.phase == .running { Button(.focusPause) { controller.pause() } }
-                        else { Button(.focusResume) { controller.resume() } }
-                        Button(.focusExtend) { controller.extend() }.disabled(session.duration > 86100)
-                        Button(.focusFinish) { controller.finish() }
+        ScrollView {
+            VStack(spacing: 14) {
+                if let session = controller.session {
+                    Text(verbatim: session.modeName).font(.title2.bold()).lineLimit(2)
+                    if session.phase == .running {
+                        TimelineView(.periodic(from: .now, by: 1)) { context in time(session, date: context.date) }
+                    } else { time(session, date: .now) }
+                    if controller.bossVictoryID != nil {
+                        Text(.bossFightVictory).font(.headline)
+                        Button(.bossFightDismissCelebration) { controller.dismissVictory() }
                     }
+                    if session.phase == .completed {
+                        Text(.focusFinishedHelp).multilineTextAlignment(.center)
+                        Button(.focusSaveCapsule, systemImage: "square.stack.3d.up") { saveCapsule() }
+                        Button(.focusDismiss) { controller.dismiss(); close() }
+                    } else {
+                        HStack {
+                            if session.phase == .running { Button(.focusPause) { controller.pause() } }
+                            else { Button(.focusResume) { controller.resume() } }
+                            Button(.focusExtend) { controller.extend() }.disabled(session.duration > 86100)
+                            Button(.focusFinish) { controller.finish() }
+                        }
+                        Button(.bossFightCancelSession, role: .cancel) { controller.dismiss(); close() }
+                    }
+                    if controller.bossFight.enabled {
+                        Button(.bossFightDisable) { controller.configureBossFight(enabled: false) }
+                    }
+                    if let error = controller.error { Text(verbatim: error).foregroundStyle(.red) }
                 }
-                if let error = controller.error { Text(verbatim: error).foregroundStyle(.red) }
             }
+            .padding(24).frame(maxWidth: .infinity)
         }
-        .padding(24).frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .dockPopoverChrome(chrome.value, opaque: reduceTransparency || forceOpaqueBackground)
     }
 
     private func time(_ session: FocusSession, date: Date) -> some View {
         VStack {
+            if controller.bossFight.enabled && session.phase != .completed {
+                BossFightStatusView(session: session, date: date, controller: controller)
+            }
             Text(verbatim: session.timeLabel(at: date)).font(.system(size: 46, weight: .light)).monospacedDigit()
+                .accessibilityLabel(Text(.bossFightTimeRemaining(session.timeLabel(at: date))))
             Text(session.phase == .completed ? .focusCompleted : session.phase == .paused ? .focusPaused : .focusRunning)
                 .foregroundStyle(.secondary)
         }

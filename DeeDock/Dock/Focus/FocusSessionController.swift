@@ -1,7 +1,7 @@
 import AppKit
 import Observation
 
-/// One persisted timer across displays. Only a running deadline owns a scheduled task.
+/// One persisted timer across displays, with a deadline task and an optional three-second celebration.
 @MainActor @Observable
 final class FocusSessionController {
     private(set) var document = FocusSessionsDocument()

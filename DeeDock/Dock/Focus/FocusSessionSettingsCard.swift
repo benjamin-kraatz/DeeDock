@@ -27,6 +27,8 @@ struct FocusSessionSettingsCard: View {
                     Toggle(.focusCelebrate, isOn: Binding(get: { controller.document.celebrates },
                                                          set: { controller.configure(celebrates: $0) }))
                         .disabled(controller.requiresReset)
+                    Divider()
+                    BossFightSettingsView(controller: controller)
                     if let session = controller.session {
                         Text(.focusCurrentMode(session.modeName)).font(.callout)
                         if session.phase == .running { Button(.focusPause) { controller.pause() } }
@@ -36,6 +38,7 @@ struct FocusSessionSettingsCard: View {
                             HStack {
                                 Button(.focusExtend) { controller.extend() }.disabled(session.duration > 86100)
                                 Button(.focusFinish) { controller.finish() }
+                                Button(.bossFightCancelSession, role: .cancel) { controller.dismiss() }
                             }
                         }
                     }

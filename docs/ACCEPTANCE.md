@@ -940,6 +940,31 @@ Remaining hands-on acceptance: pin and reorder shortcuts, restart, rename or rem
 
 ## Focus Sessions
 
+### DEE-18: optional Boss Fight skin
+
+Implemented disabled-by-default Boss Fight preferences, a bounded work-app party picker,
+a boss/timer dock tile, party and health in the timer panel, immediate disable controls,
+explicit session cancellation, and a dismissible three-second silent trophy. Existing
+deadlines, pause/resume, extension, restart/wake reconciliation, and Capsule handoff remain
+the timer authority. Distraction cues and sound are optional parts not included in this
+slice. See [behavior, model cases, and manual checklist](BOSS-FIGHT.md).
+
+On 2026-09-07, the focused Debug app build passed with Xcode 27.0 (27A5252f), macOS 27 SDK,
+Swift 5 mode, MainActor default isolation, and approachable concurrency enabled:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-DEE18-build build
+```
+
+Log: `/tmp/DeeDock-DEE18-build.log`. Existing warnings concern an unused launcher token,
+an unused badge `assumeIsolated` result, and skipped App Intents metadata extraction.
+The catalog parses, and all 15 new keys match the built English and German resources.
+No tests, previews, app launches, automated visual checks, or hands-on acceptance were run.
+Compilation is not native acceptance; DEE-18 must remain open for the documented checks.
+
+### Original timer implementation
+
 Implemented one shared, persisted focus timer started from an existing Dock Mode through Settings or the menu bar. Starting the already-active mode works without requiring a redundant mode activation. Switching to another mode must save successfully before its timer starts. Running or paused sessions prevent a second start. Timers retain the starting mode's identity and name independently of later mode edits.
 
 A dock tile shows a remaining-time ring and opens controls for pause, resume, five-minute extension, and early completion. Running visible tiles and an open timer panel update once per second; hidden, paused, and completed tiles schedule no view ticks. The controller owns one deadline task plus a wake observer, cancels old tasks on every transition, and releases both at shutdown. Running wall-clock deadlines include sleep and app downtime; paused durations do not. The versioned document under `dock.focus-sessions.v1` includes the default duration and optional completion animation. Invalid data blocks edits pending an explicit reset.

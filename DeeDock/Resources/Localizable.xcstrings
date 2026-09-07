@@ -1,6 +1,276 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "bossFightEnable": {
+    "comment": "Explicit opt-in toggle for the optional Focus Session Easter egg; off by default.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable Boss Fight"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss Fight aktivieren"
+        }
+      }
+    }
+  },
+  "bossFightHelp": {
+    "comment": "Explain the timer-only meaning and silent completion effect.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "An optional timer skin. Boss health shows time remaining, not productivity. Completion brings a brief, silent celebration."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein optionales Design für den Timer. Die Boss-Lebensleiste zeigt die verbleibende Zeit, nicht deine Produktivität. Zum Abschluss gibt es eine kurze, lautlose Feier."
+        }
+      }
+    }
+  },
+  "bossFightTitle": {
+    "comment": "Name of the optional Focus Session Easter egg. Keep the product name.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss Fight"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss Fight"
+        }
+      }
+    }
+  },
+  "bossFightParty": {
+    "comment": "Chosen work apps shown as the party in the optional timer skin.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Your party"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Deine Gruppe"
+        }
+      }
+    }
+  },
+  "bossFightPartyEmpty": {
+    "comment": "Empty party prompt in Boss Fight settings.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose work apps to join your party."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle Arbeits-Apps für deine Gruppe aus."
+        }
+      }
+    }
+  },
+  "bossFightChooseApps": {
+    "comment": "Opens the native app-bundle picker; does not launch the selected apps.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose work apps…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arbeits-Apps auswählen …"
+        }
+      }
+    }
+  },
+  "bossFightPartyLimit": {
+    "comment": "Party selection limit and its decorative-only behavior.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Up to 8 apps. This only changes their appearance in the timer; apps remain unrestricted."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bis zu 8 Apps. Die Auswahl betrifft nur die Anzeige im Timer; alle Apps bleiben frei nutzbar."
+        }
+      }
+    }
+  },
+  "bossFightRemoveApp": {
+    "comment": "Accessible remove button; argument is the app name supplied by macOS.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove %@ from party"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%@ aus der Gruppe entfernen"
+        }
+      }
+    }
+  },
+  "bossFightPickerFailed": {
+    "comment": "Native app picker failure; no app was added.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The app selection could not be opened. Please try again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die App-Auswahl konnte nicht geöffnet werden. Bitte versuche es erneut."
+        }
+      }
+    }
+  },
+  "bossFightHealth": {
+    "comment": "Progress label stating that health is only remaining time.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss health · time remaining"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss-Lebensleiste · verbleibende Zeit"
+        }
+      }
+    }
+  },
+  "bossFightVictory": {
+    "comment": "Brief, silent completion message. Never describes productivity.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss defeated. Session complete!"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss besiegt. Session abgeschlossen!"
+        }
+      }
+    }
+  },
+  "bossFightDismissCelebration": {
+    "comment": "Stops the short ornament while retaining the completed timer and Capsule action.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dismiss celebration"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Feier ausblenden"
+        }
+      }
+    }
+  },
+  "bossFightDisable": {
+    "comment": "Immediately returns to normal Focus Session appearance without changing the timer.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Disable Boss Fight"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Boss Fight deaktivieren"
+        }
+      }
+    }
+  },
+  "bossFightCancelSession": {
+    "comment": "Cancels the focus timer without completion or celebration.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cancel session"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Session abbrechen"
+        }
+      }
+    }
+  },
+  "bossFightTimeRemaining": {
+    "comment": "Accessible timer value; argument is the remaining time formatted as minutes:seconds.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%@ remaining"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%@ verbleibend"
+        }
+      }
+    }
+  },
   "breadcrumbRemoveSource": {
     "comment": "Removes this source and its captured text, link, and bookmark from the draft. Save applies the deletion.",
     "extractionState": "manual",
