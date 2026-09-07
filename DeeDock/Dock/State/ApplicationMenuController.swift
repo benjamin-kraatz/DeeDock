@@ -77,9 +77,10 @@ final class ApplicationMenuController {
         }
     }
 
+    @discardableResult
     func perform(_ action: ApplicationMenuAction,
                  for item: DockItem,
-                 completion: @escaping (LocalizedStringResource?) -> Void) {
+                 completion: @escaping (LocalizedStringResource?) -> Void) -> UUID? {
         switch action {
         case .showInFinder, .setHidden, .bringAllToFront, .quit:
             do {
@@ -97,6 +98,7 @@ final class ApplicationMenuController {
                     details: String(localized: action.failureDescription)
                 ))
             }
+            return nil
         case .selectWindow(let token):
             let id = UUID()
             let currentGeneration = generation
@@ -104,13 +106,13 @@ final class ApplicationMenuController {
             actionTasks[id] = Task { [weak self] in
                 do {
                     try await windows.selectWindow(token)
-                    guard let self, !Task.isCancelled, generation == currentGeneration else { return }
+                    guard let self, !Task.isCancelled, generation == currentGeneration, actionTasks[id] != nil else { return }
                     actionTasks[id] = nil
                     completion(nil)
                 } catch is CancellationError {
                     return
                 } catch {
-                    guard let self, !Task.isCancelled, generation == currentGeneration else { return }
+                    guard let self, !Task.isCancelled, generation == currentGeneration, actionTasks[id] != nil else { return }
                     actionTasks[id] = nil
                     completion(.applicationMenuActionFailed(
                         appName: item.reference.name,
@@ -118,8 +120,12 @@ final class ApplicationMenuController {
                     ))
                 }
             }
+            return id
         }
     }
+
+    /// Cancels a queued window action before a dismissed handoff can activate its destination.
+    func cancelAction(_ id: UUID) { actionTasks.removeValue(forKey: id)?.cancel() }
 
     func stop() {
         generation = UUID()

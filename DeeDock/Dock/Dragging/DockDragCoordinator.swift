@@ -221,7 +221,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         installMonitor()
         if pasteboard.pasteboardItems?.count != objects.count { payload = .rejected; return }
         // Acquire while the native destination still owns the user-granted pasteboard URLs.
-        let access = DocumentResourceAccess(objects)
+        let access = DocumentDragLeaseRegistry.access(for: pasteboard, urls: objects)
         importTask = Task { [weak self] in
             let worker = Task.detached {
                 Result { try DockExternalPayload.read(access, excluding: ownIdentifier) }

@@ -1,6 +1,474 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "fileRouteActivateApp" : {
+      "comment" : "Explicit app-level activation fallback.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App aktivieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate app"
+          }
+        }
+      }
+    },
+    "fileRouteActivateWindow" : {
+      "comment" : "Explicit activation of the exact AX window token.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewähltes Fenster aktivieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate selected window"
+          }
+        }
+      }
+    },
+    "fileRouteActivated" : {
+      "comment" : "Activation success is not file delivery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Ziel wurde aktiviert. Ziehe die Dateien hinein oder füge sie ein, wenn die App Dateiverweise unterstützt. Es wurden noch keine Dateien übergeben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination activated. Drag the files into it, or paste if the app supports file references. No files have been delivered yet."
+          }
+        }
+      }
+    },
+    "fileRouteAppDestination" : {
+      "comment" : "No exact accessible window is available.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziel auf App-Ebene"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-level destination"
+          }
+        }
+      }
+    },
+    "fileRouteAppUnavailable" : {
+      "comment" : "Activation failed because the original process terminated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App läuft nicht mehr. Wähle das Ziel erneut aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app is no longer running. Choose a destination again."
+          }
+        }
+      }
+    },
+    "fileRouteChecking" : {
+      "comment" : "Status while validating file references without opening them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien werden geprüft …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking files…"
+          }
+        }
+      }
+    },
+    "fileRouteChooseFiles" : {
+      "comment" : "Keyboard and accessibility entry from Window Peek.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien für ein Fenster auswählen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose files for a window…"
+          }
+        }
+      }
+    },
+    "fileRouteClose" : {
+      "comment" : "Dismisses handoff and releases temporary file grants.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übergabe schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close handoff"
+          }
+        }
+      }
+    },
+    "fileRouteCopied" : {
+      "comment" : "Explicit clipboard copy succeeded; scope is held by the panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateiverweise kopiert. Füge sie im Ziel ein, sofern es dies unterstützt. Lass dieses Fenster geöffnet, solange du die Dateien verwendest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File references copied. Paste in the destination if supported. Keep this panel open while using these files."
+          }
+        }
+      }
+    },
+    "fileRouteCopy" : {
+      "comment" : "Explicit clipboard operation, also Command C.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateiverweise kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy file references"
+          }
+        }
+      }
+    },
+    "fileRouteCopyFailed" : {
+      "comment" : "Clipboard write failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateiverweise konnten nicht kopiert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not copy file references."
+          }
+        }
+      }
+    },
+    "fileRouteDragFiles" : {
+      "comment" : "Native copy-only drag handle for the complete ordered batch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Dateien ziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag these files"
+          }
+        }
+      }
+    },
+    "fileRouteDragHelp" : {
+      "comment" : "Accessibility hint for the outgoing drag handle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe die Dateien in das echte Zielfenster. Nutze mit der Tastatur „Dateiverweise kopieren“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag into the real destination window. Use Copy file references for keyboard access."
+          }
+        }
+      }
+    },
+    "fileRouteDropApp" : {
+      "comment" : "Fallback drop target when there is no exact window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für Übergabe auf App-Ebene ablegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop for app-level handoff"
+          }
+        }
+      }
+    },
+    "fileRouteDropHelp" : {
+      "comment" : "Instructions during a file drag through Peek.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lege die Dateien auf einem Fenster ab, um die Übergabe auszuwählen. Erst deine nächste Aktion öffnet Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop on a window to choose a handoff. Files will not open until you choose an action."
+          }
+        }
+      }
+    },
+    "fileRouteFileFailed" : {
+      "comment" : "Failed filename followed by the system error. Preserve both placeholders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "fileRouteHandoffHelp" : {
+      "comment" : "Explains the deliberate manual handoff, without claiming synthetic drop delivery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Fenster hält Dateiverweise bereit. Aktiviere das Ziel und ziehe die Dateien von hier in das echte Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This panel holds file references. Activate the destination, then drag the files from here into the real window."
+          }
+        }
+      }
+    },
+    "fileRouteHover" : {
+      "comment" : "Dock feedback during deliberate file drag dwell.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halten, um ein Fenster auszuwählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold to choose a window"
+          }
+        }
+      }
+    },
+    "fileRouteInvalid" : {
+      "comment" : "Complete batch rejection, including missing files and the 100 item limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Auswahl ist nicht verfügbar oder enthält nicht unterstützte Dateien. Wähle erneut bis zu 100 Dateien oder Ordner aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This selection is unavailable or contains unsupported files. Choose up to 100 files or folders again."
+          }
+        }
+      }
+    },
+    "fileRouteOpenApp" : {
+      "comment" : "Asks Workspace to open files with the application; not targeted to a selected window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen auf App-Ebene anfragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request app-level open"
+          }
+        }
+      }
+    },
+    "fileRouteOpenHelp" : {
+      "comment" : "Explains limits before opening files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Öffnen auf App-Ebene können neue Fenster entstehen. Anhängen und Zu einem Projekt hinzufügen erfordern eine unterstützte App-Integration."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-level open may create new windows. Attach and Add to project require a supported app integration."
+          }
+        }
+      }
+    },
+    "fileRouteOpenResult" : {
+      "comment" : "Counts describe Workspace requests, not verified document delivery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS hat %1$lld von %2$lld Öffnungsanfragen an die App angenommen. Die App bestimmt die Zielfenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS accepted %1$lld of %2$lld app-level open requests. The app chooses the receiving windows."
+          }
+        }
+      }
+    },
+    "fileRoutePreview" : {
+      "comment" : "Explicit Quick Look action for a selected source file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateivorschau"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview file"
+          }
+        }
+      }
+    },
+    "fileRouteReady" : {
+      "comment" : "Status after file validation succeeds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Dateien sind bereit. Wähle, wie du fortfahren möchtest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files are ready. Choose how to continue."
+          }
+        }
+      }
+    },
+    "fileRouteSelectDestination" : {
+      "comment" : "Keyboard picker completed; choosing a card opens the handoff panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Ziel für diese Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a destination for these files."
+          }
+        }
+      }
+    },
+    "fileRouteTitle" : {
+      "comment" : "Title of the file handoff panel opened after choosing a Peek destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien übergeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File handoff"
+          }
+        }
+      }
+    },
   "watchSetupInterrupted": {
     "comment": "Watch setup interrupted by sleep or session change; user must reopen deliberately.",
     "extractionState": "manual",
