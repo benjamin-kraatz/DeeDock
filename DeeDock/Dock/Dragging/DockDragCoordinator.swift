@@ -105,7 +105,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if shelfDestinationID == displayID { return .copy }
         // Removing a staged reference is a discard, not a file operation, but the poof cursor is right.
-        if trashDestinationID == displayID { return .delete }
+        if trashDestinationID == displayID {
+            return canDiscard(info) ? .delete : []
+        }
         if documentDrag.displayID != nil {
             guard documentDrag.displayID == displayID else { return [] }
             return DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask)
@@ -138,6 +140,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             return true
         }
         if trashDestinationID == displayID, let panel = panels[displayID] {
+            guard canDiscard(info) else { return false }
             // A Shelf item dropped on Trash gives up its reference. The file itself is untouched.
             if !shelfSourceIDs.isEmpty {
                 completion.committed = true
@@ -184,8 +187,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     func springTarget(_ info: NSDraggingInfo, on displayID: String) -> String? {
         guard !entered(info, on: displayID).isEmpty else { return nil }
         if let (id, folder) = folderDestination { return id + folder.reference.id.uuidString }
-        guard payload.documents != nil else { return nil }
-        return documentDrag.targetKey
+        // App icons use Peek's own cancellable dwell, without AppKit spring activation.
+        return nil
     }
 
     func springActivate(_ info: NSDraggingInfo, on displayID: String) {
@@ -209,6 +212,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
               let documents = payload.documents,
               documents.urls.count <= WindowFileHandoffController.maximumFiles else { return nil }
         return documents
+    }
+
+    /// Removing a Shelf reference leaves its source intact. Recycling a real file needs a
+    /// source that permits removal; a copy-only handoff drag must never negotiate Trash.
+    private func canDiscard(_ info: NSDraggingInfo) -> Bool {
+        !shelfSourceIDs.isEmpty || !info.draggingSourceOperationMask.intersection([.move, .delete]).isEmpty
     }
 
     func externalEnded() { if sourceID == nil { cancel() } }

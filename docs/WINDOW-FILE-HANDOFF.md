@@ -85,8 +85,8 @@ Quick Look requires its own click. Window contents never become instructions or 
 No tests or automated visual checks were executed for this issue. These cases should receive focused
 coverage when test execution is authorized:
 
-- Same drag entering dock, crossing the panel gap, selecting different cards, and returning to dock.
-- New pasteboard generations, private pin payloads, non-copy source masks, and cancelled imports rejected by Peek.
+- Same drag entering dock, crossing the panel gap, selecting different cards, and returning to dock, including re-entry after an expired dwell.
+- New pasteboard generations, private pin payloads, non-copy source masks, and cancelled imports rejected by Peek. Copy-only outgoing drags rejected by real Trash.
 - Dwell cancellation, Escape, native end, changed app target, and late discovery results after dismissal.
 - Picker cancellation and selected files retaining their immutable app destination across focus changes.
 - Parent-folder and Shelf scope transfer, source dismissal before handoff, and exactly-once scope release.

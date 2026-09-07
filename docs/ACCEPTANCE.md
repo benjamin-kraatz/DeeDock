@@ -447,7 +447,7 @@ Added on 2026-09-03. Available application icons accept existing files, document
 
 The native drag coordinator owns payload validation and routes document targets through clipped icon geometry and the existing animation coordinate conversion. Metadata work runs outside pointer callbacks. Checking and rejected batches cannot be dropped. Document feedback uses an accent outline and localized target text without pin-insertion gaps. Either collapsed section temporarily expands after a 0.5-second document hover and restores its previous state when dragging ends. Completely hidden sections remain hidden.
 
-Spring-loading uses the AppKit destination protocol and system hover and Force Click preferences. Activation requests contain no documents. Actual drops and confirmed picker selections create independent catalog requests, including repeated batches while an app is launching. Temporary security-scope access remains owned through validation and handoff. Display removal invalidates its UI callbacks without discarding an accepted request; shutdown cancels owned tasks. Submitted OS operations cannot be rolled back, and a successful handoff does not establish that every document appeared in the receiving app.
+Historical behavior, superseded for application icons by DEE-12: spring-loading used the AppKit destination protocol and system hover and Force Click preferences. Activation requests contained no documents. Actual drops and confirmed picker selections create independent catalog requests, including repeated batches while an app is launching. Temporary security-scope access remains owned through validation and handoff. Display removal invalidates its UI callbacks without discarding an accepted request; shutdown cancels owned tasks. Submitted OS operations cannot be rolled back, and a successful handoff does not establish that every document appeared in the receiving app.
 
 Open Files… is available through app context menus, VoiceOver actions, and Command-O in Focus Dock. One app-owned native picker captures its original target, accepts multiple files and folders, and treats packages as items. Repeated commands bring that picker forward. The initiating dock remains visible until dismissal; removing it cancels the picker. Cancellation restores the originating dock selection or external application only while DeeDock still owns foreground focus. No document bookmarks, history, or preferences are stored.
 
@@ -1315,3 +1315,8 @@ metadata extraction also reports that this target has no AppIntents dependency. 
 or automated visual checks ran. Native acceptance remains open.
 
 See [file handoff controls, API findings, state cases, and manual checklist](WINDOW-FILE-HANDOFF.md).
+
+DEE-12 final implementation check on 2026-09-08: the focused Debug build passed with
+`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination
+'platform=macOS' -derivedDataPath /tmp/deedock-dee12-build build CODE_SIGNING_ALLOWED=NO`.
+All 28 new handoff keys matched their compiled `en.lproj` and `de.lproj` resources.

@@ -55,7 +55,7 @@ struct WindowPeekView: View {
             VStack(alignment: .leading, spacing: 8) {
                 cards
                 if state.usesApplicationSelection {
-                    Text(.windowPeekApplicationSelectionHelp)
+                    Text(state.routingFiles ? .fileRouteCaptureFallback : .windowPeekApplicationSelectionHelp)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)

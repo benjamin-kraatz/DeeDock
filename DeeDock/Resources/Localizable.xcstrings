@@ -1,6 +1,42 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "fileRouteDestinationUnavailable" : {
+      "comment" : "File destination disappeared or Peek was disabled before picker or drop completion.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This destination is no longer available. Choose a running app with Window Peek enabled."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Ziel ist nicht mehr verfügbar. Wähle eine laufende App mit aktiviertem Window Peek."
+          }
+        }
+      }
+    },
+    "fileRouteCaptureFallback" : {
+      "comment" : "Shown on capture-only cards while choosing a file handoff destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These previews support app-level handoff only. Selecting a card does not activate or deliver files to that window."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Vorschauen unterstützen nur die Übergabe auf App-Ebene. Die Auswahl einer Karte aktiviert das gezeigte Fenster nicht und übergibt ihm keine Dateien."
+          }
+        }
+      }
+    },
     "fileRouteActivateApp" : {
       "comment" : "Explicit app-level activation fallback.",
       "extractionState" : "manual",
@@ -44,13 +80,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Ziel wurde aktiviert. Ziehe die Dateien hinein oder füge sie ein, wenn die App Dateiverweise unterstützt. Es wurden noch keine Dateien übergeben."
+            "value" : "Das Ziel wurde aktiviert. Ziehe die Dateien hinein oder füge sie ein, wenn die App Dateiverweise unterstützt. Prüfe das Ergebnis im Ziel."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Destination activated. Drag the files into it, or paste if the app supports file references. No files have been delivered yet."
+            "value" : "Destination activated. Drag the files into it, or paste if the app supports file references. Check the result in the destination."
           }
         }
       }

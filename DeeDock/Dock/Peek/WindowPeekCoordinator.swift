@@ -56,7 +56,8 @@ final class WindowPeekCoordinator {
         }
         sourceHovered = true
         closeTask?.cancel()
-        if sourcePanel === panel, sourceItem?.id == item.id, fileDrag == (documents != nil) { return }
+        if sourcePanel === panel, sourceItem?.id == item.id, fileDrag == (documents != nil),
+           controller != nil || dwellTask != nil { return }
         close(returnFocus: false)
         fileDocuments = documents
         fileDrag = documents != nil
@@ -67,15 +68,19 @@ final class WindowPeekCoordinator {
         let currentGeneration = generation
         dwellTask = Task { @MainActor [weak self, weak panel] in
             try? await Task.sleep(for: .milliseconds(Int64((delay * 1_000).rounded())))
-            guard let self, let panel, !Task.isCancelled, generation == currentGeneration,
-                  sourceHovered, sourcePanel === panel else { return }
+            guard let self, let panel, !Task.isCancelled, generation == currentGeneration else { return }
+            dwellTask = nil
+            guard sourceHovered, sourcePanel === panel else { return }
             present(item, on: panel, keyboard: false)
         }
     }
 
     func showKeyboard(_ item: DockItem, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {
         guard item.isRunning, item.isAvailable,
-              panel.windowPeekContext(for: item.id)?.settings.windowPeekEnabled == true else { return }
+              panel.windowPeekContext(for: item.id)?.settings.windowPeekEnabled == true else {
+            if documents != nil { panel.store.errorMessage = .fileRouteDestinationUnavailable }
+            return
+        }
         close(returnFocus: false)
         fileDocuments = documents
         sourcePanel = panel
@@ -187,7 +192,7 @@ final class WindowPeekCoordinator {
         next.state.fileDrop = { [weak self] info, token in
             guard let self, fileDrag, let documents = validatedFileDrop?(info) else { return false }
             fileDocuments = documents
-            routeFiles(to: token)
+            guard routeFiles(to: token) else { return false }
             fileDropAccepted?()
             return true
         }
@@ -374,9 +379,13 @@ final class WindowPeekCoordinator {
         }
     }
 
-    private func routeFiles(to token: ApplicationWindowToken?) {
+    @discardableResult
+    private func routeFiles(to token: ApplicationWindowToken?) -> Bool {
         guard let documents = fileDocuments, let item = sourceItem, let panel = sourcePanel,
-              let context = panel.windowPeekContext(for: item.id) else { return }
+              let context = panel.windowPeekContext(for: item.id) else {
+            sourcePanel?.store.errorMessage = .fileRouteDestinationUnavailable
+            return false
+        }
         let window = token.flatMap { id in allWindows.first { $0.token == id } }
         let exact = window != nil && controller?.state.usesApplicationSelection != true
         let transferredDiscovery = discoveryID
@@ -384,6 +393,7 @@ final class WindowPeekCoordinator {
         close(returnFocus: false)
         fileHandoff.show(documents: documents, item: item, window: window, exactWindow: exact,
                          discoveryID: transferredDiscovery, visibleFrame: context.anchor.visibleFrame)
+        return true
     }
 
     private func choose(_ token: ApplicationWindowToken) {
