@@ -20,7 +20,7 @@ A breadcrumb stores app bundle identity, window title, selection time, capture-a
 
 Each source retains at most 2,000 OCR characters, a 2,048-character web link, and a 64 KiB document bookmark. Each breadcrumb has at most twelve sources, an 8,000-character note, an 8,000-character generated recap, a 2,000-character next step, and six suggestions of at most 2,000 characters each. Screenshots remain serially captured, at most 1,200 by 900 pixels each, and transient. The composer uses the existing 500-token output limit. Source text and model output never become commands or reopening paths.
 
-Capture validates the selected window's process, bundle, and title again to avoid reusing a stale window number. Sources without readable OCR are excluded from model input. If no readable source remains, generation falls back to manual editing. The prompt requires explicit evidence of unfinished work and permits an empty task list. This reduces unsupported suggestions; model correctness still requires user review.
+Capture validates the selected window's process, bundle, title, and frame again to avoid reusing a stale window number. Sources without readable OCR are excluded from model input. If no readable source remains, generation falls back to manual editing. The prompt requires explicit evidence of unfinished work and permits an empty task list. This reduces unsupported suggestions; model correctness still requires user review.
 
 Removing a source and saving removes its excerpt, link, and bookmark from the record. Removing a preview alone preserves the other source metadata. Deleting or evicting a capsule removes all of its associated data from the active collection. There are no capture sidecar files to orphan. Original documents are never deleted. This is ordinary local storage deletion, not a promise of secure erasure from OS backups.
 
@@ -63,9 +63,17 @@ All items below remain untested. Use a signed installed build for TCC and sandbo
 - [ ] Use keyboard-only navigation, Command-B, Command-M, Command-E, Return, Tab, and Escape. Exercise the file picker, VoiceOver names, German and English copy, Reduce Motion, and Reduce Transparency. Hover must not steal focus.
 - [ ] Confirm original capsule creation and focus-session completion still work. Verify no capture happens on idle, app switch, or return from a break.
 
+## Review follow-up
+
+A GPT 5.6 Luna review at Extra High confirmed four lifecycle issues, now fixed: outside clicks in the document picker could dismiss the draft; foreground source actions could strand other cards in Checking; cancelled Resume could activate its fallback app; and queued AX selections could mutate windows after cancellation. It found no additional confirmed P1/P2 issue. Source navigation also now uses the coordinator's injected window service.
+
+The subsequent merge includes DEE-15 Window Search. Its saved-capsule index includes manual breadcrumb next steps. Opening a breadcrumb from search shows the next step, separate model interpretation, and the same dated source previews and actions as the capsule panel. Existing ordinary-capsule search presentation remains available.
+
+Additional acceptance remains manual: find a next-step-only breadcrumb through Saved Capsules search, open it, inspect the complete recap, and use its source actions. The review and compilation do not replace runtime acceptance.
+
 ## Compilation and delivery
 
-The focused Debug app build uses Xcode 27.0, build 27A5252f, the macOS 27.0 SDK and deployment target, Swift 5 language mode, and MainActor default isolation. The final focused build succeeded on 2026-09-07 after merging the updated `origin/main`, including App Fusion. It reported existing unused-value warnings in `LauncherPresentationController.swift` and `DockBadgeController.swift`, plus the App Intents metadata notice for a target without that framework dependency. There were no build failures.
+The focused Debug app build uses Xcode 27.0, build 27A5252f, the macOS 27.0 SDK and deployment target, Swift 5 language mode, and MainActor default isolation. The final focused build succeeded on 2026-09-07 after the Luna review fixes and merging the updated `origin/main`, including App Fusion and Window Search. The final incremental build reported only the App Intents metadata notice for a target without that framework dependency. Earlier builds also reported existing unused-value warnings in `LauncherPresentationController.swift` and `DockBadgeController.swift`. There were no build failures.
 
 `jq empty DeeDock/Resources/Localizable.xcstrings` and `git diff --check` passed. All 45 breadcrumb keys matched their intended values in both compiled `en.lproj/Localizable.strings` and `de.lproj/Localizable.strings`, inspected with `plutil -convert json -o -`. This verifies resource contents, not native presentation or translation acceptance.
 

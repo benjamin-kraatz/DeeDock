@@ -9,7 +9,7 @@ final class SessionCapsuleCoordinator {
     private let contexts: any WindowContextCapturing
     private let composer: any SessionCapsuleComposing
     private let windows: any ApplicationWindowServicing
-    private let sourceNavigator = SessionCapsuleSourceNavigator()
+    private let sourceNavigator: SessionCapsuleSourceNavigator
     private var controller: DockPopoverPanelController<SessionCapsulePanelView>?
     private var state: SessionCapsulePanelState?
     private var task: Task<Void, Never>?
@@ -30,6 +30,7 @@ final class SessionCapsuleCoordinator {
         self.contexts = contexts
         self.composer = composer
         self.windows = windows
+        sourceNavigator = SessionCapsuleSourceNavigator(windows: windows)
         presenter.register(.sessionCapsules) { [weak self] in self?.close(returnFocus: false) }
     }
 

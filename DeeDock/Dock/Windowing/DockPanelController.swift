@@ -32,6 +32,7 @@ final class DockPanelController {
     var resignedFocus: (() -> Void)?
     var escape: (() -> Void)?
     var exclusiveInteractionBegan: (() -> Void)?
+    var windowSearchRequested: (() -> Void)?
     var modePickerRequested: (() -> Void)?
     var isMenuTracking: Bool { menuHeld }
 
@@ -469,6 +470,10 @@ final class DockPanelController {
     func handleKey(_ event: NSEvent) -> Bool {
         guard !launcher.isPresented, store.keyboardFocus else { return false }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
+           event.charactersIgnoringModifiers == "/" {
+            windowSearchRequested?(); return true
+        }
+        if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
            event.charactersIgnoringModifiers?.lowercased() == "m" {
             modePickerRequested?()
             return true
@@ -532,6 +537,7 @@ final class DockPanelController {
         interaction.stopGeometryUpdates()
         interaction.geometryDidChange = nil; interaction.menuTrackingChanged = nil; interaction.accessibilityFocusChanged = nil
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil; exclusiveInteractionBegan = nil
+        windowSearchRequested = nil
         modePickerRequested = nil
         accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; modePickerHeld = false
         store.stop(); panel.close(); panel.contentView = nil

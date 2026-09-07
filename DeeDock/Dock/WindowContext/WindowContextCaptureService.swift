@@ -85,6 +85,7 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
     }
 
     func capture(_ candidates: [WindowContextCandidate]) async throws -> [WindowContextSnapshot] {
+        try Task.checkCancellation()
         guard CGPreflightScreenCaptureAccess() else { throw WindowContextCaptureError.permissionRequired }
         let selected = Array(candidates.prefix(SessionCapsuleDocument.maximumWindowsPerCapsule))
         guard !selected.isEmpty else { throw WindowContextCaptureError.noWindows }
@@ -100,7 +101,8 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
                 guard let window = windows[candidate.id],
                       window.owningApplication?.processID == candidate.processIdentifier,
                       window.owningApplication?.bundleIdentifier == candidate.bundleIdentifier,
-                      Self.normalized(window.title) == Self.normalized(candidate.title) else {
+                      Self.normalized(window.title) == Self.normalized(candidate.title),
+                      window.frame == candidate.frame else {
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: nil, recognizedText: ""))
                     continue
                 }
@@ -149,7 +151,8 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
         request.automaticallyDetectsLanguage = true
         request.usesLanguageCorrection = true
         let observations = try await request.perform(on: image)
-        return String(observations.map(\.transcript).joined(separator: "\n").prefix(6_000))
+        try Task.checkCancellation()
+        return String(observations.lazy.map(\.transcript).joined(separator: "\n").prefix(6_000))
     }
 
     private nonisolated static func normalized(_ value: String?) -> String? {
