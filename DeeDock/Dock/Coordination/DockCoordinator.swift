@@ -34,6 +34,8 @@ final class DockCoordinator {
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     private let badges = DockBadgeController()
+    var badgeMemory: BadgeMemoryStore { badges.memory }
+    @ObservationIgnored private lazy var badgeMemoryWindow = BadgeMemoryWindowController(memory: badges.memory)
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
@@ -98,13 +100,20 @@ final class DockCoordinator {
         occupancy.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
-        focusSession.changed = { [weak self] in self?.refreshPanels() }
+        badges.focusSession = { [weak self] in self?.focusSession.session }
+        focusPopover.showDigest = { [weak self] in self?.showBadgeMemory(digest: true) }
         focusPopover.saveCapsule = { [weak self] panel in self?.sessionCapsules.beginFromFocus(on: panel) }
         focusPopover.keyboardDismissed = { [weak self] id in
             guard let self, focusedID == id else { return }
             endFocus(restore: false)
         }
         focusSession.start()
+        badgeMemory.start(session: focusSession.session)
+        focusSession.changed = { [weak self] in
+            guard let self else { return }
+            badgeMemory.synchronize(session: focusSession.session)
+            refreshPanels()
+        }
         rememberExternal(NSWorkspace.shared.frontmostApplication)
         dragging.openSpringFolder = { [weak self] folder, panel in
             self?.folderStacks.show(folder, on: panel, keyboard: false, spring: true)
@@ -289,6 +298,9 @@ final class DockCoordinator {
             panel.interaction.openFiles = { [weak self, weak panel] item in
                 guard let self, let panel else { return }
                 self.openFiles(for: item, on: panel)
+            }
+            panel.interaction.openBadgeMemory = { [weak self] item in
+                self?.showBadgeMemory(path: (item.resolvedURL ?? item.reference.url).standardizedFileURL.path)
             }
             panel.interaction.applicationMenuSnapshot = { [weak self] item in
                 self?.applicationMenus.snapshot(for: item)
@@ -490,6 +502,16 @@ final class DockCoordinator {
         focusSession.begin(modeID: current.id, name: current.name)
     }
 
+    /// Called only from a badge click, menu/keyboard command, Settings or the Focus panel.
+    func showBadgeMemory(path: String? = nil, digest: Bool = false) {
+        popovers.closeAll()
+        windowPeeks.close(returnFocus: false)
+        modePicker.close(returnFocus: false)
+        endFocus(restore: false)
+        badgeMemory.synchronize(session: focusSession.session)
+        badgeMemoryWindow.show(path: path, digest: digest, returningTo: lastExternalApplication)
+    }
+
     @discardableResult
     func activateMode(_ id: UUID) -> Bool {
         guard canSwitchModes else { return false }
@@ -570,6 +592,8 @@ final class DockCoordinator {
         panels.removeAll()
         enabledDisplays = []
         badges.stop()
+        badgeMemoryWindow.stop()
+        badges.focusSession = nil
         catalog.stop()
         trash.stop()
     }

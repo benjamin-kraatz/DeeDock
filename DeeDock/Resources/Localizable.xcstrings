@@ -1,6 +1,780 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "badgeMemoryTitle": {
+  "comment": "Badge memory: Badge memory Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge memory"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Verlauf"
+      }
+    }
+  }
+},
+    "badgeMemoryHelp": {
+  "comment": "Badge memory: Badge changes are net counts, not new-message totals. Opening an app does not mark it checked. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge changes are net counts, not new-message totals. Opening an app does not mark it checked."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Änderungen zeigen die Differenz, nicht die Anzahl neuer Nachrichten. Das Öffnen einer App setzt den Vergleichswert nicht zurück."
+      }
+    }
+  }
+},
+    "badgeMemoryDetails": {
+  "comment": "Badge memory: Badge details Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge details"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Details"
+      }
+    }
+  }
+},
+    "badgeMemoryDigest": {
+  "comment": "Badge memory: Focus badge digest Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Focus badge digest"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Rückblick zur Fokus-Sitzung"
+      }
+    }
+  }
+},
+    "badgeMemoryEmpty": {
+  "comment": "Badge memory: No badge history yet. Enable app badges, then open an app’s badge details. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No badge history yet. Enable app badges, then open an app’s badge details."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Noch kein Badge-Verlauf. Aktiviere App-Badges und öffne die Badge-Details einer App."
+      }
+    }
+  }
+},
+    "badgeMemoryApp": {
+  "comment": "Badge memory: Application Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Application"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "App"
+      }
+    }
+  }
+},
+    "badgeMemorySelectApp": {
+  "comment": "Badge memory: Choose an app Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Choose an app"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "App auswählen"
+      }
+    }
+  }
+},
+    "badgeMemoryCollect": {
+  "comment": "Badge memory: Collect badge changes in future Focus Sessions Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Collect badge changes in future Focus Sessions"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Änderungen in künftigen Fokus-Sitzungen sammeln"
+      }
+    }
+  }
+},
+    "badgeMemoryRetention": {
+  "comment": "Badge memory: Up to 100 apps, 20 changes per app and 10 digests. History expires after 7 days; checked baselines after 30 days. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Up to 100 apps, 20 changes per app and 10 digests. History expires after 7 days; checked baselines after 30 days."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Bis zu 100 Apps, 20 Änderungen je App und 10 Rückblicke. Der Verlauf verfällt nach 7 Tagen, Vergleichswerte nach 30 Tagen."
+      }
+    }
+  }
+},
+    "badgeMemoryClose": {
+  "comment": "Badge memory: Close Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Close"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Schließen"
+      }
+    }
+  }
+},
+    "badgeMemoryClearAll": {
+  "comment": "Badge memory: Clear all badge history Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Clear all badge history"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Gesamten Badge-Verlauf löschen"
+      }
+    }
+  }
+},
+    "badgeMemoryClearHelp": {
+  "comment": "Badge memory: Delete all baselines, history and digests, and turn off focus collection. Current source-app badges stay as they are. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete all baselines, history and digests, and turn off focus collection. Current source-app badges stay as they are."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Alle Vergleichswerte, Verläufe und Rückblicke löschen und die Sammlung für Fokus-Sitzungen ausschalten. Die Badges der Apps bleiben unverändert."
+      }
+    }
+  }
+},
+    "badgeMemoryUnknown": {
+  "comment": "Badge memory: Unavailable observation Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Unavailable observation"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Beobachtung nicht verfügbar"
+      }
+    }
+  }
+},
+    "badgeMemoryCleared": {
+  "comment": "Badge memory: Cleared (0) Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Cleared (0)"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Geleert (0)"
+      }
+    }
+  }
+},
+    "badgeMemoryCount": {
+  "comment": "Badge memory: Count: %1$lld Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Count: %1$lld"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Anzahl: %1$lld"
+      }
+    }
+  }
+},
+    "badgeMemoryText": {
+  "comment": "Badge memory: Text badge: %1$@ Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Text badge: %1$@"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Text-Badge: %1$@"
+      }
+    }
+  }
+},
+    "badgeMemoryCurrent": {
+  "comment": "Badge memory: Current observation Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Current observation"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Aktuelle Beobachtung"
+      }
+    }
+  }
+},
+    "badgeMemoryBaseline": {
+  "comment": "Badge memory: Last checked value Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Last checked value"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Zuletzt geprüfter Wert"
+      }
+    }
+  }
+},
+    "badgeMemoryDelta": {
+  "comment": "Badge memory: %1$@ since last checked The placeholder is a signed net count, never a message total.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "%1$@ since last checked"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "%1$@ seit der letzten Prüfung"
+      }
+    }
+  }
+},
+    "badgeMemoryNoDelta": {
+  "comment": "Badge memory: No numeric comparison available. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No numeric comparison available."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Kein Zahlenvergleich verfügbar."
+      }
+    }
+  }
+},
+    "badgeMemoryNoBaseline": {
+  "comment": "Badge memory: Not marked checked yet. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Not marked checked yet."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Noch nicht als geprüft markiert."
+      }
+    }
+  }
+},
+    "badgeMemoryMarkChecked": {
+  "comment": "Badge memory: Mark checked Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Mark checked"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Als geprüft markieren"
+      }
+    }
+  }
+},
+    "badgeMemoryResetBaseline": {
+  "comment": "Badge memory: Reset baseline Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reset baseline"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Vergleichswert zurücksetzen"
+      }
+    }
+  }
+},
+    "badgeMemoryOpenApp": {
+  "comment": "Badge memory: Open app Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Open app"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "App öffnen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteApp": {
+  "comment": "Badge memory: Delete this app’s history Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete this app’s history"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Verlauf dieser App löschen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteAppHelp": {
+  "comment": "Badge memory: Delete this app’s baseline, changes and rows in every focus digest. Later observed changes can be recorded again. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete this app’s baseline, changes and rows in every focus digest. Later observed changes can be recorded again."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Den Vergleichswert, die Änderungen und alle Einträge dieser App in Fokus-Rückblicken löschen. Spätere beobachtete Änderungen können wieder erfasst werden."
+      }
+    }
+  }
+},
+    "badgeMemoryRecent": {
+  "comment": "Badge memory: Recent observed changes Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Recent observed changes"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Zuletzt beobachtete Änderungen"
+      }
+    }
+  }
+},
+    "badgeMemoryDigestHelp": {
+  "comment": "Badge memory: Net change compares the first and last observed values. Pauses, downtime and unavailable observations leave gaps. App badges must be enabled. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Net change compares the first and last observed values. Pauses, downtime and unavailable observations leave gaps. App badges must be enabled."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die Differenz vergleicht den ersten mit dem letzten beobachteten Wert. Pausen, Ausfallzeiten und fehlende Beobachtungen hinterlassen Lücken. App-Badges müssen aktiviert sein."
+      }
+    }
+  }
+},
+    "badgeMemoryDigestEmpty": {
+  "comment": "Badge memory: No focus digest yet. Enable collection before starting a Focus Session. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No focus digest yet. Enable collection before starting a Focus Session."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Noch kein Fokus-Rückblick. Aktiviere die Sammlung vor dem Start einer Fokus-Sitzung."
+      }
+    }
+  }
+},
+    "badgeMemoryGap": {
+  "comment": "Badge memory: Incomplete observation coverage. Changes may have been missed. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Incomplete observation coverage. Changes may have been missed."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die Beobachtung ist lückenhaft. Änderungen können fehlen."
+      }
+    }
+  }
+},
+    "badgeMemoryNoChanges": {
+  "comment": "Badge memory: No changes observed in the retained apps. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No changes observed in the retained apps."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Keine Änderungen bei den gespeicherten Apps beobachtet."
+      }
+    }
+  }
+},
+    "badgeMemoryFirst": {
+  "comment": "Badge memory: First observed value Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "First observed value"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Erster beobachteter Wert"
+      }
+    }
+  }
+},
+    "badgeMemoryLast": {
+  "comment": "Badge memory: Last observed value Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Last observed value"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Letzter beobachteter Wert"
+      }
+    }
+  }
+},
+    "badgeMemoryNet": {
+  "comment": "Badge memory: Net observed change: %1$@ The placeholder is a signed net count, never a message total.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Net observed change: %1$@"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Beobachtete Differenz: %1$@"
+      }
+    }
+  }
+},
+    "badgeMemoryOpenNamedApp": {
+  "comment": "Badge memory: Open %1$@ Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Open %1$@"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "%1$@ öffnen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteDigest": {
+  "comment": "Badge memory: Delete digest Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete digest"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Rückblick löschen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteDigestHelp": {
+  "comment": "Badge memory: Delete this digest. An active session will stop collecting until the next session. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete this digest. An active session will stop collecting until the next session."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Diesen Rückblick löschen. Für eine laufende Sitzung endet die Sammlung bis zur nächsten Sitzung."
+      }
+    }
+  }
+},
+    "badgeMemoryCollecting": {
+  "comment": "Badge memory: Collecting Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Collecting"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Sammlung läuft"
+      }
+    }
+  }
+},
+    "badgeMemoryFinished": {
+  "comment": "Badge memory: Finished Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Finished"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Beendet"
+      }
+    }
+  }
+},
+    "badgeMemoryReview": {
+  "comment": "Badge memory: Review badge history… Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Review badge history…"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Verlauf ansehen …"
+      }
+    }
+  }
+},
+    "badgeMemorySettingsHelp": {
+  "comment": "Badge memory: Collection is off by default. Enabling applies to the next session; disabling stops collection now. Click a badge, use Badge details in an app’s menu, or press B in Focus Dock. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Collection is off by default. Enabling applies to the next session; disabling stops collection now. Click a badge, use Badge details in an app’s menu, or press B in Focus Dock."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die Sammlung ist zunächst aus. Einschalten gilt ab der nächsten Sitzung, Ausschalten beendet die Sammlung sofort. Klicke auf ein Badge, wähle Badge-Details im App-Menü oder drücke B in „Dock fokussieren“."
+      }
+    }
+  }
+},
+    "badgeMemoryStorageFailed": {
+  "comment": "Badge memory: Badge history could not be read or saved. Clear all badge history to reset it. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge history could not be read or saved. Clear all badge history to reset it."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Der Badge-Verlauf konnte nicht gelesen oder gespeichert werden. Lösche den gesamten Badge-Verlauf, um ihn zurückzusetzen."
+      }
+    }
+  }
+},
+    "badgeMemoryActivationFailed": {
+  "comment": "Badge memory: The app could not be opened. It may have moved or been removed. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "The app could not be opened. It may have moved or been removed."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die App konnte nicht geöffnet werden. Sie wurde möglicherweise verschoben oder entfernt."
+      }
+    }
+  }
+},
 
   "windowSearchShortcutHelp": {
     "comment": "Window search: Global shortcut: ⌘⇧Space",

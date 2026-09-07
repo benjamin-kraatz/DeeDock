@@ -33,9 +33,10 @@ final class BadgeMemoryStore {
     func observe(_ observations: [String: BadgeObservation], session: FocusSession?, at date: Date = .now) {
         synchronize(session: session, at: date)
         let previous = current
-        current = observations
+        if current != observations { current = observations }
         guard !requiresReset else { return }
         let before = document
+        if observations.isEmpty, document.active != nil { document.active?.incomplete = true }
         let paths = Set(document.apps.keys).union(observations.keys).union(document.active?.rows.keys.map { $0 } ?? [])
         for path in paths.sorted() {
             let value = observations[path] ?? .unknown
@@ -50,7 +51,9 @@ final class BadgeMemoryStore {
                     document.apps[path] = BadgeAppMemory(changes: [BadgeChange(value: value, date: date)], touched: date)
                 }
             }
-            collect(path: path, value: value)
+            if document.active?.rows[path] != nil || previous[path] != value {
+                collect(path: path, value: value)
+            }
         }
         prune(at: date)
         if document != before { persist() }
@@ -72,7 +75,7 @@ final class BadgeMemoryStore {
         if let session, document.lastSessionID != session.id {
             document.lastSessionID = session.id
             if allowStart, document.collectFocus, session.phase == .running, session.remaining(at: date) > 0 {
-                var digest = BadgeFocusDigest(id: session.id, modeName: session.modeName, started: date)
+                var digest = BadgeFocusDigest(id: session.id, modeName: String(session.modeName.prefix(1024)), started: date, incomplete: current.isEmpty)
                 for path in current.keys.sorted().prefix(100) {
                     let value = current[path] ?? .unknown
                     digest.rows[path] = BadgeDigestRow(first: value, last: value, hasGap: value == .unknown)

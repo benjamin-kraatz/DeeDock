@@ -10,6 +10,7 @@ final class DockInteraction {
     @ObservationIgnored var openFocusSession: (() -> Void)?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
+    @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?
     let tooltips = DockTooltipController()
     var tooltipPreset: DockTooltipPreset = .classic
     var suppressTooltips = false

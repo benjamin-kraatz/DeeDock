@@ -30,11 +30,17 @@ struct FeaturesPageContent: View {
         case .badges:
             AppBadgesSettingsCard(isOn: source.binding(\.showAppBadges),
                                   windowAccess: context.windowAccess, locked: locked)
+            if let coordinator = context.coordinator {
+                BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
+            }
         case .windowPeek:
             // Permissions stay usable on their own page even when unreadable settings block edits.
             WindowPeekSettingsPane(source: source, persistentSettingsDisabled: locked)
         case .focusSessions:
-            if let focus = context.coordinator?.focusSession { FocusSessionSettingsCard(controller: focus) }
+            if let coordinator = context.coordinator {
+                FocusSessionSettingsCard(controller: coordinator.focusSession)
+                BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
+            }
         case .actionTiles:
             if let actions = context.coordinator?.actionTiles { ActionTilesSettingsCard(controller: actions) }
         case .multipleDisplays:

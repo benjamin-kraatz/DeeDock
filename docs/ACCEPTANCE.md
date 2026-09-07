@@ -1199,3 +1199,9 @@ Changes are uncommitted. The issue has not been closed or marked accepted.
 Implemented on `feature/dee-15`. Find a Window searches live titles/app names, explicitly captured text, and saved capsule history in separate scopes. Image search is an explicit on-device model action and labels its output as inferred. Captured context stays in memory and supports clear, expiry, and close cleanup. Global/app shortcuts and Focus Dock `/` open the search window.
 
 See [Window search](WINDOW_SEARCH.md) for evidence rules, resource bounds, SDK investigation, model/state cases, and the manual acceptance checklist. Focused unsigned Debug app builds passed. Tests, previews, automated visual checks, runtime capture/model inference, and native acceptance were not executed. Visual-attribute accuracy, focus/accessibility, stale navigation, permissions, and multi-display/Space behavior remain unverified. This issue is not Done based on compilation.
+
+## DEE-17: badge memory and Focus digest
+
+Implemented on `feature/dee-17`. Badge details show explicit checked baselines and numeric net changes, keeping clear, text and unavailable observations separate. The existing DEE-10 reader supplies all observations. Opt-in collection follows Focus Session boundaries and retains bounded digests with source activation and deletion controls.
+
+See [Badge memory](BADGE_MEMORY.md) for observation reliability, identity, retention, model/state cases and the manual checklist. A focused unsigned Debug app build passed after correcting an Int64-to-Int argument for a generated localized string. Tests, previews, automated visual checks and native acceptance were not executed. Keyboard/VoiceOver, badge hit regions, permission loss, all dock edges, multiple displays, Spaces, sleep/restart and actual source badge behavior remain unverified. Compilation alone does not make DEE-17 Done.
