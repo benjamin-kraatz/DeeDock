@@ -1,6 +1,96 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "appBadgesTitle": {
+    "comment": "Heading for the app badge feature.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App badges"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App-Mitteilungen"
+        }
+      }
+    }
+  },
+  "appBadgesToggle": {
+    "comment": "Opt-in switch for mirroring badges from the system Dock.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show app badges"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mitteilungskennzeichen anzeigen"
+        }
+      }
+    }
+  },
+  "appBadgesHelp": {
+    "comment": "Explains badge coverage, refresh delay, and permission scope.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mirrors badge text from apps in the macOS Dock. Apps missing from that Dock or using custom artwork may not expose a badge. Updates can take a few seconds. Screen Recording is not required."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Übernimmt die Mitteilungskennzeichen von Apps im macOS-Dock. Apps, die dort fehlen oder eigene Grafiken verwenden, stellen möglicherweise kein Kennzeichen bereit. Änderungen können einige Sekunden dauern. Die Berechtigung zur Bildschirmaufnahme ist dafür nicht erforderlich."
+        }
+      }
+    }
+  },
+  "appBadgesPermission": {
+    "comment": "Explains why Accessibility permission is needed for badges.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Allow Accessibility access to read app badges."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erlaube den Zugriff über die Bedienungshilfen, um Mitteilungskennzeichen zu lesen."
+        }
+      }
+    }
+  },
+  "appBadgeAccessibility": {
+    "comment": "VoiceOver app value. First argument is running status; second is unmodified badge text.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%(status)@, badge: %(badge)@"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%(status)@, Mitteilungskennzeichen: %(badge)@"
+        }
+      }
+    }
+  },
     "secondaryDockTitle" : {
       "comment" : "Heading for the app-wide multi-monitor dock policy.",
       "extractionState" : "manual",

@@ -10,6 +10,8 @@ struct DockItem: Identifiable {
     let isRunning: Bool
     /// Whether the application bundle can currently be resolved for opening.
     let isAvailable: Bool
+    /// Current bundle location resolved by the catalog, including moved or bookmarked apps.
+    var resolvedURL: URL? = nil
     var id: String { reference.id }
 }
 

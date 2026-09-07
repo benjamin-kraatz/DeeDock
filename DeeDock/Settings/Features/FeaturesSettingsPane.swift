@@ -27,6 +27,10 @@ struct FeaturesSettingsPane: View {
                                       isOn: source.binding(\.secondaryDisplayAppsOnly))
                 }
                 .disabled(locked)
+                if let windowAccess {
+                    AppBadgesSettingsCard(isOn: source.binding(\.showAppBadges),
+                                          windowAccess: windowAccess, locked: locked)
+                }
                 if let focus { FocusSessionSettingsCard(controller: focus) }
                 if let actions { ActionTilesSettingsCard(controller: actions) }
                 SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {

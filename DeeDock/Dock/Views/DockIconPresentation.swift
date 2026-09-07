@@ -21,11 +21,12 @@ struct DockIconPresentation<Artwork: View>: View {
     /// Applied only to artwork, preserving focus/launch feedback and the button hit region.
     var artworkOpacity: Double = 1
     var artworkAnimation: Animation? = nil
+    var badgeLabel: String? = nil
 
     init(size: CGFloat, edge: DockEdge, available: Bool, running: Bool, launching: Bool,
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
-         artworkOpacity: Double = 1, artworkAnimation: Animation? = nil,
+         artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
          @ViewBuilder artwork: () -> Artwork) {
         self.artwork = artwork()
         self.size = size
@@ -39,6 +40,7 @@ struct DockIconPresentation<Artwork: View>: View {
         self.indicatorAnimated = indicatorAnimated
         self.artworkOpacity = artworkOpacity
         self.artworkAnimation = artworkAnimation
+        self.badgeLabel = badgeLabel
     }
 
     var body: some View {
@@ -63,6 +65,12 @@ struct DockIconPresentation<Artwork: View>: View {
                         ProgressView().controlSize(.small).padding(8).glassEffect(.clear)
                     }
                 }
+                .overlay(alignment: .topTrailing) {
+                    if let badgeLabel {
+                        DockAppBadge(label: badgeLabel, iconSize: size)
+                            .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
+                    }
+                }
                 .position(iconCenter)
             if running {
                 DockRunningIndicator(style: runningIndicatorStyle, edge: edge)
@@ -78,11 +86,11 @@ extension DockIconPresentation where Artwork == Image {
     init(icon: NSImage, size: CGFloat, edge: DockEdge, available: Bool, running: Bool, launching: Bool,
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
-         artworkOpacity: Double = 1, artworkAnimation: Animation? = nil) {
+         artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil) {
         self.init(size: size, edge: edge, available: available, running: running, launching: launching,
                   keyboardSelected: keyboardSelected, runningIndicatorStyle: runningIndicatorStyle,
                   indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
-                  artworkOpacity: artworkOpacity, artworkAnimation: artworkAnimation) {
+                  artworkOpacity: artworkOpacity, artworkAnimation: artworkAnimation, badgeLabel: badgeLabel) {
             Image(nsImage: icon).resizable().interpolation(.high)
         }
     }

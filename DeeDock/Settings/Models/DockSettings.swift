@@ -49,6 +49,8 @@ struct DockSettings: Codable, Equatable {
     var appVisibility: DockAppVisibility = .showAll
     /// Filters secondary docks' running-only apps by visible windows; preserves section settings.
     var secondaryDisplayAppsOnly = false
+    /// Mirror system Dock badge text after Accessibility access is granted.
+    var showAppBadges: Bool = false
     /// Whether each display dock includes the trailing Shelf tile.
     var showShelf: Bool = true
     /// Whether each display dock includes the shared Session Capsules tile.
@@ -134,6 +136,7 @@ struct DockSettings: Codable, Equatable {
 extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
+        case showAppBadges
         case appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
@@ -156,6 +159,7 @@ extension DockSettings {
         appVisibility = values.contains(.appVisibility) ? try values.decode(DockAppVisibility.self, forKey: .appVisibility) : .showAll
         secondaryDisplayAppsOnly = values.contains(.secondaryDisplayAppsOnly)
             ? try values.decode(Bool.self, forKey: .secondaryDisplayAppsOnly) : false
+        showAppBadges = try values.decodeIfPresent(Bool.self, forKey: .showAppBadges) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
         showSessionCapsules = try values.decodeIfPresent(Bool.self, forKey: .showSessionCapsules) ?? true
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true

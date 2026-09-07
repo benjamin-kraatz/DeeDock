@@ -453,3 +453,11 @@ Running timers use a saved wall-clock deadline, so sleep and app downtime count.
 ## App updates
 
 Direct builds use Sparkle’s update engine with a DDock-owned native update window. Consent, release notes, download progress, errors, and installation choices use DDock’s UI. Choose **Check for Updates…** from the DDock menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DDock quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. See [release instructions](docs/UPDATES.md) for signing, publishing, and the required archive scheme.
+
+## App badges
+
+Enable **Settings → Features → App badges → Show app badges**, then allow Accessibility access using the controls in that card. The setting is off by default and applies to every display. Screen Recording is not required.
+
+DDock mirrors badge text exposed by application items in the system Dock, matched by application URL. Apps absent from the system Dock and custom-drawn badges may not provide readable text. AX changes trigger a refresh where supported; a fallback five seconds after each completed scan covers missing notifications and permission changes. Long labels are visually truncated, with their full text available to VoiceOver.
+
+AX reads run outside the main actor and do not depend on pointer movement or animation frames. Disabling badges, disabling all docks, sleep, and shutdown clear badge state and stop the reader. Permission loss clears badges on the next refresh. Compilation is verified; live badge coverage and performance still need native acceptance. See [the acceptance record](docs/ACCEPTANCE.md#app-badges-dee-10).

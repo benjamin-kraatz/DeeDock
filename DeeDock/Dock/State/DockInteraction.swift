@@ -8,6 +8,7 @@ final class DockInteraction {
     /// Owns this panel's idle deadline and artwork opacity.
     @ObservationIgnored var openFocusSession: (() -> Void)?
     @ObservationIgnored var actionTiles: ActionTilesController?
+    var badges: DockBadgeController?
     let tooltips = DockTooltipController()
     var tooltipPreset: DockTooltipPreset = .classic
     var suppressTooltips = false
