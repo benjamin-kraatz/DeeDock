@@ -1014,3 +1014,27 @@ mirroring, disabled primary, negative origins/scaling, Spaces, sleep/wake, and r
 Finder window tiles and minimized-window home-display guarantees are outside this slice.
 The focused Debug DeeDock app build succeeded on 2026-09-05 using derived data at
 `/tmp/DeeDock-dee2-build`. Tests and automated visual checks were not run.
+
+## App badges (DEE-10)
+
+Implemented on 2026-09-07. Badge mirroring is an app-wide opt-in feature using the system Dock's `AXStatusLabel` attribute and existing Accessibility permission controls. The AX messaging APIs are public; Apple's Dock-specific badge attribute and notification behavior are not a documented cross-app badge contract. No screen capture, OCR, private framework, entitlement, or system preference change was added.
+
+The focused Debug app build succeeded with:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock \
+  -configuration Debug -destination 'platform=macOS' \
+  -derivedDataPath /tmp/DeeDock-dee-10-build build
+```
+
+The build log is `/tmp/DeeDock-dee-10-build.log`. String catalog JSON, generated named interpolation symbols, compiled English/German badge strings, and the focused diff were inspected. No tests, app launch, automated visual checks, native permission changes, or performance profiling were performed.
+
+Remaining native acceptance:
+
+- Enable access, change/remove real app badges, revoke/regrant access, and verify stale text clears within the refresh interval.
+- Check hidden system Dock, absent apps, closed pinned apps, custom badge artwork, and system Dock restart.
+- Check all four edges, magnification, long labels, VoiceOver, idle fading, multiple displays, and no focus changes on hover.
+- Check sleep/wake, screen sleep, session switching, all docks disabled, feature disable/re-enable, and shutdown cleanup.
+- Measure idle cost and badge update latency before making performance claims. AX events coalesce at 150 ms; a five-second fallback remains active while enabled and awake. Failed scans clear the snapshot.
+
+Issue: [DEE-10](https://linear.app/d-zwei/issue/DEE-10/mirror-application-notification-badges-through-accessibility).

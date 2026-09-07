@@ -32,6 +32,7 @@ final class DockCoordinator {
     @ObservationIgnored private let sessionCapsules: SessionCapsuleCoordinator
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
+    private let badges = DockBadgeController()
     @ObservationIgnored private let catalog: ApplicationCatalog
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
@@ -363,9 +364,11 @@ final class DockCoordinator {
         // If the primary dock is disabled, keep the remaining docks complete.
         let satelliteMode = settings.value.secondaryDisplayAppsOnly
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
+        badges.configure(enabled: settings.value.showAppBadges && !enabledDisplays.isEmpty)
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
+            panel.interaction.badges = badges
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil
             panel.store.refresh()
@@ -519,6 +522,7 @@ final class DockCoordinator {
         panels.values.forEach { $0.stop() }
         panels.removeAll()
         enabledDisplays = []
+        badges.stop()
         catalog.stop()
         trash.stop()
     }

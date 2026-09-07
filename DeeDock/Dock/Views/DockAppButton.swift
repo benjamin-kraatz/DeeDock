@@ -39,6 +39,11 @@ struct DockAppButton: View {
     @State private var accessibilityWindows: [ApplicationWindowSummary] = []
     @State private var accessibilityDiscoveryID: UUID?
 
+    private var badgeLabel: String? {
+        guard item.isAvailable else { return nil }
+        return interaction?.badges?.labels[item.reference.url.standardizedFileURL.path]
+    }
+
     var body: some View {
         Button(action: primaryAction) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
@@ -46,7 +51,8 @@ struct DockAppButton: View {
                                  launching: isLaunching, keyboardSelected: isKeyboardSelected,
                                  runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
                                  indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
-                                 artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation)
+                                 artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation,
+                                 badgeLabel: badgeLabel)
                 .overlay {
                     if interaction?.documentTargetID == item.id {
                         DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
@@ -93,14 +99,7 @@ struct DockAppButton: View {
             cancelAccessibilityWindowDiscovery()
         }
         .accessibilityLabel(Text(verbatim: item.reference.name))
-        .accessibilityValue(
-            Text(
-                item.isAvailable
-                    ? (item.isRunning
-                        ? .appStatusRunning : .appStatusUnavailable)
-                    : .appStatusUnavailable
-            )
-        )
+        .accessibilityValue(accessibilityStatus)
         .accessibilityHint(Text(.appOpenHint))
         .accessibilityAction(
             named: Text(item.isFavorite ? .actionUnpin : .actionPin),
@@ -152,6 +151,16 @@ struct DockAppButton: View {
                 }
             }
         }
+    }
+
+    private var accessibilityStatus: Text {
+        let status = String(localized: item.isAvailable
+            ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusUnavailable)
+            : .appStatusUnavailable)
+        if let badgeLabel {
+            return Text(.appBadgeAccessibility(status: status, badge: badgeLabel))
+        }
+        return Text(verbatim: status)
     }
 
     private func discoverAccessibilityWindows() {
