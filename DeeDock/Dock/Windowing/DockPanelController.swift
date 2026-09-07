@@ -56,6 +56,7 @@ final class DockPanelController {
             updatePointer(); present()
         }
         store.openLauncher = { [weak self] in self?.openLauncher() }
+        interaction.applicationCatalog = store.launcherCatalog
         interaction.openLauncher = store.openLauncher
         interaction.movePin = { [weak store] id, distance in store?.movePin(id, by: distance) }
         interaction.canMovePin = { [weak store] id, distance in store?.canMovePin(id, by: distance) ?? false }
@@ -129,6 +130,7 @@ final class DockPanelController {
         accessibilityIDs.formIntersection(exposedIDs)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.animateIndicators = settings.animateIndicators
+        interaction.launchAnimation = settings.launchAnimation
         interaction.idleFade.configure(settings,
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)

@@ -23,6 +23,9 @@ final class DockInteraction {
     /// Whether this panel currently paints anything. A hidden dock schedules no indicator
     /// frames; the owner keeps this in step with the visibility controller.
     var exposesContent = true
+    var launchAnimation = DockSettings.defaults.launchAnimation
+    /// Shared launch signals; each dock supplies its own animation preference.
+    var applicationCatalog: ApplicationCatalog?
     var dragProposal: DockDragProposal?
     var dragActive = false
     var dragSourceID: String?

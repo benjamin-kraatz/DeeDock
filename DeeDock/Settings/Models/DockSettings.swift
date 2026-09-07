@@ -74,6 +74,8 @@ struct DockSettings: Codable, Equatable {
     /// Whether the shader indicator styles animate. The drawn styles are always still, and
     /// Reduce Motion overrides this without rewriting the saved preference.
     var animateIndicators: Bool = true
+    /// Artwork motion for cold app launches; Reduce Motion uses progress feedback instead.
+    var launchAnimation: DockLaunchAnimation = .bounce
     var edge: DockEdge = .bottom
     var alignment: Alignment = .center
     /// Signed displacement from the alignment anchor, in points; positive moves right on horizontal docks and down on side docks.
@@ -141,7 +143,7 @@ extension DockSettings {
         case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -183,6 +185,8 @@ extension DockSettings {
             ? try values.decode(RunningIndicatorStyle.self, forKey: .runningIndicatorStyle) : .dot
         animateIndicators = values.contains(.animateIndicators)
             ? try values.decode(Bool.self, forKey: .animateIndicators) : true
+        launchAnimation = values.contains(.launchAnimation)
+            ? try values.decode(DockLaunchAnimation.self, forKey: .launchAnimation) : Self.defaults.launchAnimation
         edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : .bottom
         alignment = try values.decode(Alignment.self, forKey: .alignment)
         alongEdgeOffset = try values.decode(Double.self, forKey: .alongEdgeOffset)
