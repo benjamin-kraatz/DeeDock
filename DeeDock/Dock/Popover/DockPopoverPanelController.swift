@@ -43,6 +43,10 @@ final class DockPopoverPanelController<Content: View> {
         hosting?.dragEnded = { [weak self] in self?.dragExited?() }
     }
 
+    /// A feature may keep its draft alive while an owned native picker handles outside clicks.
+    /// Explicit close and display teardown still dismiss the panel.
+    var canDismissForOutsideClick: (() -> Bool)?
+
     /// Feature-owned teardown, invoked once before the panel animates away.
     var willClose: (() -> Void)?
     /// Reported once with the caller's focus intent. Cleared before it runs, so it never repeats.
@@ -119,6 +123,7 @@ final class DockPopoverPanelController<Content: View> {
         dragEntered = nil; dragPerformed = nil; dragExited = nil
         willClose?()
         willClose = nil
+        canDismissForOutsideClick = nil
         panel.keyboardHandler = nil
         keyHandler = nil
         let callback = closed
@@ -161,6 +166,7 @@ final class DockPopoverPanelController<Content: View> {
                 }
                 return event
             }
+            guard canDismissForOutsideClick?() != false else { return event }
             let consumesDockClick = event.window is DockPanel
             close(returnFocus: false)
             // A dock click dismisses the popover but must not reach the button underneath.
@@ -168,7 +174,8 @@ final class DockPopoverPanelController<Content: View> {
             return event
         }
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
-            self?.close(returnFocus: false)
+            guard let self, canDismissForOutsideClick?() != false else { return }
+            close(returnFocus: false)
         }
     }
 }
