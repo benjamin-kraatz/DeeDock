@@ -3,6 +3,13 @@ import AppKit
 /// App-wide owner for the single transient window preview.
 @MainActor
 final class WindowPeekCoordinator {
+    private let fileHandoff: WindowFileHandoffController
+    private var fileDocuments: DocumentResourceAccess?
+    private var fileDrag = false
+    var chooseFiles: ((DockItem, DockPanelController) -> Void)?
+    var validatedFileDrop: ((NSDraggingInfo) -> DocumentResourceAccess?)?
+    var fileDropAccepted: (() -> Void)?
+    var fileDragEnded: (() -> Void)?
     private let watches = WindowWatchController()
     private let portals = WindowPortalCoordinator()
     private let menus: ApplicationMenuController
@@ -25,16 +32,19 @@ final class WindowPeekCoordinator {
     var addToFusion: ((ApplicationWindowSummary, DockPanelController, Bool) -> Void)?
     var prepareSettings: ((String) -> Void)?
     var isOpen: Bool { controller != nil }
+    var isFileDragActive: Bool { fileDrag }
     var isKeyboardActive: Bool { controller != nil && sourcePanel?.store.keyboardFocus == true }
 
     init(menus: ApplicationMenuController, screenCapture: ScreenCaptureAccessController,
+         applications: any ApplicationServicing,
          thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService()) {
+        fileHandoff = WindowFileHandoffController(menus: menus, applications: applications)
         self.menus = menus
         self.screenCapture = screenCapture
         self.thumbnails = thumbnails
     }
 
-    func hover(_ item: DockItem?, on panel: DockPanelController) {
+    func hover(_ item: DockItem?, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {
         guard let item else {
             if sourcePanel === panel { sourceHovered = false; scheduleClose() }
             return
@@ -46,8 +56,10 @@ final class WindowPeekCoordinator {
         }
         sourceHovered = true
         closeTask?.cancel()
-        if sourcePanel === panel, sourceItem?.id == item.id { return }
+        if sourcePanel === panel, sourceItem?.id == item.id, fileDrag == (documents != nil) { return }
         close(returnFocus: false)
+        fileDocuments = documents
+        fileDrag = documents != nil
         sourceHovered = true
         sourcePanel = panel
         sourceItem = item
@@ -61,16 +73,34 @@ final class WindowPeekCoordinator {
         }
     }
 
-    func showKeyboard(_ item: DockItem, on panel: DockPanelController) {
+    func showKeyboard(_ item: DockItem, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {
         guard item.isRunning, item.isAvailable,
               panel.windowPeekContext(for: item.id)?.settings.windowPeekEnabled == true else { return }
         close(returnFocus: false)
+        fileDocuments = documents
         sourcePanel = panel
         sourceItem = item
         present(item, on: panel, keyboard: true)
     }
 
+    /// The drag coordinator owns payload validation and calls this even across panel boundaries.
+    func hoverFiles(_ item: DockItem?, on panel: DockPanelController?, documents: DocumentResourceAccess?) {
+        if let item, let panel, let documents,
+           documents.urls.count <= WindowFileHandoffController.maximumFiles {
+            hover(item, on: panel, documents: documents)
+        } else if fileDrag {
+            sourceHovered = false
+            updatePointer()
+            if !panelHovered { scheduleClose() }
+        }
+    }
+
+    func endFileDrag() { if fileDrag { close(returnFocus: false) } }
+    func dismissFileHandoff() { fileHandoff.stop() }
+
     func updatePointer() {
+        if fileDocuments != nil, !fileDrag { return }
+
         panelHovered = controller?.contains(NSEvent.mouseLocation) == true
         if WindowPeekLifecycle.retainsPresentation(sourceHovered: sourceHovered, panelHovered: panelHovered) {
             closeTask?.cancel()
@@ -112,6 +142,8 @@ final class WindowPeekCoordinator {
         activeController?.close(returnFocus: false)
         sourcePanel = nil
         sourceItem = nil
+        fileDocuments = nil
+        fileDrag = false
         allWindows = []
         pendingThumbnailIDs = []
         requestedThumbnailIDs = []
@@ -124,6 +156,7 @@ final class WindowPeekCoordinator {
     func focusNextPortal() { portals.focusNext() }
 
     func stop() {
+        fileHandoff.stop()
         portals.stop()
         close(returnFocus: false)
         watches.stop()
@@ -138,6 +171,28 @@ final class WindowPeekCoordinator {
         controller = next
         panel.holdWindowPeek(true)
         next.closed = { [weak self] returnFocus in self?.close(returnFocus: returnFocus) }
+        next.state.routingFiles = fileDocuments != nil
+        next.state.receivingFileDrag = fileDrag
+        next.state.chooseFiles = { [weak self, weak panel] in
+            guard let self, let panel else { return }
+            chooseFiles?(item, panel)
+        }
+        next.state.fileDragUpdated = { [weak self, weak next] info, token in
+            guard let self, fileDrag, validatedFileDrop?(info) != nil else { return false }
+            panelHovered = true
+            closeTask?.cancel()
+            next?.state.selectedID = token
+            return true
+        }
+        next.state.fileDrop = { [weak self] info, token in
+            guard let self, fileDrag, let documents = validatedFileDrop?(info) else { return false }
+            fileDocuments = documents
+            routeFiles(to: token)
+            fileDropAccepted?()
+            return true
+        }
+        next.state.fileDragExited = { [weak self] in self?.updatePointer() }
+        next.state.fileDragEnded = { [weak self] in self?.fileDragEnded?() }
         next.state.hovered = { [weak self] hovered in
             self?.panelHovered = hovered
             if hovered { self?.closeTask?.cancel() } else { self?.scheduleClose() }
@@ -175,6 +230,11 @@ final class WindowPeekCoordinator {
         }
         next.state.showAll = { [weak self] in self?.displayWindows(applyFilters: false) }
         next.state.thumbnailNeeded = { [weak self] token in self?.requestThumbnail(token) }
+        if fileDocuments != nil {
+            next.state.watch = nil
+            next.state.pinPortal = nil
+            next.state.addToFusion = nil
+        }
         next.show()
         discover(item)
     }
@@ -314,7 +374,20 @@ final class WindowPeekCoordinator {
         }
     }
 
+    private func routeFiles(to token: ApplicationWindowToken?) {
+        guard let documents = fileDocuments, let item = sourceItem, let panel = sourcePanel,
+              let context = panel.windowPeekContext(for: item.id) else { return }
+        let window = token.flatMap { id in allWindows.first { $0.token == id } }
+        let exact = window != nil && controller?.state.usesApplicationSelection != true
+        let transferredDiscovery = discoveryID
+        discoveryID = nil // The handoff now owns the AX handles until activation or dismissal.
+        close(returnFocus: false)
+        fileHandoff.show(documents: documents, item: item, window: window, exactWindow: exact,
+                         discoveryID: transferredDiscovery, visibleFrame: context.anchor.visibleFrame)
+    }
+
     private func choose(_ token: ApplicationWindowToken) {
+        if fileDocuments != nil { routeFiles(to: token); return }
         guard let item = sourceItem, let panel = sourcePanel else { return }
         guard controller?.state.usesApplicationSelection != true else {
             showApp()
@@ -328,15 +401,18 @@ final class WindowPeekCoordinator {
     }
 
     private func showApp() {
+        if fileDocuments != nil { routeFiles(to: nil); return }
         guard let item = sourceItem else { return }
         sourcePanel?.store.open(item)
         close(returnFocus: false)
     }
 
     private func scheduleClose() {
+        if fileDocuments != nil, !fileDrag { return }
         closeTask?.cancel()
+        let delay = fileDrag ? 650 : 180
         closeTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .milliseconds(180))
+            try? await Task.sleep(for: .milliseconds(delay))
             guard let self, !Task.isCancelled,
                   !WindowPeekLifecycle.retainsPresentation(sourceHovered: sourceHovered, panelHovered: panelHovered)
             else { return }

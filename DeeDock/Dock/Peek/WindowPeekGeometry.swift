@@ -5,7 +5,7 @@ nonisolated enum WindowPeekGeometry {
     static let screenMargin: CGFloat = 12
     static let anchorGap: CGFloat = 10
 
-    static func placement(anchor: WindowPeekAnchor, settings: DockSettings, count: Int) -> WindowPeekPlacement {
+    static func placement(anchor: WindowPeekAnchor, settings: DockSettings, count: Int, routingFiles: Bool = false) -> WindowPeekPlacement {
         let card = cardSize(settings)
         let safeCount = max(1, count)
         let requested: CGSize
@@ -22,8 +22,8 @@ nonisolated enum WindowPeekGeometry {
                                height: card.height + 52)
         }
         let available = anchor.visibleFrame.insetBy(dx: screenMargin, dy: screenMargin)
-        let size = CGSize(width: min(requested.width + 24, available.width),
-                          height: min(requested.height + 24, available.height))
+        let size = CGSize(width: min(max(requested.width + 24, routingFiles ? 430 : 0), available.width),
+                          height: min(requested.height + 24 + (routingFiles ? 140 : 0), available.height))
         let proposed: CGPoint
         switch anchor.edge {
         case .bottom:

@@ -69,3 +69,26 @@ struct WindowFileHandoffView: View {
         .background(Color(nsColor: .windowBackgroundColor))
     }
 }
+
+#if DEBUG
+#Preview("File handoff · exact destination") {
+    let documents = DocumentResourceAccess([URL(fileURLWithPath: "/Preview/Project notes.txt")],
+                                          startAccess: { _ in false }, stopAccess: { _ in })
+    let state = WindowFileHandoffState(documents: documents, appName: "Preview App",
+                                      windowTitle: "A long destination window title for layout inspection")
+    state.busy = false
+    state.valid = true
+    state.status = .fileRouteReady
+    return WindowFileHandoffView(state: state).frame(width: 500, height: 620)
+}
+
+#Preview("File handoff · unavailable source") {
+    let documents = DocumentResourceAccess([URL(fileURLWithPath: "/Preview/Unavailable.txt")],
+                                          startAccess: { _ in false }, stopAccess: { _ in })
+    let state = WindowFileHandoffState(documents: documents, appName: "Preview App", windowTitle: nil)
+    state.busy = false
+    state.activationAvailable = false
+    state.status = .fileRouteInvalid
+    return WindowFileHandoffView(state: state).frame(width: 440, height: 580)
+}
+#endif

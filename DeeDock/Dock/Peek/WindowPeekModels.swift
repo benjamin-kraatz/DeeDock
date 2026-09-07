@@ -48,6 +48,13 @@ final class WindowPeekState {
     var selectedID: ApplicationWindowToken?
     /// ScreenCaptureKit-only cards can be previewed, but selecting one can only activate its app.
     var usesApplicationSelection = false
+    var routingFiles = false
+    var receivingFileDrag = false
+    @ObservationIgnored var chooseFiles: (() -> Void)?
+    @ObservationIgnored var fileDragUpdated: ((NSDraggingInfo, ApplicationWindowToken?) -> Bool)?
+    @ObservationIgnored var fileDrop: ((NSDraggingInfo, ApplicationWindowToken?) -> Bool)?
+    @ObservationIgnored var fileDragExited: (() -> Void)?
+    @ObservationIgnored var fileDragEnded: (() -> Void)?
     @ObservationIgnored var watch: ((ApplicationWindowToken) -> Void)?
     @ObservationIgnored var pinPortal: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var addToFusion: ((ApplicationWindowSummary) -> Void)?

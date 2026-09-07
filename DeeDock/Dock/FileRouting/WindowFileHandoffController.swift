@@ -56,7 +56,9 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
         let state = WindowFileHandoffState(documents: documents, appName: item.reference.name,
                                            windowTitle: exactWindow ? title : nil)
         self.state = state
-        let processes = menus.snapshot(for: item).processes.map(\.processIdentifier)
+        let processes = menus.snapshot(for: item).processes.compactMap {
+            NSRunningApplication(processIdentifier: $0.processIdentifier)
+        }
         state.activationAvailable = !processes.isEmpty
         state.activate = { [weak self] in
             self?.activate(item, window: exactWindow ? window : nil, processes: processes)
@@ -93,7 +95,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
         }
     }
 
-    private func activate(_ item: DockItem, window: ApplicationWindowSummary?, processes: [pid_t]) {
+    private func activate(_ item: DockItem, window: ApplicationWindowSummary?, processes: [NSRunningApplication]) {
         guard let state, state.valid, !state.busy, state.activationAvailable else { return }
         if let window {
             state.busy = true
@@ -108,8 +110,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
                 actionID = nil
             }
         } else {
-            guard let app = processes.compactMap({ NSRunningApplication(processIdentifier: $0) })
-                .first(where: { !$0.isTerminated }), app.activate(options: []) else {
+            guard let app = processes.first(where: { !$0.isTerminated }), app.activate(options: []) else {
                 state.activationAvailable = false
                 state.status = .fileRouteAppUnavailable
                 return

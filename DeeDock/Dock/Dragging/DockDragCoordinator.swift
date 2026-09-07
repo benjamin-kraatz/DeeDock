@@ -24,6 +24,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var openSpringFolder: ((FolderDockItem, DockPanelController) -> Void)?
     var dropInFolder: ((NSDraggingInfo, FolderDockItem, DockPanelController) -> Bool)?
     var springDragEnded: (() -> Void)?
+    var documentHoverChanged: ((DockItem?, DockPanelController?, DocumentResourceAccess?) -> Void)?
+    var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Bool)?
     /// Non-empty while the active external drag came out of DeeDock's own Shelf.
     private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
@@ -155,7 +157,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                   !DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask).isEmpty else { return false }
             completion.committed = true
             // The catalog retains the leases before clearing this drag's temporary state.
-            panel.store.openDocuments(documents, with: item.reference)
+            if chooseDocumentDestination?(documents, item, panel) != true {
+                panel.store.openDocuments(documents, with: item.reference)
+            }
             cancel()
             return true
         }
@@ -187,12 +191,24 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     func springActivate(_ info: NSDraggingInfo, on displayID: String) {
         guard springTarget(info, on: displayID) != nil, let panel = panels[displayID] else { return }
         if let (_, folder) = folderDestination { openSpringFolder?(folder, panel) }
-        else { documentDrag.activate(on: panel) }
+        // File drags over apps use the deliberate Peek dwell. Native spring loading must
+        // never activate an app while the user is still deciding where to send the files.
     }
 
     func springHighlight(_ info: NSDraggingInfo, on displayID: String) {
         guard let panel = panels[displayID] else { return }
         panel.interaction.springEmphasized = documentDrag.displayID == displayID && info.springLoadingHighlight == .emphasized
+    }
+
+    /// Peek accepts only the already-validated native session. Private pins and replacement
+    /// pasteboards cannot borrow an earlier file grant. Copy prevents source deletion.
+    func peekDocuments(_ info: NSDraggingInfo) -> DocumentResourceAccess? {
+        guard active, sourceID == nil, !completion.cancelled, !completion.committed,
+              pasteboardChange == info.draggingPasteboard.changeCount,
+              info.draggingSourceOperationMask.contains(.copy),
+              let documents = payload.documents,
+              documents.urls.count <= WindowFileHandoffController.maximumFiles else { return nil }
+        return documents
     }
 
     func externalEnded() { if sourceID == nil { cancel() } }
@@ -252,7 +268,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if event.type == .keyDown, event.keyCode == 53 {
                 completion.cancelled = true
                 nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
-                clearFeedback()
+                cancel()
             }
             return event // AppKit must still receive Escape to terminate its native session.
         }
@@ -265,6 +281,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
+        let documentTarget = candidate?.store.displayID == nativeDisplayID && payload.documents != nil
+            ? candidate?.documentTarget(at: point) : nil
+        documentHoverChanged?(documentTarget, candidate, payload.documents)
         if sourceID == nil, payload.isReady, payload.stageableItems != nil,
            let candidate, candidate.store.displayID == nativeDisplayID,
            let action = candidate.actionTarget(at: point) {

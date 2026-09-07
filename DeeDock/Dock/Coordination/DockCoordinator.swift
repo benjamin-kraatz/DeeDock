@@ -68,7 +68,7 @@ final class DockCoordinator {
             windows: AccessibilityApplicationWindowService()
         )
         applicationMenus = menus
-        windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture)
+        windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture, applications: catalog.service)
         let semanticStacks = CoalescingSemanticStackOrganizer(
             base: FoundationModelsSemanticStackOrganizer()
         )
@@ -112,7 +112,29 @@ final class DockCoordinator {
         dragging.dropInFolder = { [weak self] info, folder, panel in
             self?.folderStacks.receive(info, folder: folder, on: panel) ?? false
         }
-        dragging.springDragEnded = { [weak self] in self?.folderStacks.dragEnded() }
+        dragging.documentHoverChanged = { [weak self] item, panel, documents in
+            self?.windowPeeks.hoverFiles(item, on: panel, documents: documents)
+        }
+        dragging.chooseDocumentDestination = { [weak self] documents, item, panel in
+            guard let self, item.isRunning,
+                  panel.windowPeekContext(for: item.id)?.settings.windowPeekEnabled == true else { return false }
+            guard documents.urls.count <= WindowFileHandoffController.maximumFiles else {
+                panel.store.errorMessage = .fileRouteInvalid
+                return true
+            }
+            windowPeeks.showKeyboard(item, on: panel, documents: documents)
+            return true
+        }
+        dragging.springDragEnded = { [weak self] in
+            self?.folderStacks.dragEnded()
+            self?.windowPeeks.endFileDrag()
+        }
+        windowPeeks.validatedFileDrop = { [weak self] in self?.dragging.peekDocuments($0) }
+        windowPeeks.fileDropAccepted = { [weak self] in self?.dragging.cancel() }
+        windowPeeks.fileDragEnded = { [weak self] in self?.dragging.externalEnded() }
+        windowPeeks.chooseFiles = { [weak self] item, panel in
+            self?.openFiles(for: item, on: panel, routeThroughPeek: true)
+        }
         folderStacks.keyboardDismissed = { [weak self] displayID in
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)
@@ -200,6 +222,7 @@ final class DockCoordinator {
                 self?.shelfSemanticWarmup.cancel()
                 self?.fusion.suspend()
                 self?.popovers.closeAll()
+                self?.windowPeeks.dismissFileHandoff()
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
                 self?.applicationMenus.cancelAllDiscoveries()
@@ -270,8 +293,13 @@ final class DockCoordinator {
                 return previous
             }
             panel.exclusiveInteractionBegan = { [weak self] in
-                self?.windowPeeks.close(returnFocus: false)
-                self?.modePicker.close(returnFocus: false)
+                guard let self else { return }
+                // Document Peek is part of this drag, so dock feedback must not dismiss it
+                // on every native draggingUpdated callback.
+                if !dragging.isDragging || !windowPeeks.isFileDragActive {
+                    windowPeeks.close(returnFocus: false)
+                }
+                modePicker.close(returnFocus: false)
             }
             panel.windowSearchRequested = { [weak self] in self?.searchWindows() }
             panel.modePickerRequested = { [weak self, weak panel] in
@@ -310,6 +338,7 @@ final class DockCoordinator {
             }
             panel.interaction.windowPeekHoverChanged = { [weak self, weak panel] item in
                 guard let self, let panel else { return }
+                guard !dragging.isDragging else { return }
                 windowPeeks.hover(item, on: panel)
             }
             panel.interaction.openWindowPeek = { [weak self, weak panel] item in
@@ -431,7 +460,7 @@ final class DockCoordinator {
         zonePreview.show(displayID: id, geometry: geometry)
     }
     /// Explicit picker activation captures focus before AppKit resigns the dock's key panel.
-    private func openFiles(for item: DockItem, on panel: DockPanelController) {
+    private func openFiles(for item: DockItem, on panel: DockPanelController, routeThroughPeek: Bool = false) {
         guard item.isAvailable, panels[panel.store.displayID] === panel else { return }
         windowPeeks.close(returnFocus: false)
         let id = panel.store.displayID
@@ -439,7 +468,16 @@ final class DockCoordinator {
         let previous = previousApplication ?? lastExternalApplication
         filePicker.show(reference: item.reference, displayID: id,
             hold: { [weak panel] in panel?.holdFilePicker($0) },
-            submit: { [weak panel] documents, reference in panel?.store.openDocuments(documents, with: reference) },
+            submit: { [weak self, weak panel] documents, reference in
+                guard let self, let panel, panels[id] === panel else { return }
+                if routeThroughPeek {
+                    guard documents.urls.count <= WindowFileHandoffController.maximumFiles else {
+                        panel.store.errorMessage = .fileRouteInvalid
+                        return
+                    }
+                    windowPeeks.showKeyboard(item, on: panel, documents: documents)
+                } else { panel.store.openDocuments(documents, with: reference) }
+            },
             cancelled: { [weak self, weak panel] in
                 guard let self, let panel, self.panels[id] === panel, NSApp.isActive else { return }
                 if let selection {

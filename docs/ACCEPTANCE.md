@@ -1300,3 +1300,18 @@ DEE-11 integration with DEE-14: resolved the latest main conflicts while preserv
 Fusion, and Portal actions, keyboard shortcuts, localization, and acceptance notes. The focused
 Debug app build passed at `/tmp/DeeDock-dee11-portals-merge-build.log`. Tests and native acceptance
 were not run.
+
+## DEE-12: files through Window Peek
+
+`feature/dee-12` adds delayed file-drag Peek, destination selection, a retained file handoff panel,
+copy-only outgoing native drags, explicit clipboard references, and serial app-level open requests.
+An exact Accessibility window can be activated deliberately. Capture-only cards and missing window
+access retain a labeled app-level fallback. No cross-process synthetic drop or app-specific attachment
+integration is claimed.
+
+Focused Debug app builds with Xcode 27 succeeded during implementation. The initial build reported
+existing unused-value warnings in LauncherPresentationController and DockBadgeController; App Intents
+metadata extraction also reports that this target has no AppIntents dependency. No tests, app launch,
+or automated visual checks ran. Native acceptance remains open.
+
+See [file handoff controls, API findings, state cases, and manual checklist](WINDOW-FILE-HANDOFF.md).

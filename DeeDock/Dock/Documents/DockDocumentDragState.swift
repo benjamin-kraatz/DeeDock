@@ -33,8 +33,12 @@ final class DockDocumentDragState {
         for panel in panels.values {
             panel.updateSectionDragHover(at: point, valid: candidate === panel, documents: true)
             let selected = panel.store.displayID == displayID ? target : nil
+            let message: LocalizedStringResource = selected.map { item in
+                panel.windowPeekContext(for: item.id)?.settings.windowPeekEnabled == true
+                    ? .fileRouteHover : .dragOpenIn(appName: item.reference.name)
+            } ?? .dragDocumentTarget
             panel.setDragPresentation(proposal: nil, source: nil, targeted: candidate === panel,
-                message: candidate === panel ? selected.map { .dragOpenIn(appName: $0.reference.name) } ?? .dragDocumentTarget : nil)
+                                      message: candidate === panel ? message : nil)
             panel.interaction.documentTargetID = selected?.id
             if selected == nil { panel.interaction.springEmphasized = false }
         }

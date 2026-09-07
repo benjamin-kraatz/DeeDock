@@ -17,8 +17,22 @@ struct WindowPeekView: View {
                 Image(nsImage: state.appIcon).resizable().interpolation(.high).frame(width: 24, height: 24)
                 Text(verbatim: state.appName).font(.headline).lineLimit(1)
                 Spacer(minLength: 0)
+                if !state.routingFiles {
+                    Button(.fileRouteChooseFiles, systemImage: "doc.badge.plus") { state.chooseFiles?() }
+                        .labelStyle(.iconOnly)
+                }
+            }
+            if state.routingFiles {
+                Text(state.receivingFileDrag ? .fileRouteDropHelp : .fileRouteSelectDestination)
+                    .font(.caption).fixedSize(horizontal: false, vertical: true)
             }
             content
+            if state.receivingFileDrag {
+                Text(.fileRouteDropApp).font(.caption)
+                    .frame(maxWidth: .infinity, minHeight: 32)
+                    .background(.quaternary, in: .rect(cornerRadius: 6))
+                    .overlay { dropTarget(nil) }
+            }
         }
         .padding(12)
         .background(usesOpaqueBackground ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor))
@@ -57,7 +71,7 @@ struct WindowPeekView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text(.windowPeekNoMatch).foregroundStyle(.secondary)
                 HStack {
-                    Button(.windowPeekShowApp) { state.showApp?() }
+                    Button(state.routingFiles ? .fileRouteAppDestination : .windowPeekShowApp) { state.showApp?() }
                     Button(.windowPeekShowAll) { state.showAll?() }
                 }
             }
@@ -66,41 +80,64 @@ struct WindowPeekView: View {
 
     @ViewBuilder private var cards: some View {
         let cardSize = WindowPeekGeometry.cardSize(state.settings)
-        switch state.settings.windowPeekLayout {
-        case .list:
-            ScrollView(.vertical) {
-                LazyVStack(spacing: 8) { cardRows(size: cardSize) }
-            }.scrollIndicators(.hidden)
-        case .grid:
-            ScrollView(.vertical) {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: cardSize.width), spacing: 10)], spacing: 10) {
-                    cardRows(size: cardSize)
+        ScrollViewReader { proxy in
+            Group {
+                switch state.settings.windowPeekLayout {
+                case .list:
+                    ScrollView(.vertical) {
+                        LazyVStack(spacing: 8) { cardRows(size: cardSize) }
+                    }.scrollIndicators(.hidden)
+                case .grid:
+                    ScrollView(.vertical) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: cardSize.width), spacing: 10)], spacing: 10) {
+                            cardRows(size: cardSize)
+                        }
+                    }.scrollIndicators(.hidden)
+                case .filmstrip:
+                    ScrollView(.horizontal) {
+                        LazyHStack(spacing: 10) { cardRows(size: cardSize) }
+                    }.scrollIndicators(.hidden)
                 }
-            }.scrollIndicators(.hidden)
-        case .filmstrip:
-            ScrollView(.horizontal) {
-                LazyHStack(spacing: 10) { cardRows(size: cardSize) }
-            }.scrollIndicators(.hidden)
+            }
+            .onChange(of: state.selectedID) { _, id in
+                if let id { proxy.scrollTo(id, anchor: .center) }
+            }
         }
     }
 
     @ViewBuilder private func cardRows(size: CGSize) -> some View {
         ForEach(state.cards) { card in
-            WindowPeekCardSlot(card: card, appIcon: state.appIcon, settings: state.settings,
-                               selected: keyboard && state.selectedID == card.id, size: size,
-                               choose: { state.choose?(card.id) },
-                               watch: { state.watch?(card.id) },
-                               addToFusion: { state.addToFusion?(card.window) },
-                               pinPortal: { state.pinPortal?(card.window) })
-                .onAppear { state.thumbnailNeeded?(card.id) }
+            if state.routingFiles {
+                WindowPeekCardView(card: card, appIcon: state.appIcon, settings: state.settings,
+                                   selected: state.selectedID == card.id, action: { state.choose?(card.id) })
+                    .frame(width: size.width, height: size.height)
+                    .id(card.id)
+                    .overlay { if state.receivingFileDrag { dropTarget(card.id) } }
+                    .accessibilityHint(Text(.fileRouteDropHelp))
+                    .onAppear { state.thumbnailNeeded?(card.id) }
+            } else {
+                WindowPeekCardSlot(card: card, appIcon: state.appIcon, settings: state.settings,
+                                   selected: keyboard && state.selectedID == card.id, size: size,
+                                   choose: { state.choose?(card.id) },
+                                   watch: { state.watch?(card.id) },
+                                   addToFusion: { state.addToFusion?(card.window) },
+                                   pinPortal: { state.pinPortal?(card.window) })
+                    .onAppear { state.thumbnailNeeded?(card.id) }
+            }
         }
+    }
+
+    private func dropTarget(_ token: ApplicationWindowToken?) -> some View {
+        WindowPeekFileDropView(update: { state.fileDragUpdated?($0, token) ?? false },
+                              receive: { state.fileDrop?($0, token) ?? false },
+                              exit: { state.fileDragExited?() }, ended: { state.fileDragEnded?() })
     }
 
     private func fallback(message: LocalizedStringResource, settings: Bool) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(message).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             HStack {
-                Button(.windowPeekShowApp) { state.showApp?() }
+                Button(state.routingFiles ? .fileRouteAppDestination : .windowPeekShowApp) { state.showApp?() }
                 if settings {
                     Button(.windowPeekOpenSettings) {
                         state.settingsSelected?()
