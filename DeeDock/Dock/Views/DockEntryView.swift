@@ -16,45 +16,135 @@ struct DockEntryView: View {
 
     var body: some View {
         switch slot {
+        case .launcher:
+            DockLauncherButton(
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.launcher.hitID, $0)
+                }
+            )
         case .focus(let item):
-            DockFocusButton(item: item, size: size, selected: selected, interaction: interaction,
-                accessibilityFocus: { accessibilityFocus(DockEntryID.focus.hitID, $0) })
+            DockFocusButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.focus.hitID, $0)
+                }
+            )
         case .action(let item):
-            DockActionButton(item: item, size: size, selected: selected, interaction: interaction,
-                accessibilityFocus: { accessibilityFocus(DockEntryID.action(item.tile.id).hitID, $0) })
+            DockActionButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                accessibilityFocus: {
+                    accessibilityFocus(
+                        DockEntryID.action(item.tile.id).hitID,
+                        $0
+                    )
+                }
+            )
         case .app(let item):
-            DockAppButton(item: item, size: size, isLaunching: launching, isKeyboardSelected: selected,
-                primaryAction: { primaryAppAction(item) }, open: { openApp(item) },
-                togglePin: { togglePin(item) }, interaction: interaction,
-                menuTracking: menuTracking, accessibilityFocus: { accessibilityFocus(DockEntryID.app(item.id).hitID, $0) })
-                .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
+            DockAppButton(
+                item: item,
+                size: size,
+                isLaunching: launching,
+                isKeyboardSelected: selected,
+                primaryAction: { primaryAppAction(item) },
+                open: { openApp(item) },
+                togglePin: { togglePin(item) },
+                interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.app(item.id).hitID, $0)
+                }
+            )
+            .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
         case .folder(let item):
-            DockFolderButton(item: item, size: size, selected: selected, interaction: interaction,
+            DockFolderButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
                 menuTracking: menuTracking,
-                accessibilityFocus: { accessibilityFocus(DockEntryID.folder(item.reference.id).hitID, $0) })
-                .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
+                accessibilityFocus: {
+                    accessibilityFocus(
+                        DockEntryID.folder(item.reference.id).hitID,
+                        $0
+                    )
+                }
+            )
+            .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
         case .group(let control):
-            DockGroupButton(control: control, size: size, selected: selected, interaction: interaction,
-                            reduceTransparency: reduceTransparency)
+            DockGroupButton(
+                control: control,
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                reduceTransparency: reduceTransparency
+            )
         case .sessionCapsule(let item):
-            DockSessionCapsuleButton(item: item, size: size, selected: selected, interaction: interaction,
+            DockSessionCapsuleButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
                 menuTracking: menuTracking,
-                accessibilityFocus: { accessibilityFocus(DockEntryID.sessionCapsule(item.capsuleID).hitID, $0) })
+                accessibilityFocus: {
+                    accessibilityFocus(
+                        DockEntryID.sessionCapsule(item.capsuleID).hitID,
+                        $0
+                    )
+                }
+            )
         case .sessionCapsules(let item):
-            DockCapsulesButton(item: item, size: size, selected: selected, interaction: interaction,
-                accessibilityFocus: { accessibilityFocus(DockEntryID.sessionCapsules.hitID, $0) })
+            DockCapsulesButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.sessionCapsules.hitID, $0)
+                }
+            )
         case .shelf(let item):
-            DockShelfButton(item: item, size: size, selected: selected, interaction: interaction,
+            DockShelfButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
                 menuTracking: menuTracking,
-                accessibilityFocus: { accessibilityFocus(DockEntryID.shelf.hitID, $0) })
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.shelf.hitID, $0)
+                }
+            )
         case .trash(let item):
-            DockTrashButton(item: item, size: size, selected: selected, interaction: interaction,
+            DockTrashButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
                 menuTracking: menuTracking,
-                accessibilityFocus: { accessibilityFocus(DockEntryID.trash.hitID, $0) })
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.trash.hitID, $0)
+                }
+            )
         case .gap:
-            RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.12))
-                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.tint, style: StrokeStyle(lineWidth: 1, dash: [3, 3])))
-                .frame(width: size, height: size).accessibilityHidden(true).allowsHitTesting(false)
+            RoundedRectangle(cornerRadius: 10).fill(
+                Color.accentColor.opacity(0.12)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10).strokeBorder(
+                    .tint,
+                    style: StrokeStyle(lineWidth: 1, dash: [3, 3])
+                )
+            )
+            .frame(width: size, height: size).accessibilityHidden(true)
+            .allowsHitTesting(false)
         }
     }
 }

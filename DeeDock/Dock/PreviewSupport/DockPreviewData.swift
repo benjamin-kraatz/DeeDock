@@ -33,16 +33,20 @@ struct DockPreviewContent: View {
     private let errorMessage: LocalizedStringResource?
     private let reduceMotion: Bool
     private let reduceTransparency: Bool
+    private let showsLauncher: Bool
+    private let openLauncher: () -> Void
     @State private var interaction: DockInteraction
     @State private var sections: DockSectionState
 
     init(items: [DockItem]? = nil, errorMessage: LocalizedStringResource? = nil,
-         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults, availableLength: CGFloat = 800, expanded: Bool = false) {
+         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults, availableLength: CGFloat = 800, expanded: Bool = false, showsLauncher: Bool = false, openLauncher: @escaping () -> Void = {}) {
         let items = items ?? DockPreviewData.items
         self.items = items
         self.errorMessage = errorMessage
         self.reduceMotion = reduceMotion
         self.reduceTransparency = reduceTransparency
+        self.showsLauncher = showsLauncher
+        self.openLauncher = openLauncher
         let interaction = DockInteraction()
         interaction.dragProposal = dragProposal
         interaction.dragMessage = dragMessage
@@ -50,13 +54,15 @@ struct DockPreviewContent: View {
         let sections = DockSectionState()
         sections.configure(settings.appVisibility)
         if expanded { sections.toggle() }
-        let entries = DockSectionProjection.entries(items: items, visibility: settings.appVisibility, expanded: sections.isExpanded)
+        let content = DockSectionProjection.entries(items: items, visibility: settings.appVisibility, expanded: sections.isExpanded)
+        let entries: [DockRenderSlot] = showsLauncher ? [.launcher] + content : content
         let slots = DockRenderSlot.slots(entries: entries, proposal: dragProposal)
         interaction.tooltipPreset = settings.tooltipPreset
         interaction.idleFade.configure(settings, reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
         sections.didChange = { [weak interaction, weak sections] in
             guard let interaction, let sections else { return }
-            let entries = DockSectionProjection.entries(items: items, visibility: settings.appVisibility, expanded: sections.isExpanded)
+            let content = DockSectionProjection.entries(items: items, visibility: settings.appVisibility, expanded: sections.isExpanded)
+            let entries: [DockRenderSlot] = showsLauncher ? [.launcher] + content : content
             let slots = DockRenderSlot.slots(entries: entries, proposal: dragProposal)
             interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                 availableLength: availableLength, settings: settings)
@@ -72,14 +78,22 @@ struct DockPreviewContent: View {
     }
 
     var body: some View {
-        let entries = DockSectionProjection.entries(items: items, visibility: sections.visibility, expanded: sections.isExpanded)
+        let content = DockSectionProjection.entries(items: items, visibility: sections.visibility, expanded: sections.isExpanded)
+        let entries: [DockRenderSlot] = showsLauncher ? [.launcher] + content : content
         DockContentView(items: items, entries: entries, launchingIDs: [], selectedTarget: entries.first?.target, keyboardFocus: true,
                         errorMessage: errorMessage, interaction: interaction,
                         reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
                         primaryAppAction: { _ in }, openApp: { _ in }, togglePin: { _ in }, dismissError: {})
             .padding(20)
-            .onAppear { interaction.toggleSection = { sections.toggle() } }
-            .onDisappear { interaction.toggleSection = nil; interaction.tooltips.clear() }
+            .onAppear {
+                interaction.openLauncher = openLauncher
+                interaction.toggleSection = { sections.toggle() }
+            }
+            .onDisappear {
+                interaction.openLauncher = nil
+                interaction.toggleSection = nil
+                interaction.tooltips.clear()
+            }
     }
 }
 #endif

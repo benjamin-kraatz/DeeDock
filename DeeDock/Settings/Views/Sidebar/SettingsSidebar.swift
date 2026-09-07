@@ -1,77 +1,56 @@
 import SwiftUI
 
-/// Searchable defaults and device navigation, retaining the pane artwork and native list styling.
+/// Searchable sections and devices, in the order System Settings uses: what the app is, then what
+/// the dock is, then the screens it appears on.
 struct SettingsSidebar: View {
-    @Binding var selection: SettingsSelection?
+    @Binding var selection: SettingsSection?
     @Binding var searchText: String
     let profiles: DisplayProfilesStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var matches: [SettingsCategory] { SettingsCategory.allCases.filter { $0.matches(searchText) } }
+    /// A section survives the filter when it, or any page it leads to, matches the query.
+    private var sections: [SettingsSection] { SettingsSection.fixed.filter { $0.matches(searchText) } }
+
+    /// A display stays listed when its own name matches, or when the query matches a dock page,
+    /// since every dock page can be set for that display.
     private func matches(_ profile: DisplayProfile) -> Bool {
-        searchText.isEmpty || profile.name.localizedStandardContains(searchText) || !matches.isEmpty
+        searchText.isEmpty
+            || profile.name.localizedStandardContains(searchText)
+            || SettingsSection.dock.matches(searchText)
     }
+
+    private var connected: [DisplaySnapshot] {
+        profiles.displays.filter { profiles.document.profiles[$0.id].map(matches) ?? false }
+    }
+    private var remembered: [DisplayProfile] { profiles.remembered.filter(matches) }
 
     var body: some View {
         List(selection: $selection) {
             Section {
-                if SettingsSelection.generalMatches(searchText) {
-                    Label {
-                        Text(.settingsGeneral)
-                    } icon: {
-                        SettingsIconTile(glyph: .symbol("gearshape.fill"), colors: [.gray, .secondary])
-                    }
-                    .padding(.vertical, 3)
-                    .tag(SettingsSelection.general)
-                }
-
-                if SettingsSelection.modesMatches(searchText) {
-                    Label {
-                        Text(.dockModesTitle)
-                    } icon: {
-                        SettingsIconTile(glyph: .symbol("square.stack.3d.up.fill"), colors: [.indigo, .purple])
-                    }
-                    .padding(.vertical, 3)
-                    .tag(SettingsSelection.modes)
-                }
-
-                if SettingsSelection.featuresMatches(searchText) {
-                    Label {
-                        Text(.settingsFeatures)
-                    } icon: {
-                        SettingsIconTile(glyph: .symbol("puzzlepiece.extension.fill"),
-                                         colors: SettingsSelection.featuresTileColors)
-                    }
-                    .padding(.vertical, 3)
-                    .tag(SettingsSelection.features)
+                ForEach(sections) { section in
+                    SettingsSectionRow(section: section, isSelected: selection == section)
+                        .tag(section)
                 }
             }
-            Section {
-                ForEach(matches) { category in
-                    SettingsCategoryRow(category: category, isSelected: selection == .defaults(category))
-                        .tag(SettingsSelection.defaults(category))
-                }
-            } header: { Text(.displayDefaults).font(.caption.weight(.semibold)) }
-            Section {
-                ForEach(profiles.displays) { display in
-                    if let profile = profiles.document.profiles[display.id], matches(profile) {
-                        DisplayProfileRow(profile: profile, snapshot: display).tag(SettingsSelection.display(display.id))
-                    }
-                }
-            } header: { Text(.displayConnectedGroup).font(.caption.weight(.semibold)) }
-            if !profiles.remembered.isEmpty {
+            if !connected.isEmpty {
                 Section {
-                    ForEach(profiles.remembered.filter(matches)) { profile in
-                        DisplayProfileRow(profile: profile, snapshot: nil).tag(SettingsSelection.display(profile.id))
+                    ForEach(connected) { display in
+                        if let profile = profiles.document.profiles[display.id] {
+                            DisplayProfileRow(profile: profile, snapshot: display)
+                                .tag(SettingsSection.display(display.id))
+                        }
+                    }
+                } header: { Text(.displayConnectedGroup).font(.caption.weight(.semibold)) }
+            }
+            if !remembered.isEmpty {
+                Section {
+                    ForEach(remembered) { profile in
+                        DisplayProfileRow(profile: profile, snapshot: nil)
+                            .tag(SettingsSection.display(profile.id))
                     }
                 } header: { Text(.displayRememberedGroup).font(.caption.weight(.semibold)) }
             }
-            if !SettingsSelection.generalMatches(searchText)
-                && !SettingsSelection.modesMatches(searchText)
-                && !SettingsSelection.featuresMatches(searchText)
-                && matches.isEmpty
-                && !profiles.document.profiles.values.contains(where: matches)
-            {
+            if sections.isEmpty && connected.isEmpty && remembered.isEmpty {
                 Text(.settingsNoMatches)
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -80,7 +59,6 @@ struct SettingsSidebar: View {
             }
         }
         .searchable(text: $searchText, placement: .sidebar, prompt: Text(.settingsSearchPrompt))
-        .toolbar(removing: .sidebarToggle)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: matches)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: sections)
     }
 }

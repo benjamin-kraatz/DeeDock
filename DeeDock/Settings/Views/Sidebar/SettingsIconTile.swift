@@ -10,23 +10,17 @@ enum SettingsGlyph: Hashable {
     case dock
 }
 
-/// A rounded, gradient app-style tile, the size and finish macOS sidebars use.
+/// Compact symbol artwork shared by sidebar and overview rows.
 struct SettingsIconTile: View {
     let glyph: SettingsGlyph
     let colors: [Color]
-    var size: CGFloat = 24
+    var size: CGFloat = 18
 
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: size * 0.29, style: .continuous) }
 
     var body: some View {
         shape
             .fill(LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom))
-            // A short gloss and a hairline rim give the tile depth without a drop shadow.
-            .overlay {
-                shape.fill(LinearGradient(colors: [.white.opacity(0.32), .clear],
-                                          startPoint: .top, endPoint: .center))
-            }
-            .overlay { shape.strokeBorder(.white.opacity(0.3), lineWidth: 0.5) }
             .overlay { artwork }
             .frame(width: size, height: size)
             .accessibilityHidden(true)
@@ -73,11 +67,11 @@ private struct DockTileGlyph: View {
 #if DEBUG
 #Preview("Icon tiles") {
     VStack(alignment: .leading, spacing: 12) {
-        ForEach(SettingsCategory.allCases) { category in
+        ForEach(SettingsPage.dockPages) { page in
             HStack(spacing: 10) {
-                SettingsIconTile(glyph: category.glyph, colors: category.tileColors)
-                SettingsIconTile(glyph: category.glyph, colors: category.tileColors, size: 48)
-                Text(category.title)
+                SettingsIconTile(glyph: page.glyph, colors: page.tileColors)
+                SettingsIconTile(glyph: page.glyph, colors: page.tileColors, size: 48)
+                Text(page.title)
             }
         }
     }

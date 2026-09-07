@@ -1,5 +1,8 @@
 import AppKit
 
+/// Successful primary actions distinguish an open from hiding the foreground application.
+enum ApplicationPrimaryActionOutcome { case opened, hidden }
+
 /// Failures specific to an app icon's show/hide toggle.
 enum ApplicationPrimaryActionError: Error {
     /// The foreground application rejected the request to hide.
@@ -15,7 +18,7 @@ protocol ApplicationServicing {
     func icon(for url: URL?) -> NSImage
     func pruneIcons(keeping urls: Set<URL>)
     /// Hides the matching foreground app, otherwise opens or activates it.
-    func performPrimaryAction(_ reference: ApplicationReference) async throws
+    func performPrimaryAction(_ reference: ApplicationReference) async throws -> ApplicationPrimaryActionOutcome
     func open(_ reference: ApplicationReference) async throws
     /// Hands the entire user-selected batch to this app; success describes the OS handoff only.
     func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws

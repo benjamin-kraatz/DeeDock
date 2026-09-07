@@ -7,9 +7,11 @@ import SwiftUI
 enum SettingsMetrics {
     static let cardRadius: CGFloat = 10
     static let cardSpacing: CGFloat = 20
+    /// Widest a column of cards grows before it centers in the window.
+    static let columnWidth: CGFloat = 620
     static let rowInset: CGFloat = 14
     static let rowVerticalInset: CGFloat = 9
-    static let rowMinimumHeight: CGFloat = 32
+    static let rowMinimumHeight: CGFloat = 44
     static let controlSpacing: CGFloat = 8
 }
 
@@ -34,6 +36,8 @@ struct SettingsRow<Control: View>: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
+            .layoutPriority(1)
             Spacer(minLength: SettingsMetrics.controlSpacing)
             control
         }

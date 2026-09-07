@@ -39,7 +39,9 @@ struct DockBackgroundView: View, Animatable {
         } else {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(.clear)
-                .glassEffect(.clear, in: .rect(cornerRadius: cornerRadius))
+                // Matches the launcher's material. The dock's surface grows into the launcher's
+                // rect, so a different material at either end would step in brightness mid-morph.
+                .glassEffect(.regular, in: .rect(cornerRadius: cornerRadius))
         }
     }
 }

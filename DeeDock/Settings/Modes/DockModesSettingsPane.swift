@@ -20,42 +20,35 @@ struct DockModesSettingsPane: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
-                SettingsCard(title: .dockModesActiveTitle, footnote: .dockModesHelp) {
-                    SettingsRow(title: .dockModesActiveMode) {
-                        Text(verbatim: store.activeMode.name).foregroundStyle(.secondary)
-                    }
-                    SettingsActionRow {
-                        Button(.dockModesNew, systemImage: "plus", action: beginCreate)
-                            .disabled(!store.canEdit)
-                    }
+        SettingsPageScaffold {
+            SettingsCard(title: .dockModesActiveTitle, footnote: .dockModesHelp) {
+                SettingsRow(title: .dockModesActiveMode) {
+                    Text(verbatim: store.activeMode.name).foregroundStyle(.secondary)
                 }
-                SettingsCard(title: .dockModesConfigurationsTitle) {
-                    SettingsStackedRow {
-                        VStack(spacing: 0) {
-                            ForEach(Array(store.modes.enumerated()), id: \.element.id) { index, mode in
-                                if index > 0 { Divider().padding(.leading, 38) }
-                                modeRow(mode, index: index)
-                            }
-                        }
-                    }
+                SettingsActionRow {
+                    Button(.dockModesNew, systemImage: "plus", action: beginCreate)
+                        .disabled(!store.canEdit)
                 }
-                if let error = store.errorMessage { SettingsErrorBanner(message: error) }
-                if store.requiresReset {
-                    SettingsCard(title: .dockModesRecoveryTitle, footnote: .dockModesRecoveryHelp) {
-                        SettingsActionRow {
-                            Button(.dockModesReset, systemImage: "arrow.counterclockwise", role: .destructive) { store.reset() }
+            }
+            SettingsCard(title: .dockModesConfigurationsTitle) {
+                SettingsStackedRow {
+                    VStack(spacing: 0) {
+                        ForEach(Array(store.modes.enumerated()), id: \.element.id) { index, mode in
+                            if index > 0 { Divider().padding(.leading, 38) }
+                            modeRow(mode, index: index)
                         }
                     }
                 }
             }
-            .frame(maxWidth: 620, alignment: .leading)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 18)
+            if let error = store.errorMessage { SettingsErrorBanner(message: error) }
+            if store.requiresReset {
+                SettingsCard(title: .dockModesRecoveryTitle, footnote: .dockModesRecoveryHelp) {
+                    SettingsActionRow {
+                        Button(.dockModesReset, systemImage: "arrow.counterclockwise", role: .destructive) { store.reset() }
+                    }
+                }
+            }
         }
-        .scrollBounceBehavior(.basedOnSize)
         .navigationTitle(Text(.dockModesTitle))
         .alert(namingTitle, isPresented: namingPresented) {
             TextField(String(localized: .dockModesNameField), text: $draftName)

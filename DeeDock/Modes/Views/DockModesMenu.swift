@@ -3,7 +3,7 @@ import SwiftUI
 /// Menu-bar switching stays nonactivating; only opening Settings deliberately activates DeeDock.
 struct DockModesMenu: View {
     let coordinator: DockCoordinator
-    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Menu(.dockModesMenuTitle) {
@@ -37,7 +37,7 @@ struct DockModesMenu: View {
             Button(.dockModesManage) {
                 coordinator.settingsModesRequest = true
                 NSApp.activate()
-                openSettings()
+                openWindow(id: "settings")
             }
         }
     }

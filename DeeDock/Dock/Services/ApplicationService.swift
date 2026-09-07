@@ -58,12 +58,13 @@ final class ApplicationService: ApplicationServicing {
     ///
     /// The live foreground process is checked at click time. Dock snapshots intentionally track
     /// only running state and may lag behind activation changes by one main-run-loop turn.
-    func performPrimaryAction(_ reference: ApplicationReference) async throws {
+    func performPrimaryAction(_ reference: ApplicationReference) async throws -> ApplicationPrimaryActionOutcome {
         if let frontmost = workspace.frontmostApplication, matches(frontmost, reference: reference) {
             try await hide(frontmost)
-            return
+            return .hidden
         }
         try await open(reference)
+        return .opened
     }
 
     /// Reconciles a rejected request with process-specific evidence before reporting failure.

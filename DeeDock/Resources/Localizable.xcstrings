@@ -1,6 +1,1524 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "settingsLauncherPosition": {
+    "comment": "Launcher placement setting; directions refer to physical dock ends.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Launcher position"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Launcher-Position"
+        }
+      }
+    }
+  },
+  "settingsLauncherPositionHelp": {
+    "comment": "Launcher placement setting; directions refer to physical dock ends.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The launcher stays in the dock. Choose which end it appears at."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Launcher bleibt im Dock. Wähle, an welchem Ende er erscheint."
+        }
+      }
+    }
+  },
+  "settingsLauncherTop": {
+    "comment": "Launcher placement setting; directions refer to physical dock ends.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Top"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Oben"
+        }
+      }
+    }
+  },
+  "settingsLauncherBottom": {
+    "comment": "Launcher placement setting; directions refer to physical dock ends.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bottom"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unten"
+        }
+      }
+    }
+  },
+  "settingsLauncherLeft": {
+    "comment": "Launcher placement setting; directions refer to physical dock ends.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Left"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Links"
+        }
+      }
+    }
+  },
+  "settingsLauncherRight": {
+    "comment": "Launcher placement setting; directions refer to physical dock ends.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Right"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rechts"
+        }
+      }
+    }
+  },
+  "launcherPinnedRunning": {
+    "comment": "Accessibility status of a launcher app pinned on this display.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pinned, running"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Angepinnt, geöffnet"
+        }
+      }
+    }
+  },
+  "launcherPinnedNotRunning": {
+    "comment": "Accessibility status of a launcher app pinned on this display.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pinned, not running"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Angepinnt, nicht geöffnet"
+        }
+      }
+    }
+  },
+    "launcherTitle": {
+      "comment": "Permanent dock tile and launcher title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Launcher"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-Launcher"
+          }
+        }
+      }
+    },
+    "launcherTileHint": {
+      "comment": "Accessibility hint for the launcher tile.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expand the dock to find and open apps."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock erweitern, um Apps zu finden und zu öffnen."
+          }
+        }
+      }
+    },
+    "launcherAll": {
+      "comment": "Launcher filter including every discovered application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Apps"
+          }
+        }
+      }
+    },
+    "launcherRunning": {
+      "comment": "Launcher running-app filter and accessible running state.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geöffnet"
+          }
+        }
+      }
+    },
+    "launcherNotRunning": {
+      "comment": "Accessible state for an application that is not running.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not running"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht geöffnet"
+          }
+        }
+      }
+    },
+    "launcherPinned": {
+      "comment": "Launcher filter for application pins on the source display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinned"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angepinnt"
+          }
+        }
+      }
+    },
+    "launcherRecent": {
+      "comment": "Launcher filter showing apps opened through DDock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt geöffnet"
+          }
+        }
+      }
+    },
+    "launcherName": {
+      "comment": "Sort applications by name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        }
+      }
+    },
+    "launcherLastOpened": {
+      "comment": "Sort by the last successful open through DDock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last opened"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt geöffnet"
+          }
+        }
+      }
+    },
+    "launcherMostOpened": {
+      "comment": "Sort by successful opens through DDock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Most opened"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Am häufigsten geöffnet"
+          }
+        }
+      }
+    },
+    "launcherUngrouped": {
+      "comment": "Show one continuous app collection.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No grouping"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Gruppierung"
+          }
+        }
+      }
+    },
+    "launcherCategory": {
+      "comment": "Group applications by bundle category.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Category"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategorie"
+          }
+        }
+      }
+    },
+    "launcherAlphabetical": {
+      "comment": "Group application names by their first letter.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First letter"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anfangsbuchstabe"
+          }
+        }
+      }
+    },
+    "launcherGrid": {
+      "comment": "Launcher icon grid view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grid"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raster"
+          }
+        }
+      }
+    },
+    "launcherList": {
+      "comment": "Launcher compact list view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "List"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liste"
+          }
+        }
+      }
+    },
+    "launcherCategoryDevelopment": {
+      "comment": "Application category group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Development"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entwicklung"
+          }
+        }
+      }
+    },
+    "launcherCategoryWork": {
+      "comment": "Application category group for productivity, business and finance.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Work"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arbeit"
+          }
+        }
+      }
+    },
+    "launcherCategoryCreative": {
+      "comment": "Application category group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Design, photo & video"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Design, Foto & Video"
+          }
+        }
+      }
+    },
+    "launcherCategoryEntertainment": {
+      "comment": "Application category group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Music & entertainment"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik & Unterhaltung"
+          }
+        }
+      }
+    },
+    "launcherCategoryInformation": {
+      "comment": "Application category group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Information & communication"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Information & Kommunikation"
+          }
+        }
+      }
+    },
+    "launcherCategoryLearning": {
+      "comment": "Application category group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learning & everyday life"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lernen & Alltag"
+          }
+        }
+      }
+    },
+    "launcherCategoryUtilities": {
+      "comment": "Application category group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilities"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dienstprogramme"
+          }
+        }
+      }
+    },
+    "launcherCategoryGames": {
+      "comment": "Application category group.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Games"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiele"
+          }
+        }
+      }
+    },
+    "launcherCategoryOther": {
+      "comment": "Group for apps with missing or unrecognized category metadata.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weitere Apps"
+          }
+        }
+      }
+    },
+    "launcherRobiNoResults": {
+      "comment": "No suggestions from the local model.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi found no suitable apps. Try describing the task differently."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi hat keine passenden Apps gefunden. Beschreibe die Aufgabe anders."
+          }
+        }
+      }
+    },
+    "launcherRobiSuggestions": {
+      "comment": "Clarifies that AI results are suggestions requiring a click.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suggested by Robi. Choose an app to open it."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschläge von Robi. Wähle eine App aus, um sie zu öffnen."
+          }
+        }
+      }
+    },
+    "launcherRobiUnavailable": {
+      "comment": "Local model unavailable; ordinary search remains usable.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi needs Apple Intelligence to be available and enabled. App search still works."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi benötigt verfügbares und aktiviertes Apple Intelligence. Die App-Suche funktioniert weiterhin."
+          }
+        }
+      }
+    },
+    "launcherRobiFailed": {
+      "comment": "Local generation error without exposing implementation details.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi could not complete this request. Try again or use app search."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi konnte diese Anfrage nicht abschließen. Versuche es erneut oder nutze die App-Suche."
+          }
+        }
+      }
+    },
+    "launcherSearchPrompt": {
+      "comment": "Launcher search field placeholder.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find an app, or describe a task for Robi…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App suchen oder eine Aufgabe für Robi beschreiben …"
+          }
+        }
+      }
+    },
+    "launcherSearch": {
+      "comment": "Accessible search field label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps suchen"
+          }
+        }
+      }
+    },
+    "launcherClearSearch": {
+      "comment": "Clears the query.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear search"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche leeren"
+          }
+        }
+      }
+    },
+    "launcherClose": {
+      "comment": "Closes launcher with a reverse morph.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to dock"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurück zum Dock"
+          }
+        }
+      }
+    },
+    "launcherClearHistory": {
+      "comment": "Action requiring confirmation before clearing DDock launch history.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear launch history…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnungsverlauf löschen …"
+          }
+        }
+      }
+    },
+    "launcherClearHistoryDetail": {
+      "comment": "Confirmation for deleting local launch history.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove the list of apps opened through DDock and their open counts?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liste der über DDock geöffneten Apps und ihre Öffnungszähler löschen?"
+          }
+        }
+      }
+    },
+    "launcherHistoryUnreadable": {
+      "comment": "History corruption is preserved until an explicit reset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launch history could not be read. Clear it to start recording again."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Öffnungsverlauf konnte nicht gelesen werden. Lösche ihn, um wieder Öffnungen zu erfassen."
+          }
+        }
+      }
+    },
+    "launcherTextSearch": {
+      "comment": "Discards Robi suggestions while retaining the query.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to app search"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurück zur App-Suche"
+          }
+        }
+      }
+    },
+    "launcherEasterEgg": {
+      "comment": "Playful message shown when searching for do a barrel roll.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrel roll complete. Your apps are still upright."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fassrolle geschafft. Deine Apps stehen noch aufrecht."
+          }
+        }
+      }
+    },
+    "launcherResultCount": {
+      "comment": "Number of apps matching current launcher filters and query.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld app"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld apps"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld App"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Apps"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "launcherDiscoveryIncomplete": {
+      "comment": "Discovery limitation shown when directory enumeration fails.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some application folders could not be read. Results may be incomplete."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einige Programmordner konnten nicht gelesen werden. Ergebnisse können unvollständig sein."
+          }
+        }
+      }
+    },
+    "launcherRefresh": {
+      "comment": "Explicitly refreshes installed application discovery.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps aktualisieren"
+          }
+        }
+      }
+    },
+    "launcherOptions": {
+      "comment": "Accessible label for history options menu.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launcher options"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launcher-Optionen"
+          }
+        }
+      }
+    },
+    "launcherFilter": {
+      "comment": "Accessible label for app filter picker.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps filtern"
+          }
+        }
+      }
+    },
+    "launcherSort": {
+      "comment": "Sort picker menu label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort by"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sortieren nach"
+          }
+        }
+      }
+    },
+    "launcherGroup": {
+      "comment": "Grouping picker menu label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Group by"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gruppieren nach"
+          }
+        }
+      }
+    },
+    "launcherSortAndGroup": {
+      "comment": "Accessible label for display options menu.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort and group apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps sortieren und gruppieren"
+          }
+        }
+      }
+    },
+    "launcherView": {
+      "comment": "Accessible label for grid or list picker.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ansicht"
+          }
+        }
+      }
+    },
+    "launcherAskRobi": {
+      "comment": "Starts explicit local AI app suggestions.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask Robi"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi fragen"
+          }
+        }
+      }
+    },
+    "launcherRobiCancel": {
+      "comment": "Cancels local AI app suggestions.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel Robi"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robi abbrechen"
+          }
+        }
+      }
+    },
+    "launcherRobiHelp": {
+      "comment": "Explains the on-device, explicitly triggered role of Robi.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Describe a task, then ask Robi to suggest installed apps using Apple Intelligence on this Mac."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beschreibe eine Aufgabe. Robi schlägt dir mit Apple Intelligence auf diesem Mac passende installierte Apps vor."
+          }
+        }
+      }
+    },
+    "launcherDiscovering": {
+      "comment": "Initial discovery placeholder.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finding your apps…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps werden gesucht …"
+          }
+        }
+      }
+    },
+    "launcherNoResults": {
+      "comment": "Empty filtered result collection.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matching apps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine passenden Apps"
+          }
+        }
+      }
+    },
+    "launcherNoResultsDetail": {
+      "comment": "Guidance for empty search results.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try another name or choose All apps. You can ask Robi to find apps for a task."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versuche einen anderen Namen oder wähle Alle Apps. Robi kann Apps für eine Aufgabe vorschlagen."
+          }
+        }
+      }
+    },
+    "launcherOpenHint": {
+      "comment": "Accessible action hint for a launcher result.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open or activate this app."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese App öffnen oder aktivieren."
+          }
+        }
+      }
+    },
+    "launcherMenuOpen": {
+      "comment": "Opens the selected launcher application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnen"
+          }
+        }
+      }
+    },
+    "launcherMenuPinOnDisplay": {
+      "comment": "Submenu listing other displays with an enabled dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pin on Display"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf Bildschirm anpinnen"
+          }
+        }
+      }
+    },
+    "launcherMenuCreateCapsule": {
+      "comment": "Opens an editable session capsule containing the selected application.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create capsule…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapsel erstellen…"
+          }
+        }
+      }
+    },
+  "settingsFeatureShelfSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keep files at hand and manage the Trash."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dateien griffbereit halten und den Papierkorb verwalten."
+        }
+      }
+    }
+  },
+  "settingsFeatureCapsulesSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Save groups of apps and folders to reopen together."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apps und Ordner als Gruppe sichern und gemeinsam wieder öffnen."
+        }
+      }
+    }
+  },
+  "settingsFeatureBadgesSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show app notification badges in the dock."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mitteilungszähler an den Apps im Dock anzeigen."
+        }
+      }
+    }
+  },
+  "settingsFeaturePeekSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preview open windows and switch between them."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Offene Fenster ansehen und zwischen ihnen wechseln."
+        }
+      }
+    }
+  },
+  "settingsFeatureFocusSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Set up timed focus sessions."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeitlich begrenzte Fokus-Sitzungen einrichten."
+        }
+      }
+    }
+  },
+  "settingsFeatureActionsSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Run Shortcuts directly from the dock."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kurzbefehle direkt aus dem Dock ausführen."
+        }
+      }
+    }
+  },
+  "settingsFeatureDisplaysSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose which apps appear on secondary displays."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Festlegen, welche Apps auf weiteren Displays erscheinen."
+        }
+      }
+    }
+  },
+  "settingsFeaturePermissionsSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manage window access and screen recording permissions."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zugriff auf Fenster und Bildschirmaufnahme verwalten."
+        }
+      }
+    }
+  },
+    "settingsBack" : {
+      "comment" : "Toolbar button that returns from a settings page to its section overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "settingsAbout" : {
+      "comment" : "Overview row leading to the installed version and build.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        }
+      }
+    },
+    "settingsBackgroundAndFading" : {
+      "comment" : "Overview row leading to dock background and idle fading settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund & Ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background & Fading"
+          }
+        }
+      }
+    },
+    "settingsDisplaySummary" : {
+      "comment" : "One-line description under a display's name on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gilt nur für dieses Display. Alles Unveränderte folgt den gemeinsamen Standardwerten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies to this display only. Anything you leave alone follows the shared defaults."
+          }
+        }
+      }
+    },
+    "settingsDockSummary" : {
+      "comment" : "One-line description under the Dock heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheinungsbild, Platzierung und Verhalten für alle Displays."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance, placement, and hiding behavior shared by every display."
+          }
+        }
+      }
+    },
+    "settingsFeaturesSummary" : {
+      "comment" : "One-line description under the Features heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionale Dock-Funktionen wie Shelf, Papierkorb, Mitteilungskennzeichen und Window Peek."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional dock capabilities such as the Shelf, Trash, badges, and Window Peek."
+          }
+        }
+      }
+    },
+    "settingsGeneralSummary" : {
+      "comment" : "One-line description under the General heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menüleiste, Start bei der Anmeldung und App-Updates."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu bar presence, launching at login, and app updates."
+          }
+        }
+      }
+    },
+    "settingsModesSummary" : {
+      "comment" : "One-line description under the Modes heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benannte Konfigurationen, die Pins und App-Sichtbarkeit jedes Displays sichern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Named configurations that store each display's pins and app visibility."
+          }
+        }
+      }
+    },
+    "settingsSelectSection" : {
+      "comment" : "Placeholder shown when no sidebar item is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle einen Einstellungsbereich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a settings section"
+          }
+        }
+      }
+    },
+    "settingsShelfAndTrash" : {
+      "comment" : "Overview row leading to the Shelf and Trash tile settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf & Papierkorb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf & Trash"
+          }
+        }
+      }
+    },
+    "settingsStartup" : {
+      "comment" : "Overview row leading to the launch-at-login setting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldung & Start"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login & Startup"
+          }
+        }
+      }
+    },
   "appBadgesTitle": {
     "comment": "Heading for the app badge feature.",
     "extractionState": "manual",
@@ -10200,24 +11718,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "s"
-          }
-        }
-      }
-    },
-    "settingsSelectCategory" : {
-      "comment" : "Placeholder shown when no settings pane is selected.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a settings category"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a settings category"
           }
         }
       }

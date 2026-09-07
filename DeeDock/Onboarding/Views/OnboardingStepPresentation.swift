@@ -24,9 +24,9 @@ extension OnboardingStep {
         switch self {
         case .welcome, .ready: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .systemDock: Color(red: 0.94, green: 0.52, blue: 0.20)
-        case .placement: SettingsCategory.position.tint
-        case .appearance: SettingsCategory.appearance.tint
-        case .hiding: SettingsCategory.behavior.tint
+        case .placement: SettingsPage.position.tint
+        case .appearance: SettingsPage.appearance.tint
+        case .hiding: SettingsPage.behavior.tint
         case .displays: Color(red: 0.36, green: 0.44, blue: 0.92)
         }
     }
@@ -34,11 +34,11 @@ extension OnboardingStep {
     /// Colors of the step's glyph tile, top to bottom.
     var tileColors: [Color] {
         switch self {
-        case .welcome, .ready: SettingsCategory.position.tileColors
+        case .welcome, .ready: SettingsPage.position.tileColors
         case .systemDock: [Color(red: 0.99, green: 0.72, blue: 0.30), Color(red: 0.94, green: 0.44, blue: 0.13)]
-        case .placement: SettingsCategory.position.tileColors
-        case .appearance: SettingsCategory.appearance.tileColors
-        case .hiding: SettingsCategory.behavior.tileColors
+        case .placement: SettingsPage.position.tileColors
+        case .appearance: SettingsPage.appearance.tileColors
+        case .hiding: SettingsPage.behavior.tileColors
         case .displays: [Color(red: 0.55, green: 0.62, blue: 0.99), Color(red: 0.28, green: 0.32, blue: 0.88)]
         }
     }

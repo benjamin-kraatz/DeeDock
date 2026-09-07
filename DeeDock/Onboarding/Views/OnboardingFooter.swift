@@ -4,6 +4,7 @@ import SwiftUI
 ///
 /// Value-driven, so previews and tests never need a store or a window.
 struct OnboardingFooter: View {
+    @Environment(\.openWindow) private var openWindow
     let step: OnboardingStep
     let total: Int
     let canGoBack: Bool
@@ -23,10 +24,11 @@ struct OnboardingFooter: View {
                     .foregroundStyle(.secondary)
             }
             if isFinalStep {
-                SettingsLink {
-                    Text(.onboardingOpenSettings)
+                Button(.onboardingOpenSettings) {
+                    settingsSelected()
+                    NSApp.activate()
+                    openWindow(id: "settings")
                 }
-                .simultaneousGesture(TapGesture().onEnded { settingsSelected() })
             }
             if canGoBack {
                 Button(.onboardingBack, action: back)

@@ -82,4 +82,5 @@ final class DockHostingView<Content: View>: NSView, NSSpringLoadingDestination {
 /// belong to the enclosing AppKit view, independently of SwiftUI's spring-loading behavior.
 private final class DockContentHostingView<Content: View>: NSHostingView<Content> {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override var needsPanelToBecomeKey: Bool { (window as? DockPanel)?.acceptsKeyboardFocus ?? false }
 }
