@@ -14,6 +14,14 @@ The words `yesterday` and `gestern` require the Saved Capsules scope and filter 
 
 Up and Down in the search field select results; Return opens the selected source. Escape closes search, cancels work, and clears captured context. Tab reaches capture choices and the other controls. A successful source activation keeps focus at that source. Escape returns focus to the previous external application.
 
+## Presentation
+
+The window is a fixed search bar, one content area, and a fixed keyboard footer. The bar holds the query field, Refresh Titles, the scope control, and the scope's disclosure text, with the full text in the adjacent info popover. Status messages appear as a single tinted line: failures and the image-search caution are tinted apart from routine notices.
+
+Choose Windows lives in the Captured context scope, either in its empty state or in the captured bar beside Search Images with AI, the capture time, and Clear Captured Context. The capture picker and an opened capsule replace the result list, so only one kind of evidence is on screen at a time.
+
+Each result row is a preview tile, the window title, its app and evidence label, and the excerpt. Metadata hits omit the excerpt because it repeats the title. Image evidence is tinted, and a result that can only open its app still says so.
+
 ## Image search and evidence
 
 Search Images with AI is a separate action available after capture. It passes each selected screenshot to a fresh, tool-free, on-device Foundation Models session. The model receives the query and one image, without OCR or title text as a substitute for image evidence. Inferred matches follow literal matches and carry the label **Image interpretation · AI suggestion**. Literal matches are not relabeled as visual proof.

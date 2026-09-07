@@ -795,6 +795,258 @@
         }
       }
     }
+  },
+  "windowSearchClearQuery": {
+    "comment": "Window search: Clear search",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear search"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Suche löschen"
+        }
+      }
+    }
+  },
+  "windowSearchOpenSettings": {
+    "comment": "Window search: Settings…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Settings…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einstellungen …"
+        }
+      }
+    }
+  },
+  "windowSearchScopeDetails": {
+    "comment": "Window search: About this scope",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "About this scope"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Über diesen Bereich"
+        }
+      }
+    }
+  },
+  "windowSearchHintSelect": {
+    "comment": "Window search: Select",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Select"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Auswählen"
+        }
+      }
+    }
+  },
+  "windowSearchHintOpen": {
+    "comment": "Window search: Open",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Öffnen"
+        }
+      }
+    }
+  },
+  "windowSearchHintClose": {
+    "comment": "Window search: Close",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schließen"
+        }
+      }
+    }
+  },
+  "windowSearchCaptureTitle": {
+    "comment": "Window search: Choose windows to capture",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose windows to capture"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster zum Erfassen auswählen"
+        }
+      }
+    }
+  },
+  "windowSearchNoCapture": {
+    "comment": "Window search: No captured context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No captured context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kein erfasster Kontext"
+        }
+      }
+    }
+  },
+  "windowSearchNoCapsules": {
+    "comment": "Window search: No saved capsules",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No saved capsules"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine gespeicherten Kapseln"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleSummary": {
+    "comment": "Window search: Summary",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Summary"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zusammenfassung"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleNote": {
+    "comment": "Window search: Note",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Note"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notiz"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleTasks": {
+    "comment": "Window search: Open tasks",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open tasks"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Offene Aufgaben"
+        }
+      }
+    }
+  },
+  "windowSearchCapsuleWindows": {
+    "comment": "Window search: Windows",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster"
+        }
+      }
+    }
+  },
+  "windowSearchCapturedContext": {
+    "comment": "Window search: Captured context",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captured context"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erfasster Kontext"
+        }
+      }
+    }
   }
 ,
   "settingsLauncherPosition": {
