@@ -7,10 +7,13 @@ final class FocusSessionController {
     private(set) var document = FocusSessionsDocument()
     private(set) var requiresReset = false
     private(set) var celebrationID: UUID?
+    private(set) var bossVictoryID: UUID?
+    private(set) var partyIcons: [String: NSImage] = [:]
     var error: String?
     @ObservationIgnored var changed: (() -> Void)?
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var deadlineTask: Task<Void, Never>?
+    @ObservationIgnored private var victoryTask: Task<Void, Never>?
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
     private static let key = "dock.focus-sessions.v1"
 
@@ -20,14 +23,19 @@ final class FocusSessionController {
     }
     var session: FocusSession? { document.session }
     var isActive: Bool { session != nil && session?.phase != .completed }
-    var item: FocusDockItem? { session.map { FocusDockItem(session: $0, celebrationID: celebrationID) } }
+    var bossFight: BossFightConfiguration { document.bossFight ?? BossFightConfiguration() }
+    var item: FocusDockItem? {
+        session.map { FocusDockItem(session: $0, celebrationID: celebrationID,
+                                   bossFightEnabled: bossFight.enabled, bossVictoryID: bossVictoryID) }
+    }
 
     func start() {
         if let stored = defaults.object(forKey: Self.key) {
             do {
                 guard let data = stored as? Data else { throw CocoaError(.coderReadCorrupt) }
                 let saved = try JSONDecoder().decode(FocusSessionsDocument.self, from: data)
-                guard saved.version == 1, (1...180).contains(saved.minutes), saved.session?.isValid != false else {
+                guard saved.version == 1, (1...180).contains(saved.minutes), saved.session?.isValid != false,
+                      saved.bossFight?.isValid != false else {
                     throw CocoaError(.coderReadCorrupt)
                 }
                 document = saved
@@ -38,6 +46,7 @@ final class FocusSessionController {
         ) { [weak self] _ in
             Task { @MainActor [weak self] in self?.reconcile() }
         }
+        refreshPartyIcons()
         reconcile(celebrate: false)
     }
 
@@ -49,6 +58,7 @@ final class FocusSessionController {
         next.session = FocusSession(id: UUID(), modeID: modeID, modeName: name, duration: duration,
                                     remainingWhenPaused: duration, deadline: Date().addingTimeInterval(duration), phase: .running)
         celebrationID = nil
+        dismissVictory()
         save(next)
     }
     func pause() {
@@ -73,10 +83,11 @@ final class FocusSessionController {
     func finish(celebrate: Bool = true) {
         guard var session, session.phase != .completed else { return }
         session.phase = .completed; session.deadline = nil; session.remainingWhenPaused = 0
-        if celebrate && document.celebrates { celebrationID = UUID() }
+        if celebrate && document.celebrates && !bossFight.enabled { celebrationID = UUID() }
         setSession(session)
+        if celebrate && bossFight.enabled && !requiresReset { startVictory() }
     }
-    func dismiss() { celebrationID = nil; setSession(nil) }
+    func dismiss() { celebrationID = nil; dismissVictory(); setSession(nil) }
     func configure(minutes: Int? = nil, celebrates: Bool? = nil) {
         guard !requiresReset else { return }
         var next = document
@@ -84,7 +95,76 @@ final class FocusSessionController {
         if let celebrates { next.celebrates = celebrates }
         save(next)
     }
-    func reset() { requiresReset = false; celebrationID = nil; save(FocusSessionsDocument()) }
+    func reset() {
+        requiresReset = false; celebrationID = nil; dismissVictory()
+        partyIcons = [:]; save(FocusSessionsDocument())
+    }
+
+    /// Changes the skin immediately without replacing the session or its deadline.
+    func configureBossFight(enabled: Bool) {
+        guard !requiresReset else { return }
+        var next = document
+        var configuration = bossFight
+        configuration.enabled = enabled
+        next.bossFight = configuration
+        celebrationID = nil
+        if !enabled { dismissVictory() }
+        save(next)
+        refreshPartyIcons()
+    }
+
+    /// Resolves only explicitly selected app bundles, outside pointer and rendering paths.
+    func addPartyApps(_ urls: [URL]) {
+        guard !requiresReset, bossFight.enabled else { return }
+        var configuration = bossFight
+        for url in urls.prefix(BossFightConfiguration.maximumPartySize) {
+            guard configuration.party.count < BossFightConfiguration.maximumPartySize else { break }
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            guard url.pathExtension.lowercased() == "app", let bundle = Bundle(url: url),
+                  let id = bundle.bundleIdentifier, !id.isEmpty, id.count <= 512,
+                  !configuration.party.contains(where: { $0.id == id }) else { continue }
+            let name = String(FileManager.default.displayName(atPath: url.path).prefix(512))
+            configuration.party.append(BossFightPartyMember(id: id, name: name))
+        }
+        var next = document; next.bossFight = configuration; save(next)
+        refreshPartyIcons()
+    }
+
+    func removePartyApp(_ id: String) {
+        guard !requiresReset else { return }
+        var next = document; var configuration = bossFight
+        configuration.party.removeAll { $0.id == id }; next.bossFight = configuration
+        save(next); partyIcons[id] = nil
+    }
+
+    /// Ends only the ornament; the completed timer and Capsule action remain available.
+    func dismissVictory() {
+        victoryTask?.cancel(); victoryTask = nil
+        bossVictoryID = nil; changed?()
+    }
+
+    private func startVictory() {
+        dismissVictory()
+        let id = UUID()
+        bossVictoryID = id; changed?()
+        victoryTask = Task { [weak self] in
+            do { try await Task.sleep(for: .seconds(3)) } catch { return }
+            guard let self, bossVictoryID == id else { return }
+            dismissVictory()
+        }
+    }
+
+    private func refreshPartyIcons() {
+        partyIcons = [:]
+        guard bossFight.enabled else { return }
+        for member in bossFight.party {
+            guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: member.id) else { continue }
+            let icon = NSWorkspace.shared.icon(forFile: url.path)
+            icon.size = NSSize(width: 32, height: 32)
+            partyIcons[member.id] = icon
+        }
+    }
 
     private func setSession(_ session: FocusSession?) {
         guard !requiresReset else { return }
@@ -114,6 +194,7 @@ final class FocusSessionController {
         }
     }
     func stop() {
+        victoryTask?.cancel(); victoryTask = nil; bossVictoryID = nil; partyIcons = [:]
         deadlineTask?.cancel(); deadlineTask = nil
         if let wakeObserver { NSWorkspace.shared.notificationCenter.removeObserver(wakeObserver) }
         wakeObserver = nil; changed = nil
