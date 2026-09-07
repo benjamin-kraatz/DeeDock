@@ -1,8 +1,10 @@
 import AppKit
+import OSLog
 
 /// Main-actor adapter for app discovery, icon caching, and Launch Services operations.
 @MainActor
 final class ApplicationService: ApplicationServicing {
+    private static let logger = Logger(subsystem: "com.deedock", category: "ApplicationHide")
     private let workspace: NSWorkspace
     private var iconCache: [URL: NSImage] = [:]
 
@@ -58,10 +60,55 @@ final class ApplicationService: ApplicationServicing {
     /// only running state and may lag behind activation changes by one main-run-loop turn.
     func performPrimaryAction(_ reference: ApplicationReference) async throws {
         if let frontmost = workspace.frontmostApplication, matches(frontmost, reference: reference) {
-            guard frontmost.hide() else { throw ApplicationPrimaryActionError.hideRejected }
+            try await hide(frontmost)
             return
         }
         try await open(reference)
+    }
+
+    /// Reconciles a rejected request with process-specific evidence before reporting failure.
+    /// Observation precedes the request so a synchronous hide notification cannot be missed.
+    private func hide(_ application: NSRunningApplication) async throws {
+        try Task.checkCancellation()
+        let pid = application.processIdentifier
+        let hiddenBefore = application.isHidden
+        let (events, continuation) = AsyncStream<Bool>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        let center = workspace.notificationCenter
+        let observer = center.addObserver(forName: NSWorkspace.didHideApplicationNotification,
+                                          object: nil, queue: .main) { notification in
+            guard let hidden = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
+                  hidden.processIdentifier == pid else { return }
+            continuation.yield(true)
+        }
+        defer {
+            center.removeObserver(observer)
+            continuation.finish()
+        }
+
+        let accepted = application.hide()
+        Self.logger.debug("Hide pid=\(pid) accepted=\(accepted) hiddenBefore=\(hiddenBefore) hiddenAfter=\(application.isHidden)")
+        if accepted || application.isHidden { return }
+
+        // Only rejected requests need a grace period. Sleeping suspends the task; no thread
+        // is blocked and no workspace enumeration or continuous polling is introduced.
+        let timeout = Task { @concurrent in
+            do {
+                try await Task.sleep(for: .milliseconds(250))
+                continuation.finish()
+            } catch { }
+        }
+        defer { timeout.cancel() }
+        var observedHide = false
+        for await _ in events {
+            observedHide = true
+            break
+        }
+        try Task.checkCancellation()
+        Self.logger.debug("Hide reconciled pid=\(pid) notification=\(observedHide) hidden=\(application.isHidden) terminated=\(application.isTerminated)")
+        // Termination also removes the app's windows, so a late hide warning is unhelpful.
+        guard observedHide || application.isHidden || application.isTerminated else {
+            throw ApplicationPrimaryActionError.hideRejected
+        }
     }
 
     /// Opens or activates the referenced app without requesting a new process instance.
