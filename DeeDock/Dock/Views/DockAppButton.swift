@@ -88,6 +88,20 @@ struct DockAppButton: View {
                 tracking: menuTracking
             )
         }
+        .overlay(alignment: .topTrailing) {
+            if badgeLabel != nil, interaction?.openBadgeMemory != nil {
+                Button { interaction?.openBadgeMemory?(item) } label: {
+                    Color.clear.frame(width: max(20, size * 0.85), height: max(20, size * 0.35))
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                // Match the upright icon origin, accounting for the edge's indicator strip.
+                .padding(.top, interaction?.layout.edge == .top ? DockGeometry.indicatorAreaDepth : 0)
+                .padding(.trailing, interaction?.layout.edge == .right ? DockGeometry.indicatorAreaDepth : 0)
+                .help(.badgeMemoryDetails)
+                .accessibilityLabel(Text(.badgeMemoryDetails))
+            }
+        }
         .accessibilityFocused($accessibilityFocused)
         .onChange(of: accessibilityFocused) { _, focused in
             accessibilityFocus(focused)
@@ -106,6 +120,9 @@ struct DockAppButton: View {
             togglePin
         )
         .accessibilityActions {
+            if interaction?.openBadgeMemory != nil {
+                Button(.badgeMemoryDetails) { interaction?.openBadgeMemory?(item) }
+            }
             if item.isAvailable {
                 Button(.actionOpenFiles) { interaction?.openFiles?(item) }
                 Button(.applicationMenuShowInFinder) { interaction?.performApplicationMenuAction?(.showInFinder, item) }

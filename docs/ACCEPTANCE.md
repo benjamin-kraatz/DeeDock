@@ -1320,3 +1320,13 @@ DEE-12 final implementation check on 2026-09-08: the focused Debug build passed 
 `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination
 'platform=macOS' -derivedDataPath /tmp/deedock-dee12-build build CODE_SIGNING_ALLOWED=NO`.
 All 28 new handoff keys matched their compiled `en.lproj` and `de.lproj` resources.
+
+## DEE-17: badge memory and Focus digest
+
+Implemented on `feature/dee-17`. Badge details show explicit checked baselines and numeric net changes, keeping clear, text and unavailable observations separate. The existing DEE-10 reader supplies all observations. Opt-in collection follows Focus Session boundaries and retains bounded digests with source activation and deletion controls.
+
+See [Badge memory](BADGE_MEMORY.md) for observation reliability, identity, retention, model/state cases and the manual checklist. A focused unsigned Debug app build passed after correcting an Int64-to-Int argument for a generated localized string. Tests, previews, automated visual checks and native acceptance were not executed. Keyboard/VoiceOver, badge hit regions, permission loss, all dock edges, multiple displays, Spaces, sleep/restart and actual source badge behavior remain unverified. Compilation alone does not make DEE-17 Done.
+
+DEE-17 validation after integrating `origin/main`: the focused unsigned Debug app build passed, including the scan-boundary fix. Command: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee17-build CODE_SIGNING_ALLOWED=NO build`. Log: `/tmp/DeeDock-dee17-build.log`. All 43 badge-memory keys matched the compiled English and German `Localizable.strings` resources. No tests or native checks were run.
+
+GPT 5.6 Luna at Extra High reviewed DEE-17 and found five defects. Corrections prevent first samples after relaunch from recreating deleted app history, retain per-session exclusions for deleted digest rows, seed first Focus observations without counting a change, cover the full possible badge width with the details hit target, retain the Focus deadline through startup completion, and enforce the 4 MB limit before writing. The review did not run tests or native checks. A focused unsigned Debug app build passed after the corrections.

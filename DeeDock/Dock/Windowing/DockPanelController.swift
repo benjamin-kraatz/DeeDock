@@ -485,6 +485,13 @@ final class DockPanelController {
             }
             return true
         }
+        if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
+           event.charactersIgnoringModifiers?.lowercased() == "b" {
+            if let item = store.entries.compactMap(\.item).first(where: { $0.id == store.selectedID }) {
+                interaction.openBadgeMemory?(item)
+            }
+            return true
+        }
         if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
             if event.modifierFlags.contains(.option),
                let pin = store.entries.first(where: { $0.target == store.selectedTarget })?.pin {
@@ -523,6 +530,7 @@ final class DockPanelController {
         invalidateDrag?(); invalidateDrag = nil
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
+        interaction.openBadgeMemory = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil
         interaction.openTrash = nil; interaction.emptyTrash = nil
         interaction.openFocusSession = nil

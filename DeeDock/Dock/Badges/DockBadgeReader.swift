@@ -10,7 +10,7 @@ actor DockBadgeReader {
 
     /// Returns a complete snapshot keyed by standardized application URL. Any failed scan clears
     /// the snapshot rather than keeping a count which may no longer be true.
-    func read(pid: pid_t?) async -> [String: String] {
+    func read(pid: pid_t?) async -> [String: BadgeObservation] {
         guard !Task.isCancelled, AXIsProcessTrusted(), let pid else { stop(); return [:] }
         if dockPID != pid {
             stop()
@@ -27,7 +27,7 @@ actor DockBadgeReader {
                     items += try value(child, kAXChildrenAttribute) as? [AXUIElement] ?? []
                 }
             }
-            var result: [String: String] = [:]
+            var result: [String: BadgeObservation] = [:]
             var applications: [AXUIElement] = []
             for (index, item) in items.enumerated() {
                 // Valid large Docks must not lose every badge just because a complete scan
@@ -38,14 +38,15 @@ actor DockBadgeReader {
                 try Task.checkCancellation()
                 guard try value(item, kAXSubroleAttribute) as? String == "AXApplicationDockItem" else { continue }
                 applications.append(item)
-                // Most apps have no badge; do not query their URL on every fallback scan.
-                guard let label = try value(item, "AXStatusLabel") as? String,
-                      !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
                 try Task.checkCancellation()
                 guard let rawURL = try value(item, kAXURLAttribute) else { continue }
                 let url = (rawURL as? URL) ?? (rawURL as? String).flatMap(URL.init(string:))
                 guard let url, url.isFileURL else { continue }
-                result[url.standardizedFileURL.path] = label
+                let path = url.standardizedFileURL.path
+                let observation = try badgeValue(item)
+                // Multiple Dock items for one installation must agree. Never sum process badges.
+                if let previous = result[path], previous != observation { result[path] = .unknown }
+                else { result[path] = observation }
             }
             updateObservation([root] + applications, pid: pid,
                               deadline: ContinuousClock.now.advanced(by: .seconds(1)))
@@ -53,6 +54,19 @@ actor DockBadgeReader {
         } catch {
             stop()
             return [:]
+        }
+    }
+
+    private func badgeValue(_ element: AXUIElement) throws -> BadgeObservation {
+        AXUIElementSetMessagingTimeout(element, 0.15)
+        var result: CFTypeRef?
+        let error = AXUIElementCopyAttributeValue(element, "AXStatusLabel" as CFString, &result)
+        switch error {
+        case .success:
+            return (result as? String).map(BadgeObservation.init(label:)) ?? .unknown
+        case .noValue: return .cleared
+        case .attributeUnsupported: return .unknown
+        default: throw NSError(domain: "DDockBadgeAccessibility", code: Int(error.rawValue))
         }
     }
 

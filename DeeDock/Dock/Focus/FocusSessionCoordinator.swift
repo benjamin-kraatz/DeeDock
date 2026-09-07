@@ -8,6 +8,7 @@ final class FocusSessionCoordinator {
     private var controller: DockPopoverPanelController<FocusSessionPanelView>?
     private weak var source: DockPanelController?
     var keyboardDismissed: ((String) -> Void)?
+    var showDigest: (() -> Void)?
     var saveCapsule: ((DockPanelController) -> Void)?
     var isOpen: Bool { controller != nil }
 
@@ -23,9 +24,9 @@ final class FocusSessionCoordinator {
         let keyboard = panel.store.keyboardFocus
         let chrome = FocusSessionPanelChrome()
         let next = DockPopoverPanelController(anchor: anchor, keyboard: true,
-                                              ideal: CGSize(width: 400, height: 290),
+                                              ideal: CGSize(width: 400, height: 330),
                                               chromeChanged: { chrome.value = $0 }) {
-            FocusSessionPanelView(controller: focus, chrome: chrome, saveCapsule: { [weak self, weak panel] in
+            FocusSessionPanelView(controller: focus, chrome: chrome, showDigest: { [weak self] in self?.showDigest?() }, saveCapsule: { [weak self, weak panel] in
                 guard let self, let panel else { return }
                 close()
                 saveCapsule?(panel)
@@ -55,5 +56,5 @@ final class FocusSessionCoordinator {
         guard displayID == nil || source?.store.displayID == displayID else { return }
         controller?.close(returnFocus: returnFocus)
     }
-    func stop() { close(); saveCapsule = nil; keyboardDismissed = nil }
+    func stop() { close(); showDigest = nil; saveCapsule = nil; keyboardDismissed = nil }
 }
