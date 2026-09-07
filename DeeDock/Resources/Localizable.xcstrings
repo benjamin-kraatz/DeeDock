@@ -271,6 +271,691 @@
       }
     }
   },
+  "watchSetupInterrupted": {
+    "comment": "Watch setup interrupted by sleep or session change; user must reopen deliberately.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Setup was interrupted by sleep or a session change. Dismiss and select the window again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Einrichtung wurde durch Ruhezustand oder einen Sitzungswechsel unterbrochen. Schließe die Vorschau und wähle das Fenster erneut."
+        }
+      }
+    }
+  },
+  "watchShowWindow": {
+    "comment": "Window watch: Show watched window",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show watched window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtetes Fenster anzeigen"
+        }
+      }
+    }
+  },
+  "watchSourceUnavailable": {
+    "comment": "Window watch: The exact window could not be opened. Window Access and an unambiguous match are required. You can still open the source app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The exact window could not be opened. Window Access and an unambiguous match are required. You can still open the source app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das genaue Fenster konnte nicht geöffnet werden. Fensterzugriff und eine eindeutige Zuordnung sind erforderlich. Du kannst weiterhin die Quell-App öffnen."
+        }
+      }
+    }
+  },
+  "watchStale": {
+    "comment": "Window watch: Capture is taking longer than expected. The preview is stale. No further capture will start until this request returns. You can stop now.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture is taking longer than expected. The preview is stale. No further capture will start until this request returns. You can stop now."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Aufnahme dauert länger als erwartet. Die Vorschau ist veraltet. Eine weitere Aufnahme startet erst, wenn diese Anfrage zurückkehrt. Du kannst die Beobachtung jetzt beenden."
+        }
+      }
+    }
+  },
+  "watchTitle": {
+    "comment": "Window watch: Watch this",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watch this"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das beobachten"
+        }
+      }
+    }
+  },
+  "watchPreparing": {
+    "comment": "Window watch: Preparing the selected window…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preparing the selected window…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das ausgewählte Fenster wird vorbereitet …"
+        }
+      }
+    }
+  },
+  "watchSetupHelp": {
+    "comment": "Window watch: Choose the highlighted area and a condition, then start. One watch can run at a time.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose the highlighted area and a condition, then start. One watch can run at a time."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle den markierten Bereich und eine Bedingung. Starte dann die Beobachtung. Es kann jeweils eine Beobachtung laufen."
+        }
+      }
+    }
+  },
+  "watchSampling": {
+    "comment": "Window watch: Checking the selected region…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Checking the selected region…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der ausgewählte Bereich wird geprüft …"
+        }
+      }
+    }
+  },
+  "watchWatching": {
+    "comment": "Window watch: Watching for a stable visible change.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watching for a stable visible change."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wartet auf eine bleibende sichtbare Änderung."
+        }
+      }
+    }
+  },
+  "watchWaitingPhrase": {
+    "comment": "Window watch: Waiting for the completion phrase to appear. It must first be absent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Waiting for the completion phrase to appear. It must first be absent."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wartet darauf, dass der Abschlusstext erscheint. Er muss zuvor fehlen."
+        }
+      }
+    }
+  },
+  "watchChangeDetected": {
+    "comment": "Window watch: Visible change detected. Watch stopped. This does not verify completion.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible change detected. Watch stopped. This does not verify completion."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbare Änderung erkannt. Beobachtung beendet. Das bestätigt keinen Abschluss."
+        }
+      }
+    }
+  },
+  "watchPhraseDetected": {
+    "comment": "Window watch: Completion phrase appeared. Watch stopped. This is text evidence, not confirmation from the source app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Completion phrase appeared. Watch stopped. This is text evidence, not confirmation from the source app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abschlusstext erschienen. Beobachtung beendet. Das ist ein Texthinweis, keine Bestätigung der Quell-App."
+        }
+      }
+    }
+  },
+  "watchStopped": {
+    "comment": "Window watch: Watch stopped.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watch stopped."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtung beendet."
+        }
+      }
+    }
+  },
+  "watchSuspended": {
+    "comment": "Window watch: Paused during sleep or an inactive session. The preview is stale. A new baseline will be taken on return.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Paused during sleep or an inactive session. The preview is stale. A new baseline will be taken on return."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Im Ruhezustand oder bei inaktiver Sitzung pausiert. Die Vorschau ist veraltet. Nach der Rückkehr wird ein neues Vergleichsbild erstellt."
+        }
+      }
+    }
+  },
+  "watchPermission": {
+    "comment": "Window watch: Screen Recording access is unavailable or was revoked. Watch stopped. Enable access in Settings, then choose the window again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Screen Recording access is unavailable or was revoked. Watch stopped. Enable access in Settings, then choose the window again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Zugriff auf die Bildschirmaufnahme fehlt oder wurde entzogen. Beobachtung beendet. Erlaube den Zugriff in den Einstellungen und wähle das Fenster erneut."
+        }
+      }
+    }
+  },
+  "watchClosed": {
+    "comment": "Window watch: The selected window or application is no longer available. Watch stopped. No other window was selected.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The selected window or application is no longer available. Watch stopped. No other window was selected."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das ausgewählte Fenster oder die App ist nicht mehr verfügbar. Beobachtung beendet. Es wurde kein anderes Fenster ausgewählt."
+        }
+      }
+    }
+  },
+  "watchOffscreen": {
+    "comment": "Window watch: Paused: the window is hidden, minimized, or outside the current Space or display. The preview is stale. Watching resumes when it is visible.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Paused: the window is hidden, minimized, or outside the current Space or display. The preview is stale. Watching resumes when it is visible."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pausiert: Das Fenster ist ausgeblendet, minimiert oder außerhalb des aktuellen Space oder Displays. Die Vorschau ist veraltet. Die Beobachtung wird fortgesetzt, sobald es sichtbar ist."
+        }
+      }
+    }
+  },
+  "watchUnavailable": {
+    "comment": "Window watch: Capture is unavailable. Any preview is stale. An active watch retries every three seconds; otherwise dismiss and select the window again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture is unavailable. Any preview is stale. An active watch retries every three seconds; otherwise dismiss and select the window again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufnahme nicht verfügbar. Eine vorhandene Vorschau ist veraltet. Eine aktive Beobachtung versucht es alle drei Sekunden erneut. Andernfalls schließe die Vorschau und wähle das Fenster erneut."
+        }
+      }
+    }
+  },
+  "watchLastSample": {
+    "comment": "Window watch: Last successful capture:",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Last successful capture:"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Letzte erfolgreiche Aufnahme:"
+        }
+      }
+    }
+  },
+  "watchIndeterminate": {
+    "comment": "Window watch: Progress unknown",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Progress unknown"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fortschritt unbekannt"
+        }
+      }
+    }
+  },
+  "watchStop": {
+    "comment": "Window watch: Stop watching",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stop watching"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtung beenden"
+        }
+      }
+    }
+  },
+  "watchShowSource": {
+    "comment": "Window watch: Show source app",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show source app"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quell-App anzeigen"
+        }
+      }
+    }
+  },
+  "watchDismiss": {
+    "comment": "Window watch: Dismiss",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dismiss"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schließen"
+        }
+      }
+    }
+  },
+  "watchWholeWindow": {
+    "comment": "Window watch: Whole window",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Whole window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ganzes Fenster"
+        }
+      }
+    }
+  },
+  "watchRegionHelp": {
+    "comment": "Window watch: Drag over the preview or adjust the region with the keyboard. Coordinates are percentages from the top-left; the outline shows the clamped area.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Drag over the preview or adjust the region with the keyboard. Coordinates are percentages from the top-left; the outline shows the clamped area."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ziehe über die Vorschau oder passe den Bereich mit der Tastatur an. Die Koordinaten sind Prozentwerte ab links oben. Die Umrandung zeigt den begrenzten Bereich."
+        }
+      }
+    }
+  },
+  "watchRegionX": {
+    "comment": "Window watch: Left",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Left"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Links"
+        }
+      }
+    }
+  },
+  "watchRegionY": {
+    "comment": "Window watch: Top",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Top"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Oben"
+        }
+      }
+    }
+  },
+  "watchRegionWidth": {
+    "comment": "Window watch: Width",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Width"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Breite"
+        }
+      }
+    }
+  },
+  "watchRegionHeight": {
+    "comment": "Window watch: Height",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Height"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Höhe"
+        }
+      }
+    }
+  },
+  "watchCondition": {
+    "comment": "Window watch: Watch for",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watch for"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachten auf"
+        }
+      }
+    }
+  },
+  "watchVisibleChange": {
+    "comment": "Window watch: Stable visible change",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stable visible change"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bleibende sichtbare Änderung"
+        }
+      }
+    }
+  },
+  "watchCompletionPhrase": {
+    "comment": "Window watch: Completion phrase",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Completion phrase"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abschlusstext"
+        }
+      }
+    }
+  },
+  "watchPhrase": {
+    "comment": "Window watch: Exact line of completion text",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exact line of completion text"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Genaue Textzeile beim Abschluss"
+        }
+      }
+    }
+  },
+  "watchPhraseHelp": {
+    "comment": "Window watch: Enter a full line such as “Export complete”. OCR must see it absent, then present three times. Text recognition can miss or misread text.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enter a full line such as “Export complete”. OCR must see it absent, then present three times. Text recognition can miss or misread text."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gib eine vollständige Zeile ein, etwa „Export abgeschlossen“. Die Texterkennung muss sie zunächst nicht und danach dreimal erkennen. Sie kann Text übersehen oder falsch lesen."
+        }
+      }
+    }
+  },
+  "watchSound": {
+    "comment": "Window watch: Play a sound when detected",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Play a sound when detected"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bei Erkennung einen Ton abspielen"
+        }
+      }
+    }
+  },
+  "watchDeliveryHelp": {
+    "comment": "Window watch: The result stays in this panel. Sound is optional. No system notification is sent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The result stays in this panel. Sound is optional. No system notification is sent."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Ergebnis bleibt in diesem Fenster. Ein Ton ist optional. Es wird keine Systemmitteilung gesendet."
+        }
+      }
+    }
+  },
+  "watchStart": {
+    "comment": "Window watch: Start watching",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Start watching"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtung starten"
+        }
+      }
+    }
+  },
+  "watchSelectedRegion": {
+    "comment": "Window watch: Watched region in the selected window",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watched region in the selected window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachteter Bereich im ausgewählten Fenster"
+        }
+      }
+    }
+  }
+,
   "breadcrumbRemoveSource": {
     "comment": "Removes this source and its captured text, link, and bookmark from the draft. Save applies the deletion.",
     "extractionState": "manual",

@@ -3,6 +3,7 @@ import AppKit
 /// App-wide owner for the single transient window preview.
 @MainActor
 final class WindowPeekCoordinator {
+    private let watches = WindowWatchController()
     private let portals = WindowPortalCoordinator()
     private let menus: ApplicationMenuController
     private let screenCapture: ScreenCaptureAccessController
@@ -125,6 +126,7 @@ final class WindowPeekCoordinator {
     func stop() {
         portals.stop()
         close(returnFocus: false)
+        watches.stop()
         prepareSettings = nil
         addToFusion = nil
     }
@@ -139,6 +141,13 @@ final class WindowPeekCoordinator {
         next.state.hovered = { [weak self] hovered in
             self?.panelHovered = hovered
             if hovered { self?.closeTask?.cancel() } else { self?.scheduleClose() }
+        }
+        next.state.watch = { [weak self, weak panel] token in
+            guard let self, let panel,
+                  let summary = allWindows.first(where: { $0.token == token }),
+                  let currentContext = panel.windowPeekContext(for: item.id) else { return }
+            close(returnFocus: false)
+            watches.show(summary, visibleFrame: currentContext.anchor.visibleFrame)
         }
         next.state.addToFusion = { [weak self, weak panel] window in
             guard let self, let panel else { return }
