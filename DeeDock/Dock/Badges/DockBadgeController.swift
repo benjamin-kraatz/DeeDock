@@ -4,6 +4,8 @@ import Observation
 /// One cancellable badge reader for all display docks. Disabled and sleeping sessions do no AX work.
 @MainActor @Observable
 final class DockBadgeController {
+    let memory = BadgeMemoryStore()
+    @ObservationIgnored var focusSession: (() -> FocusSession?)?
     private(set) var labels: [String: String] = [:]
     @ObservationIgnored private var worker: Task<Void, Never>?
     @ObservationIgnored private var continuation: AsyncStream<Void>.Continuation?
@@ -76,7 +78,9 @@ final class DockBadgeController {
                 let pid = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first?.processIdentifier
                 let next = await reader.read(pid: pid)
                 guard !Task.isCancelled, let self, generation == session else { break }
-                if labels != next { labels = next }
+                memory.observe(next, session: focusSession?())
+                let nextLabels = next.compactMapValues(\.label)
+                if labels != nextLabels { labels = nextLabels }
                 scheduleFallback()
             }
             await reader.stop()
@@ -113,6 +117,7 @@ final class DockBadgeController {
         continuation = nil
         worker?.cancel()
         if !labels.isEmpty { labels = [:] }
+        memory.observe([:], session: focusSession?())
     }
 
     /// Releases workspace/AX observation and clears presentation state.
