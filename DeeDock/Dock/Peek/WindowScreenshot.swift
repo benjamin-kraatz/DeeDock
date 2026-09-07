@@ -13,6 +13,7 @@ nonisolated enum WindowScreenshot {
         configuration.capturesAudio = false
         configuration.ignoreShadowsSingleWindow = true
         configuration.includeChildWindows = false
+        try Task.checkCancellation()
         return try await SCScreenshotManager.captureImage(
             contentFilter: SCContentFilter(desktopIndependentWindow: window), configuration: configuration)
     }

@@ -29,10 +29,13 @@ final class WindowPortalCoordinator {
     }
 
     func focusNext() {
-        guard let id = order.first else { return }
-        order.removeFirst()
-        order.append(id)
-        portals[id]?.focus()
+        for _ in 0..<order.count {
+            let id = order.removeFirst()
+            order.append(id)
+            guard let portal = portals[id], portal.isOpen else { continue }
+            portal.focus()
+            return
+        }
     }
 
     func stop() {

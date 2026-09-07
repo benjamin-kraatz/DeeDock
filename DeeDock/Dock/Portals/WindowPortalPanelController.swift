@@ -26,6 +26,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
     private let capture: WindowPortalCapture
     private let application: NSRunningApplication?
     private var captureTask: Task<Void, Never>?
+    private var requestTask: Task<WindowPortalCaptureResult, Never>?
     private var freshnessTask: Task<Void, Never>?
     private var jumpTask: Task<Void, Never>?
     private var suspended = false
@@ -79,6 +80,15 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
             while !Task.isCancelled {
                 do { try await Task.sleep(for: .seconds(1)) } catch { return }
                 guard let self, !closed else { return }
+                if !CGPreflightScreenCaptureAccess() {
+                    if state.phase != .permissionRequired {
+                        epoch = UUID()
+                        requestTask?.cancel()
+                    }
+                    state.image = nil
+                    state.phase = .permissionRequired
+                    continue
+                }
                 if state.phase == .live, let lastSuccess, lastSuccess.duration(to: .now) > .seconds(5) {
                     state.phase = .stale
                 }
@@ -86,29 +96,44 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         }
     }
 
-    func focus() { panel.makeKeyAndOrderFront(nil) }
+    var isOpen: Bool { !closed }
+
+    func focus() {
+        guard !closed else { return }
+        panel.makeKeyAndOrderFront(nil)
+    }
 
     func setSuspended(_ value: Bool) {
         suspended = value
+        requestTask?.cancel()
         epoch = UUID()
         state.phase = .paused
     }
 
     func repairPlacement() {
+        guard !closed else { return }
         guard let screen = NSScreen.screens.max(by: {
             intersectionArea(panel.frame, $0.visibleFrame) < intersectionArea(panel.frame, $1.visibleFrame)
         }) else { return }
         panel.setFrame(WindowPortalGeometry.clamped(panel.frame, to: screen.visibleFrame), display: true)
     }
 
-    func windowDidChangeScreen(_ notification: Notification) { epoch = UUID() }
-    func windowDidChangeBackingProperties(_ notification: Notification) { epoch = UUID() }
-    func windowWillClose(_ notification: Notification) { close() }
+    func windowDidChangeScreen(_ notification: Notification) { invalidateCapture() }
+    func windowDidChangeBackingProperties(_ notification: Notification) { invalidateCapture() }
+    func windowWillClose(_ notification: Notification) { tearDown(closeNativeWindow: false) }
 
-    func close() {
+    private func invalidateCapture() {
+        epoch = UUID()
+        requestTask?.cancel()
+    }
+
+    func close() { tearDown(closeNativeWindow: true) }
+
+    private func tearDown(closeNativeWindow: Bool) {
         guard !closed else { return }
         closed = true
         epoch = UUID()
+        requestTask?.cancel()
         captureTask?.cancel()
         freshnessTask?.cancel()
         jumpTask?.cancel()
@@ -124,7 +149,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         state.togglePause = nil
         panel.delegate = nil
         panel.handleKey = nil
-        panel.close()
+        if closeNativeWindow { panel.close() }
         panel.contentView = nil
         // Keep the coordinator slot until an uncancellable SDK request drains. Rapid close/pin cannot
         // accumulate more than four in-flight captures, even though the native panel closes immediately.
@@ -139,16 +164,16 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
     }
 
     private func refresh() async {
-        guard application?.isTerminated == false else {
-            state.phase = .unavailable
-            return
-        }
-        guard !suspended else { state.phase = .paused; return }
         guard CGPreflightScreenCaptureAccess() else {
             state.image = nil
             state.phase = .permissionRequired
             return
         }
+        guard application?.isTerminated == false else {
+            state.phase = .unavailable
+            return
+        }
+        guard !suspended else { state.phase = .paused; return }
         guard !state.userPaused, panel.occlusionState.contains(.visible) else {
             state.phase = .paused
             return
@@ -158,11 +183,20 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         let bounds = panel.contentView?.bounds.size ?? CGSize(width: 360, height: 260)
         let pixels = CGSize(width: min(1280, bounds.width * scale), height: min(960, bounds.height * scale))
         let start = ContinuousClock.now
-        let result = await capture.update(pixelSize: pixels)
+        let request = Task { @concurrent [capture] in
+            await capture.update(pixelSize: pixels)
+        }
+        requestTask = request
+        let result = await request.value
+        requestTask = nil
         guard !closed, !Task.isCancelled, epoch == expected else { return }
         guard CGPreflightScreenCaptureAccess() else {
             state.image = nil
             state.phase = .permissionRequired
+            return
+        }
+        guard application?.isTerminated == false else {
+            state.phase = .unavailable
             return
         }
         switch result {
@@ -187,6 +221,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
 
     private func togglePause() {
         state.userPaused.toggle()
+        requestTask?.cancel()
         epoch = UUID()
         state.phase = state.userPaused ? .paused : .connecting
     }
@@ -203,8 +238,9 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         guard jumpTask == nil, application?.isTerminated == false else { return }
         jumpTask = Task { @MainActor [weak self] in
             guard let self else { return }
-            guard let source = await capture.currentSource(), !closed, !Task.isCancelled else {
-                if !closed, !Task.isCancelled {
+            guard let source = await capture.currentSource(), !closed, !Task.isCancelled,
+                  application?.isTerminated == false else {
+                if !closed, !Task.isCancelled, application?.isTerminated == false {
                     state.jumpFailed = true
                     _ = application?.activate(options: [])
                 }
@@ -218,14 +254,21 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
                 let summaries = try await service.discover(processes: [ApplicationProcessSnapshot(
                     processIdentifier: source.processIdentifier, isHidden: false, isActive: false)], sessionID: session)
                 try Task.checkCancellation()
-                let matches = summaries.filter { $0.title == source.title && $0.frame == source.frame }
-                if matches.count == 1 {
-                    try await service.selectWindow(matches[0].token)
-                    selected = true
+                guard !closed, application?.isTerminated == false else {
+                    await service.stop()
+                    jumpTask = nil
+                    return
+                }
+                if let token = WindowThumbnailMatcher.matchingWindow(source, among: summaries) {
+                    try await service.selectWindow(token)
+                    selected = application?.isTerminated == false
                 }
             } catch { }
             await service.stop()
-            guard !closed, !Task.isCancelled else { return }
+            guard !closed, !Task.isCancelled, application?.isTerminated == false else {
+                jumpTask = nil
+                return
+            }
             state.jumpFailed = !selected
             if !selected { _ = application?.activate(options: []) }
             jumpTask = nil

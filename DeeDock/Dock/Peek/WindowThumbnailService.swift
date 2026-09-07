@@ -55,6 +55,21 @@ nonisolated enum WindowThumbnailMatcher {
         return matches
     }
 
+    /// Match freshly discovered AX metadata to the portal's bound ScreenCaptureKit source.
+    /// Apply the same title normalization and two-point tolerance as thumbnail binding, refusing ambiguity.
+    static func matchingWindow(_ source: ApplicationWindowSummary,
+                               among windows: [ApplicationWindowSummary]) -> ApplicationWindowToken? {
+        guard let frame = source.frame else { return nil }
+        let title = normalized(source.title)
+        let eligible = windows.filter { window in
+            guard let candidateFrame = window.frame else { return false }
+            return window.processIdentifier == source.processIdentifier
+                && (title == nil || normalized(window.title) == title)
+                && close(frame, candidateFrame)
+        }
+        return eligible.count == 1 ? eligible[0].token : nil
+    }
+
     private static func normalized(_ title: String?) -> String? {
         guard let value = title?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else { return nil }
         return value.precomposedStringWithCanonicalMapping

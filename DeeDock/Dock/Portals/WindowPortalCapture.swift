@@ -22,6 +22,7 @@ actor WindowPortalCapture {
     func currentSource() async -> ApplicationWindowSummary? {
         guard !lostSource, let id = boundWindow?.windowID, CGPreflightScreenCaptureAccess() else { return nil }
         do {
+            try Task.checkCancellation()
             let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
             try Task.checkCancellation()
             guard !lostSource, let window = content.windows.first(where: {
@@ -36,6 +37,7 @@ actor WindowPortalCapture {
         guard !lostSource else { return .unavailable }
         guard CGPreflightScreenCaptureAccess() else { return .permissionRequired }
         do {
+            try Task.checkCancellation()
             let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
             try Task.checkCancellation()
             let windows = content.windows.filter {
@@ -61,11 +63,19 @@ actor WindowPortalCapture {
             }
             // Off-screen includes minimized and other-Space windows; public metadata cannot distinguish them.
             guard window.isOnScreen else { return .paused }
+            try Task.checkCancellation()
             let image = try await WindowScreenshot.capture(window, fittingPixels: pixelSize)
             try Task.checkCancellation()
             return .frame(image, ApplicationWindowSummary(token: source.token,
                 processIdentifier: source.processIdentifier, title: window.title, frame: window.frame,
                 isMinimized: false, isMain: false))
-        } catch { return .stale }
+        } catch {
+            let failure = error as NSError
+            if failure.domain == SCStreamErrorDomain,
+               failure.code == SCStreamError.Code.userDeclined.rawValue {
+                return .permissionRequired
+            }
+            return .stale
+        }
     }
 }

@@ -75,7 +75,7 @@ ScreenCaptureKit metadata cannot distinguish minimization from another Space. Su
 pause. Protected content can be blank even when capture succeeds; a successful screenshot does not
 prove that protected pixels are fresh. Missing permission, hidden sources, closure, and screenshot
 errors do not promise fresh images. Source navigation performs a fresh lookup of the bound ID before
-conservatively matching an AX window; if that join fails, only the app is activated.
+conservatively matching an AX window with normalized titles and a two-point bounds tolerance; if that join fails, only the app is activated.
 
 ## SDK evidence
 
@@ -98,8 +98,14 @@ xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
 Intermediate compilation found and repaired a localized error-message type mismatch and a closure's
 missing explicit `self`. App compilation subsequently succeeded. Existing Launcher and DockBadge
 warnings and the App Intents metadata-extraction notice are unrelated to this feature. String Catalog
-JSON and the final diff are checked separately. No tests, previews, automated visual checks, live
+JSON and the final diff passed inspection. All 20 portal keys in the built English and German
+resources match the catalog. No tests, previews, automated visual checks, live
 capture, or native manual acceptance have been run for DEE-14. Compilation does not complete the issue.
+
+GPT 5.6 Luna reviewed the implementation at Extra High reasoning. Its three findings were addressed:
+source navigation now shares Peek's metadata tolerance, rechecks the retained process after asynchronous
+work, and capture checks cancellation immediately before screenshot submission. Final lifecycle review
+also added per-request cancellation, independent permission revocation checks, and closed-slot focus guards.
 
 ### Model and state cases worth testing
 
