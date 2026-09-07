@@ -34,6 +34,8 @@ struct DeeDockApp: App {
         MenuBarExtra {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
+            Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
+
             Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
                 .keyboardShortcut("f", modifiers: [.command, .shift])
             Text(delegate.coordinator.searchShortcutAvailable ? .windowSearchShortcutHelp : .windowSearchShortcutUnavailable)
@@ -61,6 +63,8 @@ struct DeeDockApp: App {
                 CheckForUpdatesButton(updater: delegate.updater)
                 #endif
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
+                Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
+
                 Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
                     .keyboardShortcut("f", modifiers: [.command, .shift])
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }

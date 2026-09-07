@@ -3,6 +3,8 @@ import AppKit
 /// App-wide owner for the single transient window preview.
 @MainActor
 final class WindowPeekCoordinator {
+    private let watches = WindowWatchController()
+    private let portals = WindowPortalCoordinator()
     private let menus: ApplicationMenuController
     private let screenCapture: ScreenCaptureAccessController
     private let thumbnails: any WindowThumbnailServicing
@@ -119,8 +121,12 @@ final class WindowPeekCoordinator {
         if returnFocus { panel?.focus() }
     }
 
+    func focusNextPortal() { portals.focusNext() }
+
     func stop() {
+        portals.stop()
         close(returnFocus: false)
+        watches.stop()
         prepareSettings = nil
         addToFusion = nil
     }
@@ -136,11 +142,26 @@ final class WindowPeekCoordinator {
             self?.panelHovered = hovered
             if hovered { self?.closeTask?.cancel() } else { self?.scheduleClose() }
         }
+        next.state.watch = { [weak self, weak panel] token in
+            guard let self, let panel,
+                  let summary = allWindows.first(where: { $0.token == token }),
+                  let currentContext = panel.windowPeekContext(for: item.id) else { return }
+            close(returnFocus: false)
+            watches.show(summary, visibleFrame: currentContext.anchor.visibleFrame)
+        }
         next.state.addToFusion = { [weak self, weak panel] window in
             guard let self, let panel else { return }
             let action = addToFusion
             close(returnFocus: false)
             action?(window, panel, keyboard)
+        }
+        next.state.pinPortal = { [weak self, weak panel] window in
+            guard let self else { return }
+            guard portals.pin(window, appName: item.reference.name, keyboard: keyboard) else {
+                panel?.store.errorMessage = .portalLimit
+                return
+            }
+            close(returnFocus: false)
         }
         next.state.choose = { [weak self] token in self?.choose(token) }
         next.state.showApp = { [weak self] in self?.showApp() }

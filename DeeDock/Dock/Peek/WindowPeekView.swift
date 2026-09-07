@@ -89,7 +89,9 @@ struct WindowPeekView: View {
             WindowPeekCardSlot(card: card, appIcon: state.appIcon, settings: state.settings,
                                selected: keyboard && state.selectedID == card.id, size: size,
                                choose: { state.choose?(card.id) },
-                               addToFusion: { state.addToFusion?(card.window) })
+                               watch: { state.watch?(card.id) },
+                               addToFusion: { state.addToFusion?(card.window) },
+                               pinPortal: { state.pinPortal?(card.window) })
                 .onAppear { state.thumbnailNeeded?(card.id) }
         }
     }
@@ -134,38 +136,51 @@ private struct WindowPeekCardSlot: View {
     let selected: Bool
     let size: CGSize
     let choose: () -> Void
+    let watch: () -> Void
     let addToFusion: () -> Void
+    let pinPortal: () -> Void
     @State private var hovering = false
 
     var body: some View {
         WindowPeekCardView(card: card, appIcon: appIcon, settings: settings,
                            selected: selected, action: choose)
             .contextMenu {
+                Button(.watchTitle, systemImage: "eye", action: watch)
+                Button(.portalPin, systemImage: "pin", action: pinPortal)
                 Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
             }
+            .accessibilityAction(named: Text(.watchTitle), watch)
             .accessibilityAction(named: Text(.fusionAdd), addToFusion)
+            .accessibilityAction(named: Text(.portalPin), pinPortal)
             .overlay(alignment: .topTrailing) {
-                WindowPeekFusionButton(revealed: hovering || selected, action: addToFusion)
-                    .padding(7)
+                HStack(spacing: 4) {
+                    WindowPeekActionButton(revealed: hovering || selected, label: .watchTitle,
+                                           symbol: "eye", action: watch)
+                    WindowPeekActionButton(revealed: hovering || selected, label: .fusionAdd,
+                                           symbol: "plus.square.on.square", action: addToFusion)
+                }
+                .padding(7)
             }
             .frame(width: size.width, height: size.height)
             .onHover { hovering = $0 }
     }
 }
 
-/// Adds one window to App Fusion, from the card that is already showing it.
+/// Presents explicit window actions on the card that is already showing the source.
 ///
 /// A bordered button sat as a grey slab on top of every thumbnail; this is a round glass control
 /// that stays out of the picture until the pointer is on the card. Keyboard selection reveals it
 /// too, and the card's context menu and accessibility action reach the same place.
-private struct WindowPeekFusionButton: View {
+private struct WindowPeekActionButton: View {
     let revealed: Bool
+    let label: LocalizedStringResource
+    let symbol: String
     let action: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: "plus.square.on.square")
+            Image(systemName: symbol)
                 .font(.system(size: 11, weight: .semibold))
                 .frame(width: 24, height: 24)
                 .contentShape(.circle)
@@ -177,8 +192,8 @@ private struct WindowPeekFusionButton: View {
         .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: revealed)
         // Hidden means gone: an invisible target must not swallow clicks meant for the card.
         .allowsHitTesting(revealed)
-        .help(Text(.fusionAdd))
-        .accessibilityLabel(Text(.fusionAdd))
+        .help(Text(label))
+        .accessibilityLabel(Text(label))
     }
 }
 

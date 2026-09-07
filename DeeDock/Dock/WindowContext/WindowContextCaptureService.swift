@@ -17,11 +17,12 @@ nonisolated struct WindowContextCandidate: Equatable, Identifiable, Sendable {
     let frame: CGRect
 }
 
-/// Ephemeral visible content for one chosen window. Callers must not persist the image or OCR.
+/// Ephemeral visible content. Breadcrumb approval may retain a bounded OCR excerpt, never pixels.
 nonisolated struct WindowContextSnapshot: @unchecked Sendable {
     let candidate: WindowContextCandidate
     let image: CGImage?
     let recognizedText: String
+    var capturedAt: Date = Date()
 }
 
 nonisolated enum WindowContextCaptureError: Error, Equatable, Sendable {
@@ -99,17 +100,19 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
                 try Task.checkCancellation()
                 guard let window = windows[candidate.id],
                       window.owningApplication?.processID == candidate.processIdentifier,
+                      window.owningApplication?.bundleIdentifier == candidate.bundleIdentifier,
                       Self.normalized(window.title) == Self.normalized(candidate.title),
                       window.frame == candidate.frame else {
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: nil, recognizedText: ""))
                     continue
                 }
+                let capturedAt = Date()
                 do {
                     let image = try await Self.capture(window)
                     try Task.checkCancellation()
                     let text = try await Self.recognizeText(in: image)
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: image,
-                                                           recognizedText: text))
+                                                           recognizedText: text, capturedAt: capturedAt))
                 } catch is CancellationError {
                     throw CancellationError()
                 } catch {

@@ -477,6 +477,8 @@ final class DockCoordinator {
         )
     }
 
+    func focusNextPortal() { windowPeeks.focusNextPortal() }
+
     /// Opens metadata search only after a menu or keyboard action.
     func searchWindows() {
         popovers.closeAll()

@@ -775,6 +775,1861 @@
     }
   }
 },
+  "watchSetupInterrupted": {
+    "comment": "Watch setup interrupted by sleep or session change; user must reopen deliberately.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Setup was interrupted by sleep or a session change. Dismiss and select the window again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Einrichtung wurde durch Ruhezustand oder einen Sitzungswechsel unterbrochen. Schließe die Vorschau und wähle das Fenster erneut."
+        }
+      }
+    }
+  },
+  "watchShowWindow": {
+    "comment": "Window watch: Show watched window",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show watched window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtetes Fenster anzeigen"
+        }
+      }
+    }
+  },
+  "watchSourceUnavailable": {
+    "comment": "Window watch: The exact window could not be opened. Window Access and an unambiguous match are required. You can still open the source app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The exact window could not be opened. Window Access and an unambiguous match are required. You can still open the source app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das genaue Fenster konnte nicht geöffnet werden. Fensterzugriff und eine eindeutige Zuordnung sind erforderlich. Du kannst weiterhin die Quell-App öffnen."
+        }
+      }
+    }
+  },
+  "watchStale": {
+    "comment": "Window watch: Capture is taking longer than expected. The preview is stale. No further capture will start until this request returns. You can stop now.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture is taking longer than expected. The preview is stale. No further capture will start until this request returns. You can stop now."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Aufnahme dauert länger als erwartet. Die Vorschau ist veraltet. Eine weitere Aufnahme startet erst, wenn diese Anfrage zurückkehrt. Du kannst die Beobachtung jetzt beenden."
+        }
+      }
+    }
+  },
+  "watchTitle": {
+    "comment": "Window watch: Watch this",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watch this"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das beobachten"
+        }
+      }
+    }
+  },
+  "watchPreparing": {
+    "comment": "Window watch: Preparing the selected window…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preparing the selected window…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das ausgewählte Fenster wird vorbereitet …"
+        }
+      }
+    }
+  },
+  "watchSetupHelp": {
+    "comment": "Window watch: Choose the highlighted area and a condition, then start. One watch can run at a time.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose the highlighted area and a condition, then start. One watch can run at a time."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle den markierten Bereich und eine Bedingung. Starte dann die Beobachtung. Es kann jeweils eine Beobachtung laufen."
+        }
+      }
+    }
+  },
+  "watchSampling": {
+    "comment": "Window watch: Checking the selected region…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Checking the selected region…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der ausgewählte Bereich wird geprüft …"
+        }
+      }
+    }
+  },
+  "watchWatching": {
+    "comment": "Window watch: Watching for a stable visible change.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watching for a stable visible change."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wartet auf eine bleibende sichtbare Änderung."
+        }
+      }
+    }
+  },
+  "watchWaitingPhrase": {
+    "comment": "Window watch: Waiting for the completion phrase to appear. It must first be absent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Waiting for the completion phrase to appear. It must first be absent."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wartet darauf, dass der Abschlusstext erscheint. Er muss zuvor fehlen."
+        }
+      }
+    }
+  },
+  "watchChangeDetected": {
+    "comment": "Window watch: Visible change detected. Watch stopped. This does not verify completion.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible change detected. Watch stopped. This does not verify completion."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbare Änderung erkannt. Beobachtung beendet. Das bestätigt keinen Abschluss."
+        }
+      }
+    }
+  },
+  "watchPhraseDetected": {
+    "comment": "Window watch: Completion phrase appeared. Watch stopped. This is text evidence, not confirmation from the source app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Completion phrase appeared. Watch stopped. This is text evidence, not confirmation from the source app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abschlusstext erschienen. Beobachtung beendet. Das ist ein Texthinweis, keine Bestätigung der Quell-App."
+        }
+      }
+    }
+  },
+  "watchStopped": {
+    "comment": "Window watch: Watch stopped.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watch stopped."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtung beendet."
+        }
+      }
+    }
+  },
+  "watchSuspended": {
+    "comment": "Window watch: Paused during sleep or an inactive session. The preview is stale. A new baseline will be taken on return.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Paused during sleep or an inactive session. The preview is stale. A new baseline will be taken on return."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Im Ruhezustand oder bei inaktiver Sitzung pausiert. Die Vorschau ist veraltet. Nach der Rückkehr wird ein neues Vergleichsbild erstellt."
+        }
+      }
+    }
+  },
+  "watchPermission": {
+    "comment": "Window watch: Screen Recording access is unavailable or was revoked. Watch stopped. Enable access in Settings, then choose the window again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Screen Recording access is unavailable or was revoked. Watch stopped. Enable access in Settings, then choose the window again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Zugriff auf die Bildschirmaufnahme fehlt oder wurde entzogen. Beobachtung beendet. Erlaube den Zugriff in den Einstellungen und wähle das Fenster erneut."
+        }
+      }
+    }
+  },
+  "watchClosed": {
+    "comment": "Window watch: The selected window or application is no longer available. Watch stopped. No other window was selected.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The selected window or application is no longer available. Watch stopped. No other window was selected."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das ausgewählte Fenster oder die App ist nicht mehr verfügbar. Beobachtung beendet. Es wurde kein anderes Fenster ausgewählt."
+        }
+      }
+    }
+  },
+  "watchOffscreen": {
+    "comment": "Window watch: Paused: the window is hidden, minimized, or outside the current Space or display. The preview is stale. Watching resumes when it is visible.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Paused: the window is hidden, minimized, or outside the current Space or display. The preview is stale. Watching resumes when it is visible."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pausiert: Das Fenster ist ausgeblendet, minimiert oder außerhalb des aktuellen Space oder Displays. Die Vorschau ist veraltet. Die Beobachtung wird fortgesetzt, sobald es sichtbar ist."
+        }
+      }
+    }
+  },
+  "watchUnavailable": {
+    "comment": "Window watch: Capture is unavailable. Any preview is stale. An active watch retries every three seconds; otherwise dismiss and select the window again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture is unavailable. Any preview is stale. An active watch retries every three seconds; otherwise dismiss and select the window again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufnahme nicht verfügbar. Eine vorhandene Vorschau ist veraltet. Eine aktive Beobachtung versucht es alle drei Sekunden erneut. Andernfalls schließe die Vorschau und wähle das Fenster erneut."
+        }
+      }
+    }
+  },
+  "watchLastSample": {
+    "comment": "Window watch: Last successful capture:",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Last successful capture:"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Letzte erfolgreiche Aufnahme:"
+        }
+      }
+    }
+  },
+  "watchIndeterminate": {
+    "comment": "Window watch: Progress unknown",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Progress unknown"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fortschritt unbekannt"
+        }
+      }
+    }
+  },
+  "watchStop": {
+    "comment": "Window watch: Stop watching",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stop watching"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtung beenden"
+        }
+      }
+    }
+  },
+  "watchShowSource": {
+    "comment": "Window watch: Show source app",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show source app"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quell-App anzeigen"
+        }
+      }
+    }
+  },
+  "watchDismiss": {
+    "comment": "Window watch: Dismiss",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dismiss"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schließen"
+        }
+      }
+    }
+  },
+  "watchWholeWindow": {
+    "comment": "Window watch: Whole window",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Whole window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ganzes Fenster"
+        }
+      }
+    }
+  },
+  "watchRegionHelp": {
+    "comment": "Window watch: Drag over the preview or adjust the region with the keyboard. Coordinates are percentages from the top-left; the outline shows the clamped area.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Drag over the preview or adjust the region with the keyboard. Coordinates are percentages from the top-left; the outline shows the clamped area."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ziehe über die Vorschau oder passe den Bereich mit der Tastatur an. Die Koordinaten sind Prozentwerte ab links oben. Die Umrandung zeigt den begrenzten Bereich."
+        }
+      }
+    }
+  },
+  "watchRegionX": {
+    "comment": "Window watch: Left",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Left"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Links"
+        }
+      }
+    }
+  },
+  "watchRegionY": {
+    "comment": "Window watch: Top",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Top"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Oben"
+        }
+      }
+    }
+  },
+  "watchRegionWidth": {
+    "comment": "Window watch: Width",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Width"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Breite"
+        }
+      }
+    }
+  },
+  "watchRegionHeight": {
+    "comment": "Window watch: Height",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Height"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Höhe"
+        }
+      }
+    }
+  },
+  "watchCondition": {
+    "comment": "Window watch: Watch for",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watch for"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachten auf"
+        }
+      }
+    }
+  },
+  "watchVisibleChange": {
+    "comment": "Window watch: Stable visible change",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stable visible change"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bleibende sichtbare Änderung"
+        }
+      }
+    }
+  },
+  "watchCompletionPhrase": {
+    "comment": "Window watch: Completion phrase",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Completion phrase"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abschlusstext"
+        }
+      }
+    }
+  },
+  "watchPhrase": {
+    "comment": "Window watch: Exact line of completion text",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exact line of completion text"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Genaue Textzeile beim Abschluss"
+        }
+      }
+    }
+  },
+  "watchPhraseHelp": {
+    "comment": "Window watch: Enter a full line such as “Export complete”. OCR must see it absent, then present three times. Text recognition can miss or misread text.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enter a full line such as “Export complete”. OCR must see it absent, then present three times. Text recognition can miss or misread text."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gib eine vollständige Zeile ein, etwa „Export abgeschlossen“. Die Texterkennung muss sie zunächst nicht und danach dreimal erkennen. Sie kann Text übersehen oder falsch lesen."
+        }
+      }
+    }
+  },
+  "watchSound": {
+    "comment": "Window watch: Play a sound when detected",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Play a sound when detected"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bei Erkennung einen Ton abspielen"
+        }
+      }
+    }
+  },
+  "watchDeliveryHelp": {
+    "comment": "Window watch: The result stays in this panel. Sound is optional. No system notification is sent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The result stays in this panel. Sound is optional. No system notification is sent."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Ergebnis bleibt in diesem Fenster. Ein Ton ist optional. Es wird keine Systemmitteilung gesendet."
+        }
+      }
+    }
+  },
+  "watchStart": {
+    "comment": "Window watch: Start watching",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Start watching"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachtung starten"
+        }
+      }
+    }
+  },
+  "watchSelectedRegion": {
+    "comment": "Window watch: Watched region in the selected window",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Watched region in the selected window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beobachteter Bereich im ausgewählten Fenster"
+        }
+      }
+    }
+  }
+,
+  "breadcrumbRemoveSource": {
+    "comment": "Removes this source and its captured text, link, and bookmark from the draft. Save applies the deletion.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove source"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelle entfernen"
+        }
+      }
+    }
+  },
+  "breadcrumbLeave": {
+    "comment": "Action to begin a deliberate leave-and-return checkpoint.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notiz für später hinterlassen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Leave a breadcrumb"
+        }
+      }
+    }
+  },
+  "breadcrumbDefaultTitle": {
+    "comment": "Default editable breadcrumb title.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wo war ich stehen geblieben?"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Where was I?"
+        }
+      }
+    }
+  },
+  "breadcrumbWriteManually": {
+    "comment": "Action to write without screen capture or Apple Intelligence.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notiz schreiben"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Write manually"
+        }
+      }
+    }
+  },
+  "breadcrumbManualHint": {
+    "comment": "Explains the manual fallback.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ohne Bildschirmaufnahme oder Apple Intelligence."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No capture or Apple Intelligence required."
+        }
+      }
+    }
+  },
+  "breadcrumbContinue": {
+    "comment": "Continues from selected window metadata without capturing content.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Weiter zur Notiz"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Continue to note"
+        }
+      }
+    }
+  },
+  "breadcrumbYourNote": {
+    "comment": "Personal writing, distinct from model interpretation.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Deine Notiz"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Your note"
+        }
+      }
+    }
+  },
+  "breadcrumbNotePrompt": {
+    "comment": "Accessible prompt for the editable personal note.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Woran hast du gearbeitet?"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What were you working on?"
+        }
+      }
+    }
+  },
+  "breadcrumbNextStep": {
+    "comment": "User-written next action, separate from model suggestions.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dein nächster Schritt"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Your next step"
+        }
+      }
+    }
+  },
+  "breadcrumbNextStepPrompt": {
+    "comment": "Accessible prompt for the manual next step.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Womit möchtest du später weitermachen?"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What will you do when you return?"
+        }
+      }
+    }
+  },
+  "breadcrumbInterpretation": {
+    "comment": "Label for editable model output, never presented as the personal note.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "KI-Einordnung"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "AI interpretation"
+        }
+      }
+    }
+  },
+  "breadcrumbReviewInterpretation": {
+    "comment": "Explains review of generated interpretation.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieser Entwurf kann Fehler enthalten. Du kannst ihn ändern oder entfernen. Deine Notiz bleibt davon getrennt."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This draft may be wrong. Edit or remove it; your note stays separate."
+        }
+      }
+    }
+  },
+  "breadcrumbSuggestedStep": {
+    "comment": "Accessible label for one editable model suggestion.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vorgeschlagener nächster Schritt"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Suggested next step"
+        }
+      }
+    }
+  },
+  "breadcrumbSuggestedSteps": {
+    "comment": "Heading for saved model suggestions.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vorgeschlagene nächste Schritte"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Suggested next steps"
+        }
+      }
+    }
+  },
+  "breadcrumbRemoveInterpretation": {
+    "comment": "Discards generated interpretation without changing the personal note.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "KI-Einordnung entfernen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove AI interpretation"
+        }
+      }
+    }
+  },
+  "breadcrumbCaptureDisclosure": {
+    "comment": "Explicit disclosure of capture and bounded saved text previews.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufnehmen & Entwurf liest die gewählten Fenster einmal. Beim Speichern bleiben bis zu 2.000 Zeichen sichtbarer Text je Quelle erhalten. Bilder werden verworfen. Es gibt keine automatische Aufnahme."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture & draft reads the selected windows once. Save keeps up to 2,000 characters of visible text per source. Images are discarded. Nothing is captured automatically."
+        }
+      }
+    }
+  },
+  "breadcrumbCaptureDraft": {
+    "comment": "Explicit action authorizing one capture and on-device draft generation.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufnehmen & Entwurf mit Apple Intelligence"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture & draft with Apple Intelligence"
+        }
+      }
+    }
+  },
+  "breadcrumbManualFallback": {
+    "comment": "Fallback after model unavailable, unreadable content, or capture failure.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Es konnte kein Entwurf erstellt werden. Deine Notiz und dein nächster Schritt bleiben erhalten. Prüfe gegebenenfalls den aufgenommenen Text und speichere manuell."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A draft could not be generated. Your note and next step are unchanged. You can review any captured text and save manually."
+        }
+      }
+    }
+  },
+  "breadcrumbAddSource": {
+    "comment": "Adds a user-supplied source without capture.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Link oder Dokument hinzufügen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Add link or document"
+        }
+      }
+    }
+  },
+  "breadcrumbLinkedSource": {
+    "comment": "Label for a manually added source with no known window owner.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verknüpfte Quelle"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Linked source"
+        }
+      }
+    }
+  },
+  "breadcrumbRestoreLimits": {
+    "comment": "Public API limits shown in breadcrumb editor and recap.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster werden anhand von App und Titel zugeordnet. Die Zuordnung kann fehlen oder mehrdeutig sein. Ungespeicherte Dokumente, Spaces und genaue Fensterpositionen lassen sich nicht zuverlässig wiederherstellen."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Window matching uses the app and title and may be unavailable or ambiguous. Unsaved documents, Spaces, and exact window positions cannot be restored reliably."
+        }
+      }
+    }
+  },
+  "breadcrumbSaveHint": {
+    "comment": "Explains minimum manual breadcrumb content.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prüfe deine Notiz, deinen nächsten Schritt oder den KI-Entwurf vor dem Speichern."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review your note, next step, or AI draft before saving."
+        }
+      }
+    }
+  },
+  "breadcrumbLinkPrompt": {
+    "comment": "Accessible input for a user-provided HTTP or HTTPS URL.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelllink (https://…)"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source link (https://…)"
+        }
+      }
+    }
+  },
+  "breadcrumbInvalidLink": {
+    "comment": "Validation error for unsupported schemes and malformed links.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gib einen vollständigen HTTP- oder HTTPS-Link ohne Zugangsdaten ein."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enter a complete HTTP or HTTPS link without credentials."
+        }
+      }
+    }
+  },
+  "breadcrumbChooseDocument": {
+    "comment": "Opens a native file picker to grant access to a saved document.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dokument auswählen …"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose document…"
+        }
+      }
+    }
+  },
+  "breadcrumbRemoveDocument": {
+    "comment": "Removes only the saved bookmark, never the source document.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dokumentverknüpfung entfernen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove document link"
+        }
+      }
+    }
+  },
+  "breadcrumbRemovePreview": {
+    "comment": "Removes captured text from the draft. Save applies the change.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufgenommenen Text entfernen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove captured text"
+        }
+      }
+    }
+  },
+  "breadcrumbHistoricalPreview": {
+    "comment": "Persistent warning that captured text is historical, never live.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Frühere Textvorschau · veraltet"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Historical text preview · stale"
+        }
+      }
+    }
+  },
+  "breadcrumbNoPreview": {
+    "comment": "Shown for manual or unreadable sources.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine aufgenommene Textvorschau."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No captured text preview."
+        }
+      }
+    }
+  },
+  "breadcrumbUnknownDate": {
+    "comment": "Legacy source metadata has no timestamp.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufnahmezeit für diese gespeicherte Quelle unbekannt."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture time unknown for this saved source."
+        }
+      }
+    }
+  },
+  "breadcrumbChecking": {
+    "comment": "Metadata-only source navigation check, without capture.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fensterverfügbarkeit wird geprüft …"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Checking window availability…"
+        }
+      }
+    }
+  },
+  "breadcrumbMatchAvailable": {
+    "comment": "Best-effort unique title match, not proof of durable exact identity.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein Fenster passt zu dieser App und diesem Titel."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "One window matches this app and title."
+        }
+      }
+    }
+  },
+  "breadcrumbWindowStale": {
+    "comment": "Closed or missing saved window.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster nicht verfügbar · gespeicherter Verweis ist veraltet"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Window unavailable · saved reference is stale"
+        }
+      }
+    }
+  },
+  "breadcrumbWindowUnverified": {
+    "comment": "Missing metadata or unavailable Accessibility access.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster nicht überprüfbar · gespeicherter Verweis möglicherweise veraltet"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Window unverified · saved reference may be stale"
+        }
+      }
+    }
+  },
+  "breadcrumbWindowAmbiguous": {
+    "comment": "Duplicate titles prevent exact-window selection.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mehrere Fenster passen · wähle das Fenster in der App"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Several windows match · choose in the app"
+        }
+      }
+    }
+  },
+  "breadcrumbShowWindow": {
+    "comment": "Raises a currently unique app/title match after rechecking.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster zeigen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show window"
+        }
+      }
+    }
+  },
+  "breadcrumbOpenApp": {
+    "comment": "Opens or activates the source app, without promising a document restore.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App öffnen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open app"
+        }
+      }
+    }
+  },
+  "breadcrumbOpenLink": {
+    "comment": "Opens a user-supplied validated web link.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Link öffnen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open link"
+        }
+      }
+    }
+  },
+  "breadcrumbOpenDocument": {
+    "comment": "Opens the explicitly selected saved file using its bookmark.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gespeichertes Dokument öffnen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open saved document"
+        }
+      }
+    }
+  },
+  "breadcrumbWindowUnavailable": {
+    "comment": "Failure after rechecking a Show window action.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Fenster ist nicht verfügbar oder nicht mehr eindeutig zuzuordnen. Öffne die App, um ein Fenster auszuwählen."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The window is unavailable or no longer matches uniquely. Use Open app to choose a window."
+        }
+      }
+    }
+  },
+  "breadcrumbAppUnavailable": {
+    "comment": "Missing application or failed Launch Services action.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Quell-App konnte nicht geöffnet werden."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The source app could not be opened."
+        }
+      }
+    }
+  },
+  "breadcrumbLinkUnavailable": {
+    "comment": "Invalid link or failed browser opening.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Quelllink konnte nicht geöffnet werden."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The source link could not be opened."
+        }
+      }
+    }
+  },
+  "breadcrumbDocumentUnavailable": {
+    "comment": "Missing document, stale bookmark, or file-access failure.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das gespeicherte Dokument ist nicht verfügbar oder der Zugriff ist veraltet. Wähle es unter Bearbeiten erneut aus."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The saved document is unavailable or its access is stale. Choose it again in Edit."
+        }
+      }
+    }
+  },
+  "breadcrumbRefreshSources": {
+    "comment": "Explicit metadata refresh without capturing source content.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quellfenster erneut prüfen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Check source windows again"
+        }
+      }
+    }
+  },
+  "breadcrumbEdit": {
+    "comment": "Reopens saved capsule content for editing without creating a duplicate.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bearbeiten"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Edit"
+        }
+      }
+    }
+  },
+  "portalFocusNext": {
+    "comment": "Window portal: menu command to focus each existing portal in turn",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Focus next portal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nächstes Portal fokussieren"
+        }
+      }
+    }
+  },
+  "portalPin": {
+    "comment": "Window portal: Pin window portal",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin window portal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fensterportal anpinnen"
+        }
+      }
+    }
+  },
+  "portalConnecting": {
+    "comment": "Window portal: Connecting…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Connecting…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verbindung wird hergestellt …"
+        }
+      }
+    }
+  },
+  "portalLive": {
+    "comment": "Window portal: Live",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Live"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Live"
+        }
+      }
+    }
+  },
+  "portalPaused": {
+    "comment": "Window portal: Paused",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Paused"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pausiert"
+        }
+      }
+    }
+  },
+  "portalUnavailable": {
+    "comment": "Window portal: Source unavailable",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Source unavailable"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelle nicht verfügbar"
+        }
+      }
+    }
+  },
+  "portalStale": {
+    "comment": "Window portal: Stale frame",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stale frame"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Veraltetes Bild"
+        }
+      }
+    }
+  },
+  "portalPermission": {
+    "comment": "Window portal: Screen Recording access required",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Screen Recording access required"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bildschirmaufnahme erlauben"
+        }
+      }
+    }
+  },
+  "portalResume": {
+    "comment": "Window portal: Resume updates",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Resume updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktualisierung fortsetzen"
+        }
+      }
+    }
+  },
+  "portalPause": {
+    "comment": "Window portal: Pause updates",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pause updates"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktualisierung pausieren"
+        }
+      }
+    }
+  },
+  "portalJump": {
+    "comment": "Window portal: Show source",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show source"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quelle anzeigen"
+        }
+      }
+    }
+  },
+  "portalJumpHelp": {
+    "comment": "Window portal: Show the source window. If Window Access is unavailable, show its app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show the source window. If Window Access is unavailable, show its app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quellfenster anzeigen. Ohne Fensterzugriff wird die App angezeigt."
+        }
+      }
+    }
+  },
+  "portalJumpFallback": {
+    "comment": "Window portal: Exact window unavailable. Opened its app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exact window unavailable. Opened its app."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster nicht erreichbar. Die App wurde geöffnet."
+        }
+      }
+    }
+  },
+  "portalClose": {
+    "comment": "Window portal: Close portal",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close portal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Portal schließen"
+        }
+      }
+    }
+  },
+  "portalMoveLeft": {
+    "comment": "Window portal: Move left",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move left"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach links bewegen"
+        }
+      }
+    }
+  },
+  "portalMoveRight": {
+    "comment": "Window portal: Move right",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move right"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach rechts bewegen"
+        }
+      }
+    }
+  },
+  "portalMoveUp": {
+    "comment": "Window portal: Move up",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move up"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach oben bewegen"
+        }
+      }
+    }
+  },
+  "portalMoveDown": {
+    "comment": "Window portal: Move down",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move down"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach unten bewegen"
+        }
+      }
+    }
+  },
+  "portalKeyboardHelp": {
+    "comment": "Window portal: Arrow keys move the portal. Return shows the source. Space pauses updates. Escape closes.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arrow keys move the portal. Return shows the source. Space pauses updates. Escape closes."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pfeiltasten bewegen das Portal. Eingabe zeigt die Quelle. Leertaste pausiert. Escape schließt."
+        }
+      }
+    }
+  },
+  "portalLimit": {
+    "comment": "Window portal: Close a portal before pinning another. You can keep up to four.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close a portal before pinning another. You can keep up to four."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schließe ein Portal, bevor du ein weiteres anpinnst. Du kannst bis zu vier behalten."
+        }
+      }
+    }
+  },
 
   "windowSearchShortcutHelp": {
     "comment": "Window search: Global shortcut: ⌘⇧Space",

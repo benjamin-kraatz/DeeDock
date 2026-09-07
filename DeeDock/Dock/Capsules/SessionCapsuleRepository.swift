@@ -1,6 +1,7 @@
 import Foundation
 
-/// Stores only approved capsule text and stable application/window identities.
+/// Stores approved capsule text, identities, and optional bounded breadcrumb excerpts/bookmarks.
+/// All associated data lives in the record, so deleting or evicting it leaves no capture sidecar.
 nonisolated struct SessionCapsuleRepository {
     private let defaults: UserDefaults
     private let key: String

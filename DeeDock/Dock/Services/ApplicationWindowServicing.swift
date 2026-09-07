@@ -93,6 +93,9 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         }
         // Every token is scoped to one menu presentation. Taking any row invalidates its siblings.
         handles = handles.filter { $0.key.sessionID != token.sessionID }
+        // A selection can be cancelled while queued behind another AX request. Consume its
+        // handles, but check again before each window mutation or foreground activation.
+        try Task.checkCancellation()
         guard let application = NSRunningApplication(processIdentifier: handle.processIdentifier),
               !application.isTerminated else {
             throw ApplicationWindowServiceError.windowUnavailable
@@ -100,14 +103,18 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
 
         if boolean(handle.element, attribute: kAXMinimizedAttribute as CFString) == true,
            isSettable(handle.element, attribute: kAXMinimizedAttribute as CFString) {
+            try Task.checkCancellation()
             try set(handle.element, attribute: kAXMinimizedAttribute as CFString, value: kCFBooleanFalse)
         }
+        try Task.checkCancellation()
         guard application.activate(options: []) else {
             throw ApplicationWindowServiceError.applicationUnavailable
         }
         if isSettable(handle.element, attribute: kAXMainAttribute as CFString) {
+            try Task.checkCancellation()
             try set(handle.element, attribute: kAXMainAttribute as CFString, value: kCFBooleanTrue)
         }
+        try Task.checkCancellation()
         try check(AXUIElementPerformAction(handle.element, kAXRaiseAction as CFString))
     }
 

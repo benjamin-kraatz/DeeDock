@@ -55,6 +55,21 @@ nonisolated enum WindowThumbnailMatcher {
         return matches
     }
 
+    /// Match freshly discovered AX metadata to the portal's bound ScreenCaptureKit source.
+    /// Apply the same title normalization and two-point tolerance as thumbnail binding, refusing ambiguity.
+    static func matchingWindow(_ source: ApplicationWindowSummary,
+                               among windows: [ApplicationWindowSummary]) -> ApplicationWindowToken? {
+        guard let frame = source.frame else { return nil }
+        let title = normalized(source.title)
+        let eligible = windows.filter { window in
+            guard let candidateFrame = window.frame else { return false }
+            return window.processIdentifier == source.processIdentifier
+                && (title == nil || normalized(window.title) == title)
+                && close(frame, candidateFrame)
+        }
+        return eligible.count == 1 ? eligible[0].token : nil
+    }
+
     private static func normalized(_ title: String?) -> String? {
         guard let value = title?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else { return nil }
         return value.precomposedStringWithCanonicalMapping
@@ -109,19 +124,9 @@ actor ScreenCaptureWindowThumbnailService: WindowThumbnailServicing {
             for summary in windows where !summary.isMinimized {
                 try Task.checkCancellation()
                 guard let id = matches[summary.token], let window = native[id] else { continue }
-                let target = Self.pixelSize(for: window.frame.size, fitting: size)
-                let configuration = SCStreamConfiguration()
-                configuration.width = Int(target.width)
-                configuration.height = Int(target.height)
-                configuration.showsCursor = false
-                configuration.capturesAudio = false
-                configuration.ignoreShadowsSingleWindow = true
-                configuration.includeChildWindows = true
                 do {
-                    let image = try await SCScreenshotManager.captureImage(
-                        contentFilter: SCContentFilter(desktopIndependentWindow: window),
-                        configuration: configuration
-                    )
+                    let image = try await WindowScreenshot.capture(window,
+                        fittingPixels: CGSize(width: size.width * 2, height: size.height * 2))
                     result[summary.token] = image
                 } catch is CancellationError {
                     return [:]
@@ -141,18 +146,11 @@ actor ScreenCaptureWindowThumbnailService: WindowThumbnailServicing {
 
     private static func candidates(from content: SCShareableContent) -> [WindowCaptureCandidate] {
         content.windows.compactMap { window in
-            guard window.windowLayer == 0, let application = window.owningApplication else { return nil }
+            guard window.windowLayer == 0, let application = window.owningApplication,
+                  application.processID != ProcessInfo.processInfo.processIdentifier else { return nil }
             return WindowCaptureCandidate(id: window.windowID, processIdentifier: application.processID,
                                           title: window.title, frame: window.frame, isOnScreen: window.isOnScreen)
         }
     }
 
-    private static func pixelSize(for source: CGSize, fitting logical: CGSize) -> CGSize {
-        guard source.width > 0, source.height > 0 else {
-            return CGSize(width: logical.width * 2, height: logical.height * 2)
-        }
-        let scale = min(logical.width / source.width, logical.height / source.height) * 2
-        return CGSize(width: max(1, (source.width * scale).rounded()),
-                      height: max(1, (source.height * scale).rounded()))
-    }
 }

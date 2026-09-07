@@ -48,6 +48,8 @@ final class WindowPeekState {
     var selectedID: ApplicationWindowToken?
     /// ScreenCaptureKit-only cards can be previewed, but selecting one can only activate its app.
     var usesApplicationSelection = false
+    @ObservationIgnored var watch: ((ApplicationWindowToken) -> Void)?
+    @ObservationIgnored var pinPortal: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var addToFusion: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var choose: ((ApplicationWindowToken) -> Void)?
     @ObservationIgnored var showApp: (() -> Void)?
