@@ -1038,3 +1038,9 @@ Remaining native acceptance:
 - Measure idle cost and badge update latency before making performance claims. AX events coalesce at 150 ms; a five-second fallback remains active while enabled and awake. Failed scans clear the snapshot.
 
 Issue: [DEE-10](https://linear.app/d-zwei/issue/DEE-10/mirror-application-notification-badges-through-accessibility).
+
+Follow-up review fixes preserve the current resolved application URL for badge matching after app moves or bookmark resolution. AX messaging timeouts now apply to each queried handle, and observer registration has a one-second budget. Teardown releases the observer instead of issuing a removal call for every subscription. The focused Debug build passed again; log: `/tmp/DeeDock-dee-10-review-build.log`. Runtime acceptance remains pending.
+
+GPT-5.6 Luna reviewed the PR with Extra High reasoning. Follow-up fixes also apply the artwork fade animation to badges, remove the silent 256-item cutoff, and track system sleep, display sleep, and inactive-session suspension independently. AX subscription registration is skipped when the element list is unchanged. The fallback scans the system Dock five seconds after the previous scan completes; profiling that cost remains a native acceptance task, not a verified performance result.
+
+A second review pass identified cancellation overlap and all-or-nothing expiry for slow but valid scans. Replacement readers now wait for the previous task to release its observer. Complete scans use batches of 16 items with a cancellable 25 ms pause between batches, retaining per-handle timeouts without an overall data-scan cutoff. The fallback timer starts after completion, so slow scans do not queue periodic work. Observer registration retains its separate one-second budget and can fall back without discarding valid badge data.

@@ -41,7 +41,7 @@ struct DockAppButton: View {
 
     private var badgeLabel: String? {
         guard item.isAvailable else { return nil }
-        return interaction?.badges?.labels[item.reference.url.standardizedFileURL.path]
+        return interaction?.badges?.labels[(item.resolvedURL ?? item.reference.url).standardizedFileURL.path]
     }
 
     var body: some View {

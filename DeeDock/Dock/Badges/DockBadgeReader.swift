@@ -10,45 +10,45 @@ actor DockBadgeReader {
 
     /// Returns a complete snapshot keyed by standardized application URL. Any failed scan clears
     /// the snapshot rather than keeping a count which may no longer be true.
-    func read(pid: pid_t?) -> [String: String] {
+    func read(pid: pid_t?) async -> [String: String] {
         guard !Task.isCancelled, AXIsProcessTrusted(), let pid else { stop(); return [:] }
         if dockPID != pid {
             stop()
             dockPID = pid
-            var created: AXObserver?
-            if AXObserverCreate(pid, { _, _, _, _ in
-                NotificationCenter.default.post(name: Notification.Name("DDockBadgeAXChanged"), object: nil)
-            }, &created) == .success, let created {
-                observer = created
-                CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(created), .commonModes)
-            }
         }
         let root = AXUIElementCreateApplication(pid)
         AXUIElementSetMessagingTimeout(root, 0.15)
-        let deadline = ContinuousClock.now.advanced(by: .seconds(1))
         do {
             var items: [AXUIElement] = []
             let children = try value(root, kAXChildrenAttribute) as? [AXUIElement] ?? []
             for child in children {
-                try check(deadline)
+                try Task.checkCancellation()
                 if try value(child, kAXRoleAttribute) as? String == kAXListRole {
                     items += try value(child, kAXChildrenAttribute) as? [AXUIElement] ?? []
                 }
             }
             var result: [String: String] = [:]
             var applications: [AXUIElement] = []
-            for item in items.prefix(256) {
-                try check(deadline)
+            for (index, item) in items.enumerated() {
+                // Valid large Docks must not lose every badge just because a complete scan
+                // takes over a second. Small batches release the executor between AX calls.
+                if index > 0 && index.isMultiple(of: 16) {
+                    try await Task.sleep(for: .milliseconds(25))
+                }
+                try Task.checkCancellation()
                 guard try value(item, kAXSubroleAttribute) as? String == "AXApplicationDockItem" else { continue }
                 applications.append(item)
+                // Most apps have no badge; do not query their URL on every fallback scan.
+                guard let label = try value(item, "AXStatusLabel") as? String,
+                      !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
+                try Task.checkCancellation()
                 guard let rawURL = try value(item, kAXURLAttribute) else { continue }
                 let url = (rawURL as? URL) ?? (rawURL as? String).flatMap(URL.init(string:))
-                guard let url, url.isFileURL,
-                      let label = try value(item, "AXStatusLabel") as? String,
-                      !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
+                guard let url, url.isFileURL else { continue }
                 result[url.standardizedFileURL.path] = label
             }
-            updateObservation([root] + applications)
+            updateObservation([root] + applications, pid: pid,
+                              deadline: ContinuousClock.now.advanced(by: .seconds(1)))
             return result
         } catch {
             stop()
@@ -62,6 +62,9 @@ actor DockBadgeReader {
     }
 
     private func value(_ element: AXUIElement, _ attribute: String) throws -> CFTypeRef? {
+        // AX timeouts belong to this exact handle; the root timeout does not cover children.
+        AXUIElementSetMessagingTimeout(element, 0.15)
+        try Task.checkCancellation()
         var result: CFTypeRef?
         let error = AXUIElementCopyAttributeValue(element, attribute as CFString, &result)
         switch error {
@@ -71,16 +74,31 @@ actor DockBadgeReader {
         }
     }
 
-    private func updateObservation(_ elements: [AXUIElement]) {
-        guard let observer else { return }
-        guard observed.count != elements.count || !zip(observed, elements).allSatisfy({ CFEqual($0, $1) }) else { return }
-        for element in observed {
-            for name in notificationNames { AXObserverRemoveNotification(observer, element, name as CFString) }
-        }
-        observed = elements
-        for element in elements {
-            // Unsupported subscriptions are harmless: the slow fallback still refreshes badges.
-            for name in notificationNames { AXObserverAddNotification(observer, element, name as CFString, nil) }
+    private func updateObservation(_ elements: [AXUIElement], pid: pid_t,
+                                   deadline: ContinuousClock.Instant) {
+        guard observer == nil || observed.count != elements.count
+            || !zip(observed, elements).allSatisfy({ CFEqual($0, $1) }) else { return }
+        releaseObserver()
+        do {
+            try check(deadline)
+            var created: AXObserver?
+            guard AXObserverCreate(pid, { _, _, _, _ in
+                NotificationCenter.default.post(name: Notification.Name("DDockBadgeAXChanged"), object: nil)
+            }, &created) == .success, let created else { return }
+            observer = created
+            for element in elements {
+                AXUIElementSetMessagingTimeout(element, 0.15)
+                for name in notificationNames {
+                    try check(deadline)
+                    // Unsupported subscriptions use the slow fallback. A failed registration
+                    // never discards a successfully read badge snapshot.
+                    AXObserverAddNotification(created, element, name as CFString, nil)
+                }
+            }
+            observed = elements
+            CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(created), .commonModes)
+        } catch {
+            releaseObserver()
         }
     }
 
@@ -88,16 +106,18 @@ actor DockBadgeReader {
         [kAXValueChangedNotification, kAXTitleChangedNotification, kAXLayoutChangedNotification]
     }
 
-    /// Removes the run-loop source and every subscription on disable, restart, or shutdown.
-    func stop() {
+    /// Releasing the observer removes its subscriptions without one IPC call per old item.
+    private func releaseObserver() {
         if let observer {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
-            for element in observed {
-                for name in notificationNames { AXObserverRemoveNotification(observer, element, name as CFString) }
-            }
         }
         observer = nil
         observed = []
+    }
+
+    /// Removes observation on disable, restart, or shutdown, even if the Dock is unresponsive.
+    func stop() {
+        releaseObserver()
         dockPID = nil
     }
 }

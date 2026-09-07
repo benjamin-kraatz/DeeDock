@@ -85,7 +85,7 @@ final class DockStore {
             defer { withExtendedLifetime(access) {} }
             let url = catalog.service.resolvedURL(for: reference)
             return DockItem(reference: reference, icon: catalog.service.icon(for: url), isFavorite: favorites[id] != nil,
-                            isRunning: running[id] != nil, isAvailable: url != nil)
+                            isRunning: running[id] != nil, isAvailable: url != nil, resolvedURL: url)
         }
         folders = pins.compactMap { pin -> FolderDockItem? in
             guard let reference = pin.folder else { return nil }

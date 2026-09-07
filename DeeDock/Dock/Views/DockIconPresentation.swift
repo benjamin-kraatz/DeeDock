@@ -68,7 +68,7 @@ struct DockIconPresentation<Artwork: View>: View {
                 .overlay(alignment: .topTrailing) {
                     if let badgeLabel {
                         DockAppBadge(label: badgeLabel, iconSize: size)
-                            .opacity(artworkOpacity)
+                            .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                     }
                 }
                 .position(iconCenter)
