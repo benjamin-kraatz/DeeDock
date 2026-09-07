@@ -34,7 +34,8 @@ nonisolated enum WindowSearchIndex {
         case .saved:
             results = saved.compactMap { capsule in
                 if yesterday && !Calendar.current.isDateInYesterday(capsule.createdAt) { return nil }
-                let fields = [capsule.title, capsule.summary, capsule.note] + capsule.unfinishedTasks.prefix(6)
+                let fields = [capsule.title, capsule.summary, capsule.note, capsule.breadcrumb?.nextStep ?? ""]
+                    + capsule.unfinishedTasks.prefix(6)
                     + capsule.windows.prefix(12).map { $0.applicationName + " " + ($0.windowTitle ?? "") }
                 let text = fields.map { String($0.prefix(2_000)) }.joined(separator: "\n")
                 guard let score = WindowSearchMatcher.score(query, in: text) else { return nil }

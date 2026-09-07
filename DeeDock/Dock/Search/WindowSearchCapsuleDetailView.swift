@@ -8,6 +8,8 @@ struct WindowSearchCapsuleDetailView: View {
     let capsule: SessionCapsule
     let onBack: () -> Void
     let onDelete: () -> Void
+    @State private var sourceNavigator = SessionCapsuleSourceNavigator()
+    @State private var navigationFailure: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -31,16 +33,27 @@ struct WindowSearchCapsuleDetailView: View {
                         Label { Text(.windowSearchCapsuleEvidence) } icon: { Image(systemName: "archivebox") }
                             .font(.caption).foregroundStyle(.secondary)
                     }
-                    section(.windowSearchCapsuleSummary, symbol: "text.alignleft") {
-                        Text(verbatim: capsule.summary)
+                    if !capsule.summary.isEmpty {
+                        section(capsule.breadcrumb?.generatedAt != nil ? .breadcrumbInterpretation : .windowSearchCapsuleSummary,
+                                symbol: "text.alignleft") {
+                            if let generatedAt = capsule.breadcrumb?.generatedAt {
+                                Text(generatedAt, format: .dateTime.year().month().day().hour().minute()).font(.caption)
+                            }
+                            Text(verbatim: capsule.summary)
+                        }
+                    }
+                    if let nextStep = capsule.breadcrumb?.nextStep, !nextStep.isEmpty {
+                        section(.breadcrumbNextStep, symbol: "arrow.forward.circle") {
+                            Text(verbatim: nextStep)
+                        }
                     }
                     if !capsule.note.isEmpty {
-                        section(.windowSearchCapsuleNote, symbol: "note.text") {
+                        section(capsule.breadcrumb != nil ? .breadcrumbYourNote : .windowSearchCapsuleNote, symbol: "note.text") {
                             Text(verbatim: capsule.note)
                         }
                     }
                     if !capsule.unfinishedTasks.isEmpty {
-                        section(.windowSearchCapsuleTasks, symbol: "checklist") {
+                        section(capsule.breadcrumb != nil ? .breadcrumbSuggestedSteps : .windowSearchCapsuleTasks, symbol: "checklist") {
                             VStack(alignment: .leading, spacing: 6) {
                                 ForEach(Array(capsule.unfinishedTasks.enumerated()), id: \.offset) { _, task in
                                     Label { Text(verbatim: task) } icon: { Image(systemName: "circle") }
@@ -49,7 +62,19 @@ struct WindowSearchCapsuleDetailView: View {
                             }
                         }
                     }
-                    if !capsule.windows.isEmpty {
+                    if capsule.breadcrumb != nil {
+                        Text(.breadcrumbRestoreLimits).font(.caption).foregroundStyle(.secondary)
+                        if let navigationFailure {
+                            Text(verbatim: navigationFailure).font(.caption).foregroundStyle(.red)
+                        }
+                        Button(.breadcrumbRefreshSources) {
+                            navigationFailure = nil
+                            sourceNavigator.refresh(capsule.windows)
+                        }
+                        ForEach(capsule.windows) { reference in
+                            SessionBreadcrumbSourceView(reference: reference, navigator: sourceNavigator)
+                        }
+                    } else if !capsule.windows.isEmpty {
                         section(.windowSearchCapsuleWindows, symbol: "macwindow") {
                             VStack(alignment: .leading, spacing: 6) {
                                 ForEach(capsule.windows) { window in
@@ -74,6 +99,12 @@ struct WindowSearchCapsuleDetailView: View {
                 .padding(WindowSearchStyle.contentPadding)
             }
         }
+        .task(id: capsule.id) {
+            guard capsule.breadcrumb != nil else { return }
+            sourceNavigator.failure = { navigationFailure = $0 }
+            sourceNavigator.refresh(capsule.windows)
+        }
+        .onDisappear { sourceNavigator.stop() }
     }
 
     private func section<Content: View>(_ title: LocalizedStringResource, symbol: String,
