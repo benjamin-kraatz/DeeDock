@@ -89,6 +89,19 @@ struct WindowPeekView: View {
                                selected: keyboard && state.selectedID == card.id) {
                 state.choose?(card.id)
             }
+            .contextMenu {
+                Button(.fusionAdd) { state.addToFusion?(card.window) }
+            }
+            .accessibilityAction(named: Text(.fusionAdd)) { state.addToFusion?(card.window) }
+            .overlay(alignment: .topTrailing) {
+                Button { state.addToFusion?(card.window) } label: {
+                    Image(systemName: "plus.square.on.square")
+                }
+                .buttonStyle(.bordered)
+                .help(Text(.fusionAdd))
+                .accessibilityLabel(Text(.fusionAdd))
+                .padding(5)
+            }
             .frame(width: size.width, height: size.height)
             .onAppear { state.thumbnailNeeded?(card.id) }
         }

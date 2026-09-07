@@ -9,6 +9,7 @@ struct DeeDockApp: App {
         MenuBarExtra {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
+            Button(.fusionTitle) { delegate.coordinator.showFusion() }
             DockModesMenu(coordinator: delegate.coordinator)
             Divider()
             OpenDockSettingsButton()

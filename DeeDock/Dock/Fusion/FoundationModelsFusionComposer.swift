@@ -8,7 +8,15 @@ private struct GeneratedFusion {
     @Guide(description: "A concise summary grounded only in the reviewed source text.")
     var summary: String
     @Guide(description: "Concrete comparison points or checklist tasks; each cites source 1, source 2, or both.", .maximumCount(8))
-    var points: [String]
+    var points: [GeneratedFusionPoint]
+}
+
+@Generable(description: "One source-grounded finding or task.")
+private struct GeneratedFusionPoint {
+    @Guide(description: "A concise finding or actionable task, without a citation suffix.")
+    var text: String
+    @Guide(description: "Source numbers supporting this point: 1, 2, or both. Never cite a source with empty text.", .maximumCount(2))
+    var sources: [Int]
 }
 
 /// A fresh on-device session per attempt, with no tools and no external provider fallback.
@@ -56,12 +64,19 @@ actor FoundationModelsFusionComposer {
             try Task.checkCancellation()
             let result = response.content
             guard !result.summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-                  result.summary.count <= 4_000, result.points.count <= 8,
-                  result.points.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && $0.count <= 1_000 }) else {
+                  result.summary.count <= 4_000, !result.points.isEmpty, result.points.count <= 8,
+                  result.points.allSatisfy({ point in
+                      !point.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && point.text.count <= 1_000
+                          && !point.sources.isEmpty && point.sources.count <= 2
+                          && Set(point.sources).count == point.sources.count
+                          && point.sources.allSatisfy { number in
+                              (1...2).contains(number) && !sources[number - 1].text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                          }
+                  }) else {
                 throw FusionFailure.invalidOutput
             }
             let marker = operation == .checklist ? "[ ] " : "• "
-            let body = ([result.summary] + result.points.map { marker + $0 }).joined(separator: "\n\n")
+            let body = ([result.summary] + result.points.map { marker + $0.text + " [" + $0.sources.sorted().map(String.init).joined(separator: ", ") + "]" }).joined(separator: "\n\n")
             let draft = FusionDraft(title: result.title, body: body, operation: operation,
                                     sources: sources.map(FusionProvenance.init), generatedAt: Date())
             guard draft.isValid else { throw FusionFailure.invalidOutput }

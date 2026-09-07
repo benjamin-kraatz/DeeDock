@@ -24,7 +24,10 @@ actor FusionArtifactStore {
                     String(localized: .fusionLimitations),
                     String(localized: .fusionGeneratedOn) + " " + draft.generatedAt.ISO8601Format(),
                     String(localized: .fusionSources), provenance].joined(separator: "\n\n")
-        try Data(text.utf8).write(to: url, options: [.atomic, .withoutOverwriting])
+        // Foundation forbids combining .atomic and .withoutOverwriting. This UUID-named
+        // app-owned destination is new; source URLs never enter this writer.
+        guard !FileManager.default.fileExists(atPath: url.path) else { throw FusionFailure.saveFailed }
+        try Data(text.utf8).write(to: url, options: .atomic)
         return url
     }
 

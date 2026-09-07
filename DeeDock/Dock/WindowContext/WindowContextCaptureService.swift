@@ -96,7 +96,9 @@ actor ScreenCaptureWindowContextService: WindowContextCapturing {
 
             for candidate in selected {
                 try Task.checkCancellation()
-                guard let window = windows[candidate.id] else {
+                guard let window = windows[candidate.id],
+                      window.owningApplication?.processID == candidate.processIdentifier,
+                      Self.normalized(window.title) == Self.normalized(candidate.title) else {
                     snapshots.append(WindowContextSnapshot(candidate: candidate, image: nil, recognizedText: ""))
                     continue
                 }

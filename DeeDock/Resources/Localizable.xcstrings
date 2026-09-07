@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "fusionSelectionFull": {
+    "comment": "App Fusion selection tray already contains two windows; replace or remove one before adding another.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Two windows are already selected. Remove or replace a source to choose another."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Es sind bereits zwei Fenster ausgewählt. Entferne oder ersetze eine Quelle, um ein anderes Fenster auszuwählen."
+        }
+      }
+    }
+  },
   "fusionTitle": {
     "comment": "App Fusion: App Fusion",
     "extractionState": "manual",

@@ -38,7 +38,8 @@ nonisolated enum FusionCaptureState: Sendable {
 }
 
 /// Attribution is frozen at generation time and never comes from model output.
-nonisolated struct FusionProvenance: Sendable {
+nonisolated struct FusionProvenance: Identifiable, Sendable {
+    let id: UInt32
     let application: String
     let title: String
     let bundleIdentifier: String?
@@ -47,6 +48,7 @@ nonisolated struct FusionProvenance: Sendable {
     let edited: Bool
 
     init(_ source: FusionSource) {
+        id = source.id
         application = source.candidate.applicationName
         title = source.title
         bundleIdentifier = source.candidate.bundleIdentifier
