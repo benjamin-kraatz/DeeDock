@@ -38,6 +38,9 @@ final class DockCoordinator {
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
     @ObservationIgnored private let capsules = SessionCapsuleController()
+    @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
+    private(set) var searchShortcutAvailable = false
+    @ObservationIgnored private lazy var windowSearch = WindowSearchController(capsules: capsules)
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
     @ObservationIgnored private let modePicker = DockModePickerCoordinator()
@@ -152,6 +155,7 @@ final class DockCoordinator {
         }
         capsules.didChange = { [weak self] in
             self?.sessionCapsules.reload()
+            self?.windowSearch.reloadCapsules()
             self?.refreshPanels()
         }
         catalog.activated = { [weak self] app in
@@ -179,6 +183,7 @@ final class DockCoordinator {
         trash.start()
         shelf.start()
         capsules.start()
+        searchShortcutAvailable = searchShortcut.start { [weak self] in self?.searchWindows() }
         scheduleShelfSemanticWarmup()
         displayService.start()
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -268,6 +273,7 @@ final class DockCoordinator {
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
             }
+            panel.windowSearchRequested = { [weak self] in self?.searchWindows() }
             panel.modePickerRequested = { [weak self, weak panel] in
                 guard let self, let panel, canSwitchModes else { return }
                 modePicker.show(modes: profiles.modes.modes,
@@ -459,6 +465,14 @@ final class DockCoordinator {
         )
     }
 
+    /// Opens metadata search only after a menu or keyboard action.
+    func searchWindows() {
+        popovers.closeAll()
+        windowPeeks.close(returnFocus: false)
+        endFocus(restore: false)
+        windowSearch.show(returningTo: lastExternalApplication)
+    }
+
     func focusDock() {
         guard let id = DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation), let panel = panels[id] else { return }
         endFocus(restore: false)
@@ -539,6 +553,8 @@ final class DockCoordinator {
         shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
+        searchShortcut.stop()
+        windowSearch.stop()
         capsules.stop()
         windowPeeks.stop()
         modePicker.stop()

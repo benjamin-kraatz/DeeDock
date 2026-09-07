@@ -28,9 +28,11 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
 
     private var handles: [ApplicationWindowToken: Handle] = [:]
     private let messagingTimeout: Float
+    private let maximumWindows: Int
 
-    init(messagingTimeout: Float = 0.25) {
+    init(messagingTimeout: Float = 0.25, maximumWindows: Int = .max) {
         self.messagingTimeout = messagingTimeout
+        self.maximumWindows = max(1, maximumWindows)
     }
 
     func discover(processes: [ApplicationProcessSnapshot], sessionID: UUID) async throws -> [ApplicationWindowSummary] {
@@ -57,6 +59,7 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
             guard let windows = try copy(application, attribute: kAXWindowsAttribute as CFString) as? [AXUIElement] else { continue }
 
             for window in windows {
+                guard handles.count < maximumWindows else { break }
                 try Task.checkCancellation()
                 guard string(window, attribute: kAXRoleAttribute as CFString) == kAXWindowRole else { continue }
                 let subrole = string(window, attribute: kAXSubroleAttribute as CFString)
@@ -79,8 +82,13 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
     }
 
     func selectWindow(_ token: ApplicationWindowToken) async throws {
+        try Task.checkCancellation()
         guard AXIsProcessTrusted() else { throw ApplicationWindowServiceError.permissionRequired }
         guard let handle = handles[token] else {
+            throw ApplicationWindowServiceError.windowUnavailable
+        }
+        // A closed AX element must fail before app activation can bring an unrelated window forward.
+        guard string(handle.element, attribute: kAXRoleAttribute as CFString) == kAXWindowRole else {
             throw ApplicationWindowServiceError.windowUnavailable
         }
         // Every token is scoped to one menu presentation. Taking any row invalidates its siblings.
