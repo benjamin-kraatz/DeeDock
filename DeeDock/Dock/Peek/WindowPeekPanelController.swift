@@ -77,6 +77,7 @@ final class WindowPeekPanelController {
         if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
         localMonitor = nil
         globalMonitor = nil
+        state.watch = nil
         state.choose = nil
         state.showApp = nil
         state.settingsSelected = nil
@@ -105,6 +106,7 @@ final class WindowPeekPanelController {
 
     private func handleKey(_ event: NSEvent) -> Bool {
         switch event.keyCode {
+        case 13: if let id = state.selectedID { state.watch?(id) }
         case 36, 76: state.chooseSelection()
         case 53: close(returnFocus: true)
         case 123, 126: state.select(by: -1)

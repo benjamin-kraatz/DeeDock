@@ -12,6 +12,7 @@ nonisolated struct WindowWatchFrame: Sendable {
     let pixels: [UInt8]
     let lines: [String]
     let size: CGSize
+    let pixelSize: CGSize
 }
 
 /// Retains the selected SCWindow and never repeats the title/geometry join after preparation.
@@ -34,6 +35,22 @@ actor WindowWatchCapture {
         }
         window = selected
         pid = summary.processIdentifier
+    }
+
+    /// Resolves an explicit jump against the fixed capture identity; ambiguous AX matches fail closed.
+    func sourceToken(in summaries: [ApplicationWindowSummary]) async throws -> ApplicationWindowToken {
+        guard let window, let pid else { throw WindowWatchFailure.closed }
+        guard CGPreflightScreenCaptureAccess() else { throw WindowWatchFailure.permission }
+        let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
+        try Task.checkCancellation()
+        guard let current = content.windows.first(where: { $0.windowID == window.windowID && $0.owningApplication?.processID == pid }) else {
+            throw WindowWatchFailure.closed
+        }
+        let candidate = WindowCaptureCandidate(id: current.windowID, processIdentifier: pid,
+                                               title: current.title, frame: current.frame, isOnScreen: current.isOnScreen)
+        let matches = WindowThumbnailMatcher.matches(summaries: summaries, candidates: [candidate])
+        guard matches.count == 1, let token = matches.keys.first else { throw WindowWatchFailure.unavailable }
+        return token
     }
 
     func sample(region: WindowWatchRegion, recognizeText: Bool) async throws -> WindowWatchFrame {
@@ -79,6 +96,7 @@ actor WindowWatchCapture {
             lines = try await request.perform(on: crop).prefix(128).map { String($0.transcript.prefix(512)).trimmingCharacters(in: .whitespacesAndNewlines) }
         }
         try Task.checkCancellation()
-        return WindowWatchFrame(image: image, pixels: bytes, lines: lines, size: current.frame.size)
+        return WindowWatchFrame(image: image, pixels: bytes, lines: lines, size: current.frame.size,
+                                pixelSize: CGSize(width: image.width, height: image.height))
     }
 }

@@ -90,6 +90,17 @@ struct WindowPeekView: View {
                                selected: keyboard && state.selectedID == card.id) {
                 state.choose?(card.id)
             }
+            .contextMenu {
+                Button(.watchTitle) { state.watch?(card.id) }
+            }
+            .accessibilityAction(named: Text(.watchTitle)) { state.watch?(card.id) }
+            .overlay(alignment: .topTrailing) {
+                Button { state.watch?(card.id) } label: { Image(systemName: "eye.circle") }
+                    .buttonStyle(.bordered)
+                    .help(Text(.watchTitle))
+                    .accessibilityLabel(Text(.watchTitle))
+                    .padding(4)
+            }
             .frame(width: size.width, height: size.height)
             .onAppear { state.thumbnailNeeded?(card.id) }
         }
