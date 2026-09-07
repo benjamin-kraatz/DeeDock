@@ -18,6 +18,20 @@ actor WindowPortalCapture {
 
     init(source: ApplicationWindowSummary) { self.source = source }
 
+    /// Resolve current metadata by the bound ID before a deliberate jump, including off-screen sources.
+    func currentSource() async -> ApplicationWindowSummary? {
+        guard !lostSource, let id = boundWindow?.windowID, CGPreflightScreenCaptureAccess() else { return nil }
+        do {
+            let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
+            try Task.checkCancellation()
+            guard !lostSource, let window = content.windows.first(where: {
+                $0.windowID == id && $0.owningApplication?.processID == source.processIdentifier
+            }) else { return nil }
+            return ApplicationWindowSummary(token: source.token, processIdentifier: source.processIdentifier,
+                title: window.title, frame: window.frame, isMinimized: !window.isOnScreen, isMain: false)
+        } catch { return nil }
+    }
+
     func update(pixelSize: CGSize) async -> WindowPortalCaptureResult {
         guard !lostSource else { return .unavailable }
         guard CGPreflightScreenCaptureAccess() else { return .permissionRequired }

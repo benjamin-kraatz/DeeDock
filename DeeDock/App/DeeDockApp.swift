@@ -34,6 +34,7 @@ struct DeeDockApp: App {
         MenuBarExtra {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
+            Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
             Button(.fusionTitle) { delegate.coordinator.showFusion() }
             DockModesMenu(coordinator: delegate.coordinator)
             Divider()
@@ -58,6 +59,7 @@ struct DeeDockApp: App {
                 CheckForUpdatesButton(updater: delegate.updater)
                 #endif
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
+                Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
             }

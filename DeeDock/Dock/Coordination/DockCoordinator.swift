@@ -459,6 +459,8 @@ final class DockCoordinator {
         )
     }
 
+    func focusNextPortal() { windowPeeks.focusNextPortal() }
+
     func focusDock() {
         guard let id = DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation), let panel = panels[id] else { return }
         endFocus(restore: false)

@@ -1193,3 +1193,15 @@ accessibility/display combinations. Remaining hands-on acceptance includes:
   full-screen apps, display disconnection, and sleep/wake during an open or closing launcher.
 
 Changes are uncommitted. The issue has not been closed or marked accepted.
+
+## DEE-14 window portals
+
+The implementation adds up to four session-only floating window portals, detached through Window Peek's
+menu, VoiceOver action, or P shortcut. Portals own capture independently of Peek, preserve image aspect
+ratio, and expose pause, source navigation, close, and keyboard movement. See the
+[window portal reference and acceptance checklist](WINDOW-PORTALS.md) for capture bounds, lifecycle
+states, display/Spaces behavior, SDK limitations, and model cases worth testing.
+
+Focused app compilation passed after repairing intermediate compiler errors. Tests, automated visual
+checks, native acceptance, and energy measurements were not run. DEE-14 remains awaiting native
+acceptance and must not be marked Done based on this build.
