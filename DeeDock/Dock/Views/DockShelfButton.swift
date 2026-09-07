@@ -9,7 +9,7 @@ struct DockShelfButton: View {
     let menuTracking: (Bool) -> Void
     let accessibilityFocus: (Bool) -> Void
 
-    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.accessibilityReduceTransparency) private
         var reduceTransparency
     @AccessibilityFocusState private var accessibilityFocused: Bool
@@ -67,7 +67,7 @@ struct DockShelfButton: View {
                 openSettings: {
                     interaction.prepareSettings?()
                     NSApp.activate()
-                    openSettings()
+                    openWindow(id: "settings")
                 },
                 clearShelf: confirmClear,
                 tracking: menuTracking

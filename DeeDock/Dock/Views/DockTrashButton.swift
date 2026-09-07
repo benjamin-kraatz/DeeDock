@@ -9,7 +9,7 @@ struct DockTrashButton: View {
     let menuTracking: (Bool) -> Void
     let accessibilityFocus: (Bool) -> Void
 
-    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
@@ -37,7 +37,7 @@ struct DockTrashButton: View {
             TrashContextMenuBridge(item: item, interaction: interaction, openSettings: {
                 interaction.prepareSettings?()
                 NSApp.activate()
-                openSettings()
+                openWindow(id: "settings")
             }, emptyTrash: confirmEmptyTrash, tracking: menuTracking)
         }
         .accessibilityFocused($accessibilityFocused)

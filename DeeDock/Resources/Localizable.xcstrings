@@ -1,6 +1,348 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "settingsFeatureShelfSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keep files at hand and manage the Trash."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dateien griffbereit halten und den Papierkorb verwalten."
+        }
+      }
+    }
+  },
+  "settingsFeatureCapsulesSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Save groups of apps and folders to reopen together."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apps und Ordner als Gruppe sichern und gemeinsam wieder öffnen."
+        }
+      }
+    }
+  },
+  "settingsFeatureBadgesSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show app notification badges in the dock."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mitteilungszähler an den Apps im Dock anzeigen."
+        }
+      }
+    }
+  },
+  "settingsFeaturePeekSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preview open windows and switch between them."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Offene Fenster ansehen und zwischen ihnen wechseln."
+        }
+      }
+    }
+  },
+  "settingsFeatureFocusSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Set up timed focus sessions."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeitlich begrenzte Fokus-Sitzungen einrichten."
+        }
+      }
+    }
+  },
+  "settingsFeatureActionsSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Run Shortcuts directly from the dock."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kurzbefehle direkt aus dem Dock ausführen."
+        }
+      }
+    }
+  },
+  "settingsFeatureDisplaysSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose which apps appear on secondary displays."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Festlegen, welche Apps auf weiteren Displays erscheinen."
+        }
+      }
+    }
+  },
+  "settingsFeaturePermissionsSubtitle": {
+    "comment": "Description of this feature on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manage window access and screen recording permissions."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zugriff auf Fenster und Bildschirmaufnahme verwalten."
+        }
+      }
+    }
+  },
+    "settingsBack" : {
+      "comment" : "Toolbar button that returns from a settings page to its section overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "settingsAbout" : {
+      "comment" : "Overview row leading to the installed version and build.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        }
+      }
+    },
+    "settingsBackgroundAndFading" : {
+      "comment" : "Overview row leading to dock background and idle fading settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund & Ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background & Fading"
+          }
+        }
+      }
+    },
+    "settingsDisplaySummary" : {
+      "comment" : "One-line description under a display's name on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gilt nur für dieses Display. Alles Unveränderte folgt den gemeinsamen Standardwerten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies to this display only. Anything you leave alone follows the shared defaults."
+          }
+        }
+      }
+    },
+    "settingsDockSummary" : {
+      "comment" : "One-line description under the Dock heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheinungsbild, Platzierung und Verhalten für alle Displays."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance, placement, and hiding behavior shared by every display."
+          }
+        }
+      }
+    },
+    "settingsFeaturesSummary" : {
+      "comment" : "One-line description under the Features heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionale Dock-Funktionen wie Shelf, Papierkorb, Mitteilungskennzeichen und Window Peek."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional dock capabilities such as the Shelf, Trash, badges, and Window Peek."
+          }
+        }
+      }
+    },
+    "settingsGeneralSummary" : {
+      "comment" : "One-line description under the General heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menüleiste, Start bei der Anmeldung und App-Updates."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu bar presence, launching at login, and app updates."
+          }
+        }
+      }
+    },
+    "settingsModesSummary" : {
+      "comment" : "One-line description under the Modes heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benannte Konfigurationen, die Pins und App-Sichtbarkeit jedes Displays sichern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Named configurations that store each display's pins and app visibility."
+          }
+        }
+      }
+    },
+    "settingsSelectSection" : {
+      "comment" : "Placeholder shown when no sidebar item is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle einen Einstellungsbereich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a settings section"
+          }
+        }
+      }
+    },
+    "settingsShelfAndTrash" : {
+      "comment" : "Overview row leading to the Shelf and Trash tile settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf & Papierkorb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf & Trash"
+          }
+        }
+      }
+    },
+    "settingsStartup" : {
+      "comment" : "Overview row leading to the launch-at-login setting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldung & Start"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login & Startup"
+          }
+        }
+      }
+    },
   "appBadgesTitle": {
     "comment": "Heading for the app badge feature.",
     "extractionState": "manual",
@@ -10200,24 +10542,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "s"
-          }
-        }
-      }
-    },
-    "settingsSelectCategory" : {
-      "comment" : "Placeholder shown when no settings pane is selected.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a settings category"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a settings category"
           }
         }
       }

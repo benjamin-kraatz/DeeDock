@@ -1044,3 +1044,36 @@ Follow-up review fixes preserve the current resolved application URL for badge m
 GPT-5.6 Luna reviewed the PR with Extra High reasoning. Follow-up fixes also apply the artwork fade animation to badges, remove the silent 256-item cutoff, and track system sleep, display sleep, and inactive-session suspension independently. AX subscription registration is skipped when the element list is unchanged. The fallback scans the system Dock five seconds after the previous scan completes; profiling that cost remains a native acceptance task, not a verified performance result.
 
 A second review pass identified cancellation overlap and all-or-nothing expiry for slow but valid scans. Replacement readers now wait for the previous task to release its observer. Complete scans use batches of 16 items with a cancellable 25 ms pause between batches, retaining per-handle timeouts without an overall data-scan cutoff. The fallback timer starts after completion, so slow scans do not queue periodic work. Observer registration retains its separate one-second budget and can fall back without discarding valid badge data.
+
+## Settings restructure — sections and pages
+
+Implemented on 2026-09-07. The Settings window follows the System Settings shape: the sidebar selects a section, the section's overview lists its pages without a duplicate header, and a page holds the controls. The detail column is a `NavigationStack`, so pushes get the window's own back button and title, and the stack empties whenever the sidebar selection changes.
+
+Navigation model:
+
+- `SettingsSection` replaces `SettingsSelection`: `general`, `dock`, `features`, `modes`, and `display(id)`. It owns the section's title, summary, artwork, tint, page groups, and search terms.
+- `SettingsPage` replaces `SettingsCategory` and covers every leaf screen. `SettingsPage.dockGroups` is the display-scopable set, so the Dock section and a display profile offer exactly the same pages.
+- Search matches a section when its own copy matches or when any page under it does, so a control two levels down still surfaces the way to reach it.
+
+Regrouping (values, defaults, and persistence are unchanged):
+
+- General → About, Updates (direct distribution only), Menu Bar Icon, Login & Startup.
+- Dock → Appearance, App names, Background & Fading, Position, Behavior, App visibility. App visibility left the Behavior pane for a page of its own; background and idle fading left Appearance.
+- Features → Shelf & Trash, Session Capsules, App badges, Window Peek, Focus Sessions, Action Tiles, Multi-monitor docks, Permissions. The Window Peek permissions card became its own page so it stays reachable when unreadable settings freeze the rest.
+- A display's overview puts its name in the window title and its connection state beside the Show Dock switch.
+
+Focus Sessions and Action Tiles are omitted from the overview when no coordinator provides them, rather than shown disabled.
+
+New shared views: `SettingsPageScaffold` (the shared content column), `SettingsLinkRow`/`SettingsLinkCard`, `SettingsOverviewView`, `SettingsPageView`, and `SettingsContext`, which carries the stores and controllers a page needs. `GeneralSettingsPane`, `FeaturesSettingsPane`, `SettingsDetailView`, and `SettingsCategoryRow` are gone; `PreviewsSettingsPane` is now `WindowPeekSettingsPane`.
+
+Navigation labels and Features subtitles were added with English and German values; `settingsSelectCategory` was removed.
+
+The Debug app build succeeded with `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug build`. The `DeeDockTests` target does not build in this checkout for reasons unrelated to this change: it fails the same way before and after, on `ActionTilesController`, `DockBadgeController`, `DockFilePreviewItem`, and `FolderFileDrop` being out of the test target's scope.
+
+Remaining native acceptance:
+
+- Launch the app and walk every section and page: back button, window title, keyboard navigation, and the search field filtering sections by a page-level term.
+- Confirm a display overview edits only that display, that overridden rows still show their inheritance status and per-field reset, and that Use Defaults still clears a profile.
+- Check Reduce Motion and Reduce Transparency, VoiceOver over the overview rows, long translated titles, and light/dark appearance.
+
+The final settings window uses a singleton SwiftUI `Window` scene, native `NavigationStack` back navigation, and the standard sidebar toggle to keep the toolbar height consistent. All app Settings entry points open this window. Native menus, segmented controls, and numeric text fields replace custom capsule controls. Repeating overview headers and custom row hover fills are removed. The user accepted the final appearance and toolbar height on 2026-09-07. The final Debug app build and diff checks passed; no tests or automated visual checks ran during this polish pass. The broader accessibility and display-specific checks above remain unverified.

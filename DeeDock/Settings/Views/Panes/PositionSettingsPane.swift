@@ -78,7 +78,7 @@ struct PositionSettingsPane: View {
                              alongEdgeOffset: $offset, edgeDistance: $bottom)
             .padding(24)
     }
-    .tint(SettingsCategory.position.tint)
+    .tint(SettingsPage.position.tint)
     .frame(width: 560, height: 640)
 }
 #endif

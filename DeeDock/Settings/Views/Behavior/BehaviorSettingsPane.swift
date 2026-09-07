@@ -1,21 +1,12 @@
 import SwiftUI
 
-/// Behavior controls share the existing Settings design and save through individual field bindings.
+/// Hiding, revealing, and the motion between the two. Which apps a dock lists is a separate page.
 struct BehaviorSettingsPane: View {
     let source: SettingsValueSource
     var previewReduceMotion: Bool? = nil
     var showZone: (() -> Void)? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
-            SettingsCard(title: .settingsAppVisibility, footnote: .settingsAppVisibilityHelp) {
-                SettingsMenuRow(title: .settingsAppVisibility,
-                                subtitle: source.activeModeName.map { .dockModesSavedIn(modeName: $0) },
-                                selection: source.appVisibilityBinding()) {
-                    ForEach(DockAppVisibility.allCases, id: \.self) { value in Text(value.title).tag(value) }
-                }
-                .disabled(!source.modeSettingsAvailable)
-                .settingsOverride(source.context, field: .appVisibility)
-            }
             SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
                 SettingsToggleRow(title: .behaviorAutoHide, isOn: source.binding(\.behavior.autoHide))
                     .settingsOverride(source.context, field: .autoHide)

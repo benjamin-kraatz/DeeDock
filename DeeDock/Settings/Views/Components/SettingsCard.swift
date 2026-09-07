@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A titled group of settings rows drawn as one raised, rounded surface.
+/// A titled group of settings rows drawn as one neutral, rounded group.
 ///
 /// Rows are laid out in order with hairline separators inserted between them, so a pane
 /// composes controls without repeating chrome. Rows own their own padding, and every row
@@ -23,7 +23,6 @@ struct SettingsCard<Content: View>: View {
             if let title {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
                     .padding(.leading, 2)
             }
             Group(subviews: content) { rows in
@@ -38,13 +37,9 @@ struct SettingsCard<Content: View>: View {
                     }
                 }
             }
-            // A plain background plus a light overlay separates the surface from the window
-            // in both appearances, where a single system fill reads as inset in dark mode.
-            .background(.background, in: shape)
-            .background(shape.fill(.white.opacity(isDark ? 0.05 : 0)))
+            .background(.background.secondary, in: shape)
             .clipShape(shape)
-            .overlay(shape.strokeBorder(.separator.opacity(isDark ? 0.55 : 0.8), lineWidth: 0.5))
-            .shadow(color: .black.opacity(isDark ? 0 : 0.05), radius: 1.5, y: 0.5)
+            .overlay(shape.strokeBorder(.separator.opacity(0.5), lineWidth: 0.5))
             if let footnote {
                 Text(footnote)
                     .font(.caption)

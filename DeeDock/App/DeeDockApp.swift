@@ -36,7 +36,7 @@ struct DeeDockApp: App {
                 .disabled(!delegate.coordinator.canFocus)
             }
         }
-        Settings {
+        Window(Text(.actionSettings), id: "settings") {
             DockSettingsView(store: delegate.coordinator.settings, profiles: delegate.coordinator.profiles,
                              loginItems: delegate.loginItems, menuBarIcon: delegate.menuBarIcon,
                              windowAccess: delegate.windowAccess,
@@ -46,6 +46,9 @@ struct DeeDockApp: App {
             .environment(\.appUpdater, delegate.updater)
             #endif
         }
+        .windowToolbarStyle(.unified)
+        .defaultLaunchBehavior(.suppressed)
+        .defaultSize(width: 820, height: 650)
     }
 }
 
