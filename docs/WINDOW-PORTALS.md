@@ -139,3 +139,7 @@ also added per-request cancellation, independent permission revocation checks, a
 - Measure one and four changing portals for 60 seconds each, repeat in Low Power Mode, then pause and
   close them. Record capture counts/latency from WindowPortal close logs, and CPU/GPU/memory in Instruments.
   Verify closed capture drains once and no subsequent screenshots or retained frame growth occur.
+
+The final merge of `origin/main` preserved DEE-15's window search commands, coordinator lifecycle, and
+all catalog entries alongside portals. The merged app build passed. All 78 portal/search keys match
+both compiled languages. This merge validation did not launch either feature.

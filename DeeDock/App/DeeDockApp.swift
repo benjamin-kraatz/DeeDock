@@ -35,6 +35,10 @@ struct DeeDockApp: App {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
             Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
+
+            Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
+                .keyboardShortcut("f", modifiers: [.command, .shift])
+            Text(delegate.coordinator.searchShortcutAvailable ? .windowSearchShortcutHelp : .windowSearchShortcutUnavailable)
             Button(.fusionTitle) { delegate.coordinator.showFusion() }
             DockModesMenu(coordinator: delegate.coordinator)
             Divider()
@@ -60,6 +64,9 @@ struct DeeDockApp: App {
                 #endif
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
                 Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
+
+                Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
+                    .keyboardShortcut("f", modifiers: [.command, .shift])
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
             }
