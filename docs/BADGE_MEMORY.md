@@ -25,15 +25,15 @@ Numeric deltas are net changes. For a checked value of 37, observations of 41, 3
 
 Collection is off by default. Enable **Collect badge changes in future Focus Sessions** in badge or Focus Session settings before beginning a new session. Enabling it during a session takes effect next session. Disabling it stops collection immediately and retains an incomplete digest for review.
 
-The existing Focus Session ID, phase and deadline define the collection interval. Each app's first and last observations produce a net change, independently of its checked baseline. Identical samples do not add history or persist redundant values. Only rows with an observed state change appear in the digest.
+The existing Focus Session ID, phase and deadline define the collection interval. Each app's first and last observations produce a net change, independently of its checked baseline. Identical samples do not add history or persist redundant values. The first reliable observation seeds an endpoint with zero changes. Only rows with an observed state change appear in the digest.
 
-Pauses exclude samples and mark coverage incomplete. Sleep, permission loss and unavailable scans mark missing coverage. After DDock restarts, saved endpoints remain historical and current observations start unknown. A persisted active digest can continue for the same unexpired session, with a gap marker. A completed or expired session closes before another sample is accepted. A scan begun before a start or resume boundary updates current details but is excluded from the digest. Relaunching DDock does not start collection for an existing session that has no active digest.
+Pauses exclude samples and mark coverage incomplete. Sleep, permission loss and unavailable scans mark missing coverage. After DDock restarts, saved endpoints remain historical and current observations start unknown. A persisted active digest can continue for the same unexpired session, with a gap marker. Its deadline is retained separately so a relaunch after expiry closes it at the deadline, not the relaunch time. A completed or expired session closes before another sample is accepted. A scan begun before a start or resume boundary updates current details but is excluded from the digest. Relaunching DDock does not start collection for an existing session that has no active digest.
 
 Open **Focus badge digest** from the timer panel, including after completion, or **Review badge history** in Settings. Dismissing the timer does not delete completed digests. Each digest offers source-app activation and a delete control. Deleting an active digest stops its collection for that session.
 
 ## Storage and deletion
 
-Local UserDefaults data uses `dock.badge-memory.v1`. Current observations are not persisted. The document stores explicit checked baselines, distinct observed values with timestamps, the focus opt-in preference, and bounded digest endpoints.
+Local UserDefaults data uses `dock.badge-memory.v1`. Current observations are not persisted. The first sample of an untracked app seeds live state; history starts with a subsequent distinct observation or an explicit checked baseline. The document stores explicit checked baselines, distinct observed values with timestamps, the focus opt-in preference, and bounded digest endpoints.
 
 - At most 100 application histories, with the most recent 20 distinct observations per app.
 - Observations expire after seven days. Explicit checked baselines expire after 30 days, even if the app continues changing.
@@ -41,9 +41,9 @@ Local UserDefaults data uses `dock.badge-memory.v1`. Current observations are no
 - At capacity, new app histories or digest rows are omitted until space becomes available. Existing records continue updating. The UI states these retention limits.
 - Text badge values are limited to 128 characters. Numeric values remain nonnegative Int64 values.
 - Expiration runs on startup, observation, session changes and opening the history window. No history-only polling timer runs when badge observation is disabled.
-- **Delete this app's history** removes its baseline, transitions and rows from all digests. A later distinct observation can create history again.
+- **Delete this app's history** removes its baseline, transitions and rows from all digests. The first sample after a relaunch only seeds live state for an untracked app, so it cannot recreate deleted history. Later distinct observations can create history again. Deleted app rows remain excluded from the current focus digest until the next session. Only their paths are retained as exclusion markers while that session is active; closing the digest removes those markers.
 - **Clear all badge history** deletes all retained data and turns off collection. Source-app badges and notification settings remain untouched.
-- Invalid storage is preserved and edits are blocked until an explicit clear. The decoder validates bounds and rejects payloads over 4 MB.
+- Invalid storage is preserved and edits are blocked until an explicit clear. Both the reader and writer enforce a 4 MB payload limit. An oversized write leaves the previous readable payload intact and shows the storage error.
 
 The history window uses native controls and an opaque system background. Opening it requires an explicit action, and closing it restores the prior application when DDock still owns focus. Source activation closes the window without restoring another app. It has no custom animation and does not depend on Reduce Motion. Placement uses the pointer display's visible frame and supports negative display origins; native verification remains pending.
 

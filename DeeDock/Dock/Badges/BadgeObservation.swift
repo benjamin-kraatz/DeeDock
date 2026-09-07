@@ -66,6 +66,10 @@ nonisolated struct BadgeFocusDigest: Codable, Equatable, Identifiable {
     var modeName: String
     var started: Date
     var ended: Date?
+    /// Retained separately because FocusSession clears its deadline when completing at startup.
+    var deadline: Date?
+    /// Deleted app rows stay excluded for this session, including across a relaunch.
+    var excludedPaths: Set<String> = []
     var incomplete = false
     var rows: [String: BadgeDigestRow] = [:]
 }

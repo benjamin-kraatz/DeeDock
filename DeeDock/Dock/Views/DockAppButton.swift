@@ -91,7 +91,7 @@ struct DockAppButton: View {
         .overlay(alignment: .topTrailing) {
             if badgeLabel != nil, interaction?.openBadgeMemory != nil {
                 Button { interaction?.openBadgeMemory?(item) } label: {
-                    Color.clear.frame(width: max(20, size * 0.4), height: max(20, size * 0.35))
+                    Color.clear.frame(width: max(20, size * 0.85), height: max(20, size * 0.35))
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)

@@ -38,7 +38,7 @@ final class BadgeMemoryStore {
         guard !requiresReset else { return }
         let before = document
         if observations.isEmpty, document.active != nil { document.active?.incomplete = true }
-        let paths = Set(document.apps.keys).union(observations.keys).union(document.active?.rows.keys.map { $0 } ?? [])
+        let paths = Set(document.apps.keys).union(observations.keys).union(previous.keys).union(document.active?.rows.keys.map { $0 } ?? [])
         for path in paths.sorted() {
             let value = observations[path] ?? .unknown
             if previous[path] != value {
@@ -48,7 +48,10 @@ final class BadgeMemoryStore {
                         app.changes = Array(app.changes.suffix(20)); app.touched = date
                         document.apps[path] = app
                     }
-                } else if value.label != nil, document.apps.count < 100 {
+                } else if let prior = previous[path], prior != .unknown,
+                          (value.label != nil || prior.label != nil), document.apps.count < 100 {
+                    // An untracked app's first sample only seeds live state. This also prevents
+                    // a redundant first scan after relaunch from recreating deleted history.
                     document.apps[path] = BadgeAppMemory(changes: [BadgeChange(value: value, date: date)], touched: date)
                 }
             }
@@ -71,18 +74,22 @@ final class BadgeMemoryStore {
         self.session = session
         guard !requiresReset else { return }
         let before = document
+        if let session, session.id == document.active?.id, session.phase != .completed {
+            document.active?.deadline = session.deadline
+        }
         if let active = document.active,
            session?.id != active.id || session?.phase == .completed ||
             (session?.phase == .running && session!.remaining(at: date) <= 0) {
             var ended = active
-            ended.ended = min(date, session?.id == active.id ? session?.deadline ?? date : date)
+            ended.ended = min(date, active.deadline ?? date)
+            ended.excludedPaths = []
             document.digests.insert(ended, at: 0)
             document.active = nil
         }
         if let session, document.lastSessionID != session.id {
             document.lastSessionID = session.id
             if allowStart, document.collectFocus, session.phase == .running, session.remaining(at: date) > 0 {
-                var digest = BadgeFocusDigest(id: session.id, modeName: String(session.modeName.prefix(1024)), started: date, incomplete: current.isEmpty)
+                var digest = BadgeFocusDigest(id: session.id, modeName: String(session.modeName.prefix(1024)), started: date, deadline: session.deadline, incomplete: current.isEmpty)
                 for path in current.keys.sorted().prefix(100) {
                     let value = current[path] ?? .unknown
                     digest.rows[path] = BadgeDigestRow(first: value, last: value, hasGap: value == .unknown)
@@ -96,13 +103,18 @@ final class BadgeMemoryStore {
     }
 
     private func collect(path: String, value: BadgeObservation) {
-        guard session?.phase == .running, var active = document.active else { return }
+        guard session?.phase == .running, var active = document.active, !active.excludedPaths.contains(path) else { return }
         if var row = active.rows[path] {
-            if row.last != value { row.last = value; row.changes = min(1_000_000, row.changes + 1) }
+            if row.changes == 0, row.first == .unknown, value != .unknown {
+                // The first reliable value is an endpoint, not an observed count change.
+                row.first = value; row.last = value
+            } else if row.last != value {
+                row.last = value; row.changes = min(1_000_000, row.changes + 1)
+            }
             if value == .unknown { row.hasGap = true }
             active.rows[path] = row
-        } else if value.label != nil, active.rows.count < 100 {
-            active.rows[path] = BadgeDigestRow(first: .unknown, last: value, changes: 1, hasGap: true)
+        } else if value != .unknown, active.rows.count + active.excludedPaths.count < 100 {
+            active.rows[path] = BadgeDigestRow(first: value, last: value)
         }
         document.active = active
     }
@@ -128,7 +140,7 @@ final class BadgeMemoryStore {
         guard !requiresReset else { return }
         document.collectFocus = enabled
         if !enabled, var active = document.active {
-            active.ended = .now; active.incomplete = true
+            active.ended = .now; active.incomplete = true; active.excludedPaths = []
             document.digests.insert(active, at: 0); document.active = nil
         }
         prune(at: .now); persist()
@@ -144,7 +156,11 @@ final class BadgeMemoryStore {
     func clearApp(_ path: String) {
         guard !requiresReset else { return }
         document.apps[path] = nil
-        document.active?.rows[path] = nil
+        if var active = document.active {
+            active.rows[path] = nil
+            if active.rows.count + active.excludedPaths.count < 100 { active.excludedPaths.insert(path) }
+            document.active = active
+        }
         for index in document.digests.indices { document.digests[index].rows[path] = nil }
         persist()
     }
@@ -171,7 +187,11 @@ final class BadgeMemoryStore {
 
     private func persist() {
         do {
-            defaults.set(try JSONEncoder().encode(document), forKey: Self.key)
+            let data = try JSONEncoder().encode(document)
+            // The writer must honor the same aggregate budget as the decoder. Keep the last
+            // readable payload if unusually long paths/text exceed the encoded byte limit.
+            guard data.count <= 4_000_000 else { throw CocoaError(.fileWriteOutOfSpace) }
+            defaults.set(data, forKey: Self.key)
             storageFailed = false
         } catch { storageFailed = true }
     }
@@ -187,8 +207,9 @@ final class BadgeMemoryStore {
         func dateValid(_ date: Date) -> Bool { date.timeIntervalSince1970.isFinite }
         func pathValid(_ path: String) -> Bool { path.hasPrefix("/") && path.count <= 4096 && path.hasSuffix(".app") }
         func digestValid(_ digest: BadgeFocusDigest) -> Bool {
-            digest.rows.count <= 100 && digest.modeName.count <= 1024 && dateValid(digest.started)
-                && (digest.ended.map(dateValid) ?? true) && digest.rows.allSatisfy { path, row in
+            digest.rows.count + digest.excludedPaths.count <= 100 && digest.excludedPaths.allSatisfy(pathValid)
+                && digest.modeName.count <= 1024 && dateValid(digest.started)
+                && (digest.ended.map(dateValid) ?? true) && (digest.deadline.map(dateValid) ?? true) && digest.rows.allSatisfy { path, row in
                     pathValid(path) && valueValid(row.first) && valueValid(row.last) && (0...1_000_000).contains(row.changes)
                 }
         }
