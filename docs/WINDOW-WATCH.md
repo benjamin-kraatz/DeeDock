@@ -36,6 +36,40 @@ Neither command runs automatically on detection.
 - Resize, raster-scale changes, capture failures, and suspension reset evidence. After resume, the
   phrase must again be absent before it can trigger. Repeated alerts cannot occur after completion.
 
+## Observed changes
+
+The expandable **Observed changes** view shows intermediate visual observations without changing
+when the watch confirms its result. Its collapsed state shows the latest observation. Entries mark
+the starting appearance, a new change, continuing movement, settling, a return to the starting
+appearance, or a comparison reset. Repeated observations update one row's timestamp. The watch keeps
+at most 12 recent entries in memory, with the newest first when expanded. These entries have no
+sound or success indicator and describe visual differences, not application events.
+
+The activity view also works in completion-phrase mode. Visual observations do not affect the phrase
+condition. An entry waiting for a visual change to settle does not mean the completion phrase matched.
+
+## Optional AI explanation
+
+Before starting, enable **Explain changes with Apple Intelligence** to request a short explanation
+after detection. It is off by default. Setup checks the on-device model's availability and support
+for the app language. An unavailable model or unsupported language leaves ordinary watching usable.
+
+The explanation compares the selected region from the detector's baseline with the region captured
+when detection succeeds. It uses the readable image crops, not the reduced pixel-comparison arrays.
+A resize, capture interruption, or suspension discards the retained baseline crop along with detector
+evidence. In completion-phrase mode, the final image is the capture that confirms the phrase.
+
+The result and optional sound appear immediately upon detection. The separate **AI explanation**
+section shows generation progress, then one or two sentences in the app language. Generation failure
+leaves the detected result intact. The model may misdescribe a difference or say it cannot identify
+one. Its prose is not proof that an underlying operation succeeded.
+
+Generation uses a fresh on-device Foundation Models session with no tools. Screenshot text is
+untrusted evidence, never instructions. The original crop is retained only when the option is on;
+the original and final crops are held during generation and released afterward. No screenshot is
+written to disk or sent to a cloud model. Stop, Dismiss, and app shutdown cancel owned generation
+and discard its output. Late results from cancelled work are ignored.
+
 ## Capture and lifecycle boundaries
 
 The initial explicit Watch action reuses Peek's conservative public title/geometry matcher to obtain
@@ -71,7 +105,8 @@ occluded-window behavior require native verification. No universal hidden-window
 
 Capture and OCR live on a dedicated actor. One full image, transient crop, two small comparison arrays,
 and at most 128 OCR lines of 512 characters are retained during processing. No image history, disk
-storage, network call, or Foundation Models inference is used. Captured text is comparison data and
+storage, or network call is used. Optional Foundation Models inference runs only after detection,
+with the two region crops described above. Captured text is comparison data and
 never becomes an instruction. Merely hovering Peek does not start this feature's capture or OCR.
 
 The implementation uses Apple's [single-window content filter](https://developer.apple.com/documentation/screencapturekit/sccontentfilter/init(desktopindependentwindow:))

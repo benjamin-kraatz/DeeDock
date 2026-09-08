@@ -1236,6 +1236,19 @@ DeeDock app build passed with Xcode 27, macOS deployment target 27, Swift 5 lang
 default isolation, and approachable concurrency. Tests, automated visual checks, app launch,
 permission changes, and resource profiling were not run. This is compilation evidence only.
 
+Window Watch activity and optional AI explanation update, 2026-09-08:
+
+- Settled-change thresholds and phrase confirmations remain unchanged. A bounded activity view
+  exposes intermediate visual observations, including in phrase mode.
+- Optional on-device image comparison runs after detection, in the app language, with matching
+  baseline/final region crops and cancellation on dismissal. English and German copy is included.
+- Manual acceptance remains pending: expand/collapse activity during motion and return to baseline;
+  check history coalescing; enable AI before Start; inspect explanation language and accuracy;
+  resize or interrupt capture before detection; dismiss during generation; try unavailable AI.
+- The DeeDock Debug build passed with Xcode 27 for macOS, including the new source files and
+  generated localization symbols. Log: `/tmp/DeeDock-watch-enhancements-build-final.log`.
+  Tests, automated visual checks, and native app launch were not run for this update.
+
 Model/state cases worth testing when authorized:
 
 - Initial baseline, transient image changes, steady changed image, persistent animation, small noise,

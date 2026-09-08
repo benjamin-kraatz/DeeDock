@@ -29,6 +29,8 @@ final class WindowWatchSession {
     var problem = false
     var startDate: Date?
     var checkCount = 0
+    var activity: [WindowWatchActivityEntry] = []
+    let explanation = WindowWatchExplanation()
 
     var phase: WindowWatchPhase {
         if detected { return .detected }
@@ -120,6 +122,8 @@ final class WindowWatchSession {
         problem = false
         detected = false
         checkCount = 0
+        activity = []
+        explanation.cancel()
         startDate = Date()
         detector = WindowWatchDetector()
         size = nil
@@ -130,6 +134,7 @@ final class WindowWatchSession {
     /// Returns a drain barrier so a replacement watch cannot overlap an in-flight OS request.
     @discardableResult
     func stop() -> Task<Void, Never> {
+        explanation.cancel()
         let pendingCapture = task
         let pendingSource = sourceTask
         generation = UUID()
@@ -211,7 +216,7 @@ final class WindowWatchSession {
                     _ = try validateProcess()
                     // Geometry changes invalidate evidence. A resized layout requires a new baseline.
                     if size != frame.size || pixelSize != frame.pixelSize {
-                        detector = WindowWatchDetector()
+                        resetEvidence()
                         size = frame.size
                         pixelSize = frame.pixelSize
                     }
@@ -219,12 +224,16 @@ final class WindowWatchSession {
                     lastSample = Date()
                     checkCount += 1
                     problem = false
-                    if detector.consume(pixels: frame.pixels, lines: frame.lines, phrase: watchedPhrase) {
+                    explanation.retainBaseline(frame.regionImage)
+                    let matched = detector.consume(pixels: frame.pixels, lines: frame.lines, phrase: watchedPhrase)
+                    recordObservation(matched ? .confirmed : detector.observation)
+                    if matched {
                         active = false
                         finished = true
                         detected = true
                         message = watchedPhrase.isEmpty ? .watchChangeDetected : .watchPhraseDetected
                         if playSound { NSSound.beep() }
+                        explanation.explain(final: frame.regionImage)
                         removeObservers()
                         task = nil
                         return
@@ -233,13 +242,30 @@ final class WindowWatchSession {
                 } catch {
                     staleTask?.cancel()
                     guard !Task.isCancelled, generation == expected else { return }
-                    detector = WindowWatchDetector()
+                    resetEvidence()
                     fail(error)
                     if !active { removeObservers(); return }
                 }
                 do { try await Task.sleep(for: .seconds(3)) } catch { return }
             }
         }
+    }
+
+    /// Keep recent transitions only. Repeated motion updates one row instead of flooding history.
+    private func recordObservation(_ observation: WindowWatchObservation) {
+        let now = Date()
+        if activity.last?.observation == observation {
+            activity[activity.count - 1].date = now
+        } else {
+            activity.append(WindowWatchActivityEntry(observation: observation, date: now))
+            if activity.count > 12 { activity.removeFirst(activity.count - 12) }
+        }
+    }
+
+    private func resetEvidence() {
+        detector = WindowWatchDetector()
+        explanation.resetBaseline()
+        if checkCount > 0 { recordObservation(.reset) }
     }
 
     private func validateProcess() throws -> NSRunningApplication {
@@ -309,7 +335,7 @@ final class WindowWatchSession {
         generation = UUID()
         task?.cancel()
         staleTask?.cancel()
-        detector = WindowWatchDetector()
+        resetEvidence()
         image = nil
         message = .watchSuspended
         if suspensionReasons.isEmpty { run() }

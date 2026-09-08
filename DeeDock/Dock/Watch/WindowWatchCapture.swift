@@ -9,6 +9,7 @@ nonisolated enum WindowWatchFailure: Error {
 
 nonisolated struct WindowWatchFrame: Sendable {
     let image: CGImage
+    let regionImage: CGImage
     let pixels: [UInt8]
     let lines: [String]
     let size: CGSize
@@ -103,7 +104,7 @@ actor WindowWatchCapture {
             lines = try await request.perform(on: crop).prefix(128).map { String($0.transcript.prefix(512)).trimmingCharacters(in: .whitespacesAndNewlines) }
         }
         try Task.checkCancellation()
-        return WindowWatchFrame(image: image, pixels: bytes, lines: lines, size: current.frame.size,
+        return WindowWatchFrame(image: image, regionImage: crop, pixels: bytes, lines: lines, size: current.frame.size,
                                 pixelSize: CGSize(width: image.width, height: image.height))
     }
 }

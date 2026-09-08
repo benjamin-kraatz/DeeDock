@@ -27,22 +27,35 @@ nonisolated struct WindowWatchDetector: Sendable {
     private var previous: [UInt8]?
     private var confirmations = 0
     private var sawPhraseAbsent = false
+    private(set) var observation: WindowWatchObservation = .baseline
+    private var wasChanged = false
 
     mutating func consume(pixels: [UInt8], lines: [String], phrase: String) -> Bool {
+        let changed: Bool
+        let settled: Bool
+        if let baseline, let previous {
+            changed = Self.changedFraction(baseline, pixels) >= 0.005
+            settled = Self.changedFraction(previous, pixels) < 0.002
+            if changed {
+                observation = !wasChanged ? .change : (settled ? .settling : .changing)
+            } else if wasChanged {
+                observation = .returned
+            }
+        } else {
+            baseline = pixels
+            changed = false
+            settled = false
+            observation = .baseline
+        }
+        previous = pixels
+        wasChanged = changed
         if !phrase.isEmpty {
             let found = lines.contains { $0.compare(phrase, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
             if !found { sawPhraseAbsent = true }
             confirmations = found && sawPhraseAbsent ? confirmations + 1 : 0
         } else {
-            guard let baseline, let previous else {
-                baseline = pixels
-                previous = pixels
-                return false
-            }
             // Reject single-frame noise and moving imagery. A changed image must settle for three samples.
-            confirmations = Self.changedFraction(baseline, pixels) >= 0.005
-                && Self.changedFraction(previous, pixels) < 0.002 ? confirmations + 1 : 0
-            self.previous = pixels
+            confirmations = changed && settled ? confirmations + 1 : 0
         }
         return confirmations >= 3
     }

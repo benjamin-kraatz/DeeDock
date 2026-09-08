@@ -12,6 +12,7 @@ struct WindowWatchView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.locale) private var locale
     @State private var fineTuning = false
 
     /// The watched app's own color carries the panel, so it is recognizably about that window.
@@ -34,6 +35,8 @@ struct WindowWatchView: View {
                     case .detected: result
                     case .preparing, .ended: if !session.problem { status }
                     }
+                    WindowWatchExplanationView(explanation: session.explanation)
+                    WindowWatchActivityView(entries: session.activity)
                     if let message = session.sourceMessage {
                         Text(message).font(.caption).foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -46,6 +49,7 @@ struct WindowWatchView: View {
             Divider()
             footer
         }
+        .task(id: locale.identifier) { session.explanation.refreshAvailability(locale: locale) }
         .tint(tint)
         .background(reduceTransparency ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor))
                                        : AnyShapeStyle(.regularMaterial))
@@ -183,11 +187,16 @@ struct WindowWatchView: View {
                 }
             }
             WindowWatchSection(title: .watchSectionDelivery, symbol: "bell") {
-                VStack(alignment: .leading, spacing: 8) {
-                    Toggle(.watchSound, isOn: $session.playSound).toggleStyle(.switch)
-                    Text(.watchDeliveryHelp)
-                        .font(.caption).foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 16) {
+                    WindowWatchExplanationSetup(explanation: session.explanation, locale: locale)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Toggle(.watchSound, isOn: $session.playSound)
+                            .toggleStyle(TrailingSwitchToggleStyle())
+                        Text(.watchDeliveryHelp)
+                            .font(.caption).foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
             }
         }
