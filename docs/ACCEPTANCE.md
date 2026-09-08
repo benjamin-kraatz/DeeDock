@@ -1757,17 +1757,23 @@ over another application's full-screen window. A timeout records an unresolved r
 than forcing repeated activation. Compilation does not establish native focus acceptance.
 
 
-### System Dock presence while app windows are open
+### DDock's own icon while app windows are open
 
-DDock switches to regular activation policy before presenting Settings, Welcome, Window Search,
-Badge Memory, or the update window. It returns to accessory policy after the last tracked window
-closes or is explicitly dismissed. Minimized windows, app hiding, and windows behind other apps
-retain the icon. Dock panels, Launcher, and floating previews do not count. Clicking the system
-Dock icon presents an existing tracked window without creating another instance. The existing
-AppIcon asset supplies the artwork; no system Dock preferences are changed.
+DDock stays an accessory app, absent from the macOS system Dock. Its own application catalog
+adds the bundled app icon while Settings, Welcome, Window Search, Badge Memory, or an update
+window is open. Window membership changes refresh all display docks without waiting for a
+Workspace launch event. The running entry disappears after the last tracked window closes or
+is explicitly dismissed. Minimized windows, app hiding, and windows behind other apps count;
+dock panels, Launcher, and floating previews do not.
 
-Native validation remains pending for multiple simultaneous windows, close/reopen in one action,
-minimization and restoration through the Dock icon, Cmd-H, passive update presentation, dismissal
-of update progress, Spaces/full-screen transitions, and focus across activation-policy changes.
-The focused unsigned Debug build passed for this follow-up. Tests, app launch, and automated
-visual checks were not run.
+Clicking DDock's tile restores an existing owned window, even when DDock is already foreground;
+it never hides the replacement dock as part of the ordinary app-icon toggle. DDock's own tile
+bypasses secondary-display external-window filtering so its windows stay reachable without
+capture permissions. Running-section hide/collapse settings and explicit user pins retain their
+normal behavior. The temporary system Dock activation-policy implementation was removed.
+
+Native validation remains pending for multiple windows, last-window close/reopen, minimized
+window restoration, Cmd-H, passive updates and progress dismissal, secondary-display filtering,
+section visibility, Spaces, and full-screen transitions. The focused unsigned Debug app build
+passed. The new window tracker was added to the existing test target source list; tests, app
+launch, and automated visual checks were not run for this correction.

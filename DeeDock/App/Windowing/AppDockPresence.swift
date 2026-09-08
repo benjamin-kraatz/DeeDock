@@ -1,7 +1,6 @@
 import AppKit
-import OSLog
 
-/// Shows the system Dock icon for open app windows, excluding transient and floating panels.
+/// Tracks DDock-owned app windows for its own dock, excluding transient and floating panels.
 /// Membership follows open/close intent, so minimization, app hiding, and occlusion retain the icon.
 @MainActor
 final class AppDockPresence {
@@ -11,7 +10,18 @@ final class AppDockPresence {
     private weak var lastOpenedWindow: NSWindow?
     private var closeObserver: NSObjectProtocol?
     private var update: Task<Void, Never>?
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "DDock", category: "DockPresence")
+    /// Catalogs refresh on membership changes without waiting for a Workspace app launch.
+    static let didChangeNotification = Notification.Name("DDockOwnedWindowsDidChange")
+    private var publishedPresence = false
+
+    var hasOpenWindows: Bool { !windows.allObjects.isEmpty }
+
+    /// Stable identity for the app tile; it uses the bundled app icon through ApplicationService.
+    static var applicationID: String { Bundle.main.bundleIdentifier ?? Bundle.main.bundleURL.standardizedFileURL.path }
+
+    static func representsCurrentApplication(_ reference: ApplicationReference) -> Bool {
+        reference.id == applicationID
+    }
 
     /// Installs one application-lifetime close observer. Preview hosts do not start this service.
     func start() {
@@ -24,16 +34,15 @@ final class AppDockPresence {
                 self?.windowDidCloseOrHide(window)
             }
         }
-        applyPolicy()
+        scheduleUpdate()
     }
 
-    /// Promote before window activation; registering an already open window is idempotent.
+    /// Register before presentation; an already open window never adds a duplicate tile.
     func windowWillOpen(_ window: NSWindow) {
         guard closeObserver != nil, !(window is NSPanel), window.styleMask.contains(.titled) else { return }
-        update?.cancel(); update = nil
         windows.add(window)
         lastOpenedWindow = window
-        applyPolicy()
+        scheduleUpdate()
     }
 
     /// Explicit order-out counts as dismissal; application-wide Hide does not call this method.
@@ -41,35 +50,35 @@ final class AppDockPresence {
         guard windows.contains(window) else { return }
         windows.remove(window)
         if lastOpenedWindow === window { lastOpenedWindow = nil }
+        scheduleUpdate()
+    }
+
+    /// Defer catalog publication beyond SwiftUI attachment and native close callbacks. Opening
+    /// a replacement window in the same action keeps the existing tile and its running order.
+    private func scheduleUpdate() {
         update?.cancel()
-        // willClose arrives before native teardown. A replacement window opened in the same
-        // action cancels this update, avoiding a brief accessory/regular transition.
         update = Task { @MainActor [weak self] in
             guard let self, !Task.isCancelled else { return }
             update = nil
-            applyPolicy()
+            let present = hasOpenWindows
+            guard present != publishedPresence else { return }
+            publishedPresence = present
+            NotificationCenter.default.post(name: Self.didChangeNotification, object: self)
         }
     }
 
-    /// The system Dock icon reopens an existing window, including a minimized one.
+    /// Clicking DDock in its own dock restores an existing window, including a minimized one.
     var windowToReopen: NSWindow? {
         lastOpenedWindow ?? windows.allObjects.first
     }
 
-    private func applyPolicy() {
-        let policy: NSApplication.ActivationPolicy = windows.allObjects.isEmpty ? .accessory : .regular
-        guard NSApp.activationPolicy() != policy else { return }
-        if !NSApp.setActivationPolicy(policy) {
-            logger.error("Could not change system Dock presence to activation policy \(policy.rawValue)")
-        }
-    }
-
-    /// Removes observation during app termination without changing activation mid-teardown.
+    /// Removes observation during app termination without publishing catalog changes mid-teardown.
     func stop() {
         update?.cancel(); update = nil
         if let closeObserver { NotificationCenter.default.removeObserver(closeObserver) }
         closeObserver = nil
         windows.removeAllObjects()
         lastOpenedWindow = nil
+        publishedPresence = false
     }
 }
