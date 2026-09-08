@@ -8,6 +8,13 @@ nonisolated enum LauncherSuggestionBaseline {
 
     static func scores(context: LauncherSuggestionContext, examples: [LauncherSuggestionExample],
                        feedback: [LauncherSuggestionFeedback], excluded: Set<String>, now: Date) -> [String: Double] {
+        LauncherSuggestionRanking.adjust(rawScores(context: context, examples: examples, excluded: excluded, now: now),
+                                         context: context, feedback: feedback, excluded: excluded, now: now)
+    }
+
+    /// Unnormalized baseline evidence; age decay is already included in these contributions.
+    static func rawScores(context: LauncherSuggestionContext, examples: [LauncherSuggestionExample],
+                          excluded: Set<String>, now: Date) -> [String: Double] {
         let cutoff = now.addingTimeInterval(-LauncherSuggestionDocument.retention)
         var scores: [String: Double] = [:]
         for example in examples {
@@ -24,24 +31,7 @@ nonisolated enum LauncherSuggestionBaseline {
             let recent = Set(previous.recentIDs.prefix(3)).intersection(context.recentIDs.prefix(3)).isEmpty ? 0 : 0.25
             scores[example.targetID, default: 0] += decay * (1 + transition + time + weekday + mode + recent)
         }
-        // Normalize before feedback so a rejection remains effective with a long history.
-        let maximum = scores.values.max() ?? 1
-        scores = scores.mapValues { $0 / max(maximum, 0.001) }
-        for (id, score) in scores {
-            let recency = context.secondsSinceUse[id].map { 0.1 * exp(-$0 / 3600) } ?? 0
-            let running = context.runningIDs.contains(id) ? 0.025 : 0
-            scores[id] = score + recency + running
-        }
-        // A feedback context is intentionally narrow; changing foreground, mode, weekday, or
-        // time band stops a negative signal from becoming a global app exclusion.
-        for item in feedback where item.date > cutoff && item.date <= now && item.context.date > cutoff && item.context.date <= now {
-            guard !excluded.contains(item.appID), item.appID != context.foregroundID,
-                  item.context.foregroundID == context.foregroundID, item.context.modeID == context.modeID,
-                  item.context.weekday == context.weekday, item.context.hour / 3 == context.hour / 3 else { continue }
-            let decay = exp(-now.timeIntervalSince(item.date) / (21 * 86400))
-            scores[item.appID, default: 0] += (item.kind == .useful ? 0.35 : -1.5) * decay
-        }
-        return scores.filter { $0.value > 0 }
+        return scores
     }
 
     @concurrent static func rank(context: LauncherSuggestionContext, document: LauncherSuggestionDocument,
@@ -49,6 +39,6 @@ nonisolated enum LauncherSuggestionBaseline {
         guard !Task.isCancelled else { return [] }
         let values = scores(context: context, examples: document.examples, feedback: document.feedback, excluded: excluded, now: now)
         guard !Task.isCancelled else { return [] }
-        return values.keys.sorted { values[$0] == values[$1] ? $0 < $1 : values[$0]! > values[$1]! }
+        return LauncherSuggestionRanking.sortedIDs(values)
     }
 }

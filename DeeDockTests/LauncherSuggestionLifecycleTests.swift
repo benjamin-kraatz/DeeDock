@@ -17,7 +17,8 @@ struct LauncherSuggestionLifecycleTests {
                 modelVersion: LauncherSuggestionBaseline.version)
         }
         try await repository.save(document, sequence: 1)
-        let store = LauncherSuggestionsStore(directory: directory, defaults: nil)
+        let store = LauncherSuggestionsStore(directory: directory, defaults: nil,
+                                              coreMLSeedURL: directory.appendingPathComponent("unused-seed.mlmodelc"))
         await store.prepare()
         store.setEnabled(true)
         try #require(store.shouldPrompt)
@@ -27,7 +28,8 @@ struct LauncherSuggestionLifecycleTests {
         let saved = try await repository.load()
         #expect(saved.promptAnswers.count == 1)
         #expect(saved.feedback.isEmpty)
-        let reloaded = LauncherSuggestionsStore(directory: directory, defaults: nil)
+        let reloaded = LauncherSuggestionsStore(directory: directory, defaults: nil,
+                                              coreMLSeedURL: directory.appendingPathComponent("unused-seed.mlmodelc"))
         await reloaded.prepare()
         reloaded.setEnabled(true)
         #expect(!reloaded.shouldPrompt)
@@ -178,6 +180,7 @@ struct LauncherSuggestionLifecycleTests {
 
     private func learnedStore() -> LauncherSuggestionsStore {
         let store = LauncherSuggestionsStore(directory: nil, defaults: nil)
+        store.setTuning(.init(minHistory: 0, minSupport: 0, minDays: 0, minAgreement: 0, maxDistance: 20, neighbors: 15))
         store.setEnabled(true)
         observeTransition(store, start: Date().addingTimeInterval(-30))
         return store

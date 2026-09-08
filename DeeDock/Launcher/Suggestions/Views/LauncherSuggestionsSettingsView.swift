@@ -6,6 +6,9 @@ struct LauncherSuggestionsSettingsView: View {
     /// Names come from the current app library, never from stored learning history.
     var applications: [LauncherApplication] = []
     @State private var confirmingReset = false
+    #if DEBUG
+    @State private var showingSuggestionInspector = false
+    #endif
 
     private var exclusions: [(id: String, name: String)] {
         store.excludedIDs.map { id in
@@ -35,6 +38,10 @@ struct LauncherSuggestionsSettingsView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            LauncherSuggestionEngineSettingsCard(store: store)
+            #if DEBUG
+            LauncherSuggestionDeveloperSettingsView(store: store) { showingSuggestionInspector = true }
+            #endif
             SettingsCard(title: .launcherSuggestionsFeedbackTitle,
                          footnote: .launcherSuggestionsPromptsHelp) {
                 SettingsToggleRow(title: .launcherSuggestionsPromptsEnabled,
@@ -74,6 +81,45 @@ struct LauncherSuggestionsSettingsView: View {
             Button(.actionCancel, role: .cancel) { }
         } message: {
             Text(.launcherSuggestionsResetConfirmation)
+        }
+        #if DEBUG
+        .sheet(isPresented: $showingSuggestionInspector) {
+            LauncherSuggestionInspectorView(store: store, applications: applications)
+        }
+        #endif
+    }
+}
+
+/// Temporary engine comparison control using the shared local learning history.
+private struct LauncherSuggestionEngineSettingsCard: View {
+    let store: LauncherSuggestionsStore
+
+    var body: some View {
+        SettingsCard(title: .launcherSuggestionsEngineTitle,
+                     footnote: .launcherSuggestionsEngineHelp) {
+            SettingsMenuRow(title: .launcherSuggestionsEnginePicker,
+                            selection: Binding(get: { store.engine }, set: store.setEngine)) {
+                Text(.launcherSuggestionsEngineBaseline).tag(LauncherSuggestionEngine.baseline)
+                Text(.launcherSuggestionsEngineCoreML).tag(LauncherSuggestionEngine.coreML)
+            }
+            if store.engineBusy {
+                SettingsStackedRow {
+                    HStack(spacing: SettingsMetrics.controlSpacing) {
+                        ProgressView().controlSize(.small)
+                        Text(.launcherSuggestionsEnginePreparing)
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            } else if store.engineUnavailable {
+                SettingsStackedRow {
+                    Text(.launcherSuggestionsEngineUnavailable)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
     }
 }

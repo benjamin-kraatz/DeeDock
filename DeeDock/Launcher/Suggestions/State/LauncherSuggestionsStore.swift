@@ -11,6 +11,16 @@ final class LauncherSuggestionsStore {
     private(set) var promptsEnabled = true
     private(set) var storageUnavailable = false
     private(set) var ready = false
+    private(set) var engine: LauncherSuggestionEngine = .baseline
+    private(set) var tuning = LauncherSuggestionTuning()
+#if DEBUG
+    private let debugController = LauncherSuggestionDebugController()
+    var debugSnapshot: LauncherSuggestionDebugSnapshot? { debugController.snapshot }
+    var debugBusy: Bool { debugController.busy }
+    var debugError: Bool { debugController.failed }
+#endif
+    private(set) var engineBusy = false
+    private(set) var engineUnavailable = false
     private(set) var revision = UUID()
     private var promptRevision = 0
     private var revokedAt: [String: Date] = [:]
@@ -28,7 +38,10 @@ final class LauncherSuggestionsStore {
     @ObservationIgnored private var sessionActive = false
     @ObservationIgnored private var latestClock: Date?
     @ObservationIgnored private var timeZone = TimeZone.autoupdatingCurrent.identifier
-    @ObservationIgnored private var rankTasks: [UUID: Task<[String], Never>] = [:]
+    @ObservationIgnored private var rankTasks: [UUID: Task<LauncherSuggestionEvaluation, Error>] = [:]
+    @ObservationIgnored private var coreML: LauncherSuggestionCoreML
+    @ObservationIgnored private let coreMLSeedURL: URL?
+    @ObservationIgnored private let cleansAbandonedModels: Bool
     @ObservationIgnored private var learningGeneration = UUID()
     private static let preferencesKey = "launcher.suggestions.preferences.v1"
 
@@ -38,20 +51,32 @@ final class LauncherSuggestionsStore {
     }
 
     /// Nil directory and defaults are fully isolated from real preferences and user history.
-    init(directory: URL? = LauncherSuggestionsStore.defaultDirectory, defaults: UserDefaults? = .standard) {
+    init(directory: URL? = LauncherSuggestionsStore.defaultDirectory, defaults: UserDefaults? = .standard,
+         coreMLSeedURL: URL? = nil) {
         self.defaults = defaults
+        self.coreMLSeedURL = coreMLSeedURL
+        cleansAbandonedModels = directory != nil && coreMLSeedURL == nil
+        coreML = LauncherSuggestionCoreML(seedURL: coreMLSeedURL)
         repository = LauncherSuggestionsRepository(directory: directory)
         if let data = defaults?.data(forKey: Self.preferencesKey) {
             if let settings = try? JSONDecoder().decode(Preferences.self, from: data), settings.version == 1 {
                 enabled = settings.enabled; paused = settings.paused
                 excludedIDs = Set(settings.excludedIDs.filter(Self.validIdentity))
                 promptsEnabled = settings.promptsEnabled
+                engine = settings.engine ?? .baseline
             } else { storageUnavailable = true }
         }
+#if DEBUG
+        if let data = defaults?.data(forKey: "launcher.suggestions.debugTuning.v1"),
+           let stored = try? JSONDecoder().decode(LauncherSuggestionTuning.self, from: data) {
+            tuning = stored.clamped
+        }
+#endif
         if directory == nil { ready = true; return }
         let repository = repository
         loadTask = Task { [weak self] in
             do {
+                if coreMLSeedURL == nil { await LauncherSuggestionCoreML.removeAbandonedTrainingFiles() }
                 let loaded = try await repository.load()
                 guard let self, !Task.isCancelled else { return }
                 document = loaded
@@ -82,6 +107,47 @@ final class LauncherSuggestionsStore {
         paused = value
         invalidate(); savePreferences()
     }
+
+    /// Temporary comparison switch. History and consent remain unchanged; the next Launcher
+    /// presentation uses this engine, and work from the previous engine cannot publish.
+    func setEngine(_ value: LauncherSuggestionEngine) {
+        guard value != engine else { return }
+        engine = value
+        revision = UUID()
+        cancelLearning(preserveDebug: true); savePreferences()
+    }
+
+#if DEBUG
+    /// Display gates apply on the next request without retraining. Changing k also retires
+    /// the model cache. Debug preferences are deliberately ignored in Release builds.
+    func setTuning(_ value: LauncherSuggestionTuning) {
+        let value = value.clamped
+        guard value != tuning else { return }
+        let changedNeighbors = value.neighbors != tuning.neighbors
+        tuning = value
+        revision = UUID()
+        if changedNeighbors { cancelLearning(preserveDebug: true) }
+        else {
+            learningGeneration = UUID()
+            rankTasks.values.forEach { $0.cancel() }; rankTasks.removeAll()
+            engineBusy = false; engineUnavailable = false
+            debugController.cancel(preserveSnapshot: true)
+        }
+        if let data = try? JSONEncoder().encode(value) {
+            defaults?.set(data, forKey: "launcher.suggestions.debugTuning.v1")
+        }
+    }
+
+    func resetTuning() { setTuning(LauncherSuggestionTuning()) }
+    func clearDebugSnapshot() { debugController.cancel() }
+    func captureLatestDebugSnapshot() { debugController.freezeLatest() }
+    func cancelDebugReplay() { debugController.cancel(preserveSnapshot: true) }
+    func replayDebug() async {
+        maintenance(now: Date())
+        guard isActive else { return }
+        await debugController.replay(tuning: tuning)
+    }
+#endif
 
     func setPromptsEnabled(_ value: Bool) { promptsEnabled = value; savePreferences() }
     func suppressPrompts() { setPromptsEnabled(false) }
@@ -132,15 +198,43 @@ final class LauncherSuggestionsStore {
         guard isActive else { return nil }
         let epoch = revision
         let learningEpoch = learningGeneration
-        let taskID = UUID(), document = document, excluded = excludedIDs
-        let task = Task { await LauncherSuggestionBaseline.rank(context: context, document: document, excluded: excluded, now: now) }
+        let selectedEngine = engine
+        let taskID = UUID(), document = document, excluded = excludedIDs, coreML = coreML
+        engineUnavailable = false
+        let tuning = tuning
+        let task = Task<LauncherSuggestionEvaluation, Error> {
+            try await LauncherSuggestionEvidence.prediction(engine: selectedEngine, context: context, document: document,
+                excluded: excluded, now: now, tuning: tuning, coreML: coreML)
+        }
         rankTasks[taskID] = task
-        let ids = await withTaskCancellationHandler { await task.value } onCancel: { task.cancel() }
-        rankTasks[taskID] = nil
-        guard !Task.isCancelled, !task.isCancelled, isActive, revision == epoch,
-              learningGeneration == learningEpoch else { return nil }
-        return LauncherSuggestionSnapshot(context: context, modelVersion: LauncherSuggestionBaseline.version,
-            rankedIDs: ids.filter { eligible($0) != nil }, createdAt: now, generation: epoch)
+        engineBusy = selectedEngine == .coreML
+        defer {
+            rankTasks[taskID] = nil
+            engineBusy = engine == .coreML && !rankTasks.isEmpty
+        }
+        do {
+            let evaluation = try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+            guard !Task.isCancelled, !task.isCancelled, isActive, revision == epoch,
+                  learningGeneration == learningEpoch, engine == selectedEngine else { return nil }
+            engineUnavailable = false
+#if DEBUG
+            debugController.capture(context: context, document: document, excluded: excluded, now: now,
+                                    seedURL: coreMLSeedURL, tuning: tuning, evaluation: evaluation)
+#endif
+            return LauncherSuggestionSnapshot(context: context, modelVersion: selectedEngine.modelVersion,
+                rankedIDs: evaluation.rankedIDs.filter { eligible($0) != nil }, createdAt: now, generation: epoch)
+        } catch {
+            if let failure = error as? LauncherSuggestionCoreML.Failure, case .superseded = failure { return nil }
+            guard !Task.isCancelled, !task.isCancelled, !(error is CancellationError), isActive,
+                  revision == epoch, learningGeneration == learningEpoch, engine == selectedEngine else { return nil }
+            // Comparison must not silently substitute baseline predictions for a failed model.
+            engineUnavailable = true
+#if DEBUG
+            debugController.capture(context: context, document: document, excluded: excluded, now: now,
+                                    seedURL: coreMLSeedURL, tuning: tuning, evaluation: nil)
+#endif
+            return nil
+        }
     }
 
     func feedback(appID: String, kind: LauncherSuggestionFeedback.Kind, snapshot: LauncherSuggestionSnapshot) {
@@ -231,7 +325,7 @@ final class LauncherSuggestionsStore {
 
     func stop() {
         endSession()
-        rankTasks.values.forEach { $0.cancel() }; rankTasks.removeAll()
+        revision = UUID(); cancelLearning()
         activityChanged = nil
     }
 
@@ -292,9 +386,20 @@ final class LauncherSuggestionsStore {
         activityChanged?()
     }
 
-    private func cancelLearning() {
+    private func cancelLearning(preserveDebug: Bool = false) {
+#if DEBUG
+        debugController.cancel(preserveSnapshot: preserveDebug)
+#endif
         learningGeneration = UUID()
         rankTasks.values.forEach { $0.cancel() }; rankTasks.removeAll()
+        engineBusy = false; engineUnavailable = false
+        let retired = coreML
+        coreML = LauncherSuggestionCoreML(seedURL: coreMLSeedURL)
+        let cleansAbandonedModels = cleansAbandonedModels
+        Task {
+            await retired.reset()
+            if cleansAbandonedModels { await LauncherSuggestionCoreML.removeAbandonedTrainingFiles() }
+        }
     }
 
     private func persist() {
@@ -326,7 +431,8 @@ final class LauncherSuggestionsStore {
     }
 
     private func savePreferences() {
-        let settings = Preferences(enabled: enabled, paused: paused, excludedIDs: excludedIDs.sorted(), promptsEnabled: promptsEnabled)
+        let settings = Preferences(enabled: enabled, paused: paused, excludedIDs: excludedIDs.sorted(), promptsEnabled: promptsEnabled,
+                                   engine: engine)
         if let data = try? JSONEncoder().encode(settings) { defaults?.set(data, forKey: Self.preferencesKey) }
     }
 
@@ -336,5 +442,6 @@ final class LauncherSuggestionsStore {
         var paused: Bool
         var excludedIDs: [String]
         var promptsEnabled: Bool
+        var engine: LauncherSuggestionEngine? = nil
     }
 }

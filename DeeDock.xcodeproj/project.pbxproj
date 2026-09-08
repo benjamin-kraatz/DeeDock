@@ -107,6 +107,13 @@
 		DE26B0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift */; };
 		DE26B0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift */; };
 		DE26B0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift */; };
+		DE26B0000000000000000007 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000007 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift */; };
+		DE26B0000000000000000008 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000008 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift */; };
+		DE26B0000000000000000009 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000009 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift */; };
+		DE26B000000000000000000A /* DeeDock/Resources/LauncherSuggestions.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DE26F000000000000000000A /* DeeDock/Resources/LauncherSuggestions.mlmodel */; };
+		DE26B000000000000000000B /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F000000000000000000B /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift */; };
+		DE26B000000000000000000C /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F000000000000000000C /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionEvidence.swift */; };
+		DE26B000000000000000000D /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F000000000000000000D /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift */; };
 		DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = DEE400000000000000000002 /* Sparkle-LICENSE.txt */; };
 		DEE8B0000000000000000000 /* DeeDock/Launcher/Models/LauncherApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE8F0000000000000000000 /* DeeDock/Launcher/Models/LauncherApplication.swift */; };
 		DEE8B0000000000000000001 /* DeeDock/Launcher/Discovery/LauncherDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE8F0000000000000000001 /* DeeDock/Launcher/Discovery/LauncherDiscovery.swift */; };
@@ -220,6 +227,13 @@
 		DE26F0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift; sourceTree = SOURCE_ROOT; };
 		DE26F0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/State/LauncherBrowseNavigation.swift; sourceTree = SOURCE_ROOT; };
 		DE26F0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000007 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000008 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000009 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift; sourceTree = SOURCE_ROOT; };
+		DE26F000000000000000000A /* DeeDock/Resources/LauncherSuggestions.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DeeDock/Resources/LauncherSuggestions.mlmodel; sourceTree = SOURCE_ROOT; };
+		DE26F000000000000000000B /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift; sourceTree = SOURCE_ROOT; };
+		DE26F000000000000000000C /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionEvidence.swift; sourceTree = SOURCE_ROOT; };
+		DE26F000000000000000000D /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift; sourceTree = SOURCE_ROOT; };
 		DEE400000000000000000002 /* Sparkle-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Sparkle-LICENSE.txt"; path = "ThirdParty/Sparkle-LICENSE.txt"; sourceTree = "<group>"; };
 		DEE8F0000000000000000000 /* DeeDock/Launcher/Models/LauncherApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Models/LauncherApplication.swift; sourceTree = SOURCE_ROOT; };
 		DEE8F0000000000000000001 /* DeeDock/Launcher/Discovery/LauncherDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Discovery/LauncherDiscovery.swift; sourceTree = SOURCE_ROOT; };
@@ -393,6 +407,13 @@
 				DE26F0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift */,
 				DE26F0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift */,
 				DE26F0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift */,
+				DE26F000000000000000000A /* DeeDock/Resources/LauncherSuggestions.mlmodel */,
+				DE26F000000000000000000B /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift */,
+				DE26F000000000000000000C /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionEvidence.swift */,
+				DE26F000000000000000000D /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift */,
+				DE26F0000000000000000009 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift */,
+				DE26F0000000000000000008 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift */,
+				DE26F0000000000000000007 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift */,
 				DD7000000000000000000005 /* DeeDock/Dock/State/DockSession.swift */,
 				DD7000000000000000000004 /* DeeDock/Settings/State/DockSettingsStore.swift */,
 				DD7000000000000000000003 /* DeeDock/Settings/Profiles/DisplayProfilesStore.swift */,
@@ -646,6 +667,13 @@
 				DE26B0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift in Sources */,
 				DE26B0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift in Sources */,
 				DE26B0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift in Sources */,
+				DE26B000000000000000000A /* DeeDock/Resources/LauncherSuggestions.mlmodel in Sources */,
+				DE26B000000000000000000B /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift in Sources */,
+				DE26B000000000000000000C /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionEvidence.swift in Sources */,
+				DE26B000000000000000000D /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift in Sources */,
+				DE26B0000000000000000009 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift in Sources */,
+				DE26B0000000000000000008 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift in Sources */,
+				DE26B0000000000000000007 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift in Sources */,
 				DD6000000000000000000005 /* DeeDock/Dock/State/DockSession.swift in Sources */,
 				DD6000000000000000000004 /* DeeDock/Settings/State/DockSettingsStore.swift in Sources */,
 				DD6000000000000000000003 /* DeeDock/Settings/Profiles/DisplayProfilesStore.swift in Sources */,

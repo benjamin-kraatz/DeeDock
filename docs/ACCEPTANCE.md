@@ -45,6 +45,75 @@ Real chronological quality, results by history age, ranking stability, and idle 
 Public session notifications do not guarantee a screen-lock boundary, so foreground duration
 is omitted rather than treating unattended time as active use. DEE-26 is not native-acceptance complete.
 
+
+### Selectable Core ML engine follow-up
+
+Added a temporary Development picker to App Suggestions settings. The weighted baseline remains
+selected by default. Core ML trains locally from the same retained examples using a bundled empty,
+updatable nearest-neighbor seed. Switching preserves consent and history, cancels stale predictions,
+and takes effect on the next Launcher opening. Preparing and unavailable states are explicit;
+model failure does not silently use the baseline.
+
+The focused unsigned Debug app build passed with Xcode-beta:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -derivedDataPath /tmp/DeeDock-DEE26-CoreML-build CODE_SIGNING_ALLOWED=NO build
+```
+
+Log: `/tmp/DeeDock-DEE26-CoreML-build.log`. Direct resource inspection confirmed the packaged
+model is updatable with the expected input and outputs. All seven added English and German
+strings are packaged; existing catalog entries are unchanged.
+
+The isolated focused runner passed **32 tests across five suites** using Xcode-beta, including
+actual model updates and inference, concurrent requests, cancellation, history invalidation,
+isolated abandoned-file cleanup, preference migration, baseline score preservation, and failure
+without fallback. Log: `/tmp/dee26-coreml-final-focused-tests.log`. The full Xcode test target
+remains outside this validation for the dependency issues recorded above.
+
+No app launch, native Settings interaction, live-history collection, or real-world engine quality
+comparison was performed. The original single-batch prototype timings do not describe the new
+batched production rebuild. See [model evidence](LAUNCHER-SUGGESTIONS-MODEL.md) for that limitation
+and the remaining performance and quality measurements.
+
+
+### Evidence gates and Debug inspector follow-up
+
+Both engines now require enough retained history and candidate-specific support, distinct UTC dates,
+reconstructed neighbor agreement, and a close enough matching example. Defaults are 30 examples,
+three supporting neighbors, two dates, 60% agreement, squared distance at most 2.0, and 15 neighbors.
+The 60% agreement default allows at most one candidate. These defaults have not been validated
+against real user habits; abstention is not an accuracy guarantee.
+
+Debug builds expose runtime tuning and a native inspector. The inspector includes editable controls,
+frozen replay, a side-by-side engine comparison, complete score adjustments, failed gates,
+reconstructed neighbors, qualified history, preparation and inference timing, cache reuse, and the
+actual loaded neighbor parameter. Replay uses a separate model and does not enter learning or
+impression paths. Release ignores saved Debug overrides and compiles out the inspector and its
+frozen history controller.
+
+The final isolated beta runner passed **47 tests across six suites** with no warnings or errors.
+The Debug-only tuning and replay tests ran, including persistence, clamping, restored defaults,
+frozen input, unchanged serialized learning, and reset racing replay. Core ML tests verify changed
+votes when k changes, actual parameter values, cache reuse, empty history, and per-call diagnostics.
+Log: `/tmp/dee26-evidence-final-focused-tests.log`.
+
+The focused unsigned Debug build passed using Xcode-beta and the same scheme and derived-data path
+as the Core ML follow-up above. Log: `/tmp/dee26-evidence-debug-build.log`.
+
+The unsigned Release build also passed with Xcode-beta, `-configuration Release`, and
+`-derivedDataPath /tmp/DeeDock-DEE26-evidence-release`. Log: `/tmp/dee26-evidence-release-build.log`.
+Binary string inspection found the inspector/controller type names and Debug preference key in
+Debug and absent in Release, consistent with the source guards. Release emitted existing unused
+result/token warnings in unrelated badge and Launcher code plus the App Intents metadata warning.
+The catalog preserves every existing entry; all 86 additions across these Core ML follow-ups have
+translator comments and packaged English and German values. Project plist and diff checks passed.
+
+No app launch, automated visual test, native inspector interaction, or real-history quality evaluation
+was performed. Hands-on acceptance should exercise tuning inside the inspector, replay and capture
+latest request, translated layouts, keyboard/VoiceOver access, and privacy actions while replaying.
+
 Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current folder-stack slice.
 
 ## Compilation

@@ -10132,6 +10132,1428 @@
         }
       }
     },
+    "launcher.suggestions.debugAgeFactor" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Age factor",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altersfaktor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Age factor"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugAgreement" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Neighbor agreement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übereinstimmung der Nachbarn"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neighbor agreement"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCandidates" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Candidates",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kandidaten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Candidates"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCaptureLatest" : {
+      "comment" : "Development inspector action replacing its frozen input with the latest real Launcher prediction request.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neueste Anfrage erfassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture latest request"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCaptured" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Captured at",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasst am"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captured at"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugClear" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Clear snapshot",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momentaufnahme löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear snapshot"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugContext" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Captured context",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasster Kontext"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captured context"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugDays" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Distinct days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterschiedliche Tage, UTC"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distinct days, UTC"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugDistance" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Nearest squared distance",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächster quadrierter Abstand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nearest squared distance"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugDone" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Done",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugElapsed" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Evaluation time, ms",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamte Auswertung, ms"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total evaluation, ms"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugEligible" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Eligible",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugelassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eligible"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugEligibleCount" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Eligible candidates",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugelassene Kandidaten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eligible candidates"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugEmptyHelp" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Enable suggestions and open Launcher to capture a prediction. Then replay both engines here.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviere Vorschläge und öffne den Launcher, um eine Vorhersage zu erfassen. Danach kannst du hier beide Engines erneut auswerten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable suggestions and open Launcher to capture a prediction. Then replay both engines here."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugEmptyTitle" : {
+      "comment" : "Development-only suggestion inspector or tuning control: No captured prediction",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Vorhersage erfasst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No captured prediction"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugFeedbackAdjustment" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Feedback adjustment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback-Anpassung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback adjustment"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugFinalScore" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Final score",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endwert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Final score"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugForeground" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Foreground app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App im Vordergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foreground app"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateAgreement" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Neighbor agreement is below the minimum.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Übereinstimmung der Nachbarn liegt unter dem Mindestwert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neighbor agreement is below the minimum."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateDays" : {
+      "comment" : "Development-only suggestion inspector or tuning control: This app has examples on too few distinct days.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diese App gibt es an zu wenigen unterschiedlichen Tagen Beispiele."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app has examples on too few distinct days."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateDistance" : {
+      "comment" : "Development-only suggestion inspector or tuning control: The nearest example exceeds the maximum squared distance.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das nächste Beispiel überschreitet den maximalen quadrierten Abstand."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The nearest example exceeds the maximum squared distance."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateExcluded" : {
+      "comment" : "Development-only suggestion inspector or tuning control: This app is excluded from suggestions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App ist von Vorschlägen ausgeschlossen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is excluded from suggestions."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateForeground" : {
+      "comment" : "Development-only suggestion inspector or tuning control: This app is already in the foreground.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App ist bereits im Vordergrund."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is already in the foreground."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateHistory" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Not enough retained history examples.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht genügend gespeicherte Beispiele."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not enough retained history examples."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateNonPositive" : {
+      "comment" : "Development-only suggestion inspector or tuning control: The final score is zero or negative.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Endwert ist null oder negativ."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The final score is zero or negative."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateSupport" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Not enough examples for this app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht genügend Beispiele für diese App."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not enough examples for this app."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugGateUnavailable" : {
+      "comment" : "Development-only suggestion inspector or tuning control: The engine could not evaluate this candidate.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Engine konnte diesen Kandidaten nicht auswerten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The engine could not evaluate this candidate."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugHistory" : {
+      "comment" : "Development-only suggestion inspector or tuning control: History",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugHistoryCount" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Retained examples",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beispiele"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retained examples"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugHistoryFirst" : {
+      "comment" : "Development-only suggestion inspector or tuning control: First example",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstes Beispiel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First example"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugHistoryLast" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Latest example",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuestes Beispiel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latest example"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugInspect" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Open inspector…",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspektor öffnen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open inspector…"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugInspectorHelp" : {
+      "comment" : "Development-only suggestion inspector or tuning control: This snapshot stays frozen for inspection. Replay evaluates both engines with the current thresholds and the captured history and context. It records no usage or feedback.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Momentaufnahme bleibt für die Prüfung unverändert. Die erneute Auswertung verwendet für beide Engines die aktuellen Schwellenwerte sowie den erfassten Verlauf und Kontext. Sie zeichnet keine Nutzung und kein Feedback auf."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This snapshot stays frozen for inspection. Replay evaluates both engines with the current thresholds and the captured history and context. It records no usage or feedback."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugInspectorTitle" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Suggestion inspector",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschlagsinspektor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestion inspector"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugMaxDistance" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Maximum squared distance",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximaler quadrierter Abstand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum squared distance"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugMetric" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Evidence",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachweis"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evidence"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugMinAgreement" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Minimum neighbor agreement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindestübereinstimmung der Nachbarn"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimum neighbor agreement"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugMinDays" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Minimum distinct days per app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindestens unterschiedliche Tage pro App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimum distinct days per app"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugMinHistory" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Minimum history examples",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindestens gespeicherte Beispiele"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimum history examples"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugMinSupport" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Minimum examples per app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindestens Beispiele pro App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimum examples per app"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugMode" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Dock Mode ID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock-Modus-ID"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock Mode ID"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNeighborHelp" : {
+      "comment" : "Development-only suggestion inspector or tuning control: These neighbors are reconstructed from the captured feature vectors and squared distances. They are diagnostic evidence, not an internal trace from Core ML. Expand a row to inspect its original context.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Nachbarn werden aus den erfassten Merkmalsvektoren und quadrierten Abständen rekonstruiert. Sie dienen der Diagnose und sind kein interner Ablaufbericht von Core ML. Klappe eine Zeile auf, um ihren ursprünglichen Kontext zu prüfen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These neighbors are reconstructed from the captured feature vectors and squared distances. They are diagnostic evidence, not an internal trace from Core ML. Expand a row to inspect its original context."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNeighborTab" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Neighbors",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachbarn"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neighbors"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNeighbors" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Requested neighbors, k",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeforderte Nachbarn, k"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requested neighbors, k"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNoCandidates" : {
+      "comment" : "Development-only suggestion inspector or tuning control: No candidates in this evaluation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Kandidaten in dieser Auswertung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No candidates in this evaluation."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNone" : {
+      "comment" : "Development-only suggestion inspector or tuning control: None",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Angabe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNormalizedScore" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Normalized score",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normalisierter Wert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normalized score"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNotEvaluated" : {
+      "comment" : "Development-only suggestion inspector or tuning control: No evaluation result. Replay both engines to compare them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Auswertungsergebnis. Werte beide Engines erneut aus, um sie zu vergleichen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No evaluation result. Replay both engines to compare them."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugRawScore" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Raw engine score",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unveränderter Engine-Wert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raw engine score"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugRecencyBonus" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Recent-use bonus",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bonus für kürzliche Nutzung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent-use bonus"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugRecent" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Recent apps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt verwendete Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent apps"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugRejected" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Rejected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelehnt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rejected"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugReplay" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Replay both engines",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beide Engines erneut auswerten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replay both engines"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugReplayError" : {
+      "comment" : "Development-only suggestion inspector or tuning control: The comparison could not finish. Any available engine results remain visible.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Vergleich konnte nicht abgeschlossen werden. Verfügbare Ergebnisse der Engines bleiben sichtbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The comparison could not finish. Any available engine results remain visible."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugResetTuning" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Reset thresholds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwellenwerte zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset thresholds"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugRunning" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Running apps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufende Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running apps"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugRunningBonus" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Running-app bonus",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bonus für laufende App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running-app bonus"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugSummary" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Summary",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summary"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugSupport" : {
+      "comment" : "Development-only suggestion inspector or tuning control: App examples",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Beispiele"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App examples"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugThreshold" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Required",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erforderlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Required"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugTuningHelp" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Development controls for suggestion eligibility and nearest-neighbor lookup. Changes apply to the next Launcher opening or inspector replay. Reset restores the engine defaults.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwicklungseinstellungen für die Zulassung von Vorschlägen und die Nachbarsuche. Änderungen gelten beim nächsten Öffnen des Launchers oder bei der erneuten Auswertung im Inspektor. Zurücksetzen stellt die Standardwerte der Engine wieder her."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Development controls for suggestion eligibility and nearest-neighbor lookup. Changes apply to the next Launcher opening or inspector replay. Reset restores the engine defaults."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugTuningTitle" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Core ML thresholds · Development",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core-ML-Schwellenwerte · Entwicklung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core ML thresholds · Development"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugValue" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Observed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beobachtet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Observed"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugHour" : {
+      "comment" : "Development-only diagnostic label: Captured hour, 0–23",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasste Stunde, 0–23"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captured hour, 0–23"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugWeekday" : {
+      "comment" : "Development-only diagnostic label: Captured weekday, Sunday = 1",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasster Wochentag, Sonntag = 1"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captured weekday, Sunday = 1"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugForegroundSeconds" : {
+      "comment" : "Development-only diagnostic label: Foreground duration, seconds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dauer im Vordergrund, Sekunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foreground duration, seconds"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNeighborCount" : {
+      "comment" : "Development-only diagnostic label: Reconstructed neighbor count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl rekonstruierter Nachbarn"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconstructed neighbor count"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugApp" : {
+      "comment" : "Development-only suggestion comparison label or explanation: App",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugComparison" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Final scores by app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endwerte pro App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Final scores by app"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNoCandidate" : {
+      "comment" : "Development-only suggestion comparison label or explanation: No candidate",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Kandidat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No candidate"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCurrentTuningHelp" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Results above use the frozen snapshot settings. The controls below edit the current settings. Replay both engines to apply these values to the same captured input.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Ergebnisse oben verwenden die Einstellungen der eingefrorenen Momentaufnahme. Die folgenden Steuerelemente ändern die aktuellen Einstellungen. Werte beide Engines erneut aus, um diese Werte auf dieselben erfassten Eingaben anzuwenden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Results above use the frozen snapshot settings. The controls below edit the current settings. Replay both engines to apply these values to the same captured input."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugPreparationTime" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Model preparation, ms · load, train or wait",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellvorbereitung, ms · Laden, Training oder Warten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model preparation, ms · load, train or wait"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugInferenceTime" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Model inference, ms",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellvorhersage, ms"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model inference, ms"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCacheReused" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Reused",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederverwendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reused"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCacheRebuilt" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Rebuilt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu erstellt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rebuilt"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugModelCache" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Model cache",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellcache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model cache"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugEffectiveNeighbors" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Effective neighbors, k",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effektive Nachbarn, k"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effective neighbors, k"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugLiveEngineTitle" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Live Launcher engine",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Launcher-Engine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Launcher engine"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugIdle" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Idle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inaktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idle"
+          }
+        }
+      }
+    },
     "launcher.suggestions.dismiss" : {
       "comment" : "Dismiss the optional suggestion feedback prompt without sending a quality answer.",
       "extractionState" : "manual",
@@ -10200,6 +11622,132 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suggest apps in App Launcher based on how you use them. Off by default."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.engineBaseline" : {
+      "comment" : "Name of the existing rule-based app suggestion algorithm.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewichtete Basislogik"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weighted baseline"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.engineCoreML" : {
+      "comment" : "Name of the alternative Core ML nearest-neighbor app suggestion engine.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core ML · Nächste Nachbarn"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core ML · Nearest neighbors"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.engineHelp" : {
+      "comment" : "Explains that the development engine switch preserves shared history and applies at the next Launcher presentation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorübergehende Einstellung zum Vergleich. Beide Engines verwenden denselben lokalen Verlauf. Die Auswahl gilt, sobald du den Launcher erneut öffnest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporary comparison setting. Both engines use the same local history. The selected engine takes effect the next time you open Launcher."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.enginePicker" : {
+      "comment" : "Label for the app suggestion prediction engine selector.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engine"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.enginePreparing" : {
+      "comment" : "Status while the selected Core ML engine prepares its model and app ranking.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core-ML-Vorschläge werden vorbereitet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing Core ML suggestions…"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.engineTitle" : {
+      "comment" : "Heading for a temporary development control comparing local app suggestion engines.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorhersage-Engine · Entwicklung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prediction engine · Development"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.engineUnavailable" : {
+      "comment" : "Explicit Core ML failure status. Suggestions do not silently fall back to the baseline engine.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core-ML-Vorschläge sind nicht verfügbar. Du kannst den Launcher weiterhin verwenden oder in den Einstellungen die gewichtete Basislogik auswählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core ML suggestions are unavailable. You can still use Launcher or select the weighted baseline in Settings."
           }
         }
       }

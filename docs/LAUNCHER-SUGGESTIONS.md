@@ -3,6 +3,71 @@
 App suggestions are off by default. **Settings → Features → App suggestions** controls the feature for every display.
 When enabled, DDock learns from application activity observed while it runs. It does not import earlier Launcher history.
 
+## Temporary engine comparison
+
+The **Development** card in App suggestions selects **Weighted baseline** or **Core ML nearest neighbors**.
+Baseline remains the default, including for existing preferences. This temporary selector is available in Debug and Release builds.
+Switching keeps the same local history, feedback, exclusions, and consent. It cancels outstanding predictions and clears the cached model.
+The next Launcher presentation uses the selected engine. This control is intended for development comparison and will be removed after an engine is chosen.
+
+Core ML uses an updatable nearest-neighbor classifier trained on the retained app transitions.
+The first prediction trains it locally; later predictions reuse the completed model until its training examples change.
+Training runs off the UI actor, in batches of at most 256 examples, with a 10,000-example cap and a 30-second overall deadline.
+Launcher and Settings show a preparing state during that work. Empty history needs no training and produces no suggestions.
+If Core ML fails, an unavailable message appears. It does not silently use the baseline; ordinary Launcher results remain available.
+
+Both engines use the same explicit feedback and exclusion rules. Core ML class votes receive a mean age adjustment for each app,
+then the shared normalization, recent-use bonus, running-app bonus, and contextual feedback adjustment.
+The age adjustment uses the same 21-day decay scale as the baseline, but does not weight individual neighbors by age.
+This difference matters when comparing predictions.
+
+## Evidence requirements
+
+Both engines abstain when the evidence is too thin. The default requirements are:
+
+- At least 30 retained, qualified training examples overall.
+- At least three supporting examples among the 15 nearest examples.
+- Supporting examples on at least two distinct UTC dates.
+- At least 60% of reconstructed neighbor weight supporting the candidate within the distance limit.
+- A nearest supporting example within squared feature distance 2.0.
+
+Support uses the same context features as Core ML: time, weekday, preceding foreground app,
+recent app sequence, running apps, and Dock Mode. Distance is squared Euclidean distance over
+the 256 Float32 features. Reconstruction uses `1 / max(distance, 0.000001)` as the weight.
+The denominator includes all selected neighbors; support counts only neighbors within the distance limit.
+Equal distances are ordered by target identity, newest date, then persistent example identity.
+These reconstructed neighbors are explicit evidence for the shared gates, not internal records exported by Core ML.
+
+A candidate must also have positive raw engine evidence and a positive final ranking score.
+Feedback and recency bonuses cannot create evidence or bypass a gate. Every displayed candidate must qualify separately.
+The 60% default permits at most one qualifying candidate. Lower agreement thresholds can permit more.
+The two-date requirement can reject a pattern when its nearest examples all come from today, even if older history exists.
+These defaults favor abstention and are experimental; they do not guarantee a useful first suggestion.
+
+## Debug tuning and inspector
+
+Debug builds add bounded evidence controls and an inspector to App suggestions settings.
+Release builds use the model-owned defaults and ignore saved Debug tuning values.
+The engine selector described above remains available in both configurations during the comparison period.
+
+The inspector freezes an actual Launcher request, including its context, history, feedback, exclusions, and evaluation time.
+**Capture latest request** replaces it with the newest captured request. **Replay both engines** applies the current tuning
+to that same frozen input using a separate Core ML instance. Replay never records app activity, feedback, or impressions.
+Controls are also available inside the inspector so tuning and comparison can happen without closing it.
+
+Summary shows both engines side by side. Candidate details separate raw scores, age factors, normalization,
+recent-use and running bonuses, contextual feedback, final scores, and the exact failed gates.
+Neighbors are labeled as reconstructed evidence; History shows the qualified transitions and their preceding context.
+Model diagnostics separate preparation time, inference time, and total evaluation time. Preparation includes any model load,
+rebuild, or wait for shared training. The inspector also shows cache reuse and the model's effective neighbor count when available.
+None of these scores is a calibrated probability of correctness.
+
+Changing a display threshold affects the next prediction without rebuilding the model.
+Changing the neighbor count recreates the cached model with Core ML's runtime parameter override.
+Closing the inspector cancels its replay. Reset, pause, disable, exclusion changes, and expiry also discard frozen diagnostics.
+Debug tuning survives a history reset; **Restore defaults** resets only the tuning controls.
+No inspector, diagnostic history capture, or tuning controls are compiled into Release builds.
+
 ## Launcher behavior
 
 An empty query can show a **Suggested** section below the search controls and above ordinary app results.
@@ -16,7 +81,7 @@ Typing a query uses ordinary search. Suggestions do not replace Ask Robi or use 
 
 Ranking stays fixed while Launcher is open. Filters and availability can remove candidates without reordering the snapshot.
 Excluding an app removes its suggestion immediately. If a selected suggestion disappears, Return does nothing until another selection is made.
-New observations affect the next presentation. An empty history can produce no suggestions, and learning does not require waiting 90 days.
+New observations affect the next presentation. History below the evidence requirements produces no suggestions. Learning does not require waiting 90 days.
 
 ## Feedback and controls
 
@@ -34,7 +99,7 @@ Section-level answers are aggregate feedback. They do not assign a negative labe
 
 Pause and disable stop observation, predictions, and pending ranking work immediately. Existing history remains subject to expiry.
 **Reset learned suggestions** removes behavioral history, soft feedback, impressions, and pending results.
-Reset preserves deliberate exclusions and the feedback-prompt preference. There is no personalized model file to restore after reset.
+Reset preserves deliberate exclusions, the feedback-prompt preference, and the engine choice. It also discards the personalized Core ML cache.
 
 ## Local data and limits
 
@@ -55,6 +120,7 @@ Invalid idle readings end the session. The feature does not request Accessibilit
 
 Behavioral records expire after 90 days. Cleanup runs before predictions, on startup, and once a minute while DDock runs, including while disabled.
 Predictions rebuild scores from eligible examples, so no separate aggregate can retain expired learning.
+Core ML rebuilds from the remaining examples after removal or expiry; a model from an older privacy generation cannot publish predictions.
 Safety caps retain at most 20,000 events, 10,000 examples, 2,000 app feedback records, and 2,000 impressions.
 The atomic history file is limited to 16 MiB. When it exceeds that limit, the newest half of each collection is retained until it fits.
 These limits can shorten the retained history on busy installations. Exclusions and consent are separate preferences and do not expire.
@@ -63,9 +129,13 @@ History lives in `~/Library/Application Support/DDock/LauncherSuggestions/histor
 Unreadable or unsupported storage stops the feature and leaves normal Launcher use available. Reset is the explicit recovery action.
 No detailed behavioral history is added to general logs or exported diagnostics.
 
+Core ML uses private temporary directories during training and removes them on completion, cancellation, or failure.
+The completed model is cached in memory. Startup and privacy cleanup remove abandoned training directories belonging to exited processes,
+while leaving another live process's files alone. The packaged model contains no personal examples.
+
 ## Predictor and validation
 
-The initial predictor combines decayed frequency, transitions, time, weekday, Dock Mode, recent apps, and recency.
+The baseline predictor combines decayed frequency, transitions, time, weekday, Dock Mode, recent apps, and recency.
 Recent examples receive more weight, using a 21-day decay scale. Feedback adjusts normalized scores for matching contexts.
 These constants are tuning defaults, not measured optima.
 

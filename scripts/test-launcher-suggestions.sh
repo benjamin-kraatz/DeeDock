@@ -1,22 +1,35 @@
 #!/bin/bash
 # Run only DEE-26's isolated model, persistence, lifecycle, and navigation tests.
 set -euo pipefail
+export DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer
 repository=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 dee26_runner=$(mktemp -d /tmp/dee26-tests.XXXXXX)
 trap 'rm -rf "$dee26_runner"' EXIT
 mkdir "$dee26_runner/Tests"
+mkdir "$dee26_runner/Resources"
+xcrun coremlcompiler compile "$repository/DeeDock/Resources/LauncherSuggestions.mlmodel" "$dee26_runner/Resources"
+export DEE26_COREML_SEED_URL="$dee26_runner/Resources/LauncherSuggestions.mlmodelc"
 sources=(
   DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift
+  DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift
+  DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift
   DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift
   DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift
+  DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift
+  DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionEvidence.swift
+  DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift
   DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift
   DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift
+  DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift
   DeeDock/Launcher/State/LauncherBrowseNavigation.swift
   DeeDock/Launcher/Models/LauncherApplication.swift
   DeeDock/Dock/Models/ApplicationReference.swift
   DeeDockTests/LauncherSuggestionTests.swift
   DeeDockTests/LauncherSuggestionNavigationTests.swift
   DeeDockTests/LauncherSuggestionLifecycleTests.swift
+  DeeDockTests/LauncherSuggestionEngineTests.swift
+  DeeDockTests/LauncherSuggestionEvidenceTests.swift
+  DeeDockTests/LauncherSuggestionCoreMLTests.swift
 )
 for source in "${sources[@]}"; do
   cp "$repository/$source" "$dee26_runner/Tests/"
