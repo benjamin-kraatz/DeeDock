@@ -9,6 +9,8 @@ final class ApplicationCatalog {
     private(set) var running: [ApplicationReference] = []
     private(set) var runningIDs: [String] = []
     private(set) var launching: Set<String> = []
+    /// Retained after completion so even a fast cold launch produces one complete visual cycle.
+    private(set) var launchAnimationRequests: [String: Date] = [:]
     private(set) var documentRequests: [UUID: String] = [:]
     var busyApplications: Set<String> { launching.union(documentRequests.values) }
     let service: any ApplicationServicing
@@ -88,6 +90,10 @@ final class ApplicationCatalog {
             do {
                 try Task.checkCancellation()
                 guard ifCurrent() else { return }
+                let now = Date()
+                launchAnimationRequests = launchAnimationRequests.filter { now.timeIntervalSince($0.value) < 30 }
+                launchAnimationRequests[reference.id] = service.runningApplications().contains { $0.id == reference.id }
+                    ? nil : now
                 let opened = try await operation(service)
                 guard !Task.isCancelled, generation == currentGeneration else { return }
                 if opened { launcherHistory.record(reference) }
@@ -95,6 +101,7 @@ final class ApplicationCatalog {
                 refresh()
             } catch {
                 guard !Task.isCancelled, generation == currentGeneration else { return }
+                launchAnimationRequests[reference.id] = nil
                 failure(error)
             }
         }
@@ -162,6 +169,7 @@ final class ApplicationCatalog {
         documentTasks.removeAll()
         documentRequests.removeAll()
         launching.removeAll()
+        launchAnimationRequests.removeAll()
         didChange = nil
         activated = nil
     }

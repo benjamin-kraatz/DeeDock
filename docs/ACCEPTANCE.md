@@ -1345,3 +1345,48 @@ acceptance-note conflicts. Every catalog entry from both branches was preserved.
 build passed at `/tmp/dee12-merge-build.log`. The build after review fixes passed at
 `/tmp/dee12-review-build.log`, with only the App Intents metadata-extraction notice in that final
 incremental build. Tests and automated visual checks were not run.
+
+## App launch animations
+
+Appearance includes Classic Bounce, Spring, Pulse, Wobble, Flip, and Indicator only.
+The gallery previews the production motion without launching an app. Classic Bounce is the
+default for new and existing settings; each display can override it or use the shared setting.
+English and German copy is included in the String Catalog.
+
+The shared application catalog emits a visual signal when DDock opens an app that is not
+running. Activating or hiding a running app and opening documents keep their existing busy
+feedback. Fast launches retain one animation cycle; slower launches repeat until completion,
+then finish the current cycle. Failed launches clear their signal. Motion stops after 30 seconds
+even if Workspace has not completed; the loading indicator remains until the request ends.
+Hidden or faded docks and Reduce Motion suppress artwork motion. Removing a tile cancels its
+visual task. Each edge directs the bounce into the display; layout and click targets stay fixed.
+
+A focused unsigned Debug build of the DeeDock scheme passed. No tests or native visual checks
+were run. Hands-on acceptance remains open for all five presets on all four edges, crowded and
+magnified docks, rapid and slow launches, failures, simultaneous launches on multiple displays,
+shared-setting persistence and reset, Reduce Motion changes, display removal, Spaces, full-screen
+apps, and sleep/wake. Classic Bounce is a custom Dock-style animation; exact system Dock timing
+parity has not been established.
+
+### Live follow-up
+
+Computer Use exercised the six gallery choices and captured distinct Spring, Pulse, Wobble,
+Flip, and Classic Bounce poses. Calculator opened through pinned icons on a side dock and a
+horizontal dock. The captured real-launch frames did not establish that Classic Bounce played;
+that path remains an acceptance failure pending investigation, even though the gallery moved.
+
+The check found closed apps incorrectly announced as unavailable. Their accessibility value now
+uses the existing localized Not Running status. The Indicator only gallery choice also lacked
+its loading indicator; the gallery now uses `DockIconPresentation` to preview the same artwork
+and progress feedback as the dock. These corrections compile but still need a live recheck.
+
+The final unsigned Debug app build passed. Focused ApplicationCatalogTests and DockSettingsTests
+were attempted, including new launch-signal and settings-persistence regressions. No tests ran:
+the test target fails to compile its existing DockInteraction dependencies because
+ActionTilesController and DockBadgeController are missing. The new launch preset model is now
+included in the test target's explicit sources.
+
+The Mac locked during the check and Computer Use could not unlock it. Native rechecks, restoring
+temporary test preferences and pins, Reduce Motion, per-display inheritance, slow launches,
+failures, Spaces, full-screen apps, and sleep/wake remain open. No native acceptance is claimed
+for those cases.

@@ -52,7 +52,10 @@ struct DockAppButton: View {
                                  runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
                                  indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
                                  artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation,
-                                 badgeLabel: badgeLabel)
+                                 badgeLabel: badgeLabel,
+                                 launchAnimation: interaction?.launchAnimation ?? DockSettings.defaults.launchAnimation,
+                                 launchRequest: interaction?.applicationCatalog?.launchAnimationRequests[item.id],
+                                 launchMotionEnabled: interaction.map { $0.exposesContent && $0.idleFade.fraction == 0 } ?? true)
                 .overlay {
                     if interaction?.documentTargetID == item.id {
                         DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
@@ -172,7 +175,7 @@ struct DockAppButton: View {
 
     private var accessibilityStatus: Text {
         let status = String(localized: item.isAvailable
-            ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusUnavailable)
+            ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusNotRunning)
             : .appStatusUnavailable)
         if let badgeLabel {
             return Text(.appBadgeAccessibility(status: status, badge: badgeLabel))

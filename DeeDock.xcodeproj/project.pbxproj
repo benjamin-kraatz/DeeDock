@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC1000000000000000000001 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1000000000000000000002 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift */; };
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */; };
 		AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */; };
@@ -107,6 +108,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AC1000000000000000000002 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift; sourceTree = SOURCE_ROOT; };
 		000000000000000000000120 /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
@@ -375,6 +377,7 @@
 				DD7000000000000000000000 /* DeeDock/Displays/Models/DisplaySnapshot.swift */,
 				DD5000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift */,
 				DD5000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift */,
+				AC1000000000000000000002 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift */,
 				DD5000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift */,
 				DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */,
 				DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */,
@@ -619,6 +622,7 @@
 				DD6000000000000000000000 /* DeeDock/Displays/Models/DisplaySnapshot.swift in Sources */,
 				DD4000000000000000000002 /* DeeDock/Dock/Layout/DockPlacement.swift in Sources */,
 				DD4000000000000000000001 /* DeeDock/Settings/Persistence/DockSettingsRepository.swift in Sources */,
+				AC1000000000000000000001 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift in Sources */,
 				DD4000000000000000000000 /* DeeDock/Settings/Models/DockSettings.swift in Sources */,
 				DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */,
 				DDB100000000000000000003 /* DeeDock/Dock/Dragging/DockApplicationImporter.swift in Sources */,

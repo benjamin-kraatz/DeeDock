@@ -505,6 +505,150 @@
         }
       }
     },
+  "settingsLaunchAnimation": {
+    "comment": "Title of the app icon launch animation gallery.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App launch animation"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Animation beim App-Start"
+        }
+      }
+    }
+  },
+  "settingsLaunchAnimationHelp": {
+    "comment": "Explains launch animation previews and the accessibility fallback.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose an animation for apps opened through DDock. Select a preset to preview it. Reduce Motion keeps the loading indicator."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle eine Animation für Apps, die du über DDock startest. Klicke auf eine Variante, um sie anzusehen. Bei reduzierter Bewegung bleibt die Ladeanzeige."
+        }
+      }
+    }
+  },
+  "launchAnimationBounce": {
+    "comment": "Launch preset: two hops away from the dock edge.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Classic Bounce"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Klassisches Hüpfen"
+        }
+      }
+    }
+  },
+  "launchAnimationSpring": {
+    "comment": "Launch preset: elastic stretching and compression.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Spring"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Feder"
+        }
+      }
+    }
+  },
+  "launchAnimationPulse": {
+    "comment": "Launch preset: the icon grows and shrinks.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pulse"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pulsieren"
+        }
+      }
+    }
+  },
+  "launchAnimationWobble": {
+    "comment": "Launch preset: the icon rocks from side to side.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wobble"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wackeln"
+        }
+      }
+    }
+  },
+  "launchAnimationFlip": {
+    "comment": "Launch preset: a full three-dimensional turn.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Flip"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Drehung"
+        }
+      }
+    }
+  },
+  "launchAnimationNone": {
+    "comment": "Launch preset: no artwork motion, retain the loading indicator.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Indicator only"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nur Ladeanzeige"
+        }
+      }
+    }
+  },
     "badgeMemoryTitle": {
   "comment": "Badge memory: Badge memory Values and application names come from the source app when present.",
   "extractionState": "manual",

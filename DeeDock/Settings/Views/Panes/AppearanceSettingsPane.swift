@@ -9,6 +9,7 @@ struct AppearanceSettingsPane: View {
     @Binding var cornerRadius: Double
     @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
     @Binding var animateIndicators: Bool
+    @Binding var launchAnimation: DockLaunchAnimation
 
     var appearanceSettings = DockSettings.defaults
     var overrideContext: SettingsOverrideContext? = nil
@@ -52,6 +53,10 @@ struct AppearanceSettingsPane: View {
                                   defaultValue: DockSettings.defaults.itemSpacing)
                     .settingsOverride(overrideContext, field: .itemSpacing)
             }
+            SettingsCard(title: .settingsLaunchAnimation, footnote: .settingsLaunchAnimationHelp) {
+                DockLaunchAnimationPicker(edge: edge, selection: $launchAnimation)
+                    .settingsOverride(overrideContext, field: .launchAnimation)
+            }
             SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
                 RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle, animated: animateIndicators)
                     .settingsOverride(overrideContext, field: .runningIndicatorStyle)
@@ -73,7 +78,7 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var animate = true
     ScrollView {
         AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,
-                               runningIndicatorStyle: $indicator, animateIndicators: $animate)
+                               runningIndicatorStyle: $indicator, animateIndicators: $animate, launchAnimation: .constant(DockSettings.defaults.launchAnimation))
             .padding(24)
     }
     .tint(SettingsPage.appearance.tint)
