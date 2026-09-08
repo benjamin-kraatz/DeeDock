@@ -217,3 +217,9 @@ reconnection. Exercise keyboard/VoiceOver editing and sliders, Reduce Motion/Tra
 navigation, Spaces/full-screen, permission revocation, sleep/lock/display sleep, and closing frozen
 portals. Measure four portals with live, frozen, and offscreen sources using Instruments and the
 existing WindowPortal frame-count/capture-time close logs. No runtime measurements were collected.
+
+DEE-23 delivery: [PR #41](https://github.com/benjamin-kraatz/DeeDock/pull/41) targets main from
+`feature/dee-23`. The final focused unsigned Debug build passed at
+`/tmp/DeeDock-dee23-final-build.log`, with only the App Intents metadata-extraction notice.
+All 14 new strings match the packaged English and German resources. GPT 5.6 Sol at Low reasoning
+reported no actionable defects in its static PR review; its trailing-blank-line finding was removed.

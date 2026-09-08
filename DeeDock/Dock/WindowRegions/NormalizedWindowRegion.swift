@@ -20,4 +20,3 @@ nonisolated struct NormalizedWindowRegion: Equatable, Sendable {
                height: min(max(height, 0.05), 1 - min(max(y, 0), 0.95)))
     }
 }
-
