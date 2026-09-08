@@ -1,5 +1,163 @@
 # DeeDock acceptance record
 
+## DEE-26 app suggestions
+
+Implemented on `codex/dee-26`. The opt-in Suggested section shares Launcher app controls,
+supports grid and list layouts, and keeps a frozen ranking with separate selection identities
+for ordinary and suggested occurrences. Settings include enable, pause, exclusions, reset,
+and optional inline feedback prompts. English and German resources include all 31 new keys.
+See [app suggestions](LAUNCHER-SUGGESTIONS.md) for behavior and retention limits.
+
+Focused unsigned Debug compilation passed with Xcode 27, Swift 5, MainActor default isolation,
+and approachable concurrency:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -derivedDataPath /tmp/DeeDock-DEE26-build CODE_SIGNING_ALLOWED=NO build
+```
+
+The packaged English and German `Localizable.strings` files contain all 31 suggestion keys.
+Compilation does not establish interaction quality. Log: `/tmp/DeeDock-DEE26-build.log`.
+
+The authorized focused test run passed 20 tests in three Swift Testing suites using
+`scripts/test-launcher-suggestions.sh`. The runner copies the production sources to a temporary
+package with Swift 5, MainActor default isolation, and the relevant concurrency flags.
+Coverage includes off and pause gating, preceding context, dwell, startup and session gaps,
+reset races, exclusion reversal, stale feedback, prompt cooldown and persistence, expiry,
+corrupt storage, the 16 MiB storage cap, and navigation through duplicate and partial rows.
+Log: `/tmp/DeeDock-DEE26-tests.log`.
+
+The existing Xcode test target cannot compile because several unrelated production dependencies
+are absent from its source membership. The focused Xcode attempt reported WindowActionModels,
+BossFightConfiguration, DockFilePreview, ActionTilesController, and badge dependencies.
+Only DEE-26 source membership was added. The full suite was not run or repaired.
+
+The [Core ML prototype and chronological comparison](LAUNCHER-SUGGESTIONS-MODEL.md) support
+the initial baseline choice. Core ML and the production baseline each hit 108 of 120 synthetic
+outcomes in their top three. This proves the evaluation mechanics, not usefulness on real habits.
+No live history was collected or uploaded during implementation. No personal model ships.
+
+Native acceptance remains open for keyboard and VoiceOver behavior, four dock edges, long
+German labels, Reduce Motion and Reduce Transparency, multiple displays, app removal and moves,
+Spaces and full-screen apps, sleep and wake, user switching, permission-denied idle readings,
+and exact screen-lock behavior. Safe deterministic previews were added but not launched.
+Real chronological quality, results by history age, ranking stability, and idle energy remain unmeasured.
+Public session notifications do not guarantee a screen-lock boundary, so foreground duration
+is omitted rather than treating unattended time as active use. DEE-26 is not native-acceptance complete.
+
+
+### Selectable Core ML engine follow-up
+
+Added a temporary Development picker to App Suggestions settings. The weighted baseline remains
+selected by default. Core ML trains locally from the same retained examples using a bundled empty,
+updatable nearest-neighbor seed. Switching preserves consent and history, cancels stale predictions,
+and takes effect on the next Launcher opening. Preparing and unavailable states are explicit;
+model failure does not silently use the baseline.
+
+The focused unsigned Debug app build passed with Xcode-beta:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -derivedDataPath /tmp/DeeDock-DEE26-CoreML-build CODE_SIGNING_ALLOWED=NO build
+```
+
+Log: `/tmp/DeeDock-DEE26-CoreML-build.log`. Direct resource inspection confirmed the packaged
+model is updatable with the expected input and outputs. All seven added English and German
+strings are packaged; existing catalog entries are unchanged.
+
+The isolated focused runner passed **32 tests across five suites** using Xcode-beta, including
+actual model updates and inference, concurrent requests, cancellation, history invalidation,
+isolated abandoned-file cleanup, preference migration, baseline score preservation, and failure
+without fallback. Log: `/tmp/dee26-coreml-final-focused-tests.log`. The full Xcode test target
+remains outside this validation for the dependency issues recorded above.
+
+No app launch, native Settings interaction, live-history collection, or real-world engine quality
+comparison was performed. The original single-batch prototype timings do not describe the new
+batched production rebuild. See [model evidence](LAUNCHER-SUGGESTIONS-MODEL.md) for that limitation
+and the remaining performance and quality measurements.
+
+
+### Evidence gates and Debug inspector follow-up
+
+Both engines now require enough retained history and candidate-specific support, distinct UTC dates,
+reconstructed neighbor agreement, and a close enough matching example. Defaults are 30 examples,
+three supporting neighbors, two dates, 60% agreement, squared distance at most 2.0, and 15 neighbors.
+The 60% agreement default allows at most one candidate. These defaults have not been validated
+against real user habits; abstention is not an accuracy guarantee.
+
+Debug builds expose runtime tuning and a native inspector. The inspector includes editable controls,
+frozen replay, a side-by-side engine comparison, complete score adjustments, failed gates,
+reconstructed neighbors, qualified history, preparation and inference timing, cache reuse, and the
+actual loaded neighbor parameter. Replay uses a separate model and does not enter learning or
+impression paths. Release ignores saved Debug overrides and compiles out the inspector and its
+frozen history controller.
+
+The final isolated beta runner passed **47 tests across six suites** with no warnings or errors.
+The Debug-only tuning and replay tests ran, including persistence, clamping, restored defaults,
+frozen input, unchanged serialized learning, and reset racing replay. Core ML tests verify changed
+votes when k changes, actual parameter values, cache reuse, empty history, and per-call diagnostics.
+Log: `/tmp/dee26-evidence-final-focused-tests.log`.
+
+The focused unsigned Debug build passed using Xcode-beta and the same scheme and derived-data path
+as the Core ML follow-up above. Log: `/tmp/dee26-evidence-debug-build.log`.
+
+The unsigned Release build also passed with Xcode-beta, `-configuration Release`, and
+`-derivedDataPath /tmp/DeeDock-DEE26-evidence-release`. Log: `/tmp/dee26-evidence-release-build.log`.
+Binary string inspection found the inspector/controller type names and Debug preference key in
+Debug and absent in Release, consistent with the source guards. Release emitted existing unused
+result/token warnings in unrelated badge and Launcher code plus the App Intents metadata warning.
+The catalog preserves every existing entry; all 86 additions across these Core ML follow-ups have
+translator comments and packaged English and German values. Project plist and diff checks passed.
+
+No app launch, automated visual test, native inspector interaction, or real-history quality evaluation
+was performed. Hands-on acceptance should exercise tuning inside the inspector, replay and capture
+latest request, translated layouts, keyboard/VoiceOver access, and privacy actions while replaying.
+
+
+### Synthetic Debug inspector follow-up
+
+Checkpoint `03538a9` records the preceding Core ML, evidence-gate, and inspector implementation.
+The subsequent synthetic mode adds six deterministic scenarios, independent strength/noise controls,
+a seeded generator, simulated time, and chronological playback over 60 future outcomes.
+It uses fictional app identifiers in an isolated in-memory session and works without enabling activity
+collection. Replay and playback do not touch the live recorder, impressions, consent, or history repository.
+
+All **61 focused tests across seven suites passed** using Xcode-beta, with no warnings or errors.
+Coverage includes all six scenarios, deterministic identities, bounded chronological records, outcome/input
+separation, off-consent replay with unchanged real history bytes, label-neutral distance ties, delayed outcome
+learning, preserved event spacing after clock advancement, drift metrics, and reset/source-change/cancellation.
+A complete 60-step run finished with 60 attempts per engine and zero model failures. Its last snapshot contained
+only the 59 previously revealed outcomes, proving the final target was not supplied as training input.
+Log: `/tmp/dee26-synthetic-final-focused-tests.log`.
+
+Unsigned Debug and Release builds both passed with Xcode-beta using the existing DeeDock scheme.
+Logs: `/tmp/dee26-synthetic-debug-build.log` and `/tmp/dee26-synthetic-release-build.log`.
+Debug derived data: `/tmp/DeeDock-DEE26-CoreML-build`. Release derived data: `/tmp/DeeDock-DEE26-evidence-release`.
+Release retained the previously recorded unrelated unused-result/token warnings and App Intents metadata warning.
+Binary inspection found the synthetic generator, session, and controls in Debug and absent in Release.
+All 45 added catalog keys have translator comments and packaged English/German values; existing entries
+are unchanged. Project plist and diff checks passed.
+
+No app launch or native visual/interaction acceptance was performed. Hands-on acceptance remains for source
+switching, generation, seeded reproduction, tuning during inspection, Stop/resume, date controls, translated
+layouts, and accessibility. Synthetic coverage and hit rates do not establish real-history quality.
+
+
+### Core ML default and developer-only settings
+
+Core ML is now the default engine. The engine picker, engine mutation API, override loading,
+tuning controls, inspector, and synthetic tools are guarded by `#if DEBUG`. Release ignores
+Debug override preferences. Legacy engine values in shared consent preferences are ignored,
+while enable/pause, exclusions, and feedback preferences remain intact. Explicit Debug engine
+choices use the separate `launcher.suggestions.debugEngine.v1` key.
+
+The focused runner passed **61 tests across seven suites**, including both missing and legacy
+baseline preference migration, explicit Debug baseline persistence, and unchanged consent bytes.
+Log: `/tmp/dee26-dev-only-final-focused-tests.log`. The Debug build passed with Xcode-beta;
+log: `/tmp/dee26-default-debug-build.log`. Source guards provide the developer-only acceptance
+evidence requested for this final change. Native interaction remains unverified.
+
 Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current folder-stack slice.
 
 ## Compilation

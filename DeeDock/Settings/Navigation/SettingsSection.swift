@@ -80,7 +80,7 @@ enum SettingsSection: Hashable, Identifiable {
             SettingsPage.dockGroups
         case .features:
             [[.shelfAndTrash, .capsules, .badges],
-             [.windowPeek, .focusSessions, .actionTiles],
+             [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
              [.multipleDisplays, .permissions]]
         case .modes:
             []

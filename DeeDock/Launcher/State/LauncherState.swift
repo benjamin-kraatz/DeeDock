@@ -6,6 +6,9 @@ import SwiftUI
 @MainActor @Observable
 final class LauncherState {
     let catalog: ApplicationCatalog
+    let suggestions = LauncherSuggestionPresentation()
+    @ObservationIgnored var suggestionModeID: (() -> String?)?
+    @ObservationIgnored var suggestionVisibility: (() -> DockAppVisibility)?
     var library: LauncherLibrary { catalog.launcherLibrary }
     var history: LauncherHistory { catalog.launcherHistory }
     var isPresented = false
@@ -53,7 +56,7 @@ final class LauncherState {
     var sort: LauncherSort = .name { didSet { if oldValue != sort { search.invalidateQuery() } } }
     var grouping: LauncherGrouping = .none { didSet { if oldValue != grouping { search.invalidateQuery() } } }
     var layout: LauncherLayout = .grid
-    var selectedID: String?
+    var selectedID: LauncherBrowseID?
     var navigationColumns = 1
     var keyboardNavigationActive = false
     private var initialPinnedIDs: Set<String> = []
@@ -123,15 +126,17 @@ final class LauncherState {
             .map { Group(id: $0, applications: groups[$0] ?? []) }
     }
 
-    func begin(pins: [ApplicationReference]) {
+    func begin(pins: [ApplicationReference], foregroundID: String? = nil) {
         presentationGeneration = UUID()
         search.begin()
         initialPinnedIDs = Set(pins.map(\.id))
         query = ""; error = nil; selectedID = nil
+        suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
         library.acquire(owner, extraURLs: pins.map(\.url) + catalog.running.map(\.url) + history.visits.values.map { $0.reference.url })
     }
 
     func end() {
+        suggestions.end()
         presentationGeneration = UUID()
         search.stop()
         cancelRobi(); library.release(owner); icons = [:]
@@ -171,18 +176,23 @@ final class LauncherState {
 
     func openSelection() {
         if usesMixedResults { search.openSelection(); return }
-        let apps = groups.flatMap(\.applications)
-        if let app = apps.first(where: { $0.id == selectedID }) ?? apps.first { open(app) }
+        let items = browseRows.flatMap { $0 }
+        if let selectedID {
+            // A removed suggestion must never silently activate the next ordinary result.
+            guard let item = items.first(where: { $0.id == selectedID }) else { return }
+            if case .suggested = item.id { openSuggested(item.application) }
+            else { open(item.application) }
+        } else if let item = items.first {
+            if case .suggested = item.id { openSuggested(item.application) }
+            else { open(item.application) }
+        }
     }
 
     func moveSelection(by distance: Int) {
         keyboardNavigationActive = true
         if usesMixedResults { search.moveSelection(by: distance); return }
-        let apps = groups.flatMap(\.applications)
-        guard !apps.isEmpty else { selectedID = nil; return }
-        let current = selectedID.flatMap { id in apps.firstIndex { $0.id == id } }
-        let index = current.map { min(max($0 + distance, 0), apps.count - 1) } ?? 0
-        selectedID = apps[index].id
+        selectedID = LauncherBrowseNavigation.move(selectedID, distance: distance,
+            columns: layout == .grid ? navigationColumns : 1, rows: browseRows.map { $0.map(\.id) })
     }
 
     func askRobi() {

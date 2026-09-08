@@ -1,5 +1,7 @@
 # Launcher
 
+Optional [app suggestions](LAUNCHER-SUGGESTIONS.md) appear above ordinary results for an empty query after explicit opt-in.
+
 The permanent **App Launcher** tile expands its dock window into a panel on the same display.
 **Back to dock** and Escape reverse the transition. An outside click closes the panel without
 reactivating the previous app. Reduce Motion disables the window animation, and Reduce

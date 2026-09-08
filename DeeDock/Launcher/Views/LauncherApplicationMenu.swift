@@ -5,21 +5,31 @@ struct LauncherApplicationMenu: View {
     let application: LauncherApplication
     let state: LauncherState
     var searchResult: LauncherSearchResult? = nil
+    var isSuggestion = false
 
     var body: some View {
-        Button(.launcherMenuOpen) {
+        Button {
             if let searchResult { state.search.activate(searchResult) }
+            else if isSuggestion { state.openSuggested(application) }
             else { state.open(application) }
+        } label: {
+            Label { Text(.launcherMenuOpen) } icon: { Image(systemName: "arrow.up.forward.app") }
         }
-        Button(.applicationMenuShowInFinder) {
+        Button {
             if let searchResult { state.search.activate(searchResult, reveal: true) }
             else { state.showInFinder(application) }
+        } label: {
+            Label { Text(.applicationMenuShowInFinder) } icon: { Image(systemName: "folder") }
         }
         Divider()
-        Button(
-            state.pinnedIDs.contains(application.id) ? .actionUnpin : .actionPin
-        ) {
+        Button {
             state.togglePin(application)
+        } label: {
+            Label {
+                Text(state.pinnedIDs.contains(application.id) ? .actionUnpin : .actionPin)
+            } icon: {
+                Image(systemName: state.pinnedIDs.contains(application.id) ? "pin.slash" : "pin")
+            }
         }
         Menu {
             ForEach(state.pinDestinations) { display in
@@ -29,15 +39,18 @@ struct LauncherApplicationMenu: View {
                         display.id
                     )
                 } label: {
-                    Text(verbatim: display.name)
+                    Label { Text(verbatim: display.name) } icon: { Image(systemName: "display") }
                 }
             }
         } label: {
-            Text(.launcherMenuPinOnDisplay)
+            Label { Text(.launcherMenuPinOnDisplay) } icon: { Image(systemName: "display") }
         }
         .disabled(state.pinDestinations.isEmpty)
-        Button(.launcherMenuCreateCapsule) {
+        Divider()
+        Button {
             state.createCapsule?(application.reference)
+        } label: {
+            Label { Text(.launcherMenuCreateCapsule) } icon: { Image(systemName: "capsule.portrait") }
         }
     }
 }

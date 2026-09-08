@@ -6,6 +6,8 @@ import Observation
 final class ApplicationCatalog {
     let launcherLibrary: LauncherLibrary
     let launcherHistory: LauncherHistory
+    let suggestions: LauncherSuggestionsStore
+    @ObservationIgnored private lazy var suggestionObservation = LauncherSuggestionObservation(store: suggestions)
     private(set) var running: [ApplicationReference] = []
     private(set) var runningIDs: [String] = []
     private(set) var launching: Set<String> = []
@@ -21,10 +23,12 @@ final class ApplicationCatalog {
     @ObservationIgnored private var documentTasks: [UUID: Task<Void, Never>] = [:]
     @ObservationIgnored private var generation = UUID()
 
-    init(service: any ApplicationServicing, launcherHistory: LauncherHistory? = nil, launcherLibrary: LauncherLibrary? = nil) {
+    init(service: any ApplicationServicing, launcherHistory: LauncherHistory? = nil, launcherLibrary: LauncherLibrary? = nil,
+         suggestions: LauncherSuggestionsStore? = nil) {
         self.service = service
         self.launcherHistory = launcherHistory ?? LauncherHistory(defaults: nil)
         self.launcherLibrary = launcherLibrary ?? LauncherLibrary()
+        self.suggestions = suggestions ?? LauncherSuggestionsStore(directory: nil, defaults: nil)
     }
 
     func start() {
@@ -32,19 +36,24 @@ final class ApplicationCatalog {
         let center = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.didLaunchApplicationNotification, NSWorkspace.didTerminateApplicationNotification,
                      NSWorkspace.didUnhideApplicationNotification, NSWorkspace.didWakeNotification] {
-            observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.refresh() }
+            observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] notification in
+                MainActor.assumeIsolated {
+                    self?.refresh()
+                    self?.suggestionObservation.workspaceEvent(notification)
+                }
             })
         }
         observers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification,
                                              object: nil, queue: .main) { [weak self] notification in
             MainActor.assumeIsolated {
                 if let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication {
+                    self?.suggestionObservation.activated(app)
                     self?.activated?(app)
                 }
             }
         })
         refresh()
+        suggestionObservation.start()
     }
 
     func refresh() {
@@ -159,6 +168,7 @@ final class ApplicationCatalog {
     }
 
     func stop() {
+        suggestionObservation.stop()
         launcherLibrary.stop()
         generation = UUID()
         observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }

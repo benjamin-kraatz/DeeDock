@@ -34,6 +34,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case actionTiles
     case multipleDisplays
     case permissions
+    case appSuggestions
 
     var id: Self { self }
 
@@ -50,7 +51,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
-             .focusSessions, .actionTiles, .multipleDisplays, .permissions: .features
+             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions: .features
         }
     }
 
@@ -83,6 +84,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .focusSessions: .focusTitle
         case .actionTiles: .actionsTitle
         case .multipleDisplays: .secondaryDockTitle
+        case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .permissions: .windowPeekPermissionsTitle
         }
     }
@@ -97,6 +99,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .focusSessions: .settingsFeatureFocusSubtitle
         case .actionTiles: .settingsFeatureActionsSubtitle
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
+        case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
         }
@@ -122,6 +125,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .focusSessions: .symbol("timer")
         case .actionTiles: .symbol("bolt.fill")
         case .multipleDisplays: .symbol("display.2")
+        case .appSuggestions: .symbol("sparkles")
         case .permissions: .symbol("lock.fill")
         }
     }
@@ -145,6 +149,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .focusSessions: Color(red: 0.92, green: 0.38, blue: 0.24)
         case .actionTiles: Color(red: 0.60, green: 0.34, blue: 0.90)
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
+        case .appSuggestions: .indigo
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
     }
@@ -168,6 +173,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .focusSessions: [Color(red: 1.0, green: 0.58, blue: 0.34), Color(red: 0.84, green: 0.24, blue: 0.16)]
         case .actionTiles: [Color(red: 0.78, green: 0.54, blue: 1.0), Color(red: 0.48, green: 0.22, blue: 0.84)]
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
+        case .appSuggestions: [.indigo, .purple]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
     }
@@ -176,6 +182,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     /// not only by its title.
     private var keywords: LocalizedStringResource {
         switch self {
+        case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords
