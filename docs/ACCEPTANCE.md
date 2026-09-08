@@ -1523,3 +1523,29 @@ both refresh controls are disabled until the action completes. The reviewer conf
 remaining findings after inspecting the correction. Follow-up changes also keep the selected
 row visible after asynchronous reordering and provide static preview states. Native acceptance
 remains pending as described above.
+
+
+### Search options follow-up
+
+App filters, sorting, grouping, and grid/list layout now remain active with a search term,
+including the Apps result type. Running, pinned, and recent filters restrict All types to that
+app subset. Explicit non-app types ignore hidden app filters. App sections use the same cells
+as browsing, followed by compact rows for other types. Keyboard order matches the displayed
+groups and crosses partial grid rows without skipping the next section.
+
+Sol Low reviewed this follow-up and identified a shared-cell action bypass. Search app cells
+and their Open/Show in Finder menu actions now route through the typed search dispatcher,
+preserving pending-action and stale-result guards. Ordinary app browsing keeps its existing
+route. Focused unsigned Debug compilation passed; tests and native visual checks were not run.
+
+The production-ranker benchmark was repeated with the same synthetic dataset and default
+options. Query medians were 27.58 ms for `invoice`, 58.35 ms for `Invoice Tool 9999`, 57.80 ms
+for `invocie`, 37.74 ms for `büro`, and 45.53 ms for `no-such-result`. Maximum measured time
+was 112.76 ms. These measurements exclude debounce and native rendering; the original table
+above records the earlier implementation. Output: `/tmp/DeeDock-DEE20-benchmark-followup.log`.
+Filter intersections, history tie-breaks, grouping under pagination, grid/list keyboard movement,
+and source changes during an app action remain cases for automated coverage when authorized.
+
+Empty mixed-search results now occupy the full results area, with centered content and a
+kind-neutral empty title and result count in English and German. Native visual verification
+of this correction remains pending. Further subagent review was stopped at the user's request.

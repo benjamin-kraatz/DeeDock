@@ -4,7 +4,7 @@ import Observation
 /// Presentation-scoped metadata and ranking. Ending the Launcher cancels discovery and invalidates every result.
 @MainActor @Observable
 final class LauncherSearchState {
-    var kind: LauncherSearchKind = .all { didSet { invalidateQuery() } }
+    var kind: LauncherSearchKind = .all { didSet { if oldValue != kind { invalidateQuery() } } }
     private(set) var results: [LauncherSearchResult] = []
     var selectedID: LauncherSearchID?
     private(set) var limit = 40
@@ -34,11 +34,11 @@ final class LauncherSearchState {
             || actions?.requiresReset == true || modes?.requiresReset == true
     }
 
-    func input(query: String, applications: [LauncherApplication]) -> LauncherSearchInput {
+    func input(query: String, applications: [LauncherApplication], options: LauncherSearchOptions = LauncherSearchOptions()) -> LauncherSearchInput {
         LauncherSearchInput(query: query, kind: kind, applications: applications,
             capsules: capsules?.capsules ?? [], shelf: shelf?.items ?? [], shortcuts: actions?.tiles ?? [],
             modes: modes?.modes.map { LauncherSearchName(id: $0.id, name: $0.name) } ?? [],
-            windowRevision: windowRevision)
+            windowRevision: windowRevision, options: options)
     }
 
     func begin() {
@@ -97,7 +97,19 @@ final class LauncherSearchState {
         let values = visible
         guard !values.isEmpty else { return }
         let index = selectedID.flatMap { id in values.firstIndex { $0.id == id } }
-        selectedID = values[index.map { min(max($0 + offset, 0), values.count - 1) } ?? 0].id
+        guard let index else { selectedID = values.first?.id; return }
+        var target = min(max(index + offset, 0), values.count - 1)
+        if abs(offset) > 1, values[index].application != nil {
+            let group = values[index].group
+            // A partial grid row must enter the adjacent section, never skip its first rows.
+            if offset > 0, let boundary = values.indices.first(where: {
+                $0 > index && (values[$0].application == nil || values[$0].group != group)
+            }) { target = min(target, boundary) }
+            if offset < 0, let boundary = values.indices.last(where: {
+                $0 < index && (values[$0].application == nil || values[$0].group != group)
+            }) { target = max(target, boundary) }
+        }
+        selectedID = values[target].id
     }
 
     func openSelection() {

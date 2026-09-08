@@ -60,7 +60,7 @@ import Foundation
         "DeeDock/Dock/Capsules/SessionCapsuleModels.swift", "DeeDock/Dock/Shelf/ShelfItem.swift",
         "DeeDock/Dock/Actions/ActionTile.swift", "DeeDock/Dock/Search/WindowSearchModels.swift",
         "DeeDock/Dock/Search/WindowSearchIndex.swift", "DeeDock/Launcher/Models/LauncherApplication.swift",
-        "DeeDock/Launcher/Search/LauncherSearchResult.swift", "DeeDock/Launcher/Search/LauncherSearchIndex.swift",
+        "DeeDock/Launcher/Models/LauncherOptions.swift", "DeeDock/Launcher/Search/LauncherSearchResult.swift", "DeeDock/Launcher/Search/LauncherSearchIndex.swift",
     ]
     binary = work / "benchmark"
     subprocess.run(["xcrun", "swiftc", "-O", "-parse-as-library", "-swift-version", "5", "-o", str(binary)]

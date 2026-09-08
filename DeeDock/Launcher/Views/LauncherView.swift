@@ -128,7 +128,7 @@ struct LauncherView: View {
         HStack(spacing: 12) {
             HStack {
                 if state.library.isLoading { ProgressView().controlSize(.mini) }
-                Text(.launcherResultCount(count))
+                Text(state.usesMixedResults ? .unifiedResultCount(count) : .launcherResultCount(count))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .contentTransition(.numericText(value: Double(count)))

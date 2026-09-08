@@ -38,11 +38,16 @@ containing that app. Enter a summary and save to persist it.
 
 ## Mixed search
 
-A nonempty query uses compact rows. Each row identifies its kind, source, and default action.
+A nonempty query keeps app matches in the selected grid or list layout. Other kinds use compact
+rows that identify their kind, source, and default action.
 **Result type** filters apps, windows, Capsules and Breadcrumbs, Shelf files, pinned Shortcuts,
 or named Dock Modes. Selecting a non-app type also browses that source without a query.
 Clear the query and choose **All types** or **Apps** to return to app grid/list browsing.
-App browsing filters, sorting, and grouping remain available there and for explicit Robi suggestions.
+App filters, sorting, and grouping apply with or without a query, including when **Apps** is
+selected as the result type. Running, pinned, and recent filters show only matching apps in
+**All types** or **Apps**. Select the all-apps filter to include other kinds again. A specific
+non-app result type uses its own source and ignores the hidden app filter. App sections appear first and use the selected
+category or first-letter grouping. Other kinds remain compact rows below them.
 
 Ordinary search reads copied metadata. It does not capture windows, read file contents,
 request permission, use a model, or run an action. Queries debounce for 120 milliseconds.
@@ -52,8 +57,9 @@ when another provider finishes. If that object disappears, Return does nothing u
 another result, rather than acting on a replacement. Explicit window refresh obtains new AX tokens
 and requires selecting a window again.
 
-App matching retains normalization, aliases, and one-edit typo matching. Exact app names rank
-first, followed by exact names of other kinds. Prefix, substring, app alias, window metadata,
+App matching retains normalization, aliases, and one-edit typo matching. Within each app group,
+relevance ranks first and the chosen name, recent, or frequent order breaks ties. Other kinds
+retain their own relevance order. Prefix, substring, app alias, window metadata,
 historical capsule, and app typo matches use fixed priorities with name and typed identity
 as tie-breakers. Objects of different kinds remain separate even when their names match.
 

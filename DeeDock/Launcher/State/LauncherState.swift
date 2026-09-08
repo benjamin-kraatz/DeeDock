@@ -27,19 +27,31 @@ final class LauncherState {
     /// Whether the launcher shows mixed search results instead of application-only results.
     /// Returns `false` while Robi suggestions are active.
     var usesMixedResults: Bool { robiIDs == nil && (!query.isEmpty || (search.kind != .all && search.kind != .application)) }
-    var usesGridNavigation: Bool { !usesMixedResults && layout == .grid }
+    var usesGridNavigation: Bool {
+        guard layout == .grid else { return false }
+        guard usesMixedResults else { return true }
+        guard let id = search.selectedID else { return search.visible.first?.application != nil }
+        return search.visible.first(where: { $0.id == id })?.application != nil
+    }
+    var searchOptions: LauncherSearchOptions {
+        LauncherSearchOptions(filter: filter, sort: sort, grouping: grouping,
+            running: Set(catalog.runningIDs), pinned: pinnedIDs,
+            visits: history.visits.mapValues { .init(count: $0.count, lastOpened: $0.lastOpened) })
+    }
     var query = "" { didSet {
         guard oldValue != query else { return }
         cancelRobi(); search.invalidateQuery(); selectedID = nil; keyboardNavigationActive = false
     } }
     var filter: LauncherFilter = .all {
         didSet {
+            guard oldValue != filter else { return }
             selectedID = nil
+            search.invalidateQuery()
             if filter == .recent { sort = .recent }
         }
     }
-    var sort: LauncherSort = .name
-    var grouping: LauncherGrouping = .none
+    var sort: LauncherSort = .name { didSet { if oldValue != sort { search.invalidateQuery() } } }
+    var grouping: LauncherGrouping = .none { didSet { if oldValue != grouping { search.invalidateQuery() } } }
     var layout: LauncherLayout = .grid
     var selectedID: String?
     var navigationColumns = 1

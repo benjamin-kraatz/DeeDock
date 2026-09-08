@@ -29,7 +29,7 @@ struct LauncherToolbar: View {
     }
     
     private var hasDiscreteKindSelected: Bool {
-        state.search.kind != .all
+        state.search.kind != .all && state.search.kind != .application
     }
 
     private var filters: some View {

@@ -1,6 +1,6 @@
 import Foundation
 
-enum LauncherFilter: String, CaseIterable, Identifiable {
+nonisolated enum LauncherFilter: String, CaseIterable, Identifiable, Sendable {
     case all, running, pinned, recent
     var id: Self { self }
     var title: LocalizedStringResource {
@@ -13,7 +13,7 @@ enum LauncherFilter: String, CaseIterable, Identifiable {
     }
 }
 
-enum LauncherSort: String, CaseIterable, Identifiable {
+nonisolated enum LauncherSort: String, CaseIterable, Identifiable, Sendable {
     case name, recent, frequent
     var id: Self { self }
     var title: LocalizedStringResource {
@@ -21,7 +21,7 @@ enum LauncherSort: String, CaseIterable, Identifiable {
     }
 }
 
-enum LauncherGrouping: String, CaseIterable, Identifiable {
+nonisolated enum LauncherGrouping: String, CaseIterable, Identifiable, Sendable {
     case none, category, letter
     var id: Self { self }
     var title: LocalizedStringResource {
@@ -29,7 +29,7 @@ enum LauncherGrouping: String, CaseIterable, Identifiable {
     }
 }
 
-enum LauncherLayout: String, CaseIterable, Identifiable {
+nonisolated enum LauncherLayout: String, CaseIterable, Identifiable, Sendable {
     case grid, list
     var id: Self { self }
     var title: LocalizedStringResource { self == .grid ? .launcherGrid : .launcherList }
@@ -37,7 +37,7 @@ enum LauncherLayout: String, CaseIterable, Identifiable {
 }
 
 /// Bundle categories map to app-owned translated copy; unknown or missing metadata stays explicit.
-enum LauncherCategory {
+nonisolated enum LauncherCategory {
     static func title(_ identifier: String) -> LocalizedStringResource {
         switch identifier.replacingOccurrences(of: "public.app-category.", with: "") {
         case "developer-tools": .launcherCategoryDevelopment

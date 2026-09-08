@@ -8,48 +8,45 @@ struct LauncherMixedResultsView: View {
     var body: some View {
         let input = state.input(
             query: launcher.query,
-            applications: launcher.library.applications
+            applications: launcher.library.applications,
+            options: launcher.searchOptions
         )
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 4) {
-                    if state.ranking {
-                        ProgressView().controlSize(.small).padding()
-                    } else if state.results.isEmpty {
-                        ContentUnavailableView {
-                            Label {
-                                Text(.launcherNoResults)
-                            } icon: {
-                                Image(systemName: "magnifyingglass")
+        ZStack {
+            if state.results.isEmpty {
+                if state.ranking {
+                    ProgressView().controlSize(.small)
+                } else {
+                    ContentUnavailableView {
+                        Label { Text(.unifiedNoResults) } icon: { Image(systemName: "magnifyingglass") }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 4) {
+                            if state.ranking { ProgressView().controlSize(.small).padding() }
+                            LauncherSearchAppSections(launcher: launcher, results: state.visible)
+                            ForEach(state.visible.filter { $0.application == nil }) { result in
+                                LauncherMixedResultRow(result: result, launcher: launcher).id(result.id)
+                            }
+                            if state.results.count > state.visible.count {
+                                Button { state.revealMore() } label: { Text(.unifiedShowMore) }
+                                    .padding(10)
                             }
                         }
+                        .padding(2)
                     }
-                    ForEach(state.visible) { result in
-                        LauncherMixedResultRow(
-                            result: result,
-                            launcher: launcher
-                        ).id(result.id)
+                    .onChange(of: state.selectedID) { _, id in
+                        if let id { proxy.scrollTo(id, anchor: .center) }
                     }
-                    if state.results.count > state.visible.count {
-                        Button {
-                            state.revealMore()
-                        } label: {
-                            Text(.unifiedShowMore)
-                        }
-                        .padding(10)
+                    .onChange(of: state.results.map(\.id), initial: true) {
+                        if let id = state.selectedID { proxy.scrollTo(id, anchor: .center) }
                     }
-                }
-                .padding(2)
-            }
-            .onChange(of: state.selectedID) { _, id in
-                if let id { proxy.scrollTo(id, anchor: .center) }
-            }
-            .onChange(of: state.results.map(\.id)) {
-                if let id = state.selectedID {
-                    proxy.scrollTo(id, anchor: .center)
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .task(id: input) { await state.rank(input) }
     }
 }
@@ -133,7 +130,8 @@ struct LauncherMixedResultMenu: View {
     let launcher: LauncherState
     var body: some View {
         if let app = result.application {
-            LauncherApplicationMenu(application: app, state: launcher)
+            LauncherApplicationMenu(application: app, state: launcher, searchResult: result)
+                .disabled(launcher.search.actionBusy || launcher.search.ranking)
         } else {
             Button {
                 launcher.search.activate(result)

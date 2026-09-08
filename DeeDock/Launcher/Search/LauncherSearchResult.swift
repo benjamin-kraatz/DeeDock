@@ -44,6 +44,7 @@ nonisolated struct LauncherSearchResult: Identifiable, Sendable {
     var application: LauncherApplication?
     var window: WindowSearchSource?
     var unavailable = false
+    var group = ""
 }
 
 /// Copies only searchable metadata, never mode configuration or file contents.
@@ -61,4 +62,19 @@ nonisolated struct LauncherSearchInput: Equatable, Sendable {
     var shortcuts: [ActionTile]
     var modes: [LauncherSearchName]
     var windowRevision: UUID
+    var options = LauncherSearchOptions()
+}
+
+/// App browsing policy copied alongside a query so asynchronous ranking uses one consistent snapshot.
+nonisolated struct LauncherSearchOptions: Equatable, Sendable {
+    struct Visit: Equatable, Sendable {
+        let count: Int
+        let lastOpened: Date
+    }
+    var filter: LauncherFilter = .all
+    var sort: LauncherSort = .name
+    var grouping: LauncherGrouping = .none
+    var running: Set<String> = []
+    var pinned: Set<String> = []
+    var visits: [String: Visit] = [:]
 }
