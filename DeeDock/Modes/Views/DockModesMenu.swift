@@ -36,8 +36,7 @@ struct DockModesMenu: View {
             Divider()
             Button(.dockModesManage) {
                 coordinator.settingsModesRequest = true
-                NSApp.activate()
-                openWindow(id: "settings")
+                openWindow.openDockSettings()
             }
         }
     }

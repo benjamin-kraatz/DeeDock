@@ -479,7 +479,8 @@ final class DockPanelController {
         visibility.showImmediately()
         panel.acceptsKeyboardFocus = true
         store.selectedTarget = store.selectedTarget ?? store.entries.first?.target
-        NSApp.activate(); panel.makeKeyAndOrderFront(nil); panel.makeFirstResponder(panel)
+        ExplicitWindowPresenter.shared.present(panel)
+        panel.makeFirstResponder(panel)
         updatePointer()
     }
     func handleKey(_ event: NSEvent) -> Bool {
@@ -529,6 +530,7 @@ final class DockPanelController {
     }
     /// The coordinator clears its focus owner before this potentially reentrant resign operation.
     func endFocus() {
+        ExplicitWindowPresenter.shared.cancel(panel)
         store.keyboardFocus = false; store.selectedID = nil; panel.acceptsKeyboardFocus = false
         panel.resignKey(); updatePointer()
     }

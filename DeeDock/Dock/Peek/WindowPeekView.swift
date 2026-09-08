@@ -163,8 +163,7 @@ struct WindowPeekView: View {
                 if settings {
                     Button(.windowPeekOpenSettings) {
                         state.settingsSelected?()
-                        NSApp.activate()
-                        openWindow(id: "settings")
+                        openWindow.openDockSettings()
                     }
                 }
             }

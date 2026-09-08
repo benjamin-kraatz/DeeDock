@@ -1723,3 +1723,35 @@ and source changes during an app action remain cases for automated coverage when
 Empty mixed-search results now occupy the full results area, with centered content and a
 kind-neutral empty title and result count in English and German. Native visual verification
 of this correction remains pending. Further subagent review was stopped at the user's request.
+
+## DEE-27: explicit window focus
+
+Settings commands now share one presentation path, including menu-bar and app commands, dock
+context menus, Window Peek, Window Search, Dock Modes, and onboarding. The scene registers its
+actual native window. Existing windows are reused and deminiaturized. Presentation leaves menu
+tracking before ordering the target and requesting app activation; an activation notification
+reasserts key focus on that target. Requests end on confirmed focus, close, app deactivation,
+selection of another app-owned window, supersession, or a two-second deadline. There is no
+continuous polling or unbounded activation retry.
+
+Welcome, Window Search, Badge Memory, explicit update presentation, Launcher, and Focus Dock
+use the same presenter. Launcher close completions and search/memory focus restoration check
+that no newer request has taken ownership. Passive hover, magnification, nonactivating preview
+panels, and passive update presentation retain their existing paths.
+
+The `WindowPresentation` debug log category records the source file, version, request identity,
+foreground PID, app activity, window number, visibility, minimized/key/main state, and request,
+activation, key-window, completion, and timeout events. Native reproduction is still needed to
+identify the reported intermittent failure's exact entry point and notification ordering.
+
+A focused unsigned Debug build of the DeeDock scheme passed. Tests, app launch, and automated
+visual checks were not run. Native acceptance remains pending for Settings closed, open behind
+another app, and minimized; menu-bar and dock context-menu entry points; welcome/search/update
+windows; repeated opens without duplicates; opening during Launcher dismissal; keyboard input;
+passive hover; multiple displays; other Spaces; full-screen foreground apps; and sleep/wake.
+
+The macOS 27 SDK's `NSApplication.activate` contract states that activation can arrive later or
+be denied. This implementation uses public activation and window ordering APIs, keeps existing
+Space collection policies and window levels, and cannot guarantee a Space switch or placement
+over another application's full-screen window. A timeout records an unresolved request rather
+than forcing repeated activation. Compilation does not establish native focus acceptance.

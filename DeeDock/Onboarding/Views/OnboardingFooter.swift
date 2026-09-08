@@ -26,8 +26,7 @@ struct OnboardingFooter: View {
             if isFinalStep {
                 Button(.onboardingOpenSettings) {
                     settingsSelected()
-                    NSApp.activate()
-                    openWindow(id: "settings")
+                    openWindow.openDockSettings()
                 }
             }
             if canGoBack {

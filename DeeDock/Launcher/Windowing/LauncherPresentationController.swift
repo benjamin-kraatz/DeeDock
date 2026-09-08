@@ -10,6 +10,7 @@ final class LauncherPresentationController {
     var origin = CGRect.zero
     var didClose: (() -> Void)?
     private var previousApplication: NSRunningApplication?
+    private var focusGeneration = UUID()
     private var monitors: [Any] = []
     private var generation = UUID()
     private var closing = false
@@ -25,7 +26,6 @@ final class LauncherPresentationController {
               previousApplication: NSRunningApplication?) {
         guard !state.isPresented else { close(); return }
         generation = UUID(); closing = false
-        let token = generation
         self.origin = origin
         self.previousApplication = previousApplication
         if self.previousApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier { self.previousApplication = nil }
@@ -49,8 +49,8 @@ final class LauncherPresentationController {
         // needs ordinary field-editor focus, including after application activation settles.
         panel.becomesKeyOnlyIfNeeded = false
         panel.ignoresMouseEvents = false
-        NSApp.activate()
-        panel.makeKeyAndOrderFront(nil)
+        ExplicitWindowPresenter.shared.present(panel)
+        focusGeneration = ExplicitWindowPresenter.shared.generation
         installMonitors()
         if reduceMotion {
             state.expanded = true; state.morph = 1
@@ -66,6 +66,7 @@ final class LauncherPresentationController {
 
     func close(animated: Bool = true, restoreFocus: Bool = true) {
         guard state.isPresented, !closing || !animated else { return }
+        ExplicitWindowPresenter.shared.cancel(panel)
         closing = true; generation = UUID()
         let token = generation
         removeMonitors()
@@ -80,7 +81,10 @@ final class LauncherPresentationController {
             panel.resignKey()
             closing = false
             didClose?()
-            if restoreFocus, let previousApplication, !previousApplication.isTerminated {
+            // A window command can arrive while the collapse animation is still running.
+            // Its newer request owns focus even before its native window becomes key.
+            if restoreFocus, focusGeneration == ExplicitWindowPresenter.shared.generation,
+               NSApp.isActive, let previousApplication, !previousApplication.isTerminated {
                 previousApplication.activate(options: [])
             }
             previousApplication = nil
@@ -148,6 +152,7 @@ final class LauncherPresentationController {
     private func removeMonitors() { monitors.forEach(NSEvent.removeMonitor); monitors = [] }
 
     func stop() {
+        ExplicitWindowPresenter.shared.cancel(panel)
         generation = UUID(); removeMonitors()
         state.isPresented = false; state.contentVisible = false; state.expanded = false
         state.morph = 0; state.end()

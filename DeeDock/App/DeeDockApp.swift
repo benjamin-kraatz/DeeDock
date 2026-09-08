@@ -77,6 +77,7 @@ struct DeeDockApp: App {
                              windowAccess: delegate.windowAccess,
                              screenCapture: delegate.screenCapture,
                              coordinator: delegate.coordinator)
+            .background { SettingsWindowRegistration() }
             #if DIRECT_DISTRIBUTION
             .environment(\.appUpdater, delegate.updater)
             #endif
