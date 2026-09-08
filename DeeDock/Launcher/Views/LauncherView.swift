@@ -31,8 +31,10 @@ struct LauncherView: View {
                     .frame(width: rect.width, height: rect.height)
                     .offset(x: rect.minX, y: rect.minY)
                 VStack(spacing: 16) {
-                    header
-                    LauncherSearchControls(launcher: state)
+                    LauncherSearchBar(
+                        state: state,
+                        searchFocused: $searchFocused
+                    )
                     LauncherToolbar(state: state)
                     status
                     if state.usesMixedResults {
@@ -89,36 +91,6 @@ struct LauncherView: View {
             RoundedRectangle(cornerRadius: radius).fill(.clear)
                 .glassEffect(.regular, in: .rect(cornerRadius: radius))
         }
-    }
-
-    private var header: some View {
-        HStack(spacing: 14) {
-            Button { searchFocused = true; state.keyboardNavigationActive = false } label: {
-                Image(systemName: "magnifyingglass").font(.title2).foregroundStyle(.tint)
-            }
-            .buttonStyle(.plain).keyboardShortcut("f", modifiers: .command)
-            .accessibilityLabel(Text(.launcherSearch))
-            TextField(text: $state.query, prompt: Text(.unifiedSearchPrompt)) {
-                Text(.launcherSearch)
-            }
-            .textFieldStyle(.plain).font(.title2)
-            .focused($searchFocused)
-            .onSubmit { state.openSelection() }
-            .autocorrectionDisabled()
-            if !state.query.isEmpty {
-                Button { state.query = ""; searchFocused = true } label: {
-                    Image(systemName: "xmark.circle.fill")
-                }
-                .buttonStyle(.plain).foregroundStyle(.secondary)
-                .accessibilityLabel(Text(.launcherClearSearch))
-            }
-            Button { state.close?() } label: { Image(systemName: "chevron.right") }
-                .buttonStyle(.borderless)
-                .help(.launcherClose)
-                .accessibilityLabel(Text(.launcherClose))
-        }
-        .padding(16)
-        .background(.primary.opacity(0.045), in: .rect(cornerRadius: 18))
     }
 
     @ViewBuilder private var status: some View {

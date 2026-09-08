@@ -24,6 +24,8 @@ final class LauncherState {
     /// they keep the position they had while they fade.
     var dockContentOffset = CGSize.zero
     let search = LauncherSearchState()
+    /// Whether the launcher shows mixed search results instead of application-only results.
+    /// Returns `false` while Robi suggestions are active.
     var usesMixedResults: Bool { robiIDs == nil && (!query.isEmpty || (search.kind != .all && search.kind != .application)) }
     var usesGridNavigation: Bool { !usesMixedResults && layout == .grid }
     var query = "" { didSet {
