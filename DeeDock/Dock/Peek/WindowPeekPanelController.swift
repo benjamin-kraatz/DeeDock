@@ -41,7 +41,10 @@ final class WindowPeekPanelController {
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
         panel.acceptsKeyboardFocus = keyboard
-        panel.contentView = WindowPeekHostingView(rootView: WindowPeekView(state: state, keyboard: keyboard))
+        let hosting = WindowPeekHostingView(rootView: WindowPeekView(state: state, keyboard: keyboard,
+                                                                     edge: anchor.edge))
+        panel.contentView = hosting
+        hosting.rootView.contentHeightChanged = { [weak self] height in self?.fit(contentHeight: height) }
         panel.keyboardHandler = { [weak self] event in self?.handleKey(event) ?? false }
         panel.setFrame(placement.frame, display: false)
     }
@@ -65,7 +68,16 @@ final class WindowPeekPanelController {
     func update(anchor: WindowPeekAnchor, settings: DockSettings, count: Int) {
         state.settings = settings
         placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: count, routingFiles: state.routingFiles)
+        (panel.contentView as? WindowPeekHostingView<WindowPeekView>)?.rootView.edge = anchor.edge
         panel.setFrame(placement.frame, display: true)
+    }
+
+    /// Content shorter than the panel would otherwise leave a gap between the card and its icon.
+    private func fit(contentHeight: CGFloat) {
+        guard !stopped, contentHeight > 0 else { return }
+        let frame = WindowPeekGeometry.fitted(placement, contentHeight: contentHeight)
+        guard abs(frame.height - panel.frame.height) > 0.5 || abs(frame.minY - panel.frame.minY) > 0.5 else { return }
+        panel.setFrame(frame, display: true)
     }
 
     var actionMenuPoint: CGPoint { CGPoint(x: panel.frame.midX, y: panel.frame.midY) }

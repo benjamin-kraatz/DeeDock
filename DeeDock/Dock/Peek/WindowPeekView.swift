@@ -4,6 +4,8 @@ struct WindowPeekView: View {
     @Environment(\.openWindow) private var openWindow
     let state: WindowPeekState
     let keyboard: Bool
+    var edge: DockEdge = .bottom
+    var contentHeightChanged: ((CGFloat) -> Void)? = nil
     var reduceTransparencyOverride: Bool? = nil
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
@@ -11,7 +13,22 @@ struct WindowPeekView: View {
         reduceTransparencyOverride ?? reduceTransparency
     }
 
+    /// The panel keeps the side nearest the dock icon, so a body shorter than the panel hugs the tile.
+    private var alignment: Alignment {
+        switch edge {
+        case .bottom: .bottom
+        case .top: .top
+        case .left, .right: .center
+        }
+    }
+
     var body: some View {
+        card
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeightChanged?($0) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
+    }
+
+    private var card: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(nsImage: state.appIcon).resizable().interpolation(.high).frame(width: 24, height: 24)
