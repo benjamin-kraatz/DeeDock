@@ -21,9 +21,12 @@ Neither command runs automatically on detection.
 
 ## Detection rules
 
-- Stable visible change compares 96 by 96 grayscale samples against the starting image. Mean absolute
-  difference must exceed 2.5 percent, while consecutive samples differ by less than 0.6 percent for
-  three confirmations. Moving imagery may never settle. Very small changes can be missed.
+- Stable visible change compares 192 by 192 color samples against the first sample after Start.
+  A pixel counts as changed when any RGB channel differs by at least 24 out of 255. At least 0.5
+  percent of pixels must change from the baseline, while fewer than 0.2 percent change between
+  consecutive samples for three confirmations. This preserves localized and color-only changes
+  that a whole-region grayscale average missed. Allow roughly nine seconds after the image settles,
+  plus capture time. Moving imagery may never settle. Very small changes can still be missed.
 - Completion phrase uses local Vision OCR on the selected region. An entire recognized line must
   match the user-entered phrase, ignoring case and diacritics. The phrase must first be absent and
   then appear in three consecutive samples. A phrase present at Start does not immediately alert.

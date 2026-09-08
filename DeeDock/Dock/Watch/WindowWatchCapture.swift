@@ -78,12 +78,19 @@ actor WindowWatchCapture {
         let cropRect = CGRect(x: rect.minX * Double(image.width), y: rect.minY * Double(image.height),
                               width: rect.width * Double(image.width), height: rect.height * Double(image.height)).integral
         guard let crop = image.cropping(to: cropRect) else { throw WindowWatchFailure.unavailable }
-        var bytes = [UInt8](repeating: 0, count: 96 * 96)
+        let comparisonSide = 192
+        var bytes = [UInt8](repeating: 0, count: comparisonSide * comparisonSide * 4)
         let rendered = bytes.withUnsafeMutableBytes { buffer -> Bool in
-            guard let context = CGContext(data: buffer.baseAddress, width: 96, height: 96,
-                                          bitsPerComponent: 8, bytesPerRow: 96,
-                                          space: CGColorSpaceCreateDeviceGray(), bitmapInfo: 0) else { return false }
-            context.draw(crop, in: CGRect(x: 0, y: 0, width: 96, height: 96))
+            guard let context = CGContext(data: buffer.baseAddress, width: comparisonSide, height: comparisonSide,
+                                          bitsPerComponent: 8, bytesPerRow: comparisonSide * 4,
+                                          space: CGColorSpaceCreateDeviceRGB(),
+                                          bitmapInfo: CGBitmapInfo.byteOrder32Big.rawValue
+                                            | CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
+            // Composite transparent pixels consistently and retain color-only status changes.
+            context.setFillColor(gray: 1, alpha: 1)
+            context.fill(CGRect(x: 0, y: 0, width: comparisonSide, height: comparisonSide))
+            context.interpolationQuality = .high
+            context.draw(crop, in: CGRect(x: 0, y: 0, width: comparisonSide, height: comparisonSide))
             return true
         }
         guard rendered else { throw WindowWatchFailure.unavailable }
