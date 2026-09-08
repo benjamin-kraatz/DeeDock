@@ -63,8 +63,16 @@ actor WindowPortalCapture {
             }
             // Off-screen includes minimized and other-Space windows; public metadata cannot distinguish them.
             guard window.isOnScreen else { return .paused }
+            let size = window.frame.size
+            guard size.width.isFinite, size.height.isFinite, size.width > 0, size.height > 0 else {
+                return .stale
+            }
             try Task.checkCancellation()
             let image = try await WindowScreenshot.capture(window, fittingPixels: pixelSize)
+            // Reject unexpected output geometry rather than mapping a crop onto unknown pixels.
+            let scale = min(pixelSize.width / size.width, pixelSize.height / size.height)
+            guard image.width == max(1, Int((size.width * scale).rounded())),
+                  image.height == max(1, Int((size.height * scale).rounded())) else { return .stale }
             try Task.checkCancellation()
             return .frame(image, ApplicationWindowSummary(token: source.token,
                 processIdentifier: source.processIdentifier, title: window.title, frame: window.frame,

@@ -13,7 +13,6 @@ struct WindowWatchView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.locale) private var locale
-    @State private var fineTuning = false
 
     /// The watched app's own color carries the panel, so it is recognizably about that window.
     private var tint: Color {
@@ -115,11 +114,11 @@ struct WindowWatchView: View {
     @ViewBuilder private var preview: some View {
         if let image = session.image {
             VStack(alignment: .leading, spacing: 8) {
-                WindowWatchRegionEditor(image: image, region: $session.region, editable: session.ready,
-                                        scanning: session.active, tint: session.detected ? .green : tint)
+                WindowRegionEditor(image: image, region: $session.region, editable: session.ready,
+                                   scanning: session.active, tint: session.detected ? .green : tint)
                     .frame(height: 240)
                 if session.ready {
-                    Text(.watchRegionDragHint)
+                    Text(.regionDragHint)
                         .font(.caption).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -148,25 +147,10 @@ struct WindowWatchView: View {
 
     private var setup: some View {
         VStack(alignment: .leading, spacing: 16) {
-            WindowWatchSection(title: .watchSectionRegion, symbol: "viewfinder") {
+            WindowWatchSection(title: .regionSectionTitle, symbol: "viewfinder") {
                 VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 8) {
-                        presetButton(.watchWholeWindow, region: WindowWatchRegion())
-                        presetButton(.watchPresetTop, region: WindowWatchRegion(x: 0, y: 0, width: 1, height: 0.5))
-                        presetButton(.watchPresetBottom, region: WindowWatchRegion(x: 0, y: 0.5, width: 1, height: 0.5))
-                        presetButton(.watchPresetCenter, region: WindowWatchRegion(x: 0.25, y: 0.25, width: 0.5, height: 0.5))
-                    }
-                    DisclosureGroup(isExpanded: $fineTuning) {
-                        Grid(alignment: .leading) {
-                            regionControl(.watchRegionX, value: regionBinding(\.x), range: 0...0.95)
-                            regionControl(.watchRegionY, value: regionBinding(\.y), range: 0...0.95)
-                            regionControl(.watchRegionWidth, value: regionBinding(\.width), range: 0.05...1)
-                            regionControl(.watchRegionHeight, value: regionBinding(\.height), range: 0.05...1)
-                        }
-                        .padding(.top, 6)
-                    } label: {
-                        Text(.watchRegionFineTune).font(.callout)
-                    }
+                    WindowRegionPresetPicker(region: $session.region, tint: tint)
+                    WindowRegionFineTuning(region: $session.region)
                 }
             }
             WindowWatchSection(title: .watchSectionCondition, symbol: "flag.checkered") {
@@ -200,25 +184,6 @@ struct WindowWatchView: View {
                 }
             }
         }
-    }
-
-    private func presetButton(_ label: LocalizedStringResource, region: WindowWatchRegion) -> some View {
-        let selected = session.region.clamped == region.clamped
-        return Button {
-            session.region = region
-        } label: {
-            Text(label)
-                .font(.caption.weight(.medium))
-                .lineLimit(1)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(selected ? AnyShapeStyle(tint) : AnyShapeStyle(.primary))
-        .background(selected ? tint.opacity(0.16) : Color.primary.opacity(0.06), in: .rect(cornerRadius: 8))
-        .overlay { RoundedRectangle(cornerRadius: 8).strokeBorder(tint.opacity(selected ? 0.5 : 0), lineWidth: 1) }
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 
     /// The two conditions state what ends a watch, so the choice is made on the evidence rule
@@ -379,27 +344,6 @@ struct WindowWatchView: View {
             button.buttonStyle(.glassProminent)
         } else {
             button
-        }
-    }
-
-    // MARK: Region plumbing
-
-    private func regionBinding(_ keyPath: WritableKeyPath<WindowWatchRegion, Double>) -> Binding<Double> {
-        Binding {
-            session.region.clamped[keyPath: keyPath]
-        } set: { value in
-            var region = session.region.clamped
-            region[keyPath: keyPath] = value
-            session.region = region.clamped
-        }
-    }
-
-    private func regionControl(_ label: LocalizedStringResource, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
-        GridRow {
-            Text(label).font(.callout)
-            Slider(value: value, in: range, step: 0.01).accessibilityLabel(Text(label))
-            Text(value.wrappedValue, format: .percent.precision(.fractionLength(0)))
-                .font(.callout).monospacedDigit().frame(width: 44, alignment: .trailing)
         }
     }
 }

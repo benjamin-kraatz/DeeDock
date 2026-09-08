@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// The live preview and the selection drawn on it.
+/// The live preview and the selection drawn on it, shared by Window Watch and window portals.
 ///
 /// The overlay and the cropping share top-left unit coordinates, so what the outline encloses is
 /// what the watch samples. Letterbox margins never enter the selection: every gesture works in the
 /// scaled image rectangle, not in the space the preview happens to occupy.
-struct WindowWatchRegionEditor: View {
+struct WindowRegionEditor: View {
     let image: CGImage
-    @Binding var region: WindowWatchRegion
+    @Binding var region: NormalizedWindowRegion
     let editable: Bool
     let scanning: Bool
     let tint: Color
@@ -57,7 +57,7 @@ struct WindowWatchRegionEditor: View {
         .onChange(of: scanning, initial: true) { _, active in
             sweep = active && !reduceMotion
         }
-        .accessibilityLabel(Text(.watchSelectedRegion))
+        .accessibilityLabel(Text(.regionSelected))
     }
 
     /// The selection stated in the same percentages the sliders use, next to the outline it describes.
@@ -129,7 +129,7 @@ struct WindowWatchRegionEditor: View {
             .frame(width: frame.width, height: frame.height, alignment: corner.alignment)
             .offset(x: frame.minX, y: frame.minY)
             .gesture(resize(corner, in: size))
-            .accessibilityLabel(Text(.watchRegionResize))
+            .accessibilityLabel(Text(.regionResize))
     }
 
     private func draw(in size: CGSize) -> some Gesture {
@@ -186,7 +186,7 @@ struct WindowWatchRegionEditor: View {
     }
 
     private func apply(_ rect: CGRect) {
-        region = WindowWatchRegion(x: rect.minX, y: rect.minY,
-                                   width: rect.width, height: rect.height).clamped
+        region = NormalizedWindowRegion(x: rect.minX, y: rect.minY,
+                                        width: rect.width, height: rect.height).clamped
     }
 }
