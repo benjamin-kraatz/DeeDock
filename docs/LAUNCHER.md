@@ -1,4 +1,4 @@
-# App Launcher
+# Launcher
 
 The permanent **App Launcher** tile expands its dock window into a panel on the same display.
 **Back to dock** and Escape reverse the transition. An outside click closes the panel without
@@ -6,8 +6,9 @@ reactivating the previous app. Reduce Motion disables the window animation, and 
 Transparency supplies an opaque background.
 
 The launcher is also a selectable tile in **Focus Dock**. Return opens it. In the launcher,
-typing searches applications, arrows select results, and Return opens the selected result or
-the first result. Command-F focuses the search field. Tab navigates the native controls.
+typing searches apps, windows, saved work, Shelf filenames, pinned Shortcuts, and Dock Modes.
+Arrows select results, and Return performs the selected result's labeled action. If no result
+has been selected, Return performs the first result's action. Command-F focuses the search field. Tab navigates the native controls.
 
 ## Search and discovery
 
@@ -27,13 +28,53 @@ a runnable executable. Duplicate bundle identifiers produce one entry.
 The installed-app snapshot stays in memory between presentations. Opening the launcher or
 choosing **Refresh apps** refreshes it. Discovery stops when the last launcher closes. Apps in
 unindexed, nonstandard folders that DDock has never opened or pinned may not appear. A warning
-identifies directory enumeration failures. Search latency and discovery completeness have not
-been measured on a large application collection.
+identifies directory enumeration failures. Synthetic metadata-ranking measurements are recorded in [DEE-20 acceptance](ACCEPTANCE.md#dee-20-unified-launcher).
+Discovery completeness and end-to-end native latency remain unmeasured.
 
 Each app has a context menu in both views: **Open**, **Show in Finder**, **Pin** or
 **Unpin**, **Pin on Display**, and **Create capsule…**. Pinning applies to the source
 display; the submenu lists other enabled docks. Creating a capsule opens an editable draft
 containing that app. Enter a summary and save to persist it.
+
+## Mixed search
+
+A nonempty query uses compact rows. Each row identifies its kind, source, and default action.
+**Result type** filters apps, windows, Capsules and Breadcrumbs, Shelf files, pinned Shortcuts,
+or named Dock Modes. Selecting a non-app type also browses that source without a query.
+Clear the query and choose **All types** or **Apps** to return to app grid/list browsing.
+App browsing filters, sorting, and grouping remain available there and for explicit Robi suggestions.
+
+Ordinary search reads copied metadata. It does not capture windows, read file contents,
+request permission, use a model, or run an action. Queries debounce for 120 milliseconds.
+Ranking runs outside the UI actor and obsolete tasks cannot publish results. Forty rows appear
+initially; **Show more results** reveals forty more. A selected object retains its identity
+when another provider finishes. If that object disappears, Return does nothing until you select
+another result, rather than acting on a replacement. Explicit window refresh obtains new AX tokens
+and requires selecting a window again.
+
+App matching retains normalization, aliases, and one-edit typo matching. Exact app names rank
+first, followed by exact names of other kinds. Prefix, substring, app alias, window metadata,
+historical capsule, and app typo matches use fixed priorities with name and typed identity
+as tie-breakers. Objects of different kinds remain separate even when their names match.
+
+Window titles are a snapshot from opening or explicit refresh. Exact window actions revalidate
+the original process and AX handle. Metadata-only windows without usable AX handles are labeled
+unavailable for exact activation. **Refresh window metadata** obtains a fresh snapshot.
+App-level search remains available without capture permission or Apple Intelligence.
+
+Capsule matches identify historical saved text. Matches found only in saved breadcrumb OCR carry
+**Saved OCR text · historical**. Opening a capsule uses the current saved object and does not
+resume it automatically. Shelf rows identify stored references whose availability is checked on
+opening. Missing files produce an error and keep the Launcher open. Shortcut availability is
+checked by the existing runner; running, success, and failure status remain visible in the row.
+The runner prevents duplicate concurrent runs. A deleted or guarded mode cannot be activated.
+Unreadable stores show a notice without removing other providers' results or rewriting storage.
+
+Right-click a row for its actions, or use Tab to reach **Result actions** for the keyboard-selected
+row. App results retain their full existing menu. Shelf files also offer **Show in Finder**;
+window results offer metadata refresh. **Capture & image search…** opens the existing explicit
+window-search flow with its capture chooser, OCR, and separately labeled model suggestions.
+The existing **Find a Window** entry points and keyboard shortcut keep their existing controls.
 
 ## Views and history
 

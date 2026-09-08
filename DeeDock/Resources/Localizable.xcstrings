@@ -1,6 +1,546 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "unified.savedOCR" : {
+      "comment" : "Unified Launcher evidence source. Saved OCR text · historical.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved OCR text · historical"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherter OCR-Text · historisch"
+          }
+        }
+      }
+    },
+    "unified.shelfReference" : {
+      "comment" : "Unified Launcher evidence source. Shelf reference · checked on opening.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf reference · checked on opening"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablageverweis · wird beim Öffnen geprüft"
+          }
+        }
+      }
+    },
+    "unified.all" : {
+      "comment" : "Unified Launcher: All types. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All types"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Typen"
+          }
+        }
+      }
+    },
+    "unified.apps" : {
+      "comment" : "Unified Launcher: Apps. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
+    },
+    "unified.windows" : {
+      "comment" : "Unified Launcher: Windows. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster"
+          }
+        }
+      }
+    },
+    "unified.capsules" : {
+      "comment" : "Unified Launcher: Capsules & Breadcrumbs. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capsules & Breadcrumbs"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kapseln & Wegmarken"
+          }
+        }
+      }
+    },
+    "unified.shelf" : {
+      "comment" : "Unified Launcher: Shelf files. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf files"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablage-Dateien"
+          }
+        }
+      }
+    },
+    "unified.shortcuts" : {
+      "comment" : "Unified Launcher: Shortcuts. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcuts"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle"
+          }
+        }
+      }
+    },
+    "unified.modes" : {
+      "comment" : "Unified Launcher: Dock Modes. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock Modes"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock-Modi"
+          }
+        }
+      }
+    },
+    "unified.openApp" : {
+      "comment" : "Unified Launcher: Open app. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open app"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App öffnen"
+          }
+        }
+      }
+    },
+    "unified.showWindow" : {
+      "comment" : "Unified Launcher: Show window. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show window"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster anzeigen"
+          }
+        }
+      }
+    },
+    "unified.openCapsule" : {
+      "comment" : "Unified Launcher: Open capsule. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open capsule"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kapsel öffnen"
+          }
+        }
+      }
+    },
+    "unified.openFile" : {
+      "comment" : "Unified Launcher: Open file. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open file"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei öffnen"
+          }
+        }
+      }
+    },
+    "unified.runShortcut" : {
+      "comment" : "Unified Launcher: Run Shortcut. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run Shortcut"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl ausführen"
+          }
+        }
+      }
+    },
+    "unified.switchMode" : {
+      "comment" : "Unified Launcher: Switch mode. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch mode"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modus wechseln"
+          }
+        }
+      }
+    },
+    "unified.windowUnavailable" : {
+      "comment" : "Unified Launcher: Exact window access unavailable. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact window access unavailable"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf dieses Fenster nicht verfügbar"
+          }
+        }
+      }
+    },
+    "unified.pinnedShortcut" : {
+      "comment" : "Unified Launcher: Pinned Shortcut · availability checked when run. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinned Shortcut · availability checked when run"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angehefteter Kurzbefehl · Verfügbarkeit wird beim Ausführen geprüft"
+          }
+        }
+      }
+    },
+    "unified.modeSource" : {
+      "comment" : "Unified Launcher: Saved Dock Mode. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Dock Mode"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherter Dock-Modus"
+          }
+        }
+      }
+    },
+    "unified.showMore" : {
+      "comment" : "Unified Launcher: Show more results. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show more results"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Ergebnisse anzeigen"
+          }
+        }
+      }
+    },
+    "unified.revealFile" : {
+      "comment" : "Unified Launcher: Show in Finder. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in Finder"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder anzeigen"
+          }
+        }
+      }
+    },
+    "unified.refreshWindows" : {
+      "comment" : "Unified Launcher: Refresh window metadata. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh window metadata"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensterdaten aktualisieren"
+          }
+        }
+      }
+    },
+    "unified.typeFilter" : {
+      "comment" : "Unified Launcher: Result type. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Result type"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnistyp"
+          }
+        }
+      }
+    },
+    "unified.resultActions" : {
+      "comment" : "Unified Launcher: Result actions. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Result actions"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnisaktionen"
+          }
+        }
+      }
+    },
+    "unified.captureRoute" : {
+      "comment" : "Unified Launcher: Capture & image search…. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture & image search…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufnahme & Bildsuche …"
+          }
+        }
+      }
+    },
+    "unified.searchPrompt" : {
+      "comment" : "Unified Launcher: Search apps, windows, saved work, and actions. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search apps, windows, saved work, and actions"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps, Fenster, gespeicherte Arbeit und Aktionen suchen"
+          }
+        }
+      }
+    },
+    "unified.storageUnavailable" : {
+      "comment" : "Unified Launcher: Some saved sources could not be read. Review their storage status in Settings. Other results remain available.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some saved sources could not be read. Review their storage status in Settings. Other results remain available."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige gespeicherte Quellen konnten nicht gelesen werden. Prüfe ihren Speicherstatus in den Einstellungen. Andere Ergebnisse bleiben verfügbar."
+          }
+        }
+      }
+    },
+    "unified.metadataSnapshot" : {
+      "comment" : "Unified Launcher: Window titles reflect the last refresh. No screenshots are taken.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window titles reflect the last refresh. No screenshots are taken."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenstertitel entsprechen der letzten Aktualisierung. Es werden keine Bildschirmaufnahmen erstellt."
+          }
+        }
+      }
+    },
+    "unified.stale" : {
+      "comment" : "Unified Launcher: This item is no longer available. Refresh the search.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This item is no longer available. Refresh the search."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Objekt ist nicht mehr verfügbar. Aktualisiere die Suche."
+          }
+        }
+      }
+    },
+    "unified.shortcutUnavailable" : {
+      "comment" : "Unified Launcher: This Shortcut is already running or is no longer pinned.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This Shortcut is already running or is no longer pinned."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Kurzbefehl wird bereits ausgeführt oder ist nicht mehr angeheftet."
+          }
+        }
+      }
+    },
+    "unified.modeUnavailable" : {
+      "comment" : "Unified Launcher: This mode is no longer available or switching is currently blocked.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This mode is no longer available or switching is currently blocked."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Modus ist nicht mehr verfügbar oder ein Wechsel ist gerade nicht möglich."
+          }
+        }
+      }
+    },
     "" : {
 
     },

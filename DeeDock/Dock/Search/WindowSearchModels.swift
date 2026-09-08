@@ -26,12 +26,13 @@ nonisolated struct WindowSearchSource: Identifiable, Sendable {
 
 /// Literal evidence is separate from image-model suggestions, including their sort priority.
 nonisolated enum WindowSearchEvidence: Sendable {
-    case metadata, text, capsule, image
+    case metadata, text, capsule, historicalOCR, image
     var label: LocalizedStringResource {
         switch self {
         case .metadata: .windowSearchMetadataEvidence
         case .text: .windowSearchTextEvidence
         case .capsule: .windowSearchCapsuleEvidence
+        case .historicalOCR: .unifiedSavedOCR
         case .image: .windowSearchImageEvidence
         }
     }

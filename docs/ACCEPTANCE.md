@@ -1457,3 +1457,57 @@ exact AX object before native access, including close buttons. The fullscreen co
 as an explicit capability limitation: only app-advertised `AXFullScreen` metadata is read through
 public AX queries, and missing state remains unavailable. The final staged-tree build passed
 after these changes. No additional native acceptance is claimed.
+
+
+## DEE-20: unified Launcher
+
+Implemented on `feature/dee-20` in the existing worktree. The Launcher combines app metadata,
+window titles, Capsules/Breadcrumbs including saved OCR, staged Shelf names, pinned Shortcuts,
+and named Dock Modes. See [Launcher controls](LAUNCHER.md#mixed-search) for ranking, evidence
+labels, source limits, and action behavior. No persisted format or permission changes were added.
+
+Focused unsigned Debug app compilation passed with Xcode 27.0, build 27A5252f, Swift 5 and the
+project's MainActor default isolation, targeting macOS 27. Command:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -derivedDataPath /tmp/DeeDock-DEE20-build CODE_SIGNING_ALLOWED=NO build
+```
+
+Local compilation log: `/tmp/DeeDock-DEE20-build.log`. This proves compilation only.
+Tests and automated visual checks were not run. Native keyboard/VoiceOver, IME composition,
+four-edge layouts, narrow displays, focus restoration, Spaces/full-screen, permission changes,
+sleep/wake, display reconnection, source deletion, file access, and Shortcut execution still
+need hands-on acceptance. Do not mark DEE-20 Done on compilation alone.
+
+### Search measurement
+
+`python3 scripts/benchmark-launcher-search.py` compiles the production ranker with `swiftc -O`
+and runs synthetic in-memory metadata on an Apple M4 with macOS 27.0. Dataset: 10,000 apps,
+200 windows, 30 capsules, 50 Shelf references, 30 pinned Shortcuts, and 100 modes. Capsule
+summaries contain 5,700 characters; matching consumes the existing bounded field prefixes.
+Each query has one warm-up and 20 measured iterations. No files, live windows, permissions,
+or models are accessed. Local output: `/tmp/DeeDock-DEE20-benchmark.log`.
+
+| Query | Results | Median | p95 | Maximum |
+| --- | ---: | ---: | ---: | ---: |
+| `invoice` | 10,410 | 13.80 ms | 14.12 ms | 14.32 ms |
+| `Invoice Tool 9999` | 37 | 48.27 ms | 49.51 ms | 49.66 ms |
+| `invocie` | 10,000 | 46.60 ms | 47.79 ms | 47.93 ms |
+| `büro` | 10,000 | 30.83 ms | 31.47 ms | 32.41 ms |
+| `no-such-result` | 0 | 40.30 ms | 41.57 ms | 42.03 ms |
+
+These numbers measure ranking, excluding the 120 ms debounce, discovery, main-actor snapshot
+copying, localization resources, and native layout. They do not establish end-to-end typing
+latency or discovery completeness. Shelf and capsule counts match their current store limits.
+
+### Cases worth automated coverage when authorized
+
+- Equal names across all six types remain distinct, with exact app matches first.
+- Accents, aliases, width folding, invisible formatting, and transposed letters retain app matching.
+- Older ranking tasks cannot publish after query/filter changes, closure, or reopening.
+- Provider completion preserves selected identity; deletion leaves no replacement Return target.
+- Missing Shelf references, consumed/closed AX windows, deleted modes, and concurrent Shortcut
+  runs fail through their original owners without activating another object.
+- Saved OCR is historical evidence; metadata typing never calls capture or model services.
+- Pagination keeps an existing selection visible, and empty-query app browsing retains grid/list.

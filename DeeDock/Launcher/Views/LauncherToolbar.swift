@@ -7,15 +7,15 @@ struct LauncherToolbar: View {
     var body: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 12) {
-                filters
+                if !state.usesMixedResults { filters }
                 Spacer(minLength: 8)
-                options
+                if !state.usesMixedResults { options }
                 robi
             }
             VStack(alignment: .leading, spacing: 10) {
-                filters
+                if !state.usesMixedResults { filters }
                 HStack {
-                    options
+                    if !state.usesMixedResults { options }
                     Spacer()
                     robi
                 }

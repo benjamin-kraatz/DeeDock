@@ -38,9 +38,12 @@ nonisolated enum WindowSearchIndex {
                     + capsule.unfinishedTasks.prefix(6)
                     + capsule.windows.prefix(12).map { $0.applicationName + " " + ($0.windowTitle ?? "") }
                 let text = fields.map { String($0.prefix(2_000)) }.joined(separator: "\n")
-                guard let score = WindowSearchMatcher.score(query, in: text) else { return nil }
+                let metadataScore = WindowSearchMatcher.score(query, in: text)
+                let ocr = capsule.windows.prefix(12).compactMap { $0.textPreview }.map { String($0.prefix(2_000)) }.joined(separator: "\n")
+                guard let score = metadataScore ?? WindowSearchMatcher.score(query, in: text + "\n" + ocr) else { return nil }
                 return WindowSearchResult(id: capsule.id, title: capsule.title, applicationName: "",
-                    evidence: .capsule, excerpt: WindowSearchMatcher.excerpt(text, query: query), score: score,
+                    evidence: metadataScore == nil ? .historicalOCR : .capsule,
+                    excerpt: WindowSearchMatcher.excerpt(metadataScore == nil ? ocr : text, query: query), score: score,
                     date: capsule.createdAt, source: nil, capsuleID: capsule.id)
             }
         }

@@ -13,7 +13,7 @@ struct LauncherView: View {
     @State private var confirmClear = false
 
     var body: some View {
-        let groups = state.groups
+        let groups = state.usesMixedResults ? [] : state.groups
         GeometryReader { geometry in
             // Presented, the panel's window is fixed at a frame that covers both ends of the morph
             // and the content lays out once at the rect it lands on. The morph is the glass rect
@@ -32,10 +32,15 @@ struct LauncherView: View {
                     .offset(x: rect.minX, y: rect.minY)
                 VStack(spacing: 16) {
                     header
+                    LauncherSearchControls(launcher: state)
                     LauncherToolbar(state: state)
                     status
-                    LauncherResultsView(state: state, columns: columns, groups: groups)
-                    footer(count: groups.reduce(0) { $0 + $1.applications.count })
+                    if state.usesMixedResults {
+                        LauncherMixedResultsView(launcher: state)
+                    } else {
+                        LauncherResultsView(state: state, columns: columns, groups: groups)
+                    }
+                    footer(count: state.usesMixedResults ? state.search.results.count : groups.reduce(0) { $0 + $1.applications.count })
                 }
                 .padding(20)
                 .frame(width: landing.width, height: landing.height)
@@ -58,10 +63,10 @@ struct LauncherView: View {
         .onChange(of: state.contentVisible) { _, visible in searchFocused = visible }
         .onExitCommand { state.close?() }
         .onKeyPress(.downArrow) {
-            state.moveSelection(by: state.layout == .grid ? columns : 1); return .handled
+            state.moveSelection(by: state.usesGridNavigation ? columns : 1); return .handled
         }
         .onKeyPress(.upArrow) {
-            state.moveSelection(by: state.layout == .grid ? -columns : -1); return .handled
+            state.moveSelection(by: state.usesGridNavigation ? -columns : -1); return .handled
         }
         .onKeyPress(.leftArrow) {
             guard !searchFocused else { return .ignored }
@@ -93,7 +98,7 @@ struct LauncherView: View {
             }
             .buttonStyle(.plain).keyboardShortcut("f", modifiers: .command)
             .accessibilityLabel(Text(.launcherSearch))
-            TextField(text: $state.query, prompt: Text(.launcherSearchPrompt)) {
+            TextField(text: $state.query, prompt: Text(.unifiedSearchPrompt)) {
                 Text(.launcherSearch)
             }
             .textFieldStyle(.plain).font(.title2)
@@ -117,6 +122,15 @@ struct LauncherView: View {
     }
 
     @ViewBuilder private var status: some View {
+        if let error = state.search.actionError {
+            Text(error).font(.callout).foregroundStyle(.red).textSelection(.enabled)
+        }
+        if state.search.incompleteStores {
+            Text(.unifiedStorageUnavailable).font(.caption).foregroundStyle(.secondary)
+        }
+        if state.usesMixedResults, let message = state.search.message {
+            Text(message).font(.caption).foregroundStyle(.secondary)
+        }
         if state.query.lowercased().trimmingCharacters(in: .whitespaces) == "do a barrel roll" {
             LauncherEasterEgg()
         }
@@ -156,7 +170,7 @@ struct LauncherView: View {
                     .help(Text(.launcherDiscoveryIncomplete)).accessibilityLabel(Text(.launcherDiscoveryIncomplete))
             }
             Spacer()
-            Button { state.library.refresh() } label: { Image(systemName: "arrow.clockwise") }
+            Button { state.library.refresh(); state.search.refreshWindows() } label: { Image(systemName: "arrow.clockwise") }
                 .disabled(state.library.isLoading).accessibilityLabel(Text(.launcherRefresh))
                 .symbolEffect(.rotate.byLayer, options: .nonRepeating, value: state.library.isLoading)
             Menu {

@@ -23,7 +23,13 @@ final class LauncherState {
     /// Shifts the dock's contents from its own window's origin to the presentation window's, so
     /// they keep the position they had while they fade.
     var dockContentOffset = CGSize.zero
-    var query = "" { didSet { if oldValue != query { cancelRobi() }; selectedID = nil; keyboardNavigationActive = false } }
+    let search = LauncherSearchState()
+    var usesMixedResults: Bool { robiIDs == nil && (!query.isEmpty || (search.kind != .all && search.kind != .application)) }
+    var usesGridNavigation: Bool { !usesMixedResults && layout == .grid }
+    var query = "" { didSet {
+        guard oldValue != query else { return }
+        cancelRobi(); search.invalidateQuery(); selectedID = nil; keyboardNavigationActive = false
+    } }
     var filter: LauncherFilter = .all {
         didSet {
             selectedID = nil
@@ -105,6 +111,7 @@ final class LauncherState {
 
     func begin(pins: [ApplicationReference]) {
         presentationGeneration = UUID()
+        search.begin()
         initialPinnedIDs = Set(pins.map(\.id))
         query = ""; error = nil; selectedID = nil
         library.acquire(owner, extraURLs: pins.map(\.url) + catalog.running.map(\.url) + history.visits.values.map { $0.reference.url })
@@ -112,6 +119,7 @@ final class LauncherState {
 
     func end() {
         presentationGeneration = UUID()
+        search.stop()
         cancelRobi(); library.release(owner); icons = [:]
         close = nil; didOpen = nil; error = nil
     }
@@ -148,12 +156,14 @@ final class LauncherState {
     }
 
     func openSelection() {
+        if usesMixedResults { search.openSelection(); return }
         let apps = groups.flatMap(\.applications)
         if let app = apps.first(where: { $0.id == selectedID }) ?? apps.first { open(app) }
     }
 
     func moveSelection(by distance: Int) {
         keyboardNavigationActive = true
+        if usesMixedResults { search.moveSelection(by: distance); return }
         let apps = groups.flatMap(\.applications)
         guard !apps.isEmpty else { selectedID = nil; return }
         let current = selectedID.flatMap { id in apps.firstIndex { $0.id == id } }
