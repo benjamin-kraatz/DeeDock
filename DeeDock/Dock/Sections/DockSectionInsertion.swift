@@ -12,7 +12,13 @@ enum DockSectionInsertion {
             if case .group(let control) = entries[controlIndex], !control.expanded { return nil }
         }
         let pins = entries.indices.filter { entries[$0].pin != nil && $0 < centers.count }
-        if let running = entries.firstIndex(where: { !$0.isPinned }), running < centers.count,
+        // Leading utilities such as App Launcher are not the running-section boundary.
+        // Only entries after the pins can terminate the insertion region.
+        let firstTrailing = entries.indices.first { index in
+            !entries[index].isPinned && (entries[index].appGroup == .running
+                || index > (pins.last ?? entries.count))
+        }
+        if let running = firstTrailing, running < centers.count,
            along > centers[running] - layout.iconSize / 2 - 4 { return nil }
         guard !pins.isEmpty else { return 0 }
         return pins.filter { along > centers[$0] }.count
