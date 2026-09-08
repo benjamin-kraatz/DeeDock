@@ -63,7 +63,7 @@ final class LauncherSearchState {
                 let found = try await service.discover()
                 guard !Task.isCancelled, let self, active, generation == token else { return }
                 sources = found; windowRevision = UUID(); discovering = false
-                message = found.contains(where: { $0.window != nil }) ? .unifiedMetadataSnapshot : .unifiedWindowUnavailable
+                message = found.contains(where: { $0.window != nil }) ? nil : .unifiedWindowUnavailable
             } catch {
                 guard !Task.isCancelled, let self, active, generation == token else { return }
                 discovering = false; message = .windowSearchUnavailable
