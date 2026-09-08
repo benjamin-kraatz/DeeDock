@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AC1000000000000000000001 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1000000000000000000002 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift */; };
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */; };
 		AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */; };
@@ -32,6 +31,7 @@
 		AB0700000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift */; };
 		AB0700000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift */; };
 		AB0700000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0800000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift */; };
+		AC1000000000000000000001 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1000000000000000000002 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift */; };
 		AC7100000000000000000001 /* DeeDock/Dock/Actions/ActionTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7100000000000000000002 /* DeeDock/Dock/Actions/ActionTile.swift */; };
 		AC7200000000000000000001 /* DeeDock/Dock/Focus/FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7200000000000000000002 /* DeeDock/Dock/Focus/FocusSession.swift */; };
 		DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */; };
@@ -108,7 +108,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AC1000000000000000000002 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift; sourceTree = SOURCE_ROOT; };
 		000000000000000000000120 /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
@@ -136,6 +135,7 @@
 		AB0800000000000000000002 /* DeeDock/Dock/Capsules/SessionCapsuleController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/SessionCapsuleController.swift; sourceTree = SOURCE_ROOT; };
 		AB0800000000000000000003 /* DeeDock/Dock/Capsules/CapsuleGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/CapsuleGlyph.swift; sourceTree = SOURCE_ROOT; };
 		AB0800000000000000000004 /* DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Capsules/SessionCapsuleApplicationIcons.swift; sourceTree = SOURCE_ROOT; };
+		AC1000000000000000000002 /* DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/LaunchAnimations/DockLaunchAnimation.swift; sourceTree = SOURCE_ROOT; };
 		AC7100000000000000000002 /* DeeDock/Dock/Actions/ActionTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Actions/ActionTile.swift; sourceTree = SOURCE_ROOT; };
 		AC7200000000000000000002 /* DeeDock/Dock/Focus/FocusSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Focus/FocusSession.swift; sourceTree = SOURCE_ROOT; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -783,7 +783,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -838,7 +838,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -1112,7 +1112,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;

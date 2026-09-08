@@ -20,6 +20,7 @@ final class ShelfDragSession: NSObject, NSDraggingSource {
     private let completed: (Bool) -> Void
     /// Held until AppKit finishes, so neither the session nor its file access is collected early.
     private var retained: ShelfDragSession?
+    private var leaseToken: String?
 
     private init(accesses: [ShelfResourceAccess], completed: @escaping (Bool) -> Void) {
         self.accesses = accesses
@@ -39,6 +40,8 @@ final class ShelfDragSession: NSObject, NSDraggingSource {
             let pasteboard = NSPasteboardItem()
             pasteboard.setString(access.url.absoluteString, forType: .fileURL)
             if index == 0 {
+                session.leaseToken = DocumentDragLeaseRegistry.register(
+                    DocumentResourceAccess(accesses.map(\.url), retaining: accesses), on: pasteboard)
                 pasteboard.setString(ids.map(\.uuidString).joined(separator: ","),
                                      forType: Self.pasteboardType)
             }
@@ -72,6 +75,8 @@ final class ShelfDragSession: NSObject, NSDraggingSource {
                          operation: NSDragOperation) {
         let accepted = !operation.intersection([.copy, .move, .delete]).isEmpty
         withExtendedLifetime(accesses) { completed(accepted) }
+        DocumentDragLeaseRegistry.release(leaseToken)
+        leaseToken = nil
         retained = nil
     }
 }

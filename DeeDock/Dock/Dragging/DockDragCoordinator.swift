@@ -24,6 +24,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var openSpringFolder: ((FolderDockItem, DockPanelController) -> Void)?
     var dropInFolder: ((NSDraggingInfo, FolderDockItem, DockPanelController) -> Bool)?
     var springDragEnded: (() -> Void)?
+    var documentHoverChanged: ((DockItem?, DockPanelController?, DocumentResourceAccess?) -> Void)?
+    var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Void)?
     /// Non-empty while the active external drag came out of DeeDock's own Shelf.
     private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
@@ -103,7 +105,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if shelfDestinationID == displayID { return .copy }
         // Removing a staged reference is a discard, not a file operation, but the poof cursor is right.
-        if trashDestinationID == displayID { return .delete }
+        if trashDestinationID == displayID {
+            return canDiscard(info) ? .delete : []
+        }
         if documentDrag.displayID != nil {
             guard documentDrag.displayID == displayID else { return [] }
             return DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask)
@@ -136,6 +140,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             return true
         }
         if trashDestinationID == displayID, let panel = panels[displayID] {
+            guard canDiscard(info) else { return false }
             // A Shelf item dropped on Trash gives up its reference. The file itself is untouched.
             if !shelfSourceIDs.isEmpty {
                 completion.committed = true
@@ -154,8 +159,14 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                   let panel = panels[displayID],
                   !DockDocumentTarget.operation(allowed: info.draggingSourceOperationMask).isEmpty else { return false }
             completion.committed = true
-            // The catalog retains the leases before clearing this drag's temporary state.
-            panel.store.openDocuments(documents, with: item.reference)
+            // Honor the operation advertised during this target visit even if the app quits
+            // or Peek is disabled before release. An unavailable route must never open files.
+            if documentDrag.requiresWindowChoice {
+                if let chooseDocumentDestination { chooseDocumentDestination(documents, item, panel) }
+                else { panel.store.errorMessage = .fileRouteDestinationUnavailable }
+            } else {
+                panel.store.openDocuments(documents, with: item.reference)
+            }
             cancel()
             return true
         }
@@ -180,19 +191,37 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     func springTarget(_ info: NSDraggingInfo, on displayID: String) -> String? {
         guard !entered(info, on: displayID).isEmpty else { return nil }
         if let (id, folder) = folderDestination { return id + folder.reference.id.uuidString }
-        guard payload.documents != nil else { return nil }
-        return documentDrag.targetKey
+        // App icons use Peek's own cancellable dwell, without AppKit spring activation.
+        return nil
     }
 
     func springActivate(_ info: NSDraggingInfo, on displayID: String) {
         guard springTarget(info, on: displayID) != nil, let panel = panels[displayID] else { return }
         if let (_, folder) = folderDestination { openSpringFolder?(folder, panel) }
-        else { documentDrag.activate(on: panel) }
+        // File drags over apps use the deliberate Peek dwell. Native spring loading must
+        // never activate an app while the user is still deciding where to send the files.
     }
 
     func springHighlight(_ info: NSDraggingInfo, on displayID: String) {
         guard let panel = panels[displayID] else { return }
         panel.interaction.springEmphasized = documentDrag.displayID == displayID && info.springLoadingHighlight == .emphasized
+    }
+
+    /// Peek accepts only the already-validated native session. Private pins and replacement
+    /// pasteboards cannot borrow an earlier file grant. Copy prevents source deletion.
+    func peekDocuments(_ info: NSDraggingInfo) -> DocumentResourceAccess? {
+        guard active, sourceID == nil, !completion.cancelled, !completion.committed,
+              pasteboardChange == info.draggingPasteboard.changeCount,
+              info.draggingSourceOperationMask.contains(.copy),
+              let documents = payload.documents,
+              documents.urls.count <= WindowFileHandoffController.maximumFiles else { return nil }
+        return documents
+    }
+
+    /// Removing a Shelf reference leaves its source intact. Recycling a real file needs a
+    /// source that permits removal; a copy-only handoff drag must never negotiate Trash.
+    private func canDiscard(_ info: NSDraggingInfo) -> Bool {
+        !shelfSourceIDs.isEmpty || !info.draggingSourceOperationMask.intersection([.move, .delete]).isEmpty
     }
 
     func externalEnded() { if sourceID == nil { cancel() } }
@@ -221,7 +250,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         installMonitor()
         if pasteboard.pasteboardItems?.count != objects.count { payload = .rejected; return }
         // Acquire while the native destination still owns the user-granted pasteboard URLs.
-        let access = DocumentResourceAccess(objects)
+        let access = DocumentDragLeaseRegistry.access(for: pasteboard, urls: objects)
         importTask = Task { [weak self] in
             let worker = Task.detached {
                 Result { try DockExternalPayload.read(access, excluding: ownIdentifier) }
@@ -252,7 +281,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if event.type == .keyDown, event.keyCode == 53 {
                 completion.cancelled = true
                 nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
-                clearFeedback()
+                cancel()
             }
             return event // AppKit must still receive Escape to terminate its native session.
         }
@@ -265,6 +294,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
+        let documentTarget = candidate?.store.displayID == nativeDisplayID && payload.documents != nil
+            ? candidate?.documentTarget(at: point) : nil
+        documentHoverChanged?(documentTarget, candidate, payload.documents)
         if sourceID == nil, payload.isReady, payload.stageableItems != nil,
            let candidate, candidate.store.displayID == nativeDisplayID,
            let action = candidate.actionTarget(at: point) {

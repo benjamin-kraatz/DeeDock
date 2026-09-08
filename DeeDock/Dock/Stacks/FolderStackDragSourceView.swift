@@ -28,6 +28,7 @@ struct FolderStackDragSourceView: NSViewRepresentable {
         var completed: ((Bool) -> Void)?
         var lease: (() -> FolderResourceAccess?)?
         private var dragLease: FolderResourceAccess?
+        private var leaseToken: String?
         /// AppKit does not own the source lease after a different stack removes this row.
         private var retained: SourceView?
         private var dragCompleted: ((Bool) -> Void)?
@@ -102,11 +103,14 @@ struct FolderStackDragSourceView: NSViewRepresentable {
                 if hypot(next.locationInWindow.x - origin.x, next.locationInWindow.y - origin.y) >= DockDragGeometry.startDistance {
                     let pasteboard = NSPasteboardItem()
                     pasteboard.setString(entry.reference.url.absoluteString, forType: .fileURL)
+                    dragLease = lease?()
+                    leaseToken = DocumentDragLeaseRegistry.register(
+                        DocumentResourceAccess([entry.reference.url], retaining: dragLease.map { [$0] } ?? []),
+                        on: pasteboard)
                     let item = NSDraggingItem(pasteboardWriter: pasteboard)
                     let dimension = min(bounds.width, bounds.height)
                     item.setDraggingFrame(CGRect(x: bounds.midX - dimension / 2, y: bounds.midY - dimension / 2,
                                                  width: dimension, height: dimension), contents: entry.icon)
-                    dragLease = lease?()
                     dragCompleted = completed
                     retained = self
                     let session = beginDraggingSession(with: [item], event: next, source: self)
@@ -123,6 +127,8 @@ struct FolderStackDragSourceView: NSViewRepresentable {
         func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
             dragCompleted?(!operation.intersection([.copy, .move]).isEmpty)
             dragCompleted = nil
+            DocumentDragLeaseRegistry.release(leaseToken)
+            leaseToken = nil
             dragLease = nil
             retained = nil
         }

@@ -25,11 +25,12 @@ final class BadgeMemoryWindowController: NSObject, NSWindowDelegate {
         presentation.activationFailed = false
         if let window { NSApp.activate(); window.makeKeyAndOrderFront(nil); return }
         previousApplication = application ?? NSWorkspace.shared.frontmostApplication
-        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 650, height: 580),
+        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 820, height: 620),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         window.title = String(localized: .badgeMemoryTitle)
         window.isReleasedWhenClosed = false
-        window.minSize = CGSize(width: 460, height: 380)
+        // The list pane and a three-tile detail row both need room before either starts wrapping.
+        window.minSize = CGSize(width: 640, height: 460)
         window.contentViewController = NSHostingController(rootView: BadgeMemoryView(
             memory: memory, presentation: presentation,
             activate: { [weak self] path in self?.activate(path) },
@@ -37,7 +38,7 @@ final class BadgeMemoryWindowController: NSObject, NSWindowDelegate {
         window.delegate = self
         if let screen = NSScreen.screens.first(where: { $0.frame.contains(NSEvent.mouseLocation) }) ?? NSScreen.main {
             let frame = screen.visibleFrame
-            let size = CGSize(width: min(650, frame.width), height: min(580, frame.height))
+            let size = CGSize(width: min(820, frame.width), height: min(620, frame.height))
             window.setFrame(CGRect(x: frame.midX - size.width / 2, y: frame.midY - size.height / 2,
                                    width: size.width, height: size.height), display: false)
         }

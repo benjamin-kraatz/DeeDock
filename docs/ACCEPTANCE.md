@@ -447,7 +447,7 @@ Added on 2026-09-03. Available application icons accept existing files, document
 
 The native drag coordinator owns payload validation and routes document targets through clipped icon geometry and the existing animation coordinate conversion. Metadata work runs outside pointer callbacks. Checking and rejected batches cannot be dropped. Document feedback uses an accent outline and localized target text without pin-insertion gaps. Either collapsed section temporarily expands after a 0.5-second document hover and restores its previous state when dragging ends. Completely hidden sections remain hidden.
 
-Spring-loading uses the AppKit destination protocol and system hover and Force Click preferences. Activation requests contain no documents. Actual drops and confirmed picker selections create independent catalog requests, including repeated batches while an app is launching. Temporary security-scope access remains owned through validation and handoff. Display removal invalidates its UI callbacks without discarding an accepted request; shutdown cancels owned tasks. Submitted OS operations cannot be rolled back, and a successful handoff does not establish that every document appeared in the receiving app.
+Historical behavior, superseded for application icons by DEE-12: spring-loading used the AppKit destination protocol and system hover and Force Click preferences. Activation requests contained no documents. Actual drops and confirmed picker selections create independent catalog requests, including repeated batches while an app is launching. Temporary security-scope access remains owned through validation and handoff. Display removal invalidates its UI callbacks without discarding an accepted request; shutdown cancels owned tasks. Submitted OS operations cannot be rolled back, and a successful handoff does not establish that every document appeared in the receiving app.
 
 Open Files… is available through app context menus, VoiceOver actions, and Command-O in Focus Dock. One app-owned native picker captures its original target, accepts multiple files and folders, and treats packages as items. Repeated commands bring that picker forward. The initiating dock remains visible until dismissal; removing it cancels the picker. Cancellation restores the originating dock selection or external application only while DeeDock still owns foreground focus. No document bookmarks, history, or preferences are stored.
 
@@ -1301,6 +1301,26 @@ Fusion, and Portal actions, keyboard shortcuts, localization, and acceptance not
 Debug app build passed at `/tmp/DeeDock-dee11-portals-merge-build.log`. Tests and native acceptance
 were not run.
 
+## DEE-12: files through Window Peek
+
+`feature/dee-12` adds delayed file-drag Peek, destination selection, a retained file handoff panel,
+copy-only outgoing native drags, explicit clipboard references, and serial app-level open requests.
+An exact Accessibility window can be activated deliberately. Capture-only cards and missing window
+access retain a labeled app-level fallback. No cross-process synthetic drop or app-specific attachment
+integration is claimed.
+
+Focused Debug app builds with Xcode 27 succeeded during implementation. The initial build reported
+existing unused-value warnings in LauncherPresentationController and DockBadgeController; App Intents
+metadata extraction also reports that this target has no AppIntents dependency. No tests, app launch,
+or automated visual checks ran. Native acceptance remains open.
+
+See [file handoff controls, API findings, state cases, and manual checklist](WINDOW-FILE-HANDOFF.md).
+
+DEE-12 final implementation check on 2026-09-08: the focused Debug build passed with
+`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination
+'platform=macOS' -derivedDataPath /tmp/deedock-dee12-build build CODE_SIGNING_ALLOWED=NO`.
+All 28 new handoff keys matched their compiled `en.lproj` and `de.lproj` resources.
+
 ## DEE-17: badge memory and Focus digest
 
 Implemented on `feature/dee-17`. Badge details show explicit checked baselines and numeric net changes, keeping clear, text and unavailable observations separate. The existing DEE-10 reader supplies all observations. Opt-in collection follows Focus Session boundaries and retains bounded digests with source activation and deletion controls.
@@ -1311,6 +1331,20 @@ DEE-17 validation after integrating `origin/main`: the focused unsigned Debug ap
 
 GPT 5.6 Luna at Extra High reviewed DEE-17 and found five defects. Corrections prevent first samples after relaunch from recreating deleted app history, retain per-session exclusions for deleted digest rows, seed first Focus observations without counting a change, cover the full possible badge width with the details hit target, retain the Focus deadline through startup completion, and enforce the 4 MB limit before writing. The review did not run tests or native checks. A focused unsigned Debug app build passed after the corrections.
 
+### DEE-12 review and main integration
+
+GPT 5.6 Luna at Extra High reviewed the file-routing implementation. Follow-up changes cancel an
+unfinished dwell on every icon exit and retain the operation advertised during each target visit.
+If a window-selection destination becomes unavailable before release, the drop reports an error
+instead of opening files at app level. The Peek affordance now checks running state explicitly.
+The review also inspected exact AX token transfer, source grants, ordering, native destination
+registration, and outgoing copy-only drags. This was static review, not native acceptance.
+
+Merged `origin/main` into `feature/dee-12` in the same worktree and resolved the String Catalog and
+acceptance-note conflicts. Every catalog entry from both branches was preserved. The merged Debug
+build passed at `/tmp/dee12-merge-build.log`. The build after review fixes passed at
+`/tmp/dee12-review-build.log`, with only the App Intents metadata-extraction notice in that final
+incremental build. Tests and automated visual checks were not run.
 
 ## App launch animations
 

@@ -64,7 +64,7 @@ final class WindowPeekPanelController {
 
     func update(anchor: WindowPeekAnchor, settings: DockSettings, count: Int) {
         state.settings = settings
-        placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: count)
+        placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: count, routingFiles: state.routingFiles)
         panel.setFrame(placement.frame, display: true)
     }
 
@@ -77,6 +77,11 @@ final class WindowPeekPanelController {
         if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
         localMonitor = nil
         globalMonitor = nil
+        state.chooseFiles = nil
+        state.fileDragUpdated = nil
+        state.fileDrop = nil
+        state.fileDragExited = nil
+        state.fileDragEnded = nil
         state.watch = nil
         state.pinPortal = nil
         state.addToFusion = nil
@@ -108,6 +113,7 @@ final class WindowPeekPanelController {
 
     private func handleKey(_ event: NSEvent) -> Bool {
         switch event.keyCode {
+        case 8 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: state.chooseFiles?()
         case 13 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: if let id = state.selectedID { state.watch?(id) }
         case 35 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
             if let card = state.cards.first(where: { $0.id == state.selectedID }) {
