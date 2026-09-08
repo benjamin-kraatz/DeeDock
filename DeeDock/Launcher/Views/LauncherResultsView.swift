@@ -25,6 +25,10 @@ struct LauncherResultsView: View {
                     .frame(maxWidth: .infinity, minHeight: 180)
                 } else {
                     LazyVStack(alignment: .leading, spacing: 20) {
+                        if !state.suggestedApplications.isEmpty {
+                            LauncherSuggestedSection(state: state, columns: columns)
+                            Divider()
+                        }
                         ForEach(groups) { group in
                             VStack(alignment: .leading) {
                                 if !group.id.isEmpty {
@@ -65,8 +69,11 @@ struct LauncherResultsView: View {
             .onChange(of: state.selectedID) { _, id in
                 if let id { proxy.scrollTo(id, anchor: .center) }
             }
+            .task(id: state.suggestionAvailabilityKey) {
+                await state.suggestions.updateAvailability(applications: state.library.applications)
+            }
             .onChange(of: groups.flatMap(\.applications).map(\.id)) { _, ids in
-                if let selected = state.selectedID, !ids.contains(selected) {
+                if case .application(let selected) = state.selectedID, !ids.contains(selected) {
                     state.selectedID = nil
                 }
             }
@@ -75,7 +82,7 @@ struct LauncherResultsView: View {
 
     private func result(_ application: LauncherApplication) -> some View {
         LauncherResultButton(application: application, state: state).id(
-            application.id
+            LauncherBrowseID.application(application.id)
         )
     }
 }
@@ -85,10 +92,14 @@ struct LauncherResultButton: View {
     let state: LauncherState
     /// Mixed search retains typed membership and action guards; ordinary browsing uses its existing owner directly.
     var searchResult: LauncherSearchResult? = nil
+    var isSuggestion = false
     @State private var icon: NSImage?
     @State private var hovered = false
 
-    private var selected: Bool { state.usesMixedResults ? state.search.selectedID == .application(application.id) : state.selectedID == application.id }
+    private var selected: Bool {
+        state.usesMixedResults ? state.search.selectedID == .application(application.id)
+            : state.selectedID == (isSuggestion ? .suggested(application.id) : .application(application.id))
+    }
     private var pinned: Bool { state.pinnedIDs.contains(application.id) }
     private var running: Bool {
         state.catalog.runningIDs.contains(application.id)
@@ -101,6 +112,7 @@ struct LauncherResultButton: View {
     var body: some View {
         Button {
             if let searchResult { state.search.activate(searchResult) }
+            else if isSuggestion { state.openSuggested(application) }
             else { state.open(application) }
         } label: {
             Group {
@@ -150,7 +162,11 @@ struct LauncherResultButton: View {
         }
         .buttonStyle(.plain).disabled(interactionBlocked)
         .contextMenu {
-            LauncherApplicationMenu(application: application, state: state, searchResult: searchResult)
+            LauncherApplicationMenu(application: application, state: state, searchResult: searchResult, isSuggestion: isSuggestion)
+            if isSuggestion {
+                Divider()
+                LauncherSuggestionActions(application: application, state: state)
+            }
         }
         .onHover { hovered = $0 }
         .task(id: application.reference.url) {
@@ -165,6 +181,9 @@ struct LauncherResultButton: View {
                 : Text(running ? .launcherRunning : .launcherNotRunning)
         )
         .accessibilityHint(Text(.launcherOpenHint))
+        .accessibilityActions {
+            if isSuggestion { LauncherSuggestionActions(application: application, state: state) }
+        }
         .accessibilityAddTraits(selected ? [.isSelected] : [])
         .help(application.reference.url.path)
     }

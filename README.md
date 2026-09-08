@@ -76,6 +76,10 @@ pinned Shortcuts, and Dock Modes. App browsing retains filters, sorting, groupin
 See the [launcher reference](docs/LAUNCHER.md) for controls and discovery limits, and the
 [acceptance notes](docs/ACCEPTANCE.md#dee-8-app-launcher) for validation status.
 
+Optional **App suggestions** learn from local app activity after opt-in under **Settings → Features → App suggestions**.
+An empty Launcher query can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.
+See [app suggestions](docs/LAUNCHER-SUGGESTIONS.md) for the 90-day retention policy and observation limits.
+
 DDock starts as a menu-bar app, without a normal document window or a second icon in the system Dock. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DDock; dedicated coexistence controls are future work.
 
 - Choose **Appearance → App launch animation** for Classic Bounce, Spring, Pulse, Wobble, Flip, or Indicator only. Classic Bounce is the default. Select a preset to preview it; shared defaults and per-display overrides are supported. Reduce Motion keeps the loading indicator.

@@ -49,6 +49,11 @@ struct FeaturesPageContent: View {
                                   isOn: source.binding(\.secondaryDisplayAppsOnly))
             }
             .disabled(locked)
+        case .appSuggestions:
+            if let coordinator = context.coordinator {
+                LauncherSuggestionsSettingsView(store: coordinator.launcherSuggestions,
+                                                applications: coordinator.launcherApplications)
+            }
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)

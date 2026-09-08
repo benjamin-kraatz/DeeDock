@@ -92,7 +92,6 @@
 		DDF7000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift */; };
 		DDF7000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */; };
 		DDF7000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */; };
-		DDFE00000000000000000101 /* DeeDock/Dock/Portals/WindowPortalExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFE00000000000000000102 /* DeeDock/Dock/Portals/WindowPortalExport.swift */; };
 		DDFA00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */; };
 		DDFA00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift */; };
 		DDFA00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift */; };
@@ -100,6 +99,14 @@
 		DDFA00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */; };
 		DDFA00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */; };
 		DDFC00000000000000000001 /* DeeDock/Dock/Services/TrashController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */; };
+		DDFE00000000000000000101 /* DeeDock/Dock/Portals/WindowPortalExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFE00000000000000000102 /* DeeDock/Dock/Portals/WindowPortalExport.swift */; };
+		DE26B0000000000000000000 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000000 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift */; };
+		DE26B0000000000000000001 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000001 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift */; };
+		DE26B0000000000000000002 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000002 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift */; };
+		DE26B0000000000000000003 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000003 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift */; };
+		DE26B0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift */; };
+		DE26B0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift */; };
+		DE26B0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift */; };
 		DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = DEE400000000000000000002 /* Sparkle-LICENSE.txt */; };
 		DEE8B0000000000000000000 /* DeeDock/Launcher/Models/LauncherApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE8F0000000000000000000 /* DeeDock/Launcher/Models/LauncherApplication.swift */; };
 		DEE8B0000000000000000001 /* DeeDock/Launcher/Discovery/LauncherDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE8F0000000000000000001 /* DeeDock/Launcher/Discovery/LauncherDiscovery.swift */; };
@@ -198,7 +205,6 @@
 		DDF8000000000000000000006 /* DeeDock/Dock/Popover/DockPopoverGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Popover/DockPopoverGeometry.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000007 /* DeeDock/Dock/Stacks/FolderStackState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackState.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000008 /* DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderDirectoryMonitor.swift; sourceTree = SOURCE_ROOT; };
-		DDFE00000000000000000102 /* DeeDock/Dock/Portals/WindowPortalExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Portals/WindowPortalExport.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000000 /* DeeDock/Dock/Models/ApplicationMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationMenu.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000001 /* DeeDock/Dock/Services/ApplicationMenuServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationMenuServicing.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000002 /* DeeDock/Dock/Services/ApplicationWindowServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/ApplicationWindowServicing.swift; sourceTree = SOURCE_ROOT; };
@@ -206,6 +212,14 @@
 		DDFB00000000000000000004 /* DeeDock/Dock/State/ApplicationMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/State/ApplicationMenuController.swift; sourceTree = SOURCE_ROOT; };
 		DDFB00000000000000000005 /* DeeDock/Settings/General/WindowAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/General/WindowAccessController.swift; sourceTree = SOURCE_ROOT; };
 		DDFC00000000000000000002 /* DeeDock/Dock/Services/TrashController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/TrashController.swift; sourceTree = SOURCE_ROOT; };
+		DDFE00000000000000000102 /* DeeDock/Dock/Portals/WindowPortalExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Portals/WindowPortalExport.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000000 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000001 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000002 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000003 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/State/LauncherBrowseNavigation.swift; sourceTree = SOURCE_ROOT; };
+		DE26F0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift; sourceTree = SOURCE_ROOT; };
 		DEE400000000000000000002 /* Sparkle-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Sparkle-LICENSE.txt"; path = "ThirdParty/Sparkle-LICENSE.txt"; sourceTree = "<group>"; };
 		DEE8F0000000000000000000 /* DeeDock/Launcher/Models/LauncherApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Models/LauncherApplication.swift; sourceTree = SOURCE_ROOT; };
 		DEE8F0000000000000000001 /* DeeDock/Launcher/Discovery/LauncherDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Discovery/LauncherDiscovery.swift; sourceTree = SOURCE_ROOT; };
@@ -372,6 +386,13 @@
 				DD7000000000000000000008 /* DeeDock/Dock/Models/DockItem.swift */,
 				DD7000000000000000000007 /* DeeDock/Dock/State/DockStore.swift */,
 				DD7000000000000000000006 /* DeeDock/Dock/State/ApplicationCatalog.swift */,
+				DE26F0000000000000000000 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift */,
+				DE26F0000000000000000001 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift */,
+				DE26F0000000000000000002 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift */,
+				DE26F0000000000000000003 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift */,
+				DE26F0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift */,
+				DE26F0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift */,
+				DE26F0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift */,
 				DD7000000000000000000005 /* DeeDock/Dock/State/DockSession.swift */,
 				DD7000000000000000000004 /* DeeDock/Settings/State/DockSettingsStore.swift */,
 				DD7000000000000000000003 /* DeeDock/Settings/Profiles/DisplayProfilesStore.swift */,
@@ -618,6 +639,13 @@
 				DD6000000000000000000008 /* DeeDock/Dock/Models/DockItem.swift in Sources */,
 				DD6000000000000000000007 /* DeeDock/Dock/State/DockStore.swift in Sources */,
 				DD6000000000000000000006 /* DeeDock/Dock/State/ApplicationCatalog.swift in Sources */,
+				DE26B0000000000000000000 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift in Sources */,
+				DE26B0000000000000000001 /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift in Sources */,
+				DE26B0000000000000000002 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift in Sources */,
+				DE26B0000000000000000003 /* DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift in Sources */,
+				DE26B0000000000000000004 /* DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift in Sources */,
+				DE26B0000000000000000005 /* DeeDock/Launcher/State/LauncherBrowseNavigation.swift in Sources */,
+				DE26B0000000000000000006 /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionObservation.swift in Sources */,
 				DD6000000000000000000005 /* DeeDock/Dock/State/DockSession.swift in Sources */,
 				DD6000000000000000000004 /* DeeDock/Settings/State/DockSettingsStore.swift in Sources */,
 				DD6000000000000000000003 /* DeeDock/Settings/Profiles/DisplayProfilesStore.swift in Sources */,

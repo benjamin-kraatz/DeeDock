@@ -29,7 +29,7 @@ final class LauncherPresentationController {
         self.origin = origin
         self.previousApplication = previousApplication
         if self.previousApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier { self.previousApplication = nil }
-        state.begin(pins: pins)
+        state.begin(pins: pins, foregroundID: self.previousApplication?.bundleIdentifier)
         state.close = { [weak self] in self?.close() }
         state.didOpen = { [weak self] in self?.close(restoreFocus: false) }
         state.isPresented = true; state.contentVisible = false; state.expanded = false

@@ -1,5 +1,50 @@
 # DeeDock acceptance record
 
+## DEE-26 app suggestions
+
+Implemented on `codex/dee-26`. The opt-in Suggested section shares Launcher app controls,
+supports grid and list layouts, and keeps a frozen ranking with separate selection identities
+for ordinary and suggested occurrences. Settings include enable, pause, exclusions, reset,
+and optional inline feedback prompts. English and German resources include all 31 new keys.
+See [app suggestions](LAUNCHER-SUGGESTIONS.md) for behavior and retention limits.
+
+Focused unsigned Debug compilation passed with Xcode 27, Swift 5, MainActor default isolation,
+and approachable concurrency:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -derivedDataPath /tmp/DeeDock-DEE26-build CODE_SIGNING_ALLOWED=NO build
+```
+
+The packaged English and German `Localizable.strings` files contain all 31 suggestion keys.
+Compilation does not establish interaction quality. Log: `/tmp/DeeDock-DEE26-build.log`.
+
+The authorized focused test run passed 20 tests in three Swift Testing suites using
+`scripts/test-launcher-suggestions.sh`. The runner copies the production sources to a temporary
+package with Swift 5, MainActor default isolation, and the relevant concurrency flags.
+Coverage includes off and pause gating, preceding context, dwell, startup and session gaps,
+reset races, exclusion reversal, stale feedback, prompt cooldown and persistence, expiry,
+corrupt storage, the 16 MiB storage cap, and navigation through duplicate and partial rows.
+Log: `/tmp/DeeDock-DEE26-tests.log`.
+
+The existing Xcode test target cannot compile because several unrelated production dependencies
+are absent from its source membership. The focused Xcode attempt reported WindowActionModels,
+BossFightConfiguration, DockFilePreview, ActionTilesController, and badge dependencies.
+Only DEE-26 source membership was added. The full suite was not run or repaired.
+
+The [Core ML prototype and chronological comparison](LAUNCHER-SUGGESTIONS-MODEL.md) support
+the initial baseline choice. Core ML and the production baseline each hit 108 of 120 synthetic
+outcomes in their top three. This proves the evaluation mechanics, not usefulness on real habits.
+No live history was collected or uploaded during implementation. No personal model ships.
+
+Native acceptance remains open for keyboard and VoiceOver behavior, four dock edges, long
+German labels, Reduce Motion and Reduce Transparency, multiple displays, app removal and moves,
+Spaces and full-screen apps, sleep and wake, user switching, permission-denied idle readings,
+and exact screen-lock behavior. Safe deterministic previews were added but not launched.
+Real chronological quality, results by history age, ranking stability, and idle energy remain unmeasured.
+Public session notifications do not guarantee a screen-lock boundary, so foreground duration
+is omitted rather than treating unattended time as active use. DEE-26 is not native-acceptance complete.
+
 Recorded on 2026-09-02 with macOS 27.0 (26A5425a) and Xcode 27.0 (27A5252f). Earlier sections retain historical observations; the final section records the current folder-stack slice.
 
 ## Compilation

@@ -37,6 +37,8 @@ final class DockCoordinator {
     var badgeMemory: BadgeMemoryStore { badges.memory }
     @ObservationIgnored private lazy var badgeMemoryWindow = BadgeMemoryWindowController(memory: badges.memory)
     @ObservationIgnored private let catalog: ApplicationCatalog
+    var launcherSuggestions: LauncherSuggestionsStore { catalog.suggestions }
+    var launcherApplications: [LauncherApplication] { catalog.launcherLibrary.applications }
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
     @ObservationIgnored private let capsules = SessionCapsuleController()
@@ -63,7 +65,8 @@ final class DockCoordinator {
         profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository(),
                                          modesRepository: DockModesRepository())
         let applicationService = ApplicationService()
-        catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory())
+        catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory(),
+                                     suggestions: LauncherSuggestionsStore())
         let menus = ApplicationMenuController(
             access: windowAccess,
             applications: ApplicationMenuService(applications: applicationService),
@@ -213,6 +216,7 @@ final class DockCoordinator {
             self?.occupancySuspended = false
             self?.reconcile($0)
         }
+        catalog.suggestions.modeProvider = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
         catalog.start()
         trash.start()
         shelf.start()
@@ -282,6 +286,10 @@ final class DockCoordinator {
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles, focusSession: focusSession)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             configureLauncherSearch(on: panel)
+            panel.launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
+            panel.launcher.suggestionVisibility = { [weak self] in
+                self?.profiles.modes.effectiveVisibility(for: display.id) ?? .showAll
+            }
             panel.interaction.actionTiles = actionTiles
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }

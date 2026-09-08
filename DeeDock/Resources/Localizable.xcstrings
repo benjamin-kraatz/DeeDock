@@ -1,607 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "unified.resultCount" : {
-      "comment" : "Number of matching unified Launcher results across all object kinds.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Ergebnis"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Ergebnisse"
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld result"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld results"
-                }
-              }
-            }
-          }
-        }
-      }
+    "" : {
+
     },
-    "unified.noResults" : {
-      "comment" : "Empty state for unified Launcher search, including non-app result types.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No matching results"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine passenden Ergebnisse"
-          }
-        }
-      }
-    },
-    "unified.savedOCR" : {
-      "comment" : "Unified Launcher evidence source. Saved OCR text · historical.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved OCR text · historical"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherter OCR-Text · historisch"
-          }
-        }
-      }
-    },
-    "unified.shelfReference" : {
-      "comment" : "Unified Launcher evidence source. Shelf reference · checked on opening.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shelf reference · checked on opening"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ablageverweis · wird beim Öffnen geprüft"
-          }
-        }
-      }
-    },
-    "unified.all" : {
-      "comment" : "Unified Launcher: All types. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All types"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Typen"
-          }
-        }
-      }
-    },
-    "unified.apps" : {
-      "comment" : "Unified Launcher: Apps. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apps"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apps"
-          }
-        }
-      }
-    },
-    "unified.windows" : {
-      "comment" : "Unified Launcher: Windows. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Windows"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster"
-          }
-        }
-      }
-    },
-    "unified.capsules" : {
-      "comment" : "Unified Launcher: Capsules & Breadcrumbs. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Capsules & Breadcrumbs"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kapseln & Wegmarken"
-          }
-        }
-      }
-    },
-    "unified.shelf" : {
-      "comment" : "Unified Launcher: Shelf files. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shelf files"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ablage-Dateien"
-          }
-        }
-      }
-    },
-    "unified.shortcuts" : {
-      "comment" : "Unified Launcher: Shortcuts. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shortcuts"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kurzbefehle"
-          }
-        }
-      }
-    },
-    "unified.modes" : {
-      "comment" : "Unified Launcher: Dock Modes. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dock Modes"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dock-Modi"
-          }
-        }
-      }
-    },
-    "unified.openApp" : {
-      "comment" : "Unified Launcher: Open app. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open app"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App öffnen"
-          }
-        }
-      }
-    },
-    "unified.showWindow" : {
-      "comment" : "Unified Launcher: Show window. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show window"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster anzeigen"
-          }
-        }
-      }
-    },
-    "unified.openCapsule" : {
-      "comment" : "Unified Launcher: Open capsule. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open capsule"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kapsel öffnen"
-          }
-        }
-      }
-    },
-    "unified.openFile" : {
-      "comment" : "Unified Launcher: Open file. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open file"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Datei öffnen"
-          }
-        }
-      }
-    },
-    "unified.runShortcut" : {
-      "comment" : "Unified Launcher: Run Shortcut. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Run Shortcut"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kurzbefehl ausführen"
-          }
-        }
-      }
-    },
-    "unified.switchMode" : {
-      "comment" : "Unified Launcher: Switch mode. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Switch mode"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modus wechseln"
-          }
-        }
-      }
-    },
-    "unified.windowUnavailable" : {
-      "comment" : "Unified Launcher: Exact window access unavailable. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exact window access unavailable"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zugriff auf dieses Fenster nicht verfügbar"
-          }
-        }
-      }
-    },
-    "unified.pinnedShortcut" : {
-      "comment" : "Unified Launcher: Pinned Shortcut · availability checked when run. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pinned Shortcut · availability checked when run"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Angehefteter Kurzbefehl · Verfügbarkeit wird beim Ausführen geprüft"
-          }
-        }
-      }
-    },
-    "unified.modeSource" : {
-      "comment" : "Unified Launcher: Saved Dock Mode. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved Dock Mode"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherter Dock-Modus"
-          }
-        }
-      }
-    },
-    "unified.showMore" : {
-      "comment" : "Unified Launcher: Show more results. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show more results"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weitere Ergebnisse anzeigen"
-          }
-        }
-      }
-    },
-    "unified.revealFile" : {
-      "comment" : "Unified Launcher: Show in Finder. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show in Finder"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Im Finder anzeigen"
-          }
-        }
-      }
-    },
-    "unified.refreshWindows" : {
-      "comment" : "Unified Launcher: Refresh window metadata. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Refresh window metadata"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fensterdaten aktualisieren"
-          }
-        }
-      }
-    },
-    "unified.typeFilter" : {
-      "comment" : "Unified Launcher: Result type. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Result type"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ergebnistyp"
-          }
-        }
-      }
-    },
-    "unified.resultActions" : {
-      "comment" : "Unified Launcher: Result actions. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Result actions"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ergebnisaktionen"
-          }
-        }
-      }
-    },
-    "unified.captureRoute" : {
-      "comment" : "Unified Launcher: Capture & image search…. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Capture & image search…"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aufnahme & Bildsuche …"
-          }
-        }
-      }
-    },
-    "unified.searchPrompt" : {
-      "comment" : "Unified Launcher: Search apps, windows, saved work, and actions. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search apps, windows, saved work, and actions"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apps, Fenster, gespeicherte Arbeit und Aktionen suchen"
-          }
-        }
-      }
-    },
-    "unified.storageUnavailable" : {
-      "comment" : "Unified Launcher: Some saved sources could not be read. Review their storage status in Settings. Other results remain available.. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Some saved sources could not be read. Review their storage status in Settings. Other results remain available."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einige gespeicherte Quellen konnten nicht gelesen werden. Prüfe ihren Speicherstatus in den Einstellungen. Andere Ergebnisse bleiben verfügbar."
-          }
-        }
-      }
-    },
-    "unified.metadataSnapshot" : {
-      "comment" : "Unified Launcher: Window titles reflect the last refresh. No screenshots are taken.. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Window titles reflect the last refresh. No screenshots are taken."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenstertitel entsprechen der letzten Aktualisierung. Es werden keine Bildschirmaufnahmen erstellt."
-          }
-        }
-      }
-    },
-    "unified.stale" : {
-      "comment" : "Unified Launcher: This item is no longer available. Refresh the search.. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This item is no longer available. Refresh the search."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieses Objekt ist nicht mehr verfügbar. Aktualisiere die Suche."
-          }
-        }
-      }
-    },
-    "unified.shortcutUnavailable" : {
-      "comment" : "Unified Launcher: This Shortcut is already running or is no longer pinned.. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This Shortcut is already running or is no longer pinned."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Kurzbefehl wird bereits ausgeführt oder ist nicht mehr angeheftet."
-          }
-        }
-      }
-    },
-    "unified.modeUnavailable" : {
-      "comment" : "Unified Launcher: This mode is no longer available or switching is currently blocked.. Keep source and action terminology distinct.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This mode is no longer available or switching is currently blocked."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Modus ist nicht mehr verfügbar oder ein Wechsel ist gerade nicht möglich."
-          }
-        }
-      }
-    },
-    "" : {},
     "actionCancel" : {
       "comment" : "Cancels an editing or confirmation alert.",
       "extractionState" : "manual",
@@ -7812,16 +7214,16 @@
       "comment" : "Command to preview a selected file without opening an application.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quick Look"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Übersicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Look"
           }
         }
       }
@@ -7830,16 +7232,16 @@
       "comment" : "Button that returns from Quick Look to the file list.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close Preview"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vorschau schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Preview"
           }
         }
       }
@@ -8916,16 +8318,16 @@
       "comment" : "File drag feedback; the source files stay in their original locations.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy into Folder"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "In Ordner kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy into Folder"
           }
         }
       }
@@ -8934,16 +8336,16 @@
       "comment" : "Progress while a dropped batch is copied into a folder.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copying files…"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dateien werden kopiert …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copying files…"
           }
         }
       }
@@ -8952,13 +8354,13 @@
       "comment" : "Error from a dropped file batch, including the system details.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@"
           }
         },
-        "de" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@"
@@ -8970,16 +8372,16 @@
       "comment" : "File copy failure, including the number already copied and the system error.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copied %1$lld items. %2$@"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld Objekte kopiert. %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied %1$lld items. %2$@"
           }
         }
       }
@@ -8988,16 +8390,16 @@
       "comment" : "Return to the previous folder in the stack.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Back"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zurück"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
           }
         }
       }
@@ -9006,16 +8408,16 @@
       "comment" : "Accessibility hint for a browsable subfolder.",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open this folder in the stack."
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diesen Ordner im Stapel öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open this folder in the stack."
           }
         }
       }
@@ -10712,6 +10114,564 @@
         }
       }
     },
+    "launcher.suggestions.dataTitle" : {
+      "comment" : "Heading for destructive learning reset controls.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lerndaten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learning data"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.dismiss" : {
+      "comment" : "Dismiss the optional suggestion feedback prompt without sending a quality answer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.dontAsk" : {
+      "comment" : "Disable future optional suggestion quality prompts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht mehr fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don't ask again"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.enabled" : {
+      "comment" : "Opt-in toggle enabling local app use learning and suggestions; off by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Nutzungsgewohnheiten lernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn app-use habits"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.enabledHelp" : {
+      "comment" : "Explanation beside the suggestion learning opt-in toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps im App Launcher anhand deiner Nutzung vorschlagen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggest apps in App Launcher based on how you use them. Off by default."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.exclude" : {
+      "comment" : "Contextual action permanently excluding an app until reversed in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App nie vorschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never suggest this app"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.excludedEmpty" : {
+      "comment" : "Empty state for the explicit suggestion exclusion list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Apps ausgeschlossen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No apps excluded."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.excludedHelp" : {
+      "comment" : "Explains adding and removing deliberate app exclusions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle im Menü einer vorgeschlagenen App „Diese App nie vorschlagen“, um sie von Vorschlägen und künftigem Lernen auszuschließen. Hier kannst du sie jederzeit wieder zulassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose “Never suggest this app” from a suggested app’s menu to exclude it from suggestions and future learning. Allow it again here at any time."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.excludedTitle" : {
+      "comment" : "Heading for the reversible app suggestion exclusion list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeschlossene Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excluded apps"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.feedbackTitle" : {
+      "comment" : "Settings card heading for optional inline feedback prompts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.include" : {
+      "comment" : "Button removing one deliberate app suggestion exclusion.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wieder zulassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow again"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.includeApp" : {
+      "comment" : "VoiceOver action to remove an exclusion. Placeholder is an app name or stable app identity; do not translate it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge für %@ wieder zulassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow suggestions for %@ again"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.no" : {
+      "comment" : "Negative answer to the aggregate suggestion quality question.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.notNow" : {
+      "comment" : "Contextual negative suggestion feedback; does not permanently exclude the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade nicht hilfreich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not useful right now"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.paused" : {
+      "comment" : "Pause toggle that stops collection, updates, and presentation together.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lernen und Vorschläge pausieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause learning and suggestions"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.pausedHelp" : {
+      "comment" : "Explains retention when suggestions are paused or disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausieren oder Ausschalten stoppt Lernen und Vorschläge sofort. Gespeicherte Lerndaten bleiben bis zum Ablauf oder Zurücksetzen erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausing or turning off stops learning and suggestions immediately. Saved learning data stays until it expires or you reset it."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.privacy" : {
+      "comment" : "Privacy disclosure for opt-in app suggestions. Behavioral metadata is local and retained at most 90 days.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock speichert bis zu 90 Tage lang nur Metadaten zur App-Nutzung auf diesem Mac, darunter App-Kennungen, Zeiten, laufende Apps, Dock-Modus und Feedback zu Vorschlägen. Fenstertitel, Dokumente, URLs, Screenshots, Tastatureingaben und Inhalte werden nicht gespeichert. Lerndaten bleiben privat auf deinem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock stores only app-use metadata on this Mac for up to 90 days, including app identities, times, running apps, Dock Mode, and suggestion feedback. It does not store window titles, documents, URLs, screenshots, keystrokes, or content, and sends no learning data to the cloud. Learning starts when you enable it; existing Launcher history is not imported."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.prompt" : {
+      "comment" : "Optional inline aggregate quality question; feedback does not label individual apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waren diese Vorschläge hilfreich?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Were these suggestions useful?"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.promptsEnabled" : {
+      "comment" : "Toggle controlling optional inline suggestion quality prompts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach der Qualität der Vorschläge fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask about suggestion quality"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.promptsHelp" : {
+      "comment" : "Explanation of optional inline feedback prompts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach einiger Nutzung gelegentlich eine freiwillige Frage im App Launcher anzeigen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Occasionally show an optional question in App Launcher after you have used suggestions for a while. No notifications or dialogs."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.reset" : {
+      "comment" : "Button opening confirmation for clearing suggestion learning data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelernte Vorschläge zurücksetzen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset learned suggestions…"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.resetConfirmation" : {
+      "comment" : "Confirmation explaining which suggestion data is permanently deleted and which preferences remain.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dadurch werden der gespeicherte Lernverlauf, Feedback und personalisierte Modelle gelöscht. Ausgeschlossene Apps und deine Einstellung für Feedback-Fragen bleiben erhalten. Dies kann nicht rückgängig gemacht werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This deletes saved learning history, feedback, and personalized models. Excluded apps and your feedback-prompt preference are kept. This cannot be undone."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.resetHelp" : {
+      "comment" : "Explanation of suggestion reset semantics.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen löscht die gelernte App-Nutzung und das Feedback. Ausgeschlossene Apps und deine Einstellung für Feedback-Fragen bleiben gespeichert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset deletes learned app use and feedback. Your excluded apps and feedback-prompt preference stay saved."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.resetTitle" : {
+      "comment" : "Title of the destructive suggestion data reset confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelernte Vorschläge zurücksetzen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset learned suggestions?"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.sectionTitle" : {
+      "comment" : "Accessible heading for suggested app tiles or rows before ordinary Launcher results.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorgeschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.settingsKeywords" : {
+      "comment" : "Search synonyms for app suggestions settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge Launcher Lernen Vorhersage Datenschutz Verlauf Ausschlüsse Pause Zurücksetzen Feedback"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "suggestions launcher learning prediction privacy history exclusions pause reset feedback"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.settingsSubtitle" : {
+      "comment" : "Description of the app suggestions settings page in the Features overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Mac lernen, welche Apps du als Nächstes verwendest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn which apps you use next, on this Mac."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.settingsTitle" : {
+      "comment" : "Title of app-wide learning settings and its Features navigation entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Vorschläge"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App suggestions"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.storageUnavailable" : {
+      "comment" : "Recoverable suggestion storage error that leaves normal Launcher operation available.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lerndaten konnten nicht gelesen oder gespeichert werden. Lernen und Vorschläge sind gestoppt. Apps lassen sich weiterhin wie gewohnt öffnen. Setze gelernte Vorschläge zurück, um die gespeicherten Daten zu entfernen und es erneut zu versuchen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learning data could not be read or saved. Learning and suggestions are stopped. Ordinary app launching still works. Reset learned suggestions to remove the saved data and try again."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.useful" : {
+      "comment" : "App-specific positive feedback action, attached to the captured suggestion context.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfreicher Vorschlag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Useful suggestion"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.yes" : {
+      "comment" : "Positive answer to the aggregate suggestion quality question.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ja"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yes"
+          }
+        }
+      }
+    },
     "launcherAll" : {
       "comment" : "Launcher filter including every discovered application.",
       "extractionState" : "manual",
@@ -11985,7 +11945,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock won’t launch automatically when you sign in."
+            "value" : "DDock startet nicht automatisch beim Anmelden."
           }
         },
         "en" : {
@@ -12543,7 +12503,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock lives in the menu bar. Its icon is where you find Settings and Quit."
+            "value" : "DDock lebt in der Menüleiste. Dort findest du Einstellungen und mehr."
           }
         },
         "en" : {
@@ -12820,6 +12780,690 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Files in %(appName)@"
+          }
+        }
+      }
+    },
+    "peekActionCaptureOnly" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Vorschau lässt sich keinem steuerbaren Fenster sicher zuordnen. Aktiviere den Fensterzugriff in den Einstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This preview has no reliable window-control target. Enable Window Access in Settings."
+          }
+        }
+      }
+    },
+    "peekActionCenter" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster zentrieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center window"
+          }
+        }
+      }
+    },
+    "peekActionClose" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close window"
+          }
+        }
+      }
+    },
+    "peekActionCompleted" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster aktualisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window updated."
+          }
+        }
+      }
+    },
+    "peekActionConstrained" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App hat die Platzierung eingeschränkt. Das Fenster wurde möglicherweise verschoben oder skaliert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app constrained the placement. The window may have moved or resized."
+          }
+        }
+      }
+    },
+    "peekActionFailed" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster hat sich geändert oder die App hat die Aktion nicht bestätigt. Öffne die Vorschau erneut, um sie zu aktualisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The window changed or the app did not confirm the action. Reopen Peek to refresh."
+          }
+        }
+      }
+    },
+    "peekActionFill" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzbaren Bereich ausfüllen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill usable area"
+          }
+        }
+      }
+    },
+    "peekActionLeft" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linke Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left half"
+          }
+        }
+      }
+    },
+    "peekActionMinimize" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster minimieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimize window"
+          }
+        }
+      }
+    },
+    "peekActionMove" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Display verschieben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to display"
+          }
+        }
+      }
+    },
+    "peekActionPermission" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Fensterzugriff ist nicht verfügbar. Prüfe die Berechtigung für Bedienungshilfen in den Systemeinstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window Access is unavailable. Check Accessibility permission in System Settings."
+          }
+        }
+      }
+    },
+    "peekActionRestore" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster wiederherstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore window"
+          }
+        }
+      }
+    },
+    "peekActionRestricted" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im aktuellen Fensterzustand sind keine Aktionen verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions are unavailable in this window’s current state."
+          }
+        }
+      }
+    },
+    "peekActionRight" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right half"
+          }
+        }
+      }
+    },
+    "peekActionTitle" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensteraktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window actions"
+          }
+        }
+      }
+    },
+    "peekActionUndo" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensterposition zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo window placement"
+          }
+        }
+      }
+    },
+    "peekActionUnsupported" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App unterstützt keine Aktionen für dieses Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app does not support actions for this window."
+          }
+        }
+      }
+    },
+    "portal.capturedAt" : {
+      "comment" : "Label before localized date and time of the retained frame.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufgenommen:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captured:"
+          }
+        }
+      }
+    },
+    "portal.crop" : {
+      "comment" : "Action opening a portal crop preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich auswählen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose region…"
+          }
+        }
+      }
+    },
+    "portal.crop.cancel" : {
+      "comment" : "Cancel crop editing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "portal.crop.confirm" : {
+      "comment" : "Confirm selected portal region.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich übernehmen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply crop"
+          }
+        }
+      }
+    },
+    "portal.crop.help" : {
+      "comment" : "Crop editor guidance and layout limitation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindestgröße: 5 %. Der Bereich folgt Inhalten nicht, wenn sich das Fensterlayout ändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimum size: 5%. A region does not follow content when the window layout changes."
+          }
+        }
+      }
+    },
+    "portal.freeze" : {
+      "comment" : "Stop capture and retain the current frame.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momentaufnahme einfrieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freeze snapshot"
+          }
+        }
+      }
+    },
+    "portal.frozen" : {
+      "comment" : "Explicit frozen state, never live.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingefrorene Momentaufnahme"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frozen snapshot"
+          }
+        }
+      }
+    },
+    "portal.menu.frame" : {
+      "comment" : "Window portal: context menu section for actions on the captured frame.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frame"
+          }
+        }
+      }
+    },
+    "portal.menu.view" : {
+      "comment" : "Window portal: context menu section for what the portal shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ansicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View"
+          }
+        }
+      }
+    },
+    "portal.menu.window" : {
+      "comment" : "Window portal: context menu section for actions on the panel itself.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panel"
+          }
+        }
+      }
+    },
+    "portal.move" : {
+      "comment" : "Window portal: submenu grouping the four move commands.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move panel"
+          }
+        }
+      }
+    },
+    "portal.panHorizontal" : {
+      "comment" : "Pan within the selected region.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horizontale Position"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horizontal position"
+          }
+        }
+      }
+    },
+    "portal.panVertical" : {
+      "comment" : "Pan within the selected region, measured from top.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertikale Position"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertical position"
+          }
+        }
+      }
+    },
+    "portal.reselect" : {
+      "comment" : "Crop cannot safely map to resized source.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Fenstergröße hat sich geändert. Wähle den Bereich erneut aus oder zeige das ganze Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window size changed. Choose the region again or show the whole window."
+          }
+        }
+      }
+    },
+    "portal.resetCrop" : {
+      "comment" : "Fit the saved crop again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom und Verschiebung zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset zoom and pan"
+          }
+        }
+      }
+    },
+    "portal.save" : {
+      "comment" : "Window portal: action saving the visible frame to a file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild sichern …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save frame…"
+          }
+        }
+      }
+    },
+    "portal.save.failed" : {
+      "comment" : "Window portal: shown when saving the frame produced no file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bild konnte nicht gesichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The frame could not be saved."
+          }
+        }
+      }
+    },
+    "portal.save.help" : {
+      "comment" : "Window portal: help text for the save action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichert das sichtbare Bild als PNG-Datei."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save the visible frame as a PNG file."
+          }
+        }
+      }
+    },
+    "portal.userPaused" : {
+      "comment" : "User explicitly paused capture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuell pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused by you"
+          }
+        }
+      }
+    },
+    "portal.wholeWindow" : {
+      "comment" : "Reset portal region to the full source window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ganzes Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whole window"
+          }
+        }
+      }
+    },
+    "portal.zoom" : {
+      "comment" : "Portal magnification control, one to four times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
           }
         }
       }
@@ -13180,6 +13824,240 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Source unavailable"
+          }
+        }
+      }
+    },
+    "region.dragHint" : {
+      "comment" : "Region editing: how to edit the region on the preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe auf der Vorschau, um einen Bereich aufzuziehen, darin, um ihn zu verschieben, und an einer Ecke, um ihn anzupassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag on the preview to draw a region, inside it to move, and on a corner to resize."
+          }
+        }
+      }
+    },
+    "region.fineTune" : {
+      "comment" : "Region editing: disclosure label for the numeric region sliders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Reglern feinjustieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fine-tune with sliders"
+          }
+        }
+      }
+    },
+    "region.height" : {
+      "comment" : "Region editing: height of the region.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Höhe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Height"
+          }
+        }
+      }
+    },
+    "region.presetBottom" : {
+      "comment" : "Region presets: the lower half of the window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untere Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom half"
+          }
+        }
+      }
+    },
+    "region.presetCenter" : {
+      "comment" : "Region presets: the middle of the window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center"
+          }
+        }
+      }
+    },
+    "region.presetTop" : {
+      "comment" : "Region presets: the upper half of the window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obere Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top half"
+          }
+        }
+      }
+    },
+    "region.resize" : {
+      "comment" : "Region editing: accessibility label for a corner resize handle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beobachteten Bereich anpassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resize the watched region"
+          }
+        }
+      }
+    },
+    "region.sectionTitle" : {
+      "comment" : "Region editing: section title above the region controls.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Region"
+          }
+        }
+      }
+    },
+    "region.selected" : {
+      "comment" : "Region editing: accessibility label for the preview and its selection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beobachteter Bereich im ausgewählten Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watched region in the selected window"
+          }
+        }
+      }
+    },
+    "region.wholeWindow" : {
+      "comment" : "Region presets: the entire window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ganzes Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whole window"
+          }
+        }
+      }
+    },
+    "region.width" : {
+      "comment" : "Region editing: width of the region.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breite"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Width"
+          }
+        }
+      }
+    },
+    "region.x" : {
+      "comment" : "Region editing: distance of the region from the left edge.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        }
+      }
+    },
+    "region.y" : {
+      "comment" : "Region editing: distance of the region from the top edge.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top"
           }
         }
       }
@@ -17342,6 +18220,606 @@
         }
       }
     },
+    "unified.all" : {
+      "comment" : "Unified Launcher: All types. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Typen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All types"
+          }
+        }
+      }
+    },
+    "unified.apps" : {
+      "comment" : "Unified Launcher: Apps. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
+    },
+    "unified.capsules" : {
+      "comment" : "Unified Launcher: Capsules & Breadcrumbs. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kapseln & Wegmarken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capsules & Breadcrumbs"
+          }
+        }
+      }
+    },
+    "unified.captureRoute" : {
+      "comment" : "Unified Launcher: Capture & image search…. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufnahme & Bildsuche …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture & image search…"
+          }
+        }
+      }
+    },
+    "unified.metadataSnapshot" : {
+      "comment" : "Unified Launcher: Window titles reflect the last refresh. No screenshots are taken.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenstertitel entsprechen der letzten Aktualisierung. Es werden keine Bildschirmaufnahmen erstellt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window titles reflect the last refresh. No screenshots are taken."
+          }
+        }
+      }
+    },
+    "unified.modes" : {
+      "comment" : "Unified Launcher: Dock Modes. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock-Modi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock Modes"
+          }
+        }
+      }
+    },
+    "unified.modeSource" : {
+      "comment" : "Unified Launcher: Saved Dock Mode. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherter Dock-Modus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Dock Mode"
+          }
+        }
+      }
+    },
+    "unified.modeUnavailable" : {
+      "comment" : "Unified Launcher: This mode is no longer available or switching is currently blocked.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Modus ist nicht mehr verfügbar oder ein Wechsel ist gerade nicht möglich."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This mode is no longer available or switching is currently blocked."
+          }
+        }
+      }
+    },
+    "unified.noResults" : {
+      "comment" : "Empty state for unified Launcher search, including non-app result types.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine passenden Ergebnisse"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No matching results"
+          }
+        }
+      }
+    },
+    "unified.openApp" : {
+      "comment" : "Unified Launcher: Open app. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open app"
+          }
+        }
+      }
+    },
+    "unified.openCapsule" : {
+      "comment" : "Unified Launcher: Open capsule. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kapsel öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open capsule"
+          }
+        }
+      }
+    },
+    "unified.openFile" : {
+      "comment" : "Unified Launcher: Open file. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open file"
+          }
+        }
+      }
+    },
+    "unified.pinnedShortcut" : {
+      "comment" : "Unified Launcher: Pinned Shortcut · availability checked when run. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angehefteter Kurzbefehl · Verfügbarkeit wird beim Ausführen geprüft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinned Shortcut · availability checked when run"
+          }
+        }
+      }
+    },
+    "unified.refreshWindows" : {
+      "comment" : "Unified Launcher: Refresh window metadata. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensterdaten aktualisieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh window metadata"
+          }
+        }
+      }
+    },
+    "unified.resultActions" : {
+      "comment" : "Unified Launcher: Result actions. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnisaktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Result actions"
+          }
+        }
+      }
+    },
+    "unified.resultCount" : {
+      "comment" : "Number of matching unified Launcher results across all object kinds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ergebnis"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ergebnisse"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld result"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld results"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "unified.revealFile" : {
+      "comment" : "Unified Launcher: Show in Finder. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "unified.runShortcut" : {
+      "comment" : "Unified Launcher: Run Shortcut. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run Shortcut"
+          }
+        }
+      }
+    },
+    "unified.savedOCR" : {
+      "comment" : "Unified Launcher evidence source. Saved OCR text · historical.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherter OCR-Text · historisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved OCR text · historical"
+          }
+        }
+      }
+    },
+    "unified.searchPrompt" : {
+      "comment" : "Unified Launcher: Search apps, windows, saved work, and actions. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps, Fenster, gespeicherte Arbeit und Aktionen suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search apps, windows, saved work, and actions"
+          }
+        }
+      }
+    },
+    "unified.shelf" : {
+      "comment" : "Unified Launcher: Shelf files. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablage-Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf files"
+          }
+        }
+      }
+    },
+    "unified.shelfReference" : {
+      "comment" : "Unified Launcher evidence source. Shelf reference · checked on opening.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablageverweis · wird beim Öffnen geprüft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf reference · checked on opening"
+          }
+        }
+      }
+    },
+    "unified.shortcuts" : {
+      "comment" : "Unified Launcher: Shortcuts. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcuts"
+          }
+        }
+      }
+    },
+    "unified.shortcutUnavailable" : {
+      "comment" : "Unified Launcher: This Shortcut is already running or is no longer pinned.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Kurzbefehl wird bereits ausgeführt oder ist nicht mehr angeheftet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This Shortcut is already running or is no longer pinned."
+          }
+        }
+      }
+    },
+    "unified.showMore" : {
+      "comment" : "Unified Launcher: Show more results. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Ergebnisse anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show more results"
+          }
+        }
+      }
+    },
+    "unified.showWindow" : {
+      "comment" : "Unified Launcher: Show window. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show window"
+          }
+        }
+      }
+    },
+    "unified.stale" : {
+      "comment" : "Unified Launcher: This item is no longer available. Refresh the search.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Objekt ist nicht mehr verfügbar. Aktualisiere die Suche."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This item is no longer available. Refresh the search."
+          }
+        }
+      }
+    },
+    "unified.storageUnavailable" : {
+      "comment" : "Unified Launcher: Some saved sources could not be read. Review their storage status in Settings. Other results remain available.. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige gespeicherte Quellen konnten nicht gelesen werden. Prüfe ihren Speicherstatus in den Einstellungen. Andere Ergebnisse bleiben verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some saved sources could not be read. Review their storage status in Settings. Other results remain available."
+          }
+        }
+      }
+    },
+    "unified.switchMode" : {
+      "comment" : "Unified Launcher: Switch mode. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modus wechseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch mode"
+          }
+        }
+      }
+    },
+    "unified.typeFilter" : {
+      "comment" : "Unified Launcher: Result type. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnistyp"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Result type"
+          }
+        }
+      }
+    },
+    "unified.windows" : {
+      "comment" : "Unified Launcher: Windows. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows"
+          }
+        }
+      }
+    },
+    "unified.windowUnavailable" : {
+      "comment" : "Unified Launcher: Exact window access unavailable. Keep source and action terminology distinct.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf dieses Fenster nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact window access unavailable"
+          }
+        }
+      }
+    },
     "updatesAllowChecks" : {
       "comment" : "Custom DDock update window: Check Automatically",
       "extractionState" : "manual",
@@ -19238,114 +20716,6 @@
         }
       }
     },
-    "region.presetBottom" : {
-      "comment" : "Region presets: the lower half of the window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Untere Hälfte"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bottom half"
-          }
-        }
-      }
-    },
-    "region.presetCenter" : {
-      "comment" : "Region presets: the middle of the window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mitte"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Center"
-          }
-        }
-      }
-    },
-    "region.presetTop" : {
-      "comment" : "Region presets: the upper half of the window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obere Hälfte"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Top half"
-          }
-        }
-      }
-    },
-    "region.dragHint" : {
-      "comment" : "Region editing: how to edit the region on the preview.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziehe auf der Vorschau, um einen Bereich aufzuziehen, darin, um ihn zu verschieben, und an einer Ecke, um ihn anzupassen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drag on the preview to draw a region, inside it to move, and on a corner to resize."
-          }
-        }
-      }
-    },
-    "region.fineTune" : {
-      "comment" : "Region editing: disclosure label for the numeric region sliders.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mit Reglern feinjustieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fine-tune with sliders"
-          }
-        }
-      }
-    },
-    "region.height" : {
-      "comment" : "Region editing: height of the region.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Höhe"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Height"
-          }
-        }
-      }
-    },
     "watchRegionHelp" : {
       "comment" : "Window watch: Drag over the preview or adjust the region with the keyboard. Coordinates are percentages from the top-left; the outline shows the clamped area.",
       "extractionState" : "manual",
@@ -19360,78 +20730,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Drag over the preview or adjust the region with the keyboard. Coordinates are percentages from the top-left; the outline shows the clamped area."
-          }
-        }
-      }
-    },
-    "region.resize" : {
-      "comment" : "Region editing: accessibility label for a corner resize handle.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beobachteten Bereich anpassen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resize the watched region"
-          }
-        }
-      }
-    },
-    "region.width" : {
-      "comment" : "Region editing: width of the region.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Breite"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Width"
-          }
-        }
-      }
-    },
-    "region.x" : {
-      "comment" : "Region editing: distance of the region from the left edge.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Links"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Left"
-          }
-        }
-      }
-    },
-    "region.y" : {
-      "comment" : "Region editing: distance of the region from the top edge.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oben"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Top"
           }
         }
       }
@@ -19486,42 +20784,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "On detection"
-          }
-        }
-      }
-    },
-    "region.sectionTitle" : {
-      "comment" : "Region editing: section title above the region controls.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereich"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Region"
-          }
-        }
-      }
-    },
-    "region.selected" : {
-      "comment" : "Region editing: accessibility label for the preview and its selection.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beobachteter Bereich im ausgewählten Fenster"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Watched region in the selected window"
           }
         }
       }
@@ -19918,24 +21180,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Watching for a stable visible change."
-          }
-        }
-      }
-    },
-    "region.wholeWindow" : {
-      "comment" : "Region presets: the entire window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ganzes Fenster"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Whole window"
           }
         }
       }
@@ -21880,690 +23124,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“Yesterday” searches only capsules saved yesterday. Choose Saved Capsules. Without a saved checkpoint, there is no history to search."
-          }
-        }
-      }
-    },
-    "peekActionCaptureOnly" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Vorschau lässt sich keinem steuerbaren Fenster sicher zuordnen. Aktiviere den Fensterzugriff in den Einstellungen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This preview has no reliable window-control target. Enable Window Access in Settings."
-          }
-        }
-      }
-    },
-    "peekActionCenter" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster zentrieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Center window"
-          }
-        }
-      }
-    },
-    "peekActionClose" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster schließen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close window"
-          }
-        }
-      }
-    },
-    "peekActionCompleted" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster aktualisiert."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Window updated."
-          }
-        }
-      }
-    },
-    "peekActionConstrained" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die App hat die Platzierung eingeschränkt. Das Fenster wurde möglicherweise verschoben oder skaliert."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The app constrained the placement. The window may have moved or resized."
-          }
-        }
-      }
-    },
-    "peekActionFailed" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Fenster hat sich geändert oder die App hat die Aktion nicht bestätigt. Öffne die Vorschau erneut, um sie zu aktualisieren."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The window changed or the app did not confirm the action. Reopen Peek to refresh."
-          }
-        }
-      }
-    },
-    "peekActionFill" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nutzbaren Bereich ausfüllen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fill usable area"
-          }
-        }
-      }
-    },
-    "peekActionLeft" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Linke Hälfte"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Left half"
-          }
-        }
-      }
-    },
-    "peekActionMinimize" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster minimieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimize window"
-          }
-        }
-      }
-    },
-    "peekActionMove" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf Display verschieben"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move to display"
-          }
-        }
-      }
-    },
-    "peekActionPermission" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Fensterzugriff ist nicht verfügbar. Prüfe die Berechtigung für Bedienungshilfen in den Systemeinstellungen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Window Access is unavailable. Check Accessibility permission in System Settings."
-          }
-        }
-      }
-    },
-    "peekActionRestore" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster wiederherstellen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restore window"
-          }
-        }
-      }
-    },
-    "peekActionRestricted" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Im aktuellen Fensterzustand sind keine Aktionen verfügbar."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actions are unavailable in this window’s current state."
-          }
-        }
-      }
-    },
-    "peekActionRight" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechte Hälfte"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Right half"
-          }
-        }
-      }
-    },
-    "peekActionTitle" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fensteraktionen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Window actions"
-          }
-        }
-      }
-    },
-    "peekActionUndo" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fensterposition zurücksetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Undo window placement"
-          }
-        }
-      }
-    },
-    "peekActionUnsupported" : {
-      "comment" : "Window Peek individual-window action or availability explanation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese App unterstützt keine Aktionen für dieses Fenster."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This app does not support actions for this window."
-          }
-        }
-      }
-    },
-    "portal.crop" : {
-      "comment" : "Action opening a portal crop preview.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose region…"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereich auswählen …"
-          }
-        }
-      }
-    },
-    "portal.crop.help" : {
-      "comment" : "Crop editor guidance and layout limitation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimum size: 5%. A region does not follow content when the window layout changes."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mindestgröße: 5 %. Der Bereich folgt Inhalten nicht, wenn sich das Fensterlayout ändert."
-          }
-        }
-      }
-    },
-    "portal.crop.cancel" : {
-      "comment" : "Cancel crop editing.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abbrechen"
-          }
-        }
-      }
-    },
-    "portal.crop.confirm" : {
-      "comment" : "Confirm selected portal region.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apply crop"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereich übernehmen"
-          }
-        }
-      }
-    },
-    "portal.wholeWindow" : {
-      "comment" : "Reset portal region to the full source window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Whole window"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ganzes Fenster"
-          }
-        }
-      }
-    },
-    "portal.resetCrop" : {
-      "comment" : "Fit the saved crop again.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset zoom and pan"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom und Verschiebung zurücksetzen"
-          }
-        }
-      }
-    },
-    "portal.zoom" : {
-      "comment" : "Portal magnification control, one to four times.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        }
-      }
-    },
-    "portal.panHorizontal" : {
-      "comment" : "Pan within the selected region.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Horizontal position"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Horizontale Position"
-          }
-        }
-      }
-    },
-    "portal.panVertical" : {
-      "comment" : "Pan within the selected region, measured from top.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vertical position"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vertikale Position"
-          }
-        }
-      }
-    },
-    "portal.freeze" : {
-      "comment" : "Stop capture and retain the current frame.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Freeze snapshot"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Momentaufnahme einfrieren"
-          }
-        }
-      }
-    },
-    "portal.frozen" : {
-      "comment" : "Explicit frozen state, never live.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frozen snapshot"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eingefrorene Momentaufnahme"
-          }
-        }
-      }
-    },
-    "portal.userPaused" : {
-      "comment" : "User explicitly paused capture.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paused by you"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manuell pausiert"
-          }
-        }
-      }
-    },
-    "portal.reselect" : {
-      "comment" : "Crop cannot safely map to resized source.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Window size changed. Choose the region again or show the whole window."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Fenstergröße hat sich geändert. Wähle den Bereich erneut aus oder zeige das ganze Fenster."
-          }
-        }
-      }
-    },
-    "portal.capturedAt" : {
-      "comment" : "Label before localized date and time of the retained frame.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Captured:"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aufgenommen:"
-          }
-        }
-      }
-    },
-    "portal.save" : {
-      "comment" : "Window portal: action saving the visible frame to a file.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save frame…"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild sichern …"
-          }
-        }
-      }
-    },
-    "portal.save.help" : {
-      "comment" : "Window portal: help text for the save action.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save the visible frame as a PNG file."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sichert das sichtbare Bild als PNG-Datei."
-          }
-        }
-      }
-    },
-    "portal.save.failed" : {
-      "comment" : "Window portal: shown when saving the frame produced no file.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The frame could not be saved."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Bild konnte nicht gesichert werden."
-          }
-        }
-      }
-    },
-    "portal.move" : {
-      "comment" : "Window portal: submenu grouping the four move commands.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move panel"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster bewegen"
-          }
-        }
-      }
-    },
-    "portal.menu.view" : {
-      "comment" : "Window portal: context menu section for what the portal shows.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ansicht"
-          }
-        }
-      }
-    },
-    "portal.menu.frame" : {
-      "comment" : "Window portal: context menu section for actions on the captured frame.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frame"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild"
-          }
-        }
-      }
-    },
-    "portal.menu.window" : {
-      "comment" : "Window portal: context menu section for actions on the panel itself.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panel"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster"
           }
         }
       }
