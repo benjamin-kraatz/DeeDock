@@ -416,6 +416,13 @@ final class DockCoordinator {
                 shelves.toggle(on: panel, keyboard: false)
             }
             panel.interaction.clearShelf = { [weak panel] in panel?.store.clearShelf() }
+            panel.interaction.canPasteToShelf = { [weak self] in
+                self?.shelves.canPaste == true
+            }
+            panel.interaction.pasteToShelf = { [weak self, weak panel] in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                shelves.paste(on: panel)
+            }
             panel.interaction.beginShelfDrag = { [weak self, weak panel] view, event in
                 guard let self, let panel, panels[display.id] === panel else { return }
                 shelves.beginTileDrag(from: view, event: event, on: panel)

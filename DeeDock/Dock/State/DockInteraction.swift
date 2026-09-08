@@ -48,6 +48,8 @@ final class DockInteraction {
     @ObservationIgnored var openTrash: (() -> Void)?
     @ObservationIgnored var emptyTrash: (() -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    @ObservationIgnored var pasteToShelf: (() -> Void)?
+    @ObservationIgnored var canPasteToShelf: (() -> Bool)?
     @ObservationIgnored var openSessionCapsules: (() -> Void)?
     @ObservationIgnored var openSessionCapsule: ((UUID) -> Void)?
     @ObservationIgnored var resumeSessionCapsule: ((UUID) -> Void)?

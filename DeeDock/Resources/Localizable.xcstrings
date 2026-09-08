@@ -19534,6 +19534,204 @@
         }
       }
     },
+    "shelfPasteClipboard" : {
+      "comment" : "Shelf dock icon context menu action. Adds files or an image from the clipboard.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Zwischenablage einfügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste from Clipboard"
+          }
+        }
+      }
+    },
+    "shelfPasteStorageUnavailable" : {
+      "comment" : "Clipboard import cannot modify corrupt Shelf storage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Ablage kann erst nach Wiederherstellung oder Zurücksetzen ihrer Daten aktualisiert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Shelf cannot be updated until its storage has been recovered or reset."
+          }
+        }
+      }
+    },
+    "shelfPasteChanged" : {
+      "comment" : "Clipboard changed while taking a snapshot for Shelf.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zwischenablage wurde geändert. Öffne das Ablage-Menü und füge erneut ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The clipboard changed. Open the Shelf menu and paste again."
+          }
+        }
+      }
+    },
+    "shelfPasteUnavailable" : {
+      "comment" : "Clipboard empty or access was denied when Paste was invoked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zwischenablage ist leer oder kann nicht gelesen werden. Kopiere die Dateien oder das Bild erneut und erlaube den Zugriff, falls macOS danach fragt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The clipboard is empty or cannot be read. Copy the files or image again and allow clipboard access if macOS asks."
+          }
+        }
+      }
+    },
+    "shelfPasteFailed" : {
+      "comment" : "Shelf paste result with one or more localized failure details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Elemente aus der Zwischenablage konnten nicht hinzugefügt werden. %1$(details)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some clipboard items could not be added. %1$(details)@"
+          }
+        }
+      }
+    },
+    "shelfPasteBatchLimit" : {
+      "comment" : "A paste exceeded the bounded batch size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wurden nur die ersten 100 Einträge der Zwischenablage berücksichtigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the first 100 clipboard entries were considered."
+          }
+        }
+      }
+    },
+    "shelfPasteUnsupported" : {
+      "comment" : "One clipboard item was malformed, unsupported, or too large to read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Element enthält keinen unterstützten Dateipfad oder kein unterstütztes Bild oder überschreitet die Zwischenablage-Grenze von 64 MB."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An item has no supported file path or image, or exceeds the 64 MB clipboard limit."
+          }
+        }
+      }
+    },
+    "shelfPasteFileUnavailable" : {
+      "comment" : "A supplied local path cannot be read. path is a literal filesystem path.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei oder dieser Ordner fehlt oder kann nicht gelesen werden: %1$(path)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file or folder is missing or cannot be read: %1$(path)@"
+          }
+        }
+      }
+    },
+    "shelfPasteImageInvalid" : {
+      "comment" : "Clipboard image validation failed or exceeded a resource limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bild ist ungültig oder überschreitet die Grenze von einem Bild, 40 Megapixeln und 64 MB."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The image is invalid or exceeds the limit of one image, 40 megapixels, and 64 MB."
+          }
+        }
+      }
+    },
+    "shelfPasteRejected" : {
+      "comment" : "Shelf add rejected a clipboard reference, usually because its 50 slots are full.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Ablage ist voll oder die Datei ist nicht mehr verfügbar. Sie fasst bis zu 50 Elemente."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Shelf is full or the file is no longer available. It holds up to 50 items."
+          }
+        }
+      }
+    },
+    "shelfPasteRollbackFailed" : {
+      "comment" : "Generated image could not be staged or removed after failure. path locates the retained file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bild konnte nicht hinzugefügt werden und das Aufräumen ist fehlgeschlagen. Die gespeicherte Datei liegt unter %1$(path)@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The image could not be added, and cleanup failed. The saved file is at %1$(path)@."
+          }
+        }
+      }
+    },
     "shelfUnavailableItems" : {
       "comment" : "Reported when a drag out of the Shelf finds no item that still exists.",
       "extractionState" : "manual",
