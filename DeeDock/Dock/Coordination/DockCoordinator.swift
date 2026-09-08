@@ -281,6 +281,7 @@ final class DockCoordinator {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles, focusSession: focusSession)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
+            configureLauncherSearch(on: panel)
             panel.interaction.actionTiles = actionTiles
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
@@ -553,6 +554,51 @@ final class DockCoordinator {
         endFocus(restore: false)
         badgeMemory.synchronize(session: focusSession.session)
         badgeMemoryWindow.show(path: path, digest: digest, returningTo: lastExternalApplication)
+    }
+
+    /// Shared search borrows stored metadata; native actions stay with the same owners as the dock tiles.
+    private func configureLauncherSearch(on panel: DockPanelController) {
+        let search = panel.launcher.search
+        search.shelf = shelf; search.capsules = capsules; search.actions = actionTiles; search.modes = profiles.modes
+        search.explicitSearch = { [weak self, weak panel] in
+            panel?.closeLauncher()
+            self?.searchWindows()
+        }
+        search.dispatch = { [weak self, weak panel] result, reveal in
+            guard let self, let panel else { return }
+            let launcher = panel.launcher
+            let search = launcher.search
+            switch result.id {
+            case .application(let id):
+                guard let app = launcher.library.applications.first(where: { $0.id == id }) else {
+                    search.actionError = String(localized: .unifiedStale); return
+                }
+                if reveal { launcher.showInFinder(app) } else { launcher.open(app) }
+            case .window:
+                guard let source = result.window else { return }
+                search.activateWindow(source) { [weak panel] in panel?.launcher.didOpen?() }
+            case .capsule(let id):
+                guard capsules.capsules.contains(where: { $0.id == id }) else {
+                    search.actionError = String(localized: .unifiedStale); return
+                }
+                panel.closeLauncher()
+                sessionCapsules.show(id, on: panel, anchor: .launcher)
+            case .shelf(let id):
+                search.performOwnedAction({ [shelves] completion in
+                    shelves.openReference(id, reveal: reveal, completion: completion)
+                }, completion: { [weak panel] in panel?.launcher.didOpen?() })
+            case .shortcut(let id):
+                guard actionTiles.run(id) else {
+                    search.actionError = String(localized: .unifiedShortcutUnavailable); return
+                }
+                // Keep completion or failure visible. The action owner enforces one run per UUID.
+            case .mode(let id):
+                guard profiles.modes.modes.contains(where: { $0.id == id }), activateMode(id) else {
+                    search.actionError = String(localized: .unifiedModeUnavailable); return
+                }
+                launcher.close?()
+            }
+        }
     }
 
     @discardableResult

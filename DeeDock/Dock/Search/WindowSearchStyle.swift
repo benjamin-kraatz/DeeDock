@@ -36,7 +36,7 @@ extension WindowSearchEvidence {
         switch self {
         case .metadata: "textformat"
         case .text: "text.viewfinder"
-        case .capsule: "archivebox"
+        case .capsule, .historicalOCR: "archivebox"
         case .image: "sparkles"
         }
     }

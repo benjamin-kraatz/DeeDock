@@ -4,10 +4,17 @@ import SwiftUI
 struct LauncherApplicationMenu: View {
     let application: LauncherApplication
     let state: LauncherState
+    var searchResult: LauncherSearchResult? = nil
 
     var body: some View {
-        Button(.launcherMenuOpen) { state.open(application) }
-        Button(.applicationMenuShowInFinder) { state.showInFinder(application) }
+        Button(.launcherMenuOpen) {
+            if let searchResult { state.search.activate(searchResult) }
+            else { state.open(application) }
+        }
+        Button(.applicationMenuShowInFinder) {
+            if let searchResult { state.search.activate(searchResult, reveal: true) }
+            else { state.showInFinder(application) }
+        }
         Divider()
         Button(
             state.pinnedIDs.contains(application.id) ? .actionUnpin : .actionPin

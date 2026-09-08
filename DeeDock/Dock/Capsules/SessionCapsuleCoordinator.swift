@@ -123,9 +123,9 @@ final class SessionCapsuleCoordinator {
                 bundleIdentifier: application.bundleIdentifier, windowTitle: nil)], note: "")))
     }
 
-    func show(_ capsuleID: UUID, on panel: DockPanelController) {
+    func show(_ capsuleID: UUID, on panel: DockPanelController, anchor: DockEntryID? = nil) {
         close(returnFocus: false)
-        toggle(on: panel, anchorTarget: .sessionCapsule(capsuleID), initialCapsuleID: capsuleID)
+        toggle(on: panel, anchorTarget: anchor ?? .sessionCapsule(capsuleID), initialCapsuleID: capsuleID)
     }
 
     func resume(_ capsuleID: UUID) {
