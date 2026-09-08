@@ -11158,6 +11158,24 @@
         }
       }
     },
+    "launcher.suggestions.debugStop" : {
+      "comment" : "Stops the current developer inspector operation while preserving completed chronological steps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stoppen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
     "launcher.suggestions.debugSummary" : {
       "comment" : "Development-only suggestion inspector or tuning control: Summary",
       "extractionState" : "manual",
@@ -12198,6 +12216,798 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Useful suggestion"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticAdaptation" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Steps to first new-pattern hit",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritte bis zum ersten Treffer des neuen Musters"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Steps to first new-pattern hit"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticAdvanceOne" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Advance 1 day",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Tag vorspulen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advance 1 day"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticAdvanceSeven" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Advance 7 days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 Tage vorspulen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advance 7 days"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticAdvanceThirty" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Advance 30 days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Tage vorspulen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advance 30 days"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticBurst" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Single-day burst",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzungsspitze an einem Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Single-day burst"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticClock" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Simulated clock",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulierte Uhr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulated clock"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticClockHelp" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Advance the evaluation clock while keeping the generated history. Replay both engines to inspect decay and retention. Later playback steps never move the clock backward.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verschiebe die Auswertungszeit unter Beibehaltung des erzeugten Verlaufs. Werte beide Engines erneut aus, um Alterung und Aufbewahrung zu prüfen. Spätere Wiedergabeschritte setzen die Uhr nicht zurück."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advance the evaluation clock while keeping the generated history. Replay both engines to inspect decay and retention. Later playback steps never move the clock backward."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticColdStart" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Cold start",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaltstart"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cold start"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticConflicting" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Conflicting patterns",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widersprüchliche Muster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conflicting patterns"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticCoverage" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Suggestion coverage",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschlagsabdeckung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestion coverage"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticDays" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: History span, days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufsdauer, Tage"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History span, days"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticDraftHelp" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: These are draft settings. Generate scenario replaces the synthetic data with a repeatable sequence for this seed. Editing the draft cancels a running operation but keeps the generated data until you generate again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies sind Entwurfseinstellungen. Szenario erzeugen ersetzt die synthetischen Daten durch eine mit diesem Startwert wiederholbare Abfolge. Änderungen am Entwurf brechen einen laufenden Vorgang ab. Die erzeugten Daten bleiben bis zur nächsten Erzeugung erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These are draft settings. Generate scenario replaces the synthetic data with a repeatable sequence for this seed. Editing the draft cancels a running operation but keeps the generated data until you generate again."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticDrift" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Changing routine",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wechselnde Routine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changing routine"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticEvaluationDate" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Evaluation date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswertungsdatum, UTC"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evaluation date, UTC"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticExampleCount" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Example count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfängliche Verlaufsbeispiele"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Initial history examples"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticFailures" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Engine failures",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engine-Fehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engine failures"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticGenerate" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Generate scenario",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szenario erzeugen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generate scenario"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticGenerator" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Scenario generator",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szenariogenerator"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scenario generator"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticHitRate" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Hit rate when offered",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trefferquote bei Vorschlägen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hit rate when offered"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticHits" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Top-three hits",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treffer unter den ersten drei"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top-three hits"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticIsolation" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Synthetic mode uses isolated generated data and works without usage consent. It never adds history or suggestions to the real Launcher. Chronological playback reveals each outcome only after prediction, then learns it for the next step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der synthetische Modus verwendet isolierte erzeugte Daten und funktioniert ohne Einwilligung zur Nutzungserfassung. Er fügt dem echten Launcher weder Verlauf noch Vorschläge hinzu. Die chronologische Wiedergabe zeigt jedes Ergebnis erst nach der Vorhersage und lernt es dann für den nächsten Schritt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synthetic mode uses isolated generated data and works without usage consent. It never adds history or suggestions to the real Launcher. Chronological playback reveals each outcome only after prediction, then learns it for the next step."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticMetrics" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Playback metrics",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiedergabekennzahlen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playback metrics"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticMetricsHelp" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Coverage is the share of successful prediction attempts that offer at least one eligible suggestion. A hit means the actual next app is among the first three eligible suggestions. Hit rate divides hits by offered steps. Engine failures are separate from abstention. Adaptation counts steps to the first new-pattern hit after a routine change, not sustained accuracy.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abdeckung ist der Anteil erfolgreicher Vorhersageversuche mit mindestens einem zugelassenen Vorschlag. Ein Treffer bedeutet, dass die tatsächliche nächste App unter den ersten drei zugelassenen Vorschlägen ist. Die Trefferquote teilt Treffer durch Schritte mit Vorschlägen. Engine-Fehler zählen getrennt vom Verzicht auf Vorschläge. Anpassung zählt Schritte bis zum ersten Treffer des neuen Musters nach einem Routinewechsel, nicht bis zu dauerhaft hoher Genauigkeit."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coverage is the share of successful prediction attempts that offer at least one eligible suggestion. A hit means the actual next app is among the first three eligible suggestions. Hit rate divides hits by offered steps. Engine failures are separate from abstention. Adaptation counts steps to the first new-pattern hit after a routine change, not sustained accuracy."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticNoAdaptation" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Not observed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht beobachtet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not observed"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticNoRate" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: No suggestions yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Vorschläge"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No suggestions yet"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticNoise" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Noise",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rauschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noise"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticOffered" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Steps with suggestions",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritte mit Vorschlägen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Steps with suggestions"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticPatternStrength" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Pattern strength",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Musterstärke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pattern strength"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticPlayback" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Chronological playback",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chronologische Wiedergabe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chronological playback"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticPlaybackHelp" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Each step predicts before observing its next app. Run remaining repeats those steps in order. Changing tuning restarts chronological playback so metrics never mix thresholds. Ordinary Replay keeps the frozen input.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeder Schritt sagt die nächste App voraus, bevor er sie beobachtet. Rest ausführen wiederholt diese Schritte der Reihe nach. Änderungen an den Schwellenwerten starten die chronologische Wiedergabe neu, damit Kennzahlen keine Schwellenwerte vermischen. Die normale erneute Auswertung behält die eingefrorenen Eingaben bei."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each step predicts before observing its next app. Run remaining repeats those steps in order. Changing tuning restarts chronological playback so metrics never mix thresholds. Ordinary Replay keeps the frozen input."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticPredictions" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Prediction attempts",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorhersageversuche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prediction attempts"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticProgress" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Outcomes processed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verarbeitete Ergebnisse"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outcomes processed"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticRealSource" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Real captured history",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Echter erfasster Verlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Real captured history"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticReferenceDate" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Reference date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Referenzdatum, UTC"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reference date, UTC"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticRestart" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Restart playback",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiedergabe neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart playback"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticRevealedOutcome" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Revealed next app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufgedeckte nächste App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revealed next app"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticRoutine" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Stable routine",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stabile Routine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stable routine"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticRun" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Run remaining",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rest ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run remaining"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticScenario" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Scenario",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szenario"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scenario"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticSeed" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Random seed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zufallsstartwert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Random seed"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticSource" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Synthetic scenario",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synthetisches Szenario"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synthetic scenario"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticSourcePicker" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: History source",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufsquelle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History source"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticStep" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Step next",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächster Schritt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Step next"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticUnfamiliar" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: Unfamiliar context",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbekannter Kontext"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unfamiliar context"
           }
         }
       }

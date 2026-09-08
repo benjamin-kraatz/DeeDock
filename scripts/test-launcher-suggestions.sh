@@ -13,6 +13,7 @@ sources=(
   DeeDock/Launcher/Suggestions/Models/LauncherSuggestionModels.swift
   DeeDock/Launcher/Suggestions/Models/LauncherSuggestionEngine.swift
   DeeDock/Launcher/Suggestions/Models/LauncherSuggestionTuning.swift
+  DeeDock/Launcher/Suggestions/Models/LauncherSuggestionSyntheticHistory.swift
   DeeDock/Launcher/Suggestions/Models/LauncherSuggestionRecorder.swift
   DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift
   DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift
@@ -21,6 +22,7 @@ sources=(
   DeeDock/Launcher/Suggestions/Persistence/LauncherSuggestionsRepository.swift
   DeeDock/Launcher/Suggestions/State/LauncherSuggestionsStore.swift
   DeeDock/Launcher/Suggestions/State/LauncherSuggestionDebugController.swift
+  DeeDock/Launcher/Suggestions/State/LauncherSuggestionSyntheticPlayback.swift
   DeeDock/Launcher/State/LauncherBrowseNavigation.swift
   DeeDock/Launcher/Models/LauncherApplication.swift
   DeeDock/Dock/Models/ApplicationReference.swift
@@ -29,6 +31,7 @@ sources=(
   DeeDockTests/LauncherSuggestionLifecycleTests.swift
   DeeDockTests/LauncherSuggestionEngineTests.swift
   DeeDockTests/LauncherSuggestionEvidenceTests.swift
+  DeeDockTests/LauncherSuggestionSyntheticTests.swift
   DeeDockTests/LauncherSuggestionCoreMLTests.swift
 )
 for source in "${sources[@]}"; do

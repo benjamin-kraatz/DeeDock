@@ -11,13 +11,17 @@ final class LauncherSuggestionsStore {
     private(set) var promptsEnabled = true
     private(set) var storageUnavailable = false
     private(set) var ready = false
-    private(set) var engine: LauncherSuggestionEngine = .baseline
+    private(set) var engine: LauncherSuggestionEngine = .defaultEngine
     private(set) var tuning = LauncherSuggestionTuning()
 #if DEBUG
     private let debugController = LauncherSuggestionDebugController()
     var debugSnapshot: LauncherSuggestionDebugSnapshot? { debugController.snapshot }
     var debugBusy: Bool { debugController.busy }
     var debugError: Bool { debugController.failed }
+    var debugSource: LauncherSuggestionDebugSource { debugController.source }
+    var syntheticConfiguration: LauncherSuggestionSyntheticConfiguration { debugController.configuration }
+    var syntheticPlayback: LauncherSuggestionSyntheticPlayback? { debugController.playback }
+
 #endif
     private(set) var engineBusy = false
     private(set) var engineUnavailable = false
@@ -63,10 +67,11 @@ final class LauncherSuggestionsStore {
                 enabled = settings.enabled; paused = settings.paused
                 excludedIDs = Set(settings.excludedIDs.filter(Self.validIdentity))
                 promptsEnabled = settings.promptsEnabled
-                engine = settings.engine ?? .baseline
             } else { storageUnavailable = true }
         }
 #if DEBUG
+        if let value = defaults?.string(forKey: "launcher.suggestions.debugEngine.v1"),
+           let selected = LauncherSuggestionEngine(rawValue: value) { engine = selected }
         if let data = defaults?.data(forKey: "launcher.suggestions.debugTuning.v1"),
            let stored = try? JSONDecoder().decode(LauncherSuggestionTuning.self, from: data) {
             tuning = stored.clamped
@@ -108,16 +113,17 @@ final class LauncherSuggestionsStore {
         invalidate(); savePreferences()
     }
 
+#if DEBUG
     /// Temporary comparison switch. History and consent remain unchanged; the next Launcher
     /// presentation uses this engine, and work from the previous engine cannot publish.
     func setEngine(_ value: LauncherSuggestionEngine) {
         guard value != engine else { return }
         engine = value
         revision = UUID()
-        cancelLearning(preserveDebug: true); savePreferences()
+        cancelLearning(preserveDebug: true)
+        defaults?.set(value.rawValue, forKey: "launcher.suggestions.debugEngine.v1")
     }
 
-#if DEBUG
     /// Display gates apply on the next request without retraining. Changing k also retires
     /// the model cache. Debug preferences are deliberately ignored in Release builds.
     func setTuning(_ value: LauncherSuggestionTuning) {
@@ -133,16 +139,33 @@ final class LauncherSuggestionsStore {
             engineBusy = false; engineUnavailable = false
             debugController.cancel(preserveSnapshot: true)
         }
+        debugController.tuningChanged(value)
         if let data = try? JSONEncoder().encode(value) {
             defaults?.set(data, forKey: "launcher.suggestions.debugTuning.v1")
         }
     }
+
+    func setDebugSource(_ source: LauncherSuggestionDebugSource) {
+        debugController.setSource(source, tuning: tuning, seedURL: coreMLSeedURL)
+    }
+    func setSyntheticConfiguration(_ value: LauncherSuggestionSyntheticConfiguration) { debugController.setConfiguration(value) }
+    func generateSyntheticHistory() async { await debugController.generate(tuning: tuning, seedURL: coreMLSeedURL) }
+    func advanceSyntheticDays(_ days: Int) { debugController.advance(days: days, tuning: tuning, seedURL: coreMLSeedURL) }
+    func stepSyntheticHistory() async { await debugController.play(all: false, tuning: tuning, seedURL: coreMLSeedURL) }
+    func runSyntheticHistory() async { await debugController.play(all: true, tuning: tuning, seedURL: coreMLSeedURL) }
+    func resetSyntheticPlayback() { debugController.restart(tuning: tuning, seedURL: coreMLSeedURL) }
 
     func resetTuning() { setTuning(LauncherSuggestionTuning()) }
     func clearDebugSnapshot() { debugController.cancel() }
     func captureLatestDebugSnapshot() { debugController.freezeLatest() }
     func cancelDebugReplay() { debugController.cancel(preserveSnapshot: true) }
     func replayDebug() async {
+        // Synthetic experiments must not trigger expiry, persistence, or consent-dependent
+        // lifecycle changes in the user's real history.
+        if debugSource == .synthetic {
+            await debugController.replay(tuning: tuning)
+            return
+        }
         maintenance(now: Date())
         guard isActive else { return }
         await debugController.replay(tuning: tuning)
@@ -431,8 +454,7 @@ final class LauncherSuggestionsStore {
     }
 
     private func savePreferences() {
-        let settings = Preferences(enabled: enabled, paused: paused, excludedIDs: excludedIDs.sorted(), promptsEnabled: promptsEnabled,
-                                   engine: engine)
+        let settings = Preferences(enabled: enabled, paused: paused, excludedIDs: excludedIDs.sorted(), promptsEnabled: promptsEnabled)
         if let data = try? JSONEncoder().encode(settings) { defaults?.set(data, forKey: Self.preferencesKey) }
     }
 
@@ -442,6 +464,5 @@ final class LauncherSuggestionsStore {
         var paused: Bool
         var excludedIDs: [String]
         var promptsEnabled: Bool
-        var engine: LauncherSuggestionEngine? = nil
     }
 }

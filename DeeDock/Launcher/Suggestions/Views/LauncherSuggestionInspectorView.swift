@@ -6,8 +6,17 @@ struct LauncherSuggestionInspectorView: View {
     let store: LauncherSuggestionsStore
     var applications: [LauncherApplication] = []
     @Environment(\.dismiss) private var dismiss
-    @State private var replayID: UUID?
+    @State private var operation: Operation?
+    @State private var selectedTab = Tab.summary
     @State private var selectedEngine = LauncherSuggestionEngine.coreML
+
+    private enum Operation: Equatable {
+        case replay(UUID), generate(UUID), step(UUID), run(UUID)
+    }
+
+    private enum Tab: Hashable {
+        case scenario, summary, candidates, neighbors, history
+    }
 
     private var names: [String: String] {
         Dictionary(applications.map { ($0.id, $0.reference.name) }, uniquingKeysWith: { first, _ in first })
@@ -21,31 +30,64 @@ struct LauncherSuggestionInspectorView: View {
                 Button(.launcherSuggestionsDebugDone) { dismiss() }
                     .keyboardShortcut(.cancelAction)
             }
+            Picker(selection: Binding(get: { store.debugSource }, set: { source in
+                operation = nil
+                store.setDebugSource(source)
+            })) {
+                Text(.launcherSuggestionsSyntheticRealSource).tag(LauncherSuggestionDebugSource.realHistory)
+                Text(.launcherSuggestionsSyntheticSource).tag(LauncherSuggestionDebugSource.synthetic)
+            } label: {
+                Text(.launcherSuggestionsSyntheticSourcePicker)
+            }
+            .pickerStyle(.segmented)
             HStack {
-                Button(.launcherSuggestionsDebugCaptureLatest) { store.captureLatestDebugSnapshot() }
-                    .disabled(store.debugBusy)
-                Button(.launcherSuggestionsDebugReplay) { replayID = UUID() }
+                if store.debugSource == .realHistory {
+                    Button(.launcherSuggestionsDebugCaptureLatest) { store.captureLatestDebugSnapshot() }
+                        .disabled(store.debugBusy)
+                }
+                Button(.launcherSuggestionsDebugReplay) { operation = .replay(UUID()) }
                     .disabled(store.debugBusy || store.debugSnapshot == nil)
                 Spacer()
-                if store.debugBusy { ProgressView().controlSize(.small) }
+                if store.debugBusy {
+                    ProgressView().controlSize(.small)
+                    Button(.launcherSuggestionsDebugStop) {
+                        operation = nil
+                        store.cancelDebugReplay()
+                    }
+                }
             }
-            Text(.launcherSuggestionsDebugInspectorHelp)
+            Text(store.debugSource == .synthetic ? .launcherSuggestionsSyntheticIsolation : .launcherSuggestionsDebugInspectorHelp)
                 .font(.callout)
                 .foregroundStyle(.secondary)
             if store.debugError {
                 Label { Text(.launcherSuggestionsDebugReplayError) } icon: { Image(systemName: "exclamationmark.triangle") }
                     .foregroundStyle(.secondary)
             }
-            if let snapshot = store.debugSnapshot {
-                TabView {
-                    summary(snapshot)
+            if store.debugSource == .synthetic || store.debugSnapshot != nil {
+                TabView(selection: $selectedTab) {
+                    if store.debugSource == .synthetic {
+                        LauncherSuggestionSyntheticControlsView(store: store,
+                            cancelOperation: { operation = nil },
+                            generate: { operation = .generate(UUID()) },
+                            step: { operation = .step(UUID()) },
+                            run: { operation = .run(UUID()) })
+                            .tabItem { Text(.launcherSuggestionsSyntheticScenario) }
+                            .tag(Tab.scenario)
+                    }
+                    if let snapshot = store.debugSnapshot {
+                        summary(snapshot)
                         .tabItem { Text(.launcherSuggestionsDebugSummary) }
-                    candidates(snapshot)
+                        .tag(Tab.summary)
+                        candidates(snapshot)
                         .tabItem { Text(.launcherSuggestionsDebugCandidates) }
-                    neighbors(snapshot)
+                        .tag(Tab.candidates)
+                        neighbors(snapshot)
                         .tabItem { Text(.launcherSuggestionsDebugNeighborTab) }
-                    history(snapshot)
+                        .tag(Tab.neighbors)
+                        history(snapshot)
                         .tabItem { Text(.launcherSuggestionsDebugHistory) }
+                        .tag(Tab.history)
+                    }
                 }
             } else {
                 ContentUnavailableView {
@@ -57,9 +99,22 @@ struct LauncherSuggestionInspectorView: View {
         }
         .padding(20)
         .frame(minWidth: 840, idealWidth: 960, minHeight: 580, idealHeight: 700)
-        .task(id: replayID) {
-            guard replayID != nil else { return }
-            await store.replayDebug()
+        .task(id: operation) {
+            switch operation {
+            case .replay: await store.replayDebug()
+            case .generate: await store.generateSyntheticHistory()
+            case .step: await store.stepSyntheticHistory()
+            case .run: await store.runSyntheticHistory()
+            case nil: break
+            }
+        }
+        .onChange(of: store.debugSource, initial: true) {
+            selectedTab = store.debugSource == .synthetic ? .scenario : .summary
+        }
+        .onChange(of: store.debugSnapshot == nil) {
+            if store.debugSnapshot == nil, store.debugSource == .synthetic {
+                selectedTab = .scenario
+            }
         }
         .onDisappear { store.cancelDebugReplay() }
     }
@@ -67,7 +122,8 @@ struct LauncherSuggestionInspectorView: View {
     private func summary(_ snapshot: LauncherSuggestionDebugSnapshot) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                GroupBox {
+                if snapshot.source == .realHistory {
+                    GroupBox {
                     HStack {
                         Text(store.engine == .baseline ? .launcherSuggestionsEngineBaseline : .launcherSuggestionsEngineCoreML)
                         Spacer()
@@ -83,9 +139,16 @@ struct LauncherSuggestionInspectorView: View {
                 } label: {
                     Text(.launcherSuggestionsDebugLiveEngineTitle)
                 }
+                }
                 GroupBox {
                     VStack(alignment: .leading, spacing: 6) {
                     LabeledContent { Text(snapshot.date, format: .dateTime) } label: { Text(.launcherSuggestionsDebugCaptured) }
+                    LabeledContent {
+                        Text(snapshot.source == .synthetic ? .launcherSuggestionsSyntheticSource : .launcherSuggestionsSyntheticRealSource)
+                    } label: { Text(.launcherSuggestionsSyntheticSourcePicker) }
+                    if let target = snapshot.expectedTargetID {
+                        LabeledContent { Text(verbatim: names[target] ?? target) } label: { Text(.launcherSuggestionsSyntheticRevealedOutcome) }
+                    }
                     LabeledContent { Text(snapshot.exampleCount, format: .number) } label: { Text(.launcherSuggestionsDebugHistoryCount) }
                     LabeledContent { Text(snapshot.tuning.minHistory, format: .number) } label: { Text(.launcherSuggestionsDebugMinHistory) }
                     if let first = snapshot.firstExampleDate {

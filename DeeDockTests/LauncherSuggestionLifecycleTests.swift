@@ -180,6 +180,7 @@ struct LauncherSuggestionLifecycleTests {
 
     private func learnedStore() -> LauncherSuggestionsStore {
         let store = LauncherSuggestionsStore(directory: nil, defaults: nil)
+        store.setEngine(.baseline)
         store.setTuning(.init(minHistory: 0, minSupport: 0, minDays: 0, minAgreement: 0, maxDistance: 20, neighbors: 15))
         store.setEnabled(true)
         observeTransition(store, start: Date().addingTimeInterval(-30))

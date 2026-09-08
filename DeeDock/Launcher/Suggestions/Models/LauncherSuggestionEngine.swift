@@ -5,6 +5,9 @@ nonisolated enum LauncherSuggestionEngine: String, Codable, CaseIterable, Identi
     case baseline
     case coreML
 
+    /// Shipping engine; development overrides never change the Release selection.
+    static let defaultEngine: Self = .coreML
+
     var id: Self { self }
     var modelVersion: String {
         switch self {

@@ -69,7 +69,8 @@ nonisolated enum LauncherSuggestionEvidence {
     }
 
     /// Computes deterministic nearest examples in the exact Float32 feature representation.
-    /// Equal distances use app identity, date, then persistent example identity as tie breakers.
+    /// Equal distances use newest date, then persistent example identity. The target label must
+    /// not influence which examples enter the evidence neighborhood.
     static func nearest(context: LauncherSuggestionContext, examples: [LauncherSuggestionExample],
                         count: Int) -> [LauncherSuggestionNeighbor] {
         let input = context.featureVector
@@ -83,7 +84,6 @@ nonisolated enum LauncherSuggestionEvidence {
                                               distance: distance, context: example.context)
         }.sorted {
             if $0.distance != $1.distance { return $0.distance < $1.distance }
-            if $0.appID != $1.appID { return $0.appID < $1.appID }
             if $0.date != $1.date { return $0.date > $1.date }
             return $0.id.uuidString < $1.id.uuidString
         }.prefix(max(1, count)))

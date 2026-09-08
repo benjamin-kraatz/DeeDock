@@ -6,7 +6,9 @@ When enabled, DDock learns from application activity observed while it runs. It 
 ## Temporary engine comparison
 
 The **Development** card in App suggestions selects **Weighted baseline** or **Core ML nearest neighbors**.
-Baseline remains the default, including for existing preferences. This temporary selector is available in Debug and Release builds.
+Core ML is the default. The temporary engine selector is compiled only into Debug builds.
+Release always uses Core ML and ignores developer overrides. Legacy engine values in shared consent preferences are ignored;
+an explicit Debug selection is stored separately without changing consent or history.
 Switching keeps the same local history, feedback, exclusions, and consent. It cancels outstanding predictions and clears the cached model.
 The next Launcher presentation uses the selected engine. This control is intended for development comparison and will be removed after an engine is chosen.
 
@@ -35,7 +37,7 @@ Support uses the same context features as Core ML: time, weekday, preceding fore
 recent app sequence, running apps, and Dock Mode. Distance is squared Euclidean distance over
 the 256 Float32 features. Reconstruction uses `1 / max(distance, 0.000001)` as the weight.
 The denominator includes all selected neighbors; support counts only neighbors within the distance limit.
-Equal distances are ordered by target identity, newest date, then persistent example identity.
+Equal distances are ordered by newest date, then persistent example identity. Target identity never selects the evidence neighborhood.
 These reconstructed neighbors are explicit evidence for the shared gates, not internal records exported by Core ML.
 
 A candidate must also have positive raw engine evidence and a positive final ranking score.
@@ -48,7 +50,7 @@ These defaults favor abstention and are experimental; they do not guarantee a us
 
 Debug builds add bounded evidence controls and an inspector to App suggestions settings.
 Release builds use the model-owned defaults and ignore saved Debug tuning values.
-The engine selector described above remains available in both configurations during the comparison period.
+The engine selector is also Debug-only. Release has no developer engine, tuning, inspector, or synthetic controls.
 
 The inspector freezes an actual Launcher request, including its context, history, feedback, exclusions, and evaluation time.
 **Capture latest request** replaces it with the newest captured request. **Replay both engines** applies the current tuning
@@ -67,6 +69,58 @@ Changing the neighbor count recreates the cached model with Core ML's runtime pa
 Closing the inspector cancels its replay. Reset, pause, disable, exclusion changes, and expiry also discard frozen diagnostics.
 Debug tuning survives a history reset; **Restore defaults** resets only the tuning controls.
 No inspector, diagnostic history capture, or tuning controls are compiled into Release builds.
+
+## Synthetic scenarios in Debug builds
+
+Open the inspector and select **Synthetic scenario**. This mode works while real app suggestions are off.
+It generates fictional app identities entirely in memory and uses an independent model. It does not inject
+examples into the actual Launcher, write your history file, enable recording, or change consent.
+
+Choose one of six scenarios:
+
+| Scenario | Generated behavior |
+| --- | --- |
+| Cold start | Starts with five examples by default; the count remains adjustable. |
+| Clear routine | Repeats a dominant outcome across the configured days. |
+| One-day burst | Compresses historical examples into one UTC date. |
+| Conflicting routines | Distributes pattern-following outcomes among three apps. |
+| Changed habits | Historical outcomes favor Terminal; future outcomes favor Browser. |
+| Unfamiliar context | Queries use a different foreground app, mode, recent sequence, and running set. |
+
+Controls set the example count, history span, pattern strength, context noise, random seed, and reference date.
+The reference date uses UTC. Generation is reproducible, including example identities: the same settings and
+seed produce the same history, contexts, and future outcomes. Strength affects outcome selection; noise
+independently perturbs context. No generated target is encoded into its preceding context.
+History is capped at 1,000 examples, and every scenario has 60 future outcomes, scheduled four per day.
+
+Editing these controls changes a draft. Select **Generate scenario** to replace the generated dataset.
+**Replay both engines** evaluates the current frozen query and history without learning an outcome.
+Use the existing Summary, Candidates, Neighbors, and History tabs to inspect the results and tune the gates.
+
+**Step next outcome** predicts first, reveals the generated target, then adds that outcome to the isolated
+history. **Run remaining outcomes** repeats that sequence to the end. Results and the History tab show the
+input *before* the latest outcome was learned. **Stop** cancels pending work and preserves completed steps.
+The shared source switch cancels work too. Restart returns to the originally generated history and clock.
+Changing tuning resets chronological playback and its metrics while keeping the frozen input available for Replay.
+
+The simulated-clock buttons advance time without changing existing history dates or identities. Remaining
+future events shift by the same interval, preserving their spacing. This lets decay and expiry be inspected
+without accidentally converting the remaining daily routine into a burst. Synthetic replay does not run
+maintenance against real history, and its simulated date is independent of the computer's clock.
+
+Playback reports separate values for each engine:
+
+- Attempts and model failures.
+- Offers: successful predictions with at least one eligible suggestion.
+- Hits: offered sets whose first three suggestions contain the generated next app.
+- Coverage: offers divided by successful predictions, excluding failures.
+- Hit rate: hits divided by offers; unavailable until at least one offer exists.
+- First changed-pattern hit: steps after the generated habit change until a suggestion contains the new
+  dominant outcome on an occasion where it actually occurs. A hit on a noisy old outcome does not count.
+
+A first changed-pattern hit does not prove stable adaptation. All measurements describe the selected
+synthetic scenario; they do not establish accuracy or usefulness on real habits. No scenario data is saved
+or exported, and the generator, session, controls, and playback metrics are compiled only into Debug builds.
 
 ## Launcher behavior
 

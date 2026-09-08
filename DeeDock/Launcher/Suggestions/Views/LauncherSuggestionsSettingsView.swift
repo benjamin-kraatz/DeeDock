@@ -38,8 +38,8 @@ struct LauncherSuggestionsSettingsView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            LauncherSuggestionEngineSettingsCard(store: store)
             #if DEBUG
+            LauncherSuggestionEngineSettingsCard(store: store)
             LauncherSuggestionDeveloperSettingsView(store: store) { showingSuggestionInspector = true }
             #endif
             SettingsCard(title: .launcherSuggestionsFeedbackTitle,
@@ -90,6 +90,7 @@ struct LauncherSuggestionsSettingsView: View {
     }
 }
 
+#if DEBUG
 /// Temporary engine comparison control using the shared local learning history.
 private struct LauncherSuggestionEngineSettingsCard: View {
     let store: LauncherSuggestionsStore
@@ -124,7 +125,6 @@ private struct LauncherSuggestionEngineSettingsCard: View {
     }
 }
 
-#if DEBUG
 #Preview("Suggestions off") {
     @Previewable @State var store = LauncherSuggestionsStore(directory: nil, defaults: nil)
     ScrollView {

@@ -12,7 +12,7 @@ struct LauncherSuggestionEvidenceTests {
         defer { defaults.removePersistentDomain(forName: suite) }
         let store = LauncherSuggestionsStore(directory: nil, defaults: defaults)
         #expect(store.tuning == LauncherSuggestionTuning())
-        #expect(store.engine == .baseline)
+        #expect(store.engine == .coreML)
         let originalPreferences = defaults.data(forKey: "launcher.suggestions.preferences.v1")
         let outOfRange = LauncherSuggestionTuning(minHistory: -5, minSupport: 500, minDays: -2,
             minAgreement: 4, maxDistance: -1, neighbors: 0)
@@ -26,7 +26,7 @@ struct LauncherSuggestionEvidenceTests {
         #expect(defaults.data(forKey: "launcher.suggestions.preferences.v1") == originalPreferences)
         let reloaded = LauncherSuggestionsStore(directory: nil, defaults: defaults)
         #expect(reloaded.tuning == store.tuning)
-        #expect(reloaded.engine == .baseline)
+        #expect(reloaded.engine == .coreML)
         #expect(!reloaded.enabled)
         reloaded.reset()
         await reloaded.flush()
@@ -36,7 +36,7 @@ struct LauncherSuggestionEvidenceTests {
         #expect(afterReset.tuning == LauncherSuggestionTuning())
         let restored = LauncherSuggestionsStore(directory: nil, defaults: defaults)
         #expect(restored.tuning == LauncherSuggestionTuning())
-        #expect(restored.engine == .baseline)
+        #expect(restored.engine == .coreML)
         #expect(!restored.enabled)
     }
 

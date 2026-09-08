@@ -1,6 +1,6 @@
 # Launcher suggestion model decision
 
-DEE-26 defaults to the local frequency, recency, and transition baseline. A temporary development selector now exposes the Core ML nearest-neighbor engine for direct comparison using the same retained history. The original synthetic comparison established feasibility but did not establish a quality advantage. The final engine choice remains open.
+DEE-26 defaults to Core ML nearest neighbors. A Debug-only selector retains the local frequency, recency, and transition baseline for comparison using the same history. Release always uses Core ML and ignores developer engine overrides. This default is a product decision; the original synthetic comparison established feasibility but did not establish a quality advantage.
 
 ## Selectable Core ML engine
 
@@ -37,6 +37,8 @@ scores so a rejected candidate still shows the actual feedback contribution.
 Frozen replay uses a separate model and never enters the recorder or impression paths. Privacy invalidation clears its input,
 results, and pending work. Runtime overrides and detailed captured history are compiled only into Debug builds.
 Preparation and inference timings are measured per Core ML call rather than read from shared mutable last-call state.
+
+The [synthetic inspector](LAUNCHER-SUGGESTIONS.md#synthetic-scenarios-in-debug-builds) generates deterministic contexts and outcomes without importing or modifying real activity. Chronological playback evaluates each outcome before adding it to history. Its conflicting-routine fixture exposed a target-label bias in equal-distance neighbor selection; the evidence policy now breaks ties by date and example identity. Synthetic metrics remain separate from claims about real-world accuracy.
 
 ## Core ML feasibility evidence
 
@@ -103,13 +105,13 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcrun swiftc -O \
 
 ## Focused behavior verification
 
-The six suggestion suites passed 47 tests in an isolated Swift Testing runner using Xcode-beta on 8 September 2026. They cover consent, pause, reset, stale feedback, exclusions, preceding context, dwell, session gaps, expiry, corrupt storage, bounded persistence, and keyboard ordering. The oversized persistence case verifies that a document exceeding 16 MiB saves a smaller document and reloads it successfully.
+The seven suggestion suites passed 61 tests in an isolated Swift Testing runner using Xcode-beta on 8 September 2026. They cover consent, pause, reset, stale feedback, exclusions, preceding context, dwell, session gaps, expiry, corrupt storage, bounded persistence, and keyboard ordering. The oversized persistence case verifies that a document exceeding 16 MiB saves a smaller document and reloads it successfully.
 
-Additional Core ML coverage verifies dynamic labels, cache reuse after temporary-file deletion, changed and expired history, the 10,000-example cap, concurrent requests, cancellation, privacy invalidation, isolated abandoned-file cleanup, preference migration, baseline score preservation, and explicit model failure without fallback. The latest run includes evidence gates, runtime neighbor overrides, per-call diagnostics, Debug tuning persistence and clamping, frozen replay without learning side effects, and reset during replay. It completed in 4.866 seconds after a 6.91-second test build, with no warnings or errors. App builds ran concurrently, so these durations are verification timings rather than performance measurements. Log: `/tmp/dee26-evidence-final-focused-tests.log`.
+Additional Core ML coverage verifies dynamic labels, cache reuse after temporary-file deletion, changed and expired history, the 10,000-example cap, concurrent requests, cancellation, privacy invalidation, isolated abandoned-file cleanup, preference migration, baseline score preservation, and explicit model failure without fallback. The latest run includes evidence gates, runtime neighbor overrides, per-call diagnostics, Debug tuning persistence and clamping, frozen replay without learning side effects, and reset during replay. Synthetic coverage also verifies seeded reproducibility, input/outcome separation, off-consent isolation, chronological learning, clock shifts, cancellation, and a complete 60-step run with both engines. A balanced equal-distance fixture verifies that target labels cannot bias the reconstructed neighborhood. The final run completed in 1.132 seconds after a 6.38-second test build, with no warnings or errors. These are verification timings rather than performance measurements. Log: `/tmp/dee26-synthetic-final-focused-tests.log`.
 
 The existing Xcode test target could not compile because unrelated shared-source dependencies were missing, including `WindowActionModels` and `BossFightConfiguration`. Only DEE-26 source memberships were retained in the project. The temporary runner copied the actual production files and tests, with Swift 5 language mode and MainActor default isolation. It does not exercise app integration or native UI.
 
-The [focused test script](../scripts/test-launcher-suggestions.sh) reproduces the runner from the repository root. It copies an explicit list of production sources and the six suites, then removes the temporary package on exit.
+The [focused test script](../scripts/test-launcher-suggestions.sh) reproduces the runner from the repository root. It copies an explicit list of production sources and the seven suites, then removes the temporary package on exit.
 
 ```sh
 scripts/test-launcher-suggestions.sh

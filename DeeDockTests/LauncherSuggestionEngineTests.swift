@@ -22,17 +22,18 @@ struct LauncherSuggestionEngineTests {
         #expect(scores["excluded"] == nil)
     }
 
-    @Test("Existing consent preferences migrate to the baseline engine")
-    func oldPreferences() throws {
+    @Test("Existing consent preferences adopt Core ML and ignore legacy engine choices", arguments: [false, true])
+    func oldPreferences(_ savedBaseline: Bool) throws {
         let suite = "DEE26.engine.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let previous: [String: Any] = ["version": 1, "enabled": true, "paused": true,
+        var previous: [String: Any] = ["version": 1, "enabled": true, "paused": true,
                                        "excludedIDs": ["excluded"], "promptsEnabled": false]
+        if savedBaseline { previous["engine"] = "baseline" }
         defaults.set(try JSONSerialization.data(withJSONObject: previous),
                      forKey: "launcher.suggestions.preferences.v1")
         let store = LauncherSuggestionsStore(directory: nil, defaults: defaults)
-        #expect(store.engine == .baseline)
+        #expect(store.engine == .coreML)
         #expect(store.enabled && store.paused)
         #expect(store.excludedIDs == ["excluded"])
         #expect(!store.promptsEnabled)
@@ -93,11 +94,14 @@ struct LauncherSuggestionEngineTests {
         store.setPaused(true)
         store.exclude(appID: "excluded")
         store.suppressPrompts()
-        store.setEngine(.coreML)
+        let consent = defaults.data(forKey: "launcher.suggestions.preferences.v1")
+        store.setEngine(.baseline)
+        #expect(defaults.data(forKey: "launcher.suggestions.preferences.v1") == consent)
+        #expect(defaults.object(forKey: "launcher.suggestions.debugEngine.v1") != nil)
         store.reset()
         await store.flush()
         let reloaded = LauncherSuggestionsStore(directory: nil, defaults: defaults)
-        #expect(reloaded.engine == .coreML)
+        #expect(reloaded.engine == .baseline)
         #expect(reloaded.enabled && reloaded.paused)
         #expect(reloaded.excludedIDs == ["excluded"])
         #expect(!reloaded.promptsEnabled)
@@ -140,6 +144,7 @@ struct LauncherSuggestionEngineTests {
     }
 
     private func teach(_ store: LauncherSuggestionsStore) {
+        store.setEngine(.baseline)
         store.setTuning(.init(minHistory: 0, minSupport: 0, minDays: 0, minAgreement: 0, maxDistance: 20, neighbors: 15))
         let start = Date().addingTimeInterval(-30)
         store.beginSession(foregroundID: "source", runningIDs: ["source"], now: start)
