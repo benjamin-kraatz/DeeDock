@@ -30,6 +30,9 @@ struct LauncherMixedResultsView: View {
             .onChange(of: state.selectedID) { _, id in
                 if let id { proxy.scrollTo(id, anchor: .center) }
             }
+            .onChange(of: state.results.map(\.id)) {
+                if let id = state.selectedID { proxy.scrollTo(id, anchor: .center) }
+            }
         }
         .task(id: input) { await state.rank(input) }
     }
@@ -40,6 +43,7 @@ private struct LauncherMixedResultRow: View {
     let launcher: LauncherState
     private var state: LauncherSearchState { launcher.search }
     private var selected: Bool { state.selectedID == result.id }
+    @State private var appIcon: NSImage?
     private var shortcutStatus: ActionTileStatus? {
         guard case .shortcut(let id) = result.id else { return nil }
         return state.actions?.statuses[id]
@@ -48,8 +52,14 @@ private struct LauncherMixedResultRow: View {
     var body: some View {
         Button { state.activate(result) } label: {
             HStack(spacing: 12) {
-                Image(systemName: result.kind.symbol).font(.title2).frame(width: 34)
-                    .accessibilityHidden(true)
+                Group {
+                    if let appIcon {
+                        Image(nsImage: appIcon).resizable().scaledToFit()
+                    } else {
+                        Image(systemName: result.kind.symbol).font(.title2)
+                    }
+                }
+                .frame(width: 34, height: 34).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text(result.title).font(.body.bold()).lineLimit(1)
@@ -70,6 +80,9 @@ private struct LauncherMixedResultRow: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .task(id: result.application?.reference.url) {
+            appIcon = result.application.map { launcher.icon(for: $0) }
+        }
         .disabled(result.unavailable || state.actionBusy || shortcutStatus?.busy == true)
         .contextMenu { LauncherMixedResultMenu(result: result, launcher: launcher) }
         .accessibilityElement(children: .combine)
@@ -93,6 +106,7 @@ struct LauncherMixedResultMenu: View {
             }
             if case .window = result.id {
                 Button { launcher.search.refreshWindows() } label: { Text(.unifiedRefreshWindows) }
+                    .disabled(launcher.search.actionBusy || launcher.search.discovering)
             }
         }
     }
@@ -129,3 +143,41 @@ struct LauncherSearchControls: View {
         }
     }
 }
+
+#if DEBUG
+/// Static rows never start discovery, read real preferences, or dispatch actions.
+private struct LauncherMixedRowsPreview: View {
+    private let launcher = LauncherState(catalog: ApplicationCatalog(service: ApplicationService(),
+        launcherHistory: LauncherHistory(defaults: nil), launcherLibrary: LauncherLibrary(applications: [])))
+    private let sampleID = UUID(uuidString: "00000000-0000-0000-0000-000000000020")!
+
+    var body: some View {
+        VStack(spacing: 4) {
+            LauncherMixedResultRow(result: LauncherSearchResult(id: .window(sampleID), kind: .window,
+                title: "Invoice review with a particularly long document title", source: "Preview App",
+                action: .unifiedShowWindow, score: 0, tieBreak: "0"), launcher: launcher)
+            LauncherMixedResultRow(result: LauncherSearchResult(id: .capsule(sampleID), kind: .capsule,
+                title: "Invoice review", source: String(localized: .unifiedSavedOCR),
+                action: .unifiedOpenCapsule, score: 0, tieBreak: "1"), launcher: launcher)
+            LauncherMixedResultRow(result: LauncherSearchResult(id: .shelf(sampleID), kind: .shelf,
+                title: "Invoice.pdf", source: String(localized: .unifiedShelfReference),
+                action: .unifiedOpenFile, score: 0, tieBreak: "2"), launcher: launcher)
+            LauncherMixedResultRow(result: LauncherSearchResult(id: .window(UUID(uuidString: "00000000-0000-0000-0000-000000000021")!), kind: .window,
+                title: "Invoice archive", source: "Preview App",
+                action: .unifiedWindowUnavailable, score: 0, tieBreak: "3", unavailable: true), launcher: launcher)
+        }
+        .padding()
+        .onAppear { launcher.search.selectedID = .capsule(sampleID) }
+    }
+}
+
+#Preview("Mixed results, long titles") {
+    LauncherMixedRowsPreview().frame(width: 640)
+}
+
+#Preview("Mixed results, German, dark") {
+    LauncherMixedRowsPreview().frame(width: 540)
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.dark)
+}
+#endif

@@ -171,7 +171,8 @@ struct LauncherView: View {
             }
             Spacer()
             Button { state.library.refresh(); state.search.refreshWindows() } label: { Image(systemName: "arrow.clockwise") }
-                .disabled(state.library.isLoading).accessibilityLabel(Text(.launcherRefresh))
+                .disabled(state.library.isLoading || state.search.actionBusy || state.search.discovering)
+                .accessibilityLabel(Text(.launcherRefresh))
                 .symbolEffect(.rotate.byLayer, options: .nonRepeating, value: state.library.isLoading)
             Menu {
                 Button { confirmClear = true } label: { Text(.launcherClearHistory) }

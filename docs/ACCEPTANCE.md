@@ -1475,6 +1475,8 @@ xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
 ```
 
 Local compilation log: `/tmp/DeeDock-DEE20-build.log`. This proves compilation only.
+All 30 new String Catalog keys match the packaged English and German resources.
+Deterministic mixed-row previews are provided but were not run.
 Tests and automated visual checks were not run. Native keyboard/VoiceOver, IME composition,
 four-edge layouts, narrow displays, focus restoration, Spaces/full-screen, permission changes,
 sleep/wake, display reconnection, source deletion, file access, and Shortcut execution still
@@ -1485,7 +1487,7 @@ need hands-on acceptance. Do not mark DEE-20 Done on compilation alone.
 `python3 scripts/benchmark-launcher-search.py` compiles the production ranker with `swiftc -O`
 and runs synthetic in-memory metadata on an Apple M4 with macOS 27.0. Dataset: 10,000 apps,
 200 windows, 30 capsules, 50 Shelf references, 30 pinned Shortcuts, and 100 modes. Capsule
-summaries contain 5,700 characters; matching consumes the existing bounded field prefixes.
+summaries contain 6,000 characters; matching consumes the existing bounded field prefixes.
 Each query has one warm-up and 20 measured iterations. No files, live windows, permissions,
 or models are accessed. Local output: `/tmp/DeeDock-DEE20-benchmark.log`.
 
@@ -1511,3 +1513,13 @@ latency or discovery completeness. Shelf and capsule counts match their current 
   runs fail through their original owners without activating another object.
 - Saved OCR is historical evidence; metadata typing never calls capture or model services.
 - Pagination keeps an existing selection visible, and empty-query app browsing retains grid/list.
+
+### Delivery and review
+
+[PR #42](https://github.com/benjamin-kraatz/DeeDock/pull/42) targets `main` from `feature/dee-20`.
+GPT 5.6 Sol reviewed the PR at Low reasoning. It found that metadata refresh could clear the
+busy state during a pending Shelf open. Refresh now refuses to run during an owned action, and
+both refresh controls are disabled until the action completes. The reviewer confirmed no
+remaining findings after inspecting the correction. Follow-up changes also keep the selected
+row visible after asynchronous reordering and provide static preview states. Native acceptance
+remains pending as described above.

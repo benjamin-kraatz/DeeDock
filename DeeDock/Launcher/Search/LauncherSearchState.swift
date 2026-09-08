@@ -48,6 +48,7 @@ final class LauncherSearchState {
 
     /// Discovery happens on presentation or explicit refresh, never because a query changed.
     func refreshWindows() {
+        guard active, !actionBusy else { return }
         discovery?.cancel(); activation?.cancel(); generation = UUID()
         actionBusy = false
         let previous = service
@@ -78,6 +79,7 @@ final class LauncherSearchState {
 
     /// SwiftUI owns this task and cancels it when any copied input changes or the view disappears.
     func rank(_ input: LauncherSearchInput) async {
+        guard active else { ranking = false; return }
         let token = queryGeneration, session = generation
         ranking = true
         do { try await Task.sleep(for: .milliseconds(120)) } catch { return }
@@ -100,8 +102,12 @@ final class LauncherSearchState {
 
     func openSelection() {
         guard !ranking else { return }
-        let result = selectedID.map { id in visible.first { $0.id == id } } ?? visible.first
-        if let result { activate(result) }
+        if let selectedID {
+            guard let result = visible.first(where: { $0.id == selectedID }) else { return }
+            activate(result)
+        } else if let first = visible.first {
+            activate(first)
+        }
     }
 
     func activate(_ result: LauncherSearchResult, reveal: Bool = false) {
