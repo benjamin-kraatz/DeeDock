@@ -1777,3 +1777,65 @@ window restoration, Cmd-H, passive updates and progress dismissal, secondary-dis
 section visibility, Spaces, and full-screen transitions. The focused unsigned Debug app build
 passed. The new window tracker was added to the existing test target source list; tests, app
 launch, and automated visual checks were not run for this correction.
+
+## DEE-28: paste from Clipboard into Shelf
+
+The Shelf icon's native context menu adds **Paste from Clipboard** after Open Shelf.
+It accepts Finder file URLs, literal absolute paths, `~/` paths, newline-separated
+path lists, and single-frame PNG or TIFF images. File URLs take precedence over
+alternate representations on the same clipboard item. Separate items remain separate
+imports. Web URLs, remote `file://` hosts, relative paths, and prose are unsupported.
+Shell characters in a path remain literal. Blank lines are ignored.
+
+The command takes a fresh snapshot during the native `paste:` action. It does not
+replace clipboard contents. Shelf keeps its existing 50-item capacity and duplicate
+suppression. Imports run one at a time across displays. Valid entries can succeed
+when other entries fail, and failures appear in the open Shelf panel or the source
+dock's existing error presentation.
+
+`ShelfClipboardArtifacts` validates images off the main actor and writes exclusive,
+user-readable PNG files in `Application Support/<bundle identifier>/Clipboard`.
+Images retain pixel dimensions, transparency, and orientation. Saved images survive
+restart, removal from Shelf, and Clear Shelf. A staging failure or cancellation
+removes only the new image. A cleanup failure reports its retained path. The
+app-wide import task finishes rollback when stopped; closing the menu or removing
+its originating display does not abandon a save.
+
+Limits are 100 clipboard entries, 1 MiB per text representation, 64 MiB of retained
+image payloads per snapshot, and 40 million pixels per image. Each encoded PNG also
+has a 64 MiB limit. Animated and multi-page images are rejected. Pasteboard providers
+materialize data before AppKit returns it, so these checks cannot prevent the initial
+provider allocation or guarantee that a third-party provider responds promptly.
+
+File URL and image menu checks inspect advertised types only. Plain-text path
+classification reads text when the menu opens and can trigger the macOS clipboard
+permission prompt. The installed SDK exposes no metadata-only local-path detector.
+Text paths are hidden while programmatic access is always denied; the VoiceOver
+Paste action still attempts an explicit paste. File existence is checked at import
+time, so a syntactically valid missing path offers the command and then reports a
+failure. VoiceOver exposes a named Paste action without reading the clipboard during
+SwiftUI rendering.
+
+Validation: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration
+Debug -destination 'platform=macOS' -derivedDataPath /tmp/deedock-dee28-build
+CODE_SIGNING_ALLOWED=NO build` passed. Tests were authored for path parsing,
+representation precedence, fresh reads, batch limits, mixed file results, image
+persistence, and rollback. The new test file passed isolated `swiftc -typecheck`
+against the built Debug app module, using Swift Testing's compiler plugin.
+
+Building the existing `DeeDockTests` target remains blocked by missing source
+membership for unrelated types such as `WindowActionCapabilities`,
+`FocusSessionController`, and `BossFightConfiguration`. Those types are referenced
+by existing test-model sources. No tests, previews, or automated visual checks were
+run. The app was not launched for native acceptance.
+
+Pending hands-on acceptance:
+
+- Copy Finder files and folders, Finder paths with spaces and Unicode, and images
+  from Screenshot and Preview. Confirm dimensions, transparency, previews, and drag-out.
+- Change the clipboard between opening the menu and choosing Paste. Exercise empty,
+  malformed, denied, oversized, missing-file, full-Shelf, and corrupt-storage cases.
+- Check English and German text, VoiceOver, Control-click, all dock edges, auto-hide,
+  multiple displays, and removal of the initiating display during an image import.
+- Confirm actual macOS permission behavior for custom `paste:` dispatch and text
+  classification. No machine privacy preferences were changed during development.

@@ -9,6 +9,7 @@ final class ShelfCoordinator {
     private let presenter: DockPopoverPresenter
     private let shelf: ShelfController
     private let organizer: any SemanticStackOrganizing
+    private let clipboard: ShelfClipboardImporter
     private var controller: DockPopoverPanelController<ShelfPanelView>?
     private var state: ShelfPanelState?
     private let thumbnails = ShelfThumbnailLoader()
@@ -22,6 +23,7 @@ final class ShelfCoordinator {
         self.shelf = shelf
         self.presenter = presenter
         self.organizer = organizer
+        clipboard = ShelfClipboardImporter(shelf: shelf)
         presenter.register(.shelf) { [weak self] in self?.close(returnFocus: false) }
     }
 
@@ -140,7 +142,21 @@ final class ShelfCoordinator {
         controller?.close(returnFocus: returnFocus)
     }
 
-    func stop() { close(returnFocus: false); thumbnails.stop(); keyboardDismissed = nil }
+    func stop() { clipboard.stop(); close(returnFocus: false); thumbnails.stop(); keyboardDismissed = nil }
+
+    /// Evaluate only for an explicit menu opening, never from a rendering or pointer path.
+    var canPaste: Bool { !clipboard.isImporting && ShelfClipboardReader.canPaste() }
+
+    /// Paste captures the clipboard synchronously while AppKit is dispatching the user's command.
+    func paste(on panel: DockPanelController) {
+        clipboard.paste { [weak self, weak panel] message in
+            if let state = self?.state {
+                state.report(String(localized: message)) { [weak self] in self?.reload() }
+            } else {
+                panel?.store.errorMessage = message
+            }
+        }
+    }
 
     // MARK: - Item commands
 
