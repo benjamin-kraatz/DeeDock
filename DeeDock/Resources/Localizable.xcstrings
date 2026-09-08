@@ -21591,6 +21591,258 @@
           }
         }
       }
+    },
+    "portal.crop" : {
+      "comment" : "Action opening a portal crop preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose region…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich auswählen …"
+          }
+        }
+      }
+    },
+    "portal.crop.help" : {
+      "comment" : "Crop editor guidance and layout limitation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag across the preview or adjust the percentages. Minimum size: 5%. A region does not follow content when the source layout changes."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe einen Bereich in der Vorschau auf oder passe die Prozentwerte an. Mindestgröße: 5 %. Der Bereich folgt Inhalten nicht, wenn sich das Fensterlayout ändert."
+          }
+        }
+      }
+    },
+    "portal.crop.cancel" : {
+      "comment" : "Cancel crop editing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        }
+      }
+    },
+    "portal.crop.confirm" : {
+      "comment" : "Confirm selected portal region.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply crop"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich übernehmen"
+          }
+        }
+      }
+    },
+    "portal.wholeWindow" : {
+      "comment" : "Reset portal region to the full source window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whole window"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ganzes Fenster"
+          }
+        }
+      }
+    },
+    "portal.resetCrop" : {
+      "comment" : "Fit the saved crop again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset zoom and pan"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom und Verschiebung zurücksetzen"
+          }
+        }
+      }
+    },
+    "portal.zoom" : {
+      "comment" : "Portal magnification control, one to four times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "portal.panHorizontal" : {
+      "comment" : "Pan within the selected region.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horizontal position"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horizontale Position"
+          }
+        }
+      }
+    },
+    "portal.panVertical" : {
+      "comment" : "Pan within the selected region, measured from top.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertical position"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertikale Position"
+          }
+        }
+      }
+    },
+    "portal.freeze" : {
+      "comment" : "Stop capture and retain the current frame.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freeze snapshot"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Momentaufnahme einfrieren"
+          }
+        }
+      }
+    },
+    "portal.frozen" : {
+      "comment" : "Explicit frozen state, never live.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frozen snapshot"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingefrorene Momentaufnahme"
+          }
+        }
+      }
+    },
+    "portal.userPaused" : {
+      "comment" : "User explicitly paused capture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused by you"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuell pausiert"
+          }
+        }
+      }
+    },
+    "portal.reselect" : {
+      "comment" : "Crop cannot safely map to resized source.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window size changed. Choose the region again or show the whole window."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Fenstergröße hat sich geändert. Wähle den Bereich erneut aus oder zeige das ganze Fenster."
+          }
+        }
+      }
+    },
+    "portal.capturedAt" : {
+      "comment" : "Label before localized date and time of the retained frame.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captured:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufgenommen:"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

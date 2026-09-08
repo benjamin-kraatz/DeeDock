@@ -56,6 +56,8 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         panel.delegate = self
         panel.contentView = NSHostingView(rootView: WindowPortalView(state: state))
         panel.handleKey = { [weak self] in self?.handleKey($0) ?? false }
+        state.freeze = { [weak self] in self?.freeze() }
+        state.editCrop = { [weak self] in self?.editCrop() }
         state.close = { [weak self] in self?.close() }
         state.jump = { [weak self] in self?.jump() }
         state.togglePause = { [weak self] in self?.togglePause() }
@@ -85,7 +87,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
                         epoch = UUID()
                         requestTask?.cancel()
                     }
-                    state.image = nil
+                    clearPixels()
                     state.phase = .permissionRequired
                     continue
                 }
@@ -107,7 +109,11 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         suspended = value
         requestTask?.cancel()
         epoch = UUID()
-        state.phase = .paused
+        if value {
+            clearPixels()
+            state.userPaused = true
+            state.phase = .userPaused
+        }
     }
 
     func repairPlacement() {
@@ -142,7 +148,9 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         let elapsed = started.duration(to: .now)
         Logger(subsystem: Bundle.main.bundleIdentifier ?? "DeeDock", category: "WindowPortal").info(
             "Portal closed: frames=\(self.state.captures), captureMilliseconds=\(self.state.captureMilliseconds), elapsed=\(String(describing: elapsed), privacy: .public)")
-        state.image = nil
+        clearPixels()
+        state.freeze = nil
+        state.editCrop = nil
         state.close = nil
         state.jump = nil
         state.move = nil
@@ -165,23 +173,29 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
 
     private func refresh() async {
         guard CGPreflightScreenCaptureAccess() else {
-            state.image = nil
+            clearPixels()
             state.phase = .permissionRequired
             return
         }
+        guard !state.frozen else { return }
         guard application?.isTerminated == false else {
             state.phase = .unavailable
             return
         }
         guard !suspended else { state.phase = .paused; return }
-        guard !state.userPaused, panel.occlusionState.contains(.visible) else {
+        guard !state.editingCrop, !state.needsReselection else { return }
+        guard !state.userPaused else { state.phase = .userPaused; return }
+        guard panel.occlusionState.contains(.visible) else {
             state.phase = .paused
             return
         }
         let expected = epoch
         let scale = panel.backingScaleFactor
         let bounds = panel.contentView?.bounds.size ?? CGSize(width: 360, height: 260)
-        let pixels = CGSize(width: min(1280, bounds.width * scale), height: min(960, bounds.height * scale))
+        // Cropped views use the same bounded single capture, retaining enough detail for small regions.
+        let pixels = state.cropSourceSize == nil
+            ? CGSize(width: min(1280, bounds.width * scale), height: min(960, bounds.height * scale))
+            : CGSize(width: 1280, height: 960)
         let start = ContinuousClock.now
         let request = Task { @concurrent [capture] in
             await capture.update(pixelSize: pixels)
@@ -191,7 +205,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         requestTask = nil
         guard !closed, !Task.isCancelled, epoch == expected else { return }
         guard CGPreflightScreenCaptureAccess() else {
-            state.image = nil
+            clearPixels()
             state.phase = .permissionRequired
             return
         }
@@ -204,7 +218,14 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
             state.image = image
             state.source = source
             panel.title = state.sourceName
-            state.phase = .live
+            // Source sizes are ScreenCaptureKit global points, not output pixels or display backing scale.
+            if let saved = state.cropSourceSize, source.frame?.size != saved {
+                state.needsReselection = true
+                state.resetZoom()
+                state.phase = .reselect
+            } else {
+                state.phase = .live
+            }
             state.lastFrameAt = Date()
             lastSuccess = .now
             state.captures += 1
@@ -213,17 +234,45 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         case .paused: state.phase = .paused
         case .unavailable: state.phase = .unavailable
         case .permissionRequired:
-            state.image = nil
+            clearPixels()
             state.phase = .permissionRequired
         case .stale: state.phase = state.image == nil ? .unavailable : .stale
         }
     }
 
     private func togglePause() {
-        state.userPaused.toggle()
+        guard !state.editingCrop else { return }
+        if state.frozen { state.frozen = false; state.userPaused = false }
+        else { state.userPaused.toggle() }
         requestTask?.cancel()
         epoch = UUID()
-        state.phase = state.userPaused ? .paused : .connecting
+        state.phase = state.needsReselection ? .reselect : (state.userPaused ? .userPaused : .connecting)
+    }
+
+    /// Freeze retains the existing frame and invalidates any SDK result already in flight.
+    private func freeze() {
+        guard state.image != nil, !state.editingCrop, !state.needsReselection else { return }
+        invalidateCapture()
+        state.frozen = true
+        state.userPaused = false
+        state.phase = .frozen
+    }
+
+    private func editCrop() {
+        guard state.image != nil, !suspended else { return }
+        invalidateCapture()
+        state.editingCrop = true
+        if !state.frozen, !state.needsReselection { state.phase = .paused }
+    }
+
+    /// Privacy boundaries discard the sole retained frame, including deliberate frozen snapshots.
+    private func clearPixels() {
+        state.image = nil
+        state.lastFrameAt = nil
+        state.editingCrop = false
+        state.needsReselection = false
+        if state.frozen { state.userPaused = true }
+        state.frozen = false
     }
 
     private func move(x: CGFloat, y: CGFloat) {
@@ -276,6 +325,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
     }
 
     private func handleKey(_ event: NSEvent) -> Bool {
+        guard !state.editingCrop else { return false }
         guard event.modifierFlags.intersection([.command, .control, .option]).isEmpty else { return false }
         let step: CGFloat = event.modifierFlags.contains(.shift) ? 40 : 10
         switch event.keyCode {

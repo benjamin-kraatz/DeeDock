@@ -52,7 +52,10 @@ persistence, cross-process input forwarding, or new permission prompt is added.
 | --- | --- |
 | Connecting | Waiting for the first capture or a resumed update |
 | Live | A screenshot completed within the past five seconds |
-| Paused | User pause, sleep, inactive session, occluded portal, or off-screen source |
+| Paused | Occluded portal, off-screen source, sleep, or crop editing |
+| Paused by you | Explicit user pause, or waiting for Resume after a privacy suspension |
+| Frozen snapshot | Deliberately retained frame with a visible capture date and time; no new capture |
+| Choose region again | Source dimensions changed; cropped presentation is hidden until reselection or Whole window |
 | Source unavailable | Source process ended, the bound window disappeared, matching failed, or initial capture failed |
 | Stale frame | Capture failed after an image was received, or no replacement arrived for five seconds |
 | Screen Recording access required | The existing permission is absent or revoked; the retained image is cleared |
@@ -143,3 +146,74 @@ also added per-request cancellation, independent permission revocation checks, a
 The final merge of `origin/main` preserved DEE-15's window search commands, coordinator lifecycle, and
 all catalog entries alongside portals. The merged app build passed. All 78 portal/search keys match
 both compiled languages. This merge validation did not launch either feature.
+
+## DEE-23 cropped and frozen portals
+
+In an existing portal, choose **Choose region…**. Drag across the full-window preview or use the
+four percentage steppers for horizontal position, vertical position, width, and height. Keyboard
+and VoiceOver users can adjust each stepper in one-percent increments. **Apply crop** confirms
+the selection. **Whole window** in the editor resets the draft; the same context-menu action
+immediately returns the portal to the full window. Each dimension has a five-percent minimum.
+The existing Peek pin action and four-portal limit remain unchanged.
+
+**Zoom** opens controls for magnification from 1× to 4× and horizontal and vertical position.
+Drag the image to pan, or use the labeled sliders with keyboard or VoiceOver.
+**Reset zoom and pan** fits the saved crop. Both crop and zoom preserve aspect ratio and leave
+letterboxing when necessary. Image gestures change only the preview, never the source application.
+
+**Freeze snapshot** keeps the current retained frame and its capture date and time. It cancels
+pending work and rejects late results; an already submitted SDK screenshot may still finish.
+The serial loop submits no screenshots or source discovery while frozen. Permission checks still run.
+**Resume** revalidates capture permission, the original running process, the bound window ID,
+on-screen status, and source dimensions before showing a new live frame. It never repeats title matching.
+Closing clears the sole retained image. No file export, restoration, history, or disk storage is added.
+
+Sleep, display sleep, inactive-session notifications, and permission loss clear all retained pixels,
+including frozen snapshots and crop editor previews. Privacy suspension ends freeze and requires
+explicit Resume after waking. An ordinary display disconnect repairs placement without clearing a
+frozen frame. Source termination leaves a frozen snapshot labeled with its original time; Resume
+reports unavailable. The timestamp is the screenshot completion time, not a source application's data time.
+
+### Region and frame contract
+
+`NormalizedWindowRegion` is shared with Watch through its existing type alias. Regions use top-left
+unit coordinates of the entire source window. Preview gestures belong to the fitted image rectangle,
+so centered letterbox margins do not enter normalization. SwiftUI image offsets use top-left image
+coordinates; no bottom-left AppKit flip applies. Image dimensions are pixels. Window size checks use
+ScreenCaptureKit global-point dimensions, independently of output pixels and backing scale.
+Portal placement alone uses AppKit global points, including negative display origins.
+
+The crop stores the source-point size at confirmation. Any observed size change pauses cropped
+presentation and retains one new whole-window frame for reselection. The portal hides the mismatched
+crop until the user confirms a region or returns to the whole window. The next capture checks again,
+including after Resume. Moving between displays with unchanged source-point dimensions preserves the
+region. Relative coordinates cannot track semantic content or detect layout changes at unchanged size.
+Choose the region again after such a layout change.
+
+Cropping is presentation-only. The retained full-window bitmap supports reselection and zoom without
+a second image owner. Cropped capture uses at most 1280 × 960 pixels through the existing single
+serial request. Whole-window capture retains its panel-size/backing-scale budget. Zoom changes no
+capture cadence, creates no stream, and retains no additional bitmap. SDK/framework/GPU transient
+copies are outside the calculated retained-pixel budget.
+
+The installed macOS 27 `SCStream.h` exposes `sourceRect` in logical points to sample a subset of the
+input and `destinationRect` in output pixels. Source cropping could reduce sampled/output data when
+configured with smaller output dimensions. This implementation leaves those fields unset to retain
+the full-window selection preview. No measured CPU, GPU, memory, or energy savings are claimed.
+
+### Validation and pending acceptance
+
+Focused unsigned app compilation uses the existing DeeDock target and Xcode 27. Tests and automated
+visual checks are not authorized and were not run. Native acceptance and measurements remain pending;
+DEE-23 must not be marked Done on compilation alone.
+
+Model/state cases worth testing include minimum and boundary crops; letterbox exclusion; fit and pan
+at all four corners and zoom limits; source-size changes before and after confirmation; freeze during
+an in-flight request; privacy clearing while an editor is open; and Resume after process/window loss.
+
+Native acceptance must cover a narrow progress bar and chart, all four dock edges, negative origins,
+unequal displays, Retina and non-Retina scaling, source movement/resize/layout changes, and display
+reconnection. Exercise keyboard/VoiceOver editing and sliders, Reduce Motion/Transparency, source
+navigation, Spaces/full-screen, permission revocation, sleep/lock/display sleep, and closing frozen
+portals. Measure four portals with live, frozen, and offscreen sources using Instruments and the
+existing WindowPortal frame-count/capture-time close logs. No runtime measurements were collected.

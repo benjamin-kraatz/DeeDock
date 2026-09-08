@@ -1457,3 +1457,15 @@ exact AX object before native access, including close buttons. The fullscreen co
 as an explicit capability limitation: only app-advertised `AXFullScreen` metadata is read through
 public AX queries, and missing state remains unavailable. The final staged-tree build passed
 after these changes. No additional native acceptance is claimed.
+
+## DEE-23 cropped and frozen portals
+
+Implemented crop selection with shared normalized geometry, keyboard/VoiceOver percentage steppers,
+aspect-preserving fit, bounded zoom/pan, and an explicit timestamped frozen state. Source dimension
+changes require reselection; privacy suspension clears retained pixels, including frozen frames.
+See [window portals](WINDOW-PORTALS.md#dee-23-cropped-and-frozen-portals) for coordinate conversions,
+API/resource limits, lifecycle policy, and model/native acceptance cases.
+
+The focused unsigned Debug app build passed with Xcode 27. Log: `/tmp/DeeDock-dee23-build.log`.
+Tests, automated visual checks, native acceptance, and memory/capture measurements were not run.
+Compilation alone does not make DEE-23 Done.
