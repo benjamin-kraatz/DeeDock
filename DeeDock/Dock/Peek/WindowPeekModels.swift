@@ -48,6 +48,10 @@ final class WindowPeekState {
     var selectedID: ApplicationWindowToken?
     /// ScreenCaptureKit-only cards can be previewed, but selecting one can only activate its app.
     var usesApplicationSelection = false
+    var actionBusy = false
+    var actionMenuTracking = false
+    var actionMessage: LocalizedStringResource?
+    @ObservationIgnored var manage: ((ApplicationWindowToken) -> Void)?
     var routingFiles = false
     var receivingFileDrag = false
     @ObservationIgnored var chooseFiles: (() -> Void)?

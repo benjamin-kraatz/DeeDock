@@ -15,19 +15,24 @@ nonisolated enum ApplicationWindowServiceError: Error, Equatable, Sendable {
 protocol ApplicationWindowServicing: Actor {
     func discover(processes: [ApplicationProcessSnapshot], sessionID: UUID) async throws -> [ApplicationWindowSummary]
     func selectWindow(_ token: ApplicationWindowToken) async throws
+    func actionSummary(_ token: ApplicationWindowToken) async throws -> ApplicationWindowSummary
+    func capabilities(_ token: ApplicationWindowToken) async throws -> WindowActionCapabilities
+    func perform(_ action: WindowAction, token: ApplicationWindowToken, displays: [WindowActionDisplay]) async throws -> ApplicationWindowSummary?
     func discard(sessionID: UUID)
     func stop()
 }
 
 /// Public AX window access with bounded cross-process messaging.
 actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
-    private struct Handle {
+    struct Handle {
         let element: AXUIElement
         let processIdentifier: pid_t
+        let launchDate: Date?
     }
 
-    private var handles: [ApplicationWindowToken: Handle] = [:]
-    private let messagingTimeout: Float
+    var undoFrames: [ApplicationWindowToken: CGRect] = [:]
+    var handles: [ApplicationWindowToken: Handle] = [:]
+    let messagingTimeout: Float
     private let maximumWindows: Int
 
     init(messagingTimeout: Float = 0.25, maximumWindows: Int = .max) {
@@ -49,6 +54,7 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
 
     private func discoverTrusted(processes: [ApplicationProcessSnapshot], sessionID: UUID) throws
         -> [ApplicationWindowSummary] {
+        undoFrames = undoFrames.filter { $0.key.sessionID != sessionID }
         handles = handles.filter { $0.key.sessionID != sessionID }
         var result: [ApplicationWindowSummary] = []
 
@@ -66,7 +72,8 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
                 if subrole == kAXFloatingWindowSubrole || subrole == kAXSystemFloatingWindowSubrole { continue }
 
                 let token = ApplicationWindowToken(sessionID: sessionID, id: UUID())
-                handles[token] = Handle(element: window, processIdentifier: process.processIdentifier)
+                handles[token] = Handle(element: window, processIdentifier: process.processIdentifier,
+                                        launchDate: NSRunningApplication(processIdentifier: process.processIdentifier)?.launchDate)
                 let rawTitle = string(window, attribute: kAXTitleAttribute as CFString)
                 result.append(ApplicationWindowSummary(
                     token: token,
@@ -115,16 +122,18 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
             try set(handle.element, attribute: kAXMainAttribute as CFString, value: kCFBooleanTrue)
         }
         try Task.checkCancellation()
-        try check(AXUIElementPerformAction(handle.element, kAXRaiseAction as CFString))
+        try performNativeAction(handle.element, action: kAXRaiseAction as CFString)
     }
 
     func discard(sessionID: UUID) {
+        undoFrames = undoFrames.filter { $0.key.sessionID != sessionID }
         handles = handles.filter { $0.key.sessionID != sessionID }
     }
 
-    func stop() { handles.removeAll() }
+    func stop() { handles.removeAll(); undoFrames.removeAll() }
 
-    private func copy(_ element: AXUIElement, attribute: CFString) throws -> CFTypeRef? {
+    func copy(_ element: AXUIElement, attribute: CFString) throws -> CFTypeRef? {
+        try prepareElement(element)
         var value: CFTypeRef?
         let error = AXUIElementCopyAttributeValue(element, attribute, &value)
         if error == .attributeUnsupported || error == .noValue { return nil }
@@ -132,17 +141,17 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         return value
     }
 
-    private func string(_ element: AXUIElement, attribute: CFString) -> String? {
+    func string(_ element: AXUIElement, attribute: CFString) -> String? {
         (try? copy(element, attribute: attribute)) as? String
     }
 
-    private func boolean(_ element: AXUIElement, attribute: CFString) -> Bool? {
+    func boolean(_ element: AXUIElement, attribute: CFString) -> Bool? {
         guard let value = try? copy(element, attribute: attribute) else { return nil }
         guard CFGetTypeID(value) == CFBooleanGetTypeID() else { return nil }
         return CFBooleanGetValue((value as! CFBoolean))
     }
 
-    private func rect(_ element: AXUIElement) -> CGRect? {
+    func rect(_ element: AXUIElement) -> CGRect? {
         guard let positionValue = try? copy(element, attribute: kAXPositionAttribute as CFString),
               let sizeValue = try? copy(element, attribute: kAXSizeAttribute as CFString),
               CFGetTypeID(positionValue) == AXValueGetTypeID(),
@@ -154,16 +163,33 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         return CGRect(origin: origin, size: size)
     }
 
-    private func isSettable(_ element: AXUIElement, attribute: CFString) -> Bool {
+    func isSettable(_ element: AXUIElement, attribute: CFString) -> Bool {
+        guard (try? prepareElement(element)) != nil else { return false }
         var settable = DarwinBoolean(false)
         return AXUIElementIsAttributeSettable(element, attribute, &settable) == .success && settable.boolValue
     }
 
-    private func set(_ element: AXUIElement, attribute: CFString, value: CFTypeRef) throws {
+    func set(_ element: AXUIElement, attribute: CFString, value: CFTypeRef) throws {
+        try prepareElement(element)
+        try Task.checkCancellation()
+        guard AXIsProcessTrusted() else { throw ApplicationWindowServiceError.permissionRequired }
         try check(AXUIElementSetAttributeValue(element, attribute, value))
     }
 
-    private func check(_ error: AXError) throws {
+    /// AX messaging timeouts belong to an exact object instance, not its app or equal elements.
+    func prepareElement(_ element: AXUIElement) throws {
+        try Task.checkCancellation()
+        try check(AXUIElementSetMessagingTimeout(element, messagingTimeout))
+    }
+
+    func performNativeAction(_ element: AXUIElement, action: CFString) throws {
+        try prepareElement(element)
+        try Task.checkCancellation()
+        guard AXIsProcessTrusted() else { throw ApplicationWindowServiceError.permissionRequired }
+        try check(AXUIElementPerformAction(element, action))
+    }
+
+    func check(_ error: AXError) throws {
         guard error != .success else { return }
         throw ApplicationWindowServiceError.accessibility(error.rawValue)
     }
@@ -176,5 +202,19 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
                 task, "com.apple.security.app-sandbox" as CFString, nil
               ) else { return false }
         return value as? Bool == true
+    }
+}
+
+/// Consumers that only discover/select windows do not promise mutation support.
+extension ApplicationWindowServicing {
+    func actionSummary(_ token: ApplicationWindowToken) async throws -> ApplicationWindowSummary {
+        throw WindowActionError.unsupported
+    }
+    func capabilities(_ token: ApplicationWindowToken) async throws -> WindowActionCapabilities {
+        throw WindowActionError.unsupported
+    }
+    func perform(_ action: WindowAction, token: ApplicationWindowToken,
+                 displays: [WindowActionDisplay]) async throws -> ApplicationWindowSummary? {
+        throw WindowActionError.unsupported
     }
 }

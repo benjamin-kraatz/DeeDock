@@ -40,6 +40,24 @@ nonisolated enum WindowPeekGeometry {
         return WindowPeekPlacement(frame: CGRect(origin: origin, size: size), edge: anchor.edge)
     }
 
+    /// Trims the sized panel down to the height the presented content actually needs.
+    ///
+    /// The panel is sized for a full card layout before anything is known about the windows, so a
+    /// short body (loading, a permission fallback) would otherwise leave dead space. The edge the
+    /// dock sits on decides which side stays put: the side nearest the icon, so the panel never
+    /// drifts away from the tile it belongs to.
+    static func fitted(_ placement: WindowPeekPlacement, contentHeight: CGFloat) -> CGRect {
+        let height = min(max(contentHeight, 1), placement.frame.height)
+        var frame = placement.frame
+        frame.size.height = height
+        switch placement.edge {
+        case .bottom: break
+        case .top: frame.origin.y = placement.frame.maxY - height
+        case .left, .right: frame.origin.y = placement.frame.midY - height / 2
+        }
+        return frame
+    }
+
     static func cardSize(_ settings: DockSettings) -> CGSize {
         let thumbnail = settings.windowPeekSize.thumbnailSize
         return switch settings.windowPeekLayout {

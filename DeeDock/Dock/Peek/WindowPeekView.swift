@@ -4,6 +4,8 @@ struct WindowPeekView: View {
     @Environment(\.openWindow) private var openWindow
     let state: WindowPeekState
     let keyboard: Bool
+    var edge: DockEdge = .bottom
+    var contentHeightChanged: ((CGFloat) -> Void)? = nil
     var reduceTransparencyOverride: Bool? = nil
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
@@ -11,7 +13,22 @@ struct WindowPeekView: View {
         reduceTransparencyOverride ?? reduceTransparency
     }
 
+    /// The panel keeps the side nearest the dock icon, so a body shorter than the panel hugs the tile.
+    private var alignment: Alignment {
+        switch edge {
+        case .bottom: .bottom
+        case .top: .top
+        case .left, .right: .center
+        }
+    }
+
     var body: some View {
+        card
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeightChanged?($0) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
+    }
+
+    private var card: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(nsImage: state.appIcon).resizable().interpolation(.high).frame(width: 24, height: 24)
@@ -20,13 +37,17 @@ struct WindowPeekView: View {
                 if !state.routingFiles {
                     Button(.fileRouteChooseFiles, systemImage: "doc.badge.plus") { state.chooseFiles?() }
                         .labelStyle(.iconOnly)
+                        .disabled(state.actionBusy)
                 }
             }
             if state.routingFiles {
                 Text(state.receivingFileDrag ? .fileRouteDropHelp : .fileRouteSelectDestination)
                     .font(.caption).fixedSize(horizontal: false, vertical: true)
             }
-            content
+            if let message = state.actionMessage {
+                Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
+            }
+            content.disabled(state.actionBusy)
             if state.receivingFileDrag {
                 Text(.fileRouteDropApp).font(.caption)
                     .frame(maxWidth: .infinity, minHeight: 32)
@@ -118,6 +139,7 @@ struct WindowPeekView: View {
             } else {
                 WindowPeekCardSlot(card: card, appIcon: state.appIcon, settings: state.settings,
                                    selected: keyboard && state.selectedID == card.id, size: size,
+                                   manage: { state.manage?(card.id) },
                                    choose: { state.choose?(card.id) },
                                    watch: { state.watch?(card.id) },
                                    addToFusion: { state.addToFusion?(card.window) },
@@ -172,6 +194,7 @@ private struct WindowPeekCardSlot: View {
     let settings: DockSettings
     let selected: Bool
     let size: CGSize
+    let manage: () -> Void
     let choose: () -> Void
     let watch: () -> Void
     let addToFusion: () -> Void
@@ -182,15 +205,20 @@ private struct WindowPeekCardSlot: View {
         WindowPeekCardView(card: card, appIcon: appIcon, settings: settings,
                            selected: selected, action: choose)
             .contextMenu {
+                Button(.peekActionTitle, systemImage: "ellipsis", action: manage)
+                Divider()
                 Button(.watchTitle, systemImage: "eye", action: watch)
                 Button(.portalPin, systemImage: "pin", action: pinPortal)
                 Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
             }
+            .accessibilityAction(named: Text(.peekActionTitle), manage)
             .accessibilityAction(named: Text(.watchTitle), watch)
             .accessibilityAction(named: Text(.fusionAdd), addToFusion)
             .accessibilityAction(named: Text(.portalPin), pinPortal)
             .overlay(alignment: .topTrailing) {
                 HStack(spacing: 4) {
+                    WindowPeekActionButton(revealed: hovering || selected, label: .peekActionTitle,
+                                           symbol: "ellipsis", action: manage)
                     WindowPeekActionButton(revealed: hovering || selected, label: .watchTitle,
                                            symbol: "eye", action: watch)
                     WindowPeekActionButton(revealed: hovering || selected, label: .fusionAdd,

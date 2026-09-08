@@ -289,6 +289,19 @@ final class DockPanelController {
             layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
     }
 
+    /// Uses resting section bounds so insertion previews cannot move the unpin destination.
+    /// Includes spacing between running apps and a collapsed running-section control.
+    func runningSectionTarget(at point: CGPoint) -> Bool {
+        guard !launcher.isPresented, visibility.exposesContent, restingDragBounds.contains(point) else { return false }
+        let indices = store.entries.indices.filter { store.entries[$0].appGroup == .running }
+        guard let first = indices.first, let last = indices.last,
+              last < baseLayout.restingCenters.count else { return false }
+        let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
+        let along = baseLayout.edge.along(local) - interaction.scrollOffset
+        return along >= baseLayout.restingCenters[first] - baseLayout.iconSize / 2
+            && along <= baseLayout.restingCenters[last] + baseLayout.iconSize / 2
+    }
+
     /// Document hits use the same inverse animation transform and viewport-clipped icons as clicks.
     func documentTarget(at point: CGPoint) -> DockItem? {
         guard !stopped, !launcher.isPresented, panel.frame.contains(point) else { return nil }

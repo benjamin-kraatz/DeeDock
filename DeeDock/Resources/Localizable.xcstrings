@@ -6893,7 +6893,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add to Shelf"
+            "value" : "Zum Shelf hinzufügen"
           }
         },
         "en" : {
@@ -6911,7 +6911,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Checking applications…"
+            "value" : "Apps werden geprüft …"
           }
         },
         "en" : {
@@ -6929,7 +6929,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Checking items…"
+            "value" : "Objekte werden geprüft …"
           }
         },
         "en" : {
@@ -6947,7 +6947,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drop onto an app to open"
+            "value" : "Zum Öffnen auf eine App ziehen"
           }
         },
         "en" : {
@@ -6965,7 +6965,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move to Trash"
+            "value" : "In den Papierkorb legen"
           }
         },
         "en" : {
@@ -6983,7 +6983,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open in %(appName)@"
+            "value" : "In %(appName)@ öffnen"
           }
         },
         "en" : {
@@ -7001,7 +7001,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pin here"
+            "value" : "Hier anpinnen"
           }
         },
         "en" : {
@@ -7019,7 +7019,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drag into the pinned section"
+            "value" : "In den Bereich für angepinnte Objekte ziehen"
           }
         },
         "en" : {
@@ -7037,13 +7037,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drop applications only. Pins could not be changed."
+            "value" : "Diese Auswahl kann hier nicht abgelegt werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drop applications only. Pins could not be changed."
+            "value" : "This selection cannot be dropped here."
           }
         }
       }
@@ -7055,7 +7055,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove from Shelf"
+            "value" : "Aus dem Shelf entfernen"
           }
         },
         "en" : {
@@ -7219,6 +7219,12 @@
             "state" : "translated",
             "value" : "Quick Look"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersicht"
+          }
         }
       }
     },
@@ -7230,6 +7236,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Close Preview"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau schließen"
           }
         }
       }
@@ -8311,6 +8323,12 @@
             "state" : "translated",
             "value" : "Copy into Folder"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ordner kopieren"
+          }
         }
       }
     },
@@ -8323,6 +8341,12 @@
             "state" : "translated",
             "value" : "Copying files…"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien werden kopiert …"
+          }
         }
       }
     },
@@ -8331,6 +8355,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@"
+          }
+        },
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@"
@@ -8347,6 +8377,12 @@
             "state" : "translated",
             "value" : "Copied %1$lld items. %2$@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Objekte kopiert. %2$@"
+          }
         }
       }
     },
@@ -8358,6 +8394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Back"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
           }
         }
       }
@@ -8371,6 +8413,12 @@
             "state" : "translated",
             "value" : "Open this folder in the stack."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diesen Ordner im Stapel öffnen."
+          }
         }
       }
     },
@@ -8381,7 +8429,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Folder stack: %1$(folderName)@"
+            "value" : "Ordnerstapel: %1$(folderName)@"
           }
         },
         "en" : {
@@ -8399,7 +8447,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Folder stack"
+            "value" : "Ordnerstapel"
           }
         },
         "en" : {
@@ -8417,7 +8465,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opens the folder stack"
+            "value" : "Öffnet den Ordnerstapel"
           }
         },
         "en" : {
@@ -8435,7 +8483,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This folder is empty"
+            "value" : "Dieser Ordner ist leer"
           }
         },
         "en" : {
@@ -8453,7 +8501,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grid"
+            "value" : "Raster"
           }
         },
         "en" : {
@@ -8471,7 +8519,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$(count)lld items, %2$(mode)@"
+            "value" : "%1$(count)lld Objekte, %2$(mode)@"
           }
         },
         "en" : {
@@ -8489,7 +8537,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$(itemName)@ is no longer available."
+            "value" : "%1$(itemName)@ ist nicht mehr verfügbar."
           }
         },
         "en" : {
@@ -8507,7 +8555,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "List"
+            "value" : "Liste"
           }
         },
         "en" : {
@@ -8525,7 +8573,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Loading folder"
+            "value" : "Ordner wird geladen …"
           }
         },
         "en" : {
@@ -8543,7 +8591,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Stack"
+            "value" : "Stapel öffnen"
           }
         },
         "en" : {
@@ -8561,7 +8609,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t open %1$(itemName)@."
+            "value" : "%1$(itemName)@ konnte nicht geöffnet werden."
           }
         },
         "en" : {
@@ -8579,7 +8627,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opens with the default application"
+            "value" : "Öffnet das Objekt mit der Standard-App"
           }
         },
         "en" : {
@@ -8597,7 +8645,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Presentation"
+            "value" : "Darstellung"
           }
         },
         "en" : {
@@ -8615,7 +8663,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retry"
+            "value" : "Erneut versuchen"
           }
         },
         "en" : {
@@ -8633,7 +8681,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shows this folder in Finder"
+            "value" : "Zeigt diesen Ordner im Finder"
           }
         },
         "en" : {
@@ -8651,7 +8699,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t save the folder view."
+            "value" : "Die Ordneransicht konnte nicht gespeichert werden."
           }
         },
         "en" : {
@@ -8669,7 +8717,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show in Finder"
+            "value" : "Im Finder zeigen"
           }
         },
         "en" : {
@@ -8687,7 +8735,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This folder is unavailable."
+            "value" : "Dieser Ordner ist nicht verfügbar."
           }
         },
         "en" : {
@@ -8705,7 +8753,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Folder unavailable"
+            "value" : "Ordner nicht verfügbar"
           }
         },
         "en" : {
@@ -8723,7 +8771,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Grid"
+            "value" : "Als Raster anzeigen"
           }
         },
         "en" : {
@@ -8741,7 +8789,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use List"
+            "value" : "Als Liste anzeigen"
           }
         },
         "en" : {
@@ -12167,7 +12215,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Files in %(appName)@"
+            "value" : "Dateien in %(appName)@ öffnen"
           }
         },
         "en" : {
@@ -21234,6 +21282,312 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“Yesterday” searches only capsules saved yesterday. Choose Saved Capsules. Without a saved checkpoint, there is no history to search."
+          }
+        }
+      }
+    },
+    "peekActionCaptureOnly" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Vorschau lässt sich keinem steuerbaren Fenster sicher zuordnen. Aktiviere den Fensterzugriff in den Einstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This preview has no reliable window-control target. Enable Window Access in Settings."
+          }
+        }
+      }
+    },
+    "peekActionCenter" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster zentrieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center window"
+          }
+        }
+      }
+    },
+    "peekActionClose" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close window"
+          }
+        }
+      }
+    },
+    "peekActionCompleted" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster aktualisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window updated."
+          }
+        }
+      }
+    },
+    "peekActionConstrained" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App hat die Platzierung eingeschränkt. Das Fenster wurde möglicherweise verschoben oder skaliert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app constrained the placement. The window may have moved or resized."
+          }
+        }
+      }
+    },
+    "peekActionFailed" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster hat sich geändert oder die App hat die Aktion nicht bestätigt. Öffne die Vorschau erneut, um sie zu aktualisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The window changed or the app did not confirm the action. Reopen Peek to refresh."
+          }
+        }
+      }
+    },
+    "peekActionFill" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzbaren Bereich ausfüllen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill usable area"
+          }
+        }
+      }
+    },
+    "peekActionLeft" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linke Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left half"
+          }
+        }
+      }
+    },
+    "peekActionMinimize" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster minimieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimize window"
+          }
+        }
+      }
+    },
+    "peekActionMove" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Display verschieben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to display"
+          }
+        }
+      }
+    },
+    "peekActionPermission" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Fensterzugriff ist nicht verfügbar. Prüfe die Berechtigung für Bedienungshilfen in den Systemeinstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window Access is unavailable. Check Accessibility permission in System Settings."
+          }
+        }
+      }
+    },
+    "peekActionRestore" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster wiederherstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore window"
+          }
+        }
+      }
+    },
+    "peekActionRestricted" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im aktuellen Fensterzustand sind keine Aktionen verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions are unavailable in this window’s current state."
+          }
+        }
+      }
+    },
+    "peekActionRight" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right half"
+          }
+        }
+      }
+    },
+    "peekActionTitle" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensteraktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window actions"
+          }
+        }
+      }
+    },
+    "peekActionUndo" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensterposition zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo window placement"
+          }
+        }
+      }
+    },
+    "peekActionUnsupported" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App unterstützt keine Aktionen für dieses Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app does not support actions for this window."
           }
         }
       }

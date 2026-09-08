@@ -1435,3 +1435,25 @@ The Mac locked during the check and Computer Use could not unlock it. Native rec
 temporary test preferences and pins, Reduce Motion, per-display inheritance, slow launches,
 failures, Spaces, full-screen apps, and sleep/wake remain open. No native acceptance is claimed
 for those cases.
+
+## DEE-22: individual Window Peek actions
+
+Window Peek exposes per-window minimize/restore, cooperative close, move to display, rectangular
+placement, and presentation-scoped geometry Undo. See [window actions](WINDOW-ACTIONS.md) for
+controls, target validation, geometry policy, public API limits, and pending acceptance cases.
+Focused unsigned Debug app compilation passed. Tests and automated visual checks were not run.
+Native window actions, unsaved prompts, keyboard/VoiceOver, and multi-display behavior remain
+unverified. DEE-22 must not be marked Done on compilation alone.
+
+The staged DEE-22 tree also compiled independently of concurrent Peek sizing edits. Exported with
+`git checkout-index` to `/tmp/dee22-delivery-source`, it passed the same focused unsigned Debug
+build using `/tmp/DeeDock-dee22-delivery-build`. Log: `/tmp/DeeDock-dee22-delivery-build.log`.
+The build reported existing Launcher and Dock Badges unused-value warnings and the App Intents
+metadata-extraction notice. All 17 action keys matched compiled English and German strings.
+Following menu feedback, unavailable actions are hidden and the explanatory footer is removed.
+
+GPT 5.6 Luna reviewed DEE-22 at Extra High. Its timeout finding was fixed by preparing every
+exact AX object before native access, including close buttons. The fullscreen concern is handled
+as an explicit capability limitation: only app-advertised `AXFullScreen` metadata is read through
+public AX queries, and missing state remains unavailable. The final staged-tree build passed
+after these changes. No additional native acceptance is claimed.

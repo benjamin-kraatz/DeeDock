@@ -101,6 +101,21 @@ struct WindowPeekTests {
         #expect(placement.frame.maxY <= safe.maxY)
     }
 
+    @Test("Short content keeps the panel edge that faces the dock icon", arguments: DockEdge.allCases)
+    func fittedHeightHugsTheIcon(_ edge: DockEdge) {
+        let placement = WindowPeekPlacement(frame: CGRect(x: 100, y: 200, width: 400, height: 300), edge: edge)
+        let fitted = WindowPeekGeometry.fitted(placement, contentHeight: 120)
+        #expect(fitted.height == 120)
+        #expect(fitted.width == placement.frame.width)
+        switch edge {
+        case .bottom: #expect(fitted.minY == placement.frame.minY)
+        case .top: #expect(fitted.maxY == placement.frame.maxY)
+        case .left, .right: #expect(fitted.midY == placement.frame.midY)
+        }
+        // Content taller than the sized panel never grows it past the clamped placement.
+        #expect(WindowPeekGeometry.fitted(placement, contentHeight: 900) == placement.frame)
+    }
+
     private func summary(session: UUID, pid: pid_t, title: String?, x: CGFloat) -> ApplicationWindowSummary {
         ApplicationWindowSummary(token: ApplicationWindowToken(sessionID: session, id: UUID()),
                                  processIdentifier: pid, title: title,

@@ -41,7 +41,10 @@ final class WindowPeekPanelController {
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
         panel.acceptsKeyboardFocus = keyboard
-        panel.contentView = WindowPeekHostingView(rootView: WindowPeekView(state: state, keyboard: keyboard))
+        let hosting = WindowPeekHostingView(rootView: WindowPeekView(state: state, keyboard: keyboard,
+                                                                     edge: anchor.edge))
+        panel.contentView = hosting
+        hosting.rootView.contentHeightChanged = { [weak self] height in self?.fit(contentHeight: height) }
         panel.keyboardHandler = { [weak self] event in self?.handleKey(event) ?? false }
         panel.setFrame(placement.frame, display: false)
     }
@@ -65,8 +68,19 @@ final class WindowPeekPanelController {
     func update(anchor: WindowPeekAnchor, settings: DockSettings, count: Int) {
         state.settings = settings
         placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: count, routingFiles: state.routingFiles)
+        (panel.contentView as? WindowPeekHostingView<WindowPeekView>)?.rootView.edge = anchor.edge
         panel.setFrame(placement.frame, display: true)
     }
+
+    /// Content shorter than the panel would otherwise leave a gap between the card and its icon.
+    private func fit(contentHeight: CGFloat) {
+        guard !stopped, contentHeight > 0 else { return }
+        let frame = WindowPeekGeometry.fitted(placement, contentHeight: contentHeight)
+        guard abs(frame.height - panel.frame.height) > 0.5 || abs(frame.minY - panel.frame.minY) > 0.5 else { return }
+        panel.setFrame(frame, display: true)
+    }
+
+    var actionMenuPoint: CGPoint { CGPoint(x: panel.frame.midX, y: panel.frame.midY) }
 
     func contains(_ screenPoint: CGPoint) -> Bool { panel.frame.contains(screenPoint) }
 
@@ -77,6 +91,7 @@ final class WindowPeekPanelController {
         if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
         localMonitor = nil
         globalMonitor = nil
+        state.manage = nil
         state.chooseFiles = nil
         state.fileDragUpdated = nil
         state.fileDrop = nil
@@ -102,17 +117,24 @@ final class WindowPeekPanelController {
     private func installMonitors() {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
-            guard let self, event.window !== self.panel else { return event }
+            guard let self, !self.state.actionMenuTracking, event.window !== self.panel else { return event }
             self.close(returnFocus: false)
             return event
         }
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
+            guard self?.state.actionMenuTracking != true else { return }
             self?.close(returnFocus: false)
         }
     }
 
     private func handleKey(_ event: NSEvent) -> Bool {
+        if state.actionBusy {
+            if event.keyCode == 53 { close(returnFocus: false) }
+            return true
+        }
         switch event.keyCode {
+        case 0 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
+            if let id = state.selectedID { state.manage?(id) }
         case 8 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: state.chooseFiles?()
         case 13 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: if let id = state.selectedID { state.watch?(id) }
         case 35 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:

@@ -17,6 +17,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var destinationID: String?
     private var trackingID: String?
     private var destinationIndex: Int?
+    private var unpinDestinationID: String?
     private var trashDestinationID: String?
     private var shelfDestinationID: String?
     private var actionDestination: (String, UUID)?
@@ -101,6 +102,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard validates(info.draggingPasteboard) else { return [] }
         nativeDisplayID = displayID // Loading a new payload clears the preceding session.
         update(at: NSEvent.mouseLocation)
+        if unpinDestinationID == displayID { return .move }
         if actionDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if shelfDestinationID == displayID { return .copy }
@@ -120,6 +122,16 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
+        if unpinDestinationID == displayID, sourceID == displayID,
+           let sourcePin, let panel = panels[displayID] {
+            committing = true
+            let success = panel.store.removePin(sourcePin.id)
+            committing = false
+            // A failed save must not fall through to drag-out removal on completion.
+            completion.committed = true
+            clearFeedback()
+            return success
+        }
         if let (id, actionID) = actionDestination, id == displayID,
            info.draggingSourceOperationMask.contains(.copy), let files = payload.stageableItems,
            panels[id]?.store.actions?.run(actionID, files: files) == true {
@@ -292,8 +304,17 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         updating = true
         defer { updating = false }
         destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil
+        unpinDestinationID = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
+        // Moving a saved pin into this dock's running section removes only the pin.
+        // Other displays continue to copy pins, and utility tiles never remove them.
+        if let candidate, candidate.store.displayID == sourceID,
+           candidate.store.canEditPins, let sourcePin,
+           candidate.store.pins.contains(where: { $0.id == sourcePin.id }),
+           candidate.runningSectionTarget(at: point) {
+            unpinDestinationID = sourceID
+        }
         let documentTarget = candidate?.store.displayID == nativeDisplayID && payload.documents != nil
             ? candidate?.documentTarget(at: point) : nil
         documentHoverChanged?(documentTarget, candidate, payload.documents)
@@ -377,7 +398,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         for (id, panel) in panels {
             let targeted = candidate === panel
             let proposal = id == destinationID ? DockDragProposal(pins: pins, index: destinationIndex!) : nil
-            let message: LocalizedStringResource? = id == sourceID && removing ? .actionUnpin : (targeted
+            let message: LocalizedStringResource? = id == sourceID && (removing || unpinDestinationID == id) ? .actionUnpin : (targeted
                 ? (rejected || (!pins.isEmpty && !panel.store.canEditPins) ? .dragRejected
                     : (payload.isChecking ? .dragCheckingFiles
                         : (pins.isEmpty ? .dragDocumentTarget : (proposal == nil ? .dragPinnedSection : .dragPinHere))))
@@ -480,6 +501,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
         nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; token = nil
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
+        unpinDestinationID = nil
         trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; shelfSourceIDs = []
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }
         pasteboardChange = nil
