@@ -9,6 +9,7 @@ final class FocusSessionPanelChrome {
 struct FocusSessionPanelView: View {
     let controller: FocusSessionController
     let chrome: FocusSessionPanelChrome
+    var showDigest: (() -> Void)? = nil
     let saveCapsule: () -> Void
     let close: () -> Void
     var forceOpaqueBackground = false
@@ -42,6 +43,7 @@ struct FocusSessionPanelView: View {
                     if controller.bossFight.enabled {
                         Button(.bossFightDisable) { controller.configureBossFight(enabled: false) }
                     }
+                    if let showDigest { Button(.badgeMemoryDigest, action: showDigest) }
                     if let error = controller.error { Text(verbatim: error).foregroundStyle(.red) }
                 }
             }

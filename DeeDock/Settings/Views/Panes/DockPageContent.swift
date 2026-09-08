@@ -27,6 +27,7 @@ struct DockPageContent: View {
                                        cornerRadius: binding(\.cornerRadius),
                                        runningIndicatorStyle: binding(\.runningIndicatorStyle),
                                        animateIndicators: binding(\.animateIndicators),
+                                       launchAnimation: binding(\.launchAnimation),
                                        appearanceSettings: source.value,
                                        overrideContext: override)
             case .appNames:

@@ -52,7 +52,10 @@ struct DockAppButton: View {
                                  runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
                                  indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
                                  artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation,
-                                 badgeLabel: badgeLabel)
+                                 badgeLabel: badgeLabel,
+                                 launchAnimation: interaction?.launchAnimation ?? DockSettings.defaults.launchAnimation,
+                                 launchRequest: interaction?.applicationCatalog?.launchAnimationRequests[item.id],
+                                 launchMotionEnabled: interaction.map { $0.exposesContent && $0.idleFade.fraction == 0 } ?? true)
                 .overlay {
                     if interaction?.documentTargetID == item.id {
                         DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
@@ -88,6 +91,20 @@ struct DockAppButton: View {
                 tracking: menuTracking
             )
         }
+        .overlay(alignment: .topTrailing) {
+            if badgeLabel != nil, interaction?.openBadgeMemory != nil {
+                Button { interaction?.openBadgeMemory?(item) } label: {
+                    Color.clear.frame(width: max(20, size * 0.85), height: max(20, size * 0.35))
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                // Match the upright icon origin, accounting for the edge's indicator strip.
+                .padding(.top, interaction?.layout.edge == .top ? DockGeometry.indicatorAreaDepth : 0)
+                .padding(.trailing, interaction?.layout.edge == .right ? DockGeometry.indicatorAreaDepth : 0)
+                .help(.badgeMemoryDetails)
+                .accessibilityLabel(Text(.badgeMemoryDetails))
+            }
+        }
         .accessibilityFocused($accessibilityFocused)
         .onChange(of: accessibilityFocused) { _, focused in
             accessibilityFocus(focused)
@@ -106,6 +123,9 @@ struct DockAppButton: View {
             togglePin
         )
         .accessibilityActions {
+            if interaction?.openBadgeMemory != nil {
+                Button(.badgeMemoryDetails) { interaction?.openBadgeMemory?(item) }
+            }
             if item.isAvailable {
                 Button(.actionOpenFiles) { interaction?.openFiles?(item) }
                 Button(.applicationMenuShowInFinder) { interaction?.performApplicationMenuAction?(.showInFinder, item) }
@@ -155,7 +175,7 @@ struct DockAppButton: View {
 
     private var accessibilityStatus: Text {
         let status = String(localized: item.isAvailable
-            ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusUnavailable)
+            ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusNotRunning)
             : .appStatusUnavailable)
         if let badgeLabel {
             return Text(.appBadgeAccessibility(status: status, badge: badgeLabel))

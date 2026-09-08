@@ -17,11 +17,13 @@ struct ApplicationCatalogTests {
         catalog.open(reference) { _ in Issue.record("A duplicate request must not be submitted") }
         #expect(service.requests == 1)
         #expect(catalog.launching == [reference.id])
+        #expect(catalog.launchAnimationRequests[reference.id] != nil)
         dock.stop()
         #expect(catalog.launching == [reference.id])
         service.finish()
         await service.waitForReturn()
         await Task.yield()
+        #expect(catalog.launchAnimationRequests[reference.id] == nil)
         #expect(dock.errorMessage == nil)
         #expect(catalog.launching.isEmpty)
         #expect(!service.wasCancelled)
@@ -51,6 +53,28 @@ struct ApplicationCatalogTests {
         catalog.stop()
     }
 
+    @Test("Only cold launches retain an animation signal after completion", arguments: [false, true])
+    func launchAnimationSignal(alreadyRunning: Bool) async {
+        let service = ControlledApplicationService()
+        let reference = DisplayFixtures.app("animation")
+        service.running = alreadyRunning ? [reference] : []
+        let catalog = ApplicationCatalog(service: service)
+        await withCheckedContinuation { completed in
+            catalog.open(reference) { error in
+                #expect(error == nil)
+                completed.resume()
+            }
+            Task {
+                await service.waitForRequest()
+                #expect((catalog.launchAnimationRequests[reference.id] != nil) == !alreadyRunning)
+                service.finishSuccessfully()
+            }
+        }
+        #expect((catalog.launchAnimationRequests[reference.id] != nil) == !alreadyRunning)
+        catalog.stop()
+        #expect(catalog.launchAnimationRequests.isEmpty)
+    }
+
     @Test("Quitting cancels pending work and ignores late completion")
     func shutdown() async {
         let service = ControlledApplicationService()
@@ -60,6 +84,7 @@ struct ApplicationCatalogTests {
         await service.waitForRequest()
         catalog.stop()
         #expect(catalog.launching.isEmpty)
+        #expect(catalog.launchAnimationRequests.isEmpty)
         service.finish()
         await service.waitForReturn()
         await Task.yield()
@@ -100,7 +125,8 @@ private final class ControlledApplicationService: ApplicationServicing {
     private var requestWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
     private var returnWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
     private var returns = 0
-    func runningApplications() -> [ApplicationReference] { [] }
+    var running: [ApplicationReference] = []
+    func runningApplications() -> [ApplicationReference] { running }
     func defaultFavorites() -> [ApplicationReference] { [] }
     func resolvedURL(for reference: ApplicationReference) -> URL? { reference.url }
     func icon(for url: URL?) -> NSImage { NSImage(size: NSSize(width: 48, height: 48)) }

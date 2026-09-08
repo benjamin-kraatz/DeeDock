@@ -19,6 +19,27 @@ struct DockSettingsTests {
         #expect(settings.windowPeekHoverDelay == 0.4)
     }
 
+    @Test("Launch animation settings migrate, round-trip, and resume inheritance")
+    func launchAnimationPersistence() throws {
+        let encoded = try JSONEncoder().encode(DockSettings.defaults)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "launchAnimation")
+        let legacy = try JSONDecoder().decode(DockSettings.self, from: JSONSerialization.data(withJSONObject: object))
+        #expect(legacy.launchAnimation == .bounce)
+        for style in DockLaunchAnimation.allCases {
+            var shared = DockSettings.defaults
+            shared.launchAnimation = style
+            let decoded = try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(shared))
+            #expect(decoded.launchAnimation == style)
+            var overrides = DockSettingsOverrides()
+            overrides.set(.launchAnimation, from: shared)
+            let restored = try JSONDecoder().decode(DockSettingsOverrides.self, from: JSONEncoder().encode(overrides))
+            #expect(restored.resolving(.defaults).launchAnimation == style)
+            overrides.set(.launchAnimation, from: nil)
+            #expect(overrides.resolving(shared).launchAnimation == style)
+        }
+    }
+
     @Test("Settings saved before Window Peek receive the Balanced defaults")
     func windowPeekBackwardDecode() throws {
         let encoded = try JSONEncoder().encode(DockSettings.defaults)

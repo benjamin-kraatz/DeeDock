@@ -1,276 +1,1998 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-  "bossFightEnable": {
-    "comment": "Explicit opt-in toggle for the optional Focus Session Easter egg; off by default.",
+    "bossFightEnable" : {
+      "comment" : "Explicit opt-in toggle for the optional Focus Session Easter egg; off by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Boss Fight"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss Fight aktivieren"
+          }
+        }
+      }
+    },
+    "bossFightHelp" : {
+      "comment" : "Explain the timer-only meaning and silent completion effect.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An optional timer skin. Boss health shows time remaining, not productivity. Completion brings a brief, silent celebration."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein optionales Design für den Timer. Die Boss-Lebensleiste zeigt die verbleibende Zeit, nicht deine Produktivität. Zum Abschluss gibt es eine kurze, lautlose Feier."
+          }
+        }
+      }
+    },
+    "bossFightTitle" : {
+      "comment" : "Name of the optional Focus Session Easter egg. Keep the product name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss Fight"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss Fight"
+          }
+        }
+      }
+    },
+    "bossFightParty" : {
+      "comment" : "Chosen work apps shown as the party in the optional timer skin.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your party"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Gruppe"
+          }
+        }
+      }
+    },
+    "bossFightPartyEmpty" : {
+      "comment" : "Empty party prompt in Boss Fight settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose work apps to join your party."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle Arbeits-Apps für deine Gruppe aus."
+          }
+        }
+      }
+    },
+    "bossFightChooseApps" : {
+      "comment" : "Opens the native app-bundle picker; does not launch the selected apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose work apps…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbeits-Apps auswählen …"
+          }
+        }
+      }
+    },
+    "bossFightPartyLimit" : {
+      "comment" : "Party selection limit and its decorative-only behavior.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to 8 apps. This only changes their appearance in the timer; apps remain unrestricted."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bis zu 8 Apps. Die Auswahl betrifft nur die Anzeige im Timer; alle Apps bleiben frei nutzbar."
+          }
+        }
+      }
+    },
+    "bossFightRemoveApp" : {
+      "comment" : "Accessible remove button; argument is the app name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@ from party"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ aus der Gruppe entfernen"
+          }
+        }
+      }
+    },
+    "bossFightPickerFailed" : {
+      "comment" : "Native app picker failure; no app was added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app selection could not be opened. Please try again."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App-Auswahl konnte nicht geöffnet werden. Bitte versuche es erneut."
+          }
+        }
+      }
+    },
+    "bossFightHealth" : {
+      "comment" : "Progress label stating that health is only remaining time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss health · time remaining"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss-Lebensleiste · verbleibende Zeit"
+          }
+        }
+      }
+    },
+    "bossFightVictory" : {
+      "comment" : "Brief, silent completion message. Never describes productivity.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss defeated. Session complete!"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss besiegt. Session abgeschlossen!"
+          }
+        }
+      }
+    },
+    "bossFightDismissCelebration" : {
+      "comment" : "Stops the short ornament while retaining the completed timer and Capsule action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss celebration"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feier ausblenden"
+          }
+        }
+      }
+    },
+    "bossFightDisable" : {
+      "comment" : "Immediately returns to normal Focus Session appearance without changing the timer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable Boss Fight"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boss Fight deaktivieren"
+          }
+        }
+      }
+    },
+    "bossFightCancelSession" : {
+      "comment" : "Cancels the focus timer without completion or celebration.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel session"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session abbrechen"
+          }
+        }
+      }
+    },
+    "bossFightTimeRemaining" : {
+      "comment" : "Accessible timer value; argument is the remaining time formatted as minutes:seconds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ remaining"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ verbleibend"
+          }
+        }
+      }
+    },
+    "badgeMemoryApps" : {
+      "comment" : "Heading of the list of apps that have retained badge history.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracked apps"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasste Apps"
+          }
+        }
+      }
+    },
+    "badgeMemoryChangesCount" : {
+      "comment" : "Number of observed badge changes recorded for one app in a focus digest.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld change"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld changes"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Änderung"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Änderungen"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "badgeMemoryDeltaLabel" : {
+      "comment" : "Label of the tile showing the change since the last checked value.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Since last checked"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seit der letzten Prüfung"
+          }
+        }
+      }
+    },
+    "badgeMemoryEnded" : {
+      "comment" : "Label for the time a focus digest stopped collecting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ended"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestoppt"
+          }
+        }
+      }
+    },
+    "badgeMemoryHistoryEmpty" : {
+      "comment" : "Shown when a tracked app has a baseline but no retained changes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No changes recorded for this app yet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diese App wurden noch keine Änderungen erfasst."
+          }
+        }
+      }
+    },
+    "badgeMemoryNoAppSelected" : {
+      "comment" : "Placeholder shown while no app is selected in the badge details list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose an app to see its badge history."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle eine App, um ihren Badge-Verlauf zu sehen."
+          }
+        }
+      }
+    },
+    "badgeMemoryStarted" : {
+      "comment" : "Label for the time a focus digest began collecting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Started"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestartet"
+          }
+        }
+      }
+    },
+    "fileRouteActivateHelp" : {
+      "comment" : "Explains what activation does and does not do, next to the activate action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brings the destination forward. The files stay here until you drag them."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holt das Ziel nach vorn. Die Dateien bleiben hier, bis du sie ziehst."
+          }
+        }
+      }
+    },
+    "fileRouteCopyHelp" : {
+      "comment" : "Explains the clipboard action next to Copy file references.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puts the file references on the clipboard, for apps that accept paste."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legt die Dateiverweise in die Zwischenablage – für Apps, die Einfügen unterstützen."
+          }
+        }
+      }
+    },
+    "fileRouteFailuresTitle" : {
+      "comment" : "Heading above the filenames an app-level open request did not accept.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not accepted"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht angenommen"
+          }
+        }
+      }
+    },
+    "fileRouteFileCount" : {
+      "comment" : "Count of file references held by the handoff panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "fileRouteFilesTitle" : {
+      "comment" : "Heading of the file list inside the handoff panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien"
+          }
+        }
+      }
+    },
+    "fileRouteMoreActions" : {
+      "comment" : "Heading above the handoff actions that are alternatives to dragging.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other ways to continue"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Möglichkeiten"
+          }
+        }
+      }
+    },
+    "fileRouteWindowDestination" : {
+      "comment" : "Label for a destination that is one exact accessible window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected window"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewähltes Fenster"
+          }
+        }
+      }
+    },
+    "fileRouteDestinationUnavailable" : {
+      "comment" : "File destination disappeared or Peek was disabled before picker or drop completion.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This destination is no longer available. Choose a running app with Window Peek enabled."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Ziel ist nicht mehr verfügbar. Wähle eine laufende App mit aktiviertem Window Peek."
+          }
+        }
+      }
+    },
+    "fileRouteCaptureFallback" : {
+      "comment" : "Shown on capture-only cards while choosing a file handoff destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These previews support app-level handoff only. Selecting a card does not activate or deliver files to that window."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Vorschauen unterstützen nur die Übergabe auf App-Ebene. Die Auswahl einer Karte aktiviert das gezeigte Fenster nicht und übergibt ihm keine Dateien."
+          }
+        }
+      }
+    },
+    "fileRouteActivateApp" : {
+      "comment" : "Explicit app-level activation fallback.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App aktivieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate app"
+          }
+        }
+      }
+    },
+    "fileRouteActivateWindow" : {
+      "comment" : "Explicit activation of the exact AX window token.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewähltes Fenster aktivieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate selected window"
+          }
+        }
+      }
+    },
+    "fileRouteActivated" : {
+      "comment" : "Activation success is not file delivery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Ziel wurde aktiviert. Ziehe die Dateien hinein oder füge sie ein, wenn die App Dateiverweise unterstützt. Prüfe das Ergebnis im Ziel."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination activated. Drag the files into it, or paste if the app supports file references. Check the result in the destination."
+          }
+        }
+      }
+    },
+    "fileRouteAppDestination" : {
+      "comment" : "No exact accessible window is available.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziel auf App-Ebene"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-level destination"
+          }
+        }
+      }
+    },
+    "fileRouteAppUnavailable" : {
+      "comment" : "Activation failed because the original process terminated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App läuft nicht mehr. Wähle das Ziel erneut aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app is no longer running. Choose a destination again."
+          }
+        }
+      }
+    },
+    "fileRouteChecking" : {
+      "comment" : "Status while validating file references without opening them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien werden geprüft …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking files…"
+          }
+        }
+      }
+    },
+    "fileRouteChooseFiles" : {
+      "comment" : "Keyboard and accessibility entry from Window Peek.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien für ein Fenster auswählen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose files for a window…"
+          }
+        }
+      }
+    },
+    "fileRouteClose" : {
+      "comment" : "Dismisses handoff and releases temporary file grants.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übergabe schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close handoff"
+          }
+        }
+      }
+    },
+    "fileRouteCopied" : {
+      "comment" : "Explicit clipboard copy succeeded; scope is held by the panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateiverweise kopiert. Füge sie im Ziel ein, sofern es dies unterstützt. Lass dieses Fenster geöffnet, solange du die Dateien verwendest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File references copied. Paste in the destination if supported. Keep this panel open while using these files."
+          }
+        }
+      }
+    },
+    "fileRouteCopy" : {
+      "comment" : "Explicit clipboard operation, also Command C.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateiverweise kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy file references"
+          }
+        }
+      }
+    },
+    "fileRouteCopyFailed" : {
+      "comment" : "Clipboard write failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateiverweise konnten nicht kopiert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not copy file references."
+          }
+        }
+      }
+    },
+    "fileRouteDragFiles" : {
+      "comment" : "Native copy-only drag handle for the complete ordered batch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Dateien ziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag these files"
+          }
+        }
+      }
+    },
+    "fileRouteDragHelp" : {
+      "comment" : "Accessibility hint for the outgoing drag handle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe die Dateien in das echte Zielfenster. Nutze mit der Tastatur „Dateiverweise kopieren“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag into the real destination window. Use Copy file references for keyboard access."
+          }
+        }
+      }
+    },
+    "fileRouteDropApp" : {
+      "comment" : "Fallback drop target when there is no exact window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für Übergabe auf App-Ebene ablegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop for app-level handoff"
+          }
+        }
+      }
+    },
+    "fileRouteDropHelp" : {
+      "comment" : "Instructions during a file drag through Peek.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lege die Dateien auf einem Fenster ab, um die Übergabe auszuwählen. Erst deine nächste Aktion öffnet Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop on a window to choose a handoff. Files will not open until you choose an action."
+          }
+        }
+      }
+    },
+    "fileRouteFileFailed" : {
+      "comment" : "Failed filename followed by the system error. Preserve both placeholders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "fileRouteHandoffHelp" : {
+      "comment" : "Explains the deliberate manual handoff, without claiming synthetic drop delivery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Fenster hält Dateiverweise bereit. Aktiviere das Ziel und ziehe die Dateien von hier in das echte Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This panel holds file references. Activate the destination, then drag the files from here into the real window."
+          }
+        }
+      }
+    },
+    "fileRouteHover" : {
+      "comment" : "Dock feedback during deliberate file drag dwell.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halten, um ein Fenster auszuwählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold to choose a window"
+          }
+        }
+      }
+    },
+    "fileRouteInvalid" : {
+      "comment" : "Complete batch rejection, including missing files and the 100 item limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Auswahl ist nicht verfügbar oder enthält nicht unterstützte Dateien. Wähle erneut bis zu 100 Dateien oder Ordner aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This selection is unavailable or contains unsupported files. Choose up to 100 files or folders again."
+          }
+        }
+      }
+    },
+    "fileRouteOpenApp" : {
+      "comment" : "Asks Workspace to open files with the application; not targeted to a selected window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen auf App-Ebene anfragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request app-level open"
+          }
+        }
+      }
+    },
+    "fileRouteOpenHelp" : {
+      "comment" : "Explains limits before opening files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Öffnen auf App-Ebene können neue Fenster entstehen. Anhängen und Zu einem Projekt hinzufügen erfordern eine unterstützte App-Integration."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-level open may create new windows. Attach and Add to project require a supported app integration."
+          }
+        }
+      }
+    },
+    "fileRouteOpenResult" : {
+      "comment" : "Counts describe Workspace requests, not verified document delivery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS hat %1$lld von %2$lld Öffnungsanfragen an die App angenommen. Die App bestimmt die Zielfenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS accepted %1$lld of %2$lld app-level open requests. The app chooses the receiving windows."
+          }
+        }
+      }
+    },
+    "fileRoutePreview" : {
+      "comment" : "Explicit Quick Look action for a selected source file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateivorschau"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview file"
+          }
+        }
+      }
+    },
+    "fileRouteReady" : {
+      "comment" : "Status after file validation succeeds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Dateien sind bereit. Wähle, wie du fortfahren möchtest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files are ready. Choose how to continue."
+          }
+        }
+      }
+    },
+    "fileRouteSelectDestination" : {
+      "comment" : "Keyboard picker completed; choosing a card opens the handoff panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Ziel für diese Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a destination for these files."
+          }
+        }
+      }
+    },
+    "fileRouteTitle" : {
+      "comment" : "Title of the file handoff panel opened after choosing a Peek destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien übergeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File handoff"
+          }
+        }
+      }
+    },
+  "settingsLaunchAnimation": {
+    "comment": "Title of the app icon launch animation gallery.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Enable Boss Fight"
+          "value": "App launch animation"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Boss Fight aktivieren"
+          "value": "Animation beim App-Start"
         }
       }
     }
   },
-  "bossFightHelp": {
-    "comment": "Explain the timer-only meaning and silent completion effect.",
+  "settingsLaunchAnimationHelp": {
+    "comment": "Explains launch animation previews and the accessibility fallback.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "An optional timer skin. Boss health shows time remaining, not productivity. Completion brings a brief, silent celebration."
+          "value": "Choose an animation for apps opened through DDock. Select a preset to preview it. Reduce Motion keeps the loading indicator."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Ein optionales Design für den Timer. Die Boss-Lebensleiste zeigt die verbleibende Zeit, nicht deine Produktivität. Zum Abschluss gibt es eine kurze, lautlose Feier."
+          "value": "Wähle eine Animation für Apps, die du über DDock startest. Klicke auf eine Variante, um sie anzusehen. Bei reduzierter Bewegung bleibt die Ladeanzeige."
         }
       }
     }
   },
-  "bossFightTitle": {
-    "comment": "Name of the optional Focus Session Easter egg. Keep the product name.",
+  "launchAnimationBounce": {
+    "comment": "Launch preset: two hops away from the dock edge.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Boss Fight"
+          "value": "Classic Bounce"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Boss Fight"
+          "value": "Klassisches Hüpfen"
         }
       }
     }
   },
-  "bossFightParty": {
-    "comment": "Chosen work apps shown as the party in the optional timer skin.",
+  "launchAnimationSpring": {
+    "comment": "Launch preset: elastic stretching and compression.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Your party"
+          "value": "Spring"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Deine Gruppe"
+          "value": "Feder"
         }
       }
     }
   },
-  "bossFightPartyEmpty": {
-    "comment": "Empty party prompt in Boss Fight settings.",
+  "launchAnimationPulse": {
+    "comment": "Launch preset: the icon grows and shrinks.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Choose work apps to join your party."
+          "value": "Pulse"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Wähle Arbeits-Apps für deine Gruppe aus."
+          "value": "Pulsieren"
         }
       }
     }
   },
-  "bossFightChooseApps": {
-    "comment": "Opens the native app-bundle picker; does not launch the selected apps.",
+  "launchAnimationWobble": {
+    "comment": "Launch preset: the icon rocks from side to side.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Choose work apps…"
+          "value": "Wobble"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Arbeits-Apps auswählen …"
+          "value": "Wackeln"
         }
       }
     }
   },
-  "bossFightPartyLimit": {
-    "comment": "Party selection limit and its decorative-only behavior.",
+  "launchAnimationFlip": {
+    "comment": "Launch preset: a full three-dimensional turn.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Up to 8 apps. This only changes their appearance in the timer; apps remain unrestricted."
+          "value": "Flip"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Bis zu 8 Apps. Die Auswahl betrifft nur die Anzeige im Timer; alle Apps bleiben frei nutzbar."
+          "value": "Drehung"
         }
       }
     }
   },
-  "bossFightRemoveApp": {
-    "comment": "Accessible remove button; argument is the app name supplied by macOS.",
+  "launchAnimationNone": {
+    "comment": "Launch preset: no artwork motion, retain the loading indicator.",
     "extractionState": "manual",
     "localizations": {
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Remove %@ from party"
+          "value": "Indicator only"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "%@ aus der Gruppe entfernen"
+          "value": "Nur Ladeanzeige"
         }
       }
     }
   },
-  "bossFightPickerFailed": {
-    "comment": "Native app picker failure; no app was added.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "The app selection could not be opened. Please try again."
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Die App-Auswahl konnte nicht geöffnet werden. Bitte versuche es erneut."
-        }
+    "badgeMemoryTitle": {
+  "comment": "Badge memory: Badge memory Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge memory"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Verlauf"
       }
     }
-  },
-  "bossFightHealth": {
-    "comment": "Progress label stating that health is only remaining time.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Boss health · time remaining"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Boss-Lebensleiste · verbleibende Zeit"
-        }
+  }
+},
+    "badgeMemoryHelp": {
+  "comment": "Badge memory: Badge changes are net counts, not new-message totals. Opening an app does not mark it checked. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge changes are net counts, not new-message totals. Opening an app does not mark it checked."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Änderungen zeigen die Differenz, nicht die Anzahl neuer Nachrichten. Das Öffnen einer App setzt den Vergleichswert nicht zurück."
       }
     }
-  },
-  "bossFightVictory": {
-    "comment": "Brief, silent completion message. Never describes productivity.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Boss defeated. Session complete!"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Boss besiegt. Session abgeschlossen!"
-        }
+  }
+},
+    "badgeMemoryDetails": {
+  "comment": "Badge memory: Badge details Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge details"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Details"
       }
     }
-  },
-  "bossFightDismissCelebration": {
-    "comment": "Stops the short ornament while retaining the completed timer and Capsule action.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Dismiss celebration"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Feier ausblenden"
-        }
+  }
+},
+    "badgeMemoryDigest": {
+  "comment": "Badge memory: Focus badge digest Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Focus badge digest"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Rückblick zur Fokus-Sitzung"
       }
     }
-  },
-  "bossFightDisable": {
-    "comment": "Immediately returns to normal Focus Session appearance without changing the timer.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Disable Boss Fight"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Boss Fight deaktivieren"
-        }
+  }
+},
+    "badgeMemoryEmpty": {
+  "comment": "Badge memory: No badge history yet. Enable app badges, then open an app’s badge details. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No badge history yet. Enable app badges, then open an app’s badge details."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Noch kein Badge-Verlauf. Aktiviere App-Badges und öffne die Badge-Details einer App."
       }
     }
-  },
-  "bossFightCancelSession": {
-    "comment": "Cancels the focus timer without completion or celebration.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Cancel session"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Session abbrechen"
-        }
+  }
+},
+    "badgeMemoryApp": {
+  "comment": "Badge memory: Application Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Application"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "App"
       }
     }
-  },
-  "bossFightTimeRemaining": {
-    "comment": "Accessible timer value; argument is the remaining time formatted as minutes:seconds.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "%@ remaining"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "%@ verbleibend"
-        }
+  }
+},
+    "badgeMemorySelectApp": {
+  "comment": "Badge memory: Choose an app Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Choose an app"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "App auswählen"
       }
     }
-  },
+  }
+},
+    "badgeMemoryCollect": {
+  "comment": "Badge memory: Collect badge changes in future Focus Sessions Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Collect badge changes in future Focus Sessions"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Änderungen in künftigen Fokus-Sitzungen sammeln"
+      }
+    }
+  }
+},
+    "badgeMemoryRetention": {
+  "comment": "Badge memory: Up to 100 apps, 20 changes per app and 10 digests. History expires after 7 days; checked baselines after 30 days. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Up to 100 apps, 20 changes per app and 10 digests. History expires after 7 days; checked baselines after 30 days."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Bis zu 100 Apps, 20 Änderungen je App und 10 Rückblicke. Der Verlauf verfällt nach 7 Tagen, Vergleichswerte nach 30 Tagen."
+      }
+    }
+  }
+},
+    "badgeMemoryClose": {
+  "comment": "Badge memory: Close Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Close"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Schließen"
+      }
+    }
+  }
+},
+    "badgeMemoryClearAll": {
+  "comment": "Badge memory: Clear all badge history Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Clear all badge history"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Gesamten Badge-Verlauf löschen"
+      }
+    }
+  }
+},
+    "badgeMemoryClearHelp": {
+  "comment": "Badge memory: Delete all baselines, history and digests, and turn off focus collection. Current source-app badges stay as they are. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete all baselines, history and digests, and turn off focus collection. Current source-app badges stay as they are."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Alle Vergleichswerte, Verläufe und Rückblicke löschen und die Sammlung für Fokus-Sitzungen ausschalten. Die Badges der Apps bleiben unverändert."
+      }
+    }
+  }
+},
+    "badgeMemoryUnknown": {
+  "comment": "Badge memory: Unavailable observation Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Unavailable observation"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Beobachtung nicht verfügbar"
+      }
+    }
+  }
+},
+    "badgeMemoryCleared": {
+  "comment": "Badge memory: Cleared (0) Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Cleared (0)"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Geleert (0)"
+      }
+    }
+  }
+},
+    "badgeMemoryCount": {
+  "comment": "Badge memory: Count: %1$lld Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Count: %1$lld"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Anzahl: %1$lld"
+      }
+    }
+  }
+},
+    "badgeMemoryText": {
+  "comment": "Badge memory: Text badge: %1$@ Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Text badge: %1$@"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Text-Badge: %1$@"
+      }
+    }
+  }
+},
+    "badgeMemoryCurrent": {
+  "comment": "Badge memory: Current observation Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Current observation"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Aktuelle Beobachtung"
+      }
+    }
+  }
+},
+    "badgeMemoryBaseline": {
+  "comment": "Badge memory: Last checked value Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Last checked value"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Zuletzt geprüfter Wert"
+      }
+    }
+  }
+},
+    "badgeMemoryDelta": {
+  "comment": "Badge memory: %1$@ since last checked The placeholder is a signed net count, never a message total.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "%1$@ since last checked"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "%1$@ seit der letzten Prüfung"
+      }
+    }
+  }
+},
+    "badgeMemoryNoDelta": {
+  "comment": "Badge memory: No numeric comparison available. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No numeric comparison available."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Kein Zahlenvergleich verfügbar."
+      }
+    }
+  }
+},
+    "badgeMemoryNoBaseline": {
+  "comment": "Badge memory: Not marked checked yet. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Not marked checked yet."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Noch nicht als geprüft markiert."
+      }
+    }
+  }
+},
+    "badgeMemoryMarkChecked": {
+  "comment": "Badge memory: Mark checked Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Mark checked"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Als geprüft markieren"
+      }
+    }
+  }
+},
+    "badgeMemoryResetBaseline": {
+  "comment": "Badge memory: Reset baseline Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reset baseline"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Vergleichswert zurücksetzen"
+      }
+    }
+  }
+},
+    "badgeMemoryOpenApp": {
+  "comment": "Badge memory: Open app Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Open app"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "App öffnen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteApp": {
+  "comment": "Badge memory: Delete this app’s history Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete this app’s history"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Verlauf dieser App löschen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteAppHelp": {
+  "comment": "Badge memory: Delete this app’s baseline, changes and rows in every focus digest. Later observed changes can be recorded again. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete this app’s baseline, changes and rows in every focus digest. Later observed changes can be recorded again."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Den Vergleichswert, die Änderungen und alle Einträge dieser App in Fokus-Rückblicken löschen. Spätere beobachtete Änderungen können wieder erfasst werden."
+      }
+    }
+  }
+},
+    "badgeMemoryRecent": {
+  "comment": "Badge memory: Recent observed changes Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Recent observed changes"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Zuletzt beobachtete Änderungen"
+      }
+    }
+  }
+},
+    "badgeMemoryDigestHelp": {
+  "comment": "Badge memory: Net change compares the first and last observed values. Pauses, downtime and unavailable observations leave gaps. App badges must be enabled. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Net change compares the first and last observed values. Pauses, downtime and unavailable observations leave gaps. App badges must be enabled."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die Differenz vergleicht den ersten mit dem letzten beobachteten Wert. Pausen, Ausfallzeiten und fehlende Beobachtungen hinterlassen Lücken. App-Badges müssen aktiviert sein."
+      }
+    }
+  }
+},
+    "badgeMemoryDigestEmpty": {
+  "comment": "Badge memory: No focus digest yet. Enable collection before starting a Focus Session. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No focus digest yet. Enable collection before starting a Focus Session."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Noch kein Fokus-Rückblick. Aktiviere die Sammlung vor dem Start einer Fokus-Sitzung."
+      }
+    }
+  }
+},
+    "badgeMemoryGap": {
+  "comment": "Badge memory: Incomplete observation coverage. Changes may have been missed. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Incomplete observation coverage. Changes may have been missed."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die Beobachtung ist lückenhaft. Änderungen können fehlen."
+      }
+    }
+  }
+},
+    "badgeMemoryNoChanges": {
+  "comment": "Badge memory: No changes observed in the retained apps. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "No changes observed in the retained apps."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Keine Änderungen bei den gespeicherten Apps beobachtet."
+      }
+    }
+  }
+},
+    "badgeMemoryFirst": {
+  "comment": "Badge memory: First observed value Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "First observed value"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Erster beobachteter Wert"
+      }
+    }
+  }
+},
+    "badgeMemoryLast": {
+  "comment": "Badge memory: Last observed value Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Last observed value"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Letzter beobachteter Wert"
+      }
+    }
+  }
+},
+    "badgeMemoryNet": {
+  "comment": "Badge memory: Net observed change: %1$@ The placeholder is a signed net count, never a message total.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Net observed change: %1$@"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Beobachtete Differenz: %1$@"
+      }
+    }
+  }
+},
+    "badgeMemoryOpenNamedApp": {
+  "comment": "Badge memory: Open %1$@ Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Open %1$@"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "%1$@ öffnen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteDigest": {
+  "comment": "Badge memory: Delete digest Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete digest"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Rückblick löschen"
+      }
+    }
+  }
+},
+    "badgeMemoryDeleteDigestHelp": {
+  "comment": "Badge memory: Delete this digest. An active session will stop collecting until the next session. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Delete this digest. An active session will stop collecting until the next session."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Diesen Rückblick löschen. Für eine laufende Sitzung endet die Sammlung bis zur nächsten Sitzung."
+      }
+    }
+  }
+},
+    "badgeMemoryCollecting": {
+  "comment": "Badge memory: Collecting Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Collecting"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Sammlung läuft"
+      }
+    }
+  }
+},
+    "badgeMemoryFinished": {
+  "comment": "Badge memory: Finished Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Finished"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Beendet"
+      }
+    }
+  }
+},
+    "badgeMemoryReview": {
+  "comment": "Badge memory: Review badge history… Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Review badge history…"
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge-Verlauf ansehen …"
+      }
+    }
+  }
+},
+    "badgeMemorySettingsHelp": {
+  "comment": "Badge memory: Collection is off by default. Enabling applies to the next session; disabling stops collection now. Click a badge, use Badge details in an app’s menu, or press B in Focus Dock. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Collection is off by default. Enabling applies to the next session; disabling stops collection now. Click a badge, use Badge details in an app’s menu, or press B in Focus Dock."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die Sammlung ist zunächst aus. Einschalten gilt ab der nächsten Sitzung, Ausschalten beendet die Sammlung sofort. Klicke auf ein Badge, wähle Badge-Details im App-Menü oder drücke B in „Dock fokussieren“."
+      }
+    }
+  }
+},
+    "badgeMemoryStorageFailed": {
+  "comment": "Badge memory: Badge history could not be read or saved. Clear all badge history to reset it. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Badge history could not be read or saved. Clear all badge history to reset it."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Der Badge-Verlauf konnte nicht gelesen oder gespeichert werden. Lösche den gesamten Badge-Verlauf, um ihn zurückzusetzen."
+      }
+    }
+  }
+},
+    "badgeMemoryActivationFailed": {
+  "comment": "Badge memory: The app could not be opened. It may have moved or been removed. Values and application names come from the source app when present.",
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "The app could not be opened. It may have moved or been removed."
+      }
+    },
+    "de": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Die App konnte nicht geöffnet werden. Sie wurde möglicherweise verschoben oder entfernt."
+      }
+    }
+  }
+},
   "watchSetupInterrupted": {
     "comment": "Watch setup interrupted by sleep or session change; user must reopen deliberately.",
     "extractionState": "manual",

@@ -447,7 +447,7 @@ Added on 2026-09-03. Available application icons accept existing files, document
 
 The native drag coordinator owns payload validation and routes document targets through clipped icon geometry and the existing animation coordinate conversion. Metadata work runs outside pointer callbacks. Checking and rejected batches cannot be dropped. Document feedback uses an accent outline and localized target text without pin-insertion gaps. Either collapsed section temporarily expands after a 0.5-second document hover and restores its previous state when dragging ends. Completely hidden sections remain hidden.
 
-Spring-loading uses the AppKit destination protocol and system hover and Force Click preferences. Activation requests contain no documents. Actual drops and confirmed picker selections create independent catalog requests, including repeated batches while an app is launching. Temporary security-scope access remains owned through validation and handoff. Display removal invalidates its UI callbacks without discarding an accepted request; shutdown cancels owned tasks. Submitted OS operations cannot be rolled back, and a successful handoff does not establish that every document appeared in the receiving app.
+Historical behavior, superseded for application icons by DEE-12: spring-loading used the AppKit destination protocol and system hover and Force Click preferences. Activation requests contained no documents. Actual drops and confirmed picker selections create independent catalog requests, including repeated batches while an app is launching. Temporary security-scope access remains owned through validation and handoff. Display removal invalidates its UI callbacks without discarding an accepted request; shutdown cancels owned tasks. Submitted OS operations cannot be rolled back, and a successful handoff does not establish that every document appeared in the receiving app.
 
 Open Files… is available through app context menus, VoiceOver actions, and Command-O in Focus Dock. One app-owned native picker captures its original target, accepts multiple files and folders, and treats packages as items. Repeated commands bring that picker forward. The initiating dock remains visible until dismissal; removing it cancels the picker. Cancellation restores the originating dock selection or external application only while DeeDock still owns foreground focus. No document bookmarks, history, or preferences are stored.
 
@@ -966,8 +966,9 @@ Compilation is not native acceptance; DEE-18 must remain open for the documented
 A GPT 5.6 Luna review at Extra High prompted follow-up fixes for picker cancellation,
 normal-timer accessibility copy, and party/zero-health visibility during victory. The
 focused app build passed again on 2026-09-08 after those changes. The latest main branch
-was merged on this feature branch; the catalog conflict preserves both Window Watch
-and Boss Fight entries. No native acceptance was performed as part of the review.
+was merged on this feature branch; the catalog conflict preserves Boss Fight, badge
+memory, file-handoff, and launch-animation entries. The Focus Session panel still offers
+the digest action from DEE-17. No native acceptance was performed as part of the review.
 
 ### Original timer implementation
 
@@ -1331,3 +1332,93 @@ DEE-11 integration with DEE-14: resolved the latest main conflicts while preserv
 Fusion, and Portal actions, keyboard shortcuts, localization, and acceptance notes. The focused
 Debug app build passed at `/tmp/DeeDock-dee11-portals-merge-build.log`. Tests and native acceptance
 were not run.
+
+## DEE-12: files through Window Peek
+
+`feature/dee-12` adds delayed file-drag Peek, destination selection, a retained file handoff panel,
+copy-only outgoing native drags, explicit clipboard references, and serial app-level open requests.
+An exact Accessibility window can be activated deliberately. Capture-only cards and missing window
+access retain a labeled app-level fallback. No cross-process synthetic drop or app-specific attachment
+integration is claimed.
+
+Focused Debug app builds with Xcode 27 succeeded during implementation. The initial build reported
+existing unused-value warnings in LauncherPresentationController and DockBadgeController; App Intents
+metadata extraction also reports that this target has no AppIntents dependency. No tests, app launch,
+or automated visual checks ran. Native acceptance remains open.
+
+See [file handoff controls, API findings, state cases, and manual checklist](WINDOW-FILE-HANDOFF.md).
+
+DEE-12 final implementation check on 2026-09-08: the focused Debug build passed with
+`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination
+'platform=macOS' -derivedDataPath /tmp/deedock-dee12-build build CODE_SIGNING_ALLOWED=NO`.
+All 28 new handoff keys matched their compiled `en.lproj` and `de.lproj` resources.
+
+## DEE-17: badge memory and Focus digest
+
+Implemented on `feature/dee-17`. Badge details show explicit checked baselines and numeric net changes, keeping clear, text and unavailable observations separate. The existing DEE-10 reader supplies all observations. Opt-in collection follows Focus Session boundaries and retains bounded digests with source activation and deletion controls.
+
+See [Badge memory](BADGE_MEMORY.md) for observation reliability, identity, retention, model/state cases and the manual checklist. A focused unsigned Debug app build passed after correcting an Int64-to-Int argument for a generated localized string. Tests, previews, automated visual checks and native acceptance were not executed. Keyboard/VoiceOver, badge hit regions, permission loss, all dock edges, multiple displays, Spaces, sleep/restart and actual source badge behavior remain unverified. Compilation alone does not make DEE-17 Done.
+
+DEE-17 validation after integrating `origin/main`: the focused unsigned Debug app build passed, including the scan-boundary fix. Command: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee17-build CODE_SIGNING_ALLOWED=NO build`. Log: `/tmp/DeeDock-dee17-build.log`. All 43 badge-memory keys matched the compiled English and German `Localizable.strings` resources. No tests or native checks were run.
+
+GPT 5.6 Luna at Extra High reviewed DEE-17 and found five defects. Corrections prevent first samples after relaunch from recreating deleted app history, retain per-session exclusions for deleted digest rows, seed first Focus observations without counting a change, cover the full possible badge width with the details hit target, retain the Focus deadline through startup completion, and enforce the 4 MB limit before writing. The review did not run tests or native checks. A focused unsigned Debug app build passed after the corrections.
+
+### DEE-12 review and main integration
+
+GPT 5.6 Luna at Extra High reviewed the file-routing implementation. Follow-up changes cancel an
+unfinished dwell on every icon exit and retain the operation advertised during each target visit.
+If a window-selection destination becomes unavailable before release, the drop reports an error
+instead of opening files at app level. The Peek affordance now checks running state explicitly.
+The review also inspected exact AX token transfer, source grants, ordering, native destination
+registration, and outgoing copy-only drags. This was static review, not native acceptance.
+
+Merged `origin/main` into `feature/dee-12` in the same worktree and resolved the String Catalog and
+acceptance-note conflicts. Every catalog entry from both branches was preserved. The merged Debug
+build passed at `/tmp/dee12-merge-build.log`. The build after review fixes passed at
+`/tmp/dee12-review-build.log`, with only the App Intents metadata-extraction notice in that final
+incremental build. Tests and automated visual checks were not run.
+
+## App launch animations
+
+Appearance includes Classic Bounce, Spring, Pulse, Wobble, Flip, and Indicator only.
+The gallery previews the production motion without launching an app. Classic Bounce is the
+default for new and existing settings; each display can override it or use the shared setting.
+English and German copy is included in the String Catalog.
+
+The shared application catalog emits a visual signal when DDock opens an app that is not
+running. Activating or hiding a running app and opening documents keep their existing busy
+feedback. Fast launches retain one animation cycle; slower launches repeat until completion,
+then finish the current cycle. Failed launches clear their signal. Motion stops after 30 seconds
+even if Workspace has not completed; the loading indicator remains until the request ends.
+Hidden or faded docks and Reduce Motion suppress artwork motion. Removing a tile cancels its
+visual task. Each edge directs the bounce into the display; layout and click targets stay fixed.
+
+A focused unsigned Debug build of the DeeDock scheme passed. No tests or native visual checks
+were run. Hands-on acceptance remains open for all five presets on all four edges, crowded and
+magnified docks, rapid and slow launches, failures, simultaneous launches on multiple displays,
+shared-setting persistence and reset, Reduce Motion changes, display removal, Spaces, full-screen
+apps, and sleep/wake. Classic Bounce is a custom Dock-style animation; exact system Dock timing
+parity has not been established.
+
+### Live follow-up
+
+Computer Use exercised the six gallery choices and captured distinct Spring, Pulse, Wobble,
+Flip, and Classic Bounce poses. Calculator opened through pinned icons on a side dock and a
+horizontal dock. The captured real-launch frames did not establish that Classic Bounce played;
+that path remains an acceptance failure pending investigation, even though the gallery moved.
+
+The check found closed apps incorrectly announced as unavailable. Their accessibility value now
+uses the existing localized Not Running status. The Indicator only gallery choice also lacked
+its loading indicator; the gallery now uses `DockIconPresentation` to preview the same artwork
+and progress feedback as the dock. These corrections compile but still need a live recheck.
+
+The final unsigned Debug app build passed. Focused ApplicationCatalogTests and DockSettingsTests
+were attempted, including new launch-signal and settings-persistence regressions. No tests ran:
+the test target fails to compile its existing DockInteraction dependencies because
+ActionTilesController and DockBadgeController are missing. The new launch preset model is now
+included in the test target's explicit sources.
+
+The Mac locked during the check and Computer Use could not unlock it. Native rechecks, restoring
+temporary test preferences and pins, Reduce Motion, per-display inheritance, slow launches,
+failures, Spaces, full-screen apps, and sleep/wake remain open. No native acceptance is claimed
+for those cases.

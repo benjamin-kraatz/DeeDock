@@ -56,6 +56,7 @@ final class DockPanelController {
             updatePointer(); present()
         }
         store.openLauncher = { [weak self] in self?.openLauncher() }
+        interaction.applicationCatalog = store.launcherCatalog
         interaction.openLauncher = store.openLauncher
         interaction.movePin = { [weak store] id, distance in store?.movePin(id, by: distance) }
         interaction.canMovePin = { [weak store] id, distance in store?.canMovePin(id, by: distance) ?? false }
@@ -129,6 +130,7 @@ final class DockPanelController {
         accessibilityIDs.formIntersection(exposedIDs)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.animateIndicators = settings.animateIndicators
+        interaction.launchAnimation = settings.launchAnimation
         interaction.idleFade.configure(settings,
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
@@ -485,6 +487,13 @@ final class DockPanelController {
             }
             return true
         }
+        if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
+           event.charactersIgnoringModifiers?.lowercased() == "b" {
+            if let item = store.entries.compactMap(\.item).first(where: { $0.id == store.selectedID }) {
+                interaction.openBadgeMemory?(item)
+            }
+            return true
+        }
         if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
             if event.modifierFlags.contains(.option),
                let pin = store.entries.first(where: { $0.target == store.selectedTarget })?.pin {
@@ -523,6 +532,7 @@ final class DockPanelController {
         invalidateDrag?(); invalidateDrag = nil
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
+        interaction.openBadgeMemory = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil
         interaction.openTrash = nil; interaction.emptyTrash = nil
         interaction.openFocusSession = nil
