@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import SwiftUI
 
 nonisolated enum WindowPortalPhase: Equatable {
     case connecting, live, paused, userPaused, frozen, reselect, unavailable, stale, permissionRequired
@@ -17,12 +18,42 @@ nonisolated enum WindowPortalPhase: Equatable {
         case .permissionRequired: .portalPermission
         }
     }
+
+    /// The one glyph that states what the portal is doing, next to the phase's own words.
+    var symbol: String {
+        switch self {
+        case .connecting: "arrow.triangle.2.circlepath"
+        case .live: "dot.radiowaves.left.and.right"
+        case .paused, .userPaused: "pause.circle.fill"
+        case .frozen: "snowflake"
+        case .reselect: "crop"
+        case .unavailable: "exclamationmark.triangle.fill"
+        case .stale: "clock.badge.exclamationmark"
+        case .permissionRequired: "lock.fill"
+        }
+    }
+
+    /// Green reads as running, orange as needing attention, and everything else stays quiet.
+    var color: Color {
+        switch self {
+        case .live: .green
+        case .connecting, .paused, .userPaused: .secondary
+        case .frozen: .cyan
+        case .reselect, .stale: .orange
+        case .unavailable, .permissionRequired: .red
+        }
+    }
+
+    /// True while a frame is arriving on its own; the pill then pulses instead of sitting still.
+    var isStreaming: Bool { self == .live || self == .connecting }
 }
 
 /// Ephemeral presentation state; retains at most the latest image and no captured content on disk.
 @MainActor @Observable
 final class WindowPortalState {
     let appName: String
+    /// The source application's icon, used to tint the portal in its own app's color.
+    let icon: NSImage?
     var source: ApplicationWindowSummary
     var image: CGImage?
     var phase: WindowPortalPhase = .connecting
@@ -61,20 +92,24 @@ final class WindowPortalState {
     var captures = 0
     var captureMilliseconds = 0.0
     var jumpFailed = false
+    /// Set when a save was attempted and no file was written, so the panel can say so.
+    var exportFailed = false
     @ObservationIgnored var freeze: (() -> Void)?
     @ObservationIgnored var editCrop: (() -> Void)?
     @ObservationIgnored var close: (() -> Void)?
     @ObservationIgnored var jump: (() -> Void)?
     @ObservationIgnored var togglePause: (() -> Void)?
+    @ObservationIgnored var saveFrame: (() -> Void)?
     @ObservationIgnored var move: ((CGFloat, CGFloat) -> Void)?
 
     var sourceName: String {
         source.title?.isEmpty == false ? "\(appName): \(source.title!)" : appName
     }
 
-    init(appName: String, source: ApplicationWindowSummary) {
+    init(appName: String, source: ApplicationWindowSummary, icon: NSImage? = nil) {
         self.appName = appName
         self.source = source
+        self.icon = icon
     }
 }
 

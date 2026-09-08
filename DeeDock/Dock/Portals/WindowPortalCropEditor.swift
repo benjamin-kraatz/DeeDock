@@ -1,76 +1,99 @@
 import SwiftUI
 
 /// Edits the retained full-window frame. Confirmation binds the selection to that frame's source size.
+///
+/// The selection is made the same way it is made for Window Watch — drawn, moved, and resized
+/// directly on the preview — so one gesture vocabulary covers both features. The percentages stay
+/// available underneath for precision and for keyboard-only operation.
 struct WindowPortalCropEditor: View {
     let state: WindowPortalState
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var region = NormalizedWindowRegion()
 
+    private var tint: Color {
+        guard let icon = state.icon else { return .accentColor }
+        return DockIconAccent.surface(for: icon, identity: state.appName, dark: colorScheme == .dark) ?? .accentColor
+    }
+
     var body: some View {
-        VStack(spacing: 12) {
-            Text(.portalCrop).font(.headline)
-            if let image = state.image {
-                GeometryReader { geometry in
-                    // Both SwiftUI image and gesture coordinates have a top-left origin. The outer
-                    // centered frame supplies letterboxing; gestures belong only to the inner image.
-                    let scale = min(geometry.size.width / Double(image.width), geometry.size.height / Double(image.height))
-                    let size = CGSize(width: Double(image.width) * scale, height: Double(image.height) * scale)
-                    let rect = region.rect
-                    Image(decorative: image, scale: 1).resizable()
-                        .frame(width: size.width, height: size.height)
-                        .overlay(alignment: .topLeading) {
-                            Rectangle().strokeBorder(.orange, lineWidth: 3)
-                                .background(.orange.opacity(0.12))
-                                .frame(width: rect.width * size.width, height: rect.height * size.height)
-                                .offset(x: rect.minX * size.width, y: rect.minY * size.height)
-                                .allowsHitTesting(false)
-                        }
-                        .contentShape(.rect)
-                        .gesture(DragGesture(minimumDistance: 2).onChanged { value in
-                            guard size.width > 0, size.height > 0 else { return }
-                            let x = min(max(value.startLocation.x / size.width, 0), 1)
-                            let y = min(max(value.startLocation.y / size.height, 0), 1)
-                            let endX = min(max(value.location.x / size.width, 0), 1)
-                            let endY = min(max(value.location.y / size.height, 0), 1)
-                            region = NormalizedWindowRegion(x: min(x, endX), y: min(y, endY),
-                                width: abs(x - endX), height: abs(y - endY)).clamped
-                        })
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        VStack(spacing: 0) {
+            header
+            Divider()
+            VStack(alignment: .leading, spacing: 14) {
+                if let image = state.image {
+                    WindowRegionEditor(image: image, region: $region, editable: true,
+                                       scanning: false, tint: tint)
+                        .frame(height: 260)
+                    Text(.regionDragHint)
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    WindowRegionPresetPicker(region: $region, tint: tint)
+                    WindowRegionFineTuning(region: $region)
+                } else {
+                    ContentUnavailableView { Label(.portalUnavailable, systemImage: "macwindow.badge.plus") }
+                        .frame(height: 260)
                 }
-                .frame(height: 200)
-                .accessibilityHidden(true)
-                Text(.portalCropHelp).font(.caption)
-                control(.watchRegionX, keyPath: \.x, range: 0...0.95)
-                control(.watchRegionY, keyPath: \.y, range: 0...0.95)
-                control(.watchRegionWidth, keyPath: \.width, range: 0.05...1)
-                control(.watchRegionHeight, keyPath: \.height, range: 0.05...1)
+                Text(.portalCropHelp)
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            HStack {
-                Button(.portalWholeWindow) { region = NormalizedWindowRegion() }
-                Spacer()
-                Button(.portalCropCancel) { state.editingCrop = false }.keyboardShortcut(.cancelAction)
-                Button(.portalCropConfirm) { state.applyCrop(region) }
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(state.image == nil || state.source.frame == nil)
-            }
+            .padding(18)
+            Divider()
+            footer
         }
-        .padding(20)
-        .frame(width: 440)
+        .tint(tint)
+        .frame(width: 520)
+        .background(reduceTransparency ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor))
+                                       : AnyShapeStyle(.regularMaterial))
         .onAppear { region = state.crop }
     }
 
-    private func control(_ label: LocalizedStringResource,
-                         keyPath: WritableKeyPath<NormalizedWindowRegion, Double>,
-                         range: ClosedRange<Double>) -> some View {
-        let binding = Binding<Double>(get: { region.clamped[keyPath: keyPath] }, set: {
-            region[keyPath: keyPath] = $0
-            region = region.clamped
-        })
-        return HStack {
-            Text(label)
-            Spacer()
-            Text(binding.wrappedValue, format: .percent.precision(.fractionLength(0)))
-                .monospacedDigit()
-            Stepper(label, value: binding, in: range, step: 0.01).labelsHidden()
+    private var header: some View {
+        HStack(spacing: 12) {
+            Group {
+                if let icon = state.icon {
+                    Image(nsImage: icon).resizable().interpolation(.high).scaledToFit()
+                } else {
+                    Image(systemName: "crop").font(.title2).foregroundStyle(.secondary)
+                }
+            }
+            .frame(width: 30, height: 30)
+            .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(.portalCrop)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .accessibilityAddTraits(.isHeader)
+                Text(verbatim: state.sourceName)
+                    .font(.caption).foregroundStyle(.secondary)
+                    .lineLimit(1).truncationMode(.middle)
+            }
+            Spacer(minLength: 8)
         }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 12)
+        .background(alignment: .top) {
+            LinearGradient(colors: [tint.opacity(reduceTransparency ? 0 : 0.18), .clear],
+                           startPoint: .top, endPoint: .bottom)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
+    }
+
+    private var footer: some View {
+        HStack {
+            Button(.portalWholeWindow) { region = NormalizedWindowRegion() }
+                .disabled(region.clamped == NormalizedWindowRegion())
+            Spacer()
+            Button(.portalCropCancel) { state.editingCrop = false }
+                .keyboardShortcut(.cancelAction)
+            Button(.portalCropConfirm) { state.applyCrop(region) }
+                .buttonStyle(.glassProminent)
+                .keyboardShortcut(.defaultAction)
+                .disabled(state.image == nil || state.source.frame == nil)
+        }
+        .controlSize(.large)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 12)
     }
 }

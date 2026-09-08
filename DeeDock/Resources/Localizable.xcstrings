@@ -601,9 +601,7 @@
         }
       }
     },
-    "" : {
-
-    },
+    "" : {},
     "actionCancel" : {
       "comment" : "Cancels an editing or confirmation alert.",
       "extractionState" : "manual",
@@ -12941,13 +12939,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pfeiltasten bewegen das Portal. Eingabe zeigt die Quelle. Leertaste pausiert. Escape schließt."
+            "value" : "Pfeiltasten bewegen das Portal. Eingabe zeigt die Quelle. Leertaste pausiert. Befehl-S sichert das Bild. Escape schließt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Arrow keys move the portal. Return shows the source. Space pauses updates. Escape closes."
+            "value" : "Arrow keys move the portal. Return shows the source. Space pauses updates. Command-S saves the frame. Escape closes."
           }
         }
       }
@@ -19240,8 +19238,8 @@
         }
       }
     },
-    "watchPresetBottom" : {
-      "comment" : "Window watch: region preset covering the lower half of the window.",
+    "region.presetBottom" : {
+      "comment" : "Region presets: the lower half of the window.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19258,8 +19256,8 @@
         }
       }
     },
-    "watchPresetCenter" : {
-      "comment" : "Window watch: region preset covering the middle of the window.",
+    "region.presetCenter" : {
+      "comment" : "Region presets: the middle of the window.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19276,8 +19274,8 @@
         }
       }
     },
-    "watchPresetTop" : {
-      "comment" : "Window watch: region preset covering the upper half of the window.",
+    "region.presetTop" : {
+      "comment" : "Region presets: the upper half of the window.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19294,8 +19292,8 @@
         }
       }
     },
-    "watchRegionDragHint" : {
-      "comment" : "Window watch: how to edit the region on the preview.",
+    "region.dragHint" : {
+      "comment" : "Region editing: how to edit the region on the preview.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19312,8 +19310,8 @@
         }
       }
     },
-    "watchRegionFineTune" : {
-      "comment" : "Window watch: disclosure label for the numeric region sliders.",
+    "region.fineTune" : {
+      "comment" : "Region editing: disclosure label for the numeric region sliders.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19330,8 +19328,8 @@
         }
       }
     },
-    "watchRegionHeight" : {
-      "comment" : "Window watch: Height",
+    "region.height" : {
+      "comment" : "Region editing: height of the region.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19366,8 +19364,8 @@
         }
       }
     },
-    "watchRegionResize" : {
-      "comment" : "Window watch: accessibility label for a corner resize handle.",
+    "region.resize" : {
+      "comment" : "Region editing: accessibility label for a corner resize handle.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19384,8 +19382,8 @@
         }
       }
     },
-    "watchRegionWidth" : {
-      "comment" : "Window watch: Width",
+    "region.width" : {
+      "comment" : "Region editing: width of the region.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19402,8 +19400,8 @@
         }
       }
     },
-    "watchRegionX" : {
-      "comment" : "Window watch: Left",
+    "region.x" : {
+      "comment" : "Region editing: distance of the region from the left edge.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19420,8 +19418,8 @@
         }
       }
     },
-    "watchRegionY" : {
-      "comment" : "Window watch: Top",
+    "region.y" : {
+      "comment" : "Region editing: distance of the region from the top edge.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19492,8 +19490,8 @@
         }
       }
     },
-    "watchSectionRegion" : {
-      "comment" : "Window watch: section title above the region controls.",
+    "region.sectionTitle" : {
+      "comment" : "Region editing: section title above the region controls.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19510,8 +19508,8 @@
         }
       }
     },
-    "watchSelectedRegion" : {
-      "comment" : "Window watch: Watched region in the selected window",
+    "region.selected" : {
+      "comment" : "Region editing: accessibility label for the preview and its selection.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19924,8 +19922,8 @@
         }
       }
     },
-    "watchWholeWindow" : {
-      "comment" : "Window watch: Whole window",
+    "region.wholeWindow" : {
+      "comment" : "Region presets: the entire window.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -22217,13 +22215,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drag across the preview or adjust the percentages. Minimum size: 5%. A region does not follow content when the source layout changes."
+            "value" : "Minimum size: 5%. A region does not follow content when the window layout changes."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ziehe einen Bereich in der Vorschau auf oder passe die Prozentwerte an. Mindestgröße: 5 %. Der Bereich folgt Inhalten nicht, wenn sich das Fensterlayout ändert."
+            "value" : "Mindestgröße: 5 %. Der Bereich folgt Inhalten nicht, wenn sich das Fensterlayout ändert."
           }
         }
       }
@@ -22440,6 +22438,132 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aufgenommen:"
+          }
+        }
+      }
+    },
+    "portal.save" : {
+      "comment" : "Window portal: action saving the visible frame to a file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save frame…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild sichern …"
+          }
+        }
+      }
+    },
+    "portal.save.help" : {
+      "comment" : "Window portal: help text for the save action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save the visible frame as a PNG file."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichert das sichtbare Bild als PNG-Datei."
+          }
+        }
+      }
+    },
+    "portal.save.failed" : {
+      "comment" : "Window portal: shown when saving the frame produced no file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The frame could not be saved."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bild konnte nicht gesichert werden."
+          }
+        }
+      }
+    },
+    "portal.move" : {
+      "comment" : "Window portal: submenu grouping the four move commands.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move panel"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster bewegen"
+          }
+        }
+      }
+    },
+    "portal.menu.view" : {
+      "comment" : "Window portal: context menu section for what the portal shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ansicht"
+          }
+        }
+      }
+    },
+    "portal.menu.frame" : {
+      "comment" : "Window portal: context menu section for actions on the captured frame.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frame"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild"
+          }
+        }
+      }
+    },
+    "portal.menu.window" : {
+      "comment" : "Window portal: context menu section for actions on the panel itself.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panel"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster"
           }
         }
       }

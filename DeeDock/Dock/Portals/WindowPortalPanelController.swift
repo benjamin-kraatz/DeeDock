@@ -1,9 +1,11 @@
 import AppKit
 import SwiftUI
 import OSLog
+import UniformTypeIdentifiers
 
 private final class WindowPortalPanel: NSPanel {
     var handleKey: ((NSEvent) -> Bool)?
+    var saveFrame: (() -> Void)?
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
     override func keyDown(with event: NSEvent) {
@@ -12,6 +14,10 @@ private final class WindowPortalPanel: NSPanel {
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "w" {
             performClose(nil)
+            return true
+        }
+        if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "s" {
+            saveFrame?()
             return true
         }
         return super.performKeyEquivalent(with: event)
@@ -37,9 +43,10 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
     var onClose: (() -> Void)?
 
     init(source: ApplicationWindowSummary, appName: String, origin: CGPoint) {
-        state = WindowPortalState(appName: appName, source: source)
+        let application = NSRunningApplication(processIdentifier: source.processIdentifier)
+        state = WindowPortalState(appName: appName, source: source, icon: application?.icon)
         capture = WindowPortalCapture(source: source)
-        application = NSRunningApplication(processIdentifier: source.processIdentifier)
+        self.application = application
         panel = WindowPortalPanel(contentRect: CGRect(origin: origin, size: CGSize(width: 360, height: 260)),
             styleMask: [.titled, .closable, .resizable, .nonactivatingPanel], backing: .buffered, defer: false)
         super.init()
@@ -56,11 +63,13 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         panel.delegate = self
         panel.contentView = NSHostingView(rootView: WindowPortalView(state: state))
         panel.handleKey = { [weak self] in self?.handleKey($0) ?? false }
+        panel.saveFrame = { [weak self] in self?.saveFrame() }
         state.freeze = { [weak self] in self?.freeze() }
         state.editCrop = { [weak self] in self?.editCrop() }
         state.close = { [weak self] in self?.close() }
         state.jump = { [weak self] in self?.jump() }
         state.togglePause = { [weak self] in self?.togglePause() }
+        state.saveFrame = { [weak self] in self?.saveFrame() }
         state.move = { [weak self] x, y in self?.move(x: x, y: y) }
         repairPlacement()
     }
@@ -155,8 +164,10 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         state.jump = nil
         state.move = nil
         state.togglePause = nil
+        state.saveFrame = nil
         panel.delegate = nil
         panel.handleKey = nil
+        panel.saveFrame = nil
         if closeNativeWindow { panel.close() }
         panel.contentView = nil
         // Keep the coordinator slot until an uncancellable SDK request drains. Rapid close/pin cannot
@@ -256,6 +267,37 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         state.frozen = true
         state.userPaused = false
         state.phase = .frozen
+    }
+
+    /// Writes what the portal is showing to a file the user names. The frame never leaves memory
+    /// on its own: no default location, no temporary copy, and nothing written without the panel.
+    private func saveFrame() {
+        guard let image = state.image, !state.editingCrop,
+              let visible = WindowPortalExport.visibleFrame(of: image, viewport: state.viewport),
+              let data = WindowPortalExport.png(visible) else {
+            state.exportFailed = true
+            return
+        }
+        state.exportFailed = false
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.png]
+        savePanel.canCreateDirectories = true
+        savePanel.nameFieldStringValue = WindowPortalExport.suggestedFilename(source: state.sourceName, at: .now)
+        savePanel.beginSheetModal(for: panel) { [weak self] response in
+            MainActor.assumeIsolated {
+                guard let self, response == .OK, let url = savePanel.url else { return }
+                do {
+                    try data.write(to: url, options: .atomic)
+                } catch {
+                    Logger(subsystem: Bundle.main.bundleIdentifier ?? "DeeDock", category: "WindowPortal")
+                        .error("Portal frame not saved: \(error.localizedDescription, privacy: .public)")
+                    self.state.exportFailed = true
+                }
+            }
+        }
+        // A sheet on a non-activating panel needs the app frontmost, or the save panel takes no keys.
+        NSApp.activate(ignoringOtherApps: true)
+        panel.makeKeyAndOrderFront(nil)
     }
 
     private func editCrop() {
