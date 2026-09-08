@@ -53,6 +53,7 @@ struct WindowWatchExplanationSetup: View {
     }
 }
 
+#if DEBUG
 #Preview("Explanation") {
     WindowWatchExplanationView(
         explanation: WindowWatchExplanation(
@@ -85,3 +86,5 @@ struct WindowWatchExplanationSetup: View {
     )
     .padding().frame(width: 460)
 }
+
+#endif
