@@ -61,6 +61,7 @@ final class ExplicitWindowPresenter {
     }
 
     private func attach(_ window: NSWindow) {
+        AppDockPresence.shared.windowWillOpen(window)
         awaitingSettings = false
         target = window
         log("window attached")
