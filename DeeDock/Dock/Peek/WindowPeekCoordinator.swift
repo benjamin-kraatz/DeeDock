@@ -3,6 +3,10 @@ import AppKit
 /// App-wide owner for the single transient window preview.
 @MainActor
 final class WindowPeekCoordinator {
+    var actionDisplays: (() -> [DisplaySnapshot])?
+    private var windowActionTask: Task<Void, Never>?
+    private var actionLayout: [WindowActionDisplay] = []
+    private let actionMenu = WindowActionMenu()
     private let fileHandoff: WindowFileHandoffController
     private var fileDocuments: DocumentResourceAccess?
     private var fileDrag = false
@@ -121,6 +125,10 @@ final class WindowPeekCoordinator {
     }
 
     func refresh() {
+        if controller?.state.actionBusy == true, actionDisplaySnapshot() != actionLayout {
+            close(returnFocus: false)
+            return
+        }
         guard let sourcePanel, let sourceItem,
               let context = sourcePanel.windowPeekContext(for: sourceItem.id),
               context.settings.windowPeekEnabled else {
@@ -136,6 +144,9 @@ final class WindowPeekCoordinator {
     }
 
     func close(returnFocus: Bool) {
+        windowActionTask?.cancel()
+        windowActionTask = nil
+        actionMenu.cancel()
         generation = UUID()
         dwellTask?.cancel()
         closeTask?.cancel()
@@ -231,6 +242,7 @@ final class WindowPeekCoordinator {
             }
             close(returnFocus: false)
         }
+        next.state.manage = { [weak self] token in self?.manage(token) }
         next.state.choose = { [weak self] token in self?.choose(token) }
         next.state.showApp = { [weak self] in self?.showApp() }
         next.state.settingsSelected = { [weak self, weak panel] in
@@ -378,6 +390,8 @@ final class WindowPeekCoordinator {
                   WindowPeekLifecycle.acceptsResult(expected: currentGeneration, current: generation),
                   let controller else { return }
             controller.state.cards = controller.state.cards.map { card in
+                guard let captured = windows.first(where: { $0.token == card.id }),
+                      captured == card.window else { return card }
                 var updated = card
                 updated.thumbnail = images[card.id]
                 return updated
@@ -404,6 +418,99 @@ final class WindowPeekCoordinator {
         return true
     }
 
+    private func actionDisplaySnapshot() -> [WindowActionDisplay] {
+        let displays = actionDisplays?() ?? []
+        guard let primary = displays.first(where: \.isPrimary) else { return [] }
+        // NSScreen uses upward y; AX uses downward y relative to the primary screen's top.
+        func quartz(_ rect: CGRect) -> CGRect {
+            CGRect(x: rect.minX, y: primary.frame.maxY - rect.maxY, width: rect.width, height: rect.height)
+        }
+        return displays.filter(\.hostsDock).map {
+            WindowActionDisplay(id: $0.id, runtimeID: $0.runtimeID, name: $0.name, frame: quartz($0.frame), usable: quartz($0.visibleFrame))
+        }
+    }
+
+    private func manage(_ token: ApplicationWindowToken) {
+        guard let controller, !controller.state.actionBusy, !controller.state.routingFiles else { return }
+        guard !controller.state.usesApplicationSelection else {
+            controller.state.actionMessage = .peekActionCaptureOnly
+            return
+        }
+        actionLayout = actionDisplaySnapshot()
+        controller.state.actionBusy = true
+        controller.state.actionMessage = nil
+        closeTask?.cancel()
+        let currentGeneration = generation
+        let point = isKeyboardActive ? controller.actionMenuPoint : NSEvent.mouseLocation
+        windowActionTask = Task { [weak self, weak controller] in
+            guard let self, let controller else { return }
+            defer {
+                if generation == currentGeneration {
+                    controller.state.actionBusy = false
+                    windowActionTask = nil
+                }
+            }
+            var closingWindow = false
+            do {
+                let capabilities = try await menus.windowCapabilities(token)
+                guard !Task.isCancelled, generation == currentGeneration else { return }
+                guard capabilities.canMinimize || capabilities.canClose || capabilities.canMove else {
+                    controller.state.actionMessage = capabilities.restricted ? .peekActionRestricted : .peekActionUnsupported
+                    return
+                }
+                controller.state.actionMenuTracking = true
+                let selection = actionMenu.show(capabilities: capabilities, displays: actionDisplaySnapshot(), at: point)
+                controller.state.actionMenuTracking = false
+                guard let action = selection else { return }
+                guard !Task.isCancelled, generation == currentGeneration else { return }
+                closingWindow = action == .close
+                let result = try await menus.performWindowAction(action, token: token, displays: actionDisplaySnapshot())
+                guard !Task.isCancelled, generation == currentGeneration else { return }
+                if action == .close {
+                    // Dismiss without focus restoration so a native document prompt stays in charge.
+                    close(returnFocus: false)
+                    return
+                }
+                if let result { refreshActionCard(result) }
+                controller.state.actionMessage = .peekActionCompleted
+            } catch is CancellationError { return }
+            catch {
+                guard !Task.isCancelled, generation == currentGeneration else { return }
+                if closingWindow {
+                    sourcePanel?.store.errorMessage = .peekActionFailed
+                    close(returnFocus: false)
+                    return
+                }
+                if let summary = try? await menus.windowActionSummary(token),
+                   !Task.isCancelled, generation == currentGeneration {
+                    refreshActionCard(summary)
+                }
+                guard !Task.isCancelled, generation == currentGeneration else { return }
+                switch error {
+                case WindowActionError.permission, ApplicationWindowServiceError.permissionRequired:
+                    controller.state.actionMessage = .peekActionPermission
+                case WindowActionError.constrained:
+                    controller.state.actionMessage = .peekActionConstrained
+                case WindowActionError.unsupported:
+                    controller.state.actionMessage = .peekActionUnsupported
+                default: controller.state.actionMessage = .peekActionFailed
+                }
+            }
+        }
+    }
+
+    /// Keep sibling thumbnails and filtering intact when a single command changes its source.
+    private func refreshActionCard(_ summary: ApplicationWindowSummary) {
+        guard let controller, let index = allWindows.firstIndex(where: { $0.token == summary.token }) else { return }
+        allWindows[index] = summary
+        if let cardIndex = controller.state.cards.firstIndex(where: { $0.id == summary.token }) {
+            controller.state.cards[cardIndex] = WindowPeekCard(window: summary, thumbnail: nil)
+        }
+        controller.state.selectedID = summary.token
+        requestedThumbnailIDs.remove(summary.token)
+        requestThumbnail(summary.token)
+    }
+
     private func choose(_ token: ApplicationWindowToken) {
         if fileDocuments != nil { routeFiles(to: token); return }
         guard let item = sourceItem, let panel = sourcePanel else { return }
@@ -426,6 +533,7 @@ final class WindowPeekCoordinator {
     }
 
     private func scheduleClose() {
+        if controller?.state.actionBusy == true { return }
         if fileDocuments != nil, !fileDrag { return }
         closeTask?.cancel()
         let delay = fileDrag ? 650 : 180

@@ -21237,6 +21237,312 @@
           }
         }
       }
+    },
+    "peekActionCaptureOnly" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Vorschau lässt sich keinem steuerbaren Fenster sicher zuordnen. Aktiviere den Fensterzugriff in den Einstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This preview has no reliable window-control target. Enable Window Access in Settings."
+          }
+        }
+      }
+    },
+    "peekActionCenter" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster zentrieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center window"
+          }
+        }
+      }
+    },
+    "peekActionClose" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close window"
+          }
+        }
+      }
+    },
+    "peekActionCompleted" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster aktualisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window updated."
+          }
+        }
+      }
+    },
+    "peekActionConstrained" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App hat die Platzierung eingeschränkt. Das Fenster wurde möglicherweise verschoben oder skaliert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app constrained the placement. The window may have moved or resized."
+          }
+        }
+      }
+    },
+    "peekActionFailed" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster hat sich geändert oder die App hat die Aktion nicht bestätigt. Öffne die Vorschau erneut, um sie zu aktualisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The window changed or the app did not confirm the action. Reopen Peek to refresh."
+          }
+        }
+      }
+    },
+    "peekActionFill" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzbaren Bereich ausfüllen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill usable area"
+          }
+        }
+      }
+    },
+    "peekActionLeft" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linke Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left half"
+          }
+        }
+      }
+    },
+    "peekActionMinimize" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster minimieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimize window"
+          }
+        }
+      }
+    },
+    "peekActionMove" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Display verschieben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to display"
+          }
+        }
+      }
+    },
+    "peekActionPermission" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Fensterzugriff ist nicht verfügbar. Prüfe die Berechtigung für Bedienungshilfen in den Systemeinstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window Access is unavailable. Check Accessibility permission in System Settings."
+          }
+        }
+      }
+    },
+    "peekActionRestore" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster wiederherstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore window"
+          }
+        }
+      }
+    },
+    "peekActionRestricted" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im aktuellen Fensterzustand sind keine Aktionen verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions are unavailable in this window’s current state."
+          }
+        }
+      }
+    },
+    "peekActionRight" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right half"
+          }
+        }
+      }
+    },
+    "peekActionTitle" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensteraktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window actions"
+          }
+        }
+      }
+    },
+    "peekActionUndo" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensterposition zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo window placement"
+          }
+        }
+      }
+    },
+    "peekActionUnsupported" : {
+      "comment" : "Window Peek individual-window action or availability explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App unterstützt keine Aktionen für dieses Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app does not support actions for this window."
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

@@ -68,6 +68,8 @@ final class WindowPeekPanelController {
         panel.setFrame(placement.frame, display: true)
     }
 
+    var actionMenuPoint: CGPoint { CGPoint(x: panel.frame.midX, y: panel.frame.midY) }
+
     func contains(_ screenPoint: CGPoint) -> Bool { panel.frame.contains(screenPoint) }
 
     func close(returnFocus: Bool) {
@@ -77,6 +79,7 @@ final class WindowPeekPanelController {
         if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
         localMonitor = nil
         globalMonitor = nil
+        state.manage = nil
         state.chooseFiles = nil
         state.fileDragUpdated = nil
         state.fileDrop = nil
@@ -102,17 +105,24 @@ final class WindowPeekPanelController {
     private func installMonitors() {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
-            guard let self, event.window !== self.panel else { return event }
+            guard let self, !self.state.actionMenuTracking, event.window !== self.panel else { return event }
             self.close(returnFocus: false)
             return event
         }
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
+            guard self?.state.actionMenuTracking != true else { return }
             self?.close(returnFocus: false)
         }
     }
 
     private func handleKey(_ event: NSEvent) -> Bool {
+        if state.actionBusy {
+            if event.keyCode == 53 { close(returnFocus: false) }
+            return true
+        }
         switch event.keyCode {
+        case 0 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
+            if let id = state.selectedID { state.manage?(id) }
         case 8 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: state.chooseFiles?()
         case 13 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: if let id = state.selectedID { state.watch?(id) }
         case 35 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:

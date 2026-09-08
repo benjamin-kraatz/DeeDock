@@ -140,6 +140,7 @@ final class DockCoordinator {
             self?.folderStacks.dragEnded()
             self?.windowPeeks.endFileDrag()
         }
+        windowPeeks.actionDisplays = { [weak self] in self?.profiles.displays ?? [] }
         windowPeeks.validatedFileDrop = { [weak self] in self?.dragging.peekDocuments($0) }
         windowPeeks.fileDropAccepted = { [weak self] in self?.dragging.cancel() }
         windowPeeks.fileDragEnded = { [weak self] in self?.dragging.externalEnded() }

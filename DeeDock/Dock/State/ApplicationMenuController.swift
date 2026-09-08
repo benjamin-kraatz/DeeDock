@@ -63,6 +63,19 @@ final class ApplicationMenuController {
         }
     }
 
+    func windowActionSummary(_ token: ApplicationWindowToken) async throws -> ApplicationWindowSummary {
+        try await windows.actionSummary(token)
+    }
+
+    func windowCapabilities(_ token: ApplicationWindowToken) async throws -> WindowActionCapabilities {
+        try await windows.capabilities(token)
+    }
+
+    func performWindowAction(_ action: WindowAction, token: ApplicationWindowToken,
+                             displays: [WindowActionDisplay]) async throws -> ApplicationWindowSummary? {
+        try await windows.perform(action, token: token, displays: displays)
+    }
+
     func cancelDiscovery(_ sessionID: UUID) {
         discoveryTasks.removeValue(forKey: sessionID)?.cancel()
         Task { await windows.discard(sessionID: sessionID) }
