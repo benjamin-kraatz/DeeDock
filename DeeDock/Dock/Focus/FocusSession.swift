@@ -36,9 +36,12 @@ nonisolated struct FocusSessionsDocument: Codable {
     var minutes = 25
     var celebrates = false
     var session: FocusSession?
+    var bossFight: BossFightConfiguration?
 }
 
 struct FocusDockItem {
     let session: FocusSession
     let celebrationID: UUID?
+    var bossFightEnabled = false
+    var bossVictoryID: UUID?
 }

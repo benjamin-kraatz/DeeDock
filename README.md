@@ -466,6 +466,11 @@ Shortcuts may show their own permission or input dialogs. Configure the shortcut
 
 ## Focus Sessions
 
+**Boss Fight** is an optional Easter egg in Settings → Features → Focus Sessions. Choose
+up to eight work apps for your party, then start a normal session. A boss health bar shows
+remaining time, and completion adds a brief, silent trophy. Disable the skin at any time
+without changing the timer. See [Boss Fight behavior and acceptance](docs/BOSS-FIGHT.md).
+
 Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or use the timer button beside a mode in **Settings → Modes**. DDock activates that mode and starts a shared timer. You can also start from the already-active mode. Only one session can run or pause at a time; switching modes later does not replace its timer.
 
 The timer tile appears on every display. Its ring shows time remaining. Click it for **Pause**, **Resume**, **Add 5 Minutes**, and **Finish**. A finished session keeps a checkmark tile until dismissed or replaced by a new session. **Save Session Capsule** opens the usual window-selection and draft-review flow; finishing never captures or saves anything automatically.

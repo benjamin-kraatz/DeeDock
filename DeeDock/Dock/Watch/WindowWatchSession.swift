@@ -2,9 +2,16 @@ import AppKit
 import Observation
 
 /// One explicitly started, memory-only watch. Closing its panel cancels every owned task.
+/// What the panel shows about a watch, in the order a watch moves through it.
+enum WindowWatchPhase {
+    case preparing, ready, watching, detected, ended
+}
+
 @MainActor @Observable
 final class WindowWatchSession {
     let title: String
+    let appName: String
+    let icon: NSImage?
     var region = WindowWatchRegion()
     var usesPhrase = false
     var phrase = ""
@@ -16,6 +23,20 @@ final class WindowWatchSession {
     var finished = false
     var lastSample: Date?
     var sourceMessage: LocalizedStringResource?
+    /// The condition was met. Kept apart from `finished`, which a manual stop also sets.
+    var detected = false
+    /// The current message reports a problem rather than progress, so the panel can mark it.
+    var problem = false
+    var startDate: Date?
+    var checkCount = 0
+
+    var phase: WindowWatchPhase {
+        if detected { return .detected }
+        if active { return .watching }
+        if ready { return .ready }
+        if finished { return .ended }
+        return .preparing
+    }
     @ObservationIgnored private let capture = WindowWatchCapture()
     @ObservationIgnored private let process: NSRunningApplication?
     @ObservationIgnored private let launchDate: Date?
@@ -32,7 +53,10 @@ final class WindowWatchSession {
 
     init(summary: ApplicationWindowSummary, after previousWork: Task<Void, Never>? = nil) {
         title = summary.title ?? String(localized: .applicationMenuUntitledWindow)
-        process = NSRunningApplication(processIdentifier: summary.processIdentifier)
+        let application = NSRunningApplication(processIdentifier: summary.processIdentifier)
+        appName = application?.localizedName ?? ""
+        icon = application?.icon
+        process = application
         launchDate = process?.launchDate
         observeLifecycle()
         task = Task { [weak self] in
@@ -76,6 +100,8 @@ final class WindowWatchSession {
     /// Deterministic preview state with no capture service calls, observers, or permission requests.
     init(previewTitle: String, message: LocalizedStringResource, setup: Bool) {
         title = previewTitle
+        appName = previewTitle
+        icon = NSImage(systemSymbolName: "app.dashed", accessibilityDescription: nil)
         process = nil
         launchDate = nil
         self.message = message
@@ -91,6 +117,10 @@ final class WindowWatchSession {
         task?.cancel()
         active = true
         ready = false
+        problem = false
+        detected = false
+        checkCount = 0
+        startDate = Date()
         detector = WindowWatchDetector()
         size = nil
         generation = UUID()
@@ -109,6 +139,9 @@ final class WindowWatchSession {
         active = false
         ready = false
         finished = true
+        detected = false
+        problem = false
+        startDate = nil
         message = .watchStopped
         removeObservers()
         return Task {
@@ -184,9 +217,12 @@ final class WindowWatchSession {
                     }
                     image = frame.image
                     lastSample = Date()
+                    checkCount += 1
+                    problem = false
                     if detector.consume(pixels: frame.pixels, lines: frame.lines, phrase: watchedPhrase) {
                         active = false
                         finished = true
+                        detected = true
                         message = watchedPhrase.isEmpty ? .watchChangeDetected : .watchPhraseDetected
                         if playSound { NSSound.beep() }
                         removeObservers()
@@ -224,6 +260,7 @@ final class WindowWatchSession {
     }
 
     private func fail(_ error: Error) {
+        problem = true
         switch error as? WindowWatchFailure {
         case .permission:
             message = .watchPermission

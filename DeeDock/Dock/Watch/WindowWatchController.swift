@@ -17,7 +17,7 @@ final class WindowWatchController: NSObject, NSWindowDelegate {
     func show(_ summary: ApplicationWindowSummary, visibleFrame: CGRect) {
         if let panel { panel.makeKeyAndOrderFront(nil); return }
         let session = WindowWatchSession(summary: summary, after: previousWork)
-        let panel = WindowWatchPanel(contentRect: CGRect(x: 0, y: 0, width: 460, height: 680),
+        let panel = WindowWatchPanel(contentRect: CGRect(x: 0, y: 0, width: 520, height: 780),
                                      styleMask: [.titled, .closable, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.title = String(localized: .watchTitle)
         panel.isReleasedWhenClosed = false
@@ -46,8 +46,8 @@ final class WindowWatchController: NSObject, NSWindowDelegate {
         let screen = NSScreen.screens.first { $0 === panel.screen }
             ?? NSScreen.screens.first { $0.frame.contains(NSEvent.mouseLocation) } ?? NSScreen.main
         guard let visible = requestedFrame ?? screen?.visibleFrame else { return }
-        let height = min(720, visible.height)
-        let width = min(460, visible.width)
+        let height = min(780, visible.height)
+        let width = min(520, visible.width)
         panel.setFrame(CGRect(x: visible.midX - width / 2, y: visible.midY - height / 2,
                               width: width, height: height), display: true)
     }

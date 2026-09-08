@@ -39,7 +39,17 @@ struct DockFocusButton: View {
         case .completed: .focusCompleted
         }
     }
-    private func glyph(at date: Date) -> some View {
+    @ViewBuilder private func glyph(at date: Date) -> some View {
+        if item.bossVictoryID != nil {
+            BossFightVictoryGlyph(size: size, exposesContent: interaction.exposesContent)
+        } else if item.bossFightEnabled && item.session.phase != .completed {
+            BossFightGlyph(session: item.session, date: date, size: size)
+        } else {
+            normalGlyph(at: date)
+        }
+    }
+
+    private func normalGlyph(at date: Date) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.23).fill(.teal.gradient)
             Circle().stroke(.white.opacity(0.25), lineWidth: max(2, size * 0.06)).padding(size * 0.1)
