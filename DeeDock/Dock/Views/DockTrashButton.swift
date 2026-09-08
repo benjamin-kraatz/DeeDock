@@ -36,8 +36,7 @@ struct DockTrashButton: View {
         .overlay {
             TrashContextMenuBridge(item: item, interaction: interaction, openSettings: {
                 interaction.prepareSettings?()
-                NSApp.activate()
-                openWindow(id: "settings")
+                openWindow.openDockSettings()
             }, emptyTrash: confirmEmptyTrash, tracking: menuTracking)
         }
         .accessibilityFocused($accessibilityFocused)

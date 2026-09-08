@@ -44,7 +44,7 @@ struct DockFolderButton: View {
         }
         .overlay {
             FolderContextMenuBridge(item: item, interaction: interaction, openSettings: {
-                interaction.prepareSettings?(); NSApp.activate(); openWindow(id: "settings")
+                interaction.prepareSettings?(); openWindow.openDockSettings()
             }, tracking: menuTracking)
         }
         .accessibilityFocused($accessibilityFocused)

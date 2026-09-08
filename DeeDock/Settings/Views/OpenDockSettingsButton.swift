@@ -6,8 +6,7 @@ struct OpenDockSettingsButton: View {
 
     var body: some View {
         Button(.actionSettings) {
-            NSApp.activate()
-            openWindow(id: "settings")
+            openWindow.openDockSettings()
         }
     }
 }

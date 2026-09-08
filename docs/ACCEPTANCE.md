@@ -1724,6 +1724,60 @@ Empty mixed-search results now occupy the full results area, with centered conte
 kind-neutral empty title and result count in English and German. Native visual verification
 of this correction remains pending. Further subagent review was stopped at the user's request.
 
+## DEE-27: explicit window focus
+
+Settings commands now share one presentation path, including menu-bar and app commands, dock
+context menus, Window Peek, Window Search, Dock Modes, and onboarding. The scene registers its
+actual native window. Existing windows are reused and deminiaturized. Presentation leaves menu
+tracking before ordering the target and requesting app activation; an activation notification
+reasserts key focus on that target. Requests end on confirmed focus, close, app deactivation,
+selection of another app-owned window, supersession, or a two-second deadline. There is no
+continuous polling or unbounded activation retry.
+
+Welcome, Window Search, Badge Memory, explicit update presentation, Launcher, and Focus Dock
+use the same presenter. Launcher close completions and search/memory focus restoration check
+that no newer request has taken ownership. Passive hover, magnification, nonactivating preview
+panels, and passive update presentation retain their existing paths.
+
+The `WindowPresentation` debug log category records the source file, version, request identity,
+foreground PID, app activity, window number, visibility, minimized/key/main state, and request,
+activation, key-window, completion, and timeout events. Native reproduction is still needed to
+identify the reported intermittent failure's exact entry point and notification ordering.
+
+A focused unsigned Debug build of the DeeDock scheme passed. Tests, app launch, and automated
+visual checks were not run. Native acceptance remains pending for Settings closed, open behind
+another app, and minimized; menu-bar and dock context-menu entry points; welcome/search/update
+windows; repeated opens without duplicates; opening during Launcher dismissal; keyboard input;
+passive hover; multiple displays; other Spaces; full-screen foreground apps; and sleep/wake.
+
+The macOS 27 SDK's `NSApplication.activate` contract states that activation can arrive later or
+be denied. This implementation uses public activation and window ordering APIs, keeps existing
+Space collection policies and window levels, and cannot guarantee a Space switch or placement
+over another application's full-screen window. A timeout records an unresolved request rather
+than forcing repeated activation. Compilation does not establish native focus acceptance.
+
+
+### DDock's own icon while app windows are open
+
+DDock stays an accessory app, absent from the macOS system Dock. Its own application catalog
+adds the bundled app icon while Settings, Welcome, Window Search, Badge Memory, or an update
+window is open. Window membership changes refresh all display docks without waiting for a
+Workspace launch event. The running entry disappears after the last tracked window closes or
+is explicitly dismissed. Minimized windows, app hiding, and windows behind other apps count;
+dock panels, Launcher, and floating previews do not.
+
+Clicking DDock's tile restores an existing owned window, even when DDock is already foreground;
+it never hides the replacement dock as part of the ordinary app-icon toggle. DDock's own tile
+bypasses secondary-display external-window filtering so its windows stay reachable without
+capture permissions. Running-section hide/collapse settings and explicit user pins retain their
+normal behavior. The temporary system Dock activation-policy implementation was removed.
+
+Native validation remains pending for multiple windows, last-window close/reopen, minimized
+window restoration, Cmd-H, passive updates and progress dismissal, secondary-display filtering,
+section visibility, Spaces, and full-screen transitions. The focused unsigned Debug app build
+passed. The new window tracker was added to the existing test target source list; tests, app
+launch, and automated visual checks were not run for this correction.
+
 ## DEE-28: paste from Clipboard into Shelf
 
 The Shelf icon's native context menu adds **Paste from Clipboard** after Open Shelf.

@@ -76,7 +76,10 @@ final class DockStore {
         let pinnedApplications = pins.compactMap(\.application)
         let running = Dictionary(uniqueKeysWithValues: catalog.running.map { ($0.id, $0) })
         let favorites = Dictionary(uniqueKeysWithValues: pinnedApplications.map { ($0.id, $0) })
-        let runningIDs = catalog.runningIDs.filter { visibleApplicationIDs?.contains($0) ?? true }
+        // Own windows remain reachable without Screen Recording or external-window occupancy.
+        let runningIDs = catalog.runningIDs.filter {
+            $0 == AppDockPresence.applicationID || (visibleApplicationIDs?.contains($0) ?? true)
+        }
         items = DockOrdering.itemOrder(favorites: pinnedApplications, runningIDs: runningIDs).compactMap { id in
             // Finder stays running for the desktop. On filtered secondary docks its saved
             // pin appears only with an actual visible window; persistence is untouched.

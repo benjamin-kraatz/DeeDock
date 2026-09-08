@@ -37,15 +37,21 @@ final class UpdateWindowController: NSObject, NSWindowDelegate {
             self.window = window
         }
         if activate {
-            NSApp.activate()
-            window?.makeKeyAndOrderFront(nil)
+            if let window { ExplicitWindowPresenter.shared.present(window) }
         } else {
+            if let window { AppDockPresence.shared.windowWillOpen(window) }
             window?.orderFront(nil)
         }
     }
 
     /// Hiding progress retains the same session; dismissal never implies permission to install.
-    func dismiss() { window?.orderOut(nil) }
+    func dismiss() {
+        if let window {
+            ExplicitWindowPresenter.shared.cancel(window)
+            window.orderOut(nil)
+            AppDockPresence.shared.windowDidCloseOrHide(window)
+        }
+    }
 
     /// Releases the hosting hierarchy at process termination without invoking a user response.
     func stop() {

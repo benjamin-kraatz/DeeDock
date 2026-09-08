@@ -24,6 +24,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !isRunningForCanvasPreview else { return }
         NSApp.setActivationPolicy(.accessory)
+        AppDockPresence.shared.start()
         loginItems.refresh()
         windowAccess.refresh()
         screenCapture.refresh()
@@ -36,11 +37,21 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         onboarding.presentIfNeeded()
     }
 
+    /// Reopening the app restores an owned window without creating another scene.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        guard !isRunningForCanvasPreview else { return false }
+        if let window = AppDockPresence.shared.windowToReopen {
+            ExplicitWindowPresenter.shared.present(window)
+        }
+        return false
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         guard !isRunningForCanvasPreview else { return }
         #if DIRECT_DISTRIBUTION
         updater.stop()
         #endif
+        AppDockPresence.shared.stop()
         onboarding.stop()
         loginItems.stop()
         windowAccess.stop()

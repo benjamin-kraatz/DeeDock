@@ -8,12 +8,17 @@ final class WindowSearchController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private var state: WindowSearchState?
     private var previousApplication: NSRunningApplication?
+    private var focusGeneration = UUID()
     private var restoresFocus = true
 
     init(capsules: SessionCapsuleController) { self.capsules = capsules }
 
     func show(returningTo application: NSRunningApplication? = nil) {
-        if let window { NSApp.activate(); window.makeKeyAndOrderFront(nil); return }
+        if let window {
+            ExplicitWindowPresenter.shared.present(window)
+            focusGeneration = ExplicitWindowPresenter.shared.generation
+            return
+        }
         previousApplication = application ?? NSWorkspace.shared.frontmostApplication
         restoresFocus = true
         let state = WindowSearchState(capsules: capsules)
@@ -37,13 +42,15 @@ final class WindowSearchController: NSObject, NSWindowDelegate {
             self.window?.close()
         }
         state.activated = { [weak self] in self?.restoresFocus = false; self?.window?.close() }
-        NSApp.activate(); window.makeKeyAndOrderFront(nil)
+        ExplicitWindowPresenter.shared.present(window)
+        focusGeneration = ExplicitWindowPresenter.shared.generation
         state.refresh()
     }
 
     func windowWillClose(_ notification: Notification) {
         state?.stop(); state = nil; window = nil
-        if restoresFocus, let previousApplication, !previousApplication.isTerminated,
+        if restoresFocus, focusGeneration == ExplicitWindowPresenter.shared.generation, NSApp.isActive,
+           let previousApplication, !previousApplication.isTerminated,
            previousApplication.processIdentifier != ProcessInfo.processInfo.processIdentifier {
             previousApplication.activate(options: [])
         }

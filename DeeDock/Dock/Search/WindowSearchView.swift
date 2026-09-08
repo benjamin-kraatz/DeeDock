@@ -18,7 +18,7 @@ struct WindowSearchView: View {
             }
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            WindowSearchFooterView { openWindow(id: "settings") }
+            WindowSearchFooterView { openWindow.openDockSettings() }
         }
         .frame(minWidth: WindowSearchStyle.minimumSize.width, minHeight: WindowSearchStyle.minimumSize.height)
         .background(reduceTransparency ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor))

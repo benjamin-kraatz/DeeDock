@@ -19,6 +19,7 @@ final class ApplicationCatalog {
     @ObservationIgnored var didChange: (() -> Void)?
     @ObservationIgnored var activated: ((NSRunningApplication) -> Void)?
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
+    @ObservationIgnored private var ownedWindowsObserver: NSObjectProtocol?
     @ObservationIgnored private var tasks: [String: Task<Void, Never>] = [:]
     @ObservationIgnored private var documentTasks: [UUID: Task<Void, Never>] = [:]
     @ObservationIgnored private var generation = UUID()
@@ -52,6 +53,11 @@ final class ApplicationCatalog {
                 }
             }
         })
+        ownedWindowsObserver = NotificationCenter.default.addObserver(
+            forName: AppDockPresence.didChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.refresh() }
+        }
         refresh()
         suggestionObservation.start()
     }
@@ -173,6 +179,8 @@ final class ApplicationCatalog {
         generation = UUID()
         observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
         observers.removeAll()
+        if let ownedWindowsObserver { NotificationCenter.default.removeObserver(ownedWindowsObserver) }
+        ownedWindowsObserver = nil
         tasks.values.forEach { $0.cancel() }
         tasks.removeAll()
         documentTasks.values.forEach { $0.cancel() }

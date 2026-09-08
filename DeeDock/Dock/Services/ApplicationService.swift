@@ -11,15 +11,20 @@ final class ApplicationService: ApplicationServicing {
     /// Uses the supplied workspace; constructing the service does not enumerate or launch apps.
     init(workspace: NSWorkspace = .shared) { self.workspace = workspace }
 
-    /// Returns regular, bundle-backed apps, excluding DDock and background/accessory processes.
+    /// Returns regular apps plus DDock while it owns an open window. Other accessory apps stay excluded.
     func runningApplications() -> [ApplicationReference] {
-        workspace.runningApplications.compactMap { app in
+        var applications = workspace.runningApplications.compactMap { app -> ApplicationReference? in
             guard app.activationPolicy == .regular,
                   app.processIdentifier != ProcessInfo.processInfo.processIdentifier,
                   let url = app.bundleURL else { return nil }
             return ApplicationReference(bundleIdentifier: app.bundleIdentifier, url: url,
                                         name: app.localizedName ?? url.deletingPathExtension().lastPathComponent)
         }
+        if AppDockPresence.shared.hasOpenWindows {
+            applications.append(ApplicationReference(bundleIdentifier: Bundle.main.bundleIdentifier,
+                url: Bundle.main.bundleURL, name: String(localized: .appName)))
+        }
+        return applications
     }
 
     /// Resolves the initial pin choices, skipping apps that are not installed.
@@ -59,6 +64,12 @@ final class ApplicationService: ApplicationServicing {
     /// The live foreground process is checked at click time. Dock snapshots intentionally track
     /// only running state and may lag behind activation changes by one main-run-loop turn.
     func performPrimaryAction(_ reference: ApplicationReference) async throws -> ApplicationPrimaryActionOutcome {
+        // Hiding ourselves would also hide the user's replacement dock. The self tile always
+        // restores the requested app window, even when DDock already owns keyboard focus.
+        if AppDockPresence.representsCurrentApplication(reference) {
+            try await open(reference)
+            return .opened
+        }
         if let frontmost = workspace.frontmostApplication, matches(frontmost, reference: reference) {
             try await hide(frontmost)
             return .hidden
@@ -116,6 +127,11 @@ final class ApplicationService: ApplicationServicing {
     /// - Throws: A missing-bundle error or the failure reported by Launch Services.
     /// - Note: Cancellation cannot undo a launch already submitted to macOS.
     func open(_ reference: ApplicationReference) async throws {
+        if AppDockPresence.representsCurrentApplication(reference),
+           let window = AppDockPresence.shared.windowToReopen {
+            ExplicitWindowPresenter.shared.present(window)
+            return
+        }
         let access = ApplicationResourceAccess(reference)
         defer { withExtendedLifetime(access) {} }
         guard let url = resolvedURL(for: reference) else {

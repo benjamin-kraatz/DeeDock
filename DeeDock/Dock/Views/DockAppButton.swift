@@ -85,8 +85,7 @@ struct DockAppButton: View {
                 interaction: interaction,
                 openSettings: {
                     interaction?.prepareSettings?()
-                    NSApp.activate()
-                    openWindow(id: "settings")
+                    openWindow.openDockSettings()
                 },
                 tracking: menuTracking
             )

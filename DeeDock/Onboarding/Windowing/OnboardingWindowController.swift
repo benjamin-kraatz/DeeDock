@@ -45,8 +45,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         if window == nil { store.restart() }
         let window = window ?? makeWindow()
         self.window = window
-        NSApp.activate()
-        window.makeKeyAndOrderFront(nil)
+        ExplicitWindowPresenter.shared.present(window)
     }
 
     /// Closes the tour and releases its window. Dismissal counts as having seen it.

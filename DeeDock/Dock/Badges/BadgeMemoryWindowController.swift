@@ -15,6 +15,7 @@ final class BadgeMemoryWindowController: NSObject, NSWindowDelegate {
     private let presentation = BadgeMemoryPresentation()
     private var window: NSWindow?
     private var previousApplication: NSRunningApplication?
+    private var focusGeneration = UUID()
     private var activationID = UUID()
 
     init(memory: BadgeMemoryStore) { self.memory = memory }
@@ -23,7 +24,11 @@ final class BadgeMemoryWindowController: NSObject, NSWindowDelegate {
         presentation.path = path
         presentation.tab = digest ? 1 : 0
         presentation.activationFailed = false
-        if let window { NSApp.activate(); window.makeKeyAndOrderFront(nil); return }
+        if let window {
+            ExplicitWindowPresenter.shared.present(window)
+            focusGeneration = ExplicitWindowPresenter.shared.generation
+            return
+        }
         previousApplication = application ?? NSWorkspace.shared.frontmostApplication
         let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 820, height: 620),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
@@ -43,7 +48,8 @@ final class BadgeMemoryWindowController: NSObject, NSWindowDelegate {
                                    width: size.width, height: size.height), display: false)
         }
         self.window = window
-        NSApp.activate(); window.makeKeyAndOrderFront(nil)
+        ExplicitWindowPresenter.shared.present(window)
+        focusGeneration = ExplicitWindowPresenter.shared.generation
     }
 
     private func activate(_ path: String) {
@@ -65,7 +71,8 @@ final class BadgeMemoryWindowController: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         activationID = UUID(); window = nil
-        if NSWorkspace.shared.frontmostApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier,
+        if focusGeneration == ExplicitWindowPresenter.shared.generation,
+           NSWorkspace.shared.frontmostApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier,
            let previousApplication, !previousApplication.isTerminated,
            previousApplication.processIdentifier != ProcessInfo.processInfo.processIdentifier {
             previousApplication.activate(options: [])
