@@ -1,6 +1,306 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "badgeMemoryApps" : {
+      "comment" : "Heading of the list of apps that have retained badge history.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracked apps"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasste Apps"
+          }
+        }
+      }
+    },
+    "badgeMemoryChangesCount" : {
+      "comment" : "Number of observed badge changes recorded for one app in a focus digest.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld change"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld changes"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Änderung"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Änderungen"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "badgeMemoryDeltaLabel" : {
+      "comment" : "Label of the tile showing the change since the last checked value.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Since last checked"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seit der letzten Prüfung"
+          }
+        }
+      }
+    },
+    "badgeMemoryEnded" : {
+      "comment" : "Label for the time a focus digest stopped collecting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ended"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestoppt"
+          }
+        }
+      }
+    },
+    "badgeMemoryHistoryEmpty" : {
+      "comment" : "Shown when a tracked app has a baseline but no retained changes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No changes recorded for this app yet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diese App wurden noch keine Änderungen erfasst."
+          }
+        }
+      }
+    },
+    "badgeMemoryNoAppSelected" : {
+      "comment" : "Placeholder shown while no app is selected in the badge details list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose an app to see its badge history."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle eine App, um ihren Badge-Verlauf zu sehen."
+          }
+        }
+      }
+    },
+    "badgeMemoryStarted" : {
+      "comment" : "Label for the time a focus digest began collecting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Started"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestartet"
+          }
+        }
+      }
+    },
+    "fileRouteActivateHelp" : {
+      "comment" : "Explains what activation does and does not do, next to the activate action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brings the destination forward. The files stay here until you drag them."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holt das Ziel nach vorn. Die Dateien bleiben hier, bis du sie ziehst."
+          }
+        }
+      }
+    },
+    "fileRouteCopyHelp" : {
+      "comment" : "Explains the clipboard action next to Copy file references.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puts the file references on the clipboard, for apps that accept paste."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legt die Dateiverweise in die Zwischenablage – für Apps, die Einfügen unterstützen."
+          }
+        }
+      }
+    },
+    "fileRouteFailuresTitle" : {
+      "comment" : "Heading above the filenames an app-level open request did not accept.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not accepted"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht angenommen"
+          }
+        }
+      }
+    },
+    "fileRouteFileCount" : {
+      "comment" : "Count of file references held by the handoff panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "fileRouteFilesTitle" : {
+      "comment" : "Heading of the file list inside the handoff panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien"
+          }
+        }
+      }
+    },
+    "fileRouteMoreActions" : {
+      "comment" : "Heading above the handoff actions that are alternatives to dragging.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other ways to continue"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Möglichkeiten"
+          }
+        }
+      }
+    },
+    "fileRouteWindowDestination" : {
+      "comment" : "Label for a destination that is one exact accessible window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected window"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewähltes Fenster"
+          }
+        }
+      }
+    },
     "fileRouteDestinationUnavailable" : {
       "comment" : "File destination disappeared or Peek was disabled before picker or drop completion.",
       "extractionState" : "manual",

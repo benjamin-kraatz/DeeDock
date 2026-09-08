@@ -8,11 +8,19 @@ final class WindowFileHandoffState {
     let documents: DocumentResourceAccess
     let appName: String
     let windowTitle: String?
+    /// Destination app artwork, resolved once so the panel stays recognizable on its own.
+    let icon: NSImage
+    /// Cache key for the icon's extracted color: the destination's stable application identity.
+    let iconIdentity: String
+    /// The staged batch in drop order, with the names, locations, and type icons the list shows.
+    let files: [WindowFileHandoffFile]
+    /// Stable identity for the drag source view, so a redraw never restarts a running drag.
+    let dragID = UUID()
     var busy = true
     var valid = false
     var activationAvailable = true
     var openRequested = false
-    var status: LocalizedStringResource = .fileRouteChecking
+    var status: WindowFileHandoffStatus = .checking
     var failures: [String] = []
     var preview: DockFilePreviewItem?
     @ObservationIgnored var activate: (() -> Void)?
@@ -20,10 +28,14 @@ final class WindowFileHandoffState {
     @ObservationIgnored var copy: (() -> Void)?
     @ObservationIgnored var close: (() -> Void)?
 
-    init(documents: DocumentResourceAccess, appName: String, windowTitle: String?) {
+    init(documents: DocumentResourceAccess, appName: String, windowTitle: String?, icon: NSImage,
+         iconIdentity: String) {
         self.documents = documents
         self.appName = appName
         self.windowTitle = windowTitle
+        self.icon = icon
+        self.iconIdentity = iconIdentity
+        files = documents.urls.map(WindowFileHandoffFile.init)
     }
 }
 
@@ -54,7 +66,9 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
             ApplicationContextMenuProjection.windowTitle($0, untitled: String(localized: .applicationMenuUntitledWindow))
         }
         let state = WindowFileHandoffState(documents: documents, appName: item.reference.name,
-                                           windowTitle: exactWindow ? title : nil)
+                                           windowTitle: exactWindow ? title : nil,
+                                           icon: applications.icon(for: applications.resolvedURL(for: item.reference)),
+                                           iconIdentity: item.reference.id)
         self.state = state
         let processes = menus.snapshot(for: item).processes.compactMap {
             NSRunningApplication(processIdentifier: $0.processIdentifier)
@@ -66,12 +80,18 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
         state.open = { [weak self] in self?.open(item.reference) }
         state.copy = { [weak self] in self?.copyReferences() }
         state.close = { [weak self] in self?.stop() }
-        let size = CGSize(width: min(500, visibleFrame.width - 24), height: min(620, visibleFrame.height - 24))
+        let size = CGSize(width: min(540, visibleFrame.width - 24), height: min(700, visibleFrame.height - 24))
         let panel = NSPanel(contentRect: CGRect(x: visibleFrame.midX - size.width / 2,
                                                 y: visibleFrame.midY - size.height / 2,
                                                 width: size.width, height: size.height),
-                            styleMask: [.titled, .closable, .nonactivatingPanel], backing: .buffered, defer: false)
+                            styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
+                            backing: .buffered, defer: false)
+        // The SwiftUI header names the destination, so the titlebar only has to stay out of its way.
         panel.title = String(localized: .fileRouteTitle)
+        panel.titleVisibility = .hidden
+        panel.titlebarAppearsTransparent = true
+        panel.isMovableByWindowBackground = true
+        panel.contentMinSize = NSSize(width: 420, height: 480)
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
         panel.level = .floating
@@ -90,7 +110,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
             guard let self, !Task.isCancelled, current == generation else { return }
             state.busy = false
             state.valid = valid
-            state.status = valid ? .fileRouteReady : .fileRouteInvalid
+            state.status = valid ? .ready : .invalid
             task = nil
         }
     }
@@ -106,16 +126,16 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
             actionID = menus.perform(.selectWindow(window.token), for: item) { [weak self] error in
                 guard let self, current == generation else { return }
                 state.busy = false
-                state.status = error ?? .fileRouteActivated
+                state.status = error.map(WindowFileHandoffStatus.actionFailed) ?? .activated
                 actionID = nil
             }
         } else {
             guard let app = processes.first(where: { !$0.isTerminated }), app.activate(options: []) else {
                 state.activationAvailable = false
-                state.status = .fileRouteAppUnavailable
+                state.status = .appUnavailable
                 return
             }
-            state.status = .fileRouteActivated
+            state.status = .activated
         }
     }
 
@@ -123,7 +143,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
         guard let state, state.valid, !state.busy else { return }
         NSPasteboard.general.clearContents()
         let written = NSPasteboard.general.writeObjects(state.documents.urls.map { $0 as NSURL })
-        state.status = written ? .fileRouteCopied : .fileRouteCopyFailed
+        state.status = written ? .copied : .copyFailed
     }
 
     private func open(_ reference: ApplicationReference) {
@@ -152,7 +172,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
             guard let self, current == generation else { return }
             state.busy = false
             state.failures = failures
-            state.status = .fileRouteOpenResult(submitted, documents.urls.count)
+            state.status = .openResult(submitted: submitted, total: documents.urls.count)
             task = nil
         }
     }
