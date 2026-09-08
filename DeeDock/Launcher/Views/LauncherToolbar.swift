@@ -2,25 +2,34 @@ import SwiftUI
 
 /// Filters constrain both ordinary and Robi results; search relevance precedes the selected tie-break order.
 struct LauncherToolbar: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var state: LauncherState
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 12) {
-                filters
+                LauncherSearchKindPicker(launcher: state)
+                kindActionsOrFilters
                 Spacer(minLength: 8)
-                options
+                if !hasDiscreteKindSelected { options }
                 robi
             }
             VStack(alignment: .leading, spacing: 10) {
-                filters
+                HStack(spacing: 12) {
+                    LauncherSearchKindPicker(launcher: state)
+                    kindActionsOrFilters
+                }
                 HStack {
-                    options
+                    if !hasDiscreteKindSelected { options }
                     Spacer()
                     robi
                 }
             }
         }
+    }
+    
+    private var hasDiscreteKindSelected: Bool {
+        state.search.kind != .all && state.search.kind != .application
     }
 
     private var filters: some View {
@@ -33,7 +42,29 @@ struct LauncherToolbar: View {
         }
         .labelsHidden()
         .controlSize(.large)
-        .pickerStyle(.menu).fixedSize()
+        .pickerStyle(.menu)
+        .disabled(hasDiscreteKindSelected)
+        .fixedSize()
+    }
+    
+    private var kindActionsOrFilters: some View {
+        ZStack(alignment: .leading) {
+            if hasDiscreteKindSelected {
+                mixedResultActions
+                    .transition(kindActionTransition)
+            } else {
+                filters
+                    .transition(kindActionTransition)
+            }
+        }
+        .animation(
+            reduceMotion ? nil : .snappy(duration: 0.24),
+            value: hasDiscreteKindSelected
+        )
+    }
+
+    private var kindActionTransition: some Transition {
+        .blurReplace
     }
 
     private var options: some View {
@@ -74,6 +105,35 @@ struct LauncherToolbar: View {
             .controlSize(.large)
             .fixedSize()
         }
+    }
+
+    private var mixedResultActionTarget: LauncherSearchResult? {
+        guard let selectedID = state.search.selectedID else {
+            return state.search.visible.first
+        }
+
+        return state.search.visible.first { $0.id == selectedID }
+    }
+
+    private var mixedResultActions: some View {
+        Menu {
+            if let result = mixedResultActionTarget {
+                LauncherMixedResultMenu(
+                    result: result,
+                    launcher: state
+                )
+            }
+        } label: {
+            Label {
+                Text(.unifiedResultActions)
+            } icon: {
+                Image(systemName: "ellipsis.circle")
+            }
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .font(.callout)
+        .disabled(mixedResultActionTarget == nil)
     }
 
     private var robi: some View {

@@ -130,8 +130,8 @@ final class LauncherPresentationController {
                panel.firstResponder is NSTextView,
                event.modifierFlags.intersection([.command, .control, .option, .shift]).isEmpty {
                 switch event.keyCode {
-                case 125: state.moveSelection(by: state.layout == .grid ? state.navigationColumns : 1); return nil
-                case 126: state.moveSelection(by: state.layout == .grid ? -state.navigationColumns : -1); return nil
+                case 125: state.moveSelection(by: state.usesGridNavigation ? state.navigationColumns : 1); return nil
+                case 126: state.moveSelection(by: state.usesGridNavigation ? -state.navigationColumns : -1); return nil
                 case 123 where state.keyboardNavigationActive: state.moveSelection(by: -1); return nil
                 case 124 where state.keyboardNavigationActive: state.moveSelection(by: 1); return nil
                 default: break

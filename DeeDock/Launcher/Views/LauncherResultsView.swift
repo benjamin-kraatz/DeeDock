@@ -80,22 +80,28 @@ struct LauncherResultsView: View {
     }
 }
 
-private struct LauncherResultButton: View {
+struct LauncherResultButton: View {
     let application: LauncherApplication
     let state: LauncherState
+    /// Mixed search retains typed membership and action guards; ordinary browsing uses its existing owner directly.
+    var searchResult: LauncherSearchResult? = nil
     @State private var icon: NSImage?
     @State private var hovered = false
 
-    private var selected: Bool { state.selectedID == application.id }
+    private var selected: Bool { state.usesMixedResults ? state.search.selectedID == .application(application.id) : state.selectedID == application.id }
     private var pinned: Bool { state.pinnedIDs.contains(application.id) }
     private var running: Bool {
         state.catalog.runningIDs.contains(application.id)
     }
     private var busy: Bool { state.catalog.launching.contains(application.id) }
+    private var interactionBlocked: Bool {
+        busy || (searchResult != nil && (state.search.actionBusy || state.search.ranking || !state.search.active))
+    }
 
     var body: some View {
         Button {
-            state.open(application)
+            if let searchResult { state.search.activate(searchResult) }
+            else { state.open(application) }
         } label: {
             Group {
                 if state.layout == .grid {
@@ -142,9 +148,9 @@ private struct LauncherResultButton: View {
             }
             .contentShape(.rect)
         }
-        .buttonStyle(.plain).disabled(busy)
+        .buttonStyle(.plain).disabled(interactionBlocked)
         .contextMenu {
-            LauncherApplicationMenu(application: application, state: state)
+            LauncherApplicationMenu(application: application, state: state, searchResult: searchResult)
         }
         .onHover { hovered = $0 }
         .task(id: application.reference.url) {

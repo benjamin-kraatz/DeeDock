@@ -19,7 +19,7 @@ struct WindowSearchResultView: View {
     private var showsExcerpt: Bool {
         switch result.evidence {
         case .metadata: false
-        case .text, .capsule, .image: !result.excerpt.isEmpty
+        case .text, .capsule, .historicalOCR, .image: !result.excerpt.isEmpty
         }
     }
     private var opensAppOnly: Bool {

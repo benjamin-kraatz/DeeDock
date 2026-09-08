@@ -144,6 +144,24 @@ final class ShelfCoordinator {
 
     // MARK: - Item commands
 
+    /// Shared Launcher route. Resolve the current stored ID and retain its scope through Workspace completion.
+    func openReference(_ id: UUID, reveal: Bool, completion: @escaping (String?) -> Void) {
+        guard let access = shelf.resolve(id) else {
+            completion(String(localized: .shelfUnavailableItems)); return
+        }
+        if reveal {
+            NSWorkspace.shared.activateFileViewerSelecting([access.url])
+            withExtendedLifetime(access) { completion(nil) }
+            return
+        }
+        NSWorkspace.shared.open(access.url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+            MainActor.assumeIsolated {
+                defer { withExtendedLifetime(access) {} }
+                completion(error?.localizedDescription)
+            }
+        }
+    }
+
     /// Opens each item with its default application, exactly as double-clicking it in Finder does.
     private func open(_ items: [ShelfItem]) {
         let resolved = items.compactMap { shelf.resolve($0.id) }

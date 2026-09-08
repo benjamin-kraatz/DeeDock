@@ -39,11 +39,6 @@ struct WindowSearchView: View {
                                           onDelete: { confirmsDelete = true })
         } else {
             VStack(alignment: .leading, spacing: 12) {
-                if let message = state.message {
-                    WindowSearchNoticeView(message: message)
-                        .padding(.horizontal, WindowSearchStyle.contentPadding)
-                        .padding(.top, 12)
-                }
                 if state.scope == .captured && !state.snapshots.isEmpty {
                     WindowSearchCapturedBarView(state: state)
                         .padding(.horizontal, WindowSearchStyle.contentPadding)

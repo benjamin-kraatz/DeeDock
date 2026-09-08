@@ -70,7 +70,8 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 ## Using DDock
 
 The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes
-grid and list views, filters, sorting, grouping, and a history of apps opened through DDock.
+grid and list app browsing plus unified search for apps, windows, Capsules/Breadcrumbs, Shelf files,
+pinned Shortcuts, and Dock Modes. App browsing retains filters, sorting, grouping, and launch history.
 **Ask Robi** uses on-device Apple Intelligence to suggest apps for a task you describe.
 See the [launcher reference](docs/LAUNCHER.md) for controls and discovery limits, and the
 [acceptance notes](docs/ACCEPTANCE.md#dee-8-app-launcher) for validation status.
