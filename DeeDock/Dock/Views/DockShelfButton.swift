@@ -85,6 +85,8 @@ struct DockShelfButton: View {
             interaction.openShelf?()
         }
         .accessibilityAction(named: Text(.shelfClear)) { confirmClear() }
+        // VoiceOver invokes the same fresh-read command without inspecting the clipboard during rendering.
+        .accessibilityAction(named: Text(.shelfPasteClipboard)) { interaction.pasteToShelf?() }
     }
 
     private var badge: some View {
@@ -240,6 +242,9 @@ private struct ShelfContextMenuBridge: NSViewRepresentable {
         override func mouseDown(with event: NSEvent) { show(event) }
 
         private func show(_ event: NSEvent) {
+            // Text classification may ask for clipboard access before AppKit opens the menu.
+            tracking?(true)
+            defer { tracking?(false) }
             let menu = NSMenu()
             menu.delegate = self
             menu.autoenablesItems = false
@@ -249,6 +254,9 @@ private struct ShelfContextMenuBridge: NSViewRepresentable {
                 symbol: "rectangle.stack.fill",
                 to: menu
             )
+            if interaction?.canPasteToShelf?() == true {
+                add(.shelfPasteClipboard, action: #selector(paste(_:)), symbol: "doc.on.clipboard", to: menu)
+            }
             add(
                 .shelfClear,
                 action: #selector(clear),
@@ -265,7 +273,6 @@ private struct ShelfContextMenuBridge: NSViewRepresentable {
             )
             trackedMenu = menu
             NSMenu.popUpContextMenu(menu, with: event, for: self)
-            tracking?(false)
             trackedMenu = nil
         }
 
@@ -292,6 +299,7 @@ private struct ShelfContextMenuBridge: NSViewRepresentable {
 
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
+        @objc private func paste(_ sender: Any?) { interaction?.pasteToShelf?() }
         @objc private func open() { interaction?.openShelf?() }
         @objc private func clear() { clearShelf?() }
         @objc private func settings() { openSettings?() }

@@ -122,6 +122,9 @@
 		DEE8B0000000000000000004 /* DeeDock/Launcher/Windowing/LauncherGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE8F0000000000000000004 /* DeeDock/Launcher/Windowing/LauncherGeometry.swift */; };
 		DE26B000000000000000000E /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionSyntheticHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F000000000000000000E /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionSyntheticHistory.swift */; };
 		DE26B000000000000000000F /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionSyntheticPlayback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26F000000000000000000F /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionSyntheticPlayback.swift */; };
+		DE28B0000000000000000001 /* ShelfClipboardReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE28F0000000000000000001 /* ShelfClipboardReader.swift */; };
+		DE28B0000000000000000002 /* ShelfClipboardArtifacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE28F0000000000000000002 /* ShelfClipboardArtifacts.swift */; };
+		DE28B0000000000000000003 /* ShelfClipboardImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE28F0000000000000000003 /* ShelfClipboardImporter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -244,6 +247,9 @@
 		DEE8F0000000000000000004 /* DeeDock/Launcher/Windowing/LauncherGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Windowing/LauncherGeometry.swift; sourceTree = SOURCE_ROOT; };
 		DE26F000000000000000000E /* DeeDock/Launcher/Suggestions/Models/LauncherSuggestionSyntheticHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/Models/LauncherSuggestionSyntheticHistory.swift; sourceTree = SOURCE_ROOT; };
 		DE26F000000000000000000F /* DeeDock/Launcher/Suggestions/State/LauncherSuggestionSyntheticPlayback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Launcher/Suggestions/State/LauncherSuggestionSyntheticPlayback.swift; sourceTree = SOURCE_ROOT; };
+		DE28F0000000000000000001 /* ShelfClipboardReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/Clipboard/ShelfClipboardReader.swift; sourceTree = SOURCE_ROOT; };
+		DE28F0000000000000000002 /* ShelfClipboardArtifacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/Clipboard/ShelfClipboardArtifacts.swift; sourceTree = SOURCE_ROOT; };
+		DE28F0000000000000000003 /* ShelfClipboardImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/Clipboard/ShelfClipboardImporter.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -360,6 +366,9 @@
 				AB0300000000000000000001 /* DeeDock/Dock/Shelf/ShelfRepository.swift */,
 				AB0300000000000000000002 /* DeeDock/Dock/Shelf/ShelfResourceAccess.swift */,
 				AB0300000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift */,
+				DE28F0000000000000000003 /* ShelfClipboardImporter.swift */,
+				DE28F0000000000000000002 /* ShelfClipboardArtifacts.swift */,
+				DE28F0000000000000000001 /* ShelfClipboardReader.swift */,
 				AB0600000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift */,
 				AB0600000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift */,
 				AB0800000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift */,
@@ -619,6 +628,9 @@
 				AB0400000000000000000001 /* DeeDock/Dock/Shelf/ShelfRepository.swift in Sources */,
 				AB0400000000000000000002 /* DeeDock/Dock/Shelf/ShelfResourceAccess.swift in Sources */,
 				AB0400000000000000000003 /* DeeDock/Dock/Shelf/ShelfController.swift in Sources */,
+				DE28B0000000000000000003 /* ShelfClipboardImporter.swift in Sources */,
+				DE28B0000000000000000002 /* ShelfClipboardArtifacts.swift in Sources */,
+				DE28B0000000000000000001 /* ShelfClipboardReader.swift in Sources */,
 				AB0500000000000000000000 /* DeeDock/Dock/SemanticStacks/SemanticStackModels.swift in Sources */,
 				AB0500000000000000000001 /* DeeDock/Dock/Shelf/ShelfSemanticWarmupController.swift in Sources */,
 				AB0700000000000000000000 /* DeeDock/Dock/Capsules/SessionCapsuleModels.swift in Sources */,
