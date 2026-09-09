@@ -9,6 +9,8 @@ import SwiftUI
 /// stop button attached. Nothing here samples or activates anything; every control is explicit.
 struct WindowWatchView: View {
     @Bindable var session: WindowWatchSession
+    var presets: WindowWatchPresetStore?
+    var actions: ActionTilesController?
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -121,6 +123,9 @@ struct WindowWatchView: View {
                     Text(.regionDragHint)
                         .font(.caption).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
+                    Text(.watchPresetRegionChangedHelp)
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         } else {
@@ -183,6 +188,14 @@ struct WindowWatchView: View {
                     }
                 }
             }
+            WindowWatchSection(title: .watchActionSection, symbol: "play.square") {
+                WindowWatchCompletionSetupView(completion: $session.completion, actions: actions, tint: tint)
+            }
+            if let presets {
+                WindowWatchSection(title: .watchPresetsTitle, symbol: "tray.full") {
+                    WindowWatchPresetSetupView(session: session, presets: presets, actions: actions, tint: tint)
+                }
+            }
         }
     }
 
@@ -241,6 +254,9 @@ struct WindowWatchView: View {
                 Text(.watchCheckCount(session.checkCount))
                     .font(.caption).foregroundStyle(.secondary).monospacedDigit()
             }
+            if let presets {
+                WindowWatchPresetRunNote(session: session, presets: presets)
+            }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -257,20 +273,29 @@ struct WindowWatchView: View {
                 .foregroundStyle(.green)
                 .symbolEffect(.bounce, options: .nonRepeating)
                 .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(.watchStatusDetected).font(.headline)
-                Text(session.message).font(.callout).fixedSize(horizontal: false, vertical: true)
-                if let date = session.lastSample {
-                    HStack(spacing: 4) { Text(.watchLastSample); Text(date, style: .time).monospacedDigit() }
-                        .font(.caption).foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(.watchStatusDetected).font(.headline)
+                    Text(session.message).font(.callout).fixedSize(horizontal: false, vertical: true)
+                    if let date = session.lastSample {
+                        HStack(spacing: 4) { Text(.watchLastSample); Text(date, style: .time).monospacedDigit() }
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
                 }
+                .accessibilityElement(children: .combine)
+                if let presets {
+                    WindowWatchPresetRunNote(session: session, presets: presets)
+                } else if session.runSnapshot != nil {
+                    Text(.watchSnapshotNote).font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                WindowWatchCompletionResultView(session: session, actions: actions, tint: .green)
             }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.green.opacity(0.12), in: .rect(cornerRadius: 14))
         .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(.green.opacity(0.28), lineWidth: 1) }
-        .accessibilityElement(children: .combine)
     }
 
     private var status: some View {
@@ -472,6 +497,15 @@ private extension WindowWatchPhase {
     WindowWatchView(session: watchPreviewSession(message: .watchChangeDetected, setup: false) {
         $0.detected = true
         $0.lastSample = Date()
+        $0.runSnapshot = WindowWatchRunSnapshot(
+            runID: UUID(), presetID: UUID(), presetName: "Export folder",
+            configuration: WindowWatchPresetConfiguration(
+                region: WindowWatchRegion(x: 0.1, y: 0.6, width: 0.4, height: 0.25),
+                usesPhrase: false, phrase: "", playSound: false,
+                completion: .openFolder(bookmark: Data([1]), name: "Exports")
+            )
+        )
+        $0.action.bind($0.runSnapshot!, outcome: .detected)
     })
     .frame(width: 520, height: 780)
 }

@@ -14,7 +14,7 @@ final class WindowPeekCoordinator {
     var validatedFileDrop: ((NSDraggingInfo) -> DocumentResourceAccess?)?
     var fileDropAccepted: (() -> Void)?
     var fileDragEnded: (() -> Void)?
-    private let watches = WindowWatchController()
+    private let watches: WindowWatchController
     private let portals = WindowPortalCoordinator()
     private let menus: ApplicationMenuController
     private let screenCapture: ScreenCaptureAccessController
@@ -41,11 +41,13 @@ final class WindowPeekCoordinator {
 
     init(menus: ApplicationMenuController, screenCapture: ScreenCaptureAccessController,
          applications: any ApplicationServicing,
-         thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService()) {
+         thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService(),
+         watchPresets: WindowWatchPresetStore, actions: ActionTilesController) {
         fileHandoff = WindowFileHandoffController(menus: menus, applications: applications)
         self.menus = menus
         self.screenCapture = screenCapture
         self.thumbnails = thumbnails
+        watches = WindowWatchController(presets: watchPresets, actions: actions)
     }
 
     func hover(_ item: DockItem?, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {

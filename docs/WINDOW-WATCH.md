@@ -4,8 +4,8 @@ Choose **Watch this** on a Window Peek card, in its context menu, or through its
 In keyboard Peek, select a card and press W. The persistent panel takes keyboard focus only after
 this explicit action. Choose **Whole window**, drag a rectangle over the preview, or use the four
 labeled sliders with the keyboard. Slider values and the orange outline show the same bounded region.
-Choose a condition and select **Start watching**. Only one watch runs at a time; another request
-reveals the existing panel without replacing its source.
+Choose a condition, optionally save the setup as a named watch, and select **Start watching**. Only
+one watch runs at a time; another request reveals the existing panel without replacing its source.
 
 The watch samples after each previous request finishes, with a three-second delay. It keeps the
 indicator and Stop control in a floating panel across Spaces. **Stop watching**, Command-period,
@@ -18,6 +18,34 @@ This slice does not send system notifications or request notification permission
 window. Missing Window Access or an ambiguous match produces an explanation. **Show source app** is
 a separate, explicitly labeled fallback that can activate a different frontmost window in that app.
 Neither command runs automatically on detection.
+
+## Saved watches
+
+**Save watch** stores a name, optional app hint, normalized region, condition, phrase, sound
+preference, and an optional folder or Shortcut action. Screenshots, OCR, capture buffers, and window
+IDs are not saved. DDock keeps at most 30 presets. Unreadable storage is left in place until you
+choose **Reset saved watches**.
+
+A later run still starts from Window Peek. Apply a saved watch to the current window, check the
+region on that window, then press **Start watching**. An app or title hint can group suggestions. It
+never starts capture and never picks among duplicate titles. Matching coordinates do not prove the
+same button or status label is still there.
+
+Start copies the configuration onto that run. Editing or deleting the saved watch after Start leaves
+the running snapshot unchanged. Delete removes the saved configuration only. It does not delete
+files or undo an action that already ran.
+
+## Completion actions
+
+**When it finishes** can offer **Open configured folder** or **Run configured Shortcut** after the
+detector finishes. Both wait for a click or keyboard action. DDock does not infer an output folder
+from window text, does not pass captured pixels or OCR to a Shortcut, and does not run the action on
+launch, wake, cancel, timeout, or source loss. The folder is a user-selected, bookmarked location.
+The Shortcut uses its stable identifier, the same way Action Tiles do.
+
+A failed folder or Shortcut is shown separately from the watch evidence. You can choose the folder
+or Shortcut again, or skip the action. A second click, a late frame, or a repeated detector result
+cannot run the same action twice after it succeeds. Stop remains in the footer while a watch runs.
 
 ## Detection rules
 

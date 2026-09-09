@@ -1504,6 +1504,48 @@ Fusion, and Portal actions, keyboard shortcuts, localization, and acceptance not
 Debug app build passed at `/tmp/DeeDock-dee11-portals-merge-build.log`. Tests and native acceptance
 were not run.
 
+## DEE-25: reusable window watches
+
+Implementation and limits are described in [Watch a window](WINDOW-WATCH.md). Saved presets store a
+name, optional app hint, normalized region, condition, phrase, sound preference, and an optional
+folder or Shortcut action. Screenshots, OCR, capture buffers, and window IDs are not persisted. Each
+run still starts from Window Peek, applies a preset to a current window, and waits for Start.
+Completion actions require an explicit click. Stop, cancel, source loss, and wake never run them.
+
+Model/state cases worth testing when authorized:
+
+- Save, reload after restart, duplicate, delete, capacity of 30, and explicit reset of unreadable
+  storage without overwriting corrupt bytes.
+- App-hint suggestions versus a silent window match. Duplicate titles stay a Peek choice.
+- Start copies a snapshot; later preset edits or deletes leave the running configuration unchanged.
+- Detector completion offers the configured action. Cancel, stop, timeout, and source loss do not.
+- Run identity rejects a second click, a stale detector callback, and a late Shortcut completion.
+- A missing folder or Shortcut fails beside the watch evidence and can be repaired or skipped.
+- Launch or wake after completion does not start a watch or run its action.
+
+Manual acceptance, all pending:
+
+- Save a phrase watch, quit DDock, bind it to a new current window, review the region, and start.
+  Confirm no periodic capture before Watch this and no watching before Start.
+- Apply a preset to a resized or retitled window and reselect the region when the outline is wrong.
+- Complete, cancel, stop, and close the source; only the completed run shows its action button.
+- Double-click the Shortcut action. Delete or move the output folder. Rename or remove the Shortcut.
+- Edit or delete the saved preset while a watch runs and confirm the snapshot copy in the panel.
+- Restart or wake after completion and confirm the action does not run.
+
+The focused Debug app build passed with Xcode 27, macOS deployment target 27, Swift 5 language
+mode, MainActor default isolation, and approachable concurrency. Command:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee25-build \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+Log: `/tmp/DeeDock-dee25-build`. All 51 new watch-preset keys matched their compiled English and
+German `.lproj/Localizable.strings` values. Tests, automated visual checks, and native app launch
+were not run. Compilation is not native acceptance. Do not mark DEE-25 Done on compilation alone.
+
 ## DEE-12: files through Window Peek
 
 `feature/dee-12` adds delayed file-drag Peek, destination selection, a retained file handoff panel,

@@ -9,14 +9,21 @@ private final class WindowWatchPanel: NSPanel {
 /// App-wide single-watch owner. A second request reveals the existing watch instead of replacing it.
 @MainActor
 final class WindowWatchController: NSObject, NSWindowDelegate {
+    private let presets: WindowWatchPresetStore
+    private let actions: ActionTilesController
     private var panel: NSPanel?
     private var session: WindowWatchSession?
     private var previousWork: Task<Void, Never>?
     private var displayObserver: NSObjectProtocol?
 
+    init(presets: WindowWatchPresetStore, actions: ActionTilesController) {
+        self.presets = presets
+        self.actions = actions
+    }
+
     func show(_ summary: ApplicationWindowSummary, visibleFrame: CGRect) {
         if let panel { panel.makeKeyAndOrderFront(nil); return }
-        let session = WindowWatchSession(summary: summary, after: previousWork)
+        let session = WindowWatchSession(summary: summary, after: previousWork, presets: presets)
         let panel = WindowWatchPanel(contentRect: CGRect(x: 0, y: 0, width: 520, height: 780),
                                      styleMask: [.titled, .closable, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.title = String(localized: .watchTitle)
@@ -24,7 +31,7 @@ final class WindowWatchController: NSObject, NSWindowDelegate {
         panel.hidesOnDeactivate = false
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.contentView = NSHostingView(rootView: WindowWatchView(session: session))
+        panel.contentView = NSHostingView(rootView: WindowWatchView(session: session, presets: presets, actions: actions))
         panel.delegate = self
         self.panel = panel
         self.session = session
