@@ -117,7 +117,10 @@ struct DockContentView: View {
                         scrollPosition.scrollTo(x: offset)
                     }
                 }
-                .scrollIndicators(.hidden)
+                // `.hidden` permits legacy mouse scrollbars on macOS. Their gutter
+                // changes the cross-axis viewport during item insertion and shifts
+                // the dock's baseline. Keyboard and wheel scrolling remain available.
+                .scrollIndicators(.never)
                 .scrollClipDisabled()
                 .coordinateSpace(name: "dockViewport")
                 .onAppear {
