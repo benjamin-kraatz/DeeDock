@@ -10,10 +10,12 @@ nonisolated struct FolderStackEntryReference: Equatable, Identifiable, Sendable 
     let byteCount: Int64?
     let createdAt: Date?
     let modifiedAt: Date?
+    let contents: FolderContentsMetrics?
     var id: String { url.standardizedFileURL.path }
 
     init(url: URL, name: String, isFolder: Bool, contentType: String? = nil,
-         byteCount: Int64? = nil, createdAt: Date? = nil, modifiedAt: Date? = nil) {
+         byteCount: Int64? = nil, createdAt: Date? = nil, modifiedAt: Date? = nil,
+         contents: FolderContentsMetrics? = nil) {
         self.url = url
         self.name = name
         self.isFolder = isFolder
@@ -21,6 +23,19 @@ nonisolated struct FolderStackEntryReference: Equatable, Identifiable, Sendable 
         self.byteCount = byteCount
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
+        self.contents = contents
+    }
+
+    /// Returns a copy that keeps identity and file metadata and replaces contents metrics.
+    func withContents(_ contents: FolderContentsMetrics?) -> FolderStackEntryReference {
+        FolderStackEntryReference(url: url, name: name, isFolder: isFolder, contentType: contentType,
+            byteCount: byteCount, createdAt: createdAt, modifiedAt: modifiedAt, contents: contents)
+    }
+
+    /// Files use metadata size. Folders use a finished contents total and never the directory-entry size.
+    var sizeSortByteCount: Int64 {
+        if isFolder { return contents?.sortByteCount ?? -1 }
+        return byteCount ?? -1
     }
 
     var semanticCandidate: SemanticStackCandidate {
@@ -43,6 +58,11 @@ struct FolderStackEntry: Identifiable {
     let reference: FolderStackEntryReference
     let icon: NSImage
     var id: String { reference.id }
+
+    /// Keeps the Finder icon and replaces contents metrics on the reference.
+    func withContents(_ contents: FolderContentsMetrics?) -> FolderStackEntry {
+        FolderStackEntry(reference: reference.withContents(contents), icon: icon)
+    }
 }
 
 nonisolated enum FolderStackLoader {

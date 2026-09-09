@@ -1888,6 +1888,22 @@ Downloads uses the existing folder stack with a stable built-in identity and a p
 
 Compilation is checked with the DeeDock Debug scheme. Tests and automated visual checks were not run. Native acceptance remains pending: opening and refreshing Downloads, file-access denial, grid/list persistence, drag and Escape on all four edges, crowded/scrolling docks, independent display ordering after relaunch, VoiceOver movement, Shelf Option-drag, Reduce Motion, auto-hide, Spaces, and display removal during a drag.
 
-Folder sort options use fixed directions: modification date descending, natural name order ascending, and metadata size descending. Missing date or size metadata sorts last, with stable name/path ties. Selection survives reordering and reloads apply the current choice. Debug compilation checked; native menu, persistence, Smart groups, and keyboard navigation acceptance remain unrun. No tests or automated visual checks were run.
+Folder sort options use fixed directions: modification date descending, natural name order ascending, and size descending. Files use metadata size. Folders use a finished contents total and never the directory-entry size. Missing date or size, and folders still being measured, sort last, with stable name/path ties. Selection survives reordering and reloads apply the current choice. Debug compilation checked; native menu, persistence, Smart groups, and keyboard navigation acceptance remain unrun. No tests or automated visual checks were run.
 
-Folder item details use already-loaded type, size, and timestamps. List/Smart show a secondary line; Grid follows the sort selection; hover text exposes full paths and exact dates. Folder sizes and absent metadata are omitted. Metadata-rich preview data is provided. Native layout, truncation, hover tooltips, localization, and VoiceOver acceptance remain unrun; no tests or automated visual checks were run.
+Folder item details use already-loaded type, size, and timestamps, plus measured folder counts and contents size. List/Smart show a secondary line; Grid follows the sort selection; hover text exposes full paths, exact dates, item counts, and folder totals. Incomplete walks say so. Absent metadata is omitted. Metadata-rich preview data is provided. Native layout, truncation, hover tooltips, localization, and VoiceOver acceptance remain unrun; no tests or automated visual checks were run.
+
+## Folder contents count and size (DEE-31)
+
+Folder stack items now show a visible immediate-child count and a recursive contents size. The walk runs off the main actor, two folders at a time, and cancels when the current directory changes or the panel closes. Hidden files are omitted. Packages count as one item and contribute their contained file bytes. Aliases and symbolic links are leaves and are not followed. iCloud placeholders are measured from resource values only; the walk does not start downloads. Inaccessible descendants mark the total incomplete. A directory entry's own `fileSize` is never shown as a folder total.
+
+Finished totals, including incomplete ones, participate in Size sort. Calculating folders stay last so selection and order stay put while numbers arrive. Results cache for the process lifetime against the folder's modification date.
+
+Authored Swift Testing coverage includes empty and nested folders, hidden-file omission, package sizing, symlink non-follow, Size-sort pending versus finished totals, cache invalidation on a changed modification date, and details that refuse directory-entry size. Tests and the app were not run in this environment.
+
+Pending hands-on acceptance:
+
+- Open Downloads and other folder stacks with small, large, and empty folders. Confirm List, Smart, and Grid show count and size, and hover shows the fuller lines.
+- Sort by Size while totals are still arriving. Confirm pending folders stay last, finished folders move once, and the selected item stays selected.
+- Browse into a subfolder and back, dismiss the stack mid-walk, and change directory contents while a walk is running. Confirm cancellation and cache reuse.
+- Check a package, an alias, a symbolic link, a hidden file, an unreadable descendant, and an iCloud placeholder. Confirm no implicit download and no cycle through links.
+- Check English and German copy, VoiceOver values, Reduce Motion, and Reduce Transparency.

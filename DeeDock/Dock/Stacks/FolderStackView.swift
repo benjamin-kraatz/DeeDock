@@ -226,18 +226,41 @@ struct FolderStackView: View {
 #if DEBUG
 @MainActor private enum FolderStackPreviewData {
     static let icon = NSImage(systemSymbolName: "doc.text.fill", accessibilityDescription: nil)!
+    static let folderIcon = NSImage(systemSymbolName: "folder.fill", accessibilityDescription: nil)!
     static let entries = [
         FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/item 2.txt"), name: "item 2.txt", isFolder: false, contentType: "public.plain-text",
                                                 byteCount: 245_000, createdAt: Date(timeIntervalSince1970: 1_780_000_000),
                                                 modifiedAt: Date(timeIntervalSince1970: 1_780_100_000)), icon: icon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/Archives"), name: "Archives", isFolder: true,
+                                                byteCount: 96, createdAt: Date(timeIntervalSince1970: 1_779_000_000),
+                                                modifiedAt: Date(timeIntervalSince1970: 1_780_200_000),
+                                                contents: FolderContentsMetrics(immediateItemCount: 12, recursiveItemCount: 48,
+                                                                               totalByteCount: 4_200_000, completeness: .complete)),
+                         icon: folderIcon),
         FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/item 10.txt"), name: "A document with a deliberately long Finder name.txt", isFolder: false), icon: icon)
+    ]
+    static let folderMetricsEntries = [
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/Complete"), name: "Complete folder", isFolder: true,
+                                                byteCount: 64, contents: FolderContentsMetrics(immediateItemCount: 3, recursiveItemCount: 10,
+                                                                                              totalByteCount: 1_500_000, completeness: .complete)),
+                         icon: folderIcon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/Calculating"), name: "Still measuring", isFolder: true,
+                                                byteCount: 64, contents: .calculating(immediateItemCount: 80)),
+                         icon: folderIcon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/Partial"), name: "Partial folder", isFolder: true,
+                                                byteCount: 64, contents: FolderContentsMetrics(immediateItemCount: 4, recursiveItemCount: 4,
+                                                                                              totalByteCount: 220_000, completeness: .incomplete)),
+                         icon: folderIcon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/notes.txt"), name: "notes.txt", isFolder: false,
+                                                contentType: "public.plain-text", byteCount: 1_024), icon: icon)
     ]
     static func state(_ mode: FolderStackPresentation = .grid, name: String = "Projects",
                       entries suppliedEntries: [FolderStackEntry]? = nil,
-                      loading: Bool = false, error: String? = nil) -> FolderStackState {
+                      loading: Bool = false, error: String? = nil,
+                      sort: FolderStackSort = .alphabetical) -> FolderStackState {
         FolderStackState(folder: FolderReference(url: URL(fileURLWithPath: "/Preview"), name: name,
                                                   bookmarkData: Data(), presentation: mode),
-                         entries: suppliedEntries ?? entries, loading: loading, error: error)
+                         entries: suppliedEntries ?? entries, loading: loading, error: error, sort: sort)
     }
 }
 
@@ -266,6 +289,16 @@ struct FolderStackView: View {
 }
 #Preview("Reduced motion and transparency") {
     FolderStackView(state: FolderStackPreviewData.state(), keyboard: false, forceOpaqueBackground: true)
+        .frame(width: 560, height: 420).padding()
+}
+#Preview("Folder contents, list") {
+    FolderStackView(state: FolderStackPreviewData.state(.list, entries: FolderStackPreviewData.folderMetricsEntries),
+                    keyboard: false)
+        .frame(width: 560, height: 420).padding()
+}
+#Preview("Folder contents, size sort") {
+    FolderStackView(state: FolderStackPreviewData.state(.grid, entries: FolderStackPreviewData.folderMetricsEntries, sort: .size),
+                    keyboard: false)
         .frame(width: 560, height: 420).padding()
 }
 #endif
