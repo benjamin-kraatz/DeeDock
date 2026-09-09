@@ -6,6 +6,14 @@ Use the `DeeDock` scheme for direct distribution. Its resources include the unch
 
 The `DeeDock-TestFlight` scheme compiles the same app with `TESTFLIGHT` instead of `DIRECT_DISTRIBUTION`. It has no Sparkle package dependency, updater UI, or updater Info.plist keys. Choosing TestFlight at export time does not remove Sparkle from a direct archive. Always archive the correct scheme.
 
+## Who publishes
+
+Esi is the release captain. Esi triggers and watches the [Release workflow](../.github/workflows/release.yml) nightly at 23:00 Europe/Berlin and on an explicit ship. Nara and other bots do not cut releases, hold Sparkle or signing secrets, or publish GitHub Latest.
+
+The workflow is a placeholder. Signing, notarization, `generate_appcast`, and Latest publish are stubs until Esi fills the [secrets checklist](#secrets-checklist) and replaces those steps. The manual archive path in this document stays valid.
+
+GitHub Release body is English only. Sparkle release notes are bilingual German and English. See [Release notes](#release-notes).
+
 ## Custom update window
 
 DDock constructs `SPUUpdater` with its own `SPUUserDriver`. It does not instantiate `SPUStandardUpdaterController` or use Sparkle's standard windows. Sparkle still owns feed selection, downloads, verification, installation, and preference persistence. macOS owns any administrator authorization dialog required by installation.
@@ -65,7 +73,7 @@ xcrun stapler validate "$EXPORTED_APP"
 
 Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DDock.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
 
-Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. Verify both assets before publishing the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
+Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. Write the GitHub Release body in English only. Put bilingual Sparkle notes in `docs/releases/<MARKETING_VERSION>.md` and copy that file beside the ZIP as `DDock.md` before `generate_appcast`, so the appcast embeds German and English. Verify both assets before publishing the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
 
 A feed containing only the newest version is sufficient while supported OS and architecture requirements remain the same. If those requirements change, retain compatible older appcast entries and their original asset URLs so existing users still receive the last compatible build. Do not rewrite older enclosures to point at the newest release tag.
 
@@ -93,6 +101,81 @@ This target preserves the existing signing and sandbox settings. It establishes 
 
 With explicit authorization, install an older Developer ID signed and notarized build, then update to a newer signed build through a staging feed. Verify relaunch, saved dock settings, manual checks, automatic-check consent and persistence, offline errors, invalid signatures, read-only installation locations, and reminders while another app has focus. Confirm German text, keyboard access, and menu availability during an active update.
 
-Compilation and bundle inspection do not establish these runtime behaviors. No feed, release, or key backup is published automatically by this repository.
+Compilation and bundle inspection do not establish these runtime behaviors. Until Esi fills the secrets checklist and replaces the Release workflow stubs, no feed, release, or key backup is published automatically.
+
+## Release notes
+
+Keep two publications separate.
+
+**GitHub Release body.** English only. Esi pastes or generates this when opening the draft. Do not put the German text in the GitHub body.
+
+**Sparkle notes.** Bilingual German and English. The source file is `docs/releases/<MARKETING_VERSION>.md`, matching the existing `docs/releases/0.2.0.md` convention. New files use this shape:
+
+```markdown
+DDock 0.2.1, Build 18, benötigt macOS 27 und einen Mac mit Apple Silicon.
+
+## Neue Funktionen
+
+- German notes first, using the same heading style as 0.2.0.
+
+## English
+
+DDock 0.2.1, Build 18, requires macOS 27 and an Apple Silicon Mac.
+
+### New features
+
+- English notes that cover the same changes.
+```
+
+`generate_appcast` embeds a `.md` file whose base name matches the archive. Copy the version file to the staging folder as `DDock.md` next to `DDock.zip`. Sparkle 2.9.6 accepts Markdown. The in-app window parses headings, lists, and HTTPS links and does not load remote styling.
+
+Existing `docs/releases/0.2.0.md` is German only. Add an `## English` section on the next version. Do not rewrite older published notes.
+
+## Release pipeline
+
+The [Release workflow](../.github/workflows/release.yml) is the intended CI path for the same archive, notarize, `generate_appcast`, draft, and Latest sequence described above.
+
+Esi triggers it in two ways:
+
+1. Nightly watch at 23:00 Europe/Berlin. The workflow uses cron `0 23 * * *` with `timezone: Europe/Berlin`. GitHub follows Central European Time in winter (23:00 Berlin is 22:00 UTC) and Central European Summer Time in summer (23:00 Berlin is 21:00 UTC). Do not read that cron as 23:00 UTC.
+2. Explicit ship from **Actions → Release → Run workflow**, with intent `ship`.
+
+Scheduled runs always use intent `watch`. They print version and secret-presence status. They do not publish. `ship` stays blocked until the stub steps are replaced.
+
+Expected later runner: a Mac with Xcode 27 and a Developer ID identity. `macos-latest` in the workflow is a placeholder. A self-hosted pool can replace it without changing the step order.
+
+On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline`. Esi may add label `Bot-Nara` once if Nara should fix pipeline code. Nara does not cut the release, hold secrets, or publish Latest.
+
+## Secrets checklist
+
+Set these as GitHub Actions repository secrets (or on a `release` environment once that environment exists). Names only. Do not put values in the repository, the workflow file, issue comments, or logs.
+
+Apple notarization, App Store Connect API key form, suitable for ephemeral CI:
+
+- [ ] `APPLE_API_KEY` (`.p8` contents for `notarytool`)
+- [ ] `APPLE_API_KEY_ID`
+- [ ] `APPLE_API_ISSUER_ID`
+- [ ] `APPLE_TEAM_ID`
+
+Developer ID signing on CI:
+
+- [ ] `DEVELOPER_ID_APPLICATION_CERTIFICATE` (base64-encoded Developer ID Application `.p12`)
+- [ ] `DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD`
+
+Sparkle EdDSA private key. The matching public key is `SPARKLE_PUBLIC_ED_KEY` in the direct target. Today's login Keychain account is `de.benjaminkraatz.DeeDock`. Never commit the private key or generate a replacement for each release:
+
+- [ ] `SPARKLE_PRIVATE_ED_KEY`
+
+Optional, when the runner already has a `notarytool` keychain profile instead of the API key trio:
+
+- [ ] `NOTARYTOOL_KEYCHAIN_PROFILE` (profile name only)
+
+Optional GitHub token when the default `GITHUB_TOKEN` cannot open a draft or publish Latest:
+
+- [ ] `GH_RELEASE_TOKEN`
+
+`GITHUB_TOKEN` with `contents: write` is the default for a later draft release, asset upload, and Latest publish. Prefer it when org policy allows.
+
+On a self-hosted Mac that already has the Developer ID identity and the Sparkle key in the login Keychain, the certificate and `SPARKLE_PRIVATE_ED_KEY` secrets may stay unset. Use `--account de.benjaminkraatz.DeeDock` for `generate_appcast` in that case. Do not export the private key into the repository to "make CI easier."
 
 Sources: [Sparkle setup and distribution](https://sparkle-project.org/documentation/), [custom user drivers](https://sparkle-project.org/documentation/custom-user-interfaces/).
