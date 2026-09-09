@@ -11,11 +11,17 @@ enum WindowWatchPhase {
 final class WindowWatchSession {
     let title: String
     let appName: String
+    let bundleIdentifier: String?
     let icon: NSImage?
     var region = WindowWatchRegion()
     var usesPhrase = false
     var phrase = ""
     var playSound = false
+    var completion = WindowWatchCompletionAction.none
+    var appliedPresetID: UUID?
+    var appliedPresetName: String?
+    var runSnapshot: WindowWatchRunSnapshot?
+    let action = WindowWatchCompletionDispatcher()
     var image: CGImage?
     var message: LocalizedStringResource = .watchPreparing
     var ready = false
@@ -46,6 +52,7 @@ final class WindowWatchSession {
     @ObservationIgnored private var sourceTask: Task<Void, Never>?
     @ObservationIgnored private var staleTask: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
+    @ObservationIgnored private let presets: WindowWatchPresetStore?
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored private var suspensionReasons: Set<String> = []
     @ObservationIgnored private var detector = WindowWatchDetector()
@@ -53,13 +60,16 @@ final class WindowWatchSession {
     @ObservationIgnored private var pixelSize: CGSize?
     @ObservationIgnored var dismiss: (() -> Void)?
 
-    init(summary: ApplicationWindowSummary, after previousWork: Task<Void, Never>? = nil) {
+    init(summary: ApplicationWindowSummary, after previousWork: Task<Void, Never>? = nil,
+         presets: WindowWatchPresetStore? = nil) {
         title = summary.title ?? String(localized: .applicationMenuUntitledWindow)
         let application = NSRunningApplication(processIdentifier: summary.processIdentifier)
         appName = application?.localizedName ?? ""
+        bundleIdentifier = application?.bundleIdentifier
         icon = application?.icon
         process = application
         launchDate = process?.launchDate
+        self.presets = presets
         observeLifecycle()
         task = Task { [weak self] in
             await previousWork?.value
@@ -103,9 +113,11 @@ final class WindowWatchSession {
     init(previewTitle: String, message: LocalizedStringResource, setup: Bool) {
         title = previewTitle
         appName = previewTitle
+        bundleIdentifier = "preview.export"
         icon = NSImage(systemSymbolName: "app.dashed", accessibilityDescription: nil)
         process = nil
         launchDate = nil
+        presets = nil
         self.message = message
         ready = setup
         finished = !setup
@@ -124,17 +136,70 @@ final class WindowWatchSession {
         checkCount = 0
         activity = []
         explanation.cancel()
+        action.cancel()
         startDate = Date()
         detector = WindowWatchDetector()
         size = nil
         generation = UUID()
+        let snapshot = WindowWatchRunSnapshot(runID: generation, presetID: appliedPresetID,
+                                              presetName: appliedPresetName, configuration: draftConfiguration())
+        runSnapshot = snapshot
+        action.bind(snapshot, outcome: .watching)
         run()
+    }
+
+    /// Copies a saved configuration onto the current window. Capture and watching stay stopped.
+    func apply(_ preset: WindowWatchPreset) {
+        guard ready, !active, !finished else { return }
+        region = preset.configuration.region.clamped
+        usesPhrase = preset.configuration.usesPhrase
+        phrase = preset.configuration.phrase
+        playSound = preset.configuration.playSound
+        completion = preset.configuration.completion
+        appliedPresetID = preset.id
+        appliedPresetName = preset.name
+    }
+
+    /// The form's current values, ready to persist or copy onto a run. No window ID is included.
+    func draftConfiguration() -> WindowWatchPresetConfiguration {
+        WindowWatchPresetConfiguration(region: region.clamped, usesPhrase: usesPhrase,
+                                       phrase: String(phrase.trimmingCharacters(in: .whitespacesAndNewlines).prefix(512)),
+                                       playSound: playSound, completion: completion,
+                                       appHint: WindowWatchAppHint(bundleIdentifier: bundleIdentifier,
+                                                                   appName: appName, title: title))
+            .normalized()
+    }
+
+    func presetDrift() -> WindowWatchPresetDrift? {
+        guard let presets, let snapshot = runSnapshot, let id = snapshot.presetID else { return nil }
+        guard let stored = presets.preset(id) else { return .deleted }
+        let nameChanged = stored.name != (snapshot.presetName ?? stored.name)
+        return stored.configuration == snapshot.configuration && !nameChanged ? nil : .edited
+    }
+
+    /// User-triggered only. Detector evidence stays as it was, including after a failed action.
+    func performCompletion() {
+        guard detected, let snapshot = runSnapshot else { return }
+        action.perform(runID: snapshot.runID, action: snapshot.configuration.completion)
+    }
+
+    func repairCompletion(_ next: WindowWatchCompletionAction) {
+        guard detected, let snapshot = runSnapshot, action.phase != .running else { return }
+        var configuration = snapshot.configuration
+        configuration.completion = next
+        let repaired = WindowWatchRunSnapshot(runID: snapshot.runID, presetID: snapshot.presetID,
+                                              presetName: snapshot.presetName, configuration: configuration)
+        runSnapshot = repaired
+        completion = next
+        action.bind(repaired, outcome: .detected)
     }
 
     /// Returns a drain barrier so a replacement watch cannot overlap an in-flight OS request.
     @discardableResult
     func stop() -> Task<Void, Never> {
         explanation.cancel()
+        action.mark(.cancelled)
+        action.cancel()
         let pendingCapture = task
         let pendingSource = sourceTask
         generation = UUID()
@@ -233,6 +298,7 @@ final class WindowWatchSession {
                         detected = true
                         message = watchedPhrase.isEmpty ? .watchChangeDetected : .watchPhraseDetected
                         if playSound { NSSound.beep() }
+                        action.mark(.detected)
                         explanation.explain(final: frame.regionImage)
                         removeObservers()
                         task = nil
@@ -293,11 +359,13 @@ final class WindowWatchSession {
             active = false
             finished = true
             image = nil
+            if runSnapshot != nil { action.mark(.failed) }
         case .closed:
             message = .watchClosed
             active = false
             finished = true
             image = nil
+            if runSnapshot != nil { action.mark(.failed) }
         case .offscreen: message = .watchOffscreen
         default: message = .watchUnavailable
         }

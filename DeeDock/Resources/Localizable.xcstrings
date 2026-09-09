@@ -23740,6 +23740,924 @@
         }
       }
     },
+    "watchActionSection" : {
+      "comment" : "Window watch: section title for the optional completion action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn es fertig ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When it finishes"
+          }
+        }
+      }
+    },
+    "watchActionHelp" : {
+      "comment" : "Window watch: explains that a completion action waits for an explicit click.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn die Erkennung fertig ist, zeigt DDock eine Taste. Es wird nichts automatisch ausgeführt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After the detector finishes, DDock shows a button. Nothing runs automatically."
+          }
+        }
+      }
+    },
+    "watchActionNone" : {
+      "comment" : "Window watch: no completion action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Aktion"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No action"
+          }
+        }
+      }
+    },
+    "watchActionFolder" : {
+      "comment" : "Window watch: completion action that opens a user-chosen folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open a folder"
+          }
+        }
+      }
+    },
+    "watchActionShortcut" : {
+      "comment" : "Window watch: completion action that runs a configured Shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run a Shortcut"
+          }
+        }
+      }
+    },
+    "watchActionChooseFolder" : {
+      "comment" : "Window watch: opens a folder picker for the completion action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner wählen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Folder…"
+          }
+        }
+      }
+    },
+    "watchActionFolderChosen" : {
+      "comment" : "Window watch: confirms the selected output folder. name is the folder name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner: %(name)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder: %(name)@"
+          }
+        }
+      }
+    },
+    "watchActionChangeFolder" : {
+      "comment" : "Window watch: replace the configured folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anderen Ordner wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a different folder"
+          }
+        }
+      }
+    },
+    "watchActionLoadShortcuts" : {
+      "comment" : "Window watch: explicitly refresh the Shortcut list. Same wording as Action Tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle laden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Shortcuts"
+          }
+        }
+      }
+    },
+    "watchActionChooseShortcut" : {
+      "comment" : "Window watch: picker label for a configured Shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Shortcut"
+          }
+        }
+      }
+    },
+    "watchActionNoShortcuts" : {
+      "comment" : "Window watch: empty Shortcut list until the user loads them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lade Kurzbefehle, um einen zu wählen. DDock übergibt weder aufgenommenes Bild noch Text."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Shortcuts to choose one. DDock does not pass captured pixels or text to it."
+          }
+        }
+      }
+    },
+    "watchActionShortcutHelp" : {
+      "comment" : "Window watch: Shortcut IDs survive renames; removed shortcuts fail when run.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwendet die Kennung des Kurzbefehls. Ein neuer Name in Kurzbefehle ändert die Aktion nicht. Ein entfernter Kurzbefehl schlägt beim Ausführen fehl."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses the shortcut’s identifier. A rename in Shortcuts keeps the same action. A removed shortcut fails when you run it."
+          }
+        }
+      }
+    },
+    "watchActionOpenFolder" : {
+      "comment" : "Window watch: explicit button after detection to open the configured folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewählten Ordner öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open configured folder"
+          }
+        }
+      }
+    },
+    "watchActionRunShortcut" : {
+      "comment" : "Window watch: explicit button after detection to run the configured Shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewählten Kurzbefehl ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run configured Shortcut"
+          }
+        }
+      }
+    },
+    "watchActionRunning" : {
+      "comment" : "Window watch: the user-triggered completion action is in progress.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gewählte Aktion wird ausgeführt…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running the configured action…"
+          }
+        }
+      }
+    },
+    "watchActionSucceeded" : {
+      "comment" : "Window watch: the completion action finished. Separate from detector evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gewählte Aktion ist fertig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured action finished."
+          }
+        }
+      }
+    },
+    "watchActionFailed" : {
+      "comment" : "Window watch: generic completion-action failure that does not change the watch result.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gewählte Aktion ist fehlgeschlagen. Das Beobachtungsergebnis bleibt unverändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured action failed. The watch result is unchanged."
+          }
+        }
+      }
+    },
+    "watchActionFolderMissing" : {
+      "comment" : "Window watch: the bookmarked folder is missing or cannot be opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gewählte Ordner fehlt oder ließ sich nicht öffnen. Wähle ihn erneut oder überspringe die Aktion."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured folder is missing or could not be opened. Choose it again or skip the action."
+          }
+        }
+      }
+    },
+    "watchActionShortcutFailed" : {
+      "comment" : "Window watch: Shortcut run failed. The placeholder is the helper or system error.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gewählte Kurzbefehl konnte nicht ausgeführt werden: %1$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured Shortcut could not run: %1$@"
+          }
+        }
+      }
+    },
+    "watchPresetsTitle" : {
+      "comment" : "Window watch: section title for saved watch presets.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved watches"
+          }
+        }
+      }
+    },
+    "watchPresetsHelp" : {
+      "comment" : "Window watch: saved presets store configuration only and still need a current window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichere diesen Bereich und diese Bedingung für später. Jeder Durchlauf braucht ein aktuelles Fenster, und Starten bleibt ein eigener Schritt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save this region and condition to use again later. Each run still needs a current window, and Start is always a separate action."
+          }
+        }
+      }
+    },
+    "watchPresetsEmpty" : {
+      "comment" : "Window watch: empty saved-preset list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine gespeicherten Beobachtungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No saved watches yet."
+          }
+        }
+      }
+    },
+    "watchPresetSave" : {
+      "comment" : "Window watch: create a new saved watch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beobachtung speichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save watch"
+          }
+        }
+      }
+    },
+    "watchPresetSaveAs" : {
+      "comment" : "Window watch: save the current setup as a new preset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als neue Beobachtung speichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save as new watch"
+          }
+        }
+      }
+    },
+    "watchPresetUpdate" : {
+      "comment" : "Window watch: overwrite the applied saved watch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtung aktualisieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update saved watch"
+          }
+        }
+      }
+    },
+    "watchPresetName" : {
+      "comment" : "Window watch: text field for the user-chosen preset name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "watchPresetNameHelp" : {
+      "comment" : "Window watch: the name is user-authored, not inferred from the window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Name, den du später wiedererkennst. DDock übernimmt ihn nicht aus dem Fenstertitel."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A name you will recognize later. DDock does not take it from the window title."
+          }
+        }
+      }
+    },
+    "watchPresetSuggested" : {
+      "comment" : "Window watch: presets whose app hint matches the current window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge für diese App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested for this app"
+          }
+        }
+      }
+    },
+    "watchPresetOthers" : {
+      "comment" : "Window watch: remaining saved watches that do not match the current app hint.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere gespeicherte Beobachtungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other saved watches"
+          }
+        }
+      }
+    },
+    "watchPresetApply" : {
+      "comment" : "Window watch: copy a saved preset onto the current window without starting capture watching.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übernehmen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply"
+          }
+        }
+      }
+    },
+    "watchPresetApplied" : {
+      "comment" : "Window watch: a preset was applied; the user must still review and start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übernommen. Prüfe den Bereich in diesem Fenster und starte dann."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied. Check the region on this window, then start."
+          }
+        }
+      }
+    },
+    "watchPresetHintMismatch" : {
+      "comment" : "Window watch: the preset was saved for a different app. appName is supplied by macOS and must stay verbatim.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Beobachtung wurde für %(appName)@ gespeichert. Prüfe, ob der Bereich noch dieselbe Stelle markiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This watch was saved for %(appName)@. Check that the region still marks the same place."
+          }
+        }
+      }
+    },
+    "watchPresetRegionChangedHelp" : {
+      "comment" : "Window watch: normalized coordinates follow window size; a changed layout may need reselection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Markierung folgt der Größe dieses Fensters. Wenn sich das Layout geändert hat, wähle den Bereich neu. Passende Koordinaten belegen nicht dieselbe Stelle."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The outline follows this window’s size. If the layout changed, select the region again. Matching coordinates do not prove it is the same control."
+          }
+        }
+      }
+    },
+    "watchPresetEdit" : {
+      "comment" : "Window watch: accessibility label for preset overflow actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtung bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit saved watch"
+          }
+        }
+      }
+    },
+    "watchPresetDuplicate" : {
+      "comment" : "Window watch: duplicate a saved watch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplizieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        }
+      }
+    },
+    "watchPresetDelete" : {
+      "comment" : "Window watch: delete a saved watch configuration.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "watchPresetDeleteConfirm" : {
+      "comment" : "Window watch: confirmation title before deleting a preset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtung löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete saved watch?"
+          }
+        }
+      }
+    },
+    "watchPresetDeleteHelp" : {
+      "comment" : "Window watch: deleting a preset does not delete files or undo actions; a running watch keeps its snapshot.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit wird nur die gespeicherte Konfiguration entfernt. Dateien werden nicht gelöscht, und eine bereits ausgeführte Aktion wird nicht rückgängig gemacht. Eine bereits gestartete Beobachtung behält den Stand vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes the saved configuration only. It does not delete files or undo an action that already ran. A watch that already started keeps the snapshot it started with."
+          }
+        }
+      }
+    },
+    "watchPresetDeletedDuringRun" : {
+      "comment" : "Window watch: the saved preset was deleted after Start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherte Beobachtung wurde gelöscht. Dieser Durchlauf verwendet weiter die Konfiguration vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved watch was deleted. This run continues with the configuration it started with."
+          }
+        }
+      }
+    },
+    "watchPresetEditedDuringRun" : {
+      "comment" : "Window watch: the saved preset changed after Start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherte Beobachtung hat sich nach dem Start geändert. Dieser Durchlauf behält den Stand vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved watch changed after this run started. This run keeps the snapshot from Start."
+          }
+        }
+      }
+    },
+    "watchPresetCopyName" : {
+      "comment" : "Window watch: default name for a duplicated preset. name is the original user-authored title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopie von %(name)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy of %(name)@"
+          }
+        }
+      }
+    },
+    "watchPresetLimit" : {
+      "comment" : "Window watch: bounded storage for saved presets.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst 30 Beobachtungen speichern. Lösche eine, um eine weitere zu speichern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can save 30 watches. Delete one to save another."
+          }
+        }
+      }
+    },
+    "watchPresetStorageFailed" : {
+      "comment" : "Window watch: unreadable preset storage is left unchanged.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtungen konnten nicht gelesen werden. DDock hat die gespeicherten Daten unverändert gelassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved watches could not be read. DDock left the stored data unchanged."
+          }
+        }
+      }
+    },
+    "watchPresetReset" : {
+      "comment" : "Window watch: explicit recovery that replaces unreadable preset storage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtungen zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset saved watches"
+          }
+        }
+      }
+    },
+    "watchPresetResetHelp" : {
+      "comment" : "Window watch: reset replaces unreadable bytes with an empty list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzt die unlesbaren Daten durch eine leere Liste. Die bisherigen Vorgaben lassen sich damit nicht wiederherstellen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace the unreadable saved-watch data with an empty list. This cannot restore the previous presets."
+          }
+        }
+      }
+    },
+    "watchPresetAppHint" : {
+      "comment" : "Window watch: app hint on a suggested preset. appName is supplied by macOS and must stay verbatim.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschlag für %(appName)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested for %(appName)@"
+          }
+        }
+      }
+    },
+    "watchPresetConditionChange" : {
+      "comment" : "Window watch: summary of a visible-change preset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichtbare Änderung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visible change"
+          }
+        }
+      }
+    },
+    "watchPresetConditionPhrase" : {
+      "comment" : "Window watch: summary of a phrase preset. phrase is the user-entered completion text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text: %(phrase)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phrase: %(phrase)@"
+          }
+        }
+      }
+    },
+    "watchPresetFolderAction" : {
+      "comment" : "Window watch: summary of a folder completion action. folder is the user-chosen name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(folder)@ öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open %(folder)@"
+          }
+        }
+      }
+    },
+    "watchPresetShortcutAction" : {
+      "comment" : "Window watch: summary of a Shortcut completion action. shortcut is the Shortcuts name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(shortcut)@ ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run %(shortcut)@"
+          }
+        }
+      }
+    },
+    "watchSnapshotNote" : {
+      "comment" : "Window watch: a running or finished watch uses the configuration copied at Start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Durchlauf verwendet die Konfiguration vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This run uses the configuration from Start."
+          }
+        }
+      }
+    },
     "windowAccessCheckAgain" : {
       "comment" : "Button that rereads Accessibility authorization from macOS.",
       "extractionState" : "manual",

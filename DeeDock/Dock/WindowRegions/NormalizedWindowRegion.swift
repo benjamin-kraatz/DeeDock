@@ -2,7 +2,7 @@ import CoreGraphics
 import Foundation
 
 /// Unit coordinates measured from the preview's top-left, independent of screen origin and scale.
-nonisolated struct NormalizedWindowRegion: Equatable, Sendable {
+nonisolated struct NormalizedWindowRegion: Codable, Equatable, Sendable {
     var x: Double = 0
     var y: Double = 0
     var width: Double = 1

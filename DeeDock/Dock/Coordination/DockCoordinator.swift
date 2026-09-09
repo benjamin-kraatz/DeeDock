@@ -7,6 +7,7 @@ final class DockCoordinator {
     let focusSession = FocusSessionController()
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
+    let watchPresets = WindowWatchPresetStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
     let zonePreview = DockZonePreviewController()
@@ -73,7 +74,8 @@ final class DockCoordinator {
             windows: AccessibilityApplicationWindowService()
         )
         applicationMenus = menus
-        windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture, applications: catalog.service)
+        windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture, applications: catalog.service,
+                                            watchPresets: watchPresets, actions: actionTiles)
         let semanticStacks = CoalescingSemanticStackOrganizer(
             base: FoundationModelsSemanticStackOrganizer()
         )
@@ -103,6 +105,7 @@ final class DockCoordinator {
         occupancy.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
+        watchPresets.start()
         badges.focusSession = { [weak self] in self?.focusSession.session }
         focusPopover.showDigest = { [weak self] in self?.showBadgeMemory(digest: true) }
         focusPopover.saveCapsule = { [weak self] panel in self?.sessionCapsules.beginFromFocus(on: panel) }
@@ -674,6 +677,7 @@ final class DockCoordinator {
         focusPopover.stop()
         focusSession.stop()
         actionTiles.stop()
+        watchPresets.stop()
         fusion.stop()
         sessionCapsules.stop()
         shelfSemanticWarmup.stop()
