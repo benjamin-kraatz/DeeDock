@@ -80,6 +80,7 @@ Keep upstream skill files intact. Sources and licenses are recorded in `.agents/
 - Do not run tests, full verification suites, or automated visual tests unless the user explicitly asks. This includes tests suggested by installed skills. Report what was and was not run.
 - For setup or documentation edits, inspect the diff, links, and file structure. Do not build or launch the app solely to validate prose.
 - When implementation warrants a build, use the narrow relevant Xcode target and report the exact result. A successful build proves compilation, not native interaction quality.
+- GitHub Actions compile unsigned Debug and Release builds on `xcode-27`. They do not run tests, sign, notarize, or publish Sparkle feeds. See `docs/CI.md`.
 - When adding tests as part of an agreed feature, focus on behavior that can regress: display placement, activation-zone boundaries, visibility transitions, configuration persistence, and lifecycle cancellation. Avoid tests that merely repeat implementation details.
 - Hands-on acceptance should cover the relevant display arrangement, focus behavior, appearance, and OS interactions. State limitations honestly when a scenario cannot be exercised.
 - Preserve existing staged and unstaged work. Never reset, stash, switch, or rewrite unrelated changes.

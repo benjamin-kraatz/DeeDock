@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  catalogs:
+    name: Validate catalogs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Parse JSON catalogs
+        run: scripts/ci-validate-catalogs.sh
+
+  compile:
+    name: Compile
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Show the runner toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcrun --show-sdk-version
+      - name: Resolve Swift packages
+        run: >
+          xcodebuild -project DeeDock.xcodeproj
+          -resolvePackageDependencies
+          -derivedDataPath /tmp/DeeDock-ci
+      - name: Compile Debug DeeDock
+        run: scripts/ci-build.sh DeeDock Debug /tmp/DeeDock-ci
+      - name: Compile Release DeeDock
+        run: scripts/ci-build.sh DeeDock Release /tmp/DeeDock-ci
+      - name: Compile Release DeeDock-TestFlight
+        run: scripts/ci-build.sh DeeDock-TestFlight Release /tmp/DeeDock-ci

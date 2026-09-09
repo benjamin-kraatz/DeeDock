@@ -1,0 +1,42 @@
+name: Release compile
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Compile Release schemes
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Show the runner toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcrun --show-sdk-version
+      - name: Resolve Swift packages
+        run: >
+          xcodebuild -project DeeDock.xcodeproj
+          -resolvePackageDependencies
+          -derivedDataPath /tmp/DeeDock-release
+      - name: Compile Release DeeDock
+        run: scripts/ci-build.sh DeeDock Release /tmp/DeeDock-release
+      - name: Compile Release DeeDock-TestFlight
+        run: scripts/ci-build.sh DeeDock-TestFlight Release /tmp/DeeDock-release
+      - name: Leave publishing on the release machine
+        run: |
+          echo 'Unsigned Release compilation succeeded.'
+          echo 'Do not upload these products.'
+          echo 'Archive, notarize, sign the Sparkle feed, and publish from a machine that holds the Developer ID certificate and Sparkle key.'
+          echo 'Follow docs/UPDATES.md.'

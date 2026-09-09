@@ -93,6 +93,6 @@ This target preserves the existing signing and sandbox settings. It establishes 
 
 With explicit authorization, install an older Developer ID signed and notarized build, then update to a newer signed build through a staging feed. Verify relaunch, saved dock settings, manual checks, automatic-check consent and persistence, offline errors, invalid signatures, read-only installation locations, and reminders while another app has focus. Confirm German text, keyboard access, and menu availability during an active update.
 
-Compilation and bundle inspection do not establish these runtime behaviors. No feed, release, or key backup is published automatically by this repository.
+Compilation and bundle inspection do not establish these runtime behaviors. No feed, release, or key backup is published automatically by this repository. GitHub Actions compile unsigned Release builds on demand. They do not archive, notarize, sign the Sparkle feed, or publish GitHub Releases. See [GitHub Actions](CI.md).
 
 Sources: [Sparkle setup and distribution](https://sparkle-project.org/documentation/), [custom user drivers](https://sparkle-project.org/documentation/custom-user-interfaces/).

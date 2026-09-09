@@ -65,6 +65,8 @@ Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existin
 
 Read [AGENTS.md](AGENTS.md) for implementation guidance, scope boundaries, and validation expectations.
 
+Pull requests compile on GitHub Actions using the `xcode-27` runner. The jobs prove unsigned compilation. They do not run tests, sign, notarize, or publish Sparkle feeds. See [GitHub Actions](docs/CI.md).
+
 Three project-local agent skills are installed under `.agents/skills`: SwiftUI Expert, Swift Concurrency, and Swift Testing. See [docs/SKILLS.md](docs/SKILLS.md) for their purpose, pinned sources, and update instructions. They add development guidance, not app dependencies.
 
 ## Using DDock
