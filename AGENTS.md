@@ -22,6 +22,7 @@ Keep future features clearly labeled as planned. Do not silently substitute simp
 - Prefer system notifications and scoped event handling over continuous polling. Remove observers, event monitors, timers, and tasks when their owner or display goes away.
 - Keep all app-owned UI copy in `DeeDock/Resources/Localizable.xcstrings`, with stable keys, generated Swift symbols, and translator comments. Use Pin/Unpin terminology. Preserve localization for conditional accessibility text and interpolated errors; do not translate app names supplied by macOS.
 - Prefer public Apple APIs. Record an API limitation or permission requirement when discovered; do not claim complete system Dock parity without evidence.
+- Debug and Preview use `de.benjaminkraatz.DeeDock.debug` and display name `DDock Debug` (`Configuration/Debug.xcconfig`). Release keeps `de.benjaminkraatz.DeeDock` / `DDock`. Leave the production Sparkle key account, feed, and pasteboard type strings on the shipping identifier.
 
 ## File and component organization
 

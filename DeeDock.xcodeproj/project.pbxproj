@@ -139,6 +139,7 @@
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
+		0EE3B5E31B6358B0F2F32163 /* Debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Configuration/Debug.xcconfig; sourceTree = "<group>"; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		525BD98535225C6EE024849D /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Models/WindowPeekSettings.swift; sourceTree = SOURCE_ROOT; };
@@ -313,6 +314,7 @@
 				33DEF2FA3049A63A007D87CE /* Recovered References */,
 				33DE04A8304AA89B007D87CE /* Frameworks */,
 				0EE3B5E31B6358B0F2F32162 /* App.xcconfig */,
+				0EE3B5E31B6358B0F2F32163 /* Debug.xcconfig */,
 				DEE400000000000000000002 /* Sparkle-LICENSE.txt */,
 			);
 			sourceTree = "<group>";
@@ -893,7 +895,7 @@
 		};
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "DeeDock" */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32163 /* Debug.xcconfig */;
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
@@ -906,7 +908,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = DDock;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
@@ -961,7 +963,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = DDock;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
@@ -1015,7 +1017,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = DDock;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
@@ -1054,7 +1056,7 @@
 		};
 		A418A470147009CA5A39EDDB /* Debug configuration for PBXNativeTarget "DeeDock-TestFlight" */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32163 /* Debug.xcconfig */;
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
@@ -1066,7 +1068,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = DDock;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
@@ -1222,7 +1224,7 @@
 		};
 		DDCA00000000000000000001 /* Preview configuration for PBXNativeTarget "DeeDock" */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32163 /* Debug.xcconfig */;
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
@@ -1235,7 +1237,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = DDock;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = NO;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
@@ -1277,7 +1279,7 @@
 		};
 		DDCA00000000000000000002 /* Preview configuration for PBXNativeTarget "DeeDock-TestFlight" */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
+			baseConfigurationReference = 0EE3B5E31B6358B0F2F32163 /* Debug.xcconfig */;
 			buildSettings = {
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
@@ -1289,7 +1291,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = DDock;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = NO;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";

@@ -1,0 +1,10 @@
+// Debug and Preview only. Release continues to use App.xcconfig unchanged.
+#include "App.xcconfig"
+
+// Distinct from the installed production app so Accessibility, Screen Recording,
+// Launch Services, and Dock identity do not collide. PRODUCT_NAME stays DDock so
+// the wrapper remains DDock.app and scheme BuildableName stays valid.
+// Sparkle feed URL, public key, and Keychain account stay on the production identifier.
+PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock.debug
+INFOPLIST_KEY_CFBundleDisplayName = DDock Debug
+INFOPLIST_KEY_CFBundleName = DDock Debug
