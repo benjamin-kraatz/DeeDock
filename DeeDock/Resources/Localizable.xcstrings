@@ -1,206 +1,15 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-  "folderItemShare": {
-    "comment": "Opens native macOS sharing destinations for the selected folder stack file or folder.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Share"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Teilen"
-        }
-      }
-    }
-  },
-  "folderDetailsFolder": {
-    "comment": "Folder kind shown in item metadata.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Folder"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Ordner"
-        }
-      }
-    }
-  },
-  "folderDetailsFile": {
-    "comment": "Fallback kind when a file type is unavailable.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "File"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Datei"
-        }
-      }
-    }
-  },
-  "folderDetailsModified": {
-    "comment": "Label for exact modification timestamp in item hover details.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Last modified"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Zuletzt geändert"
-        }
-      }
-    }
-  },
-  "folderDetailsCreated": {
-    "comment": "Label for exact creation timestamp in item hover details.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Created"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Erstellt"
-        }
-      }
-    }
-  },
-  "folderSortTitle": {
-    "comment": "Menu for folder stack sorting with fixed directions.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Sort by"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Sortieren nach"
-        }
-      }
-    }
-  },
-  "folderSortRecency": {
-    "comment": "Sort by modification date, newest first.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Recency"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Zuletzt geändert"
-        }
-      }
-    }
-  },
-  "folderSortAlphabetical": {
-    "comment": "Sort names naturally, A first.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Alphabetical"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Alphabetisch"
-        }
-      }
-    }
-  },
-  "folderSortSize": {
-    "comment": "Sort by file size, largest first.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Size"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Größe"
-        }
-      }
-    }
-  },
-  "downloadsName": {
-    "comment": "Built-in Downloads folder tile in the trailing dock section.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Downloads"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Downloads"
-        }
-      }
-    }
-  },
-  "shelfMoveHint": {
-    "comment": "Hint explaining tile reordering and the Option-drag file gesture on Shelf.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Drag to reposition. Option-drag to carry all Shelf files."
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Zum Verschieben ziehen. Mit gedrückter Wahltaste ziehen, um alle Dateien der Ablage mitzunehmen."
-        }
-      }
-    }
-  },
     "" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "actionCancel" : {
       "comment" : "Cancels an editing or confirmation alert.",
@@ -5686,8 +5495,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kapsel speicheln"
+            "state" : "machine_translated",
+            "value" : "Kapsel speichern"
           }
         },
         "en" : {
@@ -7080,6 +6889,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modes"
+          }
+        }
+      }
+    },
+    "downloadsName" : {
+      "comment" : "Built-in Downloads folder tile in the trailing dock section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
           }
         }
       }
@@ -8512,6 +8339,78 @@
         }
       }
     },
+    "folderDetailsCreated" : {
+      "comment" : "Label for exact creation timestamp in item hover details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstellt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created"
+          }
+        }
+      }
+    },
+    "folderDetailsFile" : {
+      "comment" : "Fallback kind when a file type is unavailable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
+          }
+        }
+      }
+    },
+    "folderDetailsFolder" : {
+      "comment" : "Folder kind shown in item metadata.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        }
+      }
+    },
+    "folderDetailsModified" : {
+      "comment" : "Label for exact modification timestamp in item hover details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt geändert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last modified"
+          }
+        }
+      }
+    },
     "folderDrop.copyHere" : {
       "comment" : "File drag feedback; the source files stay in their original locations.",
       "extractionState" : "manual",
@@ -8580,6 +8479,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copied %1$lld items. %2$@"
+          }
+        }
+      }
+    },
+    "folderItemShare" : {
+      "comment" : "Opens native macOS sharing destinations for the selected folder stack file or folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        }
+      }
+    },
+    "folderSortAlphabetical" : {
+      "comment" : "Sort names naturally, A first.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alphabetisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alphabetical"
+          }
+        }
+      }
+    },
+    "folderSortRecency" : {
+      "comment" : "Sort by modification date, newest first.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt geändert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recency"
+          }
+        }
+      }
+    },
+    "folderSortSize" : {
+      "comment" : "Sort by file size, largest first.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "folderSortTitle" : {
+      "comment" : "Menu for folder stack sorting with fixed directions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortieren nach"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort by"
           }
         }
       }
@@ -19428,6 +19417,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "shelfMoveHint" : {
+      "comment" : "Hint explaining tile reordering and the Option-drag file gesture on Shelf.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Verschieben ziehen. Mit gedrückter Wahltaste ziehen, um alle Dateien der Ablage mitzunehmen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag to reposition. Option-drag to carry all Shelf files."
           }
         }
       }
