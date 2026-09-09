@@ -147,12 +147,18 @@ final class DockPanelController {
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
+        let previousLayout = interaction.layout
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                  utilityCount: slots.filter(\.isUtility).count - (settings.launcherAtStart ? 1 : 0),
                                                  leadingUtilityCount: settings.launcherAtStart ? 1 : 0,
                                                  availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings)
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
+        // SwiftUI settles cross-axis layout changes immediately. The native panel
+        // must do the same, including when expanding a section crosses the fit limit.
+        let preservesCrossAxisLayout = previousLayout.edge == interaction.layout.edge
+            && previousLayout.iconSize == interaction.layout.iconSize
+            && previousLayout.panelDepth == interaction.layout.panelDepth
         let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
         geometry = updated
@@ -160,7 +166,7 @@ final class DockPanelController {
         launcherPresentation.origin = restingDragBounds
         if launcher.isPresented {
             // Catalog changes may resize the resting dock, but must not collapse the launcher.
-        } else if animateSectionChange && !visibility.reduceMotion && visibility.exposesContent {
+        } else if animateSectionChange && preservesCrossAxisLayout && !visibility.reduceMotion && visibility.exposesContent {
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.18
                 context.timingFunction = CAMediaTimingFunction(name: .easeOut)
