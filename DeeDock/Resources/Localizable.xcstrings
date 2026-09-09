@@ -8393,6 +8393,24 @@
         }
       }
     },
+    "folderDetailsImageSize" : {
+      "comment" : "Pixel dimensions in folder-stack List, Smart, and hover details. width and height are integer pixel counts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(width)lld × %2$(height)lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(width)lld × %2$(height)lld"
+          }
+        }
+      }
+    },
     "folderDetailsModified" : {
       "comment" : "Label for exact modification timestamp in item hover details.",
       "extractionState" : "manual",
@@ -8407,6 +8425,48 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last modified"
+          }
+        }
+      }
+    },
+    "folderDetailsPageCount" : {
+      "comment" : "PDF page count in folder-stack List, Smart, and hover details. count is the number of pages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld Seite"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld Seiten"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld page"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld pages"
+                }
+              }
+            }
           }
         }
       }
