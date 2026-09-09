@@ -270,13 +270,12 @@ final class FolderStackState {
         let token = generation
         metricsTask = Task { [weak self] in
             let worker = Task.detached(priority: .utility) {
-                await withExtendedLifetime(access) {
-                    await FolderContentsMetricsScheduler.measure(pending) { url, metrics in
-                        await MainActor.run {
-                            self?.applyMetrics(metrics, to: url, token: token)
-                        }
+                await FolderContentsMetricsScheduler.measure(pending) { url, metrics in
+                    await MainActor.run {
+                        self?.applyMetrics(metrics, to: url, token: token)
                     }
                 }
+                withExtendedLifetime(access) {}
             }
             await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
         }

@@ -67,7 +67,7 @@ nonisolated enum FolderContentsMetricsScheduler {
     /// Cache hits skip the walk and publish the stored total once. Cancellation stops remaining walks.
     static func measure(
         _ folders: [FolderStackEntryReference],
-        onUpdate: @Sendable (URL, FolderContentsMetrics) async -> Void
+        onUpdate: @escaping @Sendable (URL, FolderContentsMetrics) async -> Void
     ) async {
         guard !folders.isEmpty else { return }
         await withTaskGroup(of: Void.self) { group in
