@@ -1881,3 +1881,13 @@ Pending hands-on acceptance:
   multiple displays, and removal of the initiating display during an image import.
 - Confirm actual macOS permission behavior for custom `paste:` dispatch and text
   classification. No machine privacy preferences were changed during development.
+
+## Downloads and utility reordering
+
+Downloads uses the existing folder stack with a stable built-in identity and a per-display grid/list preference. Downloads, Capsules, and Shelf share a per-display saved order. Pin persistence, Dock Modes, and Trash ordering remain separate. Ordinary Shelf drags reorder the tile; Option-drag retains bulk file export. Utility movement uses the shared native drag coordinator, floating icon, animated insertion gap, Escape cancellation, and edge scrolling. Insertion hit testing uses resting geometry so preview movement cannot move its own target.
+
+Compilation is checked with the DeeDock Debug scheme. Tests and automated visual checks were not run. Native acceptance remains pending: opening and refreshing Downloads, file-access denial, grid/list persistence, drag and Escape on all four edges, crowded/scrolling docks, independent display ordering after relaunch, VoiceOver movement, Shelf Option-drag, Reduce Motion, auto-hide, Spaces, and display removal during a drag.
+
+Folder sort options use fixed directions: modification date descending, natural name order ascending, and metadata size descending. Missing date or size metadata sorts last, with stable name/path ties. Selection survives reordering and reloads apply the current choice. Debug compilation checked; native menu, persistence, Smart groups, and keyboard navigation acceptance remain unrun. No tests or automated visual checks were run.
+
+Folder item details use already-loaded type, size, and timestamps. List/Smart show a secondary line; Grid follows the sort selection; hover text exposes full paths and exact dates. Folder sizes and absent metadata are omitted. Metadata-rich preview data is provided. Native layout, truncation, hover tooltips, localization, and VoiceOver acceptance remain unrun; no tests or automated visual checks were run.

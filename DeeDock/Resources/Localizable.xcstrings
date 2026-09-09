@@ -1,6 +1,204 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "folderItemShare": {
+    "comment": "Opens native macOS sharing destinations for the selected folder stack file or folder.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Share"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Teilen"
+        }
+      }
+    }
+  },
+  "folderDetailsFolder": {
+    "comment": "Folder kind shown in item metadata.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Folder"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ordner"
+        }
+      }
+    }
+  },
+  "folderDetailsFile": {
+    "comment": "Fallback kind when a file type is unavailable.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "File"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Datei"
+        }
+      }
+    }
+  },
+  "folderDetailsModified": {
+    "comment": "Label for exact modification timestamp in item hover details.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Last modified"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zuletzt geändert"
+        }
+      }
+    }
+  },
+  "folderDetailsCreated": {
+    "comment": "Label for exact creation timestamp in item hover details.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Created"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erstellt"
+        }
+      }
+    }
+  },
+  "folderSortTitle": {
+    "comment": "Menu for folder stack sorting with fixed directions.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sort by"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sortieren nach"
+        }
+      }
+    }
+  },
+  "folderSortRecency": {
+    "comment": "Sort by modification date, newest first.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recency"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zuletzt geändert"
+        }
+      }
+    }
+  },
+  "folderSortAlphabetical": {
+    "comment": "Sort names naturally, A first.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alphabetical"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alphabetisch"
+        }
+      }
+    }
+  },
+  "folderSortSize": {
+    "comment": "Sort by file size, largest first.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Size"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Größe"
+        }
+      }
+    }
+  },
+  "downloadsName": {
+    "comment": "Built-in Downloads folder tile in the trailing dock section.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Downloads"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Downloads"
+        }
+      }
+    }
+  },
+  "shelfMoveHint": {
+    "comment": "Hint explaining tile reordering and the Option-drag file gesture on Shelf.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Drag to reposition. Option-drag to carry all Shelf files."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zum Verschieben ziehen. Mit gedrückter Wahltaste ziehen, um alle Dateien der Ablage mitzunehmen."
+        }
+      }
+    }
+  },
     "" : {
 
     },
@@ -587,7 +785,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bounce & Fade"
+            "value" : "Federn und ausblenden"
           }
         },
         "en" : {
@@ -623,7 +821,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fade"
+            "value" : "Ausblenden"
           }
         },
         "en" : {
@@ -713,7 +911,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Horizontal Wipe"
+            "value" : "Horizontal schließen"
           }
         },
         "en" : {
@@ -749,7 +947,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Left & Fade"
+            "value" : "Nach links ausblenden"
           }
         },
         "en" : {
@@ -785,7 +983,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lift & Fade"
+            "value" : "Anheben und ausblenden"
           }
         },
         "en" : {
@@ -821,7 +1019,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Right & Fade"
+            "value" : "Nach rechts ausblenden"
           }
         },
         "en" : {
@@ -857,7 +1055,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scale & Fade"
+            "value" : "Verkleinern und ausblenden"
           }
         },
         "en" : {
@@ -893,7 +1091,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bounces inward, then retreats outward and fades."
+            "value" : "Federt nach innen, bewegt sich dann nach außen zurück und blendet aus."
           }
         },
         "en" : {
@@ -911,7 +1109,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Moves down while fading."
+            "value" : "Bewegt sich beim Ausblenden nach unten."
           }
         },
         "en" : {
@@ -947,7 +1145,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Moves inward while fading."
+            "value" : "Bewegt sich beim Ausblenden nach innen."
           }
         },
         "en" : {
@@ -983,7 +1181,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shrinks toward the outer edge while fading."
+            "value" : "Schrumpft beim Ausblenden zum äußeren Rand hin."
           }
         },
         "en" : {
@@ -1001,7 +1199,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Slides toward the screen edge while fading."
+            "value" : "Gleitet beim Ausblenden zum Bildschirmrand."
           }
         },
         "en" : {
@@ -1019,7 +1217,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Slides outward through the selected edge."
+            "value" : "Gleitet durch den gewählten Rand nach außen."
           }
         },
         "en" : {
@@ -1037,7 +1235,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Closes from the top and bottom toward the center."
+            "value" : "Schließt sich von oben und unten zur Mitte hin."
           }
         },
         "en" : {
@@ -1055,7 +1253,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Moves up while fading."
+            "value" : "Bewegt sich beim Ausblenden nach oben."
           }
         },
         "en" : {
@@ -1091,7 +1289,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Closes across the glass toward the outer edge."
+            "value" : "Schließt sich über die Glasfläche zum äußeren Rand hin."
           }
         },
         "en" : {
@@ -1109,7 +1307,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Slide & Fade"
+            "value" : "Gleiten und ausblenden"
           }
         },
         "en" : {
@@ -1145,7 +1343,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Slide"
+            "value" : "Gleiten"
           }
         },
         "en" : {
@@ -1181,7 +1379,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bounces down, then retreats upward while fading."
+            "value" : "Federt nach unten und bewegt sich beim Ausblenden nach oben zurück."
           }
         },
         "en" : {
@@ -1199,7 +1397,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Moves down into the desktop while fading."
+            "value" : "Bewegt sich beim Ausblenden nach unten in den Schreibtisch hinein."
           }
         },
         "en" : {
@@ -1235,7 +1433,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shrinks toward the top edge while fading."
+            "value" : "Schrumpft beim Ausblenden zum oberen Rand hin."
           }
         },
         "en" : {
@@ -1253,7 +1451,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Slides upward toward the top edge while fading."
+            "value" : "Gleitet beim Ausblenden zum oberen Rand."
           }
         },
         "en" : {
@@ -1271,7 +1469,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Slides upward toward the top edge."
+            "value" : "Gleitet nach oben zum oberen Rand."
           }
         },
         "en" : {
@@ -1289,7 +1487,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Collapses upward toward the top edge."
+            "value" : "Klappt nach oben zum oberen Rand zusammen."
           }
         },
         "en" : {
@@ -1307,7 +1505,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vertical Wipe"
+            "value" : "Vertikal schließen"
           }
         },
         "en" : {
@@ -1775,7 +1973,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t control %1$(appName)@: %2$(details)@"
+            "value" : "%1$(appName)@ konnte nicht gesteuert werden: %2$(details)@"
           }
         },
         "en" : {
@@ -3455,7 +3653,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Timing"
+            "value" : "Zeitverhalten"
           }
         },
         "en" : {
@@ -3563,7 +3761,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The activation zone follows the selected dock edge. Length runs along the edge; depth extends inward. Positive offsets move right on top and bottom docks and down on side docks. The connecting region keeps the dock visible while you approach it."
+            "value" : "Die Aktivierungszone folgt dem gewählten Dock-Rand. Die Länge verläuft entlang des Randes, die Tiefe nach innen. Positive Versätze verschieben das Dock oben und unten nach rechts, an den Seiten nach unten. Der Verbindungsbereich hält das Dock sichtbar, während du dich ihm näherst."
           }
         },
         "en" : {
@@ -3581,7 +3779,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Along-edge offset"
+            "value" : "Versatz entlang des Randes"
           }
         },
         "en" : {
@@ -4985,7 +5183,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selected work across %1$(applications)@. Add the current state and next step before saving."
+            "value" : "Ausgewählte Arbeit in %1$(applications)@. Ergänze vor dem Speichern den aktuellen Stand und den nächsten Schritt."
           }
         },
         "en" : {
@@ -5003,7 +5201,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continue %1$(subject)@"
+            "value" : "%1$(subject)@ fortsetzen"
           }
         },
         "en" : {
@@ -5093,7 +5291,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sitzungs-Kapseln"
+            "value" : "Kapseln"
           }
         },
         "en" : {
@@ -6011,7 +6209,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This display cannot be identified reliably. Changes apply only for this connection and won’t replace any saved display profile."
+            "value" : "Dieser Bildschirm kann nicht zuverlässig identifiziert werden. Änderungen gelten nur für diese Verbindung und ersetzen kein gespeichertes Bildschirmprofil."
           }
         },
         "en" : {
@@ -6065,7 +6263,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "While mirroring, the source display controls the dock. These preferences will apply when this display has its own desktop again."
+            "value" : "Bei der Bildschirmsynchronisierung steuert der Quellbildschirm das Dock. Diese Einstellungen gelten wieder, sobald dieser Bildschirm einen eigenen Schreibtisch hat."
           }
         },
         "en" : {
@@ -6101,7 +6299,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t read or save display preferences. Saved profiles have not been replaced."
+            "value" : "Die Bildschirmeinstellungen konnten nicht gelesen oder gespeichert werden. Gespeicherte Profile wurden nicht ersetzt."
           }
         },
         "en" : {
@@ -6119,7 +6317,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Disconnected displays"
+            "value" : "Nicht verbundene Bildschirme"
           }
         },
         "en" : {
@@ -6173,7 +6371,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Display"
+            "value" : "Bildschirm"
           }
         },
         "en" : {
@@ -6263,7 +6461,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copy of %1$(modeName)@"
+            "value" : "Kopie von %1$(modeName)@"
           }
         },
         "en" : {
@@ -6461,7 +6659,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$(count)lld display layouts"
+            "value" : "%1$(count)lld Bildschirmlayouts"
           }
         },
         "en" : {
@@ -6515,7 +6713,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "modes configurations profiles work personal writing presentation pins layouts"
+            "value" : "Modi Konfigurationen Profile Arbeit Privat Schreiben Präsentation angeheftet Layouts"
           }
         },
         "en" : {
@@ -6533,7 +6731,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved Dock Modes could not be read. The recovered layout is available, but mode and pin edits are locked until you reset Dock Modes."
+            "value" : "Gespeicherte Dock-Modi konnten nicht gelesen werden. Das wiederhergestellte Layout ist verfügbar. Modi und angeheftete Elemente können erst nach dem Zurücksetzen der Dock-Modi bearbeitet werden."
           }
         },
         "en" : {
@@ -6713,7 +6911,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Previous Mode — %1$(modeName)@"
+            "value" : "Vorheriger Modus · %1$(modeName)@"
           }
         },
         "en" : {
@@ -6731,7 +6929,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Previous Mode"
+            "value" : "Vorheriger Modus"
           }
         },
         "en" : {
@@ -6749,7 +6947,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Resetting replaces the unreadable data with the recovered Default mode."
+            "value" : "Beim Zurücksetzen werden die unlesbaren Daten durch den wiederhergestellten Standardmodus ersetzt."
           }
         },
         "en" : {
@@ -6767,7 +6965,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recovery"
+            "value" : "Wiederherstellung"
           }
         },
         "en" : {
@@ -6785,7 +6983,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rename"
+            "value" : "Umbenennen"
           }
         },
         "en" : {
@@ -6803,7 +7001,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rename Dock Mode"
+            "value" : "Dock-Modus umbenennen"
           }
         },
         "en" : {
@@ -6821,7 +7019,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reset Dock Modes"
+            "value" : "Dock-Modi zurücksetzen"
           }
         },
         "en" : {
@@ -6839,7 +7037,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved in %1$(modeName)@"
+            "value" : "Gespeichert in %1$(modeName)@"
           }
         },
         "en" : {
@@ -6857,7 +7055,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Dock Mode change could not be saved. The current mode was not changed."
+            "value" : "Die Änderung des Dock-Modus konnte nicht gespeichert werden. Der aktuelle Modus wurde nicht geändert."
           }
         },
         "en" : {
@@ -6875,7 +7073,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modes"
+            "value" : "Modi"
           }
         },
         "en" : {
@@ -6893,7 +7091,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zum Shelf hinzufügen"
+            "value" : "Zur Ablage hinzufügen"
           }
         },
         "en" : {
@@ -7055,7 +7253,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aus dem Shelf entfernen"
+            "value" : "Aus der Ablage entfernen"
           }
         },
         "en" : {
@@ -7073,7 +7271,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$(appName)@ couldn’t be found. You can unpin it, then pin it again after opening the app."
+            "value" : "%1$(appName)@ wurde nicht gefunden. Du kannst die App lösen und nach dem Öffnen erneut anheften."
           }
         },
         "en" : {
@@ -7091,7 +7289,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t hide %1$(appName)@"
+            "value" : "%1$(appName)@ konnte nicht ausgeblendet werden"
           }
         },
         "en" : {
@@ -7109,7 +7307,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose accessible files or folders. Applications cannot be included."
+            "value" : "Wähle zugängliche Dateien oder Ordner. Apps können nicht hinzugefügt werden."
           }
         },
         "en" : {
@@ -7127,7 +7325,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t load pinned apps: %1$(details)@"
+            "value" : "Angeheftete Apps konnten nicht geladen werden: %1$(details)@"
           }
         },
         "en" : {
@@ -7145,7 +7343,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t open %1$(appName)@: %2$(details)@"
+            "value" : "%1$(appName)@ konnte nicht geöffnet werden: %2$(details)@"
           }
         },
         "en" : {
@@ -7163,7 +7361,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Could not open items in %1$(appName)@: %2$(details)@"
+            "value" : "Elemente konnten nicht in %1$(appName)@ geöffnet werden: %2$(details)@"
           }
         },
         "en" : {
@@ -7181,7 +7379,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t save pinned apps: %1$(details)@"
+            "value" : "Angeheftete Apps konnten nicht gespeichert werden: %1$(details)@"
           }
         },
         "en" : {
@@ -7199,7 +7397,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Shelf could not be saved. %1$(details)@"
+            "value" : "Die Ablage konnte nicht gespeichert werden. %1$(details)@"
           }
         },
         "en" : {
@@ -8033,7 +8231,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch etwas offen? Halte es in einer Sitzungs-Kapsel fest."
+            "value" : "Noch etwas offen? Halte es in einer Kapsel fest."
           }
         },
         "en" : {
@@ -8105,7 +8303,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Den gespeicherten Timer löschen und die Fokus-Vorgaben wiederherstellen? Modes und Sitzungs-Kapseln bleiben erhalten."
+            "value" : "Den gespeicherten Timer löschen und die Fokus-Vorgaben wiederherstellen? Modi und Kapseln bleiben erhalten."
           }
         },
         "en" : {
@@ -8159,7 +8357,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sitzungs-Kapsel speichern"
+            "value" : "Kapsel speichern"
           }
         },
         "en" : {
@@ -8177,7 +8375,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Starte eine Sitzung unter Modes in den Einstellungen oder über die Menüleiste. Alle Displays teilen sich einen Timer. Die Zeit läuft im Ruhezustand und bei geschlossener App weiter, während einer Pause nicht. Änderungen an diesen Vorgaben gelten für die nächste Sitzung."
+            "value" : "Starte eine Sitzung unter „Modi“ in den Einstellungen oder über die Menüleiste. Alle Bildschirme teilen sich einen Timer. Die Zeit läuft im Ruhezustand und bei geschlossener App weiter, während einer Pause nicht. Änderungen an diesen Vorgaben gelten für die nächste Sitzung."
           }
         },
         "en" : {
@@ -10013,7 +10211,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klassisches Hüpfen"
+            "value" : "Classic Bounce"
           }
         },
         "en" : {
@@ -10031,7 +10229,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drehung"
+            "value" : "Flip"
           }
         },
         "en" : {
@@ -10049,7 +10247,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nur Ladeanzeige"
+            "value" : "Indicator only"
           }
         },
         "en" : {
@@ -10067,7 +10265,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulsieren"
+            "value" : "Pulse"
           }
         },
         "en" : {
@@ -10085,7 +10283,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Feder"
+            "value" : "Spring"
           }
         },
         "en" : {
@@ -10103,7 +10301,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wackeln"
+            "value" : "Wobble"
           }
         },
         "en" : {
@@ -10168,6 +10366,60 @@
         }
       }
     },
+    "launcher.suggestions.debugApp" : {
+      "comment" : "Development-only suggestion comparison label or explanation: App",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCacheRebuilt" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Rebuilt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu erstellt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rebuilt"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCacheReused" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Reused",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederverwendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reused"
+          }
+        }
+      }
+    },
     "launcher.suggestions.debugCandidates" : {
       "comment" : "Development-only suggestion inspector or tuning control: Candidates",
       "extractionState" : "manual",
@@ -10182,24 +10434,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Candidates"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugCaptureLatest" : {
-      "comment" : "Development inspector action replacing its frozen input with the latest real Launcher prediction request.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neueste Anfrage erfassen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Capture latest request"
           }
         }
       }
@@ -10222,6 +10456,24 @@
         }
       }
     },
+    "launcher.suggestions.debugCaptureLatest" : {
+      "comment" : "Development inspector action replacing its frozen input with the latest real Launcher prediction request.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neueste Anfrage erfassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture latest request"
+          }
+        }
+      }
+    },
     "launcher.suggestions.debugClear" : {
       "comment" : "Development-only suggestion inspector or tuning control: Clear snapshot",
       "extractionState" : "manual",
@@ -10240,6 +10492,24 @@
         }
       }
     },
+    "launcher.suggestions.debugComparison" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Final scores by app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endwerte pro App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Final scores by app"
+          }
+        }
+      }
+    },
     "launcher.suggestions.debugContext" : {
       "comment" : "Development-only suggestion inspector or tuning control: Captured context",
       "extractionState" : "manual",
@@ -10254,6 +10524,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Captured context"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugCurrentTuningHelp" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Results above use the frozen snapshot settings. The controls below edit the current settings. Replay both engines to apply these values to the same captured input.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Ergebnisse oben verwenden die Einstellungen der eingefrorenen Momentaufnahme. Die folgenden Steuerelemente ändern die aktuellen Einstellungen. Werte beide Engines erneut aus, um diese Werte auf dieselben erfassten Eingaben anzuwenden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Results above use the frozen snapshot settings. The controls below edit the current settings. Replay both engines to apply these values to the same captured input."
           }
         }
       }
@@ -10308,6 +10596,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugEffectiveNeighbors" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Effective neighbors, k",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effektive Nachbarn, k"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effective neighbors, k"
           }
         }
       }
@@ -10452,6 +10758,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Foreground app"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugForegroundSeconds" : {
+      "comment" : "Development-only diagnostic label: Foreground duration, seconds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dauer im Vordergrund, Sekunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foreground duration, seconds"
           }
         }
       }
@@ -10690,6 +11014,60 @@
         }
       }
     },
+    "launcher.suggestions.debugHour" : {
+      "comment" : "Development-only diagnostic label: Captured hour, 0–23",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasste Stunde, 0–23"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captured hour, 0–23"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugIdle" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Idle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inaktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idle"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugInferenceTime" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Model inference, ms",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellvorhersage, ms"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model inference, ms"
+          }
+        }
+      }
+    },
     "launcher.suggestions.debugInspect" : {
       "comment" : "Development-only suggestion inspector or tuning control: Open inspector…",
       "extractionState" : "manual",
@@ -10740,6 +11118,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suggestion inspector"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugLiveEngineTitle" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Live Launcher engine",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Launcher-Engine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Launcher engine"
           }
         }
       }
@@ -10870,6 +11266,42 @@
         }
       }
     },
+    "launcher.suggestions.debugModelCache" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Model cache",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellcache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model cache"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNeighborCount" : {
+      "comment" : "Development-only diagnostic label: Reconstructed neighbor count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl rekonstruierter Nachbarn"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconstructed neighbor count"
+          }
+        }
+      }
+    },
     "launcher.suggestions.debugNeighborHelp" : {
       "comment" : "Development-only suggestion inspector or tuning control: These neighbors are reconstructed from the captured feature vectors and squared distances. They are diagnostic evidence, not an internal trace from Core ML. Expand a row to inspect its original context.",
       "extractionState" : "manual",
@@ -10884,6 +11316,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "These neighbors are reconstructed from the captured feature vectors and squared distances. They are diagnostic evidence, not an internal trace from Core ML. Expand a row to inspect its original context."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugNeighbors" : {
+      "comment" : "Development-only suggestion inspector or tuning control: Requested neighbors, k",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeforderte Nachbarn, k"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requested neighbors, k"
           }
         }
       }
@@ -10906,20 +11356,20 @@
         }
       }
     },
-    "launcher.suggestions.debugNeighbors" : {
-      "comment" : "Development-only suggestion inspector or tuning control: Requested neighbors, k",
+    "launcher.suggestions.debugNoCandidate" : {
+      "comment" : "Development-only suggestion comparison label or explanation: No candidate",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Angeforderte Nachbarn, k"
+            "value" : "Kein Kandidat"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Requested neighbors, k"
+            "value" : "No candidate"
           }
         }
       }
@@ -10992,6 +11442,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No evaluation result. Replay both engines to compare them."
+          }
+        }
+      }
+    },
+    "launcher.suggestions.debugPreparationTime" : {
+      "comment" : "Development-only suggestion comparison label or explanation: Model preparation, ms · load, train or wait",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellvorbereitung, ms · Laden, Training oder Warten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model preparation, ms · load, train or wait"
           }
         }
       }
@@ -11284,24 +11752,6 @@
         }
       }
     },
-    "launcher.suggestions.debugHour" : {
-      "comment" : "Development-only diagnostic label: Captured hour, 0–23",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erfasste Stunde, 0–23"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Captured hour, 0–23"
-          }
-        }
-      }
-    },
     "launcher.suggestions.debugWeekday" : {
       "comment" : "Development-only diagnostic label: Captured weekday, Sunday = 1",
       "extractionState" : "manual",
@@ -11316,258 +11766,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Captured weekday, Sunday = 1"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugForegroundSeconds" : {
-      "comment" : "Development-only diagnostic label: Foreground duration, seconds",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dauer im Vordergrund, Sekunden"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foreground duration, seconds"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugNeighborCount" : {
-      "comment" : "Development-only diagnostic label: Reconstructed neighbor count",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anzahl rekonstruierter Nachbarn"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reconstructed neighbor count"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugApp" : {
-      "comment" : "Development-only suggestion comparison label or explanation: App",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugComparison" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Final scores by app",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Endwerte pro App"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Final scores by app"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugNoCandidate" : {
-      "comment" : "Development-only suggestion comparison label or explanation: No candidate",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein Kandidat"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No candidate"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugCurrentTuningHelp" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Results above use the frozen snapshot settings. The controls below edit the current settings. Replay both engines to apply these values to the same captured input.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Ergebnisse oben verwenden die Einstellungen der eingefrorenen Momentaufnahme. Die folgenden Steuerelemente ändern die aktuellen Einstellungen. Werte beide Engines erneut aus, um diese Werte auf dieselben erfassten Eingaben anzuwenden."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Results above use the frozen snapshot settings. The controls below edit the current settings. Replay both engines to apply these values to the same captured input."
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugPreparationTime" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Model preparation, ms · load, train or wait",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modellvorbereitung, ms · Laden, Training oder Warten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model preparation, ms · load, train or wait"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugInferenceTime" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Model inference, ms",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modellvorhersage, ms"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model inference, ms"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugCacheReused" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Reused",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiederverwendet"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reused"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugCacheRebuilt" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Rebuilt",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neu erstellt"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rebuilt"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugModelCache" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Model cache",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modellcache"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model cache"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugEffectiveNeighbors" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Effective neighbors, k",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effektive Nachbarn, k"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effective neighbors, k"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugLiveEngineTitle" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Live Launcher engine",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktuelle Launcher-Engine"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live Launcher engine"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.debugIdle" : {
-      "comment" : "Development-only suggestion comparison label or explanation: Idle",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inaktiv"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Idle"
           }
         }
       }
@@ -12202,24 +12400,6 @@
         }
       }
     },
-    "launcher.suggestions.useful" : {
-      "comment" : "App-specific positive feedback action, attached to the captured suggestion context.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hilfreicher Vorschlag"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Useful suggestion"
-          }
-        }
-      }
-    },
     "launcher.suggestions.syntheticAdaptation" : {
       "comment" : "Development-only isolated synthetic suggestion inspector: Steps to first new-pattern hit",
       "extractionState" : "manual",
@@ -12652,24 +12832,6 @@
         }
       }
     },
-    "launcher.suggestions.syntheticNoRate" : {
-      "comment" : "Development-only isolated synthetic suggestion inspector: No suggestions yet",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch keine Vorschläge"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No suggestions yet"
-          }
-        }
-      }
-    },
     "launcher.suggestions.syntheticNoise" : {
       "comment" : "Development-only isolated synthetic suggestion inspector: Noise",
       "extractionState" : "manual",
@@ -12684,6 +12846,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noise"
+          }
+        }
+      }
+    },
+    "launcher.suggestions.syntheticNoRate" : {
+      "comment" : "Development-only isolated synthetic suggestion inspector: No suggestions yet",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Vorschläge"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No suggestions yet"
           }
         }
       }
@@ -13012,6 +13192,24 @@
         }
       }
     },
+    "launcher.suggestions.useful" : {
+      "comment" : "App-specific positive feedback action, attached to the captured suggestion context.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfreicher Vorschlag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Useful suggestion"
+          }
+        }
+      }
+    },
     "launcher.suggestions.yes" : {
       "comment" : "Positive answer to the aggregate suggestion quality question.",
       "extractionState" : "manual",
@@ -13260,24 +13458,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Work"
-          }
-        }
-      }
-    },
-    "launcherOpenSettings" : {
-      "comment" : "Launcher options menu item that opens the DDock Settings window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen …"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings…"
           }
         }
       }
@@ -13674,6 +13854,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open or activate this app."
+          }
+        }
+      }
+    },
+    "launcherOpenSettings" : {
+      "comment" : "Launcher options menu item that opens the DDock Settings window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
           }
         }
       }
@@ -14123,7 +14321,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t cancel the login request. %1$(reason)@"
+            "value" : "Die Anfrage zum automatischen Start konnte nicht abgebrochen werden. %1$(reason)@"
           }
         },
         "en" : {
@@ -14141,7 +14339,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelling the request…"
+            "value" : "Anfrage wird abgebrochen…"
           }
         },
         "en" : {
@@ -14159,7 +14357,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel Request"
+            "value" : "Anfrage abbrechen"
           }
         },
         "en" : {
@@ -14177,7 +14375,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Launch at Login"
+            "value" : "Bei der Anmeldung starten"
           }
         },
         "en" : {
@@ -14195,7 +14393,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open System Settings…"
+            "value" : "Systemeinstellungen öffnen…"
           }
         },
         "en" : {
@@ -14213,7 +14411,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t enable Launch at Login. macOS couldn’t complete the request because the installed application could not be verified. Check Login Items in System Settings and try again after resolving the problem."
+            "value" : "Der automatische Start bei der Anmeldung konnte nicht aktiviert werden. macOS konnte die Anfrage nicht abschließen, da die installierte App nicht überprüft werden konnte. Prüfe die Anmeldeobjekte in den Systemeinstellungen und versuche es nach Behebung des Problems erneut."
           }
         },
         "en" : {
@@ -14231,7 +14429,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Refresh"
+            "value" : "Aktualisieren"
           }
         },
         "en" : {
@@ -14249,7 +14447,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Requesting automatic launch…"
+            "value" : "Automatischer Start wird angefordert…"
           }
         },
         "en" : {
@@ -14267,7 +14465,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t enable Launch at Login. %1$(reason)@"
+            "value" : "Der automatische Start bei der Anmeldung konnte nicht aktiviert werden. %1$(reason)@"
           }
         },
         "en" : {
@@ -14285,7 +14483,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock launches automatically when you sign in, restoring your docks and menu-bar item."
+            "value" : "DDock startet automatisch bei der Anmeldung und stellt deine Docks und das Menüleistensymbol wieder her."
           }
         },
         "en" : {
@@ -14303,7 +14501,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS couldn’t find DDock’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
+            "value" : "macOS konnte das Anmeldeobjekt von DDock nicht finden. Der automatische Start ist nicht verfügbar. Aktualisiere den Status oder prüfe die Anmeldeobjekte in den Systemeinstellungen."
           }
         },
         "en" : {
@@ -14339,7 +14537,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatic launch is inactive. Allow DDock in Login Items in System Settings, or cancel the request."
+            "value" : "Der automatische Start ist inaktiv. Erlaube DDock unter „Anmeldeobjekte“ in den Systemeinstellungen oder brich die Anfrage ab."
           }
         },
         "en" : {
@@ -14357,7 +14555,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS reported an unrecognized login-item status. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
+            "value" : "macOS hat einen unbekannten Status für das Anmeldeobjekt gemeldet. Der automatische Start ist nicht verfügbar. Aktualisiere den Status oder prüfe die Anmeldeobjekte in den Systemeinstellungen."
           }
         },
         "en" : {
@@ -14375,7 +14573,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start DDock automatically when you sign in. Turning this off keeps DDock running now."
+            "value" : "DDock bei der Anmeldung automatisch starten. Beim Ausschalten bleibt DDock jetzt geöffnet."
           }
         },
         "en" : {
@@ -14393,7 +14591,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Turning off automatic launch…"
+            "value" : "Automatischer Start wird deaktiviert…"
           }
         },
         "en" : {
@@ -14411,7 +14609,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t turn off Launch at Login. %1$(reason)@"
+            "value" : "Der automatische Start bei der Anmeldung konnte nicht deaktiviert werden. %1$(reason)@"
           }
         },
         "en" : {
@@ -14501,7 +14699,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Icon size, magnification, spacing, how running apps are marked, and how their names appear — set each one for every display or just one."
+            "value" : "Symbolgröße, Vergrößerung, Abstände, Markierungen laufender Apps und App-Namen lassen sich für alle Bildschirme gemeinsam oder einzeln einstellen."
           }
         },
         "en" : {
@@ -14519,7 +14717,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make it look right"
+            "value" : "Gestalte dein Dock"
           }
         },
         "en" : {
@@ -14537,7 +14735,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Back"
+            "value" : "Zurück"
           }
         },
         "en" : {
@@ -14555,7 +14753,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continue"
+            "value" : "Weiter"
           }
         },
         "en" : {
@@ -14573,7 +14771,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Each display keeps its own pinned apps and can override any shared setting. Disconnected displays are remembered."
+            "value" : "Jeder Bildschirm behält seine eigenen angehefteten Apps und kann jede gemeinsame Einstellung überschreiben. Nicht verbundene Bildschirme bleiben gespeichert."
           }
         },
         "en" : {
@@ -14591,7 +14789,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "One dock for every display"
+            "value" : "Ein Dock für jeden Monitor"
           }
         },
         "en" : {
@@ -14609,7 +14807,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start Using DDock"
+            "value" : "DDock verwenden"
           }
         },
         "en" : {
@@ -14627,7 +14825,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide the dock and bring it back by reaching an activation zone you define. Tune how long it waits and how it moves."
+            "value" : "Blende das Dock aus und hole es über eine selbst festgelegte Aktivierungszone zurück. Passe Wartezeiten und Bewegung an."
           }
         },
         "en" : {
@@ -14645,7 +14843,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Out of the way until you need it"
+            "value" : "Ausgeblendet, bis du es brauchst"
           }
         },
         "en" : {
@@ -14663,7 +14861,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Desktop & Dock"
+            "value" : "„Schreibtisch & Dock“ öffnen"
           }
         },
         "en" : {
@@ -14681,7 +14879,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Settings"
+            "value" : "Einstellungen öffnen"
           }
         },
         "en" : {
@@ -14699,7 +14897,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Place the dock at the bottom"
+            "value" : "Dock unten platzieren"
           }
         },
         "en" : {
@@ -14717,7 +14915,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Place the dock on the left"
+            "value" : "Dock links platzieren"
           }
         },
         "en" : {
@@ -14735,7 +14933,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dock placement"
+            "value" : "Dock-Position"
           }
         },
         "en" : {
@@ -14753,7 +14951,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Click an edge to move your dock there."
+            "value" : "Klicke auf einen Rand, um dein Dock dorthin zu verschieben."
           }
         },
         "en" : {
@@ -14771,7 +14969,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Place the dock on the right"
+            "value" : "Dock rechts platzieren"
           }
         },
         "en" : {
@@ -14789,7 +14987,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose an edge and your dock moves there now. Alignment, offset, and distance from the edge are waiting in Settings."
+            "value" : "Wähle einen Rand, und dein Dock wechselt sofort dorthin. Ausrichtung, Versatz und Randabstand findest du in den Einstellungen."
           }
         },
         "en" : {
@@ -14807,7 +15005,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Put it where you want it"
+            "value" : "Platziere dein Dock"
           }
         },
         "en" : {
@@ -14825,7 +15023,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Place the dock at the top"
+            "value" : "Dock oben platzieren"
           }
         },
         "en" : {
@@ -14843,7 +15041,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Step %1$(step)lld of %2$(total)lld"
+            "value" : "Schritt %1$(step)lld von %2$(total)lld"
           }
         },
         "en" : {
@@ -14861,7 +15059,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Press Command-Comma for Settings, or choose Focus Dock to move through your apps with the arrow keys."
+            "value" : "Drücke Befehl-Komma für die Einstellungen oder wähle „Dock fokussieren“, um mit den Pfeiltasten durch deine Apps zu navigieren."
           }
         },
         "en" : {
@@ -14897,7 +15095,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drag an app from Finder onto the dock to pin it, or right-click any app for Pin and Unpin."
+            "value" : "Ziehe eine App aus dem Finder auf das Dock, um sie anzuheften. Per Rechtsklick auf eine App findest du „Anheften“ und „Lösen“."
           }
         },
         "en" : {
@@ -14915,7 +15113,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Three things worth knowing before you start."
+            "value" : "Drei Hinweise für den Start."
           }
         },
         "en" : {
@@ -14933,7 +15131,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You’re set"
+            "value" : "Alles bereit"
           }
         },
         "en" : {
@@ -14969,7 +15167,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skip"
+            "value" : "Überspringen"
           }
         },
         "en" : {
@@ -14987,7 +15185,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your desktop is clear."
+            "value" : "Dein Schreibtisch ist frei."
           }
         },
         "en" : {
@@ -15005,7 +15203,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The macOS Dock is still holding space on your desktop."
+            "value" : "Das macOS-Dock reserviert noch Platz auf deinem Schreibtisch."
           }
         },
         "en" : {
@@ -15023,7 +15221,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open System Settings, then Desktop & Dock."
+            "value" : "Öffne „Systemeinstellungen“, dann „Schreibtisch & Dock“"
           }
         },
         "en" : {
@@ -15041,7 +15239,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Turn on “Automatically hide and show the Dock”."
+            "value" : "Aktiviere „Dock automatisch ein- und ausblenden“."
           }
         },
         "en" : {
@@ -15059,7 +15257,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DDock the space."
+            "value" : "Zwei Docks am selben Rand kommen sich in die Quere. Blende das macOS-Dock aus, um Platz für DDock zu schaffen."
           }
         },
         "en" : {
@@ -15077,7 +15275,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move the macOS Dock aside"
+            "value" : "Schaffe Platz neben dem macOS-Dock"
           }
         },
         "en" : {
@@ -15095,7 +15293,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
+            "value" : "DDock ist ein nativer Ersatz für das macOS-Dock. Es läuft in der Menüleiste und lässt sich über die Einstellungen anpassen."
           }
         },
         "en" : {
@@ -15113,7 +15311,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A Dock that does what you want"
+            "value" : "Ein Dock nach deinen Wünschen"
           }
         },
         "en" : {
@@ -15131,7 +15329,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to DDock"
+            "value" : "Willkommen bei DDock"
           }
         },
         "en" : {
@@ -16445,7 +16643,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable Screen Recording"
+            "value" : "Bildschirmaufnahme erlauben"
           }
         },
         "en" : {
@@ -16463,7 +16661,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thumbnail access is enabled."
+            "value" : "Der Zugriff auf Vorschaubilder ist aktiviert."
           }
         },
         "en" : {
@@ -16481,7 +16679,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thumbnail access is not enabled."
+            "value" : "Der Zugriff auf Vorschaubilder ist nicht aktiviert."
           }
         },
         "en" : {
@@ -16499,7 +16697,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thumbnail access is unavailable in this build."
+            "value" : "Der Zugriff auf Vorschaubilder ist in dieser Version nicht verfügbar."
           }
         },
         "en" : {
@@ -16517,7 +16715,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Screen Recording"
+            "value" : "Bildschirmaufnahme"
           }
         },
         "en" : {
@@ -16589,7 +16787,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Collapsed"
+            "value" : "Eingeklappt"
           }
         },
         "en" : {
@@ -16607,7 +16805,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Expanded"
+            "value" : "Ausgeklappt"
           }
         },
         "en" : {
@@ -16625,7 +16823,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide pinned apps (%1$(count)lld)"
+            "value" : "Angeheftete Apps ausblenden (%1$(count)lld)"
           }
         },
         "en" : {
@@ -16643,7 +16841,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide running apps (%1$(count)lld)"
+            "value" : "Laufende Apps ausblenden (%1$(count)lld)"
           }
         },
         "en" : {
@@ -16661,7 +16859,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show pinned apps (%1$(count)lld)"
+            "value" : "Angeheftete Apps anzeigen (%1$(count)lld)"
           }
         },
         "en" : {
@@ -16679,7 +16877,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show running apps (%1$(count)lld)"
+            "value" : "Laufende Apps anzeigen (%1$(count)lld)"
           }
         },
         "en" : {
@@ -16697,7 +16895,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Turn on Apple Intelligence to organize these items."
+            "value" : "Aktiviere Apple Intelligence, um diese Elemente zu gruppieren."
           }
         },
         "en" : {
@@ -16715,7 +16913,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Smart grouping is not available on this Mac."
+            "value" : "Smarte Gruppen sind auf diesem Mac nicht verfügbar."
           }
         },
         "en" : {
@@ -16733,7 +16931,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t organize these items."
+            "value" : "Diese Elemente konnten nicht gruppiert werden."
           }
         },
         "en" : {
@@ -16751,7 +16949,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Smart groups ready."
+            "value" : "Smarte Gruppen sind bereit."
           }
         },
         "en" : {
@@ -16769,7 +16967,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Items"
+            "value" : "Elemente"
           }
         },
         "en" : {
@@ -16787,7 +16985,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Intelligence is still preparing its model."
+            "value" : "Apple Intelligence bereitet sein Modell noch vor."
           }
         },
         "en" : {
@@ -16805,7 +17003,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "More Items"
+            "value" : "Weitere Elemente"
           }
         },
         "en" : {
@@ -16823,7 +17021,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Organizing"
+            "value" : "Wird gruppiert"
           }
         },
         "en" : {
@@ -16841,7 +17039,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Other"
+            "value" : "Sonstige"
           }
         },
         "en" : {
@@ -16877,7 +17075,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unavailable"
+            "value" : "Nicht verfügbar"
           }
         },
         "en" : {
@@ -16913,7 +17111,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bottom"
+            "value" : "Unten"
           }
         },
         "en" : {
@@ -16931,7 +17129,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Center"
+            "value" : "Mitte"
           }
         },
         "en" : {
@@ -16949,7 +17147,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Left"
+            "value" : "Links"
           }
         },
         "en" : {
@@ -16967,7 +17165,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alignment"
+            "value" : "Ausrichtung"
           }
         },
         "en" : {
@@ -16985,7 +17183,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Right"
+            "value" : "Rechts"
           }
         },
         "en" : {
@@ -17003,7 +17201,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Top"
+            "value" : "Oben"
           }
         },
         "en" : {
@@ -17021,7 +17219,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allowed range: %1$(lower)@ to %2$(upper)@."
+            "value" : "Zulässiger Bereich: %1$(lower)@ bis %2$(upper)@."
           }
         },
         "en" : {
@@ -17039,7 +17237,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Along-edge offset"
+            "value" : "Versatz entlang des Randes"
           }
         },
         "en" : {
@@ -17057,7 +17255,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Animate indicators"
+            "value" : "Indikatoren animieren"
           }
         },
         "en" : {
@@ -17075,7 +17273,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Appearance"
+            "value" : "Erscheinungsbild"
           }
         },
         "en" : {
@@ -17093,7 +17291,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crowded docks use smaller icons before scrolling. Reduce Motion disables magnification without changing your preference."
+            "value" : "Bei Platzmangel verkleinert das Dock zuerst die Symbole, bevor es gescrollt werden kann. „Bewegung reduzieren“ deaktiviert die Vergrößerung, ohne deine Einstellung zu ändern."
           }
         },
         "en" : {
@@ -17111,7 +17309,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "icon size magnification zoom scale hover running indicator dot bar square hidden neon aura glow target orbit stardust power badge glitch plasma hologram solar flare prism shader metal background opacity transparency floating icons idle fading dimming delay restore tooltip app names labels presets caption"
+            "value" : "Symbol Größe Vergrößerung Zoom Skalierung Mauszeiger laufend Indikator Punkt Balken Quadrat ausgeblendet Neon Aura Leuchten Target Orbit Stardust Power Badge Glitch Plasma Hologram Solar Flare Prism Shader Metal Hintergrund Deckkraft Transparenz schwebend Abdunkeln Verzögerung Wiederherstellen Tooltip App-Namen Beschriftungen Vorlagen"
           }
         },
         "en" : {
@@ -17129,7 +17327,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App names"
+            "value" : "App-Namen"
           }
         },
         "en" : {
@@ -17147,7 +17345,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Each preset includes its design, placement, hover delay, and entrance. Inward is toward the desktop; before and after follow app order. Keyboard labels appear immediately. Off preserves accessible app names."
+            "value" : "Jede Vorlage legt Design, Position, Wartezeit und Einblendung fest. „Nach innen“ zeigt zum Schreibtisch; „vor“ und „nach“ folgen der App-Reihenfolge. Bei Tastaturbedienung erscheinen Namen sofort. „Off“ erhält die App-Namen für Bedienungshilfen."
           }
         },
         "en" : {
@@ -17165,7 +17363,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App visibility"
+            "value" : "Sichtbarkeit von Apps"
           }
         },
         "en" : {
@@ -17183,7 +17381,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pinned apps stay in the pinned section while running. Collapse replaces one section with a button. Expansion lasts until clicked again or the dock is recreated."
+            "value" : "Angeheftete Apps bleiben auch beim Ausführen im angehefteten Bereich. Beim Einklappen wird ein Bereich durch eine Taste ersetzt. Er bleibt nach dem Ausklappen geöffnet, bis du erneut klickst oder das Dock neu erstellt wird."
           }
         },
         "en" : {
@@ -17237,7 +17435,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Behavior"
+            "value" : "Verhalten"
           }
         },
         "en" : {
@@ -17255,7 +17453,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "auto hide reveal activation zone length depth width height offset delay animation duration preview edge app visibility hide pinned running collapse expand sections"
+            "value" : "automatisch ausblenden einblenden Aktivierungszone Länge Tiefe Breite Höhe Versatz Verzögerung Animation Dauer Vorschau Rand App Sichtbarkeit angeheftet laufend einklappen ausklappen Bereiche"
           }
         },
         "en" : {
@@ -17273,7 +17471,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bottom distance"
+            "value" : "Abstand unten"
           }
         },
         "en" : {
@@ -17291,7 +17489,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Session Capsules"
+            "value" : "Kapseln"
           }
         },
         "en" : {
@@ -17309,7 +17507,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save a compact, editable checkpoint from selected windows. Images and recognized text are used only to create the draft and are not stored."
+            "value" : "Speichere einen kompakten, bearbeitbaren Zwischenstand ausgewählter Fenster. Bilder und erkannter Text werden nur für den Entwurf verwendet und nicht gespeichert."
           }
         },
         "en" : {
@@ -17327,7 +17525,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anchor"
+            "value" : "Bezugspunkt"
           }
         },
         "en" : {
@@ -17345,7 +17543,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fine-tuning"
+            "value" : "Feinabstimmung"
           }
         },
         "en" : {
@@ -17363,7 +17561,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Icons"
+            "value" : "Symbole"
           }
         },
         "en" : {
@@ -17381,7 +17579,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirm before emptying Trash"
+            "value" : "Vor dem Leeren des Papierkorbs bestätigen"
           }
         },
         "en" : {
@@ -17453,7 +17651,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Screen-edge positioning can overlap the system Dock. An automatically hidden system Dock may overlap either mode."
+            "value" : "Bei der Positionierung am Bildschirmrand kann sich das Dock mit dem System-Dock überlappen. Ein automatisch ausgeblendetes System-Dock kann sich bei beiden Positionierungsarten mit DDock überlappen."
           }
         },
         "en" : {
@@ -17489,7 +17687,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edge"
+            "value" : "Rand"
           }
         },
         "en" : {
@@ -17507,7 +17705,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bottom"
+            "value" : "Unten"
           }
         },
         "en" : {
@@ -17525,7 +17723,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edge distance"
+            "value" : "Randabstand"
           }
         },
         "en" : {
@@ -17543,7 +17741,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Left"
+            "value" : "Links"
           }
         },
         "en" : {
@@ -17561,7 +17759,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Right"
+            "value" : "Rechts"
           }
         },
         "en" : {
@@ -17579,7 +17777,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Top"
+            "value" : "Oben"
           }
         },
         "en" : {
@@ -17723,7 +17921,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Features"
+            "value" : "Funktionen"
           }
         },
         "en" : {
@@ -17759,7 +17957,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme"
           }
         },
         "en" : {
@@ -17777,7 +17975,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Optionale Dock-Funktionen wie Shelf, Papierkorb, Mitteilungskennzeichen und Window Peek."
+            "value" : "Optionale Dock-Funktionen wie Ablage, Papierkorb, Mitteilungskennzeichen und Window Peek."
           }
         },
         "en" : {
@@ -17795,7 +17993,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "General"
+            "value" : "Allgemein"
           }
         },
         "en" : {
@@ -17867,7 +18065,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Horizontal offset"
+            "value" : "Horizontaler Versatz"
           }
         },
         "en" : {
@@ -17885,7 +18083,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Icon size"
+            "value" : "Symbolgröße"
           }
         },
         "en" : {
@@ -18155,7 +18353,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indicator style"
+            "value" : "Indikatorstil"
           }
         },
         "en" : {
@@ -18191,7 +18389,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter a number within the allowed range."
+            "value" : "Gib eine Zahl im zulässigen Bereich ein."
           }
         },
         "en" : {
@@ -18209,7 +18407,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Item spacing"
+            "value" : "Abstand zwischen Elementen"
           }
         },
         "en" : {
@@ -18371,7 +18569,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t read saved settings. Defaults are being used. Choose Restore Defaults to replace the unreadable settings; your pinned apps will be kept."
+            "value" : "Gespeicherte Einstellungen konnten nicht gelesen werden. Es werden die Standardwerte verwendet. Wähle „Standardwerte wiederherstellen“, um die unlesbaren Einstellungen zu ersetzen. Deine angehefteten Apps bleiben erhalten."
           }
         },
         "en" : {
@@ -18389,7 +18587,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maximum magnification"
+            "value" : "Maximale Vergrößerung"
           }
         },
         "en" : {
@@ -18443,7 +18641,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No settings match your search."
+            "value" : "Keine Treffer für diese Suche"
           }
         },
         "en" : {
@@ -18515,7 +18713,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Positive offsets move right on top and bottom docks and down on side docks. Edge distance measures to the outside of the glass. Placement is constrained to the display; requested values remain saved."
+            "value" : "Positive Versätze verschieben das Dock oben und unten nach rechts, an den Seiten nach unten. Der Randabstand wird bis zur Außenkante des Glases gemessen. Die Position bleibt auf den Bildschirm begrenzt; die gewünschten Werte bleiben gespeichert."
           }
         },
         "en" : {
@@ -18533,7 +18731,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "edge bottom left right top center alignment offset distance usable desktop screen position vertical horizontal"
+            "value" : "Rand unten links rechts oben Mitte Ausrichtung Versatz Abstand nutzbar Schreibtisch Bildschirm Position vertikal horizontal"
           }
         },
         "en" : {
@@ -18551,7 +18749,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Position relative to"
+            "value" : "Position relativ zu"
           }
         },
         "en" : {
@@ -18569,7 +18767,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preview"
+            "value" : "Vorschau"
           }
         },
         "en" : {
@@ -18587,7 +18785,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "An illustration of your settings, not a live view of your dock."
+            "value" : "Eine Darstellung deiner Einstellungen, keine Live-Ansicht deines Docks."
           }
         },
         "en" : {
@@ -18659,7 +18857,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restore Defaults"
+            "value" : "Standardwerte wiederherstellen"
           }
         },
         "en" : {
@@ -18677,7 +18875,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Running indicators"
+            "value" : "Indikatoren für laufende Apps"
           }
         },
         "en" : {
@@ -18695,7 +18893,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DDock menu to see the independent keyboard selection outline."
+            "value" : "Markiert laufende Apps, auch im Hintergrund. Wähle eine Randmarkierung, einen Rahmen, einen Leuchteffekt oder ein Kennzeichen. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity und Glitch verwenden das jeweilige App-Symbol für eigene Farben und Formen. Diese Effekte und Stardust lassen sich animieren. Hidden lässt die Symbolabstände unverändert. Wähle „Dock fokussieren“ im DDock-Menü, um den separaten Auswahlrahmen für die Tastaturbedienung zu sehen."
           }
         },
         "en" : {
@@ -18713,7 +18911,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t save settings. Your previous settings are still in use."
+            "value" : "Die Einstellungen konnten nicht gespeichert werden. Deine bisherigen Einstellungen bleiben aktiv."
           }
         },
         "en" : {
@@ -18731,7 +18929,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Screen edge"
+            "value" : "Bildschirmrand"
           }
         },
         "en" : {
@@ -18749,7 +18947,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search"
+            "value" : "Suchen"
           }
         },
         "en" : {
@@ -18803,7 +19001,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shelf"
+            "value" : "Ablage"
           }
         },
         "en" : {
@@ -18821,7 +19019,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shelf & Papierkorb"
+            "value" : "Ablage & Papierkorb"
           }
         },
         "en" : {
@@ -18839,7 +19037,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Shelf is a staging area for files you are moving between places. Drop files on the tile to keep them there, then drag them out where you need them. Its contents are shared by every display."
+            "value" : "Die Ablage hält Dateien bereit, die du zwischen Orten verschiebst. Lege Dateien auf dem Symbol ab und ziehe sie anschließend dorthin, wo du sie brauchst. Alle Bildschirme teilen sich den Inhalt."
           }
         },
         "en" : {
@@ -18857,7 +19055,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Session Capsules"
+            "value" : "Kapseln anzeigen"
           }
         },
         "en" : {
@@ -18875,7 +19073,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Shelf"
+            "value" : "Ablage anzeigen"
           }
         },
         "en" : {
@@ -18893,7 +19091,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Trash"
+            "value" : "Papierkorb anzeigen"
           }
         },
         "en" : {
@@ -18929,7 +19127,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Top placement always uses the usable desktop to avoid overlapping the menu bar and notch."
+            "value" : "Oben wird immer der nutzbare Schreibtisch verwendet, damit das Dock die Menüleiste und die Kameraaussparung nicht überlappt."
           }
         },
         "en" : {
@@ -18947,7 +19145,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trash"
+            "value" : "Papierkorb"
           }
         },
         "en" : {
@@ -18965,7 +19163,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adds Trash after a divider. You can also choose whether DDock asks before emptying it."
+            "value" : "Fügt den Papierkorb hinter einer Trennlinie hinzu. Du kannst außerdem festlegen, ob DDock vor dem Leeren nachfragt."
           }
         },
         "en" : {
@@ -18983,7 +19181,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usable desktop"
+            "value" : "Nutzbarer Schreibtisch"
           }
         },
         "en" : {
@@ -19001,7 +19199,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Shelf…"
+            "value" : "Ablage leeren…"
           }
         },
         "en" : {
@@ -19019,7 +19217,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
+            "value" : "Abbrechen"
           }
         },
         "en" : {
@@ -19037,7 +19235,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Shelf"
+            "value" : "Ablage leeren"
           }
         },
         "en" : {
@@ -19055,7 +19253,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The staged items are removed from the Shelf. The files themselves stay where they are."
+            "value" : "Die Elemente werden aus der Ablage entfernt. Die Dateien selbst bleiben an ihrem Speicherort."
           }
         },
         "en" : {
@@ -19073,7 +19271,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear the Shelf?"
+            "value" : "Ablage leeren?"
           }
         },
         "en" : {
@@ -19094,13 +19292,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Copy"
+                  "value" : "Kopieren"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Copy %1$(count)lld Items"
+                  "value" : "%1$(count)lld Elemente kopieren"
                 }
               }
             }
@@ -19133,7 +19331,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drag files onto the Shelf tile to keep them within reach."
+            "value" : "Ziehe Dateien auf das Ablage-Symbol, um sie griffbereit zu halten."
           }
         },
         "en" : {
@@ -19151,7 +19349,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Shelf is empty"
+            "value" : "Die Ablage ist leer"
           }
         },
         "en" : {
@@ -19169,7 +19367,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Shelf holds at most %1$(limit)lld items."
+            "value" : "Die Ablage fasst höchstens %1$(limit)lld Elemente."
           }
         },
         "en" : {
@@ -19187,7 +19385,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$(count)lld items"
+            "value" : "%1$(count)lld Elemente"
           }
         },
         "en" : {
@@ -19205,7 +19403,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drag out to copy this item elsewhere"
+            "value" : "Herausziehen, um dieses Element an einen anderen Ort zu kopieren"
           }
         },
         "en" : {
@@ -19223,7 +19421,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unavailable"
+            "value" : "Nicht verfügbar"
           }
         },
         "en" : {
@@ -19241,7 +19439,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shelf"
+            "value" : "Ablage"
           }
         },
         "en" : {
@@ -19259,7 +19457,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Shelf"
+            "value" : "Ablage öffnen"
           }
         },
         "en" : {
@@ -19277,7 +19475,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opens the Shelf"
+            "value" : "Öffnet die Ablage"
           }
         },
         "en" : {
@@ -19298,13 +19496,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Open"
+                  "value" : "Öffnen"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Open %1$(count)lld Items"
+                  "value" : "%1$(count)lld Elemente öffnen"
                 }
               }
             }
@@ -19326,318 +19524,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "shelfPresentationControl" : {
-      "comment" : "VoiceOver label for the Shelf list/grid switch.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shelf layout"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shelf layout"
-          }
-        }
-      }
-    },
-    "shelfPresentationGrid" : {
-      "comment" : "Shelf layout showing items as a grid of thumbnails.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grid"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grid"
-          }
-        }
-      }
-    },
-    "shelfPresentationList" : {
-      "comment" : "Shelf layout showing one item per row.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "List"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "List"
-          }
-        }
-      }
-    },
-    "shelfRemove" : {
-      "comment" : "Command that removes one item from the Shelf without deleting the file.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove from Shelf"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove from Shelf"
-          }
-        }
-      }
-    },
-    "shelfRemoveItem" : {
-      "comment" : "Command that removes staged items from the Shelf without deleting the files. count is how many items the command acts on.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Remove from Shelf"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Remove %1$(count)lld Items from Shelf"
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Remove from Shelf"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Remove %1$(count)lld Items from Shelf"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "shelfRevealInFinder" : {
-      "comment" : "Command that shows one staged item in Finder.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show in Finder"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show in Finder"
-          }
-        }
-      }
-    },
-    "shelfSelectAll" : {
-      "comment" : "Command that selects every staged item in the Shelf panel.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select All"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select All"
-          }
-        }
-      }
-    },
-    "shelfSort" : {
-      "comment" : "Control that chooses how the Shelf panel arranges its items.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrange"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrange"
-          }
-        }
-      }
-    },
-    "shelfSortDateAdded" : {
-      "comment" : "Shelf sort order: most recently staged item first.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Date Added"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Date Added"
-          }
-        }
-      }
-    },
-    "shelfSortName" : {
-      "comment" : "Shelf sort order: item names A to Z.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
-          }
-        }
-      }
-    },
-    "shelfUnavailable" : {
-      "comment" : "Reported on a dock when the Shelf cannot be used at all.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Shelf is unavailable."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Shelf is unavailable."
-          }
-        }
-      }
-    },
-    "shelfPasteClipboard" : {
-      "comment" : "Shelf dock icon context menu action. Adds files or an image from the clipboard.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aus Zwischenablage einfügen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paste from Clipboard"
-          }
-        }
-      }
-    },
-    "shelfPasteStorageUnavailable" : {
-      "comment" : "Clipboard import cannot modify corrupt Shelf storage.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Ablage kann erst nach Wiederherstellung oder Zurücksetzen ihrer Daten aktualisiert werden."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Shelf cannot be updated until its storage has been recovered or reset."
-          }
-        }
-      }
-    },
-    "shelfPasteChanged" : {
-      "comment" : "Clipboard changed while taking a snapshot for Shelf.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Zwischenablage wurde geändert. Öffne das Ablage-Menü und füge erneut ein."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The clipboard changed. Open the Shelf menu and paste again."
-          }
-        }
-      }
-    },
-    "shelfPasteUnavailable" : {
-      "comment" : "Clipboard empty or access was denied when Paste was invoked.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Zwischenablage ist leer oder kann nicht gelesen werden. Kopiere die Dateien oder das Bild erneut und erlaube den Zugriff, falls macOS danach fragt."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The clipboard is empty or cannot be read. Copy the files or image again and allow clipboard access if macOS asks."
-          }
-        }
-      }
-    },
-    "shelfPasteFailed" : {
-      "comment" : "Shelf paste result with one or more localized failure details.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einige Elemente aus der Zwischenablage konnten nicht hinzugefügt werden. %1$(details)@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Some clipboard items could not be added. %1$(details)@"
           }
         }
       }
@@ -19660,20 +19546,56 @@
         }
       }
     },
-    "shelfPasteUnsupported" : {
-      "comment" : "One clipboard item was malformed, unsupported, or too large to read.",
+    "shelfPasteChanged" : {
+      "comment" : "Clipboard changed while taking a snapshot for Shelf.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein Element enthält keinen unterstützten Dateipfad oder kein unterstütztes Bild oder überschreitet die Zwischenablage-Grenze von 64 MB."
+            "value" : "Die Zwischenablage wurde geändert. Öffne das Ablage-Menü und füge erneut ein."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "An item has no supported file path or image, or exceeds the 64 MB clipboard limit."
+            "value" : "The clipboard changed. Open the Shelf menu and paste again."
+          }
+        }
+      }
+    },
+    "shelfPasteClipboard" : {
+      "comment" : "Shelf dock icon context menu action. Adds files or an image from the clipboard.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Zwischenablage einfügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste from Clipboard"
+          }
+        }
+      }
+    },
+    "shelfPasteFailed" : {
+      "comment" : "Shelf paste result with one or more localized failure details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Elemente aus der Zwischenablage konnten nicht hinzugefügt werden. %1$(details)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some clipboard items could not be added. %1$(details)@"
           }
         }
       }
@@ -19750,6 +19672,282 @@
         }
       }
     },
+    "shelfPasteStorageUnavailable" : {
+      "comment" : "Clipboard import cannot modify corrupt Shelf storage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Ablage kann erst nach Wiederherstellung oder Zurücksetzen ihrer Daten aktualisiert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Shelf cannot be updated until its storage has been recovered or reset."
+          }
+        }
+      }
+    },
+    "shelfPasteUnavailable" : {
+      "comment" : "Clipboard empty or access was denied when Paste was invoked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zwischenablage ist leer oder kann nicht gelesen werden. Kopiere die Dateien oder das Bild erneut und erlaube den Zugriff, falls macOS danach fragt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The clipboard is empty or cannot be read. Copy the files or image again and allow clipboard access if macOS asks."
+          }
+        }
+      }
+    },
+    "shelfPasteUnsupported" : {
+      "comment" : "One clipboard item was malformed, unsupported, or too large to read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Element enthält keinen unterstützten Dateipfad oder kein unterstütztes Bild oder überschreitet die Zwischenablage-Grenze von 64 MB."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An item has no supported file path or image, or exceeds the 64 MB clipboard limit."
+          }
+        }
+      }
+    },
+    "shelfPresentationControl" : {
+      "comment" : "VoiceOver label for the Shelf list/grid switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablage-Layout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shelf layout"
+          }
+        }
+      }
+    },
+    "shelfPresentationGrid" : {
+      "comment" : "Shelf layout showing items as a grid of thumbnails.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid"
+          }
+        }
+      }
+    },
+    "shelfPresentationList" : {
+      "comment" : "Shelf layout showing one item per row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
+    },
+    "shelfRemove" : {
+      "comment" : "Command that removes one item from the Shelf without deleting the file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus der Ablage entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from Shelf"
+          }
+        }
+      }
+    },
+    "shelfRemoveItem" : {
+      "comment" : "Command that removes staged items from the Shelf without deleting the files. count is how many items the command acts on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Aus der Ablage entfernen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$(count)lld Elemente aus der Ablage entfernen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Remove from Shelf"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Remove %1$(count)lld Items from Shelf"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "shelfRevealInFinder" : {
+      "comment" : "Command that shows one staged item in Finder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "shelfSelectAll" : {
+      "comment" : "Command that selects every staged item in the Shelf panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "shelfSort" : {
+      "comment" : "Control that chooses how the Shelf panel arranges its items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anordnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "shelfSortDateAdded" : {
+      "comment" : "Shelf sort order: most recently staged item first.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzugefügt am"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date Added"
+          }
+        }
+      }
+    },
+    "shelfSortName" : {
+      "comment" : "Shelf sort order: item names A to Z.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "shelfUnavailable" : {
+      "comment" : "Reported on a dock when the Shelf cannot be used at all.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Ablage ist nicht verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Shelf is unavailable."
+          }
+        }
+      }
+    },
     "shelfUnavailableItems" : {
       "comment" : "Reported when a drag out of the Shelf finds no item that still exists.",
       "extractionState" : "manual",
@@ -19757,7 +19955,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "None of the staged items could be found."
+            "value" : "Keines der Elemente wurde gefunden."
           }
         },
         "en" : {
@@ -19793,7 +19991,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.15 s · fade"
+            "value" : "Nach innen · 0,15 s · Einblenden"
           }
         },
         "en" : {
@@ -19829,7 +20027,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.15 s · fade"
+            "value" : "Nach innen · 0,15 s · Einblenden"
           }
         },
         "en" : {
@@ -19865,7 +20063,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · immediate · instant"
+            "value" : "Nach innen · sofort · ohne Animation"
           }
         },
         "en" : {
@@ -19901,7 +20099,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.35 s · fade"
+            "value" : "Nach innen · 0,35 s · Einblenden"
           }
         },
         "en" : {
@@ -19937,7 +20135,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dock center · immediate · crossfade"
+            "value" : "Dock-Mitte · sofort · Überblenden"
           }
         },
         "en" : {
@@ -19973,7 +20171,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dock center · 0.20 s · crossfade"
+            "value" : "Dock-Mitte · 0,20 s · Überblenden"
           }
         },
         "en" : {
@@ -20009,7 +20207,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.15 s · fade"
+            "value" : "Nach innen · 0,15 s · Einblenden"
           }
         },
         "en" : {
@@ -20045,7 +20243,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Before icon · 0.30 s · fade"
+            "value" : "Vor dem Symbol · 0,30 s · Einblenden"
           }
         },
         "en" : {
@@ -20081,7 +20279,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Before icon · 0.15 s · slide"
+            "value" : "Vor dem Symbol · 0,15 s · Gleiten"
           }
         },
         "en" : {
@@ -20117,7 +20315,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.20 s · lift"
+            "value" : "Nach innen · 0,20 s · Anheben"
           }
         },
         "en" : {
@@ -20153,7 +20351,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.40 s · fade"
+            "value" : "Nach innen · 0,40 s · Einblenden"
           }
         },
         "en" : {
@@ -20189,7 +20387,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No visual app names"
+            "value" : "Keine App-Namen"
           }
         },
         "en" : {
@@ -20225,7 +20423,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.20 s · fade"
+            "value" : "Nach innen · 0,20 s · Einblenden"
           }
         },
         "en" : {
@@ -20261,7 +20459,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · immediate · instant"
+            "value" : "Nach innen · sofort · ohne Animation"
           }
         },
         "en" : {
@@ -20279,7 +20477,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Play Preview"
+            "value" : "Vorschau abspielen"
           }
         },
         "en" : {
@@ -20315,7 +20513,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.15 s · scale"
+            "value" : "Nach innen · 0,15 s · Skalieren"
           }
         },
         "en" : {
@@ -20333,7 +20531,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sample App"
+            "value" : "Beispiel-App"
           }
         },
         "en" : {
@@ -20369,7 +20567,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.20 s · fade"
+            "value" : "Nach innen · 0,20 s · Einblenden"
           }
         },
         "en" : {
@@ -20405,7 +20603,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inward · 0.20 s · lift"
+            "value" : "Nach innen · 0,20 s · Anheben"
           }
         },
         "en" : {
@@ -20441,7 +20639,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "After icon · 0.30 s · fade"
+            "value" : "Nach dem Symbol · 0,30 s · Einblenden"
           }
         },
         "en" : {
@@ -20477,7 +20675,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "After icon · 0.15 s · slide"
+            "value" : "Nach dem Symbol · 0,15 s · Gleiten"
           }
         },
         "en" : {
@@ -20495,7 +20693,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finder couldn’t complete the Trash command. %1$(details)@"
+            "value" : "Der Finder konnte den Papierkorbbefehl nicht ausführen. %1$(details)@"
           }
         },
         "en" : {
@@ -20513,7 +20711,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finder couldn’t complete the Trash command."
+            "value" : "Der Finder konnte den Papierkorbbefehl nicht ausführen."
           }
         },
         "en" : {
@@ -20531,7 +20729,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empty"
+            "value" : "Leer"
           }
         },
         "en" : {
@@ -20549,7 +20747,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empty Trash…"
+            "value" : "Papierkorb leeren…"
           }
         },
         "en" : {
@@ -20567,7 +20765,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
+            "value" : "Abbrechen"
           }
         },
         "en" : {
@@ -20585,7 +20783,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empty Trash"
+            "value" : "Papierkorb leeren"
           }
         },
         "en" : {
@@ -20603,7 +20801,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The items in Trash will be permanently deleted. This action can’t be undone."
+            "value" : "Die Elemente im Papierkorb werden endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
           }
         },
         "en" : {
@@ -20621,7 +20819,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empty Trash?"
+            "value" : "Papierkorb leeren?"
           }
         },
         "en" : {
@@ -20639,7 +20837,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t empty Trash. %1$(details)@"
+            "value" : "Der Papierkorb konnte nicht geleert werden. %1$(details)@"
           }
         },
         "en" : {
@@ -20657,7 +20855,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contains items"
+            "value" : "Enthält Elemente"
           }
         },
         "en" : {
@@ -20675,7 +20873,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t move the items to Trash. %1$(details)@"
+            "value" : "Die Elemente konnten nicht in den Papierkorb bewegt werden. %1$(details)@"
           }
         },
         "en" : {
@@ -20693,7 +20891,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trash"
+            "value" : "Papierkorb"
           }
         },
         "en" : {
@@ -20711,7 +20909,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Trash"
+            "value" : "Papierkorb öffnen"
           }
         },
         "en" : {
@@ -20729,7 +20927,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn’t open Trash."
+            "value" : "Der Papierkorb konnte nicht geöffnet werden."
           }
         },
         "en" : {
@@ -20747,7 +20945,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opens Trash in Finder"
+            "value" : "Papierkorb in „Finder“ öffnen"
           }
         },
         "en" : {
@@ -20765,7 +20963,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Status unavailable"
+            "value" : "Status nicht verfügbar"
           }
         },
         "en" : {
@@ -20783,7 +20981,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trash is unavailable."
+            "value" : "Der Papierkorb ist nicht verfügbar."
           }
         },
         "en" : {
@@ -22589,7 +22787,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Collapse pinned apps"
+            "value" : "Angeheftete Apps einklappen"
           }
         },
         "en" : {
@@ -22607,7 +22805,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Collapse running apps"
+            "value" : "Laufende Apps einklappen"
           }
         },
         "en" : {
@@ -22625,7 +22823,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide pinned apps"
+            "value" : "Angeheftete Apps ausblenden"
           }
         },
         "en" : {
@@ -22643,7 +22841,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide running apps"
+            "value" : "Laufende Apps ausblenden"
           }
         },
         "en" : {
@@ -22661,13 +22859,355 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show all"
+            "value" : "Alle anzeigen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show all"
+          }
+        }
+      }
+    },
+    "watchActionChangeFolder" : {
+      "comment" : "Window watch: replace the configured folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anderen Ordner wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a different folder"
+          }
+        }
+      }
+    },
+    "watchActionChooseFolder" : {
+      "comment" : "Window watch: opens a folder picker for the completion action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner wählen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Folder…"
+          }
+        }
+      }
+    },
+    "watchActionChooseShortcut" : {
+      "comment" : "Window watch: picker label for a configured Shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Shortcut"
+          }
+        }
+      }
+    },
+    "watchActionFailed" : {
+      "comment" : "Window watch: generic completion-action failure that does not change the watch result.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gewählte Aktion ist fehlgeschlagen. Das Beobachtungsergebnis bleibt unverändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured action failed. The watch result is unchanged."
+          }
+        }
+      }
+    },
+    "watchActionFolder" : {
+      "comment" : "Window watch: completion action that opens a user-chosen folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open a folder"
+          }
+        }
+      }
+    },
+    "watchActionFolderChosen" : {
+      "comment" : "Window watch: confirms the selected output folder. name is the folder name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner: %(name)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder: %(name)@"
+          }
+        }
+      }
+    },
+    "watchActionFolderMissing" : {
+      "comment" : "Window watch: the bookmarked folder is missing or cannot be opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gewählte Ordner fehlt oder ließ sich nicht öffnen. Wähle ihn erneut oder überspringe die Aktion."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured folder is missing or could not be opened. Choose it again or skip the action."
+          }
+        }
+      }
+    },
+    "watchActionHelp" : {
+      "comment" : "Window watch: explains that a completion action waits for an explicit click.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn die Erkennung fertig ist, zeigt DDock eine Taste. Es wird nichts automatisch ausgeführt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After the detector finishes, DDock shows a button. Nothing runs automatically."
+          }
+        }
+      }
+    },
+    "watchActionLoadShortcuts" : {
+      "comment" : "Window watch: explicitly refresh the Shortcut list. Same wording as Action Tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle laden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Shortcuts"
+          }
+        }
+      }
+    },
+    "watchActionNone" : {
+      "comment" : "Window watch: no completion action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Aktion"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No action"
+          }
+        }
+      }
+    },
+    "watchActionNoShortcuts" : {
+      "comment" : "Window watch: empty Shortcut list until the user loads them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lade Kurzbefehle, um einen zu wählen. DDock übergibt weder aufgenommenes Bild noch Text."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Shortcuts to choose one. DDock does not pass captured pixels or text to it."
+          }
+        }
+      }
+    },
+    "watchActionOpenFolder" : {
+      "comment" : "Window watch: explicit button after detection to open the configured folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewählten Ordner öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open configured folder"
+          }
+        }
+      }
+    },
+    "watchActionRunning" : {
+      "comment" : "Window watch: the user-triggered completion action is in progress.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gewählte Aktion wird ausgeführt…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running the configured action…"
+          }
+        }
+      }
+    },
+    "watchActionRunShortcut" : {
+      "comment" : "Window watch: explicit button after detection to run the configured Shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewählten Kurzbefehl ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run configured Shortcut"
+          }
+        }
+      }
+    },
+    "watchActionSection" : {
+      "comment" : "Window watch: section title for the optional completion action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn es fertig ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When it finishes"
+          }
+        }
+      }
+    },
+    "watchActionShortcut" : {
+      "comment" : "Window watch: completion action that runs a configured Shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run a Shortcut"
+          }
+        }
+      }
+    },
+    "watchActionShortcutFailed" : {
+      "comment" : "Window watch: Shortcut run failed. The placeholder is the helper or system error.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gewählte Kurzbefehl konnte nicht ausgeführt werden: %1$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured Shortcut could not run: %1$@"
+          }
+        }
+      }
+    },
+    "watchActionShortcutHelp" : {
+      "comment" : "Window watch: Shortcut IDs survive renames; removed shortcuts fail when run.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwendet die Kennung des Kurzbefehls. Ein neuer Name in Kurzbefehle ändert die Aktion nicht. Ein entfernter Kurzbefehl schlägt beim Ausführen fehl."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses the shortcut’s identifier. A rename in Shortcuts keeps the same action. A removed shortcut fails when you run it."
+          }
+        }
+      }
+    },
+    "watchActionSucceeded" : {
+      "comment" : "Window watch: the completion action finished. Separate from detector evidence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gewählte Aktion ist fertig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The configured action finished."
           }
         }
       }
@@ -23290,6 +23830,564 @@
         }
       }
     },
+    "watchPresetAppHint" : {
+      "comment" : "Window watch: app hint on a suggested preset. appName is supplied by macOS and must stay verbatim.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschlag für %(appName)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested for %(appName)@"
+          }
+        }
+      }
+    },
+    "watchPresetApplied" : {
+      "comment" : "Window watch: a preset was applied; the user must still review and start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übernommen. Prüfe den Bereich in diesem Fenster und starte dann."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied. Check the region on this window, then start."
+          }
+        }
+      }
+    },
+    "watchPresetApply" : {
+      "comment" : "Window watch: copy a saved preset onto the current window without starting capture watching.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übernehmen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply"
+          }
+        }
+      }
+    },
+    "watchPresetConditionChange" : {
+      "comment" : "Window watch: summary of a visible-change preset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichtbare Änderung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visible change"
+          }
+        }
+      }
+    },
+    "watchPresetConditionPhrase" : {
+      "comment" : "Window watch: summary of a phrase preset. phrase is the user-entered completion text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text: %(phrase)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phrase: %(phrase)@"
+          }
+        }
+      }
+    },
+    "watchPresetCopyName" : {
+      "comment" : "Window watch: default name for a duplicated preset. name is the original user-authored title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopie von %(name)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy of %(name)@"
+          }
+        }
+      }
+    },
+    "watchPresetDelete" : {
+      "comment" : "Window watch: delete a saved watch configuration.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "watchPresetDeleteConfirm" : {
+      "comment" : "Window watch: confirmation title before deleting a preset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtung löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete saved watch?"
+          }
+        }
+      }
+    },
+    "watchPresetDeletedDuringRun" : {
+      "comment" : "Window watch: the saved preset was deleted after Start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherte Beobachtung wurde gelöscht. Dieser Durchlauf verwendet weiter die Konfiguration vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved watch was deleted. This run continues with the configuration it started with."
+          }
+        }
+      }
+    },
+    "watchPresetDeleteHelp" : {
+      "comment" : "Window watch: deleting a preset does not delete files or undo actions; a running watch keeps its snapshot.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit wird nur die gespeicherte Konfiguration entfernt. Dateien werden nicht gelöscht, und eine bereits ausgeführte Aktion wird nicht rückgängig gemacht. Eine bereits gestartete Beobachtung behält den Stand vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes the saved configuration only. It does not delete files or undo an action that already ran. A watch that already started keeps the snapshot it started with."
+          }
+        }
+      }
+    },
+    "watchPresetDuplicate" : {
+      "comment" : "Window watch: duplicate a saved watch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplizieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        }
+      }
+    },
+    "watchPresetEdit" : {
+      "comment" : "Window watch: accessibility label for preset overflow actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtung bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit saved watch"
+          }
+        }
+      }
+    },
+    "watchPresetEditedDuringRun" : {
+      "comment" : "Window watch: the saved preset changed after Start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherte Beobachtung hat sich nach dem Start geändert. Dieser Durchlauf behält den Stand vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved watch changed after this run started. This run keeps the snapshot from Start."
+          }
+        }
+      }
+    },
+    "watchPresetFolderAction" : {
+      "comment" : "Window watch: summary of a folder completion action. folder is the user-chosen name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(folder)@ öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open %(folder)@"
+          }
+        }
+      }
+    },
+    "watchPresetHintMismatch" : {
+      "comment" : "Window watch: the preset was saved for a different app. appName is supplied by macOS and must stay verbatim.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Beobachtung wurde für %(appName)@ gespeichert. Prüfe, ob der Bereich noch dieselbe Stelle markiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This watch was saved for %(appName)@. Check that the region still marks the same place."
+          }
+        }
+      }
+    },
+    "watchPresetLimit" : {
+      "comment" : "Window watch: bounded storage for saved presets.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst 30 Beobachtungen speichern. Lösche eine, um eine weitere zu speichern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can save 30 watches. Delete one to save another."
+          }
+        }
+      }
+    },
+    "watchPresetName" : {
+      "comment" : "Window watch: text field for the user-chosen preset name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "watchPresetNameHelp" : {
+      "comment" : "Window watch: the name is user-authored, not inferred from the window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Name, den du später wiedererkennst. DDock übernimmt ihn nicht aus dem Fenstertitel."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A name you will recognize later. DDock does not take it from the window title."
+          }
+        }
+      }
+    },
+    "watchPresetOthers" : {
+      "comment" : "Window watch: remaining saved watches that do not match the current app hint.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere gespeicherte Beobachtungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other saved watches"
+          }
+        }
+      }
+    },
+    "watchPresetRegionChangedHelp" : {
+      "comment" : "Window watch: normalized coordinates follow window size; a changed layout may need reselection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Markierung folgt der Größe dieses Fensters. Wenn sich das Layout geändert hat, wähle den Bereich neu. Passende Koordinaten belegen nicht dieselbe Stelle."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The outline follows this window’s size. If the layout changed, select the region again. Matching coordinates do not prove it is the same control."
+          }
+        }
+      }
+    },
+    "watchPresetReset" : {
+      "comment" : "Window watch: explicit recovery that replaces unreadable preset storage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtungen zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset saved watches"
+          }
+        }
+      }
+    },
+    "watchPresetResetHelp" : {
+      "comment" : "Window watch: reset replaces unreadable bytes with an empty list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzt die unlesbaren Daten durch eine leere Liste. Die bisherigen Vorgaben lassen sich damit nicht wiederherstellen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace the unreadable saved-watch data with an empty list. This cannot restore the previous presets."
+          }
+        }
+      }
+    },
+    "watchPresetSave" : {
+      "comment" : "Window watch: create a new saved watch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beobachtung speichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save watch"
+          }
+        }
+      }
+    },
+    "watchPresetSaveAs" : {
+      "comment" : "Window watch: save the current setup as a new preset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als neue Beobachtung speichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save as new watch"
+          }
+        }
+      }
+    },
+    "watchPresetsEmpty" : {
+      "comment" : "Window watch: empty saved-preset list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine gespeicherten Beobachtungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No saved watches yet."
+          }
+        }
+      }
+    },
+    "watchPresetsHelp" : {
+      "comment" : "Window watch: saved presets store configuration only and still need a current window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichere diesen Bereich und diese Bedingung für später. Jeder Durchlauf braucht ein aktuelles Fenster, und Starten bleibt ein eigener Schritt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save this region and condition to use again later. Each run still needs a current window, and Start is always a separate action."
+          }
+        }
+      }
+    },
+    "watchPresetShortcutAction" : {
+      "comment" : "Window watch: summary of a Shortcut completion action. shortcut is the Shortcuts name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(shortcut)@ ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run %(shortcut)@"
+          }
+        }
+      }
+    },
+    "watchPresetsTitle" : {
+      "comment" : "Window watch: section title for saved watch presets.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved watches"
+          }
+        }
+      }
+    },
+    "watchPresetStorageFailed" : {
+      "comment" : "Window watch: unreadable preset storage is left unchanged.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtungen konnten nicht gelesen werden. DDock hat die gespeicherten Daten unverändert gelassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved watches could not be read. DDock left the stored data unchanged."
+          }
+        }
+      }
+    },
+    "watchPresetSuggested" : {
+      "comment" : "Window watch: presets whose app hint matches the current window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge für diese App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested for this app"
+          }
+        }
+      }
+    },
+    "watchPresetUpdate" : {
+      "comment" : "Window watch: overwrite the applied saved watch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Beobachtung aktualisieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update saved watch"
+          }
+        }
+      }
+    },
     "watchRegionHelp" : {
       "comment" : "Window watch: Drag over the preview or adjust the region with the keyboard. Coordinates are percentages from the top-left; the outline shows the clamped area.",
       "extractionState" : "manual",
@@ -23430,6 +24528,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show watched window"
+          }
+        }
+      }
+    },
+    "watchSnapshotNote" : {
+      "comment" : "Window watch: a running or finished watch uses the configuration copied at Start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Durchlauf verwendet die Konfiguration vom Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This run uses the configuration from Start."
           }
         }
       }
@@ -23758,924 +24874,6 @@
         }
       }
     },
-    "watchActionSection" : {
-      "comment" : "Window watch: section title for the optional completion action.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn es fertig ist"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When it finishes"
-          }
-        }
-      }
-    },
-    "watchActionHelp" : {
-      "comment" : "Window watch: explains that a completion action waits for an explicit click.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn die Erkennung fertig ist, zeigt DDock eine Taste. Es wird nichts automatisch ausgeführt."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "After the detector finishes, DDock shows a button. Nothing runs automatically."
-          }
-        }
-      }
-    },
-    "watchActionNone" : {
-      "comment" : "Window watch: no completion action.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Aktion"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No action"
-          }
-        }
-      }
-    },
-    "watchActionFolder" : {
-      "comment" : "Window watch: completion action that opens a user-chosen folder.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordner öffnen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open a folder"
-          }
-        }
-      }
-    },
-    "watchActionShortcut" : {
-      "comment" : "Window watch: completion action that runs a configured Shortcut.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kurzbefehl ausführen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Run a Shortcut"
-          }
-        }
-      }
-    },
-    "watchActionChooseFolder" : {
-      "comment" : "Window watch: opens a folder picker for the completion action.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordner wählen…"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose Folder…"
-          }
-        }
-      }
-    },
-    "watchActionFolderChosen" : {
-      "comment" : "Window watch: confirms the selected output folder. name is the folder name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordner: %(name)@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Folder: %(name)@"
-          }
-        }
-      }
-    },
-    "watchActionChangeFolder" : {
-      "comment" : "Window watch: replace the configured folder.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anderen Ordner wählen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a different folder"
-          }
-        }
-      }
-    },
-    "watchActionLoadShortcuts" : {
-      "comment" : "Window watch: explicitly refresh the Shortcut list. Same wording as Action Tiles.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kurzbefehle laden"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Load Shortcuts"
-          }
-        }
-      }
-    },
-    "watchActionChooseShortcut" : {
-      "comment" : "Window watch: picker label for a configured Shortcut.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kurzbefehl wählen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose Shortcut"
-          }
-        }
-      }
-    },
-    "watchActionNoShortcuts" : {
-      "comment" : "Window watch: empty Shortcut list until the user loads them.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lade Kurzbefehle, um einen zu wählen. DDock übergibt weder aufgenommenes Bild noch Text."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Load Shortcuts to choose one. DDock does not pass captured pixels or text to it."
-          }
-        }
-      }
-    },
-    "watchActionShortcutHelp" : {
-      "comment" : "Window watch: Shortcut IDs survive renames; removed shortcuts fail when run.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verwendet die Kennung des Kurzbefehls. Ein neuer Name in Kurzbefehle ändert die Aktion nicht. Ein entfernter Kurzbefehl schlägt beim Ausführen fehl."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uses the shortcut’s identifier. A rename in Shortcuts keeps the same action. A removed shortcut fails when you run it."
-          }
-        }
-      }
-    },
-    "watchActionOpenFolder" : {
-      "comment" : "Window watch: explicit button after detection to open the configured folder.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gewählten Ordner öffnen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open configured folder"
-          }
-        }
-      }
-    },
-    "watchActionRunShortcut" : {
-      "comment" : "Window watch: explicit button after detection to run the configured Shortcut.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gewählten Kurzbefehl ausführen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Run configured Shortcut"
-          }
-        }
-      }
-    },
-    "watchActionRunning" : {
-      "comment" : "Window watch: the user-triggered completion action is in progress.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die gewählte Aktion wird ausgeführt…"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Running the configured action…"
-          }
-        }
-      }
-    },
-    "watchActionSucceeded" : {
-      "comment" : "Window watch: the completion action finished. Separate from detector evidence.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die gewählte Aktion ist fertig."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The configured action finished."
-          }
-        }
-      }
-    },
-    "watchActionFailed" : {
-      "comment" : "Window watch: generic completion-action failure that does not change the watch result.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die gewählte Aktion ist fehlgeschlagen. Das Beobachtungsergebnis bleibt unverändert."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The configured action failed. The watch result is unchanged."
-          }
-        }
-      }
-    },
-    "watchActionFolderMissing" : {
-      "comment" : "Window watch: the bookmarked folder is missing or cannot be opened.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der gewählte Ordner fehlt oder ließ sich nicht öffnen. Wähle ihn erneut oder überspringe die Aktion."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The configured folder is missing or could not be opened. Choose it again or skip the action."
-          }
-        }
-      }
-    },
-    "watchActionShortcutFailed" : {
-      "comment" : "Window watch: Shortcut run failed. The placeholder is the helper or system error.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der gewählte Kurzbefehl konnte nicht ausgeführt werden: %1$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The configured Shortcut could not run: %1$@"
-          }
-        }
-      }
-    },
-    "watchPresetsTitle" : {
-      "comment" : "Window watch: section title for saved watch presets.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherte Beobachtungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved watches"
-          }
-        }
-      }
-    },
-    "watchPresetsHelp" : {
-      "comment" : "Window watch: saved presets store configuration only and still need a current window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speichere diesen Bereich und diese Bedingung für später. Jeder Durchlauf braucht ein aktuelles Fenster, und Starten bleibt ein eigener Schritt."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save this region and condition to use again later. Each run still needs a current window, and Start is always a separate action."
-          }
-        }
-      }
-    },
-    "watchPresetsEmpty" : {
-      "comment" : "Window watch: empty saved-preset list.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch keine gespeicherten Beobachtungen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No saved watches yet."
-          }
-        }
-      }
-    },
-    "watchPresetSave" : {
-      "comment" : "Window watch: create a new saved watch.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beobachtung speichern"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save watch"
-          }
-        }
-      }
-    },
-    "watchPresetSaveAs" : {
-      "comment" : "Window watch: save the current setup as a new preset.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als neue Beobachtung speichern"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save as new watch"
-          }
-        }
-      }
-    },
-    "watchPresetUpdate" : {
-      "comment" : "Window watch: overwrite the applied saved watch.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherte Beobachtung aktualisieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update saved watch"
-          }
-        }
-      }
-    },
-    "watchPresetName" : {
-      "comment" : "Window watch: text field for the user-chosen preset name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
-          }
-        }
-      }
-    },
-    "watchPresetNameHelp" : {
-      "comment" : "Window watch: the name is user-authored, not inferred from the window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein Name, den du später wiedererkennst. DDock übernimmt ihn nicht aus dem Fenstertitel."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A name you will recognize later. DDock does not take it from the window title."
-          }
-        }
-      }
-    },
-    "watchPresetSuggested" : {
-      "comment" : "Window watch: presets whose app hint matches the current window.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschläge für diese App"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suggested for this app"
-          }
-        }
-      }
-    },
-    "watchPresetOthers" : {
-      "comment" : "Window watch: remaining saved watches that do not match the current app hint.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Andere gespeicherte Beobachtungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Other saved watches"
-          }
-        }
-      }
-    },
-    "watchPresetApply" : {
-      "comment" : "Window watch: copy a saved preset onto the current window without starting capture watching.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Übernehmen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apply"
-          }
-        }
-      }
-    },
-    "watchPresetApplied" : {
-      "comment" : "Window watch: a preset was applied; the user must still review and start.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Übernommen. Prüfe den Bereich in diesem Fenster und starte dann."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied. Check the region on this window, then start."
-          }
-        }
-      }
-    },
-    "watchPresetHintMismatch" : {
-      "comment" : "Window watch: the preset was saved for a different app. appName is supplied by macOS and must stay verbatim.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Beobachtung wurde für %(appName)@ gespeichert. Prüfe, ob der Bereich noch dieselbe Stelle markiert."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This watch was saved for %(appName)@. Check that the region still marks the same place."
-          }
-        }
-      }
-    },
-    "watchPresetRegionChangedHelp" : {
-      "comment" : "Window watch: normalized coordinates follow window size; a changed layout may need reselection.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Markierung folgt der Größe dieses Fensters. Wenn sich das Layout geändert hat, wähle den Bereich neu. Passende Koordinaten belegen nicht dieselbe Stelle."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The outline follows this window’s size. If the layout changed, select the region again. Matching coordinates do not prove it is the same control."
-          }
-        }
-      }
-    },
-    "watchPresetEdit" : {
-      "comment" : "Window watch: accessibility label for preset overflow actions.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherte Beobachtung bearbeiten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit saved watch"
-          }
-        }
-      }
-    },
-    "watchPresetDuplicate" : {
-      "comment" : "Window watch: duplicate a saved watch.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duplizieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duplicate"
-          }
-        }
-      }
-    },
-    "watchPresetDelete" : {
-      "comment" : "Window watch: delete a saved watch configuration.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete"
-          }
-        }
-      }
-    },
-    "watchPresetDeleteConfirm" : {
-      "comment" : "Window watch: confirmation title before deleting a preset.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherte Beobachtung löschen?"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete saved watch?"
-          }
-        }
-      }
-    },
-    "watchPresetDeleteHelp" : {
-      "comment" : "Window watch: deleting a preset does not delete files or undo actions; a running watch keeps its snapshot.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Damit wird nur die gespeicherte Konfiguration entfernt. Dateien werden nicht gelöscht, und eine bereits ausgeführte Aktion wird nicht rückgängig gemacht. Eine bereits gestartete Beobachtung behält den Stand vom Start."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This removes the saved configuration only. It does not delete files or undo an action that already ran. A watch that already started keeps the snapshot it started with."
-          }
-        }
-      }
-    },
-    "watchPresetDeletedDuringRun" : {
-      "comment" : "Window watch: the saved preset was deleted after Start.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die gespeicherte Beobachtung wurde gelöscht. Dieser Durchlauf verwendet weiter die Konfiguration vom Start."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The saved watch was deleted. This run continues with the configuration it started with."
-          }
-        }
-      }
-    },
-    "watchPresetEditedDuringRun" : {
-      "comment" : "Window watch: the saved preset changed after Start.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die gespeicherte Beobachtung hat sich nach dem Start geändert. Dieser Durchlauf behält den Stand vom Start."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The saved watch changed after this run started. This run keeps the snapshot from Start."
-          }
-        }
-      }
-    },
-    "watchPresetCopyName" : {
-      "comment" : "Window watch: default name for a duplicated preset. name is the original user-authored title.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopie von %(name)@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy of %(name)@"
-          }
-        }
-      }
-    },
-    "watchPresetLimit" : {
-      "comment" : "Window watch: bounded storage for saved presets.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kannst 30 Beobachtungen speichern. Lösche eine, um eine weitere zu speichern."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can save 30 watches. Delete one to save another."
-          }
-        }
-      }
-    },
-    "watchPresetStorageFailed" : {
-      "comment" : "Window watch: unreadable preset storage is left unchanged.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherte Beobachtungen konnten nicht gelesen werden. DDock hat die gespeicherten Daten unverändert gelassen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved watches could not be read. DDock left the stored data unchanged."
-          }
-        }
-      }
-    },
-    "watchPresetReset" : {
-      "comment" : "Window watch: explicit recovery that replaces unreadable preset storage.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherte Beobachtungen zurücksetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset saved watches"
-          }
-        }
-      }
-    },
-    "watchPresetResetHelp" : {
-      "comment" : "Window watch: reset replaces unreadable bytes with an empty list.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ersetzt die unlesbaren Daten durch eine leere Liste. Die bisherigen Vorgaben lassen sich damit nicht wiederherstellen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Replace the unreadable saved-watch data with an empty list. This cannot restore the previous presets."
-          }
-        }
-      }
-    },
-    "watchPresetAppHint" : {
-      "comment" : "Window watch: app hint on a suggested preset. appName is supplied by macOS and must stay verbatim.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschlag für %(appName)@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suggested for %(appName)@"
-          }
-        }
-      }
-    },
-    "watchPresetConditionChange" : {
-      "comment" : "Window watch: summary of a visible-change preset.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sichtbare Änderung"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visible change"
-          }
-        }
-      }
-    },
-    "watchPresetConditionPhrase" : {
-      "comment" : "Window watch: summary of a phrase preset. phrase is the user-entered completion text.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text: %(phrase)@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phrase: %(phrase)@"
-          }
-        }
-      }
-    },
-    "watchPresetFolderAction" : {
-      "comment" : "Window watch: summary of a folder completion action. folder is the user-chosen name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%(folder)@ öffnen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open %(folder)@"
-          }
-        }
-      }
-    },
-    "watchPresetShortcutAction" : {
-      "comment" : "Window watch: summary of a Shortcut completion action. shortcut is the Shortcuts name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%(shortcut)@ ausführen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Run %(shortcut)@"
-          }
-        }
-      }
-    },
-    "watchSnapshotNote" : {
-      "comment" : "Window watch: a running or finished watch uses the configuration copied at Start.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Durchlauf verwendet die Konfiguration vom Start."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This run uses the configuration from Start."
-          }
-        }
-      }
-    },
     "windowAccessCheckAgain" : {
       "comment" : "Button that rereads Accessibility authorization from macOS.",
       "extractionState" : "manual",
@@ -24683,7 +24881,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Check Again"
+            "value" : "Erneut prüfen"
           }
         },
         "en" : {
@@ -24701,7 +24899,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable Window Access"
+            "value" : "Fensterzugriff erlauben"
           }
         },
         "en" : {
@@ -24719,7 +24917,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow DDock to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images."
+            "value" : "Erlaube DDock, Fenster anderer Apps aufzulisten und auszuwählen. Die Bildschirmaufnahme wird separat verwaltet und liefert nur Vorschaubilder."
           }
         },
         "en" : {
@@ -24737,7 +24935,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open System Settings…"
+            "value" : "Systemeinstellungen öffnen…"
           }
         },
         "en" : {
@@ -24755,7 +24953,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window access is enabled."
+            "value" : "Der Fensterzugriff ist aktiviert."
           }
         },
         "en" : {
@@ -24773,7 +24971,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window access is not enabled."
+            "value" : "Der Fensterzugriff ist nicht aktiviert."
           }
         },
         "en" : {
@@ -24791,7 +24989,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window access is unavailable in this build."
+            "value" : "Der Fensterzugriff ist in dieser Version nicht verfügbar."
           }
         },
         "en" : {
@@ -24809,7 +25007,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window access"
+            "value" : "Fensterzugriff"
           }
         },
         "en" : {
@@ -24827,7 +25025,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Windows for %(appName)@"
+            "value" : "Fenster von %(appName)@"
           }
         },
         "en" : {
@@ -24845,7 +25043,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selecting a preview shows the app. Exact-window control needs Window Access outside the App Sandbox."
+            "value" : "Die Auswahl einer Vorschau zeigt die App. Die gezielte Steuerung einzelner Fenster erfordert Fensterzugriff außerhalb der App-Sandbox."
           }
         },
         "en" : {
@@ -24881,7 +25079,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but DDock could not read this app's windows. You can still show the app."
+            "value" : "Der Fensterzugriff ist aktiviert, aber DDock konnte die Fenster dieser App nicht lesen. Du kannst die App weiterhin anzeigen."
           }
         },
         "en" : {
@@ -24899,7 +25097,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Window Peek"
+            "value" : "Window Peek anzeigen"
           }
         },
         "en" : {
@@ -24917,7 +25115,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Example"
+            "value" : "Beispiel"
           }
         },
         "en" : {
@@ -24935,7 +25133,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Windows"
+            "value" : "Fenster"
           }
         },
         "en" : {
@@ -24953,7 +25151,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hover over a running app, or press Space while using Focus Dock. DDock never asks for permission from the dock itself."
+            "value" : "Bewege den Zeiger über eine laufende App oder drücke bei fokussiertem Dock die Leertaste. DDock fragt nie direkt im Dock nach Berechtigungen."
           }
         },
         "en" : {
@@ -24971,7 +25169,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open after"
+            "value" : "Öffnen nach"
           }
         },
         "en" : {
@@ -24989,7 +25187,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Include minimized windows"
+            "value" : "Minimierte Fenster einbeziehen"
           }
         },
         "en" : {
@@ -25007,7 +25205,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Include untitled windows"
+            "value" : "Fenster ohne Titel einbeziehen"
           }
         },
         "en" : {
@@ -25043,7 +25241,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Filmstrip"
+            "value" : "Filmstreifen"
           }
         },
         "en" : {
@@ -25061,7 +25259,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grid"
+            "value" : "Raster"
           }
         },
         "en" : {
@@ -25079,7 +25277,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "List"
+            "value" : "Liste"
           }
         },
         "en" : {
@@ -25097,7 +25295,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Loading windows…"
+            "value" : "Fenster werden geladen…"
           }
         },
         "en" : {
@@ -25115,7 +25313,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Main window"
+            "value" : "Hauptfenster"
           }
         },
         "en" : {
@@ -25133,7 +25331,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Minimized"
+            "value" : "Minimiert"
           }
         },
         "en" : {
@@ -25151,7 +25349,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No windows match these filters."
+            "value" : "Keine Fenster entsprechen den Filtern."
           }
         },
         "en" : {
@@ -25169,7 +25367,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No windows are available."
+            "value" : "Keine Fenster verfügbar."
           }
         },
         "en" : {
@@ -25187,7 +25385,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preview Settings…"
+            "value" : "Vorschaueinstellungen…"
           }
         },
         "en" : {
@@ -25205,7 +25403,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "These macOS permissions apply to every DDock display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings."
+            "value" : "Diese macOS-Berechtigungen gelten für alle Bildschirme mit DDock. Der Fensterzugriff ermöglicht das Auflisten und Auswählen von Fenstern. Die Bildschirmaufnahme ergänzt Vorschaubilder. Zuvor verweigerter Zugriff muss in den Systemeinstellungen geändert werden."
           }
         },
         "en" : {
@@ -25223,7 +25421,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permissions"
+            "value" : "Berechtigungen"
           }
         },
         "en" : {
@@ -25241,7 +25439,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preset"
+            "value" : "Vorlage"
           }
         },
         "en" : {
@@ -25295,7 +25493,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom settings"
+            "value" : "Eigene Einstellungen"
           }
         },
         "en" : {
@@ -25331,7 +25529,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but this sandboxed DDock build cannot read other apps' windows. You can still show the app."
+            "value" : "Der Fensterzugriff ist aktiviert, aber diese DDock-Version mit App-Sandbox kann die Fenster anderer Apps nicht lesen. Du kannst die App weiterhin anzeigen."
           }
         },
         "en" : {
@@ -25349,7 +25547,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show All"
+            "value" : "Alle anzeigen"
           }
         },
         "en" : {
@@ -25367,7 +25565,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show App"
+            "value" : "App anzeigen"
           }
         },
         "en" : {
@@ -25385,7 +25583,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Size"
+            "value" : "Größe"
           }
         },
         "en" : {
@@ -25403,7 +25601,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Large"
+            "value" : "Groß"
           }
         },
         "en" : {
@@ -25421,7 +25619,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Medium"
+            "value" : "Mittel"
           }
         },
         "en" : {
@@ -25439,7 +25637,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Small"
+            "value" : "Klein"
           }
         },
         "en" : {
@@ -25457,7 +25655,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Style"
+            "value" : "Stil"
           }
         },
         "en" : {
@@ -25529,7 +25727,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Timing"
+            "value" : "Zeitverhalten"
           }
         },
         "en" : {
@@ -25565,7 +25763,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is needed to list and select individual windows. You can still show the app."
+            "value" : "Zum Auflisten und Auswählen einzelner Fenster ist Fensterzugriff erforderlich. Du kannst die App weiterhin anzeigen."
           }
         },
         "en" : {

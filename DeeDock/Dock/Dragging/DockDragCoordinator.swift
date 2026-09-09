@@ -7,6 +7,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var panels: [String: DockPanelController] = [:]
     private var sourceID: String?
     private var sourcePin: DockPin?
+    private var sourceUtilityID: String?
     private var token: String?
     private var nativeSession: NSDraggingSession?
     private var completion = DockDragCompletion()
@@ -59,6 +60,27 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         begin(pin: .folder(item.reference), icon: item.icon, from: displayID, view: view, event: event)
     }
 
+    /// Uses a native drag image and the same insertion presentation as application pins.
+    func beginUtility(_ slot: DockRenderSlot, from displayID: String, view: NSView, event: NSEvent) {
+        guard let panel = panels[displayID], let id = slot.movableUtilityID,
+              panel.store.entries.contains(where: { $0.id == id }), let icon = slot.icon else { return }
+        cancel()
+        active = true; sourceID = displayID; sourceUtilityID = id
+        payload = .selection(pins: [], documents: nil, stageableItems: nil)
+        token = UUID().uuidString; sourceBounds = panel.restingDragBounds
+        completion = DockDragCompletion()
+        let pasteboard = NSPasteboardItem()
+        pasteboard.setString(token!, forType: Self.pasteboardType)
+        let dragItem = NSDraggingItem(pasteboardWriter: pasteboard)
+        let dimension = min(view.bounds.width, view.bounds.height)
+        dragItem.setDraggingFrame(CGRect(x: view.bounds.midX - dimension / 2, y: view.bounds.maxY - dimension,
+                                        width: dimension, height: dimension), contents: icon)
+        installMonitor()
+        nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)
+        nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
+        update(at: NSEvent.mouseLocation)
+    }
+
     private func begin(pin: DockPin, icon: NSImage, from displayID: String, view: NSView, event: NSEvent) {
         guard let panel = panels[displayID], panel.store.canEditPins else { return }
         cancel()
@@ -102,6 +124,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard validates(info.draggingPasteboard) else { return [] }
         nativeDisplayID = displayID // Loading a new payload clears the preceding session.
         update(at: NSEvent.mouseLocation)
+        if sourceUtilityID != nil {
+            return destinationID == displayID && destinationIndex != nil ? .move : []
+        }
         if unpinDestinationID == displayID { return .move }
         if actionDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
@@ -122,6 +147,18 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
+        if let utilityID = sourceUtilityID {
+            guard sourceID == displayID, destinationID == displayID, let index = destinationIndex,
+                  let panel = panels[displayID] else { return false }
+            let utilities = panel.store.entries.compactMap(\.movableUtilityID)
+            guard utilities.indices.contains(index) else { return false }
+            committing = true
+            panel.store.moveUtility(utilityID, to: utilities[index])
+            committing = false
+            completion.committed = true
+            clearFeedback()
+            return true
+        }
         if unpinDestinationID == displayID, sourceID == displayID,
            let sourcePin, let panel = panels[displayID] {
             committing = true
@@ -307,6 +344,21 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         unpinDestinationID = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
+        if let utilityID = sourceUtilityID {
+            if let candidate, candidate.store.displayID == sourceID,
+               let index = candidate.utilityInsertionIndex(at: point, sourceID: utilityID) {
+                destinationID = sourceID; destinationIndex = index
+            }
+            for (id, panel) in panels {
+                let proposal = id == destinationID ? destinationIndex.map { DockDragProposal(index: $0, utilityID: utilityID) } : nil
+                panel.setDragPresentation(proposal: proposal, source: id == sourceID ? utilityID : nil,
+                    targeted: id == destinationID, message: nil)
+            }
+            // Other displays cannot reorder this display's utilities or accept them as files.
+            if trackingID != sourceID { trackingID = nil }
+            updateScrollTimer()
+            return
+        }
         // Moving a saved pin into this dock's running section removes only the pin.
         // Other displays continue to copy pins, and utility tiles never remove them.
         if let candidate, candidate.store.displayID == sourceID,
@@ -451,7 +503,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
-        context == .withinApplication ? [.move, .copy] : []
+        context == .withinApplication ? (sourceUtilityID == nil ? [.move, .copy] : .move) : []
     }
     func ignoreModifierKeys(for session: NSDraggingSession) -> Bool { true }
     func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
@@ -499,7 +551,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         cleanupTask?.cancel(); cleanupTask = nil
         clearFeedback()
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
-        nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; token = nil
+        nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; sourceUtilityID = nil; token = nil
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
         unpinDestinationID = nil
         trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; shelfSourceIDs = []

@@ -15,6 +15,10 @@ struct DockEntryView: View {
     let accessibilityFocus: (String, Bool) -> Void
 
     var body: some View {
+        content.modifier(DockUtilityMoveModifier(slot: slot, interaction: interaction))
+    }
+
+    @ViewBuilder private var content: some View {
         switch slot {
         case .launcher:
             DockLauncherButton(

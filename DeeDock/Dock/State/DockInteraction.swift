@@ -55,6 +55,9 @@ final class DockInteraction {
     @ObservationIgnored var resumeSessionCapsule: ((UUID) -> Void)?
     @ObservationIgnored var deleteSessionCapsule: ((UUID) -> Void)?
     @ObservationIgnored var clearShelf: (() -> Void)?
+    @ObservationIgnored var canMoveUtility: ((String, Int) -> Bool)?
+    @ObservationIgnored var moveUtility: ((String, Int) -> Void)?
+    @ObservationIgnored var beginUtilityDrag: ((DockRenderSlot, NSView, NSEvent) -> Void)?
     @ObservationIgnored var beginShelfDrag: ((NSView, NSEvent) -> Void)?
     @ObservationIgnored var removePin: ((String) -> Void)?
     @ObservationIgnored var setFolderPresentation: ((UUID, FolderStackPresentation) -> Void)?

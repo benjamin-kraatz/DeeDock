@@ -58,6 +58,8 @@ final class DockPanelController {
         store.openLauncher = { [weak self] in self?.openLauncher() }
         interaction.applicationCatalog = store.launcherCatalog
         interaction.openLauncher = store.openLauncher
+        interaction.canMoveUtility = { [weak store] id, distance in store?.canMoveUtility(id, by: distance) == true }
+        interaction.moveUtility = { [weak store] id, distance in store?.moveUtility(id, by: distance) }
         interaction.movePin = { [weak store] id, distance in store?.movePin(id, by: distance) }
         interaction.canMovePin = { [weak store] id, distance in store?.canMovePin(id, by: distance) ?? false }
         interaction.copyPin = { [weak store] reference, displayID in store?.copyPin?(reference, displayID) }
@@ -243,6 +245,7 @@ final class DockPanelController {
         host.springActivate = { [weak coordinator] info in coordinator?.springActivate(info, on: id) }
         host.springHighlight = { [weak coordinator] info in coordinator?.springHighlight(info, on: id) }
         interaction.sourceTrackingChanged = { [weak coordinator] in coordinator?.trackSource($0) }
+        interaction.beginUtilityDrag = { [weak coordinator] slot, view, event in coordinator?.beginUtility(slot, from: id, view: view, event: event) }
         interaction.beginDrag = { [weak coordinator] item, view, event in coordinator?.begin(item, from: id, view: view, event: event) }
         interaction.beginFolderDrag = { [weak coordinator] item, view, event in coordinator?.begin(item, from: id, view: view, event: event) }
         interaction.scrollChanged = { [weak coordinator] in coordinator?.geometryChanged() }
@@ -287,6 +290,21 @@ final class DockPanelController {
         let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
         return DockSectionInsertion.index(point: local, scrollOffset: interaction.scrollOffset,
             layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
+    }
+
+    /// Utility boundaries use the original layout, so a moving gap cannot retarget itself.
+    func utilityInsertionIndex(at point: CGPoint, sourceID: String) -> Int? {
+        guard !stopped, !launcher.isPresented, visibility.exposesContent,
+              restingDragBounds.contains(point) else { return nil }
+        let positions = store.entries.indices.filter { store.entries[$0].movableUtilityID != nil }
+        let centers = baseLayout.restingCenters
+        guard let first = positions.first, let last = positions.last, last < centers.count,
+              positions.contains(where: { store.entries[$0].id == sourceID }) else { return nil }
+        let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
+        let along = baseLayout.edge.along(local) - interaction.scrollOffset
+        let padding = baseLayout.iconSize / 2 + baseLayout.itemSpacing / 2
+        guard along >= centers[first] - padding, along <= centers[last] + padding else { return nil }
+        return positions.filter { store.entries[$0].id != sourceID && along > centers[$0] }.count
     }
 
     /// Uses resting section bounds so insertion previews cannot move the unpin destination.
@@ -557,6 +575,7 @@ final class DockPanelController {
         interaction.removePin = nil; interaction.setFolderPresentation = nil
         interaction.beginDrag = nil; interaction.movePin = nil; interaction.canMovePin = nil
         interaction.beginFolderDrag = nil
+        interaction.moveUtility = nil; interaction.canMoveUtility = nil; interaction.beginUtilityDrag = nil
         interaction.copyPin = nil; interaction.scrollChanged = nil
         panel.contentView?.unregisterDraggedTypes()
         interaction.stopGeometryUpdates()

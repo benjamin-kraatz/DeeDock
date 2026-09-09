@@ -44,8 +44,12 @@ final class FolderStackCoordinator {
             if !panel.store.refreshFolderReference(reference) { return }
         }
 
+        let sortKey = "folderStackSort.\(panel.store.displayID).\(reference.id.uuidString)"
+        let sort = UserDefaults.standard.string(forKey: sortKey).flatMap(FolderStackSort.init(rawValue:))
+            ?? (folder.isDownloads ? .recency : .alphabetical)
         let next = FolderStackPanelController(folder: reference, anchor: anchor, keyboard: keyboard,
-                                              organizer: organizer)
+                                              organizer: organizer, sort: sort)
+        next.state.sortChanged = { UserDefaults.standard.set($0.rawValue, forKey: sortKey) }
         displayID = panel.store.displayID
         folderID = reference.id
         sourcePanel = panel

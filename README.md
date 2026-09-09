@@ -101,6 +101,18 @@ The default icons are 48 points, with 4-point item spacing and 6-point glass pad
 
 Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, Session Capsules, the Shelf, Trash, and Window Peek are implemented.
 
+## Downloads and utility order
+
+List and Smart items show file type, size, and last-modified date below the name. Grid shows the current sort detail. Hover over an item for its full name, path, and exact modification and creation timestamps. Unavailable metadata and folder sizes are omitted.
+
+The folder stack header has a Sort by menu with Recency, Alphabetical, and Size. Recency puts the most recently modified items first, Alphabetical starts with A, and Size puts the largest items first. The choice is saved per folder and display. Downloads initially uses Recency. Smart mode sorts within its groups. Size uses filesystem metadata, without recursively measuring folder contents.
+
+Downloads appears to the left of Capsules and Shelf by default. Click it to browse the Downloads folder in a stack, or use its context menu to open it in Finder and choose grid or list presentation.
+
+Drag Downloads, Capsules, or Shelf within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display, independently of Dock Modes. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder the three tiles.
+
+Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
+
 ## Dock Modes
 
 In **Settings → Features → Multi-monitor docks**, enable secondary docks to show only apps

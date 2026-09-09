@@ -1,9 +1,11 @@
 import AppKit
 
-/// A temporary insertion proposal; it never changes the store or writes preferences.
+/// A temporary pin or utility insertion proposal; it never writes preferences.
 struct DockDragProposal: Equatable {
-    let pins: [DockPin]
+    var pins: [DockPin] = []
     let index: Int
+    /// When present, index is the destination in the visible utility order after removing the source.
+    var utilityID: String? = nil
 }
 
 /// A stable render identity for either an application or one place in a multi-app insertion gap.
@@ -38,7 +40,8 @@ enum DockRenderSlot: Identifiable {
     var isPinned: Bool {
         switch self {
         case .app(let item): return item.isFavorite
-        case .folder, .gap: return true
+        case .folder(let item): return !item.isDownloads
+        case .gap(let id): return !id.hasPrefix("utility:")
         case .group(let control): return control.group == .pinned
         case .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash: return false
         }
@@ -52,11 +55,14 @@ enum DockRenderSlot: Identifiable {
     /// Trailing tiles that are neither pins nor running applications, and share one divider.
     var action: ActionDockItem? { if case .action(let item) = self { return item }; return nil }
     var focus: FocusDockItem? { if case .focus(let item) = self { return item }; return nil }
-    var isUtility: Bool { target == .launcher || focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil }
+    var isUtility: Bool {
+        if case .gap(let id) = self { return id.hasPrefix("utility:") }
+        return folder?.isDownloads == true || target == .launcher || focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil
+    }
     var appGroup: DockAppGroup? {
         switch self {
         case .app(let item): item.isFavorite ? .pinned : .running
-        case .folder: .pinned
+        case .folder(let item): item.isDownloads ? nil : .pinned
         case .group(let control): control.group
         case .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash, .gap: nil
         }
@@ -64,10 +70,16 @@ enum DockRenderSlot: Identifiable {
     var pin: DockPin? {
         switch self {
         case .app(let item) where item.isFavorite: .application(item.reference)
-        case .folder(let item): .folder(item.reference)
+        case .folder(let item) where !item.isDownloads: .folder(item.reference)
         default: nil
         }
     }
+    /// Only these built-in tiles can exchange positions in the trailing section.
+    var movableUtilityID: String? {
+        if folder?.isDownloads == true || capsules != nil || shelf != nil { return id }
+        return nil
+    }
+
     var icon: NSImage? { item?.icon ?? folder?.icon ?? capsule?.icon ?? capsules?.icon ?? shelf?.icon ?? trash?.icon }
     var name: String {
         switch self {
@@ -108,6 +120,16 @@ enum DockRenderSlot: Identifiable {
     /// Gap indices refer to persisted pins, excluding section controls and incoming duplicates.
     static func slots(entries: [Self], proposal: DockDragProposal?) -> [Self] {
         guard let proposal else { return entries }
+        if let utilityID = proposal.utilityID {
+            let positions = entries.indices.filter { entries[$0].movableUtilityID != nil }
+            var utilities = positions.map { entries[$0] }
+            guard let source = utilities.firstIndex(where: { $0.id == utilityID }) else { return entries }
+            utilities.remove(at: source)
+            utilities.insert(.gap("utility:" + utilityID), at: min(max(0, proposal.index), utilities.count))
+            var result = entries
+            for (position, slot) in zip(positions, utilities) { result[position] = slot }
+            return result
+        }
         let ids = Set(proposal.pins.map(\.id))
         let pins = entries.compactMap(\.pin)
         // Collapsed and hidden pins must never leak into a gap preview.

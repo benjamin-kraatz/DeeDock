@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The Shelf tile. Clicking opens the staging panel; dragging it carries every staged reference.
+/// The Shelf tile. Clicking opens the staging panel; Option-drag carries every staged reference.
 struct DockShelfButton: View {
     let item: ShelfDockItem
     let size: CGFloat
@@ -51,7 +51,7 @@ struct DockShelfButton: View {
         }
         .buttonStyle(.plain)
         .overlay {
-            // Click opens; a drag past the threshold hands every staged reference to AppKit.
+            // The utility overlay handles ordinary movement; Option-drag reaches this file source.
             DockShelfTileDragSourceView(
                 enabled: !item.isEmpty,
                 primaryAction: { interaction.openShelf?() },
@@ -79,7 +79,8 @@ struct DockShelfButton: View {
         .onDisappear { accessibilityFocus(false) }
         .accessibilityLabel(Text(.shelfName))
         .accessibilityValue(Text(.shelfItemCount(count: item.count)))
-        .accessibilityHint(Text(.shelfOpenHint))
+        .accessibilityHint(Text(.shelfMoveHint))
+        .help(Text(.shelfMoveHint))
         .accessibilityAction(named: Text(.shelfOpen)) {
             interaction.openShelf?()
         }

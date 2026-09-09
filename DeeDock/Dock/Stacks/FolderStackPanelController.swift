@@ -14,8 +14,8 @@ final class FolderStackPanelController {
     }
 
     init(folder: FolderReference, anchor: DockPopoverAnchor, keyboard: Bool,
-         organizer: any SemanticStackOrganizing) {
-        let state = FolderStackState(folder: folder, organizer: organizer)
+         organizer: any SemanticStackOrganizing, sort: FolderStackSort = .alphabetical) {
+        let state = FolderStackState(folder: folder, sort: sort, organizer: organizer)
         self.state = state
         self.keyboard = keyboard
         popover = DockPopoverPanelController(anchor: anchor, keyboard: keyboard, clickFocus: true) { chrome in

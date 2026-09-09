@@ -118,16 +118,56 @@ final class DockStore {
     }
 
     private func refreshEntries() {
-        let content = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
+        var content = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
                                                   actions: actions?.dockItems ?? [], focus: focusSession?.item,
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
                                                   trash: showsTrash ? trash?.item : nil)
+        let downloads = DockRenderSlot.folder(DownloadsDockItem.item(displayID: displayID))
+        let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.trash != nil } ?? content.count
+        content.insert(downloads, at: insertion)
+        let order = utilityOrder
+        let positions = content.indices.filter { content[$0].movableUtilityID != nil }
+        let utilities = positions.map { content[$0] }.sorted {
+            (order.firstIndex(of: $0.id) ?? order.count) < (order.firstIndex(of: $1.id) ?? order.count)
+        }
+        for (index, slot) in zip(positions, utilities) { content[index] = slot }
         let next: [DockRenderSlot] = launcherAtStart ? [.launcher] + content : content + [.launcher]
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
+    }
+
+    private var utilityOrderKey: String { "dockUtilityOrder.\(displayID)" }
+    private var utilityOrder: [String] {
+        let defaults = ["folder:\(DownloadsDockItem.id.uuidString)", "session-capsules", "shelf"]
+        let saved = UserDefaults.standard.stringArray(forKey: utilityOrderKey) ?? []
+        var seen = Set<String>()
+        return (saved + defaults).filter { defaults.contains($0) && seen.insert($0).inserted }
+    }
+
+    /// Commits only a drop onto another utility on this display. Pins and Trash stay outside this order.
+    func moveUtility(_ id: String, to target: String) {
+        var order = utilityOrder
+        guard id != target, let source = order.firstIndex(of: id), let destination = order.firstIndex(of: target) else { return }
+        order.remove(at: source)
+        order.insert(id, at: destination)
+        UserDefaults.standard.set(order, forKey: utilityOrderKey)
+        refreshEntries()
+        presentationDidChange?()
+    }
+
+    func canMoveUtility(_ id: String, by distance: Int) -> Bool {
+        let visible = entries.compactMap(\.movableUtilityID)
+        guard let index = visible.firstIndex(of: id) else { return false }
+        return visible.indices.contains(index + distance)
+    }
+
+    func moveUtility(_ id: String, by distance: Int) {
+        let visible = entries.compactMap(\.movableUtilityID)
+        guard let index = visible.firstIndex(of: id), visible.indices.contains(index + distance) else { return }
+        moveUtility(id, to: visible[index + distance])
     }
 
     func configureTrash(_ visible: Bool) {
@@ -249,6 +289,11 @@ final class DockStore {
     func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
 
     func setFolderPresentation(_ presentation: FolderStackPresentation, for id: UUID) -> Bool {
+        if id == DownloadsDockItem.id {
+            UserDefaults.standard.set(presentation.rawValue, forKey: "downloadsPresentation.\(displayID)")
+            refreshEntries()
+            return true
+        }
         var proposed = pins
         guard let index = proposed.firstIndex(where: { $0.folder?.id == id }),
               var folder = proposed[index].folder else { return false }

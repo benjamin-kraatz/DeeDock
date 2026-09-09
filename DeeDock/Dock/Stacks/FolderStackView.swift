@@ -68,6 +68,21 @@ struct FolderStackView: View {
             Image(systemName: "folder.fill").foregroundStyle(.tint).accessibilityHidden(true)
             Text(verbatim: state.directoryName).font(.headline).lineLimit(1)
             Spacer(minLength: 8)
+            Menu {
+                Picker(.folderSortTitle, selection: Binding(get: { state.sort }, set: { state.chooseSort($0) })) {
+                    ForEach(FolderStackSort.allCases, id: \.self) { sort in
+                        Text(sort.title).tag(sort)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Label(.folderSortTitle, systemImage: "arrow.up.arrow.down")
+                    .labelStyle(.iconOnly)
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+            .help(Text(.folderSortTitle))
+            .accessibilityValue(Text(state.sort.title))
             HStack(spacing: 2) {
                 modeButton(.grid, symbol: "square.grid.2x2")
                 modeButton(.list, symbol: "list.bullet")
@@ -133,7 +148,7 @@ struct FolderStackView: View {
     private var smartContent: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 2, pinnedViews: [.sectionHeaders]) {
-                ForEach(state.semanticSections) { section in
+                ForEach(state.sortedSemanticSections) { section in
                     Section {
                         ForEach(section.itemIDs, id: \.self) { id in
                             if let entry = state.entries.first(where: { $0.id == id }) {
@@ -172,21 +187,7 @@ struct FolderStackView: View {
 
     private func item(_ entry: FolderStackEntry, grid: Bool) -> some View {
         Button { state.openEntry?(entry.reference) } label: {
-            Group {
-                if grid {
-                    VStack(spacing: 6) {
-                        Image(nsImage: entry.icon).resizable().scaledToFit().frame(width: 48, height: 48)
-                        Text(verbatim: entry.reference.name).font(.caption).lineLimit(2)
-                            .multilineTextAlignment(.center).frame(maxWidth: .infinity)
-                    }.frame(minHeight: 78)
-                } else {
-                    HStack(spacing: 9) {
-                        Image(nsImage: entry.icon).resizable().scaledToFit().frame(width: 24, height: 24)
-                        Text(verbatim: entry.reference.name).lineLimit(1)
-                        Spacer(minLength: 0)
-                    }.padding(.horizontal, 8).frame(height: 34)
-                }
-            }
+            FolderStackItemLabel(entry: entry, grid: grid, sort: state.sort)
             .contentShape(.rect)
             .background(state.selectedID == entry.id ? Color.accentColor.opacity(0.18) : .clear,
                         in: .rect(cornerRadius: 8))
@@ -201,10 +202,15 @@ struct FolderStackView: View {
                                       receive: { state.receive($0, into: entry.reference.url) },
                                       acceptsDrop: { !state.copying })
         }
+        .help(FolderStackItemDetails(reference: entry.reference).help)
         .accessibilityLabel(Text(verbatim: entry.reference.name))
+        .accessibilityValue(Text(verbatim: FolderStackItemDetails(reference: entry.reference).summary))
         .accessibilityHint(Text(entry.reference.isFolder ? .folderStackBrowseHint : .folderStackOpenHint))
         .accessibilityAddTraits(state.selectedID == entry.id ? .isSelected : [])
         .contextMenu {
+            ShareLink(item: entry.reference.url) {
+                Label(.folderItemShare, systemImage: "square.and.arrow.up")
+            }
             Button(.filePreviewAction) { state.showPreview(entry.reference) }
             Button(.folderStackShowInFinder) { NSWorkspace.shared.activateFileViewerSelecting([entry.reference.url]) }
         }
@@ -221,7 +227,9 @@ struct FolderStackView: View {
 @MainActor private enum FolderStackPreviewData {
     static let icon = NSImage(systemSymbolName: "doc.text.fill", accessibilityDescription: nil)!
     static let entries = [
-        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/item 2.txt"), name: "item 2.txt", isFolder: false), icon: icon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/item 2.txt"), name: "item 2.txt", isFolder: false, contentType: "public.plain-text",
+                                                byteCount: 245_000, createdAt: Date(timeIntervalSince1970: 1_780_000_000),
+                                                modifiedAt: Date(timeIntervalSince1970: 1_780_100_000)), icon: icon),
         FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/item 10.txt"), name: "A document with a deliberately long Finder name.txt", isFolder: false), icon: icon)
     ]
     static func state(_ mode: FolderStackPresentation = .grid, name: String = "Projects",

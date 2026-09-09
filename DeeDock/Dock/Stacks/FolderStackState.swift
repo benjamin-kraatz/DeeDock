@@ -21,6 +21,8 @@ final class FolderStackState {
     private(set) var organizing = false
     private(set) var semanticError: String?
     var error: String?
+    private(set) var sort: FolderStackSort
+    @ObservationIgnored var sortChanged: ((FolderStackSort) -> Void)?
     var presentation: FolderStackPresentation
     var selectedID: String?
     var presentationFocused = false
@@ -39,16 +41,17 @@ final class FolderStackState {
     @ObservationIgnored private let organizer: any SemanticStackOrganizing
 
     init(folder: FolderReference, entries: [FolderStackEntry] = [], loading: Bool = false,
-         error: String? = nil,
+         error: String? = nil, sort: FolderStackSort = .alphabetical,
          organizer: any SemanticStackOrganizing = UnavailableSemanticStackOrganizer()) {
+        self.sort = sort
         self.folder = folder
         directory = folder.url
         self.organizer = organizer
         presentation = folder.presentation
-        self.entries = entries
+        self.entries = entries.sorted { sort.precedes($0.reference, $1.reference) }
         self.loading = loading
         self.error = error
-        selectedID = entries.first?.id
+        selectedID = self.entries.first?.id
         if presentation == .smart, !entries.isEmpty { refreshSemanticOrganization() }
     }
 
@@ -91,6 +94,7 @@ final class FolderStackState {
                     icon.size = NSSize(width: 128, height: 128)
                     return FolderStackEntry(reference: reference, icon: icon)
                 }
+                entries.sort { self.sort.precedes($0.reference, $1.reference) }
                 if self.selectedID == nil || !entries.contains(where: { $0.id == self.selectedID }) {
                     self.selectedID = entries.first?.id
                 }
@@ -169,6 +173,23 @@ final class FolderStackState {
         return true
     }
 
+    /// Reorders loaded metadata without reloading icons or losing the selected file.
+    func chooseSort(_ value: FolderStackSort) {
+        guard value != sort else { return }
+        sort = value
+        entries.sort { value.precedes($0.reference, $1.reference) }
+        sortChanged?(value)
+    }
+
+    /// Smart mode keeps its groups and applies the selected order within each group.
+    var sortedSemanticSections: [SemanticStackSection] {
+        let ranks = Dictionary(uniqueKeysWithValues: entries.enumerated().map { ($0.element.id, $0.offset) })
+        return semanticSections.map { section in
+            SemanticStackSection(id: section.id, title: section.title,
+                itemIDs: section.itemIDs.sorted { (ranks[$0] ?? Int.max) < (ranks[$1] ?? Int.max) }, kind: section.kind)
+        }
+    }
+
     func choose(_ value: FolderStackPresentation) {
         guard value != presentation else { return }
         let previous = presentation
@@ -202,7 +223,7 @@ final class FolderStackState {
     var displayedEntries: [FolderStackEntry] {
         guard presentation == .smart else { return entries }
         let byID = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, $0) })
-        return semanticSections.flatMap(\.itemIDs).compactMap { byID[$0] }
+        return sortedSemanticSections.flatMap(\.itemIDs).compactMap { byID[$0] }
     }
 
     func select(by distance: Int) {
@@ -357,6 +378,7 @@ final class FolderStackState {
         retryAction = nil
         preview = nil
         copyFailed = nil
+        sortChanged = nil
         openEntry = nil; presentationChanged = nil; dragCompleted = nil
     }
 }

@@ -43,10 +43,10 @@ struct FolderContextMenuBridge: NSViewRepresentable {
             menu.addItem(.separator())
             let vertical = interaction?.layout.edge.isVertical == true
             add(vertical ? .actionMoveUp : .actionMoveLeft, action: #selector(movePrevious), to: menu,
-                enabled: interaction?.canMovePin?(item.id, -1) == true)
+                enabled: (item.isDownloads ? interaction?.canMoveUtility : interaction?.canMovePin)?(item.id, -1) == true)
             add(vertical ? .actionMoveDown : .actionMoveRight, action: #selector(moveNext), to: menu,
-                enabled: interaction?.canMovePin?(item.id, 1) == true)
-            if let destinations = interaction?.pinDestinations, !destinations.isEmpty {
+                enabled: (item.isDownloads ? interaction?.canMoveUtility : interaction?.canMovePin)?(item.id, 1) == true)
+            if !item.isDownloads, let destinations = interaction?.pinDestinations, !destinations.isEmpty {
                 let parent = NSMenuItem(title: String(localized: .actionPinOnDisplay), action: nil, keyEquivalent: "")
                 let submenu = NSMenu()
                 for destination in destinations {
@@ -55,7 +55,7 @@ struct FolderContextMenuBridge: NSViewRepresentable {
                 }
                 parent.submenu = submenu; menu.addItem(parent)
             }
-            add(.actionUnpin, action: #selector(unpin), symbol: "pin.slash", to: menu)
+            if !item.isDownloads { add(.actionUnpin, action: #selector(unpin), symbol: "pin.slash", to: menu) }
             menu.addItem(.separator())
             add(.actionSettings, action: #selector(settings), symbol: "gear", to: menu)
             menu.autoenablesItems = false
@@ -78,8 +78,8 @@ struct FolderContextMenuBridge: NSViewRepresentable {
         @objc private func showInFinder() { if let item { interaction?.revealFolder?(item) } }
         @objc private func useGrid() { if let item { interaction?.setFolderPresentation?(item.reference.id, .grid) } }
         @objc private func useList() { if let item { interaction?.setFolderPresentation?(item.reference.id, .list) } }
-        @objc private func movePrevious() { if let item { interaction?.movePin?(item.id, -1) } }
-        @objc private func moveNext() { if let item { interaction?.movePin?(item.id, 1) } }
+        @objc private func movePrevious() { if let item { (item.isDownloads ? interaction?.moveUtility : interaction?.movePin)?(item.id, -1) } }
+        @objc private func moveNext() { if let item { (item.isDownloads ? interaction?.moveUtility : interaction?.movePin)?(item.id, 1) } }
         @objc private func unpin() { if let item { interaction?.removePin?(item.id) } }
         @objc private func copyToDisplay(_ sender: NSMenuItem) {
             if let item, let id = sender.representedObject as? String { interaction?.copyPin?(.folder(item.reference), id) }

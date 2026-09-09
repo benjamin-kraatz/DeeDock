@@ -37,7 +37,7 @@ struct DockFolderButton: View {
         }
         .buttonStyle(.plain)
         .overlay {
-            if let begin = interaction.beginFolderDrag {
+            if !item.isDownloads, let begin = interaction.beginFolderDrag {
                 DockFolderDragSourceView(item: item, primaryAction: primaryAction, begin: begin,
                                          tracking: { interaction.sourceTrackingChanged?($0) })
             }
@@ -56,23 +56,25 @@ struct DockFolderButton: View {
         .accessibilityActions {
             Button(.folderStackOpen) { primaryAction() }
             if item.isAvailable { Button(.folderStackShowInFinder) { interaction.revealFolder?(item) } }
-            Button(.actionUnpin) { interaction.removePin?(item.id) }
             Button(item.reference.presentation == .grid ? .folderStackUseList : .folderStackUseGrid) {
                 interaction.setFolderPresentation?(item.reference.id, item.reference.presentation == .grid ? .list : .grid)
             }
-            Button {
-                interaction.movePin?(item.id, -1)
-            } label: {
-                Text(interaction.layout.edge.isVertical ? .actionMoveUp : .actionMoveLeft)
+            if !item.isDownloads {
+                Button(.actionUnpin) { interaction.removePin?(item.id) }
+                Button {
+                    interaction.movePin?(item.id, -1)
+                } label: {
+                    Text(interaction.layout.edge.isVertical ? .actionMoveUp : .actionMoveLeft)
+                }
+                .disabled(interaction.canMovePin?(item.id, -1) != true)
+                Button {
+                    interaction.movePin?(item.id, 1)
+                } label: {
+                    Text(interaction.layout.edge.isVertical ? .actionMoveDown : .actionMoveRight)
+                }
+                .disabled(interaction.canMovePin?(item.id, 1) != true)
             }
-            .disabled(interaction.canMovePin?(item.id, -1) != true)
-            Button {
-                interaction.movePin?(item.id, 1)
-            } label: {
-                Text(interaction.layout.edge.isVertical ? .actionMoveDown : .actionMoveRight)
-            }
-            .disabled(interaction.canMovePin?(item.id, 1) != true)
-            ForEach(interaction.pinDestinations) { destination in
+            ForEach(item.isDownloads ? [] : interaction.pinDestinations) { destination in
                 Button {
                     interaction.copyPin?(.folder(item.reference), destination.id)
                 } label: {
