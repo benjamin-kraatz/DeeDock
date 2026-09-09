@@ -13264,6 +13264,24 @@
         }
       }
     },
+    "launcherOpenSettings" : {
+      "comment" : "Launcher options menu item that opens the DDock Settings window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
+          }
+        }
+      }
+    },
     "launcherClearHistory" : {
       "comment" : "Action requiring confirmation before clearing DDock launch history.",
       "extractionState" : "manual",

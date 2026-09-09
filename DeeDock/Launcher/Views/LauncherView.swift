@@ -9,6 +9,7 @@ struct LauncherView: View {
     @FocusState private var searchFocused: Bool
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.openWindow) private var openWindow
     @State private var columns = 1
     @State private var confirmClear = false
 
@@ -158,6 +159,11 @@ struct LauncherView: View {
                 .symbolEffect(.rotate.byLayer, options: .nonRepeating, value: state.library.isLoading)
             Menu {
                 Button { confirmClear = true } label: { Text(.launcherClearHistory) }
+                Divider()
+                // Opening Settings deliberately activates DDock; the launcher closes as focus leaves it.
+                Button { openWindow.openDockSettings() } label: {
+                    Label { Text(.launcherOpenSettings) } icon: { Image(systemName: "gearshape") }
+                }
             } label: { Image(systemName: "ellipsis") }
             .menuStyle(.borderlessButton).fixedSize().accessibilityLabel(Text(.launcherOptions))
         }
