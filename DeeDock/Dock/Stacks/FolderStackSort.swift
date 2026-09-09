@@ -1,6 +1,9 @@
 import Foundation
 
 /// Fixed sort directions for folder contents, with stable name and path tie breakers.
+///
+/// Size uses file metadata and finished folder contents totals. Folders still being
+/// measured sort last, then by name, so rows do not jump while a walk runs.
 nonisolated enum FolderStackSort: String, CaseIterable {
     case recency, alphabetical, size
 
@@ -19,8 +22,8 @@ nonisolated enum FolderStackSort: String, CaseIterable {
             let right = rhs.modifiedAt ?? rhs.createdAt ?? .distantPast
             if left != right { return left > right }
         case .size:
-            let left = lhs.byteCount ?? -1
-            let right = rhs.byteCount ?? -1
+            let left = lhs.sizeSortByteCount
+            let right = rhs.sizeSortByteCount
             if left != right { return left > right }
         case .alphabetical: break
         }

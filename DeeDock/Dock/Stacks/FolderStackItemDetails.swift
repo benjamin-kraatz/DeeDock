@@ -1,7 +1,10 @@
 import Foundation
 import UniformTypeIdentifiers
 
-/// Formats already-loaded metadata; rendering never opens a file or measures folder contents.
+/// Formats already-loaded metadata, folder contents metrics, and optional media headers.
+///
+/// Rendering never opens a file or starts a folder walk. Folder size uses measured
+/// contents totals only, never the directory entry's own `fileSize`.
 struct FolderStackItemDetails {
     let reference: FolderStackEntryReference
 
@@ -17,8 +20,14 @@ struct FolderStackItemDetails {
     }
 
     var size: String? {
-        guard !reference.isFolder, let bytes = reference.byteCount, bytes >= 0 else { return nil }
-        return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+        if reference.isFolder { return folderSizeText }
+        guard let bytes = reference.byteCount, bytes >= 0 else { return nil }
+        return Self.bytes(bytes)
+    }
+
+    var itemCountText: String? {
+        guard reference.isFolder, let count = reference.contents?.immediateItemCount else { return nil }
+        return String(localized: .folderDetailsItemCount(count))
     }
 
     /// Localized image size, PDF page count, or media duration when that header was loaded.
@@ -36,20 +45,35 @@ struct FolderStackItemDetails {
     }
 
     var summary: String {
-        [kind, size, mediaText, reference.modifiedAt.map(Self.shortDate.string(from:))]
+        [kind, itemCountText, size, mediaText, reference.modifiedAt.map(Self.shortDate.string(from:))]
             .compactMap { $0 }.joined(separator: " · ")
     }
 
     func gridDetail(sort: FolderStackSort) -> String? {
         switch sort {
         case .recency: reference.modifiedAt.map(Self.shortDate.string(from:))
-        case .alphabetical: kind
-        case .size: reference.isFolder ? kind : size
+        case .alphabetical: reference.isFolder ? (itemCountText ?? kind) : kind
+        case .size: size ?? (reference.isFolder ? kind : nil)
         }
     }
 
     var help: String {
-        var lines = [reference.name, reference.url.path, [kind, size, mediaText].compactMap { $0 }.joined(separator: " · ")]
+        var lines = [reference.name, reference.url.path]
+        if reference.isFolder {
+            lines.append(kind)
+            if let itemCountText { lines.append(itemCountText) }
+            if let size {
+                lines.append(String(localized: .folderDetailsTotalSize) + ": " + size)
+            }
+            if let contents = reference.contents,
+               let nested = contents.recursiveItemCount,
+               let immediate = contents.immediateItemCount,
+               nested != immediate {
+                lines.append(String(localized: .folderDetailsNestedItemCount(nested)))
+            }
+        } else {
+            lines.append([kind, size, mediaText].compactMap { $0 }.joined(separator: " · "))
+        }
         if let modified = reference.modifiedAt {
             lines.append(String(localized: .folderDetailsModified) + ": " + Self.exactDate.string(from: modified))
         }
@@ -57,6 +81,24 @@ struct FolderStackItemDetails {
             lines.append(String(localized: .folderDetailsCreated) + ": " + Self.exactDate.string(from: created))
         }
         return lines.joined(separator: "\n")
+    }
+
+    private var folderSizeText: String? {
+        guard let contents = reference.contents else { return nil }
+        switch contents.completeness {
+        case .calculating:
+            return String(localized: .folderDetailsCalculating)
+        case .complete:
+            guard let bytes = contents.totalByteCount else { return nil }
+            return Self.bytes(bytes)
+        case .incomplete:
+            guard let bytes = contents.totalByteCount else { return String(localized: .folderDetailsCalculating) }
+            return String(localized: .folderDetailsIncompleteSize(Self.bytes(bytes)))
+        }
+    }
+
+    private static func bytes(_ count: Int64) -> String {
+        ByteCountFormatter.string(fromByteCount: count, countStyle: .file)
     }
 
     private static func durationText(_ seconds: TimeInterval) -> String? {

@@ -8339,6 +8339,24 @@
         }
       }
     },
+    "folderDetailsCalculating" : {
+      "comment" : "Shown while a folder's contents size is still being measured.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechnen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculating…"
+          }
+        }
+      }
+    },
     "folderDetailsCreated" : {
       "comment" : "Label for exact creation timestamp in item hover details.",
       "extractionState" : "manual",
@@ -8411,6 +8429,66 @@
         }
       }
     },
+    "folderDetailsIncompleteSize" : {
+      "comment" : "Folder contents size after a finished walk that skipped some descendants. size is a localized byte count such as 4.2 MB.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindestens %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At least %@"
+          }
+        }
+      }
+    },
+    "folderDetailsItemCount" : {
+      "comment" : "Visible immediate children in a folder stack item. The number is the count of files, packages, aliases, and subfolders, excluding hidden items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "folderDetailsModified" : {
       "comment" : "Label for exact modification timestamp in item hover details.",
       "extractionState" : "manual",
@@ -8425,6 +8503,48 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last modified"
+          }
+        }
+      }
+    },
+    "folderDetailsNestedItemCount" : {
+      "comment" : "Hover line when a folder has items in subfolders. The number is the recursive visible-item count, excluding package internals.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt einschließlich Unterordner"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte einschließlich Unterordner"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item including subfolders"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items including subfolders"
+                }
+              }
+            }
           }
         }
       }
@@ -8467,6 +8587,24 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "folderDetailsTotalSize" : {
+      "comment" : "Hover label for a folder's measured contents size, not the directory entry size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtgröße"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total size"
           }
         }
       }

@@ -33,6 +33,7 @@ final class FolderStackState {
     @ObservationIgnored private var retryAction: (() -> Void)?
     @ObservationIgnored private var access: FolderResourceAccess?
     @ObservationIgnored private var loadTask: Task<Void, Never>?
+    @ObservationIgnored private var metricsTask: Task<Void, Never>?
     @ObservationIgnored private var mediaTask: Task<Void, Never>?
     @ObservationIgnored private var debounceTask: Task<Void, Never>?
     @ObservationIgnored private var monitor: FolderDirectoryMonitor?
@@ -61,6 +62,7 @@ final class FolderStackState {
 
     func start() {
         loadTask?.cancel(); loadTask = nil
+        metricsTask?.cancel(); metricsTask = nil
         mediaTask?.cancel(); mediaTask = nil
         monitor?.stop(); monitor = nil
         access = nil
@@ -79,6 +81,7 @@ final class FolderStackState {
     func reload() {
         guard let access else { return }
         loadTask?.cancel()
+        metricsTask?.cancel()
         mediaTask?.cancel()
         semanticGeneration = UUID()
         semanticTask?.cancel()
@@ -95,10 +98,18 @@ final class FolderStackState {
             loading = false
             switch result {
             case .success(let references):
+                let cacheHits = await FolderContentsMetricsCache.shared.hits(
+                    for: references.filter(\.isFolder).map { ($0.url, $0.modifiedAt) }
+                )
+                guard !Task.isCancelled, generation == token else { return }
                 entries = references.map { reference in
                     let icon = NSWorkspace.shared.icon(forFile: reference.url.path)
                     icon.size = NSSize(width: 128, height: 128)
-                    return FolderStackEntry(reference: reference, icon: icon)
+                    let contents = cacheHits[reference.id]
+                    return FolderStackEntry(
+                        reference: contents.map(reference.withContents) ?? reference,
+                        icon: icon
+                    )
                 }
                 entries.sort { self.sort.precedes($0.reference, $1.reference) }
                 if self.selectedID == nil || !entries.contains(where: { $0.id == self.selectedID }) {
@@ -108,6 +119,7 @@ final class FolderStackState {
                     self.preview = nil
                 }
                 refreshSemanticOrganization()
+                refreshContentsMetrics()
                 enrichMedia(from: references, access: access, token: token)
             case .failure(let error):
                 report(error.localizedDescription) { [weak self] in self?.reload() }
@@ -245,6 +257,42 @@ final class FolderStackState {
     func openSelection() {
         guard let entry = entries.first(where: { $0.id == selectedID }) else { return }
         openEntry?(entry.reference)
+    }
+
+    /// Measures folder children after the listing is on screen. Navigation and dismissal cancel the walks.
+    private func refreshContentsMetrics() {
+        metricsTask?.cancel()
+        let pending = entries.compactMap { entry -> FolderStackEntryReference? in
+            guard entry.reference.isFolder, entry.reference.contents?.isFinal != true else { return nil }
+            return entry.reference
+        }
+        guard !pending.isEmpty, let access else { return }
+        let token = generation
+        metricsTask = Task { [weak self] in
+            let worker = Task.detached(priority: .utility) {
+                await withExtendedLifetime(access) {
+                    await FolderContentsMetricsScheduler.measure(pending) { url, metrics in
+                        await MainActor.run {
+                            self?.applyMetrics(metrics, to: url, token: token)
+                        }
+                    }
+                }
+            }
+            await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
+        }
+    }
+
+    /// Replaces one folder's contents metrics. Size sort waits for a finished total so rows do not jump mid-walk.
+    private func applyMetrics(_ metrics: FolderContentsMetrics, to url: URL, token: UUID) {
+        guard generation == token else { return }
+        guard let index = entries.firstIndex(where: { $0.reference.url == url }) else { return }
+        guard entries[index].reference.contents != metrics else { return }
+        let selected = selectedID
+        entries[index] = entries[index].withContents(metrics)
+        if sort == .size, metrics.isFinal {
+            entries.sort { sort.precedes($0.reference, $1.reference) }
+        }
+        selectedID = selected
     }
 
     /// Applies cached headers immediately, then reads the rest off the main actor while `access` stays alive.
@@ -423,6 +471,7 @@ final class FolderStackState {
     func stop() {
         generation = UUID()
         loadTask?.cancel(); loadTask = nil
+        metricsTask?.cancel(); metricsTask = nil
         mediaTask?.cancel(); mediaTask = nil
         debounceTask?.cancel(); debounceTask = nil
         monitor?.stop(); monitor = nil
