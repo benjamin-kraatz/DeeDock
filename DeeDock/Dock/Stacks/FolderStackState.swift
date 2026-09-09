@@ -34,20 +34,24 @@ final class FolderStackState {
     @ObservationIgnored private var access: FolderResourceAccess?
     @ObservationIgnored private var loadTask: Task<Void, Never>?
     @ObservationIgnored private var metricsTask: Task<Void, Never>?
+    @ObservationIgnored private var mediaTask: Task<Void, Never>?
     @ObservationIgnored private var debounceTask: Task<Void, Never>?
     @ObservationIgnored private var monitor: FolderDirectoryMonitor?
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var semanticGeneration = UUID()
     @ObservationIgnored private var semanticTask: Task<Void, Never>?
     @ObservationIgnored private let organizer: any SemanticStackOrganizing
+    @ObservationIgnored private let mediaCache: FolderStackMediaCache
 
     init(folder: FolderReference, entries: [FolderStackEntry] = [], loading: Bool = false,
          error: String? = nil, sort: FolderStackSort = .alphabetical,
-         organizer: any SemanticStackOrganizing = UnavailableSemanticStackOrganizer()) {
+         organizer: any SemanticStackOrganizing = UnavailableSemanticStackOrganizer(),
+         mediaCache: FolderStackMediaCache = .shared) {
         self.sort = sort
         self.folder = folder
         directory = folder.url
         self.organizer = organizer
+        self.mediaCache = mediaCache
         presentation = folder.presentation
         self.entries = entries.sorted { sort.precedes($0.reference, $1.reference) }
         self.loading = loading
@@ -58,6 +62,8 @@ final class FolderStackState {
 
     func start() {
         loadTask?.cancel(); loadTask = nil
+        metricsTask?.cancel(); metricsTask = nil
+        mediaTask?.cancel(); mediaTask = nil
         monitor?.stop(); monitor = nil
         access = nil
         let access = FolderResourceAccess(folder)
@@ -76,6 +82,7 @@ final class FolderStackState {
         guard let access else { return }
         loadTask?.cancel()
         metricsTask?.cancel()
+        mediaTask?.cancel()
         semanticGeneration = UUID()
         semanticTask?.cancel()
         generation = UUID()
@@ -113,6 +120,7 @@ final class FolderStackState {
                 }
                 refreshSemanticOrganization()
                 refreshContentsMetrics()
+                enrichMedia(from: references, access: access, token: token)
             case .failure(let error):
                 report(error.localizedDescription) { [weak self] in self?.reload() }
             }
@@ -287,6 +295,51 @@ final class FolderStackState {
         selectedID = selected
     }
 
+    /// Applies cached headers immediately, then reads the rest off the main actor while `access` stays alive.
+    private func enrichMedia(from references: [FolderStackEntryReference],
+                             access: FolderResourceAccess, token: UUID) {
+        let candidates = references.filter(FolderStackMediaReader.isCandidate)
+        guard !candidates.isEmpty else { return }
+        let cache = mediaCache
+        mediaTask = Task { [weak self] in
+            var cachedHits: [String: FolderStackMediaMetadata] = [:]
+            var pending: [FolderStackEntryReference] = []
+            for reference in candidates {
+                guard !Task.isCancelled else { return }
+                if let cached = await cache.value(for: FolderStackMediaCacheKey(reference)) {
+                    if case .metadata(let media) = cached { cachedHits[reference.id] = media }
+                } else {
+                    pending.append(reference)
+                }
+            }
+            guard let self, !Task.isCancelled, generation == token else { return }
+            applyMedia(cachedHits)
+            guard !pending.isEmpty else {
+                mediaTask = nil
+                return
+            }
+            let worker = Task.detached {
+                await FolderStackMediaReader.load(pending, cache: cache, access: access)
+            }
+            let loaded = await withTaskCancellationHandler {
+                await worker.value
+            } onCancel: {
+                worker.cancel()
+            }
+            guard !Task.isCancelled, generation == token else { return }
+            applyMedia(loaded)
+            mediaTask = nil
+        }
+    }
+
+    private func applyMedia(_ media: [String: FolderStackMediaMetadata]) {
+        guard !media.isEmpty else { return }
+        entries = entries.map { entry in
+            guard let value = media[entry.id], entry.reference.media != value else { return entry }
+            return FolderStackEntry(reference: entry.reference.updating(media: value), icon: entry.icon)
+        }
+    }
+
     private func scheduleReload() {
         debounceTask?.cancel()
         debounceTask = Task { [weak self] in
@@ -419,6 +472,7 @@ final class FolderStackState {
         generation = UUID()
         loadTask?.cancel(); loadTask = nil
         metricsTask?.cancel(); metricsTask = nil
+        mediaTask?.cancel(); mediaTask = nil
         debounceTask?.cancel(); debounceTask = nil
         monitor?.stop(); monitor = nil
         cancelSemanticOrganization(clearError: true)

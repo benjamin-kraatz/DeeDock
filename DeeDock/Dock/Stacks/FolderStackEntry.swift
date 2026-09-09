@@ -11,11 +11,13 @@ nonisolated struct FolderStackEntryReference: Equatable, Identifiable, Sendable 
     let createdAt: Date?
     let modifiedAt: Date?
     let contents: FolderContentsMetrics?
+    /// Dimensions, page count, or duration when a later header read succeeded.
+    let media: FolderStackMediaMetadata?
     var id: String { url.standardizedFileURL.path }
 
     init(url: URL, name: String, isFolder: Bool, contentType: String? = nil,
          byteCount: Int64? = nil, createdAt: Date? = nil, modifiedAt: Date? = nil,
-         contents: FolderContentsMetrics? = nil) {
+         contents: FolderContentsMetrics? = nil, media: FolderStackMediaMetadata? = nil) {
         self.url = url
         self.name = name
         self.isFolder = isFolder
@@ -24,12 +26,19 @@ nonisolated struct FolderStackEntryReference: Equatable, Identifiable, Sendable 
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
         self.contents = contents
+        self.media = media
     }
 
-    /// Returns a copy that keeps identity and file metadata and replaces contents metrics.
+    /// Returns a copy that keeps identity, file metadata, and media, and replaces contents metrics.
     func withContents(_ contents: FolderContentsMetrics?) -> FolderStackEntryReference {
         FolderStackEntryReference(url: url, name: name, isFolder: isFolder, contentType: contentType,
-            byteCount: byteCount, createdAt: createdAt, modifiedAt: modifiedAt, contents: contents)
+            byteCount: byteCount, createdAt: createdAt, modifiedAt: modifiedAt, contents: contents, media: media)
+    }
+
+    /// Replaces only the optional media payload. Listing identity, filesystem metadata, and contents stay the same.
+    func updating(media: FolderStackMediaMetadata?) -> FolderStackEntryReference {
+        FolderStackEntryReference(url: url, name: name, isFolder: isFolder, contentType: contentType,
+            byteCount: byteCount, createdAt: createdAt, modifiedAt: modifiedAt, contents: contents, media: media)
     }
 
     /// Files use metadata size. Folders use a finished contents total and never the directory-entry size.

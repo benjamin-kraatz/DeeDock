@@ -237,6 +237,14 @@ struct FolderStackView: View {
                                                 contents: FolderContentsMetrics(immediateItemCount: 12, recursiveItemCount: 48,
                                                                                totalByteCount: 4_200_000, completeness: .complete)),
                          icon: folderIcon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/Harbor.png"), name: "Harbor.png", isFolder: false, contentType: "public.png",
+                                                byteCount: 1_048_576, createdAt: Date(timeIntervalSince1970: 1_780_000_000),
+                                                modifiedAt: Date(timeIntervalSince1970: 1_780_200_000),
+                                                media: .image(width: 1920, height: 1080)), icon: icon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/Brief.pdf"), name: "Brief.pdf", isFolder: false, contentType: "com.adobe.pdf",
+                                                byteCount: 88_000, media: .pdf(pageCount: 12)), icon: icon),
+        FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/Take.m4a"), name: "Take.m4a", isFolder: false, contentType: "public.mpeg-4-audio",
+                                                byteCount: 420_000, media: .audio(duration: 125)), icon: icon),
         FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/item 10.txt"), name: "A document with a deliberately long Finder name.txt", isFolder: false), icon: icon)
     ]
     static let folderMetricsEntries = [
@@ -270,6 +278,10 @@ struct FolderStackView: View {
 #Preview("List, long name, dark") {
     FolderStackView(state: FolderStackPreviewData.state(.list, name: "A very long folder name that must remain on one line"), keyboard: true)
         .frame(width: 560, height: 420).padding().preferredColorScheme(.dark)
+}
+#Preview("List with media details") {
+    FolderStackView(state: FolderStackPreviewData.state(.list), keyboard: false)
+        .frame(width: 560, height: 420).padding()
 }
 #Preview("Loading") {
     FolderStackView(state: FolderStackPreviewData.state(entries: [], loading: true), keyboard: false)

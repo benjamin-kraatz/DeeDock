@@ -103,7 +103,7 @@ Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folde
 
 ## Downloads and utility order
 
-List and Smart items show file type, size, and last-modified date below the name. Folders show a visible-item count and contents size once measured, or an explicit calculating or incomplete state. Grid shows the current sort detail. Hover over an item for its full name, path, and exact modification and creation timestamps. Folder hover also includes the item count and total contents size. Unavailable metadata is omitted. A folder never uses its directory-entry size as a total.
+List and Smart items show file type, size, and last-modified date below the name, plus image dimensions, PDF page counts, and audio or video duration when those headers are available. Folders show a visible-item count and contents size once measured, or an explicit calculating or incomplete state. Grid shows the current sort detail. Hover over an item for its full name, path, extra media details, and exact modification and creation timestamps. Folder hover also includes the item count and total contents size. Unavailable metadata is omitted. A folder never uses its directory-entry size as a total. Cloud-only files that are not already on disk stay unread.
 
 The folder stack header has a Sort by menu with Recency, Alphabetical, and Size. Recency puts the most recently modified items first, Alphabetical starts with A, and Size puts the largest items first. The choice is saved per folder and display. Downloads initially uses Recency. Smart mode sorts within its groups. Size sorts files by filesystem metadata and folders by a finished contents total. Folders still being measured sort last, then by name.
 

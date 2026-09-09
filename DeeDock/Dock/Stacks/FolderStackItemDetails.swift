@@ -1,7 +1,7 @@
-import SwiftUI
+import Foundation
 import UniformTypeIdentifiers
 
-/// Formats already-loaded metadata and folder contents metrics.
+/// Formats already-loaded metadata, folder contents metrics, and optional media headers.
 ///
 /// Rendering never opens a file or starts a folder walk. Folder size uses measured
 /// contents totals only, never the directory entry's own `fileSize`.
@@ -30,8 +30,22 @@ struct FolderStackItemDetails {
         return String(localized: .folderDetailsItemCount(count))
     }
 
+    /// Localized image size, PDF page count, or media duration when that header was loaded.
+    var mediaText: String? {
+        switch reference.media {
+        case .image(let width, let height):
+            String(localized: .folderDetailsImageSize(width: width, height: height))
+        case .pdf(let pageCount):
+            String(localized: .folderDetailsPageCount(count: pageCount))
+        case .audio(let duration), .video(let duration):
+            Self.durationText(duration)
+        case nil:
+            nil
+        }
+    }
+
     var summary: String {
-        [kind, itemCountText, size, reference.modifiedAt.map(Self.shortDate.string(from:))]
+        [kind, itemCountText, size, mediaText, reference.modifiedAt.map(Self.shortDate.string(from:))]
             .compactMap { $0 }.joined(separator: " · ")
     }
 
@@ -58,7 +72,7 @@ struct FolderStackItemDetails {
                 lines.append(String(localized: .folderDetailsNestedItemCount(nested)))
             }
         } else {
-            lines.append([kind, size].compactMap { $0 }.joined(separator: " · "))
+            lines.append([kind, size, mediaText].compactMap { $0 }.joined(separator: " · "))
         }
         if let modified = reference.modifiedAt {
             lines.append(String(localized: .folderDetailsModified) + ": " + Self.exactDate.string(from: modified))
@@ -87,6 +101,12 @@ struct FolderStackItemDetails {
         ByteCountFormatter.string(fromByteCount: count, countStyle: .file)
     }
 
+    private static func durationText(_ seconds: TimeInterval) -> String? {
+        guard seconds.isFinite, seconds >= 0 else { return nil }
+        let formatter = seconds >= 3600 ? longDuration : shortDuration
+        return formatter.string(from: seconds)
+    }
+
     private static let shortDate: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -101,40 +121,20 @@ struct FolderStackItemDetails {
         formatter.timeStyle = .medium
         return formatter
     }()
-}
 
-/// Shared item artwork and text for List, Smart, and Grid presentations.
-struct FolderStackItemLabel: View {
-    let entry: FolderStackEntry
-    let grid: Bool
-    let sort: FolderStackSort
-    private var details: FolderStackItemDetails { FolderStackItemDetails(reference: entry.reference) }
+    private static let shortDuration: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.minute, .second]
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = .pad
+        return formatter
+    }()
 
-    var body: some View {
-        Group {
-            if grid {
-                VStack(spacing: 6) {
-                    Image(nsImage: entry.icon).resizable().scaledToFit().frame(width: 48, height: 48)
-                    Text(verbatim: entry.reference.name).font(.caption).lineLimit(2)
-                        .multilineTextAlignment(.center).frame(maxWidth: .infinity)
-                    if let detail = details.gridDetail(sort: sort) {
-                        Text(verbatim: detail).font(.caption2).foregroundStyle(.secondary)
-                            .lineLimit(1).frame(maxWidth: .infinity)
-                    }
-                }
-                .frame(minHeight: 96)
-            } else {
-                HStack(spacing: 10) {
-                    Image(nsImage: entry.icon).resizable().scaledToFit().frame(width: 32, height: 32)
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(verbatim: entry.reference.name).lineLimit(1)
-                        Text(verbatim: details.summary).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                    }
-                    Spacer(minLength: 0)
-                }
-                .padding(.horizontal, 8).padding(.vertical, 7)
-                .frame(minHeight: 50)
-            }
-        }
-    }
+    private static let longDuration: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = .pad
+        return formatter
+    }()
 }

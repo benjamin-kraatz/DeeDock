@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import PDFKit
 import Testing
 
 struct FolderStackTests {
@@ -142,6 +143,101 @@ struct FolderStackTests {
         #expect(entries.first { $0.name == "Subfolder" }?.isFolder == true)
         #expect(entries.first { $0.name == "Document.rtfd" }?.isFolder == false)
         #expect(entries.first { $0.name == "item 2.txt" }?.modifiedAt != nil)
+        #expect(entries.allSatisfy { $0.media == nil })
+    }
+
+    @Test("List and hover details include media; Grid stays on the sort field")
+    @MainActor func itemDetailsIncludeMedia() {
+        let modified = Date(timeIntervalSince1970: 1_780_100_000)
+        let image = FolderStackEntryReference(
+            url: URL(fileURLWithPath: "/Preview/Harbor.png"), name: "Harbor.png", isFolder: false,
+            contentType: "public.png", byteCount: 1_048_576, modifiedAt: modified,
+            media: .image(width: 1920, height: 1080)
+        )
+        let details = FolderStackItemDetails(reference: image)
+        #expect(details.mediaText == String(localized: .folderDetailsImageSize(width: 1920, height: 1080)))
+        #expect(details.summary.contains(details.mediaText ?? ""))
+        #expect(details.help.contains(details.mediaText ?? ""))
+        #expect(details.gridDetail(sort: .alphabetical) == details.kind)
+        #expect(details.gridDetail(sort: .size) == details.size)
+        #expect(details.gridDetail(sort: .recency) != details.mediaText)
+
+        let pages = FolderStackItemDetails(reference: FolderStackEntryReference(
+            url: URL(fileURLWithPath: "/Preview/Brief.pdf"), name: "Brief.pdf", isFolder: false,
+            media: .pdf(pageCount: 2)
+        ))
+        #expect(pages.mediaText == String(localized: .folderDetailsPageCount(count: 2)))
+
+        let audio = FolderStackItemDetails(reference: FolderStackEntryReference(
+            url: URL(fileURLWithPath: "/Preview/Take.m4a"), name: "Take.m4a", isFolder: false,
+            media: .audio(duration: 125)
+        ))
+        #expect(audio.mediaText?.contains("2") == true)
+        #expect(audio.mediaText?.contains("05") == true)
+        #expect(FolderStackItemDetails(reference: FolderStackEntryReference(
+            url: URL(fileURLWithPath: "/Preview/plain.txt"), name: "plain.txt", isFolder: false
+        )).mediaText == nil)
+    }
+
+    @Test("Image, PDF, and audio headers load; folders, text, and corrupt files do not")
+    func mediaHeaders() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let pngURL = root.appendingPathComponent("photo.png")
+        try pngData().write(to: pngURL)
+        let pdfURL = root.appendingPathComponent("brief.pdf")
+        let pdf = PDFDocument()
+        pdf.insert(PDFPage(), at: 0)
+        pdf.insert(PDFPage(), at: 1)
+        #expect(pdf.write(to: pdfURL))
+        let wavURL = root.appendingPathComponent("take.wav")
+        try wavData(sampleRate: 8_000, sampleCount: 8_000).write(to: wavURL)
+        let textURL = root.appendingPathComponent("notes.txt")
+        try Data("hello".utf8).write(to: textURL)
+        let brokenURL = root.appendingPathComponent("broken.png")
+        try Data("not an image".utf8).write(to: brokenURL)
+        let folder = root.appendingPathComponent("Album")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+
+        let image = await FolderStackMediaReader.metadata(for: try reference(pngURL))
+        #expect(image == .image(width: 2, height: 1))
+        #expect(await FolderStackMediaReader.metadata(for: try reference(pdfURL)) == .pdf(pageCount: 2))
+        guard case .audio(let seconds) = await FolderStackMediaReader.metadata(for: try reference(wavURL)) else {
+            Issue.record("Expected a WAV duration")
+            return
+        }
+        #expect((seconds - 1).magnitude < 0.05)
+        #expect(await FolderStackMediaReader.metadata(for: try reference(textURL)) == nil)
+        #expect(await FolderStackMediaReader.metadata(for: try reference(brokenURL)) == nil)
+        #expect(!FolderStackMediaReader.isCandidate(try reference(folder, isFolder: true)))
+        #expect(!FolderStackMediaReader.isCandidate(try reference(textURL)))
+    }
+
+    @Test("Media cache keys change when the file is replaced")
+    func mediaCacheIdentity() async throws {
+        let cache = FolderStackMediaCache()
+        let first = FolderStackEntryReference(
+            url: URL(fileURLWithPath: "/Preview/Harbor.png"), name: "Harbor.png", isFolder: false,
+            byteCount: 10, modifiedAt: Date(timeIntervalSince1970: 1), media: nil
+        )
+        await cache.store(.metadata(.image(width: 10, height: 10)), for: FolderStackMediaCacheKey(first))
+        #expect(await cache.value(for: FolderStackMediaCacheKey(first)) == .metadata(.image(width: 10, height: 10)))
+        let replaced = FolderStackEntryReference(
+            url: first.url, name: first.name, isFolder: false,
+            byteCount: 11, modifiedAt: Date(timeIntervalSince1970: 2)
+        )
+        #expect(await cache.value(for: FolderStackMediaCacheKey(replaced)) == nil)
+    }
+
+    @Test("Cloud placeholders are not treated as local files")
+    func cloudPlaceholdersStayUnread() {
+        #expect(FolderStackMediaReader.hasLocalContents(isUbiquitous: nil, status: nil))
+        #expect(FolderStackMediaReader.hasLocalContents(isUbiquitous: false, status: .notDownloaded))
+        #expect(FolderStackMediaReader.hasLocalContents(isUbiquitous: true, status: .current))
+        #expect(FolderStackMediaReader.hasLocalContents(isUbiquitous: true, status: .downloaded))
+        #expect(!FolderStackMediaReader.hasLocalContents(isUbiquitous: true, status: .notDownloaded))
+        #expect(!FolderStackMediaReader.hasLocalContents(isUbiquitous: true, status: nil))
     }
 
     @Test("Partial semantic groups repair duplicates, unknown numbers, and omissions")
@@ -233,5 +329,56 @@ struct FolderStackTests {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         return root
+    }
+
+    private func reference(_ url: URL, isFolder: Bool = false) throws -> FolderStackEntryReference {
+        let values = try url.resourceValues(forKeys: [
+            .typeIdentifierKey, .fileSizeKey, .contentModificationDateKey
+        ])
+        return FolderStackEntryReference(
+            url: url.standardizedFileURL,
+            name: url.lastPathComponent,
+            isFolder: isFolder,
+            contentType: values.typeIdentifier,
+            byteCount: values.fileSize.map(Int64.init),
+            modifiedAt: values.contentModificationDate
+        )
+    }
+
+    private func pngData() throws -> Data {
+        let bitmap = try #require(NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 2, pixelsHigh: 1,
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+            colorSpaceName: .deviceRGB, bytesPerRow: 8, bitsPerPixel: 32))
+        bitmap.setColor(.clear, atX: 0, y: 0)
+        bitmap.setColor(.red, atX: 1, y: 0)
+        return try #require(bitmap.representation(using: .png, properties: [:]))
+    }
+
+    private func wavData(sampleRate: Int, sampleCount: Int) -> Data {
+        let dataSize = UInt32(sampleCount * 2)
+        var data = Data()
+        func append32(_ value: UInt32) {
+            var little = value.littleEndian
+            withUnsafeBytes(of: &little) { data.append(contentsOf: $0) }
+        }
+        func append16(_ value: UInt16) {
+            var little = value.littleEndian
+            withUnsafeBytes(of: &little) { data.append(contentsOf: $0) }
+        }
+        data.append(contentsOf: Array("RIFF".utf8))
+        append32(36 + dataSize)
+        data.append(contentsOf: Array("WAVE".utf8))
+        data.append(contentsOf: Array("fmt ".utf8))
+        append32(16)
+        append16(1)
+        append16(1)
+        append32(UInt32(sampleRate))
+        append32(UInt32(sampleRate * 2))
+        append16(2)
+        append16(16)
+        data.append(contentsOf: Array("data".utf8))
+        append32(dataSize)
+        data.append(contentsOf: repeatElement(0, count: Int(dataSize)))
+        return data
     }
 }

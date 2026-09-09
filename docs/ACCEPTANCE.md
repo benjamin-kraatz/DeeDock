@@ -1890,7 +1890,13 @@ Compilation is checked with the DeeDock Debug scheme. Tests and automated visual
 
 Folder sort options use fixed directions: modification date descending, natural name order ascending, and size descending. Files use metadata size. Folders use a finished contents total and never the directory-entry size. Missing date or size, and folders still being measured, sort last, with stable name/path ties. Selection survives reordering and reloads apply the current choice. Debug compilation checked; native menu, persistence, Smart groups, and keyboard navigation acceptance remain unrun. No tests or automated visual checks were run.
 
-Folder item details use already-loaded type, size, and timestamps, plus measured folder counts and contents size. List/Smart show a secondary line; Grid follows the sort selection; hover text exposes full paths, exact dates, item counts, and folder totals. Incomplete walks say so. Absent metadata is omitted. Metadata-rich preview data is provided. Native layout, truncation, hover tooltips, localization, and VoiceOver acceptance remain unrun; no tests or automated visual checks were run.
+Folder item details use already-loaded type, size, and timestamps, plus measured folder counts, contents size, and optional media headers. List/Smart show a secondary line; Grid follows the sort selection; hover text exposes full paths, exact dates, item counts, folder totals, and media details. Incomplete walks say so. Absent metadata is omitted. Metadata-rich preview data is provided. Native layout, truncation, hover tooltips, localization, and VoiceOver acceptance remain unrun; no tests or automated visual checks were run.
+
+## Folder stack media details (DEE-30)
+
+List and Smart secondary lines, hover text, and VoiceOver values include image pixel size, PDF page count, and audio or video duration when those headers are available. Grid stays on the current sort detail. After the directory listing, `FolderStackMediaReader` uses ImageIO, PDFKit, and AVFoundation off the main actor. Results cache against path, modification date, and size. The folder access lease stays alive for the batch and cancels on navigation or dismissal. iCloud content that is not downloaded is skipped. Missing or unreadable metadata is omitted and never blocks browsing.
+
+Compilation and tests were not run in this environment. Authored tests cover formatting, type detection, ImageIO/PDF/WAV readers, corrupt files, cache invalidation, and cloud-placeholder skipping. Native layout, hover, VoiceOver, iCloud placeholders, encrypted PDFs, and pointer-path timing remain unrun.
 
 ## Folder contents count and size (DEE-31)
 
