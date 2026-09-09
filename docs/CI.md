@@ -42,7 +42,7 @@ Use `xcode-27`. GitHub now keys hosted macOS images to a major Xcode version. `m
 
 The image is arm64 only. That matches DDock.
 
-The image is still in public preview. Installed tool versions can move. The compile job prints `sw_vers` and `xcodebuild -version` so a log shows what ran.
+The image is still in public preview. Installed tool versions can move. `scripts/ci-select-xcode.sh` points `xcode-select` at Xcode.app and replaces a leftover Command Line Tools `SDKROOT` before any compile. The job then prints `sw_vers`, `xcode-select -p`, and `xcodebuild -showsdks`.
 
 Standard hosted-runner minutes on this public repository are free. Fork pull requests still need the usual first-time workflow approval.
 

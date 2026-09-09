@@ -9,6 +9,11 @@ derived=${3:-/tmp/DeeDock-ci}
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 
+# A missing Command Line Tools SDKROOT makes xcodebuild look in the wrong place.
+if [ -n "${SDKROOT:-}" ] && [ ! -e "$SDKROOT" ]; then
+	unset SDKROOT
+fi
+
 xcodebuild \
 	-project "$root/DeeDock.xcodeproj" \
 	-scheme "$scheme" \
