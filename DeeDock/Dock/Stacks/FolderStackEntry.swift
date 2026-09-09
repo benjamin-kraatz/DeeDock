@@ -10,10 +10,13 @@ nonisolated struct FolderStackEntryReference: Equatable, Identifiable, Sendable 
     let byteCount: Int64?
     let createdAt: Date?
     let modifiedAt: Date?
+    /// Dimensions, page count, or duration when a later header read succeeded.
+    let media: FolderStackMediaMetadata?
     var id: String { url.standardizedFileURL.path }
 
     init(url: URL, name: String, isFolder: Bool, contentType: String? = nil,
-         byteCount: Int64? = nil, createdAt: Date? = nil, modifiedAt: Date? = nil) {
+         byteCount: Int64? = nil, createdAt: Date? = nil, modifiedAt: Date? = nil,
+         media: FolderStackMediaMetadata? = nil) {
         self.url = url
         self.name = name
         self.isFolder = isFolder
@@ -21,6 +24,13 @@ nonisolated struct FolderStackEntryReference: Equatable, Identifiable, Sendable 
         self.byteCount = byteCount
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
+        self.media = media
+    }
+
+    /// Replaces only the optional media payload. Listing identity and filesystem metadata stay the same.
+    func updating(media: FolderStackMediaMetadata?) -> FolderStackEntryReference {
+        FolderStackEntryReference(url: url, name: name, isFolder: isFolder, contentType: contentType,
+                                  byteCount: byteCount, createdAt: createdAt, modifiedAt: modifiedAt, media: media)
     }
 
     var semanticCandidate: SemanticStackCandidate {
