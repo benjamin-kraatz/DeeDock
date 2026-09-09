@@ -30,6 +30,7 @@ jobs:
       - name: Resolve Swift packages
         run: >
           xcodebuild -project DeeDock.xcodeproj
+          -scheme DeeDock
           -resolvePackageDependencies
           -derivedDataPath /tmp/DeeDock-release
       - name: Compile Release DeeDock
