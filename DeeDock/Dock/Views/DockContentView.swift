@@ -117,7 +117,10 @@ struct DockContentView: View {
                         scrollPosition.scrollTo(x: offset)
                     }
                 }
-                .scrollIndicators(.hidden)
+                // `.hidden` permits legacy mouse scrollbars on macOS. Their gutter
+                // changes the cross-axis viewport during item insertion and shifts
+                // the dock's baseline. Keyboard and wheel scrolling remain available.
+                .scrollIndicators(.never)
                 .scrollClipDisabled()
                 .coordinateSpace(name: "dockViewport")
                 .onAppear {
@@ -150,14 +153,6 @@ struct DockContentView: View {
         )
         .coordinateSpace(name: "dockRoot")
         .clipped()
-        // Fitting another item can change the icon size and the native panel's depth.
-        // Settle that layout in the same update as the panel: interpolating the old
-        // local baseline inside the new window moves the glass away from its edge.
-        // Hover only changes `sizes`, so its spring remains active between resizes.
-        .transaction(value: CGSize(width: layout.iconSize, height: layout.panelDepth)) {
-            $0.animation = nil
-            $0.disablesAnimations = true
-        }
         .onAppear { interaction.surfaceRect = viewportSurface }
         .onChange(of: viewportSurface) { _, rect in
             guard interaction.layout.edge == edge else { return }
