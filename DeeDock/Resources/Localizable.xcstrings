@@ -17117,6 +17117,594 @@
         }
       }
     },
+    "pinWeatherClear" : {
+      "comment" : "Button that marks every pin as just used, removing all rust.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allen Rost entfernen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove All Rust…"
+          }
+        }
+      }
+    },
+    "pinWeatherClearConfirm" : {
+      "comment" : "Destructive confirmation for removing all rust.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rost entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Rust"
+          }
+        }
+      }
+    },
+    "pinWeatherClearHelp" : {
+      "comment" : "Confirmation copy before removing all rust.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Symbole gelten als gerade benutzt und sind wieder blank. Rost kommt erst zurück, wenn sie erneut liegen bleiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every pin counts as used just now and starts clean. Rust returns only if a pin sits unused again."
+          }
+        }
+      }
+    },
+    "pinWeatherDaysCount" : {
+      "comment" : "Unused-day threshold shown next to 'Rust begins after'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Tag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Tagen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "pinWeatherEnabled" : {
+      "comment" : "Toggle that lets unused pinned icons rust.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbenutzte Symbole rosten lassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let unused pins rust"
+          }
+        }
+      }
+    },
+    "pinWeatherEnabledHelp" : {
+      "comment" : "Subtitle under the Icon Rust toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was du lange nicht öffnest, setzt Rost an. Einmal öffnen, und es glänzt wieder."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore a pin long enough and it gathers rust. Open it once and it shines again."
+          }
+        }
+      }
+    },
+    "pinWeatherHeroDay" : {
+      "comment" : "Timeline marker: day number of a rust stage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day %lld"
+          }
+        }
+      }
+    },
+    "pinWeatherHeroPause" : {
+      "comment" : "Button that pauses the Icon Rust time-lapse.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitraffer anhalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause Time-Lapse"
+          }
+        }
+      }
+    },
+    "pinWeatherHeroPlay" : {
+      "comment" : "Button that starts the Icon Rust time-lapse.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitraffer abspielen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Time-Lapse"
+          }
+        }
+      }
+    },
+    "pinWeatherHeroToday" : {
+      "comment" : "Timeline marker under 'Just used'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "pinWeatherHeroUse" : {
+      "comment" : "Accessibility action that uses a sample icon and removes its rust.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use"
+          }
+        }
+      }
+    },
+    "pinWeatherPresetMonth" : {
+      "comment" : "Preset for the unused-day threshold: 30 days, the default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Monat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 month"
+          }
+        }
+      }
+    },
+    "pinWeatherPresetQuarter" : {
+      "comment" : "Preset for the unused-day threshold: 90 days.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Monate"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 months"
+          }
+        }
+      }
+    },
+    "pinWeatherPresetTwoWeeks" : {
+      "comment" : "Preset for the unused-day threshold: 14 days.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 Wochen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 weeks"
+          }
+        }
+      }
+    },
+    "pinWeatherPresetWeek" : {
+      "comment" : "Preset for the unused-day threshold: 7 days.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Woche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 week"
+          }
+        }
+      }
+    },
+    "pinWeatherPrivacyNote" : {
+      "comment" : "Privacy note for Icon Rust usage times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock merkt sich nur Klicks im eigenen Dock. Bildschirmzeit und andere Apps bleiben unberührt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock only notes clicks in its own dock. It never reads Screen Time or other apps."
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewClean" : {
+      "comment" : "Timeline stage: a pin that was just used.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade benutzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Just used"
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewHeavy" : {
+      "comment" : "Timeline stage: a pin at full rust.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ganz verrostet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fully rusted"
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewHelp" : {
+      "comment" : "Hint under the Icon Rust preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke auf ein Symbol, um es zu benutzen und den Rost wegzupolieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click an icon to use it and polish the rust away."
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewStarts" : {
+      "comment" : "Timeline stage: the first visible rust.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erster Rost"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First rust"
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewTitle" : {
+      "comment" : "Accessibility label for the animated Icon Rust preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rost-Vorschau"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust preview"
+          }
+        }
+      }
+    },
+    "pinWeatherPrivacyTitle" : {
+      "comment" : "Heading of the Icon Rust privacy row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleibt auf diesem Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stays on this Mac"
+          }
+        }
+      }
+    },
+    "pinWeatherReset" : {
+      "comment" : "Button that replaces unreadable Icon Rust data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon-Rost zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Icon Rust"
+          }
+        }
+      }
+    },
+    "pinWeatherResetHelp" : {
+      "comment" : "Shown when stored Icon Rust data could not be read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherten Rost-Daten sind nicht lesbar. Setze sie zurück, um neu zu beginnen – vorher wird nichts gelöscht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved rust data can't be read. Reset to start fresh; nothing is deleted until you do."
+          }
+        }
+      }
+    },
+    "pinWeatherSampleIcon" : {
+      "comment" : "Accessibility label for a sample icon in the rust preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Beispielsymbol, %lld Tag unbenutzt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Beispielsymbol, %lld Tage unbenutzt"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sample icon, unused for %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sample icon, unused for %lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "pinWeatherSettingsHelp" : {
+      "comment" : "Footnote on the Icon Rust settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur das Symbolbild rostet. Kennzeichen, Indikatoren und Klicks funktionieren wie immer."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the artwork rusts. Badges, indicators, and clicks work as always."
+          }
+        }
+      }
+    },
+    "pinWeatherSettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the Icon Rust settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rost Icon Symbol unbenutzt Anheftung alt verwittern Zeitstempel lokal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rust icon weather unused pin age idle local timestamp"
+          }
+        }
+      }
+    },
+    "pinWeatherStorageFailed" : {
+      "comment" : "Shown when Icon Rust usage times could not be saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzungszeiten konnten nicht gespeichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save usage times."
+          }
+        }
+      }
+    },
+    "pinWeatherTitle" : {
+      "comment" : "Feature name for rust on unused pinned icons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon-Rost"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon Rust"
+          }
+        }
+      }
+    },
+    "pinWeatherUnusedDays" : {
+      "comment" : "Label above the slider for unused days before rust begins; followed by a day count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rost beginnt nach"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust begins after"
+          }
+        }
+      }
+    },
     "portal.capturedAt" : {
       "comment" : "Label before localized date and time of the retained frame.",
       "extractionState" : "manual",
@@ -20303,6 +20891,24 @@
         }
       }
     },
+    "settingsFeaturePinWeatherSubtitle" : {
+      "comment" : "Description of the Icon Rust feature on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeheftete Symbole, die du liegen lässt, rosten langsam."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinned icons you leave alone slowly rust."
+          }
+        }
+      }
+    },
     "settingsFeaturesKeywords" : {
       "comment" : "Space-separated search synonyms for the Features section. Includes the name of everything it contains.",
       "extractionState" : "manual",
@@ -20310,13 +20916,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop"
           }
         }
       }

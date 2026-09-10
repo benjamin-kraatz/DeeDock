@@ -1,5 +1,22 @@
 # DeeDock acceptance record
 
+## DEE-44 rust on unused pins
+
+Implemented on `feature/dee-44`. Pins take a gentle rust after N unused days. Last-used times are written only when a pin is used from DDock (open, hide, spring-open, open files, open or reveal a folder). Hover, magnification, Downloads, Shelf, Trash, and apps launched outside DDock do not write timestamps. Missing times evaluate as now, so existing pins do not rust on upgrade. Using a pin writes now and the rust clears.
+
+Settings live in **Settings → Features → Pin Weather**, not in `DockSettings`, so the threshold is app-wide and parallel slices do not share that document. Weather is on by default at 30 unused days (1...90). Rust starts at a 0.32 blush on day N and reaches 1 after another N days. The look is SwiftUI Canvas oxide (no Metal). Timestamps stay in `dock.pin-weather.v1`. Corrupt bytes freeze edits and are not overwritten.
+
+This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
+
+### Required hands-on acceptance
+
+- Leave a pin unused past the threshold (or set Unused days to 1 and wait). Confirm a quiet rust, not an error badge. Using the pin restores it.
+- Confirm running-only apps, Downloads, Shelf, and Trash do not rust. Confirm an app opened from Spotlight does not clear rust on its pin.
+- Change Unused days and the enable toggle. Confirm rust appears or disappears without a restart.
+- Reset last-used times. Confirm rust stays off until pins sit unused again.
+- Confirm timestamps are not uploaded and that Screen Time is unused.
+- Exercise VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and auto-hide on a weathered pin.
+
 ## DEE-33 Dock Sims / pet mini-game
 
 Implemented on `cursor/dee-33-dock-sims-af28`. Settings → Features → Dock Sims is off by default. When it is on, each favorite application pin shows a mood mark and a small idle motion (playful bounce, content breathe, hungry or lonely sway). Intensity is a 15–100% slider. Feed, Cheer, and Settle live on the pin’s context menu and VoiceOver actions. Settle and **Reset moods** undo care without unpinning. Turning Sims off hides overlays and keeps pets. Storage is `dock.sims.v1` in UserDefaults. Debug builds add a **Simulate time** card that advances a session-only care clock (+1 / +2 / +6 / +8 hours) so moods can be checked without waiting; the offset is not persisted. Corrupt bytes freeze edits until an explicit reset. There is no network path and no rumour feed (DEE-43).
