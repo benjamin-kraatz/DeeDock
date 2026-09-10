@@ -182,7 +182,7 @@ nonisolated struct DockLocalHistoryDocument: Codable, Equatable, Sendable {
 }
 
 /// Shared bounds for the local history document. Keep writer and decoder in lockstep.
-enum DockLocalHistoryLimits {
+nonisolated enum DockLocalHistoryLimits {
     static let maximumEvents = 500
     static let retention: TimeInterval = 90 * 86_400
     static let maximumEncodedBytes = 4_000_000

@@ -81,7 +81,7 @@ nonisolated enum DockSimsCareAction: String, CaseIterable, Equatable, Sendable {
 }
 
 /// Shared bounds for the local Sims document and the care-loop clock.
-enum DockSimsLimits {
+nonisolated enum DockSimsLimits {
     static let version = 1
     static let maximumPets = 256
     static let maximumPinIDLength = 4096
