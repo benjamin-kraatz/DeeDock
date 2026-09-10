@@ -104,7 +104,6 @@ final class DockLocalHistoryStore {
 
     /// Replaces a corrupt document after an explicit reset. Recording starts enabled.
     func reset() {
-        lastSession = lastSession
         document = DockLocalHistoryDocument()
         requiresReset = false
         storageFailed = false

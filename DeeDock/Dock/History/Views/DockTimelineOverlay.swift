@@ -259,7 +259,7 @@ private enum DockTimelinePreviewData {
     }
 
     static func presentation(progress: Double = 1,
-                             events: [DockLocalHistoryEvent] = DockTimelinePreviewData.events,
+                             events: [DockLocalHistoryEvent],
                              recordingEnabled: Bool = true) -> DockTimelinePresentation {
         DockTimelinePresentation(
             isActive: true,
@@ -325,10 +325,8 @@ private struct DockTimelinePreviewHost: View {
     DockTimelinePreviewHost(edge: .right, progress: 0.2)
 }
 
-#Preview("Dark, reduced motion and transparency") {
+#Preview("Dark") {
     DockTimelinePreviewHost(progress: 0.8)
-        .environment(\.accessibilityReduceMotion, true)
-        .environment(\.accessibilityReduceTransparency, true)
         .preferredColorScheme(.dark)
 }
 #endif

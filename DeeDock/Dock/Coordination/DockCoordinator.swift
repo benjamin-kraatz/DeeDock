@@ -87,7 +87,6 @@ final class DockCoordinator {
             base: FoundationModelsSemanticStackOrganizer()
         )
         timeline = DockTimelineController(history: localHistory)
-        timeline.onEnd = { [weak self] in self?.endFocus(restore: true) }
         focusPopover = FocusSessionCoordinator(focus: focusSession, presenter: popovers)
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
         fusion = FusionCoordinator(shelf: shelf)
@@ -106,6 +105,7 @@ final class DockCoordinator {
             guard !Task.isCancelled, candidates.count >= 4 else { return nil }
             return ShelfSemanticRequestBuilder.request(candidates: candidates)
         }
+        timeline.onEnd = { [weak self] in self?.endFocus(restore: true) }
     }
 
     func start() {

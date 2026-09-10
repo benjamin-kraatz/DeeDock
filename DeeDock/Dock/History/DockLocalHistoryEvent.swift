@@ -88,17 +88,17 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
     /// Glance title shown while scrubbing. App and folder names stay untranslated.
     var glanceTitle: LocalizedStringResource {
         let subject = String((subjectName ?? "").prefix(512))
-        switch kind {
-        case .pinAdded: .timelineEventPinAdded(subject: subject)
-        case .pinRemoved: .timelineEventPinRemoved(subject: subject)
-        case .pinMoved: .timelineEventPinMoved(subject: subject)
-        case .pinsReordered: .timelineEventPinsReordered
-        case .sessionStarted: .timelineEventSessionStarted(subject: subject)
-        case .sessionPaused: .timelineEventSessionPaused
-        case .sessionResumed: .timelineEventSessionResumed
-        case .sessionFinished: .timelineEventSessionFinished
-        case .sessionDismissed: .timelineEventSessionDismissed
-        case .unrecognized: .timelineEventUnrecognized
+        return switch kind {
+        case .pinAdded: LocalizedStringResource.timelineEventPinAdded(subject: subject)
+        case .pinRemoved: LocalizedStringResource.timelineEventPinRemoved(subject: subject)
+        case .pinMoved: LocalizedStringResource.timelineEventPinMoved(subject: subject)
+        case .pinsReordered: LocalizedStringResource.timelineEventPinsReordered
+        case .sessionStarted: LocalizedStringResource.timelineEventSessionStarted(subject: subject)
+        case .sessionPaused: LocalizedStringResource.timelineEventSessionPaused
+        case .sessionResumed: LocalizedStringResource.timelineEventSessionResumed
+        case .sessionFinished: LocalizedStringResource.timelineEventSessionFinished
+        case .sessionDismissed: LocalizedStringResource.timelineEventSessionDismissed
+        case .unrecognized: LocalizedStringResource.timelineEventUnrecognized
         }
     }
 
