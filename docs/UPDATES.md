@@ -10,7 +10,9 @@ The `DeeDock-TestFlight` scheme compiles the same app with `TESTFLIGHT` instead 
 
 Esi is the release captain. Esi triggers and watches the [Release workflow](../.github/workflows/release.yml) nightly at 23:00 Europe/Berlin and on an explicit ship. Nara and other bots do not cut releases, hold Sparkle or signing secrets, or publish GitHub Latest.
 
-`intent=ship` archives the `DeeDock` scheme, exports with Developer ID, notarizes with Apple ID, staples, writes `appcast.xml`, and opens a draft GitHub Release. It does not publish Latest unless Esi sets `publish_latest`. The first smoke path stays draft-only. The [manual archive path](#prepare-the-release) stays valid.
+`intent=watch` and the nightly schedule run only on `ubuntu-latest`. They print the version, secret presence, and notes check. They do not start `xcode-27`.
+
+`intent=ship` preflights on Linux, then archives on `xcode-27`, then opens a draft GitHub Release back on `ubuntu-latest`. It does not publish Latest unless Esi sets `publish_latest`. The first smoke path stays draft-only. The [manual archive path](#prepare-the-release) stays valid.
 
 GitHub Release body is English only. Sparkle release notes are bilingual German and English. See [Release notes](#release-notes).
 
@@ -143,29 +145,33 @@ Existing `docs/releases/0.2.0.md` is German only. Add an `## English` section on
 
 ## Release pipeline
 
-The [Release workflow](../.github/workflows/release.yml) runs the archive, Developer ID export, Apple ID notarization, staple, `generate_appcast`, and draft sequence above.
+The [Release workflow](../.github/workflows/release.yml) splits cheap checks from the Mac archive.
 
 Esi triggers it in two ways:
 
 1. Nightly watch at 23:00 Europe/Berlin. The workflow uses cron `0 23 * * *` with `timezone: Europe/Berlin`. GitHub follows Central European Time in winter (23:00 Berlin is 22:00 UTC) and Central European Summer Time in summer (23:00 Berlin is 21:00 UTC). Do not read that cron as 23:00 UTC.
 2. Explicit ship from **Actions → Release → Run workflow**, with intent `ship`. Leave **publish_latest** unchecked.
 
-Scheduled runs always use intent `watch`. They print version, secret-presence status, and the runner's Xcode version. They do not archive or publish.
+**watch** (`ubuntu-latest`). Scheduled runs and `intent=watch` use this job only. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the six secrets by name, and checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section. It does not archive, import a certificate, or start `xcode-27`.
 
-`ship` does this, in order:
+**archive** (`xcode-27`). `intent=ship` only, after watch succeeds. Watch fails first if a secret or the bilingual notes file is missing, so the Mac job does not start. Then, in order:
 
-1. Fail if any of the [six secrets](#secrets-checklist) is missing, or if the runner's Xcode major version or macOS SDK is below 27.
+1. Confirm the image has Xcode 27 and the macOS 27 SDK.
 2. Resolve Sparkle tools from the pinned 2.9.6 package (`generate_appcast` under the cloned `artifacts/sparkle` tree).
 3. Import `DEVELOPER_ID_APPLICATION_CERTIFICATE` into a temporary keychain. The job deletes that keychain when it finishes.
 4. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime. This is not TestFlight.
 5. Export with a generated Developer ID options plist, then `xcrun notarytool submit ... --apple-id --password --team-id --wait`, then `stapler staple`. Nested Sparkle code stays signed. The job does not weaken hardened runtime.
 6. Verify `codesign --deep --strict` and `stapler validate`.
-7. Build `DDock.zip` with `ditto`, copy bilingual notes to `DDock.md` when `docs/releases/<MARKETING_VERSION>.md` exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`.
-8. Open a draft GitHub Release for `v<MARKETING_VERSION>` with an English-only body. Upload `DDock.zip`, `appcast.xml`, and `DDock.md` when that notes file was staged. The job refuses to overwrite a published or Latest release.
+7. Build `DDock.zip` with `ditto`, copy bilingual notes to `DDock.md`, and run `generate_appcast --ed-key-file - --maximum-deltas 0`.
+8. Upload `DDock.zip`, `appcast.xml`, `DDock.md`, and version metadata as a workflow artifact.
+
+Do not run those archive steps in parallel.
+
+**draft** (`ubuntu-latest`). After archive. Downloads the artifacts and opens a draft GitHub Release for `v<MARKETING_VERSION>` with an English-only body. Upload `DDock.zip`, `appcast.xml`, and `DDock.md`. The job refuses to overwrite a published or Latest release. `xcode-27` does not call `gh`.
 
 `publish_latest` defaults to false. Turn it on only after Benn confirms a Latest cut. The first smoke path must stay a draft.
 
-The Release job runs on `xcode-27`. That is the intended image. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, ship fails and tells Esi and Benn. Developer ID import uses a temporary keychain on that runner.
+`xcode-27` is Benn's Mac image. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, archive fails and tells Esi and Benn. Developer ID import uses a temporary keychain on that runner.
 
 On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline`. Esi may add label `Bot-Nara` once if Nara should fix pipeline code. Nara does not cut the release, hold secrets, or publish Latest.
 
