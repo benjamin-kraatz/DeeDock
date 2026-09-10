@@ -38,16 +38,14 @@ struct DockSampleView: View {
                         Image(systemName: symbols[index % symbols.count])
                             .font(.system(size: sizes[index] * 0.4, weight: .medium)).foregroundStyle(.white)
                     }
-                    // Application artwork carries its own transparent margin. Samples need one
-                    // drawn, or the shader styles have nowhere to put their light.
+                    // Application artwork carries its own transparent margin. Samples keep one
+                    // so icon decorations sit where they would on a real tile.
                     .padding(sizes[index] * 0.08)
                     .frame(width: rect.width, height: rect.height)
                     .modifier(DockIconIndicator(style: runningIndicatorStyle,
                                                 running: index.isMultiple(of: 2), size: sizes[index],
-                                                variant: DockIndicatorVariant(identity: symbols[index % symbols.count],
-                                                                              accent: colors[index % colors.count]),
-                                                animated: appearanceSettings.animateIndicators && !reduceMotion,
-                                                reduceTransparency: reduceTransparencyOverride))
+                                                variant: DockIndicatorVariant(identity: symbols[index % symbols.count]),
+                                                animated: appearanceSettings.animateIndicators && !reduceMotion))
                     .opacity(opacity.icons)
                     .position(x: rect.midX, y: rect.midY)
                 if index.isMultiple(of: 2) {

@@ -3,60 +3,25 @@ import SwiftUI
 /// Running-state artwork inside the icon square. It never changes layout or hit regions.
 /// Apply before keyboard focus and launch overlays so those interaction states stay on top.
 ///
-/// The drawn styles are decoration laid over any icon. The Metal styles instead read the
-/// icon through `DockIconAura`, so they vary per application and can animate; `variant` and
-/// `animated` are ignored by every other style.
+/// These styles are decoration laid over any icon. `variant` and `animated` are used only
+/// by Stardust; every other style ignores them.
 struct DockIconIndicator: ViewModifier {
     let style: DockSettings.RunningIndicatorStyle
     let running: Bool
     let size: CGFloat
     var variant: DockIndicatorVariant = .neutral
     var animated: Bool = false
-    /// Inert preview override; live icons follow the system preference.
-    var reduceTransparency: Bool? = nil
-    @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
-        let opaque = reduceTransparency ?? systemReduceTransparency
-        let moving = animated && !reduceMotion
-        if running, style.usesIconAura {
-            content.modifier(DockIconAura(style: style, size: size, opaque: opaque,
-                                          variant: variant, animated: moving))
-        } else {
-            content
-                .background {
-                    if running {
-                        DockIndicatorBackdrop(style: style, size: size, opaque: opaque)
-                            .accessibilityHidden(true).allowsHitTesting(false)
-                    }
+        content
+            .overlay {
+                if running {
+                    DockIndicatorForeground(style: style, size: size, variant: variant,
+                                            animated: animated && !reduceMotion)
+                        .accessibilityHidden(true).allowsHitTesting(false)
                 }
-                .overlay {
-                    if running {
-                        DockIndicatorForeground(style: style, size: size, variant: variant, animated: moving)
-                            .accessibilityHidden(true).allowsHitTesting(false)
-                    }
-                }
-        }
-    }
-}
-
-/// Backlighting and offset silhouettes stay behind the application artwork.
-private struct DockIndicatorBackdrop: View {
-    let style: DockSettings.RunningIndicatorStyle
-    let size: CGFloat
-    let opaque: Bool
-
-    var body: some View {
-        ZStack {
-            switch style {
-            default:
-                EmptyView()
             }
-        }
-        .frame(width: size, height: size)
-        // Even blurred artwork must stay inside its own icon when item spacing is zero.
-        .clipped()
     }
 }
 

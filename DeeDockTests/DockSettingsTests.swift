@@ -79,8 +79,15 @@ struct DockSettingsTests {
     @Test("Withdrawn indicator styles migrate instead of failing the whole document")
     func retiredIndicatorStyles() throws {
         let decoder = JSONDecoder()
-        for (retired, replacement) in [("neon", DockSettings.RunningIndicatorStyle.plasma),
-                                       ("aura", .solarFlare)] {
+        for (retired, replacement) in [("neon", DockSettings.RunningIndicatorStyle.dot),
+                                       ("aura", .dot),
+                                       ("plasma", .dot),
+                                       ("hologram", .dot),
+                                       ("solarFlare", .dot),
+                                       ("prism", .dot),
+                                       ("lavaChrome", .dot),
+                                       ("singularity", .dot),
+                                       ("glitch", .dot)] {
             let decoded = try decoder.decode(DockSettings.RunningIndicatorStyle.self,
                                              from: Data("\"\(retired)\"".utf8))
             #expect(decoded == replacement)
@@ -88,11 +95,11 @@ struct DockSettingsTests {
         // A whole settings document carrying a withdrawn style still decodes, so an existing
         // installation is not locked out of its own preferences.
         var document = DockSettings.defaults
-        document.runningIndicatorStyle = .prism
+        document.runningIndicatorStyle = .dot
         var json = try #require(String(data: try JSONEncoder().encode(document), encoding: .utf8))
-        json = json.replacingOccurrences(of: "\"prism\"", with: "\"neon\"")
+        json = json.replacingOccurrences(of: "\"dot\"", with: "\"plasma\"")
         let migrated = try decoder.decode(DockSettings.self, from: Data(json.utf8))
-        #expect(migrated.runningIndicatorStyle == .plasma)
+        #expect(migrated.runningIndicatorStyle == .dot)
         #expect(throws: (any Error).self) {
             try decoder.decode(DockSettings.RunningIndicatorStyle.self, from: Data("\"nonsense\"".utf8))
         }

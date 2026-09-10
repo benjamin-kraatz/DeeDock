@@ -4,17 +4,15 @@ import SwiftUI
 struct RunningIndicatorPicker: View {
     let edge: DockEdge
     @Binding var selection: DockSettings.RunningIndicatorStyle
-    /// Shows the shader styles as they will actually appear once chosen.
+    /// Shows Stardust in motion when animation is on.
     var animated = false
-    var reduceTransparency: Bool? = nil
 
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), spacing: 8)], spacing: 8) {
             ForEach(DockSettings.RunningIndicatorStyle.settingsOptions) { option in
                 Button { selection = option.value } label: {
                     VStack(spacing: 8) {
-                        RunningIndicatorThumbnail(style: option.value, edge: edge, animated: animated,
-                                                  reduceTransparency: reduceTransparency)
+                        RunningIndicatorThumbnail(style: option.value, edge: edge, animated: animated)
                             .frame(height: 56)
                         Text(option.title).font(.callout.weight(.medium))
                             .multilineTextAlignment(.center)
@@ -40,7 +38,6 @@ private struct RunningIndicatorThumbnail: View {
     let style: DockSettings.RunningIndicatorStyle
     let edge: DockEdge
     var animated = false
-    var reduceTransparency: Bool? = nil
     private let size: CGFloat = 44
 
     var body: some View {
@@ -59,8 +56,8 @@ private struct RunningIndicatorThumbnail: View {
                 .padding(4)
                 .frame(width: size, height: size)
                 .modifier(DockIconIndicator(style: style, running: true, size: size,
-                                            variant: DockIndicatorVariant(identity: style.rawValue, accent: .indigo),
-                                            animated: animated, reduceTransparency: reduceTransparency))
+                                            variant: DockIndicatorVariant(identity: style.rawValue),
+                                            animated: animated))
                 .position(center)
             DockRunningIndicator(style: style, edge: edge).position(marker)
         }
@@ -71,16 +68,16 @@ private struct RunningIndicatorThumbnail: View {
 
 #if DEBUG
 #Preview("Indicator gallery") {
-    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .singularity
+    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .stardust
     ScrollView {
         RunningIndicatorPicker(edge: .bottom, selection: $selection, animated: true)
     }.frame(width: 540, height: 460).preferredColorScheme(.dark)
 }
 
-#Preview("Side indicators, dark and reduced transparency") {
-    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .lavaChrome
+#Preview("Side indicators, dark") {
+    @Previewable @State var selection: DockSettings.RunningIndicatorStyle = .orbit
     ScrollView {
-        RunningIndicatorPicker(edge: .left, selection: $selection, reduceTransparency: true)
+        RunningIndicatorPicker(edge: .left, selection: $selection)
     }.frame(width: 440, height: 540).preferredColorScheme(.dark)
 }
 #endif
