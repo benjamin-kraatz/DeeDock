@@ -6,23 +6,27 @@ struct LauncherToolbar: View {
     @Bindable var state: LauncherState
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 12) {
-                LauncherSearchKindPicker(launcher: state)
-                kindActionsOrFilters
-                Spacer(minLength: 8)
-                if !hasDiscreteKindSelected { options }
-                robi
-            }
-            VStack(alignment: .leading, spacing: 10) {
+        if state.usesFileActions {
+            EmptyView()
+        } else {
+            ViewThatFits(in: .horizontal) {
                 HStack(spacing: 12) {
                     LauncherSearchKindPicker(launcher: state)
                     kindActionsOrFilters
-                }
-                HStack {
+                    Spacer(minLength: 8)
                     if !hasDiscreteKindSelected { options }
-                    Spacer()
                     robi
+                }
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 12) {
+                        LauncherSearchKindPicker(launcher: state)
+                        kindActionsOrFilters
+                    }
+                    HStack {
+                        if !hasDiscreteKindSelected { options }
+                        Spacer()
+                        robi
+                    }
                 }
             }
         }

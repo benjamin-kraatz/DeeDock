@@ -81,7 +81,7 @@ final class DockPanelController {
         panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
         panel.resignedKey = { [weak self] in
             guard let self else { return }
-            if launcher.isPresented { launcherPresentation.close(restoreFocus: false) }
+            if launcher.isPresented { launcherPresentation.noteWindowResignedKey() }
             else { resignedFocus?() }
         }
         interaction.idleFade.refreshInput = { [weak self] in self?.updatePointer() }
@@ -271,10 +271,22 @@ final class DockPanelController {
     }
 
     func containsDragRegion(_ point: CGPoint) -> Bool {
+        if containsLauncherFileDrop(point) { return true }
         guard !stopped, !launcher.isPresented, let geometry else { return false }
         return geometry.activation.retention.contains(point) || restingDragBounds.contains(point)
             || (visibility.exposesContent && interaction.containsDockPoint(contentPoint(point)))
     }
+
+    /// Drops land on the glass, not the transparent presentation margin.
+    func containsLauncherFileDrop(_ point: CGPoint) -> Bool {
+        guard !stopped, launcher.isPresented, launcher.contentVisible else { return false }
+        let window = panel.frame
+        guard window.contains(point) else { return false }
+        let local = CGPoint(x: point.x - window.minX, y: window.maxY - point.y)
+        return launcher.contentRect.contains(local)
+    }
+
+    func launcherTarget(at point: CGPoint) -> Bool { utilityTarget(.launcher, at: point) }
 
     /// Transparent source callout space must not extend the deliberate unpin threshold.
     func protectsDragRemoval(at point: CGPoint, isSource: Bool) -> Bool {
@@ -470,9 +482,13 @@ final class DockPanelController {
     }
 
     /// Opening is deliberate focus acquisition; hover and ordinary dock geometry remain nonactivating.
-    private func openLauncher() {
+    func openLauncher(files: LauncherFileAdoption? = nil) {
         guard !stopped, let display = lastDisplay, let settings = lastSettings else { return }
-        if launcher.isPresented { launcherPresentation.close(); return }
+        if launcher.isPresented {
+            if let files { launcher.adoptFiles(files) }
+            else { launcherPresentation.close() }
+            return
+        }
         let origin = restingDragBounds
         let previousApplication = launcherWillOpen?() ?? NSWorkspace.shared.frontmostApplication
         invalidateDrag?()
@@ -486,6 +502,7 @@ final class DockPanelController {
             target: LauncherGeometry.frame(visibleFrame: display.visibleFrame, origin: origin, edge: settings.edge),
             dockWindow: geometry?.windowFrame ?? origin,
             pins: store.pins.compactMap(\.application), previousApplication: previousApplication)
+        if let files { launcher.adoptFiles(files) }
     }
 
     func closeLauncher() { launcherPresentation.close(animated: false, restoreFocus: false) }

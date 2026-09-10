@@ -13907,6 +13907,1122 @@
         }
       }
     },
+    "launcherFile.acceptsFiles" : {
+      "comment" : "Marks a pinned Shortcut as a user-configured file-input action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewählte Dateien übergeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pass selected files"
+          }
+        }
+      }
+    },
+    "launcherFile.actionCount" : {
+      "comment" : "Number of file actions matching the current filter and query.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Aktion"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Aktionen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld action"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld actions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "launcherFile.cancelled" : {
+      "comment" : "Copy or handoff stopped because the user cancelled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgebrochen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelled."
+          }
+        }
+      }
+    },
+    "launcherFile.chooseFiles" : {
+      "comment" : "Opens the native file picker for Launcher file actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien wählen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Files…"
+          }
+        }
+      }
+    },
+    "launcherFile.chooseFilesTitle" : {
+      "comment" : "Native picker title for selecting Launcher file-action inputs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Files"
+          }
+        }
+      }
+    },
+    "launcherFile.chooseFolder" : {
+      "comment" : "Action that copies the current files into a folder the user picks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner wählen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Folder…"
+          }
+        }
+      }
+    },
+    "launcherFile.chooseFolderDetail" : {
+      "comment" : "Explains that choosing a folder copies files and can save the destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert die ausgewählten Dateien in einen Ordner. Der Ordner kann als Ziel gespeichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy the selected files into a folder. The folder can be saved as a destination."
+          }
+        }
+      }
+    },
+    "launcherFile.chooseFolderTitle" : {
+      "comment" : "Native picker title for choosing a copy destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ordner kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy to Folder"
+          }
+        }
+      }
+    },
+    "launcherFile.clear" : {
+      "comment" : "Clears the current file batch and returns to ordinary Launcher search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zur Suche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to Search"
+          }
+        }
+      }
+    },
+    "launcherFile.completed" : {
+      "comment" : "The last deliberate file action finished successfully.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done."
+          }
+        }
+      }
+    },
+    "launcherFile.copied" : {
+      "comment" : "Successful copy count and destination name. First value is the number copied; second is the destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Objekte nach %2$@ kopiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied %1$lld items to %2$@."
+          }
+        }
+      }
+    },
+    "launcherFile.copyAction" : {
+      "comment" : "Short action label for copying into a bookmarked folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "launcherFile.copyFailed" : {
+      "comment" : "Copy produced no new files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wurde nichts kopiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing was copied."
+          }
+        }
+      }
+    },
+    "launcherFile.copyIntoSelf" : {
+      "comment" : "A file cannot be copied into itself or one of its own folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Ziel liegt in diesem Objekt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The destination is inside this item."
+          }
+        }
+      }
+    },
+    "launcherFile.copyToFolder" : {
+      "comment" : "Copies selected files into this saved folder without replacing existing names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In diesen Ordner kopieren. Vorhandene Dateien bleiben erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy into this folder. Existing files are kept."
+          }
+        }
+      }
+    },
+    "launcherFile.destinationAdd" : {
+      "comment" : "Adds a bookmarked copy destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner hinzufügen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Folder…"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationBookmarkFailed" : {
+      "comment" : "Creating or repairing a destination bookmark failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock konnte den Zugriff auf diesen Ordner nicht speichern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock could not save access to that folder."
+          }
+        }
+      }
+    },
+    "launcherFile.destinationName" : {
+      "comment" : "Text field for the user-visible destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationRemove" : {
+      "comment" : "Removes a saved destination bookmark without deleting folder contents.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationRename" : {
+      "comment" : "Starts renaming a saved destination.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationRepair" : {
+      "comment" : "Re-chooses the folder for a stale destination bookmark.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reparieren…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repair…"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationSaveName" : {
+      "comment" : "Saves the edited destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namen sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Name"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationsHelp" : {
+      "comment" : "Explains that saved destinations are local bookmarks and removal never deletes files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Ziele sind lokale Lesezeichen. Entfernen löscht weder den Ordner noch seinen Inhalt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved destinations are local bookmarks. Removing one never deletes the folder or its contents."
+          }
+        }
+      }
+    },
+    "launcherFile.destinationsLimit" : {
+      "comment" : "The bounded destination list is full.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst 20 Ordnerziele speichern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can save 20 folder destinations."
+          }
+        }
+      }
+    },
+    "launcherFile.destinationsReset" : {
+      "comment" : "Discards unreadable destination storage after confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziele zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Destinations"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationsResetHelp" : {
+      "comment" : "Confirms that reset clears saved destinations, not folder contents.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dadurch werden gespeicherte Ziele aus DDock entfernt. Ordner auf der Festplatte bleiben erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes saved destinations from DDock. Folders on disk are not deleted."
+          }
+        }
+      }
+    },
+    "launcherFile.destinationsStorageFailed" : {
+      "comment" : "Saved destination bytes could not be read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Ordnerziele konnten nicht gelesen werden. Setze sie zurück oder lasse die gespeicherten Daten für eine Wiederherstellung unberührt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved folder destinations could not be read. Reset to continue, or leave the stored data for recovery."
+          }
+        }
+      }
+    },
+    "launcherFile.destinationsTitle" : {
+      "comment" : "Settings card for bookmarked Launcher copy destinations.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordnerziele"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder destinations"
+          }
+        }
+      }
+    },
+    "launcherFile.destinationUnavailable" : {
+      "comment" : "A saved destination bookmark no longer resolves.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Ordner ist nicht verfügbar. Repariere das Lesezeichen, um hierhin zu kopieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This folder is unavailable. Repair the bookmark to copy here."
+          }
+        }
+      }
+    },
+    "launcherFile.drop" : {
+      "comment" : "Native drag feedback when files are over the Launcher tile or open panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Starter verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use in Launcher"
+          }
+        }
+      }
+    },
+    "launcherFile.inputCount" : {
+      "comment" : "Number of files currently supplied to Launcher file actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "launcherFile.inputLimit" : {
+      "comment" : "The current batch exceeded the bounded input count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur die ersten 50 Dateien wurden übernommen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the first 50 files were kept."
+          }
+        }
+      }
+    },
+    "launcherFile.inputMissing" : {
+      "comment" : "A supplied file no longer exists or cannot be opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "launcherFile.kind" : {
+      "comment" : "Accessible label for the file-action kind picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionsart"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action type"
+          }
+        }
+      }
+    },
+    "launcherFile.kindAll" : {
+      "comment" : "Shows every suitable file action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        }
+      }
+    },
+    "launcherFile.kindApps" : {
+      "comment" : "File-action kind for opening with an installed app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
+    },
+    "launcherFile.kindFolders" : {
+      "comment" : "File-action kind for copy destinations.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders"
+          }
+        }
+      }
+    },
+    "launcherFile.kindShortcuts" : {
+      "comment" : "File-action kind for pinned Shortcuts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcuts"
+          }
+        }
+      }
+    },
+    "launcherFile.noActions" : {
+      "comment" : "Empty file-action list title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine passenden Aktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No matching actions"
+          }
+        }
+      }
+    },
+    "launcherFile.noActionsDetail" : {
+      "comment" : "Empty file-action list explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche anders, wähle andere Dateien oder füge in den Einstellungen ein Ordnerziel hinzu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try another search, choose different files, or add a folder destination in Settings."
+          }
+        }
+      }
+    },
+    "launcherFile.openWithApp" : {
+      "comment" : "App-level open. Does not attach files to a specific window or project.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit dieser App öffnen. Dateien werden keinem bestimmten Fenster oder Projekt zugeordnet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open with this app. Files are not attached to a specific window or project."
+          }
+        }
+      }
+    },
+    "launcherFile.openWithMixed" : {
+      "comment" : "App declares support for only some files. First value is supported count; second is the batch size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld von %2$lld Dateien mit dieser App öffnen. Nicht unterstützte Dateien bleiben sichtbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open %1$lld of %2$lld files with this app. Unsupported files stay listed."
+          }
+        }
+      }
+    },
+    "launcherFile.openWithNone" : {
+      "comment" : "The app does not declare support for these files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App gibt keine Unterstützung für diese Dateien an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app does not declare support for these files."
+          }
+        }
+      }
+    },
+    "launcherFile.passToShortcut" : {
+      "comment" : "Honest Shortcut action. Compatibility is not verified.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewählte Dateien an diesen Kurzbefehl übergeben. DDock kann nicht prüfen, was er akzeptiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pass selected files to this Shortcut. DDock cannot verify what it accepts."
+          }
+        }
+      }
+    },
+    "launcherFile.passToShortcutUnconfigured" : {
+      "comment" : "Pinned Shortcut that the user has not marked as a file-input action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewählte Dateien an diesen Kurzbefehl übergeben. Markiere ihn in den Einstellungen als Dateiaktion, wenn du ihn so verwendest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pass selected files to this Shortcut. Mark it as a file action in Settings if you use it this way."
+          }
+        }
+      }
+    },
+    "launcherFile.pending" : {
+      "comment" : "A deliberate file action is still running.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Arbeit…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Working…"
+          }
+        }
+      }
+    },
+    "launcherFile.removeInput" : {
+      "comment" : "Removes one file from the current Launcher batch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove file"
+          }
+        }
+      }
+    },
+    "launcherFile.renamedToAvoidOverwrite" : {
+      "comment" : "Some copies used new names because the destination already had those names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Dateien wurden umbenannt, damit vorhandene Zieldateien nicht ersetzt wurden:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some files were renamed so existing destination files were not replaced:"
+          }
+        }
+      }
+    },
+    "launcherFile.replace" : {
+      "comment" : "Replaces the current file batch using the native picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien ersetzen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Files…"
+          }
+        }
+      }
+    },
+    "launcherFile.searchPrompt" : {
+      "comment" : "Search field prompt while file-action mode is active.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionen filtern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter actions"
+          }
+        }
+      }
+    },
+    "launcherFile.skippedUnsupported" : {
+      "comment" : "Names that were not opened because the app did not declare support. The value is the formatted name list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht geöffnet: %@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not opened: %@."
+          }
+        }
+      }
+    },
+    "launcherFile.sourceDrop" : {
+      "comment" : "Explains that the current files came from a drop onto Launcher.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf den Starter gelegt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dropped onto Launcher"
+          }
+        }
+      }
+    },
+    "launcherFile.sourcePicker" : {
+      "comment" : "Explains that the current files came from the native picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit „Dateien wählen“ ausgewählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chosen with Choose Files"
+          }
+        }
+      }
+    },
+    "launcherFile.sourceShelf" : {
+      "comment" : "Explains that the current files came from a Shelf selection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus der Ablage"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From Shelf"
+          }
+        }
+      }
+    },
+    "launcherFile.unavailableInputs" : {
+      "comment" : "The batch has no files DDock can currently open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine dieser Dateien ist verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None of these files are available."
+          }
+        }
+      }
+    },
+    "launcherFile.unavailableSummary" : {
+      "comment" : "How many supplied files are missing or unreadable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei ist nicht verfügbar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien sind nicht verfügbar"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file is unavailable"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files are unavailable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "launcherFile.unsupportedList" : {
+      "comment" : "Names this app does not declare support for. The value is the formatted name list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht angegeben für: %@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not declared for: %@."
+          }
+        }
+      }
+    },
+    "launcherFile.useInLauncher" : {
+      "comment" : "Shelf command that opens Launcher with the current selection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Starter verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use in Launcher"
+          }
+        }
+      }
+    },
     "launcherFilter" : {
       "comment" : "Accessible label for app filter picker.",
       "extractionState" : "manual",

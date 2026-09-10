@@ -27,10 +27,17 @@ final class LauncherState {
     /// they keep the position they had while they fade.
     var dockContentOffset = CGSize.zero
     let search = LauncherSearchState()
+    /// File-first actions: open with an app, pass to a Shortcut, or copy to a folder.
+    let fileActions = LauncherFileActionState()
+    /// File-action mode replaces ordinary and mixed search until the batch is cleared.
+    var usesFileActions: Bool { fileActions.isActive }
     /// Whether the launcher shows mixed search results instead of application-only results.
     /// Returns `false` while Robi suggestions are active.
-    var usesMixedResults: Bool { robiIDs == nil && (!query.isEmpty || (search.kind != .all && search.kind != .application)) }
+    var usesMixedResults: Bool {
+        !usesFileActions && robiIDs == nil && (!query.isEmpty || (search.kind != .all && search.kind != .application))
+    }
     var usesGridNavigation: Bool {
+        if usesFileActions { return false }
         guard layout == .grid else { return false }
         guard usesMixedResults else { return true }
         guard let id = search.selectedID else { return search.visible.first?.application != nil }
@@ -81,6 +88,7 @@ final class LauncherState {
     init(catalog: ApplicationCatalog, iconProvider: ((LauncherApplication) -> NSImage)? = nil) {
         self.catalog = catalog
         self.iconProvider = iconProvider
+        fileActions.catalog = catalog
     }
 
     var results: [LauncherApplication] {
@@ -129,6 +137,8 @@ final class LauncherState {
     func begin(pins: [ApplicationReference], foregroundID: String? = nil) {
         presentationGeneration = UUID()
         search.begin()
+        fileActions.resetForPresentation()
+        fileActions.didOpen = { [weak self] in self?.didOpen?() }
         initialPinnedIDs = Set(pins.map(\.id))
         query = ""; error = nil; selectedID = nil
         suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
@@ -139,6 +149,7 @@ final class LauncherState {
         suggestions.end()
         presentationGeneration = UUID()
         search.stop()
+        fileActions.end()
         cancelRobi(); library.release(owner); icons = [:]
         close = nil; didOpen = nil; error = nil
     }
@@ -161,6 +172,14 @@ final class LauncherState {
         }
     }
 
+    /// Enters file-action mode with an already-owned batch. Drag leases are not copied.
+    func adoptFiles(_ adoption: LauncherFileAdoption) {
+        cancelRobi()
+        query = ""
+        error = nil
+        fileActions.adopt(adoption)
+    }
+
     func togglePin(_ application: LauncherApplication) {
         guard let dockStore else { return }
         let succeeded = pinnedIDs.contains(application.id)
@@ -175,6 +194,7 @@ final class LauncherState {
     }
 
     func openSelection() {
+        if usesFileActions { fileActions.openSelection(); return }
         if usesMixedResults { search.openSelection(); return }
         let items = browseRows.flatMap { $0 }
         if let selectedID {
@@ -190,12 +210,14 @@ final class LauncherState {
 
     func moveSelection(by distance: Int) {
         keyboardNavigationActive = true
+        if usesFileActions { fileActions.moveSelection(by: distance); return }
         if usesMixedResults { search.moveSelection(by: distance); return }
         selectedID = LauncherBrowseNavigation.move(selectedID, distance: distance,
             columns: layout == .grid ? navigationColumns : 1, rows: browseRows.map { $0.map(\.id) })
     }
 
     func askRobi() {
+        guard !usesFileActions else { return }
         cancelRobi()
         guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let token = UUID(); robiGeneration = token

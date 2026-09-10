@@ -35,7 +35,8 @@ final class ActionTilesController {
         changed?()
     }
 
-    /// Starts discovery when Settings or Watch first needs the list. Skips canvas and playground hosts.
+    /// Starts discovery when Settings, Watch, or Launcher file actions first need the list.
+    /// Skips canvas and playground hosts.
     func ensureLoaded() {
         guard !loading, !discovered else { return }
         let environment = ProcessInfo.processInfo.environment
@@ -83,6 +84,12 @@ final class ActionTilesController {
         var next = tiles; next.swapAt(index, target); save(next)
     }
     func reset() { requiresReset = false; save([]) }
+    func setAcceptsFiles(_ id: UUID, _ value: Bool) {
+        guard !requiresReset, let index = tiles.firstIndex(where: { $0.id == id }) else { return }
+        var next = tiles
+        next[index].acceptsFiles = value
+        save(next)
+    }
 
     private func save(_ next: [ActionTile]) {
         do {
@@ -94,8 +101,8 @@ final class ActionTilesController {
 
     /// Runs only after a click, keyboard action, or accepted drop. No uncertain run is retried.
     @discardableResult
-    func run(_ id: UUID, files: DocumentResourceAccess? = nil) -> Bool {
-        tiles.contains(where: { $0.id == id }) && start(id, files: files) { _ in }
+    func run(_ id: UUID, files: DocumentResourceAccess? = nil, finished: (() -> Void)? = nil) -> Bool {
+        tiles.contains(where: { $0.id == id }) && start(id, files: files) { _ in finished?() }
     }
 
     /// One explicit run of a configured Shortcut ID. The Shortcut need not be pinned.

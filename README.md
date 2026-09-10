@@ -73,8 +73,10 @@ The permanent **App Launcher** tile expands the dock into a searchable app panel
 grid and list app browsing plus unified search for apps, windows, Capsules/Breadcrumbs, Shelf files,
 pinned Shortcuts, and Dock Modes. App browsing retains filters, sorting, grouping, and launch history.
 **Ask Robi** uses on-device Apple Intelligence to suggest apps for a task you describe.
-See the [launcher reference](docs/LAUNCHER.md) for controls and discovery limits, and the
-[acceptance notes](docs/ACCEPTANCE.md#dee-8-app-launcher) for validation status.
+With files selected, Launcher can open them with a compatible app, pass them to a pinned
+Shortcut, or copy them into a chosen folder. See the [launcher reference](docs/LAUNCHER.md)
+for controls and discovery limits, and the [acceptance notes](docs/ACCEPTANCE.md#dee-8-app-launcher)
+for validation status.
 
 Optional **App suggestions** learn from local app activity after opt-in under **Settings → Features → App suggestions**.
 An empty Launcher query can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.

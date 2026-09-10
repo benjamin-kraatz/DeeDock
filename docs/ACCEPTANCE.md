@@ -1949,3 +1949,42 @@ Pending hands-on acceptance:
 - Browse into a subfolder and back, dismiss the stack mid-walk, and change directory contents while a walk is running. Confirm cancellation and cache reuse.
 - Check a package, an alias, a symbolic link, a hidden file, an unreadable descendant, and an iCloud placeholder. Confirm no implicit download and no cycle through links.
 - Check English and German copy, VoiceOver values, Reduce Motion, and Reduce Transparency.
+
+## DEE-24: Launcher file actions
+
+Users start with files, then choose an action. **Use in Launcher** from a Shelf selection,
+a drop onto the Launcher tile or open panel, and **Choose Files** all enter the same mode.
+The batch keeps selection order, shows unavailable inputs, and holds the existing
+`DocumentResourceAccess` grant — including Shelf owners and DEE-12 drag leases. Transient
+leases are not persisted.
+
+Declared app support comes from `NSWorkspace.urlsForApplications(toOpen:)`. Mixed batches
+list unsupported names instead of dropping them. App-level open copy says the files are not
+attached to a window or project. Shortcuts use the honest “Pass selected files” wording;
+the existing one-run-per-Shortcut rule is unchanged. Discovery uses `ensureLoaded()` when
+file-action UI appears, matching Settings and Watch. Folder copy never overwrites; conflicts
+get a numbered name and a partial result. Saved destinations are versioned local bookmarks
+(`launcher.file-destinations.v1`) with rename, remove, and repair. Remove deletes the
+bookmark only.
+
+Hover and keyboard highlight do not run an action. One activation shows pending, completed,
+failed, or partial status. Clearing the batch returns to ordinary search. File contents are
+not read to rank actions. Shortcut output is not captured to Shelf.
+
+### Cases worth automated coverage when authorized
+
+- Shelf selection order, Finder drops, and the native picker produce the same owned batch.
+- Heterogeneous app support stays visible; incompatible files are not omitted at execution.
+- Name collisions and a later copy failure leave destination and source files in place.
+- Stale destination bookmarks, missing files, and a removed Shortcut fail without retry.
+- Escape, close, and a second Return during an in-flight action do not start another run.
+- Drag-lease and nested Shelf/folder grants survive the panel transition and cancel cleanly.
+- Choose Files and Choose Folder keep the launcher presented until the panel confirms or cancels.
+
+### Delivery
+
+Implementation is on `cursor/dee-24-launcher-file-actions-ba1e`. Tests and the app were not
+run in this environment. Native acceptance still needs Shelf, Finder, and picker batches on
+a real Mac, including mixed types, Shortcut success/failure, folder conflicts, four-edge
+layouts, VoiceOver, Reduce Motion, Spaces, and sleep/wake. Do not mark DEE-24 Done on
+compilation alone.

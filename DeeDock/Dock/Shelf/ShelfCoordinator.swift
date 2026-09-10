@@ -16,6 +16,7 @@ final class ShelfCoordinator {
     private var displayID: String?
     private weak var sourcePanel: DockPanelController?
     var keyboardDismissed: ((String) -> Void)?
+    var useInLauncher: ((LauncherFileAdoption, DockPanelController) -> Void)?
     var isOpen: Bool { controller != nil }
 
     init(shelf: ShelfController, presenter: DockPopoverPresenter,
@@ -68,6 +69,7 @@ final class ShelfCoordinator {
         state.openItems = { [weak self] items in self?.open(items) }
         state.revealItems = { [weak self] items in self?.reveal(items) }
         state.copyItems = { [weak self] items in self?.copy(items) }
+        state.useInLauncher = { [weak self] items in self?.deliverSelectionToLauncher(items) }
         state.sortChanged = { [weak self] value in
             guard let self else { return }
             do { try shelf.setSort(value) } catch { report(error) }
@@ -223,6 +225,32 @@ final class ShelfCoordinator {
         close(returnFocus: false)
     }
 
+    /// Resolves the current selection in display order and hands the same owned batch to Launcher.
+    private func deliverSelectionToLauncher(_ items: [ShelfItem]) {
+        guard let panel = sourcePanel else { return }
+        var inputs: [LauncherFileInput] = []
+        var owners: [ShelfResourceAccess] = []
+        var urls: [URL] = []
+        let overflowed = items.count > LauncherFileContext.capacity
+        for item in items.prefix(LauncherFileContext.capacity) {
+            if let access = shelf.resolve(item.id), access.isAvailable {
+                owners.append(access)
+                urls.append(access.url)
+                inputs.append(LauncherFileInput(id: item.id, url: access.url, name: item.name,
+                                                isAvailable: true, isDirectory: item.isDirectory))
+            } else {
+                inputs.append(LauncherFileInput(id: item.id, url: item.url, name: item.name,
+                                                isAvailable: false, isDirectory: item.isDirectory))
+            }
+        }
+        let access = urls.isEmpty ? nil : DocumentResourceAccess(
+            urls, retaining: owners, startAccess: { _ in false }, stopAccess: { _ in }
+        )
+        let adoption = LauncherFileAdoption(source: .shelf, access: access, inputs: inputs, overflowed: overflowed)
+        close(returnFocus: false)
+        useInLauncher?(adoption, panel)
+    }
+
     /// Writes file references, so pasting in Finder copies the files themselves.
     private func copy(_ items: [ShelfItem]) {
         let resolved = items.compactMap { shelf.resolve($0.id) }
@@ -284,6 +312,7 @@ final class ShelfCoordinator {
             case "a": state.selectAll(); return true
             case "r": state.revealSelection(); return true
             case "c": state.copyItems?(state.selectedItems); return true
+            case "l": state.useInLauncher?(state.selectedItems); return true
             default: return false
             }
         }

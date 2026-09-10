@@ -98,10 +98,34 @@ final class LauncherPresentationController {
         CGRect(x: rect.minX - window.minX, y: window.maxY - rect.maxY, width: rect.width, height: rect.height)
     }
 
+    /// The expanded dock panel resigns key when a file panel becomes key. That must not
+    /// collapse the launcher; collapsing it cancels the panel.
+    func noteWindowResignedKey() {
+        guard state.isPresented else { return }
+        if holdsForFileChooser { return }
+        if NSApp.keyWindow is NSOpenPanel { return }
+        close(restoreFocus: false)
+    }
+
+    /// Native file and folder panels are often out-of-process. Their clicks look like
+    /// outside clicks and must not collapse this presentation, which would cancel the panel.
+    private var holdsForFileChooser: Bool { state.fileActions.isChoosing }
+
+    /// Popup menus and the launcher's own file panels own their clicks. A powerbox panel
+    /// has no in-process window, so `holdsForFileChooser` covers that path.
+    private func dismissesForOutsideClick(on window: NSWindow?) -> Bool {
+        if holdsForFileChooser { return false }
+        if let window, state.fileActions.ownsChooserWindow(window) { return false }
+        if window is NSOpenPanel { return false }
+        if window?.level == .popUpMenu { return false }
+        return true
+    }
+
     private func installMonitors() {
         let mouse: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mouse, handler: { [weak self] _ in
-            self?.close(restoreFocus: false)
+            guard let self, self.dismissesForOutsideClick(on: nil) else { return }
+            self.close(restoreFocus: false)
         }) { monitors.append(monitor) }
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: mouse.union(.keyDown), handler: { [weak self] event in
             guard let self else { return event }
@@ -113,7 +137,7 @@ final class LauncherPresentationController {
             // The window is larger than the glass while the launcher is open, so a click on the
             // transparent margin has to dismiss the way a click outside the window would.
             if mouse.contains(NSEvent.EventTypeMask(rawValue: 1 << event.type.rawValue)), event.window === panel,
-               state.contentRect != .zero {
+               state.contentRect != .zero, !holdsForFileChooser {
                 let point = CGPoint(x: event.locationInWindow.x, y: panel.frame.height - event.locationInWindow.y)
                 if !state.contentRect.contains(point) { close(restoreFocus: false); return nil }
             }
@@ -142,8 +166,7 @@ final class LauncherPresentationController {
                 }
             }
             if mouse.contains(NSEvent.EventTypeMask(rawValue: 1 << event.type.rawValue)), let window = event.window, window !== panel {
-                // Native popup menus own their own windows and must not dismiss the launcher.
-                if window.level != .popUpMenu { close(restoreFocus: false) }
+                if dismissesForOutsideClick(on: window) { close(restoreFocus: false) }
             }
             return event
         }) { monitors.append(monitor) }

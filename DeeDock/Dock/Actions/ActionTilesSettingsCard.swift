@@ -16,6 +16,15 @@ struct ActionTilesSettingsCard: View {
                                 Text(verbatim: tile.name)
                                 Text(verbatim: (controller.statuses[tile.id] ?? .idle).title)
                                     .font(.caption).foregroundStyle(.secondary).lineLimit(3)
+                                Toggle(isOn: Binding(
+                                    get: { tile.acceptsFiles },
+                                    set: { controller.setAcceptsFiles(tile.id, $0) }
+                                )) {
+                                    Text(.launcherFileAcceptsFiles)
+                                }
+                                .toggleStyle(.switch)
+                                .controlSize(.small)
+                                .disabled(controller.requiresReset)
                             }
                             Spacer()
                             if controller.statuses[tile.id]?.busy == true {

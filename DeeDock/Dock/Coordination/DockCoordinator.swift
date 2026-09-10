@@ -7,6 +7,7 @@ final class DockCoordinator {
     let focusSession = FocusSessionController()
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
+    let fileDestinations = LauncherFileDestinationsStore()
     let recipes: WorkspaceRecipeCoordinator
     @ObservationIgnored private lazy var recipeProgress = WorkspaceRecipeProgressController(recipes: recipes)
     let watchPresets = WindowWatchPresetStore()
@@ -109,6 +110,7 @@ final class DockCoordinator {
         occupancy.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
+        fileDestinations.start()
         recipes.didChange = { [weak self] in
             guard let self, recipes.run != nil else { return }
             recipeProgress.show()
@@ -138,6 +140,14 @@ final class DockCoordinator {
         }
         dragging.documentHoverChanged = { [weak self] item, panel, documents in
             self?.windowPeeks.hoverFiles(item, on: panel, documents: documents)
+        }
+        dragging.deliverToLauncher = { [weak self] documents, panel in
+            self?.popovers.closeAll()
+            panel.openLauncher(files: .owned(documents, source: .drop))
+        }
+        shelves.useInLauncher = { [weak self] adoption, panel in
+            self?.popovers.closeAll()
+            panel.openLauncher(files: adoption)
         }
         dragging.chooseDocumentDestination = { [weak self] documents, item, panel in
             guard let self, item.isRunning,
@@ -298,6 +308,7 @@ final class DockCoordinator {
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles, focusSession: focusSession)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             configureLauncherSearch(on: panel)
+            panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
             panel.launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
             panel.launcher.suggestionVisibility = { [weak self] in
                 self?.profiles.modes.effectiveVisibility(for: display.id) ?? .showAll
