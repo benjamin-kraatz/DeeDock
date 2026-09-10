@@ -10,7 +10,7 @@ The `DeeDock-TestFlight` scheme compiles the same app with `TESTFLIGHT` instead 
 
 Esi is the release captain. Esi triggers and watches the [Release workflow](../.github/workflows/release.yml) nightly at 23:00 Europe/Berlin and on an explicit ship. Nara and other bots do not cut releases, hold Sparkle or signing secrets, or publish GitHub Latest.
 
-The workflow is a placeholder. Signing, notarization, `generate_appcast`, and Latest publish are stubs until Esi fills the [secrets checklist](#secrets-checklist) and replaces those steps. The manual archive path in this document stays valid.
+The workflow is a placeholder. Signing, notarization, `generate_appcast`, and Latest publish are stubs until those steps are implemented. The repository already has the [six secrets](#secrets-checklist) the later `notarytool` and signing steps will consume. The manual archive path in this document stays valid.
 
 GitHub Release body is English only. Sparkle release notes are bilingual German and English. See [Release notes](#release-notes).
 
@@ -51,6 +51,8 @@ xcodebuild -exportArchive -archivePath /absolute/path/to/DDock.xcarchive \
 ```
 
 Use an export-options plist saved from Xcode's Developer ID distribution flow for the current Xcode version and signing team. If the command-line export has not notarized the app, ZIP the exported app, submit it with `xcrun notarytool submit ... --keychain-profile <profile> --wait`, then staple the accepted ticket to the app with `xcrun stapler staple`. Recreate the final ZIP after stapling. Never modify the app after producing the signed update archive.
+
+The Release workflow does not use a keychain profile. Later CI notarization uses `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID` with `notarytool`. It does not use an App Store Connect API key. TestFlight stays on Xcode Cloud.
 
 ## Generate and publish the feed
 
@@ -95,13 +97,13 @@ Keep an encrypted backup. On another release machine, use the same account with 
 
 Select `DeeDock-TestFlight` and archive that target. Its app still has the product name `DDock.app`, with ordinary build products isolated under `TestFlight`. Inspect the archive before upload: there must be no `Sparkle.framework`, Sparkle helpers, Sparkle load command, `SUFeedURL`, or `SUPublicEDKey`.
 
-This target preserves the existing signing and sandbox settings. It establishes updater exclusion, not App Store Connect acceptance. Address any TestFlight entitlement or sandbox requirements separately rather than exporting the direct target as TestFlight.
+This target preserves the existing signing and sandbox settings. It establishes updater exclusion, not App Store Connect acceptance. Address any TestFlight entitlement or sandbox requirements separately rather than exporting the direct target as TestFlight. TestFlight uploads stay on Xcode Cloud. The Release workflow does not notarize or upload that scheme, and it does not use App Store Connect API keys.
 
 ## Verify an update before release
 
 With explicit authorization, install an older Developer ID signed and notarized build, then update to a newer signed build through a staging feed. Verify relaunch, saved dock settings, manual checks, automatic-check consent and persistence, offline errors, invalid signatures, read-only installation locations, and reminders while another app has focus. Confirm German text, keyboard access, and menu availability during an active update.
 
-Compilation and bundle inspection do not establish these runtime behaviors. Until Esi fills the secrets checklist and replaces the Release workflow stubs, no feed, release, or key backup is published automatically.
+Compilation and bundle inspection do not establish these runtime behaviors. Until the Release workflow stubs are replaced, no feed, release, or key backup is published automatically.
 
 ## Release notes
 
@@ -148,34 +150,25 @@ On failure, Esi opens a high-priority Linear issue on project or label `release-
 
 ## Secrets checklist
 
-Set these as GitHub Actions repository secrets (or on a `release` environment once that environment exists). Names only. Do not put values in the repository, the workflow file, issue comments, or logs.
+The Release workflow consumes these six repository secrets. Names only. Do not put values in the repository, the workflow file, issue comments, or logs.
 
-Apple notarization, App Store Connect API key form, suitable for ephemeral CI:
+Apple ID notarization for `notarytool` (`--apple-id`, `--password`, `--team-id`):
 
-- [ ] `APPLE_API_KEY` (`.p8` contents for `notarytool`)
-- [ ] `APPLE_API_KEY_ID`
-- [ ] `APPLE_API_ISSUER_ID`
+- [ ] `APPLE_ID`
+- [ ] `APPLE_APP_SPECIFIC_PASSWORD`
 - [ ] `APPLE_TEAM_ID`
 
-Developer ID signing on CI:
+Developer ID signing:
 
-- [ ] `DEVELOPER_ID_APPLICATION_CERTIFICATE` (base64-encoded Developer ID Application `.p12`)
+- [ ] `DEVELOPER_ID_APPLICATION_CERTIFICATE`
 - [ ] `DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD`
 
 Sparkle EdDSA private key. The matching public key is `SPARKLE_PUBLIC_ED_KEY` in the direct target. Today's login Keychain account is `de.benjaminkraatz.DeeDock`. Never commit the private key or generate a replacement for each release:
 
 - [ ] `SPARKLE_PRIVATE_ED_KEY`
 
-Optional, when the runner already has a `notarytool` keychain profile instead of the API key trio:
+Do not add App Store Connect API key secrets. TestFlight stays on Xcode Cloud.
 
-- [ ] `NOTARYTOOL_KEYCHAIN_PROFILE` (profile name only)
-
-Optional GitHub token when the default `GITHUB_TOKEN` cannot open a draft or publish Latest:
-
-- [ ] `GH_RELEASE_TOKEN`
-
-`GITHUB_TOKEN` with `contents: write` is the default for a later draft release, asset upload, and Latest publish. Prefer it when org policy allows.
-
-On a self-hosted Mac that already has the Developer ID identity and the Sparkle key in the login Keychain, the certificate and `SPARKLE_PRIVATE_ED_KEY` secrets may stay unset. Use `--account de.benjaminkraatz.DeeDock` for `generate_appcast` in that case. Do not export the private key into the repository to "make CI easier."
+`GITHUB_TOKEN` with `contents: write` is the default for a later draft release, asset upload, and Latest publish. There is no separate GitHub token secret.
 
 Sources: [Sparkle setup and distribution](https://sparkle-project.org/documentation/), [custom user drivers](https://sparkle-project.org/documentation/custom-user-interfaces/).
