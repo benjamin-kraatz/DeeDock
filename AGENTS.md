@@ -22,6 +22,7 @@ Keep future features clearly labeled as planned. Do not silently substitute simp
 - Prefer system notifications and scoped event handling over continuous polling. Remove observers, event monitors, timers, and tasks when their owner or display goes away.
 - Keep all app-owned UI copy in `DeeDock/Resources/Localizable.xcstrings`, with stable keys, generated Swift symbols, and translator comments. Use Pin/Unpin terminology. Preserve localization for conditional accessibility text and interpolated errors; do not translate app names supplied by macOS.
 - Prefer public Apple APIs. Record an API limitation or permission requirement when discovered; do not claim complete system Dock parity without evidence.
+- Do not write `.environment(\.accessibilityReduceMotion, …)` or `.environment(\.accessibilityReduceTransparency, …)` anywhere. Those `EnvironmentValues` keys are not in the macOS 27 SDK and they fail the build. See SwiftUI previews for how to exercise Reduce Motion / Reduce Transparency without them.
 
 ## File and component organization
 
@@ -34,7 +35,8 @@ Keep future features clearly labeled as planned. Do not silently substitute simp
 
 - Add `#Preview` declarations when they help inspect a view's appearance, states, or interaction. Include useful states such as pinned/running/unavailable apps, empty content, and errors where relevant; avoid redundant previews for trivial wrappers.
 - Keep previews near the view they demonstrate. Use deterministic sample data and lightweight injected dependencies. Previews must not launch applications, modify real preferences, request permissions, or depend on live workspace state.
-- Use preview variants for meaningful layout and accessibility differences, such as longer translated text, light/dark appearance, and Reduce Motion or Reduce Transparency, when the view is affected.
+- Use preview variants for meaningful layout and accessibility differences, such as longer translated text and light/dark appearance, when the view is affected. Reduce Motion and Reduce Transparency still belong in the feature design; preview those paths with a dedicated stub or a local flag, not by overriding environment keys.
+- Never inject `.environment(\.accessibilityReduceMotion, …)` or `.environment(\.accessibilityReduceTransparency, …)` in `#Preview` or production code, for `true`, `false`, or any other value. Those keys do not exist in the macOS 27 SDK. Prefer a separate preview stub or a local flag. Use `accessibilityReduceMotion` only after confirming it exists on this project's actual SDK; if unsure, do not inject via `.environment(\.accessibilityReduceMotion/Transparency, …)`.
 
 ## Swift documentation and comments
 
