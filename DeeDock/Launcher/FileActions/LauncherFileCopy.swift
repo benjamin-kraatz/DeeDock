@@ -5,7 +5,7 @@ import Foundation
 /// Name collisions receive a numbered alternative (`Report 2.pdf`). Source files stay where they
 /// are. A partial batch reports both the copies that landed and the names that failed.
 enum LauncherFileCopy {
-    struct Outcome: Sendable {
+    nonisolated struct Outcome: Sendable {
         var copied = 0
         var renamed: [(from: String, to: String)] = []
         var failed: [(name: String, message: String)] = []

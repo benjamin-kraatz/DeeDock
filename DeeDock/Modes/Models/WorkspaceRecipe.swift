@@ -131,7 +131,7 @@ extension WorkspaceRecipeStep: Codable {
     }
 }
 
-extension WorkspaceRecipe {
+nonisolated extension WorkspaceRecipe {
     private enum CodingKeys: String, CodingKey { case steps }
 
     init(from decoder: Decoder) throws {
@@ -162,7 +162,7 @@ extension WorkspaceRecipe {
 }
 
 /// Consumes one unreadable JSON value so a later valid step can still decode.
-private struct WorkspaceRecipeSkippedValue: Decodable {
+nonisolated private struct WorkspaceRecipeSkippedValue: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if container.decodeNil() { return }
@@ -175,7 +175,7 @@ private struct WorkspaceRecipeSkippedValue: Decodable {
 }
 
 /// Accepts only explicit http(s) links. Other schemes never become a recipe step.
-enum WorkspaceRecipeLink {
+nonisolated enum WorkspaceRecipeLink {
     static func normalized(_ raw: String) -> URL? {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let url = URL(string: trimmed), let host = url.host, !host.isEmpty else { return nil }

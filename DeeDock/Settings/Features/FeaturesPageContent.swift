@@ -67,6 +67,10 @@ struct FeaturesPageContent: View {
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)
+        case .sims:
+            if let coordinator = context.coordinator {
+                DockSimsSettingsCard(sims: coordinator.sims)
+            }
         default:
             EmptyView()
         }

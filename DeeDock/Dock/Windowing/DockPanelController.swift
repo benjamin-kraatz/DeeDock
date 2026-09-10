@@ -672,6 +672,7 @@ final class DockPanelController {
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil; exclusiveInteractionBegan = nil
         timelineRequested = nil
         interaction.timeline = nil
+        interaction.sims = nil
         windowSearchRequested = nil
         modePickerRequested = nil
         accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; modePickerHeld = false

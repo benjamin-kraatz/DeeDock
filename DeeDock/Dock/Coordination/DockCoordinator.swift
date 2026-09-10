@@ -6,6 +6,7 @@ import Observation
 final class DockCoordinator {
     let focusSession = FocusSessionController()
     let localHistory = DockLocalHistoryStore()
+    let sims = DockSimsStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
@@ -142,6 +143,7 @@ final class DockCoordinator {
         }
         focusSession.start()
         localHistory.start(session: focusSession.session)
+        sims.start()
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
             guard let self else { return }
@@ -337,6 +339,7 @@ final class DockCoordinator {
             }
             panel.interaction.actionTiles = actionTiles
             panel.interaction.timeline = timeline
+            panel.interaction.sims = sims
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
                 focusPopover.toggle(on: panel)
@@ -520,6 +523,7 @@ final class DockCoordinator {
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
+            panel.interaction.sims = sims
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil
             panel.store.refresh()
