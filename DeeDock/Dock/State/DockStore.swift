@@ -333,7 +333,7 @@ final class DockStore {
     func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
         willMutateFavoriteIDs?(incoming.map(\.id))
         pinIDsHiddenFromDock.subtract(incoming.map(\.id))
-        savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        return savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
     }
 
     func movePin(_ id: String, by distance: Int) {
