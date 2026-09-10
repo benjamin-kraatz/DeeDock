@@ -60,8 +60,8 @@ final class DockStore {
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
-    /// Fired after a successful pin click or drop that changed this display's pins.
-    @ObservationIgnored var pinInteraction: ((String) -> Void)?
+    /// Fired on app click and after a pin click or drop that changed this display's pins.
+    @ObservationIgnored var soapBubblePlay: ((String) -> Void)?
 
     @ObservationIgnored private let history: DockLocalHistoryStore?
 
@@ -332,7 +332,7 @@ final class DockStore {
     /// Plays soap-bubble feedback only when the write landed and the pin list actually changed.
     private func notePinInteraction(_ itemID: String, previous: [DockPin], succeeded: Bool) {
         guard succeeded, persistedPins != previous else { return }
-        pinInteraction?(itemID)
+        soapBubblePlay?(itemID)
     }
 
     func setFolderPresentation(_ presentation: FolderStackPresentation, for id: UUID) -> Bool {
@@ -358,6 +358,7 @@ final class DockStore {
 
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
     func performPrimaryAction(_ item: DockItem) {
+        soapBubblePlay?(item.id)
         let token = session.token
         catalog.performPrimaryAction(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
@@ -419,5 +420,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; pinInteraction = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

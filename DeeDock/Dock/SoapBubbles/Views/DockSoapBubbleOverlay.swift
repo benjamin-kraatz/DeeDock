@@ -1,11 +1,15 @@
 import SwiftUI
 
-/// Decorative soap-bubble bursts drawn over the dock canvas after a pin click or drop.
+/// Decorative soap-bubble pops drawn over the dock canvas after an app click, pin, or drop.
 ///
 /// The overlay owns no timing: ``DockSoapBubbleController`` adds and removes bursts, and each
-/// burst plays one finite SwiftUI animation that ends inside
+/// burst plays one finite keyframe animation that ends inside
 /// ``DockSoapBubbleController/lifetime``. There is no timeline, no repeating animation, and no
 /// per-frame state, so an idle dock never requests a frame.
+///
+/// Each burst is a two-stage gesture rather than a fade: an iridescent film swells on the icon,
+/// snaps open, and throws a handful of droplets outward. The stages are separate views so the
+/// film's short life is not stretched to cover the droplets' travel.
 ///
 /// Bursts are anchored to canvas-space icon frames — the same rects tooltips are placed in — so
 /// the film stays on DDock chrome. A burst whose application no longer has a rendered frame is
@@ -28,9 +32,9 @@ struct DockSoapBubbleOverlay: View {
             if enabled, !reduceMotion {
                 ForEach(bursts) { burst in
                     if let frame = frames[.app(burst.itemID)] {
-                        DockSoapBubbleBurstView(seed: DockSoapBubbleFilm.seed(for: burst.id),
+                        DockSoapBubbleBurstView(seed: DockSoapBubblePop.seed(for: burst.id),
                                                 diameter: min(frame.width, frame.height))
-                            // Identity is the burst, so a replayed pin starts a fresh film
+                            // Identity is the burst, so a replayed pin starts a fresh pop
                             // instead of retargeting the previous one mid-flight.
                             .id(burst.id)
                             .position(x: frame.midX, y: frame.midY)
@@ -43,119 +47,203 @@ struct DockSoapBubbleOverlay: View {
     }
 }
 
-/// One burst: a small cluster of translucent films that swell, drift outward, and pop.
+/// One burst: a film that swells and bursts, plus the droplets it throws.
 ///
-/// The whole cluster is driven by a single `playing` flag flipped once on appear, so every
-/// circle shares one implicit animation and the burst has no state left to settle when the
-/// controller removes it.
+/// Both stages are triggered by a single `playing` flag flipped once on appear, so the burst
+/// has no state left to settle when the controller removes it.
 private struct DockSoapBubbleBurstView: View {
     /// Deterministic layout seed derived from the burst identifier.
     let seed: UInt64
-    /// Icon dimension in logical points; the film scales with the pin it came from.
+    /// Icon dimension in logical points; the pop scales with the pin it came from.
     let diameter: CGFloat
 
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var playing = false
 
-    private var films: [DockSoapBubbleFilm] { DockSoapBubbleFilm.cluster(seed: seed) }
-
     var body: some View {
+        let pop = DockSoapBubblePop(seed: seed)
         ZStack {
-            ForEach(films) { film in
-                DockSoapBubbleFilmView(film: film, diameter: diameter, playing: playing,
-                                       reduceTransparency: reduceTransparency)
+            DockSoapBubbleFilmView(hueAngle: pop.hueAngle, diameter: diameter, playing: playing,
+                                   reduceTransparency: reduceTransparency)
+            ForEach(pop.droplets) { droplet in
+                DockSoapBubbleDropletView(droplet: droplet, diameter: diameter, playing: playing,
+                                          hueAngle: pop.hueAngle, reduceTransparency: reduceTransparency)
             }
         }
-        .frame(width: diameter * 2.2, height: diameter * 2.2)
+        // The droplets reach roughly 0.6 of an icon from the centre; the box leaves room for
+        // that without clipping, and takes no hits either way.
+        .frame(width: diameter * 2.4, height: diameter * 2.4)
         .onAppear { playing = true }
     }
 }
 
-/// A single iridescent film. Kept separate so each one carries its own delay and easing
-/// without the parent rebuilding a large `body`.
+/// The film itself: swell, then burst.
+///
+/// A single keyframe pass drives both stages because the pop is the *shape* of the curve, not a
+/// second animation: scale eases up to full size, then jumps past it while opacity is cut over a
+/// couple of frames. An `easeOut` on scale and opacity together is what reads as a fade.
 private struct DockSoapBubbleFilmView: View {
-    let film: DockSoapBubbleFilm
+    let hueAngle: Double
     let diameter: CGFloat
     let playing: Bool
     let reduceTransparency: Bool
 
-    /// Start and end poses. Interpolation between them is the entire animation: no keyframes
-    /// are needed because a soap film only ever swells once and thins out.
-    private var scale: CGFloat { playing ? film.endScale : film.startScale }
-    private var opacity: Double { playing ? 0 : film.opacity }
-    private var offset: CGSize {
-        playing ? CGSize(width: film.drift.width * diameter, height: film.drift.height * diameter)
-                : .zero
+    var body: some View {
+        KeyframeAnimator(initialValue: Pose(), trigger: playing) { pose in
+            Circle()
+                .strokeBorder(filmStyle, lineWidth: max(1, diameter * 0.05 * pose.rim))
+                .background {
+                    // The interior sheen is what reads as soap rather than a plain ring. It is
+                    // the only translucent layer, so Reduce Transparency simply drops it.
+                    if !reduceTransparency {
+                        Circle().fill(.white.opacity(0.12)).blur(radius: diameter * 0.03)
+                    }
+                }
+                .frame(width: diameter * 0.52, height: diameter * 0.52)
+                .scaleEffect(pose.scale)
+                .opacity(playing ? pose.opacity : 0)
+        } keyframes: { _ in
+            // 0…0.20s swell, 0.20…0.28s burst. The film is gone well before the controller's
+            // 0.55s lifetime, leaving the tail to the droplets.
+            KeyframeTrack(\.scale) {
+                SpringKeyframe(1, duration: 0.20, spring: .bouncy(duration: 0.20, extraBounce: 0.2))
+                CubicKeyframe(1.62, duration: 0.08)
+            }
+            KeyframeTrack(\.opacity) {
+                LinearKeyframe(0.95, duration: 0.07)
+                LinearKeyframe(1, duration: 0.13)
+                // The snap: the rim is still growing while it disappears, so the eye reads a
+                // burst rather than something shrinking away.
+                LinearKeyframe(0, duration: 0.07)
+            }
+            // The rim thins as the film stretches, the way a real bubble does just before it goes.
+            KeyframeTrack(\.rim) {
+                LinearKeyframe(1, duration: 0.20)
+                LinearKeyframe(0.35, duration: 0.08)
+            }
+        }
     }
 
-    var body: some View {
-        Circle()
-            .strokeBorder(filmStyle, lineWidth: max(1, diameter * 0.05))
-            .background {
-                // The interior sheen is what reads as soap rather than a plain ring. It is the
-                // only translucent layer, so Reduce Transparency simply drops it.
-                if !reduceTransparency {
-                    Circle().fill(.white.opacity(0.10)).blur(radius: diameter * 0.03)
-                }
-            }
-            .frame(width: diameter * film.size, height: diameter * film.size)
-            .scaleEffect(scale)
-            .offset(offset)
-            .opacity(opacity)
-            .animation(.easeOut(duration: film.duration).delay(film.delay), value: playing)
+    /// Animated film pose. Scale and opacity are tracked separately so the opacity cut can be
+    /// much shorter than the scale ramp.
+    private struct Pose {
+        var scale: CGFloat = 0.42
+        var opacity: Double = 0
+        var rim: CGFloat = 0.7
     }
 
     private var filmStyle: AnyShapeStyle {
-        guard !reduceTransparency else { return AnyShapeStyle(Color.white.opacity(0.7)) }
+        guard !reduceTransparency else { return AnyShapeStyle(Color.white.opacity(0.8)) }
         return AnyShapeStyle(
-            AngularGradient(colors: [.white.opacity(0.9), .cyan.opacity(0.75), .purple.opacity(0.7),
-                                     .yellow.opacity(0.7), .white.opacity(0.9)],
-                            center: .center, angle: .degrees(film.hueAngle))
+            AngularGradient(colors: [.white.opacity(0.95), .cyan.opacity(0.8), .purple.opacity(0.75),
+                                     .yellow.opacity(0.75), .white.opacity(0.95)],
+                            center: .center, angle: .degrees(hueAngle))
         )
     }
 }
 
-/// Static description of one film in a burst cluster. Values are fractions of the icon
-/// dimension so the same cluster works at every icon size.
-private struct DockSoapBubbleFilm: Identifiable {
-    let id: Int
-    let size: CGFloat
-    let startScale: CGFloat
-    let endScale: CGFloat
-    let drift: CGSize
-    let opacity: Double
-    let delay: Double
-    let duration: Double
+/// One droplet thrown by the burst: it waits for the film to go, flies out, and vanishes.
+private struct DockSoapBubbleDropletView: View {
+    let droplet: DockSoapBubblePop.Droplet
+    let diameter: CGFloat
+    let playing: Bool
     let hueAngle: Double
+    let reduceTransparency: Bool
 
-    /// Six films: enough to read as a cluster, few enough to stay cheap at three concurrent bursts.
-    private static let count = 6
+    private var size: CGFloat { max(1.5, diameter * droplet.size) }
 
-    /// Builds a cluster whose spread is fixed but whose angles and sizes vary per burst, so two
-    /// pins in a row do not produce visibly identical films.
+    var body: some View {
+        KeyframeAnimator(initialValue: Pose(), trigger: playing) { pose in
+            Circle()
+                .strokeBorder(dropletStyle, lineWidth: max(1, size * 0.28))
+                .frame(width: size, height: size)
+                // Travel is a fraction of the icon dimension along a fixed angle, so the spray
+                // keeps its shape at every icon size.
+                .offset(x: cos(droplet.angle) * droplet.reach * diameter * pose.travel,
+                        y: sin(droplet.angle) * droplet.reach * diameter * pose.travel)
+                .scaleEffect(pose.scale)
+                .opacity(playing ? pose.opacity : 0)
+        } keyframes: { _ in
+            // Held at the centre until the film bursts, then one decelerating throw. The last
+            // droplet finishes at 0.24 + 0.28 = 0.52s, inside the 0.55s lifetime.
+            KeyframeTrack(\.travel) {
+                LinearKeyframe(0, duration: droplet.delay)
+                CubicKeyframe(1, duration: droplet.flight, startVelocity: 6, endVelocity: 0)
+            }
+            KeyframeTrack(\.opacity) {
+                LinearKeyframe(0, duration: droplet.delay)
+                LinearKeyframe(droplet.opacity, duration: 0.03)
+                LinearKeyframe(droplet.opacity * 0.7, duration: droplet.flight * 0.5)
+                LinearKeyframe(0, duration: droplet.flight * 0.5 - 0.03)
+            }
+            KeyframeTrack(\.scale) {
+                LinearKeyframe(1, duration: droplet.delay)
+                CubicKeyframe(0.45, duration: droplet.flight)
+            }
+        }
+    }
+
+    /// Animated droplet pose. `travel` is 0…1 along the droplet's fixed angle.
+    private struct Pose {
+        var travel: CGFloat = 0
+        var opacity: Double = 0
+        var scale: CGFloat = 0.8
+    }
+
+    private var dropletStyle: AnyShapeStyle {
+        guard !reduceTransparency else { return AnyShapeStyle(Color.white.opacity(0.85)) }
+        return AnyShapeStyle(
+            AngularGradient(colors: [.white, .cyan.opacity(0.85), .white.opacity(0.9)],
+                            center: .center, angle: .degrees(hueAngle + droplet.angle * 57.29))
+        )
+    }
+}
+
+/// Static description of one burst. Sizes and distances are fractions of the icon dimension so
+/// the same pop works at every icon size.
+private struct DockSoapBubblePop {
+    /// A ring shard flung out of the film.
+    struct Droplet: Identifiable {
+        let id: Int
+        /// Direction in radians, measured in the view's y-down space.
+        let angle: Double
+        /// Travel distance as a fraction of the icon dimension.
+        let reach: CGFloat
+        /// Diameter as a fraction of the icon dimension.
+        let size: CGFloat
+        let opacity: Double
+        /// Wait before launch, covering the film's swell and snap.
+        let delay: Double
+        /// Outward travel time. `delay + flight` stays under the controller's lifetime.
+        let flight: Double
+    }
+
+    /// Rotation of the iridescent gradient, so two pins in a row do not look identical.
+    let hueAngle: Double
+    let droplets: [Droplet]
+
+    /// Builds a burst whose spread is fixed but whose angles, sizes, and count vary per burst.
     ///
-    /// Every film finishes within ``DockSoapBubbleController/lifetime``: the latest delay plus
-    /// its duration is held under that budget so the controller's removal never clips a film.
-    static func cluster(seed: UInt64) -> [DockSoapBubbleFilm] {
+    /// Every droplet finishes within ``DockSoapBubbleController/lifetime``: the launch delay is
+    /// reserved out of the budget rather than added to it, so the controller's removal never
+    /// clips a droplet mid-flight.
+    init(seed: UInt64) {
         var generator = SplitMix64(seed: seed)
+        hueAngle = Double.random(in: 0..<360, using: &generator)
+        let count = Int.random(in: 3...6, using: &generator)
         let baseAngle = Double.random(in: 0..<(2 * .pi), using: &generator)
-        return (0..<count).map { index in
-            let spin = Double.random(in: -0.5...0.5, using: &generator)
-            let angle = baseAngle + (Double(index) / Double(count)) * 2 * .pi + spin
-            let reach = CGFloat.random(in: 0.28...0.55, using: &generator)
-            let delay = Double.random(in: 0...0.10, using: &generator)
-            // Reserve the delay out of the lifetime budget rather than adding to it.
-            let duration = DockSoapBubbleController.lifetime - delay - 0.06
-            return DockSoapBubbleFilm(
+        droplets = (0..<count).map { index in
+            let spin = Double.random(in: -0.4...0.4, using: &generator)
+            let delay = Double.random(in: 0.20...0.24, using: &generator)
+            let flight = min(0.28, DockSoapBubbleController.lifetime - delay - 0.03)
+            return Droplet(
                 id: index,
-                size: CGFloat.random(in: 0.22...0.42, using: &generator),
-                startScale: 0.35,
-                endScale: CGFloat.random(in: 1.15...1.6, using: &generator),
-                drift: CGSize(width: cos(angle) * reach, height: sin(angle) * reach),
-                opacity: Double.random(in: 0.55...0.9, using: &generator),
+                angle: baseAngle + (Double(index) / Double(count)) * 2 * .pi + spin,
+                reach: CGFloat.random(in: 0.38...0.62, using: &generator),
+                size: CGFloat.random(in: 0.09...0.17, using: &generator),
+                opacity: Double.random(in: 0.7...0.95, using: &generator),
                 delay: delay,
-                duration: max(0.2, duration),
-                hueAngle: Double.random(in: 0..<360, using: &generator))
+                flight: flight)
         }
     }
 
@@ -170,7 +258,7 @@ private struct DockSoapBubbleFilm: Identifiable {
     }
 }
 
-/// Small deterministic generator so cluster geometry depends only on the burst identifier.
+/// Small deterministic generator so burst geometry depends only on the burst identifier.
 private struct SplitMix64: RandomNumberGenerator {
     private var state: UInt64
 
@@ -221,7 +309,7 @@ private enum DockSoapBubbleOverlayPreview {
     }
 }
 
-#Preview("Bursts playing") {
+#Preview("Pop playing") {
     DockSoapBubbleOverlayPreview.stage(enabled: true)
 }
 

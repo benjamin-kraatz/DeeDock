@@ -22344,13 +22344,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Optionale Blasen, wenn du eine App anheftest oder ablegst."
+            "value" : "Optionale Blasen, wenn du eine App anklickst, anheftest oder ablegst."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Optional bursts when you pin or drop an app."
+            "value" : "Optional pops when you click, pin, or drop an app."
           }
         }
       }
@@ -22794,13 +22794,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kurzer Effekt beim Anheften oder Ablegen. „Bewegung reduzieren“ schaltet ihn aus."
+            "value" : "Kurzer Effekt beim Klicken, Anheften oder Ablegen. „Bewegung reduzieren“ schaltet ihn aus."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A short burst when you pin or drop an app. Reduce Motion turns this off."
+            "value" : "A short pop when you click, pin, or drop an app. Reduce Motion turns this off."
           }
         }
       }
@@ -22830,13 +22830,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seifenblasen Blasen Effekt anheften ablegen Bewegung reduzieren"
+            "value" : "Seifenblasen Blasen Effekt klicken anheften ablegen Bewegung reduzieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "soap bubble burst pin drop reduce motion effect delight"
+            "value" : "soap bubble burst pop click pin drop reduce motion effect delight"
           }
         }
       }

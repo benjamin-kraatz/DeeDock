@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// Short-lived soap-bubble bursts requested after a successful pin click or drop.
+/// Short-lived soap-bubble pops requested after an app click, pin, or drop.
 ///
 /// Playback is gated here so views stay decorative. The saved preference can be on and
 /// still produce no bursts when Reduce Motion is enabled. That preference is never rewritten.
@@ -14,10 +14,10 @@ final class DockSoapBubbleController {
         let startedAt: Date
     }
 
-    /// Hard cap so repeated pins cannot accumulate layers on the dock surface.
+    /// Hard cap so repeated clicks cannot accumulate layers on the dock surface.
     static let maximumConcurrentBursts = 3
-    /// Matches the overlay's visual lifetime so removal does not cut a burst short.
-    static let lifetime: TimeInterval = 0.72
+    /// Matches the overlay's visual lifetime so removal does not cut a pop short.
+    static let lifetime: TimeInterval = 0.55
 
     /// Saved preference copied from settings. Reduce Motion still suppresses `play`.
     var isEnabled = false

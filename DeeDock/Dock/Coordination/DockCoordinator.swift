@@ -393,7 +393,7 @@ final class DockCoordinator {
                 self?.windowPeeks.close(returnFocus: false)
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
             }
-            store.pinInteraction = { [weak panel] itemID in
+            store.soapBubblePlay = { [weak panel] itemID in
                 panel?.interaction.soapBubbles.play(
                     itemID: itemID,
                     reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
