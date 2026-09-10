@@ -23,10 +23,17 @@ struct ShortcutGreenhouseSettingsCard: View {
             water: { controller.water($0) },
             reset: { store.reset() }
         )
-        .onAppear {
-            guard store.isEnabled else { return }
-            controller.ensureLoaded()
+        .onAppear { loadIfEnabled() }
+        .onChange(of: store.isEnabled) { _, enabled in
+            if enabled { controller.ensureLoaded() }
         }
+    }
+
+    /// Discovery is what wilt needs. Off stays quiet so the greenhouse does not list Shortcuts
+    /// until the user turns it on.
+    private func loadIfEnabled() {
+        guard store.isEnabled else { return }
+        controller.ensureLoaded()
     }
 }
 
