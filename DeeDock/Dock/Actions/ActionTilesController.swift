@@ -89,10 +89,11 @@ final class ActionTilesController {
     /// A second overlapping run of the same identifier is rejected and never retried.
     func runConfigured(_ id: UUID) async -> Result<Void, Error> {
         await withCheckedContinuation { continuation in
-            guard start(id) { result in
+            guard start(id, completion: { result in
                 continuation.resume(returning: result.map { _ in () })
-            } else {
+            }) else {
                 continuation.resume(returning: .failure(CocoaError(.coderInvalidValue)))
+                return
             }
         }
     }
