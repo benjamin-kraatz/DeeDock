@@ -1,21 +1,44 @@
 # Direct / Sparkle distribution for the DeeDock scheme.
 #
-# Esi (release captain) triggers and watches this workflow:
-#   - Nightly at 23:00 Europe/Berlin (schedule below)
-#   - Explicit ship via workflow_dispatch with intent=ship
+# Esi (release captain) alone dispatches this workflow. There is no
+# schedule, push, or pull_request trigger. A nightly watch, if Esi wants
+# one, is her routine: she runs workflow_dispatch with intent=watch.
 #
-# Nara and other bots do not cut releases, hold Sparkle or signing secrets,
-# or publish GitHub Latest. On failure, Esi opens a high-priority Linear
-# issue on project or label release-pipeline, and may add Bot-Nara once
-# if Nara should fix pipeline code.
+# Job graph:
+#   watch (ubuntu-latest) on every dispatch. Version, secret presence, notes.
+#     intent=watch stops here. No Xcode, no certs, no Mac.
+#   archive (xcode-27) only for intent=ship, after watch succeeds.
+#     Archive, Developer ID export, notarytool+staple, zip, generate_appcast.
+#   draft (ubuntu-latest) only for intent=ship, after archive.
+#     Draft GitHub Release from artifacts. No Mac. No gh on xcode-27.
+#   remind-on-failure (ubuntu-latest) if any of those fail.
 #
-# This file is a placeholder. Signing, notarization, generate_appcast, and
-# GitHub Latest steps are stubs. Do not put secret values in this file.
-# The six repository secrets are APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD,
-# APPLE_TEAM_ID, DEVELOPER_ID_APPLICATION_CERTIFICATE,
+# Nara and other bots do not dispatch this workflow, bump versions on
+# feature work, hold Sparkle or signing secrets, or publish GitHub Latest.
+# Version bumps and bilingual notes land in a release-prep PR that Esi
+# merges before she dispatches. On failure, Esi opens a high-priority
+# Linear issue on project or label release-pipeline, and may add Bot-Nara
+# once if Nara should fix pipeline code.
+#
+# ship does not mark the release Latest unless publish_latest is true.
+# First smoke stays draft-only.
+#
+# Do not put secret values in this file. The six repository secrets are
+# APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID,
+# DEVELOPER_ID_APPLICATION_CERTIFICATE,
 # DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD, and SPARKLE_PRIVATE_ED_KEY.
 # Notarization uses Apple ID plus app-specific password plus team ID.
 # Do not add App Store Connect API keys. TestFlight stays on Xcode Cloud.
+#
+# Secret format assumptions (names only; never log values):
+#   DEVELOPER_ID_APPLICATION_CERTIFICATE is a base64-encoded PKCS#12 (.p12)
+#   of the Developer ID Application identity.
+#   DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD is that p12 password.
+#   SPARKLE_PRIVATE_ED_KEY is the first line of generate_keys -x output:
+#   Sparkle's base64 EdDSA secret. The job writes that line to stdin for
+#   generate_appcast --ed-key-file -. It does not use deprecated -s.
+#
+# Runner: xcode-27 is Benn's Mac image. Only the archive job uses it.
 
 name: Release
 
@@ -23,7 +46,7 @@ on:
   workflow_dispatch:
     inputs:
       intent:
-        description: watch prints status only. ship is reserved for Esi after secrets and real steps exist.
+        description: watch prints status on Linux. ship archives on xcode-27 and opens a draft on Linux.
         type: choice
         options:
           - watch
@@ -33,20 +56,13 @@ on:
         description: Optional MARKETING_VERSION override such as 0.2.1. Leave empty to read Configuration/App.xcconfig.
         type: string
         required: false
+      publish_latest:
+        description: If true with intent=ship, publish the draft as GitHub Latest. Leave off. First smoke stays draft-only.
+        type: boolean
+        default: false
 
-  # 23:00 Europe/Berlin every night. The timezone field is IANA, so GitHub
-  # follows Central European Time in winter and Central European Summer Time
-  # in summer. Do not drop timezone. A UTC-only reading of this cron would be
-  # 23:00 UTC, which is 00:00 or 01:00 in Berlin.
-  #
-  # Equivalent UTC hours if timezone support were absent:
-  #   21:00 UTC during CEST (UTC+2), 22:00 UTC during CET (UTC+1).
-  schedule:
-    - cron: "0 23 * * *"
-      timezone: Europe/Berlin
-
-# Later draft GitHub Release, assets, and Latest. Latest publish stays
-# Esi-gated in the ship job even with this permission.
+# Draft GitHub Release, assets, and an optional Latest publish. Latest stays
+# off unless Esi sets publish_latest on a ship dispatch.
 permissions:
   contents: write
 
@@ -55,18 +71,25 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Scheduled runs are always watch. Only Esi dispatches ship.
-  INTENT: ${{ github.event_name == 'workflow_dispatch' && inputs.intent || 'watch' }}
+  INTENT: ${{ inputs.intent }}
   XCODE_SCHEME: DeeDock
   XCODE_PROJECT: DeeDock.xcodeproj
   SPARKLE_KEYCHAIN_ACCOUNT: de.benjaminkraatz.DeeDock
+  DOWNLOAD_URL_ROOT: https://github.com/benjamin-kraatz/DeeDock/releases/download
 
 jobs:
-  release:
-    name: Archive, notarize, and publish
-    # macos-latest is a placeholder. Direct archives need Xcode 27 and a
-    # Developer ID identity. Esi can point this at a self-hosted Mac pool later.
-    runs-on: macos-latest
+  watch:
+    name: Watch / preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      marketing_version: ${{ steps.versions.outputs.marketing_version }}
+      build_number: ${{ steps.versions.outputs.build_number }}
+      release_tag: ${{ steps.versions.outputs.release_tag }}
+      notes_path: ${{ steps.notes.outputs.notes_path }}
+      has_english: ${{ steps.notes.outputs.has_english }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -74,7 +97,7 @@ jobs:
       - name: Resolve versions
         id: versions
         env:
-          INPUT_MARKETING_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.marketing_version || '' }}
+          INPUT_MARKETING_VERSION: ${{ inputs.marketing_version }}
         run: |
           set -eu
           marketing="$(awk -F ' *= *' '/^MARKETING_VERSION / { print $2; exit }' Configuration/App.xcconfig)"
@@ -88,6 +111,7 @@ jobs:
           echo "Resolved MARKETING_VERSION=$marketing CURRENT_PROJECT_VERSION=$build intent=$INTENT"
 
       - name: Report required secrets by name
+        id: secrets
         env:
           HAS_APPLE_ID: ${{ secrets.APPLE_ID != '' }}
           HAS_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD != '' }}
@@ -104,9 +128,24 @@ jobs:
           echo "DEVELOPER_ID_APPLICATION_CERTIFICATE=$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE"
           echo "DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD=$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD"
           echo "SPARKLE_PRIVATE_ED_KEY=$HAS_SPARKLE_PRIVATE_ED_KEY"
-          echo "GITHUB_TOKEN is the default token for a later draft release."
+          echo "GITHUB_TOKEN is the default token for a draft release."
+          missing=0
+          require_secret() {
+            if [ "$2" != "true" ]; then
+              echo "Missing repository secret: $1"
+              missing=1
+            fi
+          }
+          require_secret APPLE_ID "$HAS_APPLE_ID"
+          require_secret APPLE_APP_SPECIFIC_PASSWORD "$HAS_APPLE_APP_SPECIFIC_PASSWORD"
+          require_secret APPLE_TEAM_ID "$HAS_APPLE_TEAM_ID"
+          require_secret DEVELOPER_ID_APPLICATION_CERTIFICATE "$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE"
+          require_secret DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD "$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD"
+          require_secret SPARKLE_PRIVATE_ED_KEY "$HAS_SPARKLE_PRIVATE_ED_KEY"
+          echo "secrets_missing=$missing" >> "$GITHUB_OUTPUT"
 
       - name: Locate bilingual Sparkle notes
+        id: notes
         env:
           MARKETING_VERSION: ${{ steps.versions.outputs.marketing_version }}
         run: |
@@ -114,102 +153,483 @@ jobs:
           notes="docs/releases/${MARKETING_VERSION}.md"
           if [ -f "$notes" ]; then
             echo "Found $notes"
+            echo "notes_path=$notes" >> "$GITHUB_OUTPUT"
             if grep -Eq '^## English$' "$notes"; then
-              echo "English section is present for the later GitHub Release body."
+              echo "English section is present for the GitHub Release body."
+              echo "has_english=true" >> "$GITHUB_OUTPUT"
             else
               echo "Warning: $notes has no ## English heading. Sparkle notes must be bilingual German and English."
+              echo "has_english=false" >> "$GITHUB_OUTPUT"
             fi
           else
             echo "Warning: $notes is missing. Add it before a real ship."
+            echo "notes_path=" >> "$GITHUB_OUTPUT"
+            echo "has_english=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Block ship until real steps replace the stubs
+      - name: Fail ship before starting xcode-27
         if: env.INTENT == 'ship'
+        env:
+          SECRETS_MISSING: ${{ steps.secrets.outputs.secrets_missing }}
+          NOTES_PATH: ${{ steps.notes.outputs.notes_path }}
+          HAS_ENGLISH: ${{ steps.notes.outputs.has_english }}
+          MARKETING_VERSION: ${{ steps.versions.outputs.marketing_version }}
         run: |
-          echo "intent=ship is reserved for Esi after the stub steps below are implemented."
-          echo "This placeholder does not archive, notarize, or publish GitHub Latest."
-          exit 1
+          set -eu
+          failed=0
+          if [ "$SECRETS_MISSING" != "0" ]; then
+            echo "ship needs the six named secrets. Values stay out of logs."
+            failed=1
+          fi
+          if [ -z "${NOTES_PATH:-}" ]; then
+            echo "ship needs docs/releases/${MARKETING_VERSION}.md before the Mac job starts."
+            failed=1
+          elif [ "$HAS_ENGLISH" != "true" ]; then
+            echo "ship needs an ## English section in docs/releases/${MARKETING_VERSION}.md."
+            failed=1
+          fi
+          if [ "$failed" -ne 0 ]; then
+            echo "xcode-27 was not started."
+            exit 1
+          fi
+          echo "Preflight passed. archive may start on xcode-27."
+
+  archive:
+    name: Archive, notarize, and appcast
+    if: env.INTENT == 'ship'
+    needs: watch
+    # Benn's Xcode 27 image. Only this job uses it.
+    runs-on: xcode-27
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 27
+        run: |
+          set -eu
+          echo "sw_vers:"
+          sw_vers
+          echo "Installed Xcode apps:"
+          ls -d /Applications/Xcode*.app 2>/dev/null || echo "No /Applications/Xcode*.app entries."
+          selected=""
+          highest_major=0
+          highest_app=""
+          for app in /Applications/Xcode*.app; do
+            [ -d "$app" ] || continue
+            version="$(defaults read "$app/Contents/Info" CFBundleShortVersionString 2>/dev/null || true)"
+            major="${version%%.*}"
+            echo "$app version=${version:-unknown}"
+            case "$major" in
+              ''|*[!0-9]*) continue ;;
+            esac
+            if [ "$major" -gt "$highest_major" ]; then
+              highest_major="$major"
+              highest_app="$app"
+            fi
+          done
+          if [ -n "$highest_app" ]; then
+            sudo xcode-select -s "$highest_app"
+            selected="$highest_app"
+          fi
+          echo "xcode-select -p: $(xcode-select -p)"
+          xcodebuild -version
+          sdk="$(xcrun --sdk macosx --show-sdk-version 2>/dev/null || true)"
+          echo "macosx SDK=$sdk selected=$selected"
+          sdk_major="${sdk%%.*}"
+          if [ "$highest_major" -lt 27 ] || [ "${sdk_major:-0}" -lt 27 ]; then
+            echo "DDock archives need Xcode 27 and the macOS 27 SDK."
+            echo "This xcode-27 runner reports Xcode major=$highest_major macosx SDK=$sdk."
+            echo "The image labeled xcode-27 did not provide that toolchain. Tell Esi and Benn."
+            exit 1
+          fi
 
       - name: Resolve Sparkle tools
-        # TODO(Esi): resolve SourcePackages/artifacts/sparkle/Sparkle/bin after xcodebuild -resolvePackageDependencies.
-        if: false
-        run: echo "TODO resolve SPARKLE_BIN"
+        run: |
+          set -eu
+          cloned="$RUNNER_TEMP/SourcePackages"
+          mkdir -p "$cloned"
+          xcodebuild -project "$XCODE_PROJECT" -resolvePackageDependencies \
+            -clonedSourcePackagesDirPath "$cloned"
+          tool="$(find "$cloned" -type f -name generate_appcast -perm -111 | head -n 1 || true)"
+          if [ -z "$tool" ]; then
+            echo "generate_appcast was not in the resolved Sparkle artifact."
+            echo "Expected something like $cloned/artifacts/sparkle/Sparkle/bin/generate_appcast"
+            exit 1
+          fi
+          sparkle_bin="$(dirname "$tool")"
+          echo "SPARKLE_BIN=$sparkle_bin" >> "$GITHUB_ENV"
+          echo "CLONED_SOURCE_PACKAGES=$cloned" >> "$GITHUB_ENV"
+          echo "Found generate_appcast in $sparkle_bin"
 
       - name: Import Developer ID certificate
-        # TODO(Esi): create a temporary keychain and import DEVELOPER_ID_APPLICATION_CERTIFICATE.
-        # Never echo the certificate or DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD.
-        if: false
         env:
           DEVELOPER_ID_APPLICATION_CERTIFICATE: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE }}
           DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD }}
-        run: echo "TODO import Developer ID Application certificate"
+        run: |
+          set -eu
+          # Temporary keychain so the xcode-27 runner does not keep the
+          # Developer ID identity after the job. Never echo the p12 or password.
+          keychain="$RUNNER_TEMP/ddock-signing.keychain-db"
+          cert_p12="$RUNNER_TEMP/developer-id.p12"
+          password="$(openssl rand -base64 32)"
+          CERT_P12="$cert_p12" python3 - <<'PY'
+          import base64, os, pathlib, re, sys
+          raw = os.environ["DEVELOPER_ID_APPLICATION_CERTIFICATE"].strip()
+          compact = re.sub(r"\s+", "", raw)
+          try:
+              data = base64.b64decode(compact, validate=True)
+          except Exception:
+              print("DEVELOPER_ID_APPLICATION_CERTIFICATE is not valid base64 PKCS#12.", file=sys.stderr)
+              raise SystemExit(1)
+          if len(data) < 64:
+              print("DEVELOPER_ID_APPLICATION_CERTIFICATE decoded to an implausibly small blob.", file=sys.stderr)
+              raise SystemExit(1)
+          path = pathlib.Path(os.environ["CERT_P12"])
+          path.write_bytes(data)
+          path.chmod(0o600)
+          PY
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          security import "$cert_p12" -k "$keychain" \
+            -P "$DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD" \
+            -A -f pkcs12 \
+            -T /usr/bin/codesign -T /usr/bin/security \
+            -T /usr/bin/xcodebuild -T /usr/bin/productbuild
+          rm -f "$cert_p12"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$password" "$keychain" >/dev/null
+          security list-keychain -d user -s "$keychain" login.keychain-db
+          security default-keychain -s "$keychain"
+          echo "KEYCHAIN_PATH=$keychain" >> "$GITHUB_ENV"
+          identities="$(security find-identity -v -p codesigning "$keychain")"
+          echo "$identities"
+          if ! printf '%s\n' "$identities" | grep -q 'Developer ID Application'; then
+            echo "Temporary keychain has no Developer ID Application identity."
+            exit 1
+          fi
 
       - name: Archive DeeDock
-        # TODO(Esi): xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Release archive
-        if: false
-        run: echo "TODO archive DeeDock scheme"
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -eu
+          archive="$RUNNER_TEMP/DDock.xcarchive"
+          derived="$RUNNER_TEMP/DerivedData"
+          mkdir -p "$derived"
+          # Manual Developer ID on the archive so CI does not need an Apple
+          # Development identity. exportArchive then re-signs nested Sparkle
+          # code with hardened runtime. Do not pass CODE_SIGNING_ALLOWED=NO.
+          xcodebuild -project "$XCODE_PROJECT" -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$archive" \
+            -clonedSourcePackagesDirPath "$CLONED_SOURCE_PACKAGES" \
+            -derivedDataPath "$derived" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Developer ID Application" \
+            OTHER_CODE_SIGN_FLAGS="--timestamp --options runtime" \
+            archive
+          echo "ARCHIVE_PATH=$archive" >> "$GITHUB_ENV"
 
       - name: Export Developer ID, notarize, and staple
-        # TODO(Esi): exportArchive with Developer ID options, then
-        # xcrun notarytool submit --apple-id APPLE_ID --password APPLE_APP_SPECIFIC_PASSWORD
-        # --team-id APPLE_TEAM_ID --wait
-        # Do not use an App Store Connect API key. TestFlight stays on Xcode Cloud.
-        # Never echo APPLE_APP_SPECIFIC_PASSWORD.
-        # Staple, then recreate DDock.zip. Never modify the app after the signed archive.
-        if: false
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: echo "TODO export, notarize, staple"
+        run: |
+          set -eu
+          export_dir="$RUNNER_TEMP/export"
+          options="$RUNNER_TEMP/DeveloperID-ExportOptions.plist"
+          mkdir -p "$export_dir"
+          EXPORT_OPTIONS="$options" python3 - <<'PY'
+          import os, pathlib, plistlib
+          path = pathlib.Path(os.environ["EXPORT_OPTIONS"])
+          with path.open("wb") as handle:
+              plistlib.dump(
+                  {
+                      "destination": "export",
+                      "method": "developer-id",
+                      "teamID": os.environ["APPLE_TEAM_ID"],
+                      "signingStyle": "manual",
+                      "signingCertificate": "Developer ID Application",
+                      "manageAppVersionAndBuildNumber": False,
+                  },
+                  handle,
+              )
+          PY
+          # Xcode's Developer ID export re-signs nested Sparkle helpers.
+          # Keep hardened runtime. Do not skip nested code checks.
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$export_dir" \
+            -exportOptionsPlist "$options"
+          app="$export_dir/DDock.app"
+          if [ ! -d "$app" ]; then
+            echo "Export did not produce DDock.app"
+            ls -la "$export_dir"
+            exit 1
+          fi
+          notary_zip="$RUNNER_TEMP/DDock-notary.zip"
+          /usr/bin/ditto -c -k --keepParent "$app" "$notary_zip"
+          notary_json="$RUNNER_TEMP/notary.json"
+          # Apple ID path only. No App Store Connect API key. No keychain profile.
+          xcrun notarytool submit "$notary_zip" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait \
+            --output-format json > "$notary_json"
+          NOTARY_JSON="$notary_json" python3 - <<'PY'
+          import json, os, pathlib, sys
+          data = json.loads(pathlib.Path(os.environ["NOTARY_JSON"]).read_text())
+          status = data.get("status")
+          ident = data.get("id")
+          print(f"notarytool status={status} id={ident}")
+          if status != "Accepted":
+              raise SystemExit(1)
+          PY
+          xcrun stapler staple "$app"
+          echo "APP_PATH=$app" >> "$GITHUB_ENV"
 
       - name: Verify signature and ticket
-        # TODO(Esi): codesign --verify --deep --strict and xcrun stapler validate
-        if: false
-        run: echo "TODO verify codesign and stapler"
+        run: |
+          set -eu
+          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+          codesign --display --verbose=2 --entitlements - "$APP_PATH"
+          xcrun stapler validate "$APP_PATH"
+          # Nested Sparkle code must stay signed. Fail if any helper is unsigned.
+          if codesign --verify --deep --strict "$APP_PATH/Contents/Frameworks/Sparkle.framework" \
+            2>/dev/null; then
+            echo "Sparkle.framework signature is valid."
+          else
+            echo "Sparkle.framework is missing or unsigned after Developer ID export."
+            exit 1
+          fi
 
       - name: Package DDock.zip
-        # TODO(Esi): /usr/bin/ditto -c -k --sequesterRsrc --keepParent DDock.app DDock.zip
-        if: false
-        run: echo "TODO package DDock.zip"
+        run: |
+          set -eu
+          update_dir="$RUNNER_TEMP/update-staging"
+          rm -rf "$update_dir"
+          mkdir -p "$update_dir"
+          /usr/bin/ditto -c -k --sequesterRsrc --keepParent \
+            "$APP_PATH" "$update_dir/DDock.zip"
+          echo "UPDATE_DIR=$update_dir" >> "$GITHUB_ENV"
+          zipinfo -1 "$update_dir/DDock.zip" | head -n 20
+          if ! zipinfo -1 "$update_dir/DDock.zip" | grep -q '^DDock.app/'; then
+            echo "DDock.zip must contain DDock.app at its root."
+            exit 1
+          fi
 
       - name: Stage bilingual Sparkle notes
-        # TODO(Esi): copy docs/releases/<version>.md to the staging folder as DDock.md
-        # so generate_appcast embeds German and English notes. GitHub Release body
-        # uses only the English section.
-        if: false
-        run: echo "TODO stage DDock.md beside DDock.zip"
+        env:
+          NOTES_PATH: ${{ needs.watch.outputs.notes_path }}
+        run: |
+          set -eu
+          if [ -n "${NOTES_PATH:-}" ] && [ -f "$NOTES_PATH" ]; then
+            cp "$NOTES_PATH" "$UPDATE_DIR/DDock.md"
+            echo "Copied $NOTES_PATH to $UPDATE_DIR/DDock.md"
+          else
+            echo "docs/releases notes vanished after preflight."
+            exit 1
+          fi
 
       - name: Generate appcast
-        # TODO(Esi): generate_appcast --ed-key-file from SPARKLE_PRIVATE_ED_KEY
-        # (or --account de.benjaminkraatz.DeeDock on a Keychain-equipped runner)
-        # --download-url-prefix https://github.com/benjamin-kraatz/DeeDock/releases/download/<tag>/
-        # --maximum-deltas 0
-        # Never print SPARKLE_PRIVATE_ED_KEY or the generated EdDSA signature payload.
-        if: false
         env:
           SPARKLE_PRIVATE_ED_KEY: ${{ secrets.SPARKLE_PRIVATE_ED_KEY }}
-        run: echo "TODO generate_appcast"
+          RELEASE_TAG: ${{ needs.watch.outputs.release_tag }}
+          BUILD_NUMBER: ${{ needs.watch.outputs.build_number }}
+        run: |
+          set -eu
+          extra=(--embed-release-notes)
+          # SPARKLE_PRIVATE_ED_KEY is the generate_keys -x line. Sparkle 2.9.6
+          # reads that one line from stdin when --ed-key-file is -. Never print
+          # the key or the sparkle:edSignature payload.
+          python3 -c 'import os,sys; sys.stdout.write(os.environ["SPARKLE_PRIVATE_ED_KEY"].splitlines()[0].strip() + "\n")' \
+            | "$SPARKLE_BIN/generate_appcast" \
+              --ed-key-file - \
+              --account "$SPARKLE_KEYCHAIN_ACCOUNT" \
+              --download-url-prefix "$DOWNLOAD_URL_ROOT/$RELEASE_TAG/" \
+              --maximum-deltas 0 \
+              "${extra[@]}" \
+              "$UPDATE_DIR"
+          appcast="$UPDATE_DIR/appcast.xml"
+          if [ ! -f "$appcast" ]; then
+            echo "generate_appcast did not write appcast.xml"
+            ls -la "$UPDATE_DIR"
+            exit 1
+          fi
+          BUILD_NUMBER="$BUILD_NUMBER" APPCAST="$appcast" python3 - <<'PY'
+          import os, sys, xml.etree.ElementTree as ET
+          tree = ET.parse(os.environ["APPCAST"])
+          enclosure = tree.find(".//enclosure")
+          if enclosure is None:
+              print("appcast.xml has no enclosure", file=sys.stderr)
+              raise SystemExit(1)
+          sig = enclosure.get("{http://www.andymatuschak.org/xml-namespaces/sparkle}edSignature")
+          if not sig:
+              sig = enclosure.get("sparkle:edSignature")
+          url = enclosure.get("url")
+          version = tree.findtext(".//{http://www.andymatuschak.org/xml-namespaces/sparkle}version")
+          if not version:
+              version = enclosure.get("{http://www.andymatuschak.org/xml-namespaces/sparkle}version") or enclosure.get("sparkle:version")
+          if not sig:
+              print("appcast enclosure is missing sparkle:edSignature", file=sys.stderr)
+              raise SystemExit(1)
+          expected = os.environ["BUILD_NUMBER"]
+          if version and version != expected:
+              print(f"appcast version {version} does not match CURRENT_PROJECT_VERSION {expected}", file=sys.stderr)
+              raise SystemExit(1)
+          print(f"appcast enclosure present; edSignature length={len(sig)}")
+          print(f"download url={url}")
+          print(f"sparkle version={version}")
+          PY
+
+      - name: Write version metadata
+        env:
+          MARKETING_VERSION: ${{ needs.watch.outputs.marketing_version }}
+          BUILD_NUMBER: ${{ needs.watch.outputs.build_number }}
+          RELEASE_TAG: ${{ needs.watch.outputs.release_tag }}
+          HAS_ENGLISH: ${{ needs.watch.outputs.has_english }}
+        run: |
+          set -eu
+          {
+            echo "marketing_version=$MARKETING_VERSION"
+            echo "build_number=$BUILD_NUMBER"
+            echo "release_tag=$RELEASE_TAG"
+            echo "has_english=$HAS_ENGLISH"
+            echo "git_sha=$GITHUB_SHA"
+          } > "$UPDATE_DIR/version-metadata.txt"
+
+      - name: Upload Sparkle artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ddock-sparkle
+          path: |
+            ${{ env.UPDATE_DIR }}/DDock.zip
+            ${{ env.UPDATE_DIR }}/appcast.xml
+            ${{ env.UPDATE_DIR }}/DDock.md
+            ${{ env.UPDATE_DIR }}/version-metadata.txt
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Clean up temporary keychain
+        if: always()
+        run: |
+          set -eu
+          if [ -n "${KEYCHAIN_PATH:-}" ] && [ -f "$KEYCHAIN_PATH" ]; then
+            security delete-keychain "$KEYCHAIN_PATH" || true
+          fi
+          rm -f "$RUNNER_TEMP/developer-id.p12" "$RUNNER_TEMP/DDock-notary.zip"
+          echo "Temporary signing material removed."
+
+  draft:
+    name: Draft GitHub Release
+    if: env.INTENT == 'ship'
+    needs: [watch, archive]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Download Sparkle artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ddock-sparkle
+          path: ${{ runner.temp }}/ddock-sparkle
 
       - name: Open a draft GitHub Release
-        # TODO(Esi): create a draft with English-only body, attach DDock.zip and appcast.xml.
-        # Use GITHUB_TOKEN.
-        if: false
-        run: echo "TODO draft GitHub Release"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MARKETING_VERSION: ${{ needs.watch.outputs.marketing_version }}
+          BUILD_NUMBER: ${{ needs.watch.outputs.build_number }}
+          RELEASE_TAG: ${{ needs.watch.outputs.release_tag }}
+          HAS_ENGLISH: ${{ needs.watch.outputs.has_english }}
+          ARTIFACT_DIR: ${{ runner.temp }}/ddock-sparkle
+        run: |
+          set -eu
+          body="$RUNNER_TEMP/github-release-body.md"
+          ARTIFACT_DIR="$ARTIFACT_DIR" HAS_ENGLISH="$HAS_ENGLISH" \
+            MARKETING_VERSION="$MARKETING_VERSION" BUILD_NUMBER="$BUILD_NUMBER" \
+            BODY="$body" python3 - <<'PY'
+          import os
+          from pathlib import Path
+          notes = Path(os.environ["ARTIFACT_DIR"]) / "DDock.md"
+          has_english = os.environ.get("HAS_ENGLISH") == "true"
+          marketing = os.environ["MARKETING_VERSION"]
+          build = os.environ["BUILD_NUMBER"]
+          fallback = (
+              f"DDock {marketing}, build {build}.\n\n"
+              "Draft from the Release workflow. This is not GitHub Latest.\n"
+          )
+          text = ""
+          if notes.is_file() and has_english:
+              source = notes.read_text()
+              marker = None
+              for line in source.splitlines():
+                  if line.strip() == "## English":
+                      marker = line
+                      break
+              if marker is not None:
+                  text = source.split(marker, 1)[1].lstrip("\n").strip() + "\n"
+          if not text.strip():
+              text = fallback
+          Path(os.environ["BODY"]).write_text(text)
+          PY
+          assets=(
+            "$ARTIFACT_DIR/DDock.zip"
+            "$ARTIFACT_DIR/appcast.xml"
+            "$ARTIFACT_DIR/DDock.md"
+          )
+          for asset in "${assets[@]}"; do
+            if [ ! -f "$asset" ]; then
+              echo "Missing artifact: $asset"
+              ls -la "$ARTIFACT_DIR"
+              exit 1
+            fi
+          done
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            meta="$(gh release view "$RELEASE_TAG" --json isDraft,isLatest --jq '"\(.isDraft) \(.isLatest)"')"
+            is_draft="${meta%% *}"
+            is_latest="${meta##* }"
+            if [ "$is_draft" != "true" ] || [ "$is_latest" = "true" ]; then
+              echo "Release $RELEASE_TAG exists and is not a safe draft. Refusing to overwrite Latest or a published release."
+              exit 1
+            fi
+            gh release edit "$RELEASE_TAG" --draft --notes-file "$body" \
+              --title "DDock $MARKETING_VERSION"
+            gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
+          else
+            gh release create "$RELEASE_TAG" "${assets[@]}" \
+              --draft \
+              --title "DDock $MARKETING_VERSION" \
+              --notes-file "$body" \
+              --target "$GITHUB_SHA"
+          fi
+          echo "Opened draft GitHub Release $RELEASE_TAG. Latest was not published."
 
       - name: Publish Latest
-        # TODO(Esi): publish the draft as Latest only for intent=ship after asset checks.
-        # Nara and other bots must not run this step.
-        if: false
-        run: echo "TODO publish Latest"
+        if: ${{ inputs.publish_latest == true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.watch.outputs.release_tag }}
+        run: |
+          set -eu
+          echo "publish_latest is true. Marking $RELEASE_TAG as the latest published release."
+          gh release edit "$RELEASE_TAG" --draft=false --latest
 
   remind-on-failure:
     name: Remind Esi to file a Linear issue
-    if: failure()
+    if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
-    needs: release
+    needs: [watch, archive, draft]
     steps:
       - name: Print Linear follow-up
         run: |
