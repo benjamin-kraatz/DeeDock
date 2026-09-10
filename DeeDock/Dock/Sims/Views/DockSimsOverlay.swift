@@ -156,7 +156,6 @@ private enum DockSimsOverlayPreview {
     }
     .padding(24)
     .background(.black)
-    .environment(\.accessibilityReduceMotion, true)
 }
 
 #Preview("Low and high intensity") {
