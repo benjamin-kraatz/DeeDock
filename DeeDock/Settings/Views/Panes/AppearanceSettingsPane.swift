@@ -74,7 +74,7 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var magnification: Double = 1.4
     @Previewable @State var itemSpacing: Double = 4
     @Previewable @State var cornerRadius: Double = 22
-    @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .plasma
+    @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .stardust
     @Previewable @State var animate = true
     ScrollView {
         AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,

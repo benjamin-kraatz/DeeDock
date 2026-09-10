@@ -14,13 +14,16 @@ struct DockSettings: Codable, Equatable {
 
     /// Marker for running applications, independent of keyboard selection and foreground activity.
     enum RunningIndicatorStyle: String, Codable, CaseIterable {
-        case dot, bar, square, targetLock, orbit, stardust, powerBadge, glitch,
-             plasma, hologram, solarFlare, prism, lavaChrome, singularity, hidden
+        case dot, bar, square, targetLock, orbit, stardust, powerBadge, hidden
 
-        /// Withdrawn styles, mapped to their nearest survivor. A saved preference naming one
-        /// must keep working: rejecting it would fail the whole settings document, not just
-        /// this field. Genuinely unknown values still throw.
-        private static let retired: [String: Self] = ["neon": .plasma, "aura": .solarFlare]
+        /// Withdrawn styles, mapped to Dot so a saved preference naming one still loads.
+        /// Rejecting it would fail the whole settings document, not just this field.
+        /// Genuinely unknown values still throw.
+        private static let retired: [String: Self] = [
+            "neon": .dot, "aura": .dot,
+            "glitch": .dot, "plasma": .dot, "hologram": .dot, "solarFlare": .dot,
+            "prism": .dot, "lavaChrome": .dot, "singularity": .dot,
+        ]
 
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
@@ -31,6 +34,10 @@ struct DockSettings: Codable, Equatable {
             }
             self = value
         }
+
+        /// Whether this style has motion that **Animate indicators** can switch off.
+        /// Only Stardust animates; Reduce Motion overrides the preference without rewriting it.
+        var animates: Bool { self == .stardust }
     }
 
     /// Layers affected by idle dimming. Labels and interaction feedback remain fully readable.
@@ -71,8 +78,8 @@ struct DockSettings: Codable, Equatable {
     var windowPeekHoverDelay: Double = 0.4
     var tooltipPreset: DockTooltipPreset = .classic
     var runningIndicatorStyle: RunningIndicatorStyle = .dot
-    /// Whether the shader indicator styles animate. The drawn styles are always still, and
-    /// Reduce Motion overrides this without rewriting the saved preference.
+    /// Whether Stardust twinkles. Drawn styles are always still, and Reduce Motion
+    /// overrides this without rewriting the saved preference.
     var animateIndicators: Bool = true
     /// Artwork motion for cold app launches; Reduce Motion uses progress feedback instead.
     var launchAnimation: DockLaunchAnimation = .bounce

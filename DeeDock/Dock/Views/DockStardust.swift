@@ -13,8 +13,8 @@ struct DockStardust: View {
     let animated: Bool
 
     private static let slots = 4
-    /// Matches `DockIconAura.period`: elapsed time is wrapped, and every rate below is a
-    /// whole number of cycles within it, so the wrap is seamless.
+    /// Elapsed time is wrapped to this period, and every rate below is a whole number of
+    /// cycles within it, so the wrap is seamless.
     private static let period: Double = 60
     private static let palette: [Color] = [.yellow, .pink, .cyan, .mint, .orange, .white]
 

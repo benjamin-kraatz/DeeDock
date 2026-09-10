@@ -23,11 +23,9 @@ struct DockAppButton: View {
         return DockAppearanceOpacity(settings: fade.settings, idleFraction: fade.fraction,
                                      reduceTransparency: reduceTransparency).icons
     }
-    /// Stable per-application shader variation, tinted by the icon's own dominant hue.
-    /// `DockIconAccent` caches by identity, so reading it from the body stays cheap.
+    /// Stable per-application variation for Stardust sparkle sites.
     private var indicatorVariant: DockIndicatorVariant {
-        DockIndicatorVariant(identity: item.id,
-                             accent: DockIconAccent.accent(for: item.icon, identity: item.id))
+        DockIndicatorVariant(identity: item.id)
     }
     /// A dock nobody can see, or one that has already faded out, schedules no frames.
     private var indicatorAnimated: Bool { 

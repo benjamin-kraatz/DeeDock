@@ -3,9 +3,9 @@ import SwiftUI
 
 /// The dominant chromatic hue of an application icon, cached per identity.
 ///
-/// The shaders already read the artwork's local colors, but a per-pixel bleed alone has no
-/// sense of what an icon *is*: a mostly-white icon with a red mark reads as white. One
-/// dominant hue restores that identity, so WhatsApp glows green and Ghostty violet.
+/// A per-pixel sample alone has no sense of what an icon *is*: a mostly-white icon with a
+/// red mark reads as white. One dominant hue restores that identity, so WhatsApp tints
+/// green and Ghostty violet on surfaces that borrow the app colour.
 ///
 /// Each icon is reduced to a 16×16 bitmap once. Hues are averaged on the colour circle,
 /// weighted by alpha and by squared saturation, so a small vivid mark outvotes a large grey
@@ -18,7 +18,7 @@ enum DockIconAccent {
 
     /// Alpha below this contributes no colour; it is antialiasing, not artwork.
     private static let visible = 0.1
-    /// Below these the icon is treated as achromatic and the shader keeps its own palette.
+    /// Below these the icon is treated as achromatic and callers keep the system accent.
     private static let minimumAgreement = 0.35
     private static let minimumSaturation = 0.18
 

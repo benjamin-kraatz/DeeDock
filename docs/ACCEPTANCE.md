@@ -1,5 +1,16 @@
 # DeeDock acceptance record
 
+## DEE-32 Metal running indicators withdrawn
+
+Removed on 2026-09-10 so Release archive on `xcode-27` does not need MetalToolchain.
+See Linear [DEE-32](https://linear.app/d-zwei/issue/DEE-32/release-ship-archive-fails-missing-metal-toolchain-on-xcode-27) and the failed ship [run 34455065795](https://github.com/benjamin-kraatz/DeeDock/actions/runs/34455065795).
+
+`DeeDock/Dock/Views/RunningIndicatorShaders.metal` and `DockIconAura` are gone. The synchronized Xcode group no longer has a `.metal` file to compile. Appearance keeps Dot, Bar, Square, Target Lock, Orbit, Stardust, Power Badge, and Hidden. Saved Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, Glitch, Neon, and Aura values load as Dot.
+
+The Release workflow was not changed. `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` stay 0.2.2 / 19.
+
+No Xcode build, archive, or tests were run in this environment. Native acceptance of the remaining SwiftUI indicators is unchanged from the earlier running-indicator records.
+
 ## DEE-26 app suggestions
 
 Implemented on `codex/dee-26`. The opt-in Suggested section shares Launcher app controls,
@@ -472,6 +483,8 @@ Results: **TEST BUILD SUCCEEDED** and **BUILD SUCCEEDED**. Logs are `/tmp/DeeDoc
 No tests were executed, app launched, or automated visual checks performed. Runtime acceptance remains pending for the disabled picker and subtitle, defaults and override restoration, menu-bar auto-hide, notched and unnotched displays, mixed-edge monitors, negative origins, display rearrangement, scrolling and drag destinations, native menus and focus, VoiceOver, all animations and activation zones, Spaces/full-screen behavior, and sleep/wake. The placement restriction uses the existing display visible frame supplied by macOS; compilation does not establish behavior when reserved system UI changes. Stop for review before committing this addition.
 
 ## Running indicator styles
+
+Withdrawn Metal styles are recorded under [DEE-32](#dee-32-metal-running-indicators-withdrawn). The gallery below describes the earlier set.
 
 Added on 2026-09-03 before the planned background and idle-fading work.
 

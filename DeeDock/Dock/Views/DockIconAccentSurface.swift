@@ -2,12 +2,12 @@ import AppKit
 import SwiftUI
 
 extension DockIconAccent {
-    /// The icon's dominant hue, toned for panel surfaces rather than for the dock's glow.
+    /// The icon's dominant hue, toned for panel surfaces rather than for emitted light.
     ///
-    /// `accent(for:identity:)` returns emitted light: full brightness, high saturation, meant to
-    /// bleed behind artwork. The same value behind body text is unreadable on a light window, and a
-    /// yellow or cyan icon is the case that proves it. Fixing saturation and brightness per
-    /// appearance keeps every app's window equally legible while still being recognizably its color.
+    /// `accent(for:identity:)` returns full brightness and high saturation. The same value
+    /// behind body text is unreadable on a light window, and a yellow or cyan icon is the
+    /// case that proves it. Fixing saturation and brightness per appearance keeps every
+    /// app's window equally legible while still being recognizably its color.
     ///
     /// Returns `nil` for achromatic artwork, where the caller should stay on the system accent.
     static func surface(for icon: NSImage, identity: String, dark: Bool) -> Color? {

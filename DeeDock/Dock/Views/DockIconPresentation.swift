@@ -14,9 +14,9 @@ struct DockIconPresentation<Artwork: View>: View {
     let launching: Bool
     let keyboardSelected: Bool
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
-    /// Per-application shader variation; the drawn indicator styles ignore it.
+    /// Per-application variation; only Stardust reads it.
     var indicatorVariant: DockIndicatorVariant = .neutral
-    /// Whether the shader indicators may animate right now.
+    /// Whether Stardust may twinkle right now.
     var indicatorAnimated = false
 
     /// Applied only to artwork, preserving focus/launch feedback and the button hit region.

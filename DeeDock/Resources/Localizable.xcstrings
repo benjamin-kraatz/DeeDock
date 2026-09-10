@@ -19212,13 +19212,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Markiert laufende Apps, auch im Hintergrund. Wähle eine Randmarkierung, einen Rahmen, einen Leuchteffekt oder ein Kennzeichen. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity und Glitch verwenden das jeweilige App-Symbol für eigene Farben und Formen. Diese Effekte und Stardust lassen sich animieren. Hidden lässt die Symbolabstände unverändert. Wähle „Dock fokussieren“ im DDock-Menü, um den separaten Auswahlrahmen für die Tastaturbedienung zu sehen."
+            "value" : "Markiert laufende Apps, auch im Hintergrund. Wähle eine Randmarkierung, einen Rahmen oder ein Kennzeichen. Stardust lässt sich animieren. Hidden lässt die Symbolabstände unverändert. Wähle „Dock fokussieren“ im DDock-Menü, um den separaten Auswahlrahmen für die Tastaturbedienung zu sehen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, glow, or badge. Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity and Glitch read each app's own icon, so every app gets its own colours and figure; those and Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DDock menu to see the independent keyboard selection outline."
+            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, or badge. Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DDock menu to see the independent keyboard selection outline."
           }
         }
       }

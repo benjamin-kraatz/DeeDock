@@ -66,13 +66,6 @@ extension DockSettings.RunningIndicatorStyle {
          SettingsOption(value: .orbit, title: .settingsIndicatorOrbit, symbol: "circle.dotted"),
          SettingsOption(value: .stardust, title: .settingsIndicatorStardust, symbol: "sparkles"),
          SettingsOption(value: .powerBadge, title: .settingsIndicatorPowerBadge, symbol: "bolt.fill"),
-         SettingsOption(value: .glitch, title: .settingsIndicatorGlitch, symbol: "waveform.path"),
-         SettingsOption(value: .plasma, title: .settingsIndicatorPlasma, symbol: "waveform"),
-         SettingsOption(value: .hologram, title: .settingsIndicatorHologram, symbol: "rectangle.on.rectangle"),
-         SettingsOption(value: .solarFlare, title: .settingsIndicatorSolarFlare, symbol: "sun.max.fill"),
-         SettingsOption(value: .prism, title: .settingsIndicatorPrism, symbol: "diamond.fill"),
-         SettingsOption(value: .lavaChrome, title: .settingsIndicatorLavaChrome, symbol: "drop.fill"),
-         SettingsOption(value: .singularity, title: .settingsIndicatorSingularity, symbol: "hurricane"),
          SettingsOption(value: .hidden, title: .settingsIndicatorHidden, symbol: "eye.slash")]
     }
 }

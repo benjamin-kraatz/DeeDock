@@ -20,8 +20,8 @@ struct OnboardingAppearanceStage: View {
     @State private var elapsed: Double = 0
 
     /// A spread across the gallery — the restrained default, two geometric marks, and three of
-    /// the expressive ones — rather than all fifteen, which at this pace would be a flicker.
-    private static let styles: [DockSettings.RunningIndicatorStyle] = [.dot, .bar, .stardust, .orbit, .prism, .singularity]
+    /// the expressive ones — rather than every style, which at this pace would be a flicker.
+    private static let styles: [DockSettings.RunningIndicatorStyle] = [.dot, .bar, .stardust, .orbit, .targetLock, .powerBadge]
     private static let dwell: Double = 1.5
     private static let crossFade: Double = 0.4
 
