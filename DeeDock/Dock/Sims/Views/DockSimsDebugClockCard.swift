@@ -29,10 +29,10 @@ struct DockSimsDebugClockCard: View {
                     .foregroundStyle(.secondary)
             }
             SettingsActionRow {
-                Button(.simsDebugAdvance1h) { advance(DockSimsLimits.debugHour) }
-                Button(.simsDebugAdvance2h) { advance(DockSimsLimits.debugTwoHours) }
-                Button(.simsDebugAdvance6h) { advance(DockSimsLimits.debugHungryStep) }
-                Button(.simsDebugAdvance8h) { advance(DockSimsLimits.debugLonelyStep) }
+                Button(.simsDebugAdvance1H) { advance(DockSimsLimits.debugHour) }
+                Button(.simsDebugAdvance2H) { advance(DockSimsLimits.debugTwoHours) }
+                Button(.simsDebugAdvance6H) { advance(DockSimsLimits.debugHungryStep) }
+                Button(.simsDebugAdvance8H) { advance(DockSimsLimits.debugLonelyStep) }
             }
             SettingsActionRow {
                 Button(.simsDebugResetClock, action: reset)
