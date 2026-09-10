@@ -47,6 +47,19 @@ private enum LauncherPreviewData {
         if empty { state.query = "No matching app" }
         return state
     }
+
+    static func germanFileActionsState() -> LauncherState {
+        let state = state(list: true)
+        state.adoptFiles(.owned(
+            DocumentResourceAccess(
+                [URL(fileURLWithPath: "/Preview/Notes.txt")],
+                startAccess: { _ in false },
+                stopAccess: { _ in }
+            ),
+            source: .picker
+        ))
+        return state
+    }
 }
 
 /// Keeps the launcher transition interactive in the canvas without creating a real dock panel.
@@ -158,19 +171,9 @@ private struct LauncherTransitionPreview: View {
     return LauncherView(state: state).frame(width: 900, height: 640)
 }
 
-#Preview("Launcher file actions, German, Reduce Motion") {
-    let state = LauncherPreviewData.state(list: true)
-    state.adoptFiles(.owned(
-        DocumentResourceAccess(
-            [URL(fileURLWithPath: "/Preview/Notes.txt")],
-            startAccess: { _ in false },
-            stopAccess: { _ in }
-        ),
-        source: .picker
-    ))
-    return LauncherView(state: state)
+#Preview("Launcher file actions, German") {
+    LauncherView(state: LauncherPreviewData.germanFileActionsState())
         .frame(width: 720, height: 540)
         .environment(\.locale, Locale(identifier: "de"))
-        .environment(\.accessibilityReduceMotion, true)
 }
 #endif

@@ -69,7 +69,7 @@ struct LauncherFileActionsView: View {
     }
 
     @ViewBuilder private var status: some View {
-        switch state.status {
+        switch launcher.fileActions.status {
         case .idle:
             EmptyView()
         case .pending:
@@ -180,11 +180,4 @@ private struct LauncherFileActionRow: View {
         .frame(width: 720, height: 420)
 }
 
-#Preview("File actions, Reduce Motion") {
-    let launcher = LauncherState(catalog: ApplicationCatalog(service: ApplicationService()))
-    return LauncherFileActionsView(launcher: launcher)
-        .padding()
-        .frame(width: 720, height: 420)
-        .environment(\.accessibilityReduceMotion, true)
-}
 #endif

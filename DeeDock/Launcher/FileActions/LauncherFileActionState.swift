@@ -132,7 +132,7 @@ final class LauncherFileActionState {
         let kind = kind
         let items = LauncherFileActionCatalog.matching(catalogItems, query: query).filter { item in
             switch kind {
-            case .all: true
+            case .all: return true
             case .application: if case .openWith = item.id { return true }; return false
             case .shortcut: if case .shortcut = item.id { return true }; return false
             case .folder:
@@ -286,7 +286,7 @@ final class LauncherFileActionState {
             let outcome = LauncherFileCopy.perform(access, to: destinationAccess.url,
                                                    destinationAccess: destinationAccess)
             await MainActor.run { [weak self] in
-                guard let self, operationGeneration == token, context?.generation == generation else { return }
+                guard let self, operationGeneration == token, context.generation == generation else { return }
                 applyCopy(outcome, destinationName: destinationName, token: token)
             }
         }
