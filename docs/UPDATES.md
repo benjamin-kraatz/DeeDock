@@ -10,7 +10,7 @@ The `DeeDock-TestFlight` scheme compiles the same app with `TESTFLIGHT` instead 
 
 Esi is the release captain. Esi triggers and watches the [Release workflow](../.github/workflows/release.yml) nightly at 23:00 Europe/Berlin and on an explicit ship. Nara and other bots do not cut releases, hold Sparkle or signing secrets, or publish GitHub Latest.
 
-The workflow is a placeholder. Signing, notarization, `generate_appcast`, and Latest publish are stubs until those steps are implemented. The repository already has the [six secrets](#secrets-checklist) the later `notarytool` and signing steps will consume. The manual archive path in this document stays valid.
+`intent=ship` archives the `DeeDock` scheme, exports with Developer ID, notarizes with Apple ID, staples, writes `appcast.xml`, and opens a draft GitHub Release. It does not publish Latest unless Esi sets `publish_latest`. The first smoke path stays draft-only. The [manual archive path](#prepare-the-release) stays valid.
 
 GitHub Release body is English only. Sparkle release notes are bilingual German and English. See [Release notes](#release-notes).
 
@@ -52,7 +52,13 @@ xcodebuild -exportArchive -archivePath /absolute/path/to/DDock.xcarchive \
 
 Use an export-options plist saved from Xcode's Developer ID distribution flow for the current Xcode version and signing team. If the command-line export has not notarized the app, ZIP the exported app, submit it with `xcrun notarytool submit ... --keychain-profile <profile> --wait`, then staple the accepted ticket to the app with `xcrun stapler staple`. Recreate the final ZIP after stapling. Never modify the app after producing the signed update archive.
 
-The Release workflow does not use a keychain profile. Later CI notarization uses `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID` with `notarytool`. It does not use an App Store Connect API key. TestFlight stays on Xcode Cloud.
+The Release workflow does not use a keychain profile. CI notarization runs:
+
+```sh
+xcrun notarytool submit <zip> --apple-id --password --team-id --wait
+```
+
+It reads `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID`. It does not use an App Store Connect API key. TestFlight stays on Xcode Cloud.
 
 ## Generate and publish the feed
 
@@ -75,7 +81,9 @@ xcrun stapler validate "$EXPORTED_APP"
 
 Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DDock.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
 
-Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. Write the GitHub Release body in English only. Put bilingual Sparkle notes in `docs/releases/<MARKETING_VERSION>.md` and copy that file beside the ZIP as `DDock.md` before `generate_appcast`, so the appcast embeds German and English. Verify both assets before publishing the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
+Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. When `docs/releases/<MARKETING_VERSION>.md` exists, copy it beside the ZIP as `DDock.md` before `generate_appcast`, and upload that `DDock.md` with the draft. Write the GitHub Release body in English only. Sparkle notes stay bilingual German and English.
+
+The Release workflow stops at that draft. Leave `publish_latest` off until Benn confirms a Latest cut. Verify both assets before anyone marks the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
 
 A feed containing only the newest version is sufficient while supported OS and architecture requirements remain the same. If those requirements change, retain compatible older appcast entries and their original asset URLs so existing users still receive the last compatible build. Do not rewrite older enclosures to point at the newest release tag.
 
@@ -103,7 +111,7 @@ This target preserves the existing signing and sandbox settings. It establishes 
 
 With explicit authorization, install an older Developer ID signed and notarized build, then update to a newer signed build through a staging feed. Verify relaunch, saved dock settings, manual checks, automatic-check consent and persistence, offline errors, invalid signatures, read-only installation locations, and reminders while another app has focus. Confirm German text, keyboard access, and menu availability during an active update.
 
-Compilation and bundle inspection do not establish these runtime behaviors. Until the Release workflow stubs are replaced, no feed, release, or key backup is published automatically.
+Compilation and bundle inspection do not establish these runtime behaviors. `intent=watch` never publishes. `intent=ship` opens a draft only. Latest stays off until Esi sets `publish_latest`. The workflow never writes a key backup.
 
 ## Release notes
 
@@ -135,16 +143,29 @@ Existing `docs/releases/0.2.0.md` is German only. Add an `## English` section on
 
 ## Release pipeline
 
-The [Release workflow](../.github/workflows/release.yml) is the intended CI path for the same archive, notarize, `generate_appcast`, draft, and Latest sequence described above.
+The [Release workflow](../.github/workflows/release.yml) runs the archive, Developer ID export, Apple ID notarization, staple, `generate_appcast`, and draft sequence above.
 
 Esi triggers it in two ways:
 
 1. Nightly watch at 23:00 Europe/Berlin. The workflow uses cron `0 23 * * *` with `timezone: Europe/Berlin`. GitHub follows Central European Time in winter (23:00 Berlin is 22:00 UTC) and Central European Summer Time in summer (23:00 Berlin is 21:00 UTC). Do not read that cron as 23:00 UTC.
-2. Explicit ship from **Actions → Release → Run workflow**, with intent `ship`.
+2. Explicit ship from **Actions → Release → Run workflow**, with intent `ship`. Leave **publish_latest** unchecked.
 
-Scheduled runs always use intent `watch`. They print version and secret-presence status. They do not publish. `ship` stays blocked until the stub steps are replaced.
+Scheduled runs always use intent `watch`. They print version, secret-presence status, and the runner's Xcode version. They do not archive or publish.
 
-Expected later runner: a Mac with Xcode 27 and a Developer ID identity. `macos-latest` in the workflow is a placeholder. A self-hosted pool can replace it without changing the step order.
+`ship` does this, in order:
+
+1. Fail if any of the [six secrets](#secrets-checklist) is missing, or if the runner's Xcode major version or macOS SDK is below 27.
+2. Resolve Sparkle tools from the pinned 2.9.6 package (`generate_appcast` under the cloned `artifacts/sparkle` tree).
+3. Import `DEVELOPER_ID_APPLICATION_CERTIFICATE` into a temporary keychain. The job deletes that keychain when it finishes.
+4. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime. This is not TestFlight.
+5. Export with a generated Developer ID options plist, then `xcrun notarytool submit ... --apple-id --password --team-id --wait`, then `stapler staple`. Nested Sparkle code stays signed. The job does not weaken hardened runtime.
+6. Verify `codesign --deep --strict` and `stapler validate`.
+7. Build `DDock.zip` with `ditto`, copy bilingual notes to `DDock.md` when `docs/releases/<MARKETING_VERSION>.md` exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`.
+8. Open a draft GitHub Release for `v<MARKETING_VERSION>` with an English-only body. Upload `DDock.zip`, `appcast.xml`, and `DDock.md` when that notes file was staged. The job refuses to overwrite a published or Latest release.
+
+`publish_latest` defaults to false. Turn it on only after Benn confirms a Latest cut. The first smoke path must stay a draft.
+
+`macos-latest` is the public runner. DDock needs Xcode 27 and the macOS 27 SDK. If the hosted image cannot archive, ship fails and tells Esi and Benn to point `runs-on` at a self-hosted Mac they already operate. Do not invent a pool name. Developer ID import can still work on a hosted runner. The archive cannot without the SDK.
 
 On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline`. Esi may add label `Bot-Nara` once if Nara should fix pipeline code. Nara does not cut the release, hold secrets, or publish Latest.
 
@@ -167,8 +188,14 @@ Sparkle EdDSA private key. The matching public key is `SPARKLE_PUBLIC_ED_KEY` in
 
 - [ ] `SPARKLE_PRIVATE_ED_KEY`
 
+These are the assumed secret formats. Confirm them against what is stored. Never paste those values into the repo, a PR, or logs.
+
+- `DEVELOPER_ID_APPLICATION_CERTIFICATE` is the base64 encoding of a PKCS#12 (`.p12`) that holds the Developer ID Application identity.
+- `DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD` is that `.p12` password.
+- `SPARKLE_PRIVATE_ED_KEY` is the first line written by `generate_keys --account de.benjaminkraatz.DeeDock -x`. That line is Sparkle's base64 EdDSA secret. The workflow feeds it to `generate_appcast --ed-key-file -`. It does not use deprecated `-s`.
+
 Do not add App Store Connect API key secrets. TestFlight stays on Xcode Cloud.
 
-`GITHUB_TOKEN` with `contents: write` is the default for a later draft release, asset upload, and Latest publish. There is no separate GitHub token secret.
+`GITHUB_TOKEN` with `contents: write` opens the draft, uploads assets, and can publish Latest only when `publish_latest` is true. There is no separate GitHub token secret.
 
 Sources: [Sparkle setup and distribution](https://sparkle-project.org/documentation/), [custom user drivers](https://sparkle-project.org/documentation/custom-user-interfaces/).

@@ -90,4 +90,4 @@ Keep upstream skill files intact. Sources and licenses are recorded in `.agents/
 
 Read `docs/UPDATES.md` when the task is the Release workflow, Sparkle publishing, or a `Bot-Nara` pipeline fix.
 
-Esi triggers and watches Release. Agents keep to pipeline code and docs. They do not cut a release, store Sparkle or signing secrets, or publish GitHub Latest.
+Esi triggers and watches Release. Agents keep to pipeline code and docs. They do not cut a release, store Sparkle or signing secrets, or publish GitHub Latest. `ship` opens a draft. `publish_latest` stays false until Esi confirms a Latest cut.
