@@ -60,6 +60,8 @@ final class DockStore {
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
+    /// Fired on app click and after a pin click or drop that changed this display's pins.
+    @ObservationIgnored var soapBubblePlay: ((String) -> Void)?
 
     /// Pin IDs parked on a magnetic edge. Those items stay favorites but leave the
     /// linear dock until the user drops them back onto the glass.
@@ -311,7 +313,7 @@ final class DockStore {
         } else {
             pins.append(.application(item.reference))
         }
-        _ = savePins(pins)
+        notePinInteraction(item.id, previous: persistedPins, succeeded: savePins(pins))
     }
 
     /// Persists one completed edit. Preview state must never call this method.
@@ -331,9 +333,14 @@ final class DockStore {
     }
 
     func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
+        let previous = persistedPins
         willMutateFavoriteIDs?(incoming.map(\.id))
         pinIDsHiddenFromDock.subtract(incoming.map(\.id))
-        return savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        let succeeded = savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        if let itemID = incoming.compactMap(\.application?.id).first {
+            notePinInteraction(itemID, previous: previous, succeeded: succeeded)
+        }
+        return succeeded
     }
 
     func movePin(_ id: String, by distance: Int) {
@@ -364,6 +371,12 @@ final class DockStore {
         return pins.count
     }
 
+    /// Plays soap-bubble feedback only when the write landed and the pin list actually changed.
+    private func notePinInteraction(_ itemID: String, previous: [DockPin], succeeded: Bool) {
+        guard succeeded, persistedPins != previous else { return }
+        soapBubblePlay?(itemID)
+    }
+
     func setFolderPresentation(_ presentation: FolderStackPresentation, for id: UUID) -> Bool {
         if id == DownloadsDockItem.id {
             UserDefaults.standard.set(presentation.rawValue, forKey: "downloadsPresentation.\(displayID)")
@@ -387,6 +400,7 @@ final class DockStore {
 
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
     func performPrimaryAction(_ item: DockItem) {
+        soapBubblePlay?(item.id)
         let token = session.token
         catalog.performPrimaryAction(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
@@ -456,5 +470,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

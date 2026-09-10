@@ -134,6 +134,10 @@ final class DockPanelController {
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.animateIndicators = settings.animateIndicators
         interaction.launchAnimation = settings.launchAnimation
+        interaction.soapBubbles.isEnabled = settings.soapBubbleEffects
+        if !settings.soapBubbleEffects || NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            interaction.soapBubbles.removeAll()
+        }
         interaction.idleFade.configure(settings,
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
