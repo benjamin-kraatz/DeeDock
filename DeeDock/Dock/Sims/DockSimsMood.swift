@@ -99,6 +99,11 @@ enum DockSimsLimits {
     static let intensityRange = 15.0...100.0
     static let intensityStep = 5.0
     static let storageKey = "dock.sims.v1"
+    /// Debug clock steps. Not persisted; Release builds never expose them.
+    static let debugHour: TimeInterval = 3_600
+    static let debugTwoHours: TimeInterval = 2 * 3_600
+    static let debugHungryStep: TimeInterval = hungerPeriod
+    static let debugLonelyStep: TimeInterval = lonelyPeriod
 
     static func clampIntensity(_ value: Double) -> Double {
         let stepped = (value / intensityStep).rounded() * intensityStep

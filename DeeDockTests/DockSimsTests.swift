@@ -166,4 +166,33 @@ struct DockSimsTests {
         #expect(sims.document.pets["app.0"] == nil)
         #expect(sims.document.pets["app.\(DockSimsLimits.maximumPets + 2)"] != nil)
     }
+
+    @Test("A debug clock advances moods without waiting, and does not persist the offset")
+    func debugClock() throws {
+        let suite = "SimsDebugClock.\(UUID().uuidString)"
+        let (sims, defaults) = try store(suite)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        sims.start()
+        sims.setEnabled(true)
+        #expect(sims.debugTimeOffset == 0)
+        #expect(try #require(sims.pinState(for: "safari", isFavorite: true)).mood(at: .now) == .playful)
+
+        sims.debugAdvanceTime(by: DockSimsLimits.debugHungryStep)
+        #expect(sims.debugTimeOffset == DockSimsLimits.hungerPeriod)
+        let live = try #require(sims.pinState(for: "safari", isFavorite: true))
+        #expect(live.clockOffset == DockSimsLimits.hungerPeriod)
+        #expect(live.mood(at: .now) == .hungry)
+
+        let frozen = try #require(sims.pinState(for: "safari", isFavorite: true, at: .now))
+        #expect(frozen.clockOffset == 0)
+        #expect(frozen.mood(at: .now) == .playful)
+
+        sims.care(.feed, pinID: "safari")
+        let afterFeed = try #require(sims.pinState(for: "safari", isFavorite: true))
+        #expect(afterFeed.mood(at: .now) == .lonely)
+
+        sims.debugResetTime()
+        #expect(sims.debugTimeOffset == 0)
+        #expect(try #require(try DockSimsRepository(defaults: defaults).load()).pets["safari"] != nil)
+    }
 }

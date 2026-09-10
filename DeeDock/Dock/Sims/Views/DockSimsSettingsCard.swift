@@ -8,17 +8,26 @@ struct DockSimsSettingsCard: View {
     let sims: DockSimsStore
 
     var body: some View {
-        DockSimsSettingsCardContent(
-            isEnabled: sims.isEnabled,
-            intensity: sims.intensity,
-            hasPets: sims.hasPets,
-            requiresReset: sims.requiresReset,
-            storageFailed: sims.storageFailed,
-            setEnabled: { sims.setEnabled($0) },
-            setIntensity: { sims.setIntensity($0) },
-            resetMoods: { sims.resetMoods() },
-            reset: { sims.reset() }
-        )
+        VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+            DockSimsSettingsCardContent(
+                isEnabled: sims.isEnabled,
+                intensity: sims.intensity,
+                hasPets: sims.hasPets,
+                requiresReset: sims.requiresReset,
+                storageFailed: sims.storageFailed,
+                setEnabled: { sims.setEnabled($0) },
+                setIntensity: { sims.setIntensity($0) },
+                resetMoods: { sims.resetMoods() },
+                reset: { sims.reset() }
+            )
+            #if DEBUG
+            DockSimsDebugClockCard(
+                offset: sims.debugTimeOffset,
+                advance: { sims.debugAdvanceTime(by: $0) },
+                reset: { sims.debugResetTime() }
+            )
+            #endif
+        }
     }
 }
 

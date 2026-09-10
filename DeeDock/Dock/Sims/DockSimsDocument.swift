@@ -23,13 +23,21 @@ nonisolated struct DockSimsPinState: Equatable, Sendable {
     let lastCheeredAt: Date
     /// Normalized 0…1 animation strength (`intensity / 100`).
     let intensity: Double
+    /// Debug care-clock shift added to every `now` this value is asked about. Zero in Release.
+    var clockOffset: TimeInterval = 0
+
+    /// Wall-clock instant plus the debug offset, so a TimelineView date still sees simulated time.
+    func instant(at now: Date) -> Date {
+        guard clockOffset.isFinite else { return now }
+        return now.addingTimeInterval(clockOffset)
+    }
 
     func hunger(at now: Date) -> Double {
-        DockSimsLimits.hunger(since: lastFedAt, at: now)
+        DockSimsLimits.hunger(since: lastFedAt, at: instant(at: now))
     }
 
     func happiness(at now: Date) -> Double {
-        DockSimsLimits.happiness(since: lastCheeredAt, at: now)
+        DockSimsLimits.happiness(since: lastCheeredAt, at: instant(at: now))
     }
 
     func mood(at now: Date) -> DockSimsMood {

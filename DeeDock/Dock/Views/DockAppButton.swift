@@ -59,8 +59,8 @@ struct DockAppButton: View {
                         DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
                             .allowsHitTesting(false)
                     }
-                    if let interaction,
-                       let state = interaction.sims?.pinState(for: item.id, isFavorite: item.isFavorite) {
+                    if let interaction, let sims = interaction.sims,
+                       let state = sims.pinState(for: item.id, isFavorite: item.isFavorite) {
                         DockSimsOverlay(state: state, size: size, edge: interaction.layout.edge,
                                         artworkOpacity: artworkOpacity, animated: indicatorAnimated)
                             .allowsHitTesting(false)

@@ -16,6 +16,15 @@ final class DockSimsStore {
     var isEnabled: Bool { document.isEnabled }
     var intensity: Double { document.intensity }
     var hasPets: Bool { !document.pets.isEmpty }
+    /// Session-only care-clock shift. Zero in Release. Not written to `dock.sims.v1`.
+    private(set) var debugTimeOffset: TimeInterval = 0
+
+    /// Wall clock plus the debug offset, used when a caller does not pass an explicit instant.
+    var currentTime: Date { Date.now.addingTimeInterval(sanitizedOffset) }
+
+    private var sanitizedOffset: TimeInterval {
+        debugTimeOffset.isFinite ? debugTimeOffset : 0
+    }
 
     init(repository: DockSimsRepository = DockSimsRepository()) {
         self.repository = repository
@@ -33,11 +42,12 @@ final class DockSimsStore {
         }
     }
 
-    func setEnabled(_ enabled: Bool, at date: Date = .now) {
+    func setEnabled(_ enabled: Bool, at date: Date? = nil) {
         guard !requiresReset, document.isEnabled != enabled else { return }
+        let instant = date ?? currentTime
         document.isEnabled = enabled
         if enabled, document.baselineAt == nil {
-            document.baselineAt = date
+            document.baselineAt = instant
         }
         persist()
     }
@@ -51,19 +61,20 @@ final class DockSimsStore {
     }
 
     /// Feed, cheer, or settle one pinned app. Unpinned running tiles are ignored.
-    func care(_ action: DockSimsCareAction, pinID: String, at date: Date = .now) {
+    func care(_ action: DockSimsCareAction, pinID: String, at date: Date? = nil) {
+        let instant = date ?? currentTime
         guard !requiresReset, document.isEnabled, DockSimsLimits.isValidPinID(pinID),
-              date.timeIntervalSince1970.isFinite else { return }
-        let clocks = document.clocks(for: pinID, at: date) ?? (date, date)
+              instant.timeIntervalSince1970.isFinite else { return }
+        let clocks = document.clocks(for: pinID, at: instant) ?? (instant, instant)
         var pet = DockSimsPet(pinID: pinID, lastFedAt: clocks.fed, lastCheeredAt: clocks.cheered)
         switch action {
         case .feed:
-            pet.lastFedAt = date
+            pet.lastFedAt = instant
         case .cheer:
-            pet.lastCheeredAt = date
+            pet.lastCheeredAt = instant
         case .settle:
-            pet.lastFedAt = date
-            pet.lastCheeredAt = date
+            pet.lastFedAt = instant
+            pet.lastCheeredAt = instant
         }
         document.pets[pinID] = pet
         prunePets()
@@ -71,22 +82,38 @@ final class DockSimsStore {
     }
 
     /// Returns nil when Sims is off, frozen, or the tile is not a pin.
-    func pinState(for pinID: String, isFavorite: Bool, at date: Date = .now) -> DockSimsPinState? {
+    ///
+    /// Passing `date` is for tests and previews; the live dock omits it so the debug clock applies.
+    func pinState(for pinID: String, isFavorite: Bool, at date: Date? = nil) -> DockSimsPinState? {
+        let usesLiveClock = date == nil
+        let instant = date ?? currentTime
         guard !requiresReset, document.isEnabled, isFavorite,
-              let clocks = document.clocks(for: pinID, at: date) else { return nil }
+              let clocks = document.clocks(for: pinID, at: instant) else { return nil }
         return DockSimsPinState(
             pinID: pinID,
             lastFedAt: clocks.fed,
             lastCheeredAt: clocks.cheered,
-            intensity: document.intensity / 100
+            intensity: document.intensity / 100,
+            clockOffset: usesLiveClock ? sanitizedOffset : 0
         )
     }
 
+    /// Moves the session care clock forward. Release builds keep the offset at zero.
+    func debugAdvanceTime(by interval: TimeInterval) {
+        guard interval.isFinite, interval != 0 else { return }
+        debugTimeOffset = sanitizedOffset + interval
+    }
+
+    /// Returns the care clock to the wall clock. Written care stamps are left as they are.
+    func debugResetTime() {
+        debugTimeOffset = 0
+    }
+
     /// Clears every pin's care history. The feature stays on; moods start playful again.
-    func resetMoods(at date: Date = .now) {
+    func resetMoods(at date: Date? = nil) {
         guard !requiresReset else { return }
         document.pets = [:]
-        document.baselineAt = date
+        document.baselineAt = date ?? currentTime
         storageFailed = false
         persistRemovingIfEmpty()
     }
@@ -96,6 +123,7 @@ final class DockSimsStore {
         document = .empty
         requiresReset = false
         storageFailed = false
+        debugTimeOffset = 0
         repository.remove()
     }
 

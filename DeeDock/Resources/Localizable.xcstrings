@@ -22751,6 +22751,150 @@
         }
       }
     },
+    "simsDebugAdvance1h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by one hour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+1 Stunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+1 hour"
+          }
+        }
+      }
+    },
+    "simsDebugAdvance2h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by two hours.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+2 Stunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+2 hours"
+          }
+        }
+      }
+    },
+    "simsDebugAdvance6h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by six hours, to hungry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+6 Stunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+6 hours"
+          }
+        }
+      }
+    },
+    "simsDebugAdvance8h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by eight hours, to lonely if recently fed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+8 Stunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+8 hours"
+          }
+        }
+      }
+    },
+    "simsDebugHelp" : {
+      "comment" : "Footnote on the Debug-only Sims time-simulation card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Debug. Die Zuwendungsuhr läuft vor, ohne zu warten. Füttern und Aufmuntern stempeln diese Zeit. „Uhr zurücksetzen“ holt die echte Zeit zurück; schon geschriebene Stempel bleiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug only. Advance the care clock without waiting. Feed and Cheer stamp this time. Reset clock returns to now; stamps already written stay."
+          }
+        }
+      }
+    },
+    "simsDebugOffset" : {
+      "comment" : "Label for the current debug care-clock offset, shown next to a formatted hour count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorsprung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offset"
+          }
+        }
+      }
+    },
+    "simsDebugResetClock" : {
+      "comment" : "Debug-only button that returns the Sims care clock to wall time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhr zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset clock"
+          }
+        }
+      }
+    },
+    "simsDebugTitle" : {
+      "comment" : "Title of the Debug-only Sims time-simulation card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit simulieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulate time"
+          }
+        }
+      }
+    },
     "timelineAccessibility" : {
       "comment" : "VoiceOver label for the dock timeline overlay.",
       "extractionState" : "manual",
