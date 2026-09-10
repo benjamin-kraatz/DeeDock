@@ -62,6 +62,10 @@ struct FeaturesPageContent: View {
                 DockTimelineSettingsCard(history: coordinator.localHistory,
                                          browse: { coordinator.browseLocalHistory() })
             }
+        case .pinWeather:
+            if let coordinator = context.coordinator {
+                PinWeatherSettingsCard(weather: coordinator.pinWeather)
+            }
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)

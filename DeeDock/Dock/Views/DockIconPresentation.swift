@@ -6,6 +6,7 @@ import SwiftUI
 /// and the `icon:` initializer is the convenience for the common case.
 struct DockIconPresentation<Artwork: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.pinWeatherSample) private var pinWeatherSample
     let artwork: Artwork
     let size: CGFloat
     let edge: DockEdge
@@ -62,6 +63,7 @@ struct DockIconPresentation<Artwork: View>: View {
             artwork
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
+                .modifier(PinWeatherChrome(sample: pinWeatherSample))
                 .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size,
                                             variant: indicatorVariant, animated: indicatorAnimated))
                 .animation(artworkAnimation) { $0.opacity(artworkOpacity) }

@@ -36,6 +36,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case permissions
     case appSuggestions
     case localHistory
+    case pinWeather
 
     var id: Self { self }
 
@@ -52,7 +53,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
-             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory: .features
+             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory, .pinWeather: .features
         }
     }
 
@@ -87,6 +88,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .secondaryDockTitle
         case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .localHistory: .timelineTitle
+        case .pinWeather: .pinWeatherTitle
         case .permissions: .windowPeekPermissionsTitle
         }
     }
@@ -103,6 +105,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .localHistory: .settingsFeatureTimelineSubtitle
+        case .pinWeather: .settingsFeaturePinWeatherSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
         }
@@ -130,6 +133,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .symbol("display.2")
         case .appSuggestions: .symbol("sparkles")
         case .localHistory: .symbol("clock.arrow.circlepath")
+        case .pinWeather: .symbol("leaf.fill")
         case .permissions: .symbol("lock.fill")
         }
     }
@@ -155,6 +159,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
         case .appSuggestions: .indigo
         case .localHistory: Color(red: 0.22, green: 0.48, blue: 0.72)
+        case .pinWeather: Color(red: 0.62, green: 0.40, blue: 0.24)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
     }
@@ -180,6 +185,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
         case .appSuggestions: [.indigo, .purple]
         case .localHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
+        case .pinWeather: [Color(red: 0.86, green: 0.62, blue: 0.38), Color(red: 0.48, green: 0.28, blue: 0.16)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
     }
@@ -190,6 +196,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
+        case .pinWeather: .pinWeatherSettingsKeywords
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords

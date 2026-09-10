@@ -12,6 +12,10 @@ struct DockFolderButton: View {
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
     private var primaryAction: () -> Void { { interaction.openFolder?(item, false) } }
+    private var pinWeatherSample: PinWeatherSample? {
+        guard !item.isDownloads, let weather = interaction.pinWeather else { return nil }
+        return weather.sample(for: item.id)
+    }
     private var artworkOpacity: Double {
         DockAppearanceOpacity(settings: interaction.idleFade.settings,
             idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons
@@ -23,6 +27,7 @@ struct DockFolderButton: View {
                                  available: item.isAvailable, running: false, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation)
+                .environment(\.pinWeatherSample, pinWeatherSample)
                 .overlay(alignment: .bottomTrailing) {
                     Image(systemName: "square.stack.3d.up.fill")
                         .font(.system(size: max(10, size * 0.22), weight: .semibold))

@@ -6,6 +6,7 @@ import Observation
 final class DockCoordinator {
     let focusSession = FocusSessionController()
     let localHistory = DockLocalHistoryStore()
+    let pinWeather = PinWeatherStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
@@ -142,6 +143,7 @@ final class DockCoordinator {
         }
         focusSession.start()
         localHistory.start(session: focusSession.session)
+        pinWeather.start()
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
             guard let self else { return }
@@ -326,7 +328,7 @@ final class DockCoordinator {
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles,
-                                  focusSession: focusSession, history: localHistory)
+                                  focusSession: focusSession, history: localHistory, pinWeather: pinWeather)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             configureLauncherSearch(on: panel)
             panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
@@ -336,6 +338,7 @@ final class DockCoordinator {
             }
             panel.interaction.actionTiles = actionTiles
             panel.interaction.timeline = timeline
+            panel.interaction.pinWeather = pinWeather
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
                 focusPopover.toggle(on: panel)
@@ -427,10 +430,12 @@ final class DockCoordinator {
             }
             panel.interaction.openFolder = { [weak self, weak panel] folder, keyboard in
                 guard let self, let panel, panels[display.id] === panel else { return }
+                if !folder.isDownloads { pinWeather.recordUse(folder.id) }
                 folderStacks.show(folder, on: panel, keyboard: keyboard)
             }
-            panel.interaction.revealFolder = { [weak panel] folder in
+            panel.interaction.revealFolder = { [weak self, weak panel] folder in
                 guard folder.isAvailable else { return }
+                if !folder.isDownloads { self?.pinWeather.recordUse(folder.id) }
                 let access = FolderResourceAccess(folder.reference)
                 guard access.isAvailable else {
                     panel?.store.errorMessage = .folderStackUnavailable
@@ -535,6 +540,7 @@ final class DockCoordinator {
         }
         catalog.pruneIcons(items: panels.values.flatMap { $0.store.items },
                            folders: panels.values.flatMap { $0.store.folders })
+        pinWeather.synchronize(pinIDs: Set(profiles.pinLists.values.flatMap { $0.map(\.id) }))
     }
     private func updatePointers(eventType: NSEvent.EventType) {
         panels.values.forEach { $0.updatePointer(eventType: eventType) }

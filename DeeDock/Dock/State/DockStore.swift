@@ -62,11 +62,13 @@ final class DockStore {
     @ObservationIgnored var applicationOpened: (() -> Void)?
 
     @ObservationIgnored private let history: DockLocalHistoryStore?
+    @ObservationIgnored private let pinWeather: PinWeatherStore?
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
          trash: TrashController? = nil, shelf: ShelfController? = nil,
          capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil,
-         focusSession: FocusSessionController? = nil, history: DockLocalHistoryStore? = nil) {
+         focusSession: FocusSessionController? = nil, history: DockLocalHistoryStore? = nil,
+         pinWeather: PinWeatherStore? = nil) {
         self.focusSession = focusSession
         self.actions = actions
         self.displayID = displayID
@@ -76,6 +78,7 @@ final class DockStore {
         self.shelf = shelf
         self.capsules = capsules
         self.history = history
+        self.pinWeather = pinWeather
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
@@ -345,6 +348,7 @@ final class DockStore {
 
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
     func performPrimaryAction(_ item: DockItem) {
+        if item.isFavorite { pinWeather?.recordUse(item.id) }
         let token = session.token
         catalog.performPrimaryAction(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
@@ -355,6 +359,7 @@ final class DockStore {
 
     /// Opens or activates an app without applying the app-icon hide toggle.
     func open(_ item: DockItem) {
+        if item.isFavorite { pinWeather?.recordUse(item.id) }
         let token = session.token
         catalog.open(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
@@ -365,6 +370,7 @@ final class DockStore {
 
     /// Captures this panel's session, not its mutable selection or display index.
     func openDocuments(_ documents: DocumentResourceAccess, with reference: ApplicationReference) {
+        if persistedPins.contains(where: { $0.id == reference.id }) { pinWeather?.recordUse(reference.id) }
         let token = session.token
         catalog.openDocuments(documents, with: reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
@@ -375,6 +381,7 @@ final class DockStore {
 
     /// A spring activation may outlive hover, but late failures must not reveal an abandoned target.
     func springOpen(_ item: DockItem, isCurrent: @escaping () -> Bool) {
+        if item.isFavorite { pinWeather?.recordUse(item.id) }
         let token = session.token
         catalog.springOpen(item.reference, isCurrent: { [weak self] in
             self?.session.accepts(token) == true && isCurrent()

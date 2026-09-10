@@ -1,5 +1,22 @@
 # DeeDock acceptance record
 
+## DEE-44 rust on unused pins
+
+Implemented on `feature/dee-44`. Pins take a gentle rust after N unused days. Last-used times are written only when a pin is used from DDock (open, hide, spring-open, open files, open or reveal a folder). Hover, magnification, Downloads, Shelf, Trash, and apps launched outside DDock do not write timestamps. Missing times evaluate as now, so existing pins do not rust on upgrade. Using a pin writes now and the rust clears.
+
+Settings live in **Settings → Features → Pin Weather**, not in `DockSettings`, so the threshold is app-wide and parallel slices do not share that document. Weather is on by default at 30 unused days (1...90). Rust starts at a 0.32 blush on day N and reaches 1 after another N days. The look is SwiftUI Canvas oxide (no Metal). Timestamps stay in `dock.pin-weather.v1`. Corrupt bytes freeze edits and are not overwritten.
+
+This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
+
+### Required hands-on acceptance
+
+- Leave a pin unused past the threshold (or set Unused days to 1 and wait). Confirm a quiet rust, not an error badge. Using the pin restores it.
+- Confirm running-only apps, Downloads, Shelf, and Trash do not rust. Confirm an app opened from Spotlight does not clear rust on its pin.
+- Change Unused days and the enable toggle. Confirm rust appears or disappears without a restart.
+- Reset last-used times. Confirm rust stays off until pins sit unused again.
+- Confirm timestamps are not uploaded and that Screen Time is unused.
+- Exercise VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and auto-hide on a weathered pin.
+
 ## DEE-36 dock as timeline
 
 Implemented on `cursor/dee-36-dock-timeline-dfa6`. DDock records its own pin edits and Focus Session transitions into `dock.local-history.v1`. **Browse Local History** (menu bar, or **H** in Focus Dock) treats that display's dock chrome as a time axis. Position along the resting glass maps oldest to newest. Escape or **H** again leaves the timeline. Folder presentation and bookmark refreshes are not events. Mode activation does not write pin history. An already-running session after launch does not invent a start event.

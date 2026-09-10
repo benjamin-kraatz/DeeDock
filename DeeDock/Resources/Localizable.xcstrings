@@ -17117,6 +17117,276 @@
         }
       }
     },
+    "pinWeatherClear" : {
+      "comment" : "Button that forgets stored last-used times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt-verwendet zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Last-Used Times"
+          }
+        }
+      }
+    },
+    "pinWeatherClearConfirm" : {
+      "comment" : "Destructive confirmation for clearing last-used times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeiten zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Times"
+          }
+        }
+      }
+    },
+    "pinWeatherClearHelp" : {
+      "comment" : "Confirmation copy before clearing last-used times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anheftungen gelten ab jetzt als unbenutzt. Die Patina bleibt aus, bis sie wieder ungenutzt bleiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pins look unused-from-now. Rust stays off until they sit unused again."
+          }
+        }
+      }
+    },
+    "pinWeatherDays" : {
+      "comment" : "Unit abbreviation for unused days on the Pin Weather slider.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tage"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "days"
+          }
+        }
+      }
+    },
+    "pinWeatherEnabled" : {
+      "comment" : "Toggle that shows rust on unused pins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbenutzte Anheftungen verwittern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weather unused pins"
+          }
+        }
+      }
+    },
+    "pinWeatherEnabledHelp" : {
+      "comment" : "Subtitle under the Pin Weather enable toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein dezenter Rostton nach der unbenutzten Zeit. Kein Warnhinweis."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A quiet oxide wash after the unused-day threshold. Not an alert."
+          }
+        }
+      }
+    },
+    "pinWeatherPrivacyNote" : {
+      "comment" : "Privacy note on the Pin Weather settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt-verwendet-Zeiten bleiben nur auf diesem Mac. DDock liest weder Bildschirmzeit noch andere Apps."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last-used times are stored only on this Mac. DDock does not read Screen Time or other apps."
+          }
+        }
+      }
+    },
+    "pinWeatherReset" : {
+      "comment" : "Button that replaces an unreadable pin-weather document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anhefte-Patina zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Pin Weather"
+          }
+        }
+      }
+    },
+    "pinWeatherResetHelp" : {
+      "comment" : "Shown when stored pin-weather bytes could not be read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherte Patina konnte nicht gelesen werden. Setze sie zurück, um neu zu beginnen. Die vorhandenen Daten bleiben bis dahin erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stored pin weather could not be read. Reset to start clean. Existing bytes are left until you reset."
+          }
+        }
+      }
+    },
+    "pinWeatherSettingsHelp" : {
+      "comment" : "Footnote on the Pin Weather settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbenutzte Anheftungen bekommen mit der Zeit eine leichte Patina. Benutzen setzt sie zurück. Zeitstempel bleiben auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pins take on a gentle rust after they sit unused. Using a pin restores it. Last-used times stay on this Mac."
+          }
+        }
+      }
+    },
+    "pinWeatherSettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the Pin Weather settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rost Patina unbenutzt Anheftung Wetter Alter Zeitstempel lokal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rust weather unused pin patina age idle local timestamp"
+          }
+        }
+      }
+    },
+    "pinWeatherStorageFailed" : {
+      "comment" : "Shown when pin-weather timestamps could not be saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Anhefte-Patina konnte nicht gespeichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin weather could not be saved."
+          }
+        }
+      }
+    },
+    "pinWeatherTitle" : {
+      "comment" : "Feature name for unused-pin rust/weather polish.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anhefte-Patina"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin Weather"
+          }
+        }
+      }
+    },
+    "pinWeatherUnusedDays" : {
+      "comment" : "Slider label for unused days before rust begins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbenutzte Tage"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unused days"
+          }
+        }
+      }
+    },
+    "pinWeatherUnusedDaysHelp" : {
+      "comment" : "Help for the unused-days slider.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Patina beginnt nach so vielen Tagen ohne Benutzung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust begins after this many days without using the pin."
+          }
+        }
+      }
+    },
     "portal.capturedAt" : {
       "comment" : "Label before localized date and time of the retained frame.",
       "extractionState" : "manual",
@@ -20285,6 +20555,24 @@
         }
       }
     },
+    "settingsFeaturePinWeatherSubtitle" : {
+      "comment" : "Description of this feature on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leichte Patina auf unbenutzten Anheftungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gentle rust on pins left unused."
+          }
+        }
+      }
+    },
     "settingsFeaturesKeywords" : {
       "comment" : "Space-separated search synonyms for the Features section. Includes the name of everything it contains.",
       "extractionState" : "manual",
@@ -20292,13 +20580,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina"
           }
         }
       }

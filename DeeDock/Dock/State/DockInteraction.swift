@@ -10,6 +10,8 @@ final class DockInteraction {
     @ObservationIgnored var openFocusSession: (() -> Void)?
     /// Shared local-history scrub. Nil in previews that do not browse history.
     var timeline: DockTimelineController?
+    /// Unused-pin weather. Nil in previews that do not persist last-used times.
+    var pinWeather: PinWeatherStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?

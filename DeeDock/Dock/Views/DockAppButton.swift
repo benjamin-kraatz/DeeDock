@@ -37,6 +37,11 @@ struct DockAppButton: View {
     @State private var accessibilityWindows: [ApplicationWindowSummary] = []
     @State private var accessibilityDiscoveryID: UUID?
 
+    private var pinWeatherSample: PinWeatherSample? {
+        guard item.isFavorite, let weather = interaction?.pinWeather else { return nil }
+        return weather.sample(for: item.id)
+    }
+
     private var badgeLabel: String? {
         guard item.isAvailable else { return nil }
         return interaction?.badges?.labels[(item.resolvedURL ?? item.reference.url).standardizedFileURL.path]
@@ -54,6 +59,7 @@ struct DockAppButton: View {
                                  launchAnimation: interaction?.launchAnimation ?? DockSettings.defaults.launchAnimation,
                                  launchRequest: interaction?.applicationCatalog?.launchAnimationRequests[item.id],
                                  launchMotionEnabled: interaction.map { $0.exposesContent && $0.idleFade.fraction == 0 } ?? true)
+                .environment(\.pinWeatherSample, pinWeatherSample)
                 .overlay {
                     if interaction?.documentTargetID == item.id {
                         DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
