@@ -43,6 +43,9 @@ struct FeaturesPageContent: View {
             }
         case .actionTiles:
             if let actions = context.coordinator?.actionTiles { ActionTilesSettingsCard(controller: actions) }
+            if let destinations = context.coordinator?.fileDestinations {
+                LauncherFileDestinationsSettingsCard(store: destinations)
+            }
         case .multipleDisplays:
             SettingsCard(title: .secondaryDockTitle, footnote: .secondaryDockHelp) {
                 SettingsToggleRow(title: .secondaryDockToggle,

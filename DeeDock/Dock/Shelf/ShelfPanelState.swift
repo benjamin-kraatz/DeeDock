@@ -47,6 +47,7 @@ final class ShelfPanelState {
     @ObservationIgnored var openItems: (([ShelfItem]) -> Void)?
     @ObservationIgnored var revealItems: (([ShelfItem]) -> Void)?
     @ObservationIgnored var copyItems: (([ShelfItem]) -> Void)?
+    @ObservationIgnored var useInLauncher: (([ShelfItem]) -> Void)?
     @ObservationIgnored var clearAll: (() -> Void)?
     @ObservationIgnored var beginDrag: (([ShelfItem], NSView, NSEvent) -> Void)?
     @ObservationIgnored var sortChanged: ((ShelfSort) -> Void)?

@@ -377,6 +377,9 @@ private struct ShelfItemBehavior: ViewModifier {
                 } label: { Label(.shelfCopy(count: count), systemImage: "doc.on.doc") }
                     .disabled(!entry.isAvailable)
                 Button {
+                    state.useInLauncher?(targets)
+                } label: { Label(.launcherFileUseInLauncher, systemImage: "magnifyingglass") }
+                Button {
                     state.selectAll()
                 } label: { Label(.shelfSelectAll, systemImage: "checklist") }
                 Divider()
@@ -399,6 +402,7 @@ private struct ShelfItemBehavior: ViewModifier {
                     Button(.filePreviewAction) { state.previewItems?([entry.item]) }
                     Button(.shelfOpenItem(count: 1)) { state.openItems?([entry.item]) }
                     Button(.shelfRevealInFinder) { state.revealItems?([entry.item]) }
+                    Button(.launcherFileUseInLauncher) { state.useInLauncher?([entry.item]) }
                 }
                 Button(.shelfRemove) { state.removeItems?([entry.id]) }
             }

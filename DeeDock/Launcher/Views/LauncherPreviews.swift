@@ -141,4 +141,36 @@ private struct LauncherTransitionPreview: View {
         height: 540
     )
 }
+
+#Preview("Launcher file actions") {
+    let state = LauncherPreviewData.state()
+    state.adoptFiles(.owned(
+        DocumentResourceAccess(
+            [
+                URL(fileURLWithPath: "/Preview/Quarterly report.pdf"),
+                URL(fileURLWithPath: "/Preview/Missing.txt"),
+            ],
+            startAccess: { _ in false },
+            stopAccess: { _ in }
+        ),
+        source: .shelf
+    ))
+    return LauncherView(state: state).frame(width: 900, height: 640)
+}
+
+#Preview("Launcher file actions, German, Reduce Motion") {
+    let state = LauncherPreviewData.state(list: true)
+    state.adoptFiles(.owned(
+        DocumentResourceAccess(
+            [URL(fileURLWithPath: "/Preview/Notes.txt")],
+            startAccess: { _ in false },
+            stopAccess: { _ in }
+        ),
+        source: .picker
+    ))
+    return LauncherView(state: state)
+        .frame(width: 720, height: 540)
+        .environment(\.locale, Locale(identifier: "de"))
+        .environment(\.accessibilityReduceMotion, true)
+}
 #endif

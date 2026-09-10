@@ -70,6 +70,12 @@ final class ActionTilesController {
         var next = tiles; next.swapAt(index, target); save(next)
     }
     func reset() { requiresReset = false; save([]) }
+    func setAcceptsFiles(_ id: UUID, _ value: Bool) {
+        guard !requiresReset, let index = tiles.firstIndex(where: { $0.id == id }) else { return }
+        var next = tiles
+        next[index].acceptsFiles = value
+        save(next)
+    }
 
     private func save(_ next: [ActionTile]) {
         do {
@@ -81,7 +87,7 @@ final class ActionTilesController {
 
     /// Runs only after a click, keyboard action, or accepted drop. No uncertain run is retried.
     @discardableResult
-    func run(_ id: UUID, files: DocumentResourceAccess? = nil) -> Bool {
+    func run(_ id: UUID, files: DocumentResourceAccess? = nil, finished: (() -> Void)? = nil) -> Bool {
         guard tiles.contains(where: { $0.id == id }), runs[id] == nil else { return false }
         let job = ShortcutProcess()
         runs[id] = job; statuses[id] = .running; changed?()
@@ -100,6 +106,7 @@ final class ActionTilesController {
                 self.error = message
             }
             changed?()
+            finished?()
         }
         return true
     }

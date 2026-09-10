@@ -19,7 +19,7 @@ struct LauncherSearchBar: View {
             .keyboardShortcut("f", modifiers: .command)
             .accessibilityLabel(Text(.launcherSearch))
 
-            TextField(text: $state.query, prompt: Text(.unifiedSearchPrompt)) {
+            TextField(text: $state.query, prompt: Text(state.usesFileActions ? .launcherFileSearchPrompt : .unifiedSearchPrompt)) {
                 Text(.launcherSearch)
             }
             .textFieldStyle(.plain)
@@ -29,13 +29,24 @@ struct LauncherSearchBar: View {
             .autocorrectionDisabled()
 
             Button {
-                state.search.explicitSearch?()
+                state.fileActions.chooseFiles()
             } label: {
-                Image(systemName: "camera.viewfinder")
+                Image(systemName: "doc.badge.plus")
             }
             .buttonStyle(.borderless)
-            .help(.unifiedCaptureRoute)
-            .accessibilityLabel(Text(.unifiedCaptureRoute))
+            .help(.launcherFileChooseFiles)
+            .accessibilityLabel(Text(.launcherFileChooseFiles))
+
+            if !state.usesFileActions {
+                Button {
+                    state.search.explicitSearch?()
+                } label: {
+                    Image(systemName: "camera.viewfinder")
+                }
+                .buttonStyle(.borderless)
+                .help(.unifiedCaptureRoute)
+                .accessibilityLabel(Text(.unifiedCaptureRoute))
+            }
 
             if !state.query.isEmpty {
                 Button {

@@ -23,11 +23,13 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var shelfDestinationID: String?
     private var actionDestination: (String, UUID)?
     private var folderDestination: (String, FolderDockItem)?
+    private var launcherDestinationID: String?
     var openSpringFolder: ((FolderDockItem, DockPanelController) -> Void)?
     var dropInFolder: ((NSDraggingInfo, FolderDockItem, DockPanelController) -> Bool)?
     var springDragEnded: (() -> Void)?
     var documentHoverChanged: ((DockItem?, DockPanelController?, DocumentResourceAccess?) -> Void)?
     var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Void)?
+    var deliverToLauncher: ((DocumentResourceAccess, DockPanelController) -> Void)?
     /// Non-empty while the active external drag came out of DeeDock's own Shelf.
     private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
@@ -129,6 +131,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         }
         if unpinDestinationID == displayID { return .move }
         if actionDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
+        if launcherDestinationID == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if shelfDestinationID == displayID { return .copy }
         // Removing a staged reference is a discard, not a file operation, but the poof cursor is right.
@@ -168,6 +171,13 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             completion.committed = true
             clearFeedback()
             return success
+        }
+        if launcherDestinationID == displayID, info.draggingSourceOperationMask.contains(.copy),
+           let files = payload.stageableItems ?? payload.documents, let panel = panels[displayID] {
+            completion.committed = true
+            deliverToLauncher?(files, panel)
+            cancel()
+            return true
         }
         if let (id, actionID) = actionDestination, id == displayID,
            info.draggingSourceOperationMask.contains(.copy), let files = payload.stageableItems,
@@ -340,7 +350,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard active, !updating, !completion.cancelled, !completion.committed else { return }
         updating = true
         defer { updating = false }
-        destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil
+        destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; launcherDestinationID = nil
         unpinDestinationID = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
@@ -366,6 +376,25 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
            candidate.store.pins.contains(where: { $0.id == sourcePin.id }),
            candidate.runningSectionTarget(at: point) {
             unpinDestinationID = sourceID
+        }
+        if sourceID == nil, payload.isReady, (payload.stageableItems ?? payload.documents) != nil,
+           let candidate, candidate.store.displayID == nativeDisplayID,
+           candidate.containsLauncherFileDrop(point) || candidate.launcherTarget(at: point) {
+            launcherDestinationID = candidate.store.displayID
+            documentDrag.clear()
+            documentHoverChanged?(nil, nil, nil)
+            for panel in panels.values {
+                let targeted = panel === candidate
+                panel.interaction.documentTargetID = nil
+                panel.interaction.trashTargeted = false
+                panel.interaction.shelfTargeted = false
+                panel.interaction.springEmphasized = false
+                panel.updateSectionDragHover(at: point, valid: false)
+                panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
+                                          message: targeted ? .launcherFileDrop : nil)
+            }
+            updateScrollTimer()
+            return
         }
         let documentTarget = candidate?.store.displayID == nativeDisplayID && payload.documents != nil
             ? candidate?.documentTarget(at: point) : nil

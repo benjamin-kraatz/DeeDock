@@ -14,7 +14,7 @@ struct LauncherView: View {
     @State private var confirmClear = false
 
     var body: some View {
-        let groups = state.usesMixedResults ? [] : state.groups
+        let groups = state.usesFileActions || state.usesMixedResults ? [] : state.groups
         GeometryReader { geometry in
             // Presented, the panel's window is fixed at a frame that covers both ends of the morph
             // and the content lays out once at the rect it lands on. The morph is the glass rect
@@ -36,14 +36,19 @@ struct LauncherView: View {
                         state: state,
                         searchFocused: $searchFocused
                     )
-                    LauncherToolbar(state: state)
+                    if !state.usesFileActions {
+                        LauncherToolbar(state: state)
+                    }
                     status
-                    if state.usesMixedResults {
+                    if state.usesFileActions {
+                        LauncherFileInputSummaryView(state: state.fileActions)
+                        LauncherFileActionsView(launcher: state)
+                    } else if state.usesMixedResults {
                         LauncherMixedResultsView(launcher: state)
                     } else {
                         LauncherResultsView(state: state, columns: columns, groups: groups)
                     }
-                    footer(count: state.usesMixedResults ? state.search.results.count : groups.reduce(0) { $0 + $1.applications.count })
+                    footer(count: resultCount(groups: groups))
                 }
                 .padding(20)
                 .frame(width: landing.width, height: landing.height)
@@ -82,6 +87,12 @@ struct LauncherView: View {
         .confirmationDialog(Text(.launcherClearHistory), isPresented: $confirmClear) {
             Button(role: .destructive) { state.history.clear() } label: { Text(.launcherClearHistory) }
         } message: { Text(.launcherClearHistoryDetail) }
+    }
+
+    private func resultCount(groups: [LauncherState.Group]) -> Int {
+        if state.usesFileActions { return state.fileActions.actions.count }
+        if state.usesMixedResults { return state.search.results.count }
+        return groups.reduce(0) { $0 + $1.applications.count }
     }
 
     /// The launcher's own material, drawn at whatever rect the morph currently holds.
@@ -139,7 +150,8 @@ struct LauncherView: View {
         HStack(spacing: 12) {
             HStack {
                 if state.library.isLoading { ProgressView().controlSize(.mini) }
-                Text(state.usesMixedResults ? .unifiedResultCount(count) : .launcherResultCount(count))
+                Text(state.usesFileActions ? .launcherFileActionCount(count)
+                     : state.usesMixedResults ? .unifiedResultCount(count) : .launcherResultCount(count))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .contentTransition(.numericText(value: Double(count)))
