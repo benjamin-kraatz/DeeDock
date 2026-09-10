@@ -34,6 +34,7 @@ final class DockPanelController {
     var exclusiveInteractionBegan: (() -> Void)?
     var windowSearchRequested: (() -> Void)?
     var modePickerRequested: (() -> Void)?
+    var timelineRequested: (() -> Void)?
     var isMenuTracking: Bool { menuHeld }
 
     init(store: DockStore, settings: DockSettings) {
@@ -190,21 +191,31 @@ final class DockPanelController {
                                                   size: geometry.contentSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
         let rects = [interaction.surfaceRect, interaction.errorRect] + Array(interaction.iconRects.values)
         let inside = visibility.exposesContent && panel.frame.contains(NSEvent.mouseLocation) && rects.contains { sample.paintedRect($0).contains(point) }
+        let timelineHeld = interaction.timeline?.isActive(on: store.displayID) == true
         panel.ignoresMouseEvents = !inside
         // An open stack makes every dock dismissal-only. Clearing the pointer settles
         // magnification and hover without changing the dock's visible hold region.
-        interaction.setPointer(inside && !popoverHeld && !modePickerHeld ? sample.inverse(point) : nil)
+        // Timeline scrub keeps the resting axis stable, so magnification is suppressed.
+        interaction.setPointer(inside && !popoverHeld && !modePickerHeld && !timelineHeld ? sample.inverse(point) : nil)
+        if timelineHeld, inside || mouseHeld {
+            let dockPoint = sample.inverse(point)
+            let edge = interaction.layout.edge
+            let rect = interaction.surfaceRect
+            interaction.timeline?.update(along: edge.along(dockPoint) - edge.along(rect.origin),
+                                         length: max(edge.length(of: rect.size), 1))
+        }
         if let eventType {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
         let suppress = pickerHeld || popoverHeld || windowPeekHeld || modePickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+            || timelineHeld
             || (visibility.phase != .visible && visibility.phase != .hideDelay)
         if suppress != interaction.suppressTooltips {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = pickerHeld || popoverHeld || windowPeekHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil
+        let held = pickerHeld || popoverHeld || windowPeekHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
         // Tooltips are absent from `rects`, so their transparent reservation stays excluded.
@@ -245,9 +256,18 @@ final class DockPanelController {
         host.springActivate = { [weak coordinator] info in coordinator?.springActivate(info, on: id) }
         host.springHighlight = { [weak coordinator] info in coordinator?.springHighlight(info, on: id) }
         interaction.sourceTrackingChanged = { [weak coordinator] in coordinator?.trackSource($0) }
-        interaction.beginUtilityDrag = { [weak coordinator] slot, view, event in coordinator?.beginUtility(slot, from: id, view: view, event: event) }
-        interaction.beginDrag = { [weak coordinator] item, view, event in coordinator?.begin(item, from: id, view: view, event: event) }
-        interaction.beginFolderDrag = { [weak coordinator] item, view, event in coordinator?.begin(item, from: id, view: view, event: event) }
+        interaction.beginUtilityDrag = { [weak self, weak coordinator] slot, view, event in
+            guard self?.interaction.timeline?.isActive != true else { return }
+            coordinator?.beginUtility(slot, from: id, view: view, event: event)
+        }
+        interaction.beginDrag = { [weak self, weak coordinator] item, view, event in
+            guard self?.interaction.timeline?.isActive != true else { return }
+            coordinator?.begin(item, from: id, view: view, event: event)
+        }
+        interaction.beginFolderDrag = { [weak self, weak coordinator] item, view, event in
+            guard self?.interaction.timeline?.isActive != true else { return }
+            coordinator?.begin(item, from: id, view: view, event: event)
+        }
         interaction.scrollChanged = { [weak coordinator] in coordinator?.geometryChanged() }
         interaction.geometryDidChange = { [weak self, weak coordinator] in
             self?.updatePointer()
@@ -543,6 +563,19 @@ final class DockPanelController {
             }
             return true
         }
+        if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
+           event.charactersIgnoringModifiers?.lowercased() == "h" {
+            timelineRequested?()
+            return true
+        }
+        if interaction.timeline?.isActive(on: store.displayID) == true {
+            if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
+                interaction.timeline?.nudge(by: distance)
+                return true
+            }
+            if event.keyCode == 53 { escape?(); return true }
+            return true
+        }
         if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
             if event.modifierFlags.contains(.option),
                let pin = store.entries.first(where: { $0.target == store.selectedTarget })?.pin {
@@ -598,6 +631,8 @@ final class DockPanelController {
         interaction.stopGeometryUpdates()
         interaction.geometryDidChange = nil; interaction.menuTrackingChanged = nil; interaction.accessibilityFocusChanged = nil
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil; exclusiveInteractionBegan = nil
+        timelineRequested = nil
+        interaction.timeline = nil
         windowSearchRequested = nil
         modePickerRequested = nil
         accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; modePickerHeld = false

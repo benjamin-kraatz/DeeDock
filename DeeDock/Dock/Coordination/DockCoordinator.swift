@@ -5,6 +5,8 @@ import Observation
 @MainActor @Observable
 final class DockCoordinator {
     let focusSession = FocusSessionController()
+    let localHistory = DockLocalHistoryStore()
+    let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
     let fileDestinations = LauncherFileDestinationsStore()
@@ -84,6 +86,8 @@ final class DockCoordinator {
         let semanticStacks = CoalescingSemanticStackOrganizer(
             base: FoundationModelsSemanticStackOrganizer()
         )
+        timeline = DockTimelineController(history: localHistory)
+        timeline.onEnd = { [weak self] in self?.endFocus(restore: true) }
         focusPopover = FocusSessionCoordinator(focus: focusSession, presenter: popovers)
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
         fusion = FusionCoordinator(shelf: shelf)
@@ -125,9 +129,11 @@ final class DockCoordinator {
             endFocus(restore: false)
         }
         focusSession.start()
+        localHistory.start(session: focusSession.session)
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
             guard let self else { return }
+            localHistory.noteSession(focusSession.session)
             badgeMemory.synchronize(session: focusSession.session)
             refreshPanels()
         }
@@ -259,6 +265,7 @@ final class DockCoordinator {
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
                 self?.fusion.suspend()
+                self?.timeline.end()
                 self?.popovers.closeAll()
                 self?.windowPeeks.dismissFileHandoff()
                 self?.windowPeeks.close(returnFocus: false)
@@ -301,11 +308,13 @@ final class DockCoordinator {
             focusPopover.close(for: id)
             sessionCapsules.close(for: id, returnFocus: false)
             if focusedID == id { endFocus(restore: true) }
+            if timeline.displayID == id { timeline.end() }
             panels.removeValue(forKey: id)?.stop()
         }
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
-                                  trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles, focusSession: focusSession)
+                                  trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles,
+                                  focusSession: focusSession, history: localHistory)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             configureLauncherSearch(on: panel)
             panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
@@ -314,6 +323,7 @@ final class DockCoordinator {
                 self?.profiles.modes.effectiveVisibility(for: display.id) ?? .showAll
             }
             panel.interaction.actionTiles = actionTiles
+            panel.interaction.timeline = timeline
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
                 focusPopover.toggle(on: panel)
@@ -332,6 +342,7 @@ final class DockCoordinator {
                 popovers.closeAll()
                 windowPeeks.close(returnFocus: false)
                 modePicker.close(returnFocus: false)
+                timeline.end()
                 endFocus(restore: false)
                 for other in panels.values where other !== panel { other.closeLauncher() }
                 return previous
@@ -357,7 +368,12 @@ final class DockCoordinator {
                                     prepareWorkspace(mode)
                                 })
             }
-            panel.escape = { [weak self] in self?.endFocus(restore: true) }
+            panel.timelineRequested = { [weak self] in self?.browseLocalHistory() }
+            panel.escape = { [weak self] in
+                guard let self else { return }
+                if timeline.isActive { timeline.end() }
+                else { endFocus(restore: true) }
+            }
             store.applicationOpened = { [weak self] in
                 self?.windowPeeks.close(returnFocus: false)
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
@@ -568,6 +584,7 @@ final class DockCoordinator {
     func searchWindows() {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
+        timeline.end()
         endFocus(restore: false)
         windowSearch.show(returningTo: lastExternalApplication)
     }
@@ -578,6 +595,26 @@ final class DockCoordinator {
         previousApplication = lastExternalApplication
         focusedID = id
         panel.focus()
+    }
+
+    var canBrowseLocalHistory: Bool { canFocus }
+
+    /// Reveals the dock under the pointer and treats its chrome as a local-history time axis.
+    func browseLocalHistory() {
+        guard let id = DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation),
+              panels[id] != nil else { return }
+        if timeline.isActive(on: id) {
+            timeline.end()
+            return
+        }
+        popovers.closeAll()
+        windowPeeks.close(returnFocus: false)
+        modePicker.close(returnFocus: false)
+        endFocus(restore: false)
+        previousApplication = lastExternalApplication
+        focusedID = id
+        timeline.begin(on: id)
+        panels[id]?.focus()
     }
 
     var canStartFocus: Bool { canSwitchModes && !focusSession.isActive && !focusSession.requiresReset }
@@ -662,6 +699,7 @@ final class DockCoordinator {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
+        timeline.end()
         applicationMenus.cancelAllDiscoveries()
         return profiles.modes.activate(id)
     }
@@ -679,6 +717,7 @@ final class DockCoordinator {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
+        timeline.end()
         applicationMenus.cancelAllDiscoveries()
         return profiles.modes.delete(id)
     }
@@ -701,6 +740,8 @@ final class DockCoordinator {
         occupancy.stop()
         occupancy.changed = nil
         endFocus(restore: true)
+        timeline.onEnd = nil
+        timeline.end()
         monitors.forEach { NSEvent.removeMonitor($0) }
         monitors.removeAll()
         zonePreview.stop()

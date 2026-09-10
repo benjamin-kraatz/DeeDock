@@ -29,6 +29,24 @@
         }
       }
     },
+    "actionBrowseLocalHistory" : {
+      "comment" : "Menu command that treats the dock chrome as a time axis of DDock-local pin and session history.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale Chronik durchsuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse Local History"
+          }
+        }
+      }
+    },
     "actionDismissError" : {
       "comment" : "Accessibility label for the close button on an error message.",
       "extractionState" : "manual",
@@ -20249,6 +20267,24 @@
         }
       }
     },
+    "settingsFeatureTimelineSubtitle" : {
+      "comment" : "Description of this feature on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anhefte- und Sitzungsereignisse auf dem Dock durchsuchen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrub pin and session events on the dock."
+          }
+        }
+      }
+    },
     "settingsFeaturesKeywords" : {
       "comment" : "Space-separated search synonyms for the Features section. Includes the name of everything it contains.",
       "extractionState" : "manual",
@@ -20256,13 +20292,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy"
           }
         }
       }
@@ -22279,6 +22315,528 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "None of the staged items could be found."
+          }
+        }
+      }
+    },
+    "timelineAccessibility" : {
+      "comment" : "VoiceOver label for the dock timeline overlay.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale Dock-Chronik"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local dock history"
+          }
+        }
+      }
+    },
+    "timelineClear" : {
+      "comment" : "Deletes every stored DDock-local history event.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale Chronik löschen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Local History…"
+          }
+        }
+      }
+    },
+    "timelineClearConfirm" : {
+      "comment" : "Confirmation button that deletes stored local history.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chronik löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear History"
+          }
+        }
+      }
+    },
+    "timelineClearHelp" : {
+      "comment" : "Explains that clearing history cannot be undone and does not affect the system Dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Anhefte- und Sitzungsereignisse werden entfernt. macOS und andere Apps bleiben unberührt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stored pin and session events are removed. macOS and other apps are left alone."
+          }
+        }
+      }
+    },
+    "timelineClose" : {
+      "comment" : "Leaves timeline scrub and returns the dock to normal use.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "timelineEmptyMessage" : {
+      "comment" : "Privacy-first empty state when DDock has not recorded local pin or session events yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock speichert nur eigene Anhefte- und Fokus-Sitzungsaktionen. Es gibt keine Bildschirmzeit und keine Daten anderer Apps."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock stores only its own pin and Focus Session actions. There is no Screen Time and no data from other apps."
+          }
+        }
+      }
+    },
+    "timelineEmptyRecordingOff" : {
+      "comment" : "Empty state when the user paused local history recording.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die lokale Aufzeichnung ist aus. Anheften und Fokus-Sitzungen erscheinen erst wieder, wenn du sie einschaltest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local recording is off. Pin and Focus Session actions appear here again after you turn it on."
+          }
+        }
+      }
+    },
+    "timelineEmptyTitle" : {
+      "comment" : "Title shown on the dock when local history has nothing to scrub.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine lokale Chronik"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No local history yet"
+          }
+        }
+      }
+    },
+    "timelineEventPinAdded" : {
+      "comment" : "Glance title when an app or folder is pinned. subject is the untranslated name supplied by macOS or Finder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(subject)@ angeheftet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinned %1$(subject)@"
+          }
+        }
+      }
+    },
+    "timelineEventPinMoved" : {
+      "comment" : "Glance title when one pin is moved along the dock. subject is the untranslated name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(subject)@ verschoben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moved %1$(subject)@"
+          }
+        }
+      }
+    },
+    "timelineEventPinRemoved" : {
+      "comment" : "Glance title when an app or folder is unpinned. subject is the untranslated name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(subject)@ gelöst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unpinned %1$(subject)@"
+          }
+        }
+      }
+    },
+    "timelineEventPinsReordered" : {
+      "comment" : "Glance title when several pins change order at once.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anheftungen neu geordnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reordered pins"
+          }
+        }
+      }
+    },
+    "timelineEventSessionDismissed" : {
+      "comment" : "Glance title when a Focus Session ends without finishing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzung beendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ended Focus Session"
+          }
+        }
+      }
+    },
+    "timelineEventSessionFinished" : {
+      "comment" : "Glance title when a Focus Session completes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzung abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished Focus Session"
+          }
+        }
+      }
+    },
+    "timelineEventSessionPaused" : {
+      "comment" : "Glance title when a Focus Session is paused.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzung pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused Focus Session"
+          }
+        }
+      }
+    },
+    "timelineEventSessionResumed" : {
+      "comment" : "Glance title when a Focus Session continues after a pause.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzung fortgesetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumed Focus Session"
+          }
+        }
+      }
+    },
+    "timelineEventSessionStarted" : {
+      "comment" : "Glance title when a Focus Session begins. subject is the Dock Mode name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus-Sitzung gestartet: %1$(subject)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Started Focus Session: %1$(subject)@"
+          }
+        }
+      }
+    },
+    "timelineEventUnrecognized" : {
+      "comment" : "Fallback glance title for a stored local event whose kind this build does not know.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokales Ereignis"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local event"
+          }
+        }
+      }
+    },
+    "timelinePlayhead" : {
+      "comment" : "VoiceOver label for the timeline playhead on the dock chrome.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiedergabemarkierung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playhead"
+          }
+        }
+      }
+    },
+    "timelinePrivacyNote" : {
+      "comment" : "Short privacy reminder on the timeline overlay and settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur DDock-Aktionen. Nichts aus der macOS-Bildschirmzeit."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only DDock actions. Nothing from macOS Screen Time."
+          }
+        }
+      }
+    },
+    "timelineRecord" : {
+      "comment" : "Toggle that pauses or resumes recording of DDock-local pin and session events.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale Chronik aufzeichnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record local history"
+          }
+        }
+      }
+    },
+    "timelineRecordHelp" : {
+      "comment" : "Explains that recording covers only DDock pin and Focus Session actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Anhefte- und Fokus-Sitzungsaktionen in DDock. Nichts aus der Bildschirmzeit oder anderen Apps."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only pin and Focus Session actions in DDock. Nothing from Screen Time or other apps."
+          }
+        }
+      }
+    },
+    "timelineReset" : {
+      "comment" : "Replaces an unreadable local history document after an explicit choice.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chronik zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset History"
+          }
+        }
+      }
+    },
+    "timelineResetHelp" : {
+      "comment" : "Explains that reset discards unreadable stored bytes and starts a new empty document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherte Chronik konnte nicht gelesen werden. Zurücksetzen ersetzt sie durch eine leere lokale Chronik."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The stored history could not be read. Reset replaces it with an empty local history."
+          }
+        }
+      }
+    },
+    "timelineScrubHint" : {
+      "comment" : "Instruction shown while the dock timeline is open and events exist.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe entlang des Docks, um die Chronik zu durchsuchen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag along the dock to browse history."
+          }
+        }
+      }
+    },
+    "timelineSettingsHelp" : {
+      "comment" : "Footnote on the Local History settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Chronik bleibt auf diesem Mac. Wähle „Lokale Chronik durchsuchen“, um das Dock als Zeitachse zu nutzen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History stays on this Mac. Choose Browse Local History to use the dock as a time axis."
+          }
+        }
+      }
+    },
+    "timelineSettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the Local History settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chronik Verlauf Zeitleiste lokal scrubben Sitzung anheften Datenschutz Bildschirmzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "timeline history scrub local pin session privacy screen time"
+          }
+        }
+      }
+    },
+    "timelineStorageFailed" : {
+      "comment" : "Shown when local history could not be saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die lokale Chronik konnte nicht gespeichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local history could not be saved."
+          }
+        }
+      }
+    },
+    "timelineTitle" : {
+      "comment" : "Feature name for DDock-local pin and session history on the dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale Chronik"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local History"
           }
         }
       }

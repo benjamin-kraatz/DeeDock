@@ -8,6 +8,8 @@ final class DockInteraction {
     /// Owns this panel's idle deadline and artwork opacity.
     @ObservationIgnored var openLauncher: (() -> Void)?
     @ObservationIgnored var openFocusSession: (() -> Void)?
+    /// Shared local-history scrub. Nil in previews that do not browse history.
+    var timeline: DockTimelineController?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?

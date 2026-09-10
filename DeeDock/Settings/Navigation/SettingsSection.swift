@@ -81,6 +81,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .features:
             [[.shelfAndTrash, .capsules, .badges],
              [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
+             [.localHistory],
              [.multipleDisplays, .permissions]]
         case .modes:
             []

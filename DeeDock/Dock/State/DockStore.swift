@@ -54,9 +54,12 @@ final class DockStore {
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
 
+    @ObservationIgnored private let history: DockLocalHistoryStore?
+
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
          trash: TrashController? = nil, shelf: ShelfController? = nil,
-         capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil, focusSession: FocusSessionController? = nil) {
+         capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil,
+         focusSession: FocusSessionController? = nil, history: DockLocalHistoryStore? = nil) {
         self.focusSession = focusSession
         self.actions = actions
         self.displayID = displayID
@@ -65,6 +68,7 @@ final class DockStore {
         self.trash = trash
         self.shelf = shelf
         self.capsules = capsules
+        self.history = history
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
@@ -261,16 +265,22 @@ final class DockStore {
         var pins = profiles.pinLists[displayID] ?? []
         if pins.contains(where: { $0.application?.id == item.id }) { pins.removeAll { $0.application?.id == item.id } }
         else { pins.append(.application(item.reference)) }
-        do { try profiles.savePins(pins, for: displayID) }
-        catch { errorMessage = .errorSavePins(details: error.localizedDescription) }
+        _ = savePins(pins)
     }
 
     /// Persists one completed edit. Preview state must never call this method.
     @discardableResult
     func savePins(_ proposed: [DockPin]) -> Bool {
         guard proposed != pins else { return true }
-        do { try profiles.savePins(proposed, for: displayID); return true }
-        catch { errorMessage = .errorSavePins(details: error.localizedDescription); return false }
+        let previous = pins
+        do {
+            try profiles.savePins(proposed, for: displayID)
+            history?.recordPinChange(previous: previous, next: proposed, displayID: displayID)
+            return true
+        } catch {
+            errorMessage = .errorSavePins(details: error.localizedDescription)
+            return false
+        }
     }
 
     func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
