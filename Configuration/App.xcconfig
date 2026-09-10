@@ -1,7 +1,7 @@
 // Shared by direct and TestFlight app targets. This file is the Release identity.
 // Debug and Preview use Debug.xcconfig, which includes this file and overrides identity.
-CURRENT_PROJECT_VERSION = 17
-MARKETING_VERSION = 0.2.0
+CURRENT_PROJECT_VERSION = 18
+MARKETING_VERSION = 0.2.1
 PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock
 PRODUCT_NAME = DDock
 PRODUCT_MODULE_NAME = DeeDock
