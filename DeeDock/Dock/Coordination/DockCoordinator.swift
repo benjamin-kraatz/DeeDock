@@ -179,6 +179,7 @@ final class DockCoordinator {
             }
             windowPeeks.showKeyboard(item, on: panel, documents: documents)
         }
+        dragging.magnetismEnabled = { [weak self] in self?.settings.value.magneticEdges ?? true }
         dragging.springDragEnded = { [weak self] in
             self?.folderStacks.dragEnded()
             self?.windowPeeks.endFileDrag()

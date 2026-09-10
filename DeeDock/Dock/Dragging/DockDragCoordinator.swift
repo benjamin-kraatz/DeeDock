@@ -30,9 +30,18 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var documentHoverChanged: ((DockItem?, DockPanelController?, DocumentResourceAccess?) -> Void)?
     var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Void)?
     var deliverToLauncher: ((DocumentResourceAccess, DockPanelController) -> Void)?
+    /// Shared defaults; magnetism is app-wide and is read on each drag update.
+    ///
+    /// Option still frees that gesture because `ignoreModifierKeys` is true, so the
+    /// modifier cannot be reinterpreted as copy-versus-move.
+    var magnetismEnabled: () -> Bool = { true }
     /// Non-empty while the active external drag came out of DeeDock's own Shelf.
     private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
+    private var dragImageSize = CGSize.zero
+    private var dragImageBaseFrame = CGRect.zero
+    private var lastSnapOffset = CGSize.zero
+    private let magneticGuides = DockMagneticGuideController()
     private var importTask: Task<Void, Never>?
     private var cleanupTask: Task<Void, Never>?
     private var importSession = DockSession()
@@ -75,8 +84,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         pasteboard.setString(token!, forType: Self.pasteboardType)
         let dragItem = NSDraggingItem(pasteboardWriter: pasteboard)
         let dimension = min(view.bounds.width, view.bounds.height)
-        dragItem.setDraggingFrame(CGRect(x: view.bounds.midX - dimension / 2, y: view.bounds.maxY - dimension,
-                                        width: dimension, height: dimension), contents: icon)
+        rememberDragImage(size: CGSize(width: dimension, height: dimension), in: view)
+        dragItem.setDraggingFrame(dragImageBaseFrame, contents: icon)
         installMonitor()
         nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)
         nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
@@ -94,8 +103,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         pasteboard.setString(token!, forType: Self.pasteboardType)
         let dragItem = NSDraggingItem(pasteboardWriter: pasteboard)
         let dimension = min(view.bounds.width, view.bounds.height)
-        dragItem.setDraggingFrame(CGRect(x: view.bounds.midX - dimension / 2, y: view.bounds.maxY - dimension,
-                                        width: dimension, height: dimension), contents: icon)
+        rememberDragImage(size: CGSize(width: dimension, height: dimension), in: view)
+        dragItem.setDraggingFrame(dragImageBaseFrame, contents: icon)
         installMonitor()
         nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)
         nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
@@ -334,7 +343,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     }
 
     private func installMonitor() {
-        monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseUp, .keyDown]) { [weak self] event in
+        monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseUp, .keyDown, .flagsChanged]) { [weak self] event in
             guard let self else { return event }
             if event.type == .leftMouseUp { completion.released = true }
             if event.type == .keyDown, event.keyCode == 53 {
@@ -342,14 +351,63 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
                 cancel()
             }
+            if event.type == .flagsChanged, active, sourcePin != nil {
+                update(at: NSEvent.mouseLocation)
+            }
             return event // AppKit must still receive Escape to terminate its native session.
         }
     }
 
-    private func update(at point: CGPoint) {
+    private func rememberDragImage(size: CGSize, in view: NSView) {
+        dragImageSize = size
+        dragImageBaseFrame = CGRect(x: view.bounds.midX - size.width / 2, y: view.bounds.maxY - size.height,
+                                    width: size.width, height: size.height)
+        lastSnapOffset = .zero
+    }
+
+    /// Option or a disabled setting leaves the pointer unsnapped and hides guides immediately.
+    ///
+    /// Targeting follows the snapped center only while that center still sits in a dock's drag
+    /// region, so a screen-edge snap cannot unpin a pin whose pointer is still over the glass.
+    private func magnetizedPoint(_ point: CGPoint) -> CGPoint {
+        guard sourcePin != nil, sourceUtilityID == nil else {
+            magneticGuides.hide()
+            applyDragImageOffset(.zero)
+            return point
+        }
+        let enabled = magnetismEnabled() && !NSEvent.modifierFlags.contains(.option)
+        guard enabled else {
+            magneticGuides.hide()
+            applyDragImageOffset(.zero)
+            return point
+        }
+        let size = dragImageSize == .zero ? CGSize(width: 48, height: 48) : dragImageSize
+        let proposed = CGRect(x: point.x - size.width / 2, y: point.y - size.height / 2,
+                              width: size.width, height: size.height)
+        let peers = panels.values.flatMap { $0.magneticPeerFrames(excluding: sourcePin?.id) }
+        let snap = DockMagnetism.snap(frame: proposed, screens: NSScreen.screens.map(\.frame), peers: peers)
+        magneticGuides.show(snap.guides)
+        applyDragImageOffset(CGSize(width: snap.frame.minX - proposed.minX, height: snap.frame.minY - proposed.minY))
+        let center = CGPoint(x: snap.frame.midX, y: snap.frame.midY)
+        if snap.isMagnetized, panels.values.contains(where: { $0.containsDragRegion(center) }) {
+            return center
+        }
+        return point
+    }
+
+    private func applyDragImageOffset(_ offset: CGSize) {
+        guard offset != lastSnapOffset else { return }
+        lastSnapOffset = offset
+        nativeSession?.enumerateDraggingItems(options: [], for: nil, classes: [NSPasteboardItem.self], searchOptions: [:]) { item, _, _ in
+            item.draggingFrame = self.dragImageBaseFrame.offsetBy(dx: offset.width, dy: offset.height)
+        }
+    }
+
+    private func update(at rawPoint: CGPoint) {
         guard active, !updating, !completion.cancelled, !completion.committed else { return }
         updating = true
         defer { updating = false }
+        let point = magnetizedPoint(rawPoint)
         destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; launcherDestinationID = nil
         unpinDestinationID = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
@@ -556,6 +614,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     }
 
     private func clearFeedback() {
+        magneticGuides.hide()
+        applyDragImageOffset(.zero)
         scrollTimer?.invalidate(); scrollTimer = nil
         documentDrag.clear()
         panels.values.forEach {
@@ -581,6 +641,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         clearFeedback()
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
         nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; sourceUtilityID = nil; token = nil
+        dragImageSize = .zero; dragImageBaseFrame = .zero; lastSnapOffset = .zero
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
         unpinDestinationID = nil
         trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; shelfSourceIDs = []
@@ -588,5 +649,5 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         pasteboardChange = nil
     }
 
-    func stop() { cancel(); panels = [:] }
+    func stop() { cancel(); magneticGuides.stop(); panels = [:] }
 }

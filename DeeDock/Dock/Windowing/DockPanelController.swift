@@ -299,6 +299,30 @@ final class DockPanelController {
         DockGeometry.restingGlass(frame: baseRestingFrame, layout: baseLayout, scrollOffset: interaction.scrollOffset)
     }
 
+    /// Resting pin and folder-stack artwork in AppKit screen space, for peer magnetism.
+    ///
+    /// Uses the pre-preview layout so an insertion gap cannot make peers chase the drag.
+    /// Running-only apps are omitted; the dragged pin is omitted when `pinID` matches.
+    func magneticPeerFrames(excluding pinID: String?) -> [CGRect] {
+        guard !stopped, visibility.exposesContent, !baseRestingFrame.isEmpty else { return [] }
+        let size = baseLayout.iconSize
+        return zip(store.entries.indices, store.entries).compactMap { index, entry in
+            guard index < baseLayout.restingCenters.count else { return nil }
+            let isPeer: Bool
+            if let pin = entry.pin {
+                isPeer = pin.id != pinID
+            } else if case .folder = entry {
+                isPeer = true
+            } else {
+                isPeer = false
+            }
+            guard isPeer else { return nil }
+            let along = baseLayout.restingCenters[index] - interaction.scrollOffset
+            let local = baseLayout.buttonFrame(centerAlong: along, size: size)
+            return DockEdge.screenRect(local, in: baseRestingFrame)
+        }
+    }
+
     func containsDragRegion(_ point: CGPoint) -> Bool {
         if containsLauncherFileDrop(point) { return true }
         guard !stopped, !launcher.isPresented, let geometry else { return false }
