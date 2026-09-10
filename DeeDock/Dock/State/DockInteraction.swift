@@ -12,6 +12,8 @@ final class DockInteraction {
     var timeline: DockTimelineController?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
+    /// Shared opt-in Sims moods. Nil in previews that do not play the care loop.
+    var sims: DockSimsStore?
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?
     let tooltips = DockTooltipController()
     var tooltipPreset: DockTooltipPreset = .classic

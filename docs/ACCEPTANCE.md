@@ -1,5 +1,21 @@
 # DeeDock acceptance record
 
+## DEE-33 Dock Sims / pet mini-game
+
+Implemented on `cursor/dee-33-dock-sims-af28`. Settings → Features → Dock Sims is off by default. When it is on, each favorite application pin shows a mood mark and a small idle motion (playful bounce, content breathe, hungry or lonely sway). Intensity is a 15–100% slider. Feed, Cheer, and Settle live on the pin’s context menu and VoiceOver actions. Settle and **Reset moods** undo care without unpinning. Turning Sims off hides overlays and keeps pets. Storage is `dock.sims.v1` in UserDefaults. Corrupt bytes freeze edits until an explicit reset. There is no network path and no rumour feed (DEE-43).
+
+Folder pins, running-only unpinned tiles, and AI rumours are out of scope.
+
+This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
+
+### Required hands-on acceptance
+
+- Leave Sims off. Confirm pins look unchanged and the context menu has no Feed, Cheer, or Settle.
+- Turn Sims on. Confirm every pinned app shows a playful mood and idle motion. Confirm a running-only unpinned app does not.
+- Drag the intensity slider. Confirm the idle motion gets stronger or quieter. Confirm Reduce Motion shows a still mood mark.
+- Wait is not required: Feed, then later Cheer, then Settle on one pin and confirm the mood mark changes. Reset moods and confirm pins return to playful. Turn Sims off and on and confirm a fed pin still remembers care.
+- Confirm nothing is sent over the network and the system Dock is unchanged.
+
 ## DEE-36 dock as timeline
 
 Implemented on `cursor/dee-36-dock-timeline-dfa6`. DDock records its own pin edits and Focus Session transitions into `dock.local-history.v1`. **Browse Local History** (menu bar, or **H** in Focus Dock) treats that display's dock chrome as a time axis. Position along the resting glass maps oldest to newest. Escape or **H** again leaves the timeline. Folder presentation and bookmark refreshes are not events. Mode activation does not write pin history. An already-running session after launch does not invent a start event.
