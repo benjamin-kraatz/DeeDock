@@ -38,7 +38,7 @@ nonisolated struct ShortcutGreenhouseDocument: Codable, Equatable, Sendable {
 }
 
 /// Storage bounds for the greenhouse preference document.
-enum ShortcutGreenhouseLimits {
+nonisolated enum ShortcutGreenhouseLimits {
     static let version = 1
     static let storageKey = "dock.shortcut-greenhouse.v1"
     static let maximumEncodedBytes = 8 * 1024

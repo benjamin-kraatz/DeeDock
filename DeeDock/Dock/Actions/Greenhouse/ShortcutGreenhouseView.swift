@@ -114,7 +114,6 @@ private struct ShortcutGreenhouseGlass: View {
     ShortcutGreenhouseView(plants: ShortcutGreenhousePlant.previewBed, water: { _ in })
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
-        .environment(\.accessibilityReduceTransparency, true)
 }
 
 #Preview("Dark") {

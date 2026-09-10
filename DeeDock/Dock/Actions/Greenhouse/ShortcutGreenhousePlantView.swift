@@ -150,6 +150,5 @@ extension ShortcutGreenhousePlant {
 #Preview("Running, Reduce Motion") {
     ShortcutGreenhousePlantView(plant: .previewRunning, water: {})
         .padding(24)
-        .environment(\.accessibilityReduceMotion, true)
 }
 #endif
