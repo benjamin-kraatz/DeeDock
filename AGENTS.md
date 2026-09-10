@@ -90,6 +90,8 @@ Keep upstream skill files intact. Sources and licenses are recorded in `.agents/
 
 Read `docs/UPDATES.md` when the task is the Release workflow, Sparkle publishing, a release-prep version bump, or a release-pipeline YAML fix.
 
+Release-prep bumps `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` only in `Configuration/App.xcconfig`. `DeeDock.xcodeproj/project.pbxproj` target build settings inherit those keys from the xcconfig.
+
 Esi alone dispatches Release. Agents do not bump versions on feature work, dispatch the workflow, hold secrets, or publish Latest. `watch` is Esi's dry-run. `ship` opens a draft. `publish_latest` stays false until Esi confirms.
 
 Esi routes pipeline failures by creating the Linear `release-pipeline` issue and SendToAgent-pinging Nara with the failure blob. `Bot-Nara` stays on feature tickets only.
