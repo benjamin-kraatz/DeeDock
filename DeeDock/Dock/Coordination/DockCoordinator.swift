@@ -7,6 +7,7 @@ final class DockCoordinator {
     let focusSession = FocusSessionController()
     let localHistory = DockLocalHistoryStore()
     let pinWeather = PinWeatherStore()
+    let clipboardMuseum = ClipboardMuseumController()
     let sims = DockSimsStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
@@ -147,6 +148,7 @@ final class DockCoordinator {
         focusSession.start()
         localHistory.start(session: focusSession.session)
         pinWeather.start()
+        clipboardMuseum.start()
         sims.start()
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
@@ -687,6 +689,15 @@ final class DockCoordinator {
         badgeMemoryWindow.show(path: path, digest: digest, returningTo: lastExternalApplication)
     }
 
+    /// Called only from a menu command or Settings. Never opened by hover or a clipboard change.
+    func showClipboardMuseum() {
+        popovers.closeAll()
+        windowPeeks.close(returnFocus: false)
+        modePicker.close(returnFocus: false)
+        endFocus(restore: false)
+        clipboardMuseum.show(returningTo: lastExternalApplication)
+    }
+
     /// Shared search borrows stored metadata; native actions stay with the same owners as the dock tiles.
     private func configureLauncherSearch(on panel: DockPanelController) {
         let search = panel.launcher.search
@@ -822,6 +833,7 @@ final class DockCoordinator {
         enabledDisplays = []
         badges.stop()
         badgeMemoryWindow.stop()
+        clipboardMuseum.stop()
         badges.focusSession = nil
         catalog.stop()
         trash.stop()

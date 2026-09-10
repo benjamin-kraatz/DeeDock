@@ -66,6 +66,11 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 PinWeatherSettingsCard(weather: coordinator.pinWeather)
             }
+        case .clipboardMuseum:
+            if let coordinator = context.coordinator {
+                ClipboardMuseumSettingsCard(museum: coordinator.clipboardMuseum,
+                                            open: { coordinator.showClipboardMuseum() })
+            }
         case .magneticEdges:
             MagneticEdgesSettingsCard(source: source, locked: locked)
         case .permissions:

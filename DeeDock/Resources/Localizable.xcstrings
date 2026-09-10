@@ -1,6 +1,2094 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "clipboardMuseumRename": {
+    "comment": "Action that starts renaming an exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rename"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Umbenennen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRenameHint": {
+    "comment": "Tooltip on an exhibit title.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Double-click to rename"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zum Umbenennen doppelklicken"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRenameLabel": {
+    "comment": "Accessibility label of the exhibit name field.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exhibit name"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Name des Exponats"
+        }
+      }
+    }
+  },
+  "clipboardMuseumResetName": {
+    "comment": "Context menu action that removes a custom exhibit name.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Use Automatic Name"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatischen Namen verwenden"
+        }
+      }
+    }
+  },
+  "clipboardMuseumReveal": {
+    "comment": "Button that shows a redacted exhibit after Touch ID or password.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reveal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufdecken"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRevealReason": {
+    "comment": "Completes macOS's authentication sentence “DDock is trying to …”.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "reveal a redacted clipboard exhibit"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ein geschwärztes Exponat aufzudecken"
+        }
+      }
+    }
+  },
+  "clipboardMuseumHide": {
+    "comment": "Button that hides revealed content again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hide"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verbergen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumNotSecret": {
+    "comment": "Button that permanently un-redacts a falsely flagged exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Not a Secret"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kein Geheimnis"
+        }
+      }
+    }
+  },
+  "clipboardMuseumNotSecretHelp": {
+    "comment": "Tooltip for the Not a Secret button.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restore this exhibit for good. The same text won’t be flagged again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stellt das Exponat dauerhaft wieder her. Derselbe Text wird nicht erneut markiert."
+        }
+      }
+    }
+  },
+  "clipboardMuseumNotSecretReason": {
+    "comment": "Completes macOS's authentication sentence “DDock is trying to …”.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "restore a redacted clipboard exhibit"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ein geschwärztes Exponat wiederherzustellen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumShred": {
+    "comment": "Button that deletes a redacted exhibit's encrypted content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Shred"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vernichten"
+        }
+      }
+    }
+  },
+  "clipboardMuseumShredConfirm": {
+    "comment": "Title of the shred confirmation dialog.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Shred the hidden content?"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verborgenen Inhalt vernichten?"
+        }
+      }
+    }
+  },
+  "clipboardMuseumShredHelp": {
+    "comment": "Message in the shred confirmation dialog.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The encrypted content is deleted for good. The placard stays."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der verschlüsselte Inhalt wird endgültig gelöscht. Die Beschriftung bleibt."
+        }
+      }
+    }
+  },
+  "clipboardMuseumAuthFailed": {
+    "comment": "Status when authentication was cancelled or content could not be opened.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Not revealed. Authentication was cancelled or the content could not be opened."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nicht aufgedeckt. Die Authentifizierung wurde abgebrochen oder der Inhalt ist nicht lesbar."
+        }
+      }
+    }
+  },
+  "clipboardMuseumConditionShredded": {
+    "comment": "Placard condition when hidden content was shredded.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redacted, content shredded"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Geschwärzt, Inhalt vernichtet"
+        }
+      }
+    }
+  },
+  "clipboardMuseumConditionRevealed": {
+    "comment": "Placard condition while hidden content is shown.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Revealed until you look away"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aufgedeckt, bis du weiterblätterst"
+        }
+      }
+    }
+  },
+  "clipboardMuseumVeilSealedNote": {
+    "comment": "Note under the veil of a sealed exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Encrypted on this Mac. Reveal with Touch ID or your password."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Auf diesem Mac verschlüsselt. Mit Touch ID oder Passwort aufdecken."
+        }
+      }
+    }
+  },
+  "clipboardMuseumSeen": {
+    "comment": "Placard label for what Vision recognized in an image.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Seen"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erkannt"
+        }
+      }
+    }
+  },
+  "clipboardMuseumTextInImage": {
+    "comment": "Disclosure title for text Vision read in an image.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text in image"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text im Bild"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCuratorNote": {
+    "comment": "Accessibility label for the on-device curator's note or title.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Curator’s note"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notiz des Kurators"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCurate": {
+    "comment": "Settings toggle for on-device curator titles and notes.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Curator titles and notes"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Titel und Notizen vom Kurator"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCurateHelp": {
+    "comment": "Explains the curator toggle.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple’s on-device model names new pieces and adds a one-line note, so screenshots are findable by what they show. Nothing leaves this Mac. Sensitive items are skipped."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Apple-Modell auf diesem Mac benennt neue Stücke und ergänzt eine kurze Notiz, damit du Bildschirmfotos nach Inhalt findest. Nichts verlässt den Mac. Vertrauliches wird übersprungen."
+        }
+      }
+    }
+  },
+  "clipboardMuseumSave": {
+    "comment": "Menu that saves an exhibit to a file.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Save to Files"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In Dateien sichern"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSaveText": {
+    "comment": "Save format.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Plain Text (.txt)…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reiner Text (.txt)…"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSaveMarkdown": {
+    "comment": "Save format.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Markdown (.md)…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Markdown (.md)…"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSaveImage": {
+    "comment": "Save format.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "PNG Image…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "PNG-Bild…"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSaveFiles": {
+    "comment": "Save format that copies an exhibit's files into a folder.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Copies to Folder…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kopien in Ordner…"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSaveFilesPrompt": {
+    "comment": "Confirm button of the folder panel for copying files.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Copy Here"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hierhin kopieren"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSaveFailed": {
+    "comment": "Status when saving an exhibit failed.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Saving failed."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichern fehlgeschlagen."
+        }
+      }
+    }
+  },
+  "clipboardMuseumSlideshow": {
+    "comment": "Button and window name for the full-screen slideshow.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Slideshow"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diashow"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSlideshowPause": {
+    "comment": "Slideshow control.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pause"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pause"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSlideshowPlay": {
+    "comment": "Slideshow control.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Play"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abspielen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSlideshowPrevious": {
+    "comment": "Slideshow control.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Previous"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zurück"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSlideshowNext": {
+    "comment": "Slideshow control.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Next"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Weiter"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSlideshowClose": {
+    "comment": "Slideshow control.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close Slideshow"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diashow schließen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSlideshowPosition": {
+    "comment": "Slideshow position; arguments are the current slide and the total.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$lld of %2$lld"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$lld von %2$lld"
+        }
+      }
+    }
+  },
+  "actionClipboardMuseum": {
+    "comment": "Menu command that opens the Clipboard Museum window.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clipboard Museum…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zwischenablage-Museum…"
+        }
+      }
+    }
+  },
+  "clipboardMuseumTitle": {
+    "comment": "Feature and window name for the curated clipboard history.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clipboard Museum"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zwischenablage-Museum"
+        }
+      }
+    }
+  },
+  "settingsFeatureClipboardMuseumSubtitle": {
+    "comment": "Description of the Clipboard Museum on the Features settings overview.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Browse what you copied, like pieces in a gallery."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stöbere in Kopiertem wie in einer Ausstellung."
+        }
+      }
+    }
+  },
+  "clipboardMuseumSettingsKeywords": {
+    "comment": "Space-separated search synonyms for the Clipboard Museum settings page.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "clipboard history copy paste pasteboard exhibit museum redact secret local"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zwischenablage Verlauf kopieren einsetzen Ausstellung Museum schwärzen geheim lokal"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSettingsHelp": {
+    "comment": "Footnote under the Clipboard Museum settings card about where data is stored.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exhibits stay in DDock’s Application Support folder on this Mac. They are never synced and are excluded from backups."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exponate bleiben im Programmsupport-Ordner von DDock auf diesem Mac. Sie werden nie synchronisiert und sind von Backups ausgenommen."
+        }
+      }
+    }
+  },
+  "clipboardMuseumCapture": {
+    "comment": "Toggle that turns clipboard collecting on.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Collect copied items"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kopierte Objekte sammeln"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCaptureHelp": {
+    "comment": "Explains the collecting toggle, its default, and the possible macOS permission prompt.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Off by default. While on, DDock checks for a new copy about once a second. macOS may ask whether DDock can read the clipboard."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Standardmäßig aus. Solange es aktiv ist, prüft DDock etwa einmal pro Sekunde auf Neues. macOS fragt eventuell, ob DDock die Zwischenablage lesen darf."
+        }
+      }
+    }
+  },
+  "clipboardMuseumRedactSecrets": {
+    "comment": "Toggle that redacts detected secrets automatically.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redact secrets automatically"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Geheimnisse automatisch schwärzen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRedactSecretsHelp": {
+    "comment": "Explains what automatic redaction covers.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keys, tokens, card numbers, and password-like text are hidden and encrypted as soon as they are copied."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schlüssel, Tokens, Kartennummern und passwortartiger Text werden beim Kopieren verborgen und verschlüsselt."
+        }
+      }
+    }
+  },
+  "clipboardMuseumPrivacyNote": {
+    "comment": "Privacy note in the Clipboard Museum settings card.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Items that password managers mark as concealed or transient are never collected. Redacted content is encrypted with a key in your login keychain; revealing it asks for Touch ID or your password, and Shred deletes it for good."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Objekte, die Passwortmanager als verborgen oder flüchtig markieren, werden nie gesammelt. Geschwärzte Inhalte werden mit einem Schlüssel in deinem Anmelde-Schlüsselbund verschlüsselt. Aufdecken verlangt Touch ID oder dein Passwort, Vernichten löscht sie endgültig."
+        }
+      }
+    }
+  },
+  "clipboardMuseumAccessDenied": {
+    "comment": "Warning when macOS denies DDock clipboard access.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "macOS is set to deny DDock clipboard access, so nothing is collected. Allow it in System Settings to start collecting."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "macOS verweigert DDock den Zugriff auf die Zwischenablage, daher wird nichts gesammelt. Erlaube es in den Systemeinstellungen, um mit dem Sammeln zu beginnen."
+        }
+      }
+    }
+  },
+  "clipboardMuseumStorageFailed": {
+    "comment": "Warning when the collection file could not be written.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The collection could not be saved. Recent changes may be lost when DDock quits."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Sammlung konnte nicht gesichert werden. Neue Änderungen gehen beim Beenden eventuell verloren."
+        }
+      }
+    }
+  },
+  "clipboardMuseumResetHelp": {
+    "comment": "Warning when the stored collection is unreadable.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The stored collection could not be read. Collecting is paused until you reset it."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die gespeicherte Sammlung ist unlesbar. Das Sammeln pausiert, bis du sie zurücksetzt."
+        }
+      }
+    }
+  },
+  "clipboardMuseumReset": {
+    "comment": "Button that deletes an unreadable collection and starts fresh.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reset Collection"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sammlung zurücksetzen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumOpen": {
+    "comment": "Settings button that opens the Clipboard Museum window.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open Clipboard Museum…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zwischenablage-Museum öffnen…"
+        }
+      }
+    }
+  },
+  "clipboardMuseumClear": {
+    "comment": "Button that asks to delete every exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear Collection…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sammlung leeren…"
+        }
+      }
+    }
+  },
+  "clipboardMuseumClearConfirm": {
+    "comment": "Destructive confirmation button and dialog title for clearing the collection.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear Collection"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sammlung leeren"
+        }
+      }
+    }
+  },
+  "clipboardMuseumClearHelp": {
+    "comment": "Message in the clear-collection confirmation dialog.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Every exhibit, saved image, and encrypted item is deleted. Your settings stay."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alle Exponate, gespeicherten Bilder und verschlüsselten Inhalte werden gelöscht. Deine Einstellungen bleiben."
+        }
+      }
+    }
+  },
+  "clipboardMuseumSearchPrompt": {
+    "comment": "Search field prompt in the Clipboard Museum sidebar.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Search exhibits"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Exponate durchsuchen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumWingPicker": {
+    "comment": "Label of the menu that filters exhibits by medium.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gallery"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Galerie"
+        }
+      }
+    }
+  },
+  "clipboardMuseumWingAll": {
+    "comment": "Filter showing every exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "All"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alle"
+        }
+      }
+    }
+  },
+  "clipboardMuseumWingText": {
+    "comment": "Filter showing text exhibits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text"
+        }
+      }
+    }
+  },
+  "clipboardMuseumWingLinks": {
+    "comment": "Filter showing link exhibits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Links"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Links"
+        }
+      }
+    }
+  },
+  "clipboardMuseumWingImages": {
+    "comment": "Filter showing image exhibits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Images"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bilder"
+        }
+      }
+    }
+  },
+  "clipboardMuseumWingFiles": {
+    "comment": "Filter showing file exhibits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Files"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dateien"
+        }
+      }
+    }
+  },
+  "clipboardMuseumWingVault": {
+    "comment": "Filter showing redacted and sensitive exhibits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vault"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tresor"
+        }
+      }
+    }
+  },
+  "clipboardMuseumHallToday": {
+    "comment": "Sidebar section title for exhibits collected today.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Today"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Heute"
+        }
+      }
+    }
+  },
+  "clipboardMuseumHallYesterday": {
+    "comment": "Sidebar section title for exhibits collected yesterday.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Yesterday"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gestern"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCatalogNumber": {
+    "comment": "Accession number of an exhibit; argument is a sequential number.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No. %lld"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nr. %lld"
+        }
+      }
+    }
+  },
+  "clipboardMuseumMediumText": {
+    "comment": "Medium of a text exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text"
+        }
+      }
+    }
+  },
+  "clipboardMuseumMediumLink": {
+    "comment": "Medium of a link exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Link"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Link"
+        }
+      }
+    }
+  },
+  "clipboardMuseumMediumImage": {
+    "comment": "Medium of an image exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Image"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bild"
+        }
+      }
+    }
+  },
+  "clipboardMuseumMediumFiles": {
+    "comment": "Medium of a file exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Files"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dateien"
+        }
+      }
+    }
+  },
+  "clipboardMuseumUntitledImage": {
+    "comment": "Title and accessibility label for a copied image.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Untitled image"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unbenanntes Bild"
+        }
+      }
+    }
+  },
+  "clipboardMuseumFilesTitle": {
+    "comment": "Title for several copied files; first argument is a file name, second the number of other files.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%@ and %lld more"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%@ und %lld weitere"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRedactedTitle": {
+    "comment": "Title of a redacted exhibit without a hint.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redacted exhibit"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Geschwärztes Exponat"
+        }
+      }
+    }
+  },
+  "clipboardMuseumAcquired": {
+    "comment": "Placard label for when an exhibit was collected.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Acquired"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erworben"
+        }
+      }
+    }
+  },
+  "clipboardMuseumProvenance": {
+    "comment": "Placard label for the app that was in front when the copy happened.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Provenance"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Herkunft"
+        }
+      }
+    }
+  },
+  "clipboardMuseumDimensions": {
+    "comment": "Placard label for an exhibit's size.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dimensions"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Maße"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCondition": {
+    "comment": "Placard label for whether an exhibit is intact, sensitive, or redacted.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Condition"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zustand"
+        }
+      }
+    }
+  },
+  "clipboardMuseumReason": {
+    "comment": "Placard label for the kind of secret detected.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reason"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Grund"
+        }
+      }
+    }
+  },
+  "clipboardMuseumUnknownSource": {
+    "comment": "Placard value when the source app is unknown.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unknown"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unbekannt"
+        }
+      }
+    }
+  },
+  "clipboardMuseumPixels": {
+    "comment": "Image size in pixels; arguments are width and height.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$lld × %2$lld px"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$lld × %2$lld px"
+        }
+      }
+    }
+  },
+  "clipboardMuseumTruncatedNote": {
+    "comment": "Note on a text exhibit that was cut at the limit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Only the first 20,000 characters were collected."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nur die ersten 20.000 Zeichen wurden gesammelt."
+        }
+      }
+    }
+  },
+  "clipboardMuseumConditionIntact": {
+    "comment": "Placard condition for an unchanged exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Intact"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unversehrt"
+        }
+      }
+    }
+  },
+  "clipboardMuseumConditionDetected": {
+    "comment": "Placard condition for an exhibit redacted by secret detection.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redacted automatically"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatisch geschwärzt"
+        }
+      }
+    }
+  },
+  "clipboardMuseumConditionManual": {
+    "comment": "Placard condition for an exhibit the person redacted.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redacted by you"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Von dir geschwärzt"
+        }
+      }
+    }
+  },
+  "clipboardMuseumConditionSensitive": {
+    "comment": "Placard condition and row label for a flagged but unredacted exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Looks sensitive"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wirkt vertraulich"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSecretPrivateKey": {
+    "comment": "Kind of detected secret.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Private key"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Privater Schlüssel"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSecretAccessToken": {
+    "comment": "Kind of detected secret.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Access token"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zugangstoken"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSecretWebToken": {
+    "comment": "Kind of detected secret (JSON Web Token).",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Web token"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Web-Token"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSecretCardNumber": {
+    "comment": "Kind of detected secret.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Card number"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kartennummer"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSecretCredential": {
+    "comment": "Kind of detected secret, such as password=… text.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Password or key"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Passwort oder Schlüssel"
+        }
+      }
+    }
+  },
+  "clipboardMuseumSecretGenerated": {
+    "comment": "Kind of detected secret that looks randomly generated.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Generated secret"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Generiertes Geheimnis"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRestore": {
+    "comment": "Button that puts an exhibit back on the clipboard.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Copy to Clipboard"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In Zwischenablage kopieren"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRestored": {
+    "comment": "Status after an exhibit was copied.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Copied"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kopiert"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRestoreFailed": {
+    "comment": "Status when an exhibit could not be copied.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This exhibit could not be copied."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieses Exponat konnte nicht kopiert werden."
+        }
+      }
+    }
+  },
+  "clipboardMuseumRedact": {
+    "comment": "Button that redacts an exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redact"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schwärzen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRedactConfirm": {
+    "comment": "Title of the redaction confirmation dialog.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redact this exhibit?"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieses Exponat schwärzen?"
+        }
+      }
+    }
+  },
+  "clipboardMuseumRedactHelp": {
+    "comment": "Message in the redaction confirmation dialog.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The content is encrypted and hidden. You can reveal it later with Touch ID or your password."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Inhalt wird verschlüsselt und verborgen. Du kannst ihn später mit Touch ID oder deinem Passwort aufdecken."
+        }
+      }
+    }
+  },
+  "clipboardMuseumRemove": {
+    "comment": "Button that deletes one exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove from Collection"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aus Sammlung entfernen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumOpenLink": {
+    "comment": "Button that opens a link exhibit in the browser.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open Link"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Link öffnen"
+        }
+      }
+    }
+  },
+  "clipboardMuseumMoreFiles": {
+    "comment": "Count of files not shown in a file exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%lld more"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%lld weitere"
+        }
+      }
+    }
+  },
+  "clipboardMuseumImageMissing": {
+    "comment": "Shown when an image exhibit's file is gone.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The saved image is missing."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das gespeicherte Bild fehlt."
+        }
+      }
+    }
+  },
+  "clipboardMuseumEmptyTitle": {
+    "comment": "Title of the empty museum.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The galleries are empty"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Galerien sind leer"
+        }
+      }
+    }
+  },
+  "clipboardMuseumEmptyOff": {
+    "comment": "Empty museum message while collecting is off.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Turn on collecting, then copy something. It will hang here."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiviere das Sammeln und kopiere etwas. Es wird hier ausgestellt."
+        }
+      }
+    }
+  },
+  "clipboardMuseumEmptyOn": {
+    "comment": "Empty museum message while collecting is on.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Copy text, a link, an image, or files. New pieces appear here."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kopiere Text, einen Link, ein Bild oder Dateien. Neues erscheint hier."
+        }
+      }
+    }
+  },
+  "clipboardMuseumStartCollecting": {
+    "comment": "Button in the empty museum that turns collecting on.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Start Collecting"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sammeln starten"
+        }
+      }
+    }
+  },
+  "clipboardMuseumNoSelection": {
+    "comment": "Detail placeholder when no exhibit is selected.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose an exhibit"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle ein Exponat"
+        }
+      }
+    }
+  },
+  "clipboardMuseumNoMatches": {
+    "comment": "Detail placeholder when the search or filter matches nothing.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No exhibits match"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine passenden Exponate"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCollectingOn": {
+    "comment": "Sidebar status while collecting is on.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Collecting"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sammelt"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCollectingOff": {
+    "comment": "Sidebar status while collecting is off.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Collecting is off"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sammeln ist aus"
+        }
+      }
+    }
+  },
+  "clipboardMuseumVeilLabel": {
+    "comment": "Label and accessibility text on redacted content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Redacted content"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Geschwärzter Inhalt"
+        }
+      }
+    }
+  },
+  "clipboardMuseumCharacters": {
+    "comment": "Length of a text exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "variations": {
+          "plural": {
+            "one": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld character"
+              }
+            },
+            "other": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld characters"
+              }
+            }
+          }
+        }
+      },
+      "de": {
+        "variations": {
+          "plural": {
+            "one": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld Zeichen"
+              }
+            },
+            "other": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld Zeichen"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "clipboardMuseumFileCount": {
+    "comment": "Number of files in an exhibit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "variations": {
+          "plural": {
+            "one": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld file"
+              }
+            },
+            "other": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld files"
+              }
+            }
+          }
+        }
+      },
+      "de": {
+        "variations": {
+          "plural": {
+            "one": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld Datei"
+              }
+            },
+            "other": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld Dateien"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "clipboardMuseumExhibitCount": {
+    "comment": "Number of exhibits in the collection.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "variations": {
+          "plural": {
+            "one": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld exhibit"
+              }
+            },
+            "other": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld exhibits"
+              }
+            }
+          }
+        }
+      },
+      "de": {
+        "variations": {
+          "plural": {
+            "one": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld Exponat"
+              }
+            },
+            "other": {
+              "stringUnit": {
+                "state": "translated",
+                "value": "%lld Exponate"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "mode69PlusStop": {
     "comment": "Menu action to immediately disable full-display atmosphere.",
     "extractionState": "manual",

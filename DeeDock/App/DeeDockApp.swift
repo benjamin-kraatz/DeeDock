@@ -36,6 +36,7 @@ struct DeeDockApp: App {
                 .disabled(!delegate.coordinator.canFocus)
             Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                 .disabled(!delegate.coordinator.canBrowseLocalHistory)
+            Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
             Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
 
             Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
@@ -73,6 +74,7 @@ struct DeeDockApp: App {
                 .disabled(!delegate.coordinator.canFocus)
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                     .disabled(!delegate.coordinator.canBrowseLocalHistory)
+                Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
             }
         }
         Window(Text(.actionSettings), id: "settings") {
