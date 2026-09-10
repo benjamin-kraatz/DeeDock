@@ -1938,7 +1938,8 @@ leases are not persisted.
 Declared app support comes from `NSWorkspace.urlsForApplications(toOpen:)`. Mixed batches
 list unsupported names instead of dropping them. App-level open copy says the files are not
 attached to a window or project. Shortcuts use the honest “Pass selected files” wording;
-the existing one-run-per-Shortcut rule is unchanged. Folder copy never overwrites; conflicts
+the existing one-run-per-Shortcut rule is unchanged. Discovery uses `ensureLoaded()` when
+file-action UI appears, matching Settings and Watch. Folder copy never overwrites; conflicts
 get a numbered name and a partial result. Saved destinations are versioned local bookmarks
 (`launcher.file-destinations.v1`) with rename, remove, and repair. Remove deletes the
 bookmark only.

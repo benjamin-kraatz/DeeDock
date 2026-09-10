@@ -134,7 +134,9 @@ silently.
 
 Pinned Shortcuts appear as **Pass selected files to this Shortcut**. DDock does not claim to
 know what a Shortcut accepts. Mark **Pass selected files** in Settings to sort a Shortcut
-with the file-input actions. The existing one-run-per-Shortcut rule still applies.
+with the file-input actions. The installed Shortcut list loads when Settings, Watch, or this
+file-action UI appears. **Reload Shortcuts** remains a manual refresh. The existing
+one-run-per-Shortcut rule still applies.
 
 **Copy** writes into a chosen or bookmarked folder and leaves the sources in place. Existing
 destination names are never replaced; a conflicting copy gets a numbered name. Saved

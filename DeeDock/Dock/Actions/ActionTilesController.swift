@@ -35,7 +35,8 @@ final class ActionTilesController {
         changed?()
     }
 
-    /// Starts discovery when Settings or Watch first needs the list. Skips canvas and playground hosts.
+    /// Starts discovery when Settings, Watch, or Launcher file actions first need the list.
+    /// Skips canvas and playground hosts.
     func ensureLoaded() {
         guard !loading, !discovered else { return }
         let environment = ProcessInfo.processInfo.environment

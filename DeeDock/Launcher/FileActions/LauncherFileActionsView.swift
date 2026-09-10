@@ -7,6 +7,7 @@ struct LauncherFileActionsView: View {
     var body: some View {
         @Bindable var state = launcher.fileActions
         VStack(alignment: .leading, spacing: 10) {
+            Picker(selection: $state.kind) {
                 ForEach(LauncherFileActionKind.allCases) { kind in
                     Text(kind.title).tag(kind)
                 }
@@ -55,10 +56,14 @@ struct LauncherFileActionsView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .onAppear { state.actionsController?.ensureLoaded() }
         .onChange(of: launcher.query, initial: true) { _, query in
             state.filter(query: query)
         }
         .onChange(of: state.destinations.destinations.map(\.id), initial: false) { _, _ in
+            state.refreshCatalog()
+        }
+        .onChange(of: state.actionsController?.tiles.map(\.id) ?? [], initial: false) { _, _ in
             state.refreshCatalog()
         }
     }
