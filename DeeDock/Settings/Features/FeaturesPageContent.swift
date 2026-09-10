@@ -65,6 +65,8 @@ struct FeaturesPageContent: View {
                 DockTimelineSettingsCard(history: coordinator.localHistory,
                                          browse: { coordinator.browseLocalHistory() })
             }
+        case .magneticEdges:
+            MagneticEdgesSettingsCard(source: source, locked: locked)
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)
@@ -72,8 +74,35 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 DockSimsSettingsCard(sims: coordinator.sims)
             }
+        case .soapBubbles:
+            SettingsCard(title: .soapBubblesTitle, footnote: .soapBubblesSettingsHelp) {
+                SettingsToggleRow(title: .soapBubblesEnable, subtitle: .soapBubblesEnableHelp,
+                                  isOn: source.binding(\.soapBubbleEffects))
+            }
+            .disabled(locked)
         default:
             EmptyView()
         }
     }
 }
+
+#if DEBUG
+#Preview("Soap bubbles, off") {
+    SettingsCard(title: .soapBubblesTitle, footnote: .soapBubblesSettingsHelp) {
+        SettingsToggleRow(title: .soapBubblesEnable, subtitle: .soapBubblesEnableHelp,
+                          isOn: .constant(false))
+    }
+    .padding(24)
+    .frame(width: SettingsMetrics.columnWidth)
+}
+
+#Preview("Soap bubbles, on") {
+    SettingsCard(title: .soapBubblesTitle, footnote: .soapBubblesSettingsHelp) {
+        SettingsToggleRow(title: .soapBubblesEnable, subtitle: .soapBubblesEnableHelp,
+                          isOn: .constant(true))
+    }
+    .padding(24)
+    .frame(width: SettingsMetrics.columnWidth)
+    .preferredColorScheme(.dark)
+}
+#endif

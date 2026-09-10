@@ -116,6 +116,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.secondaryDisplayAppsOnly = defaults.secondaryDisplayAppsOnly
         result.showSessionCapsules = defaults.showSessionCapsules
         result.showTrash = defaults.showTrash
+        result.magneticEdges = defaults.magneticEdges
         result.confirmBeforeEmptyingTrash = defaults.confirmBeforeEmptyingTrash
         result.windowPeekEnabled = defaults.windowPeekEnabled
         result.windowPeekSize = defaults.windowPeekSize
@@ -124,6 +125,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.windowPeekIncludeMinimized = defaults.windowPeekIncludeMinimized
         result.windowPeekIncludeUntitled = defaults.windowPeekIncludeUntitled
         result.windowPeekHoverDelay = defaults.windowPeekHoverDelay
+        result.soapBubbleEffects = defaults.soapBubbleEffects
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground
         result.backgroundOpacity = backgroundOpacity ?? defaults.backgroundOpacity
