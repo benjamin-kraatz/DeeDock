@@ -87,6 +87,15 @@ final class DockCoordinator {
             base: FoundationModelsSemanticStackOrganizer()
         )
         timeline = DockTimelineController(history: localHistory)
+        timeline.applyPreview = { [weak self] id, pins in
+            self?.panels[id]?.store.applyTimelinePreview(pins)
+        }
+        timeline.clearPreview = { [weak self] id in
+            self?.panels[id]?.store.clearTimelinePreview()
+        }
+        localHistory.replayEnabledDidChange = { [weak self] in
+            self?.timeline.replayPreferenceDidChange()
+        }
         focusPopover = FocusSessionCoordinator(focus: focusSession, presenter: popovers)
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
         fusion = FusionCoordinator(shelf: shelf)
@@ -613,7 +622,8 @@ final class DockCoordinator {
         endFocus(restore: false)
         previousApplication = lastExternalApplication
         focusedID = id
-        timeline.begin(on: id)
+        let pins = panels[id]?.store.persistedPins ?? []
+        timeline.begin(on: id, currentPins: pins, archive: localHistory.pinArchive)
         panels[id]?.focus()
     }
 

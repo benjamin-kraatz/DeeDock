@@ -218,6 +218,7 @@ struct DockLocalHistoryTests {
         #expect(timeline.presentation.selectedEvent == nil)
         #expect(timeline.presentation.markers.isEmpty)
         #expect(timeline.presentation.recordingEnabled)
+        #expect(!timeline.presentation.replayEnabled)
     }
 
     @Test("DockStore pin edits record through the shared history store")
@@ -241,6 +242,207 @@ struct DockLocalHistoryTests {
         #expect(history.events.map(\.kind) == [.pinAdded])
         #expect(dock.savePins([]))
         #expect(history.events.map(\.kind) == [.pinAdded, .pinRemoved])
+    }
+
+    @Test("Pin events store post-change order and archive the pins")
+    func pinSnapshots() throws {
+        let suite = "HistorySnapshots.\(UUID().uuidString)"
+        let (history, defaults) = try store(suite)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        history.start()
+        #expect(!history.replayEnabled)
+        let safari = pin("safari")
+        let mail = pin("mail")
+        history.recordPinChange(previous: [], next: [safari], displayID: "display.primary")
+        history.recordPinChange(previous: [safari], next: [safari, mail], displayID: "display.primary")
+        history.recordPinChange(previous: [safari, mail], next: [mail, safari], displayID: "display.primary")
+
+        #expect(history.events.map(\.pinIDs) == [
+            [safari.id],
+            [safari.id, mail.id],
+            [mail.id, safari.id]
+        ])
+        #expect(history.pinArchive[safari.id] == safari)
+        #expect(history.pinArchive[mail.id] == mail)
+    }
+
+    @Test("Older documents decode with pin replay off and an empty archive")
+    func replayDefaultsOnDecode() throws {
+        let bytes = Data(#"{"version":1,"recordingEnabled":true,"events":[]}"#.utf8)
+        let document = try JSONDecoder().decode(DockLocalHistoryDocument.self, from: bytes)
+        #expect(document.isValid)
+        #expect(!document.replayEnabled)
+        #expect(document.pinArchive.isEmpty)
+        #expect(document.recordingEnabled)
+    }
+
+    @Test("Replay reconstructs add, remove, move, and reorder from snapshots")
+    func reconstructFromSnapshots() {
+        let safari = pin("safari")
+        let mail = pin("mail")
+        let calendar = pin("calendar")
+        let added = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 1), kind: .pinAdded,
+            displayID: "display.primary", subjectID: safari.id, pinIDs: [safari.id]
+        )
+        let addedMail = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 2), kind: .pinAdded,
+            displayID: "display.primary", subjectID: mail.id, pinIDs: [safari.id, mail.id]
+        )
+        let removed = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 3), kind: .pinRemoved,
+            displayID: "display.primary", subjectID: safari.id, pinIDs: [mail.id]
+        )
+        let moved = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 4), kind: .pinMoved,
+            displayID: "display.primary", subjectID: calendar.id, pinIDs: [calendar.id, mail.id]
+        )
+        let reordered = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 5), kind: .pinsReordered,
+            displayID: "display.primary", pinIDs: [mail.id, calendar.id]
+        )
+        let events = [added, addedMail, removed, moved, reordered]
+        let current = [mail.id, calendar.id]
+        #expect(DockTimelinePinReplay.pinIDs(at: 0, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [safari.id])
+        #expect(DockTimelinePinReplay.pinIDs(at: 1, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [safari.id, mail.id])
+        #expect(DockTimelinePinReplay.pinIDs(at: 2, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [mail.id])
+        #expect(DockTimelinePinReplay.pinIDs(at: 3, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [calendar.id, mail.id])
+        #expect(DockTimelinePinReplay.pinIDs(at: 4, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [mail.id, calendar.id])
+    }
+
+    @Test("Events without snapshots invert later add and remove from the live list")
+    func reconstructWithoutSnapshots() {
+        let safari = pin("safari")
+        let mail = pin("mail")
+        let addedSafari = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 1), kind: .pinAdded,
+            displayID: "display.primary", subjectID: safari.id
+        )
+        let addedMail = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 2), kind: .pinAdded,
+            displayID: "display.primary", subjectID: mail.id
+        )
+        let removedSafari = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 3), kind: .pinRemoved,
+            displayID: "display.primary", subjectID: safari.id
+        )
+        let events = [addedSafari, addedMail, removedSafari]
+        let current = [mail.id]
+        #expect(DockTimelinePinReplay.pinIDs(at: 2, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [mail.id])
+        #expect(DockTimelinePinReplay.pinIDs(at: 1, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [mail.id, safari.id])
+        #expect(DockTimelinePinReplay.pinIDs(at: 0, events: events, currentIDs: current,
+                                            displayID: "display.primary") == [safari.id])
+    }
+
+    @Test("Pin reconstruction stays on the browsed display")
+    func reconstructIgnoresOtherDisplays() {
+        let safari = pin("safari")
+        let mail = pin("mail")
+        let onPrimary = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 1), kind: .pinAdded,
+            displayID: "display.primary", subjectID: safari.id, pinIDs: [safari.id]
+        )
+        let onOther = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 2), kind: .pinAdded,
+            displayID: "display.other", subjectID: mail.id, pinIDs: [mail.id]
+        )
+        let events = [onPrimary, onOther]
+        #expect(DockTimelinePinReplay.pinIDs(at: 1, events: events, currentIDs: [safari.id],
+                                            displayID: "display.primary") == [safari.id])
+        #expect(DockTimelinePinReplay.pinIDs(at: 1, events: events, currentIDs: [mail.id],
+                                            displayID: "display.other") == [mail.id])
+    }
+
+    @Test("Timeline preview does not persist pins or record new history")
+    func previewDoesNotPersist() throws {
+        let suite = "HistoryPreview.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let display = DisplayFixtures.screen("primary", runtimeID: 1, primary: true)
+        let settings = DockSettingsStore(repository: nil)
+        let profiles = DisplayProfilesStore(
+            defaults: settings,
+            repository: DisplayProfilesRepository(defaults: defaults),
+            modesRepository: DockModesRepository(defaults: defaults)
+        )
+        profiles.synchronize([display]) { [] }
+        let history = DockLocalHistoryStore(repository: DockLocalHistoryRepository(defaults: defaults))
+        history.start()
+        let catalog = ApplicationCatalog(service: HistoryFixtureService())
+        let dock = DockStore(displayID: display.id, catalog: catalog, profiles: profiles, history: history)
+        let safari = pin("safari")
+        let mail = pin("mail")
+        #expect(dock.savePins([safari]))
+        #expect(history.events.count == 1)
+
+        dock.applyTimelinePreview([mail])
+        #expect(dock.pins.map(\.id) == [mail.id])
+        #expect(dock.persistedPins.map(\.id) == [safari.id])
+        #expect(dock.isPreviewingTimeline)
+        #expect(!dock.canEditPins)
+        #expect(!dock.savePins([mail, safari]))
+        #expect(history.events.map(\.kind) == [.pinAdded])
+        #expect(dock.persistedPins.map(\.id) == [safari.id])
+
+        dock.clearTimelinePreview()
+        #expect(dock.pins.map(\.id) == [safari.id])
+        #expect(!dock.isPreviewingTimeline)
+    }
+
+    @Test("Pin replay waits for dwell, cancels on scrub, and stays off by default")
+    func replayDwellAndGate() async throws {
+        let suite = "HistoryReplayDwell.\(UUID().uuidString)"
+        let (history, defaults) = try store(suite)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        history.start()
+        let start = Date(timeIntervalSince1970: 100)
+        history.recordPinChange(previous: [], next: [pin("one")], displayID: "display.primary", at: start)
+        history.recordPinChange(previous: [pin("one")], next: [pin("one"), pin("two")],
+                                displayID: "display.primary", at: start.addingTimeInterval(30))
+        let current = [pin("one"), pin("two")]
+        var applied: [[String]] = []
+        var cleared = 0
+
+        let timeline = DockTimelineController(history: history)
+        timeline.previewDwell = .milliseconds(25)
+        timeline.applyPreview = { _, pins in applied.append(pins.map(\.id)) }
+        timeline.clearPreview = { _ in cleared += 1 }
+
+        timeline.begin(on: "display.primary", currentPins: current, archive: history.pinArchive)
+        timeline.nudge(by: -1)
+        #expect(applied.isEmpty)
+        #expect(timeline.replayPending)
+        try await Task.sleep(for: .milliseconds(80))
+        #expect(applied.isEmpty)
+        #expect(!timeline.isReplayingPins)
+
+        history.setReplayEnabled(true)
+        timeline.begin(on: "display.primary", currentPins: current, archive: history.pinArchive)
+        timeline.nudge(by: -1)
+        #expect(applied.isEmpty)
+        try await Task.sleep(for: .milliseconds(80))
+        #expect(applied == [[pin("one").id]])
+        #expect(timeline.isReplayingPins)
+
+        timeline.nudge(by: 1)
+        try await Task.sleep(for: .milliseconds(80))
+        #expect(applied == [[pin("one").id], [pin("one").id, pin("two").id]])
+
+        applied = []
+        timeline.nudge(by: -1)
+        timeline.nudge(by: 1)
+        try await Task.sleep(for: .milliseconds(80))
+        #expect(applied.isEmpty)
+
+        timeline.end()
+        #expect(cleared == 1)
     }
 }
 

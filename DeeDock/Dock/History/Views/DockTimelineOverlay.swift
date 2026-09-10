@@ -76,7 +76,8 @@ struct DockTimelineOverlay: View {
                 DockTimelineEmptyCard(recordingEnabled: presentation.recordingEnabled,
                                       reduceTransparency: reduceTransparency, end: end)
             } else if let event = presentation.selectedEvent {
-                DockTimelineGlanceCard(event: event, reduceTransparency: reduceTransparency, end: end)
+                DockTimelineGlanceCard(event: event, replayEnabled: presentation.replayEnabled,
+                                      reduceTransparency: reduceTransparency, end: end)
                     // Reduce Motion replaces the sliding read-out with a crossfade between events.
                     .id(reduceMotion ? event.id : nil)
                     .transition(.opacity)
@@ -157,6 +158,7 @@ private struct DockTimelinePlayhead: View {
 /// Read-out for the browsed event, sized to stay legible while the pointer keeps moving.
 private struct DockTimelineGlanceCard: View {
     let event: DockLocalHistoryEvent
+    let replayEnabled: Bool
     let reduceTransparency: Bool
     let end: () -> Void
 
@@ -176,6 +178,11 @@ private struct DockTimelineGlanceCard: View {
             Text(.timelineScrubHint)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+            if replayEnabled {
+                Text(.timelineReplayHint)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
             Text(.timelinePrivacyNote)
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
@@ -260,12 +267,14 @@ private enum DockTimelinePreviewData {
 
     static func presentation(progress: Double = 1,
                              events: [DockLocalHistoryEvent],
-                             recordingEnabled: Bool = true) -> DockTimelinePresentation {
+                             recordingEnabled: Bool = true,
+                             replayEnabled: Bool = false) -> DockTimelinePresentation {
         DockTimelinePresentation(
             isActive: true,
             displayID: "preview",
             isEmpty: events.isEmpty,
             recordingEnabled: recordingEnabled,
+            replayEnabled: replayEnabled,
             progress: progress,
             selectedEvent: DockTimelineMapping.event(at: progress, in: events),
             markers: events.map {
@@ -288,6 +297,7 @@ private struct DockTimelinePreviewHost: View {
     var progress: Double = 1
     var events: [DockLocalHistoryEvent] = DockTimelinePreviewData.events
     var recordingEnabled = true
+    var replayEnabled = false
 
     var body: some View {
         let layout = DockTimelinePreviewData.layout(edge: edge)
@@ -296,7 +306,8 @@ private struct DockTimelinePreviewHost: View {
                            startPoint: .topLeading, endPoint: .bottomTrailing)
             DockTimelineOverlay(
                 presentation: DockTimelinePreviewData.presentation(progress: progress, events: events,
-                                                                  recordingEnabled: recordingEnabled),
+                                                                  recordingEnabled: recordingEnabled,
+                                                                  replayEnabled: replayEnabled),
                 layout: layout,
                 end: {}
             )
@@ -307,6 +318,10 @@ private struct DockTimelinePreviewHost: View {
 
 #Preview("Pins and sessions, mid timeline") {
     DockTimelinePreviewHost(progress: 0.45)
+}
+
+#Preview("Pin replay enabled") {
+    DockTimelinePreviewHost(progress: 0.45, replayEnabled: true)
 }
 
 #Preview("Empty and private") {

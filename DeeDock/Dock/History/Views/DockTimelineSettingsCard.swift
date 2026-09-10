@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Local History controls: recording, clearing, and recovery from an unreadable document.
+/// Local History controls: recording, optional pin preview, clearing, and recovery from an unreadable document.
 ///
 /// Reads the live store so the card reflects a clear or a failed write immediately. The
 /// presentation lives in ``DockTimelineSettingsCardContent`` so previews can show every state
@@ -13,10 +13,12 @@ struct DockTimelineSettingsCard: View {
     var body: some View {
         DockTimelineSettingsCardContent(
             recordingEnabled: history.recordingEnabled,
+            replayEnabled: history.replayEnabled,
             isEmpty: history.isEmpty,
             requiresReset: history.requiresReset,
             storageFailed: history.storageFailed,
             setRecordingEnabled: { history.setRecordingEnabled($0) },
+            setReplayEnabled: { history.setReplayEnabled($0) },
             clear: { history.clear() },
             reset: { history.reset() },
             browse: browse
@@ -27,11 +29,13 @@ struct DockTimelineSettingsCard: View {
 /// The card's rendering, driven by plain values so each state is previewable and testable.
 struct DockTimelineSettingsCardContent: View {
     let recordingEnabled: Bool
+    let replayEnabled: Bool
     let isEmpty: Bool
     /// True when stored bytes could not be read; edits stay frozen until an explicit reset.
     let requiresReset: Bool
     let storageFailed: Bool
     let setRecordingEnabled: (Bool) -> Void
+    let setReplayEnabled: (Bool) -> Void
     let clear: () -> Void
     let reset: () -> Void
     var browse: (() -> Void)?
@@ -42,6 +46,9 @@ struct DockTimelineSettingsCardContent: View {
         SettingsCard(title: .timelineTitle, footnote: .timelineSettingsHelp) {
             SettingsToggleRow(title: .timelineRecord, subtitle: .timelineRecordHelp,
                               isOn: Binding(get: { recordingEnabled }, set: setRecordingEnabled))
+                .disabled(requiresReset)
+            SettingsToggleRow(title: .timelineReplay, subtitle: .timelineReplayHelp,
+                              isOn: Binding(get: { replayEnabled }, set: setReplayEnabled))
                 .disabled(requiresReset)
             SettingsStackedRow {
                 VStack(alignment: .leading, spacing: 6) {
@@ -92,33 +99,37 @@ private struct DockTimelineSettingsNotice: View {
 
 #if DEBUG
 #Preview("Recording on with events") {
-    DockTimelineSettingsCardContent(recordingEnabled: true, isEmpty: false, requiresReset: false,
-                                    storageFailed: false, setRecordingEnabled: { _ in }, clear: {},
-                                    reset: {}, browse: {})
+    DockTimelineSettingsCardContent(recordingEnabled: true, replayEnabled: false, isEmpty: false,
+                                    requiresReset: false, storageFailed: false,
+                                    setRecordingEnabled: { _ in }, setReplayEnabled: { _ in },
+                                    clear: {}, reset: {}, browse: {})
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
 }
 
 #Preview("Recording off, no events") {
-    DockTimelineSettingsCardContent(recordingEnabled: false, isEmpty: true, requiresReset: false,
-                                    storageFailed: false, setRecordingEnabled: { _ in }, clear: {},
-                                    reset: {}, browse: {})
+    DockTimelineSettingsCardContent(recordingEnabled: false, replayEnabled: false, isEmpty: true,
+                                    requiresReset: false, storageFailed: false,
+                                    setRecordingEnabled: { _ in }, setReplayEnabled: { _ in },
+                                    clear: {}, reset: {}, browse: {})
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
 }
 
 #Preview("Unreadable history") {
-    DockTimelineSettingsCardContent(recordingEnabled: true, isEmpty: true, requiresReset: true,
-                                    storageFailed: true, setRecordingEnabled: { _ in }, clear: {},
-                                    reset: {}, browse: {})
+    DockTimelineSettingsCardContent(recordingEnabled: true, replayEnabled: false, isEmpty: true,
+                                    requiresReset: true, storageFailed: true,
+                                    setRecordingEnabled: { _ in }, setReplayEnabled: { _ in },
+                                    clear: {}, reset: {}, browse: {})
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
 }
 
 #Preview("Save failed") {
-    DockTimelineSettingsCardContent(recordingEnabled: true, isEmpty: false, requiresReset: false,
-                                    storageFailed: true, setRecordingEnabled: { _ in }, clear: {},
-                                    reset: {}, browse: nil)
+    DockTimelineSettingsCardContent(recordingEnabled: true, replayEnabled: true, isEmpty: false,
+                                    requiresReset: false, storageFailed: true,
+                                    setRecordingEnabled: { _ in }, setReplayEnabled: { _ in },
+                                    clear: {}, reset: {}, browse: nil)
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
         .preferredColorScheme(.dark)

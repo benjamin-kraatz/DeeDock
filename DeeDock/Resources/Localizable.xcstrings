@@ -22715,6 +22715,60 @@
         }
       }
     },
+    "timelineReplay" : {
+      "comment" : "Toggle that previews historical pin order while browsing local history. Off by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anheftungen beim Durchsuchen zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show pins while browsing"
+          }
+        }
+      }
+    },
+    "timelineReplayHelp" : {
+      "comment" : "Explains that pin replay is a preview and does not change saved pins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach einer kurzen Pause auf einem Ereignis zeigt das Dock die Anheftungen dieses Moments. Die gespeicherte Reihenfolge bleibt unverändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After you pause on a moment, the dock shows that pin order. Saved pins stay as they are."
+          }
+        }
+      }
+    },
+    "timelineReplayHint" : {
+      "comment" : "Shown on the timeline glance when pin replay is enabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anheftungen folgen, wenn du auf einem Moment bleibst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pins follow after you pause on a moment."
+          }
+        }
+      }
+    },
     "timelineReset" : {
       "comment" : "Replaces an unreadable local history document after an explicit choice.",
       "extractionState" : "manual",
@@ -22776,13 +22830,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Chronik bleibt auf diesem Mac. Wähle „Lokale Chronik durchsuchen“, um das Dock als Zeitachse zu nutzen."
+            "value" : "Die Chronik bleibt auf diesem Mac. Wähle „Lokale Chronik durchsuchen“, um das Dock als Zeitachse zu nutzen. Anheft-Vorschau ist aus, bis du sie einschaltest."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "History stays on this Mac. Choose Browse Local History to use the dock as a time axis."
+            "value" : "History stays on this Mac. Choose Browse Local History to use the dock as a time axis. Pin replay stays off until you turn it on."
           }
         }
       }
@@ -22794,13 +22848,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chronik Verlauf Zeitleiste lokal scrubben Sitzung anheften Datenschutz Bildschirmzeit"
+            "value" : "Chronik Verlauf Zeitleiste lokal scrubben Sitzung anheften Vorschau Datenschutz Bildschirmzeit"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "timeline history scrub local pin session privacy screen time"
+            "value" : "timeline history scrub local pin session replay preview privacy screen time"
           }
         }
       }

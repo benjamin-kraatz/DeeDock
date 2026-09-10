@@ -39,9 +39,16 @@ final class DockStore {
     @ObservationIgnored var openShelf: (() -> Void)?
     @ObservationIgnored var openSessionCapsules: (() -> Void)?
     @ObservationIgnored var openSessionCapsule: ((UUID) -> Void)?
-    var pins: [DockPin] { profiles.pinLists[displayID] ?? [] }
+    /// Presentation pins. Historical preview replaces this list without touching persistence.
+    var pins: [DockPin] { previewPins ?? persistedPins }
+    /// Saved pins for this display. Pin edits and history recording always use this list.
+    var persistedPins: [DockPin] { profiles.pinLists[displayID] ?? [] }
+    /// Temporary pin order shown while Browse Local History is replaying. Never written to disk.
+    private(set) var previewPins: [DockPin]?
+    var isPreviewingTimeline: Bool { previewPins != nil }
     var canEditPins: Bool {
-        !profiles.requiresReset && !profiles.modes.requiresReset && profiles.pinErrors[displayID] == nil
+        previewPins == nil
+            && !profiles.requiresReset && !profiles.modes.requiresReset && profiles.pinErrors[displayID] == nil
     }
 
     @ObservationIgnored private let profiles: DisplayProfilesStore
@@ -74,9 +81,25 @@ final class DockStore {
         refresh()
     }
 
+    /// Shows `pins` on this dock without saving them or recording history.
+    func applyTimelinePreview(_ pins: [DockPin]) {
+        guard previewPins != pins else { return }
+        previewPins = pins
+        refresh()
+        presentationDidChange?()
+    }
+
+    /// Restores the saved pin list after timeline preview ends.
+    func clearTimelinePreview() {
+        guard previewPins != nil else { return }
+        previewPins = nil
+        refresh()
+        presentationDidChange?()
+    }
+
     /// Rebuilds presentation from shared data without starting workspace observation.
     func refresh() {
-        let pins = profiles.pinLists[displayID] ?? []
+        let pins = self.pins
         let pinnedApplications = pins.compactMap(\.application)
         let running = Dictionary(uniqueKeysWithValues: catalog.running.map { ($0.id, $0) })
         let favorites = Dictionary(uniqueKeysWithValues: pinnedApplications.map { ($0.id, $0) })
@@ -271,8 +294,9 @@ final class DockStore {
     /// Persists one completed edit. Preview state must never call this method.
     @discardableResult
     func savePins(_ proposed: [DockPin]) -> Bool {
-        guard proposed != pins else { return true }
-        let previous = pins
+        guard previewPins == nil else { return false }
+        guard proposed != persistedPins else { return true }
+        let previous = persistedPins
         do {
             try profiles.savePins(proposed, for: displayID)
             history?.recordPinChange(previous: previous, next: proposed, displayID: displayID)
@@ -382,5 +406,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

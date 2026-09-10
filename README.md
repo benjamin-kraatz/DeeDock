@@ -502,9 +502,7 @@ Set the next session's duration, from 1 to 180 minutes, in **Settings → Featur
 
 Choose **Browse Local History** from the menu-bar item, or press **H** in Focus Dock. The dock under the pointer becomes a time axis of DDock-local pin and Focus Session events. Drag along the chrome to scrub; arrows move to the previous or next event. Escape or **H** again leaves the timeline. Nothing is imported from macOS Screen Time or other apps. **Settings → Features → Local History** can pause recording and clear stored events. An empty dock shows a privacy explanation instead of a blank track. Session events share an identifier so a later session-scrub feature can replay one Focus Session from the same log.
 
-## Local History
-
-Choose **Browse Local History** from the menu-bar item, or press **H** in Focus Dock. The dock under the pointer becomes a time axis of DDock-local pin and Focus Session events. Drag along the chrome to scrub; arrows move to the previous or next event. Escape or **H** again leaves the timeline. Nothing is imported from macOS Screen Time or other apps. **Settings → Features → Local History** can pause recording and clear stored events. An empty dock shows a privacy explanation instead of a blank track. Session events share an identifier so a later session-scrub feature can replay one Focus Session from the same log.
+**Show pins while browsing** is off until you turn it on in that same settings card. With it on, the dock waits until you pause on a moment, then shows that pin order using the usual insert, remove, and move animations. Saved pins do not change. Leaving the timeline restores the current layout.
 
 Running timers use a saved wall-clock deadline, so sleep and app downtime count. Paused timers retain their remaining duration. Reopening DDock after the deadline marks the session finished without replaying a celebration. Changing focus defaults does not restart the current session. Renaming or deleting a Dock Mode does not erase a timer already started from it.
 

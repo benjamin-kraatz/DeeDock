@@ -15,6 +15,9 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
     var displayID: String? = nil
     var subjectID: String? = nil
     var subjectName: String? = nil
+    /// Pin identity order after this mutation, when known. Session events omit this and inherit
+    /// the last snapshot for the same display while scrubbing.
+    var pinIDs: [String]? = nil
 
     /// Pin mutations and Focus Session transitions recorded by DDock itself.
     ///
@@ -110,6 +113,8 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
             && (subjectID?.count ?? 0) <= 4096
             && (subjectName?.count ?? 0) <= 512
             && (kind.rawValue.count <= 128)
+            && (pinIDs?.count ?? 0) <= DockLocalHistoryLimits.maximumPinsPerSnapshot
+            && (pinIDs?.allSatisfy { !$0.isEmpty && $0.count <= 4096 } ?? true)
     }
 }
 
@@ -126,15 +131,53 @@ extension DockLocalHistoryEvent.Kind: Codable {
 }
 
 /// Versioned local-only history. Nothing here is imported from Screen Time or other apps.
+///
+/// `replayEnabled` and `pinArchive` are optional on disk so documents written before pin
+/// preview still load. Replay stays off unless the user turns it on.
 nonisolated struct DockLocalHistoryDocument: Codable, Equatable, Sendable {
     var version = 1
     var recordingEnabled = true
+    var replayEnabled = false
     var events: [DockLocalHistoryEvent] = []
+    var pinArchive: [String: DockPin] = [:]
+
+    enum CodingKeys: String, CodingKey {
+        case version, recordingEnabled, replayEnabled, events, pinArchive
+    }
+
+    init(version: Int = 1, recordingEnabled: Bool = true, replayEnabled: Bool = false,
+         events: [DockLocalHistoryEvent] = [], pinArchive: [String: DockPin] = [:]) {
+        self.version = version
+        self.recordingEnabled = recordingEnabled
+        self.replayEnabled = replayEnabled
+        self.events = events
+        self.pinArchive = pinArchive
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 1
+        recordingEnabled = try container.decodeIfPresent(Bool.self, forKey: .recordingEnabled) ?? true
+        replayEnabled = try container.decodeIfPresent(Bool.self, forKey: .replayEnabled) ?? false
+        events = try container.decodeIfPresent([DockLocalHistoryEvent].self, forKey: .events) ?? []
+        pinArchive = try container.decodeIfPresent([String: DockPin].self, forKey: .pinArchive) ?? [:]
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(version, forKey: .version)
+        try container.encode(recordingEnabled, forKey: .recordingEnabled)
+        try container.encode(replayEnabled, forKey: .replayEnabled)
+        try container.encode(events, forKey: .events)
+        try container.encode(pinArchive, forKey: .pinArchive)
+    }
 
     var isValid: Bool {
         version == 1
             && events.count <= DockLocalHistoryLimits.maximumEvents
             && events.allSatisfy(\.isValid)
+            && pinArchive.count <= DockLocalHistoryLimits.maximumArchivedPins
+            && pinArchive.keys.allSatisfy { !$0.isEmpty && $0.count <= 4096 }
     }
 }
 
@@ -143,6 +186,8 @@ enum DockLocalHistoryLimits {
     static let maximumEvents = 500
     static let retention: TimeInterval = 90 * 86_400
     static let maximumEncodedBytes = 4_000_000
+    static let maximumPinsPerSnapshot = 256
+    static let maximumArchivedPins = 500
 }
 
 /// One user-facing pin edit inferred from two persisted lists.

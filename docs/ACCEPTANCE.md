@@ -4,7 +4,7 @@
 
 Implemented on `cursor/dee-36-dock-timeline-dfa6`. DDock records its own pin edits and Focus Session transitions into `dock.local-history.v1`. **Browse Local History** (menu bar, or **H** in Focus Dock) treats that display's dock chrome as a time axis. Position along the resting glass maps oldest to newest. Escape or **H** again leaves the timeline. Folder presentation and bookmark refreshes are not events. Mode activation does not write pin history. An already-running session after launch does not invent a start event.
 
-The event model keeps `sessionID`, optional `endedAt` on the matching start event, and `Kind.unrecognized` so DEE-45 can add playback markers without a second store. Recording is on by default and limited to 500 events or 90 days. **Settings → Features → Local History** can pause recording and clear the log. Corrupt bytes are reported and never overwritten.
+The event model keeps `sessionID`, optional `endedAt` on the matching start event, and `Kind.unrecognized` so DEE-45 can add playback markers without a second store. New pin events also store post-change `pinIDs` and an archive of resolvable pins. Recording is on by default and limited to 500 events or 90 days. **Show pins while browsing** is off by default, including on older documents. When it is on, the playhead and glance update immediately; pin layout applies only after the playhead stays on one event for 200 ms, and only as a preview. Leaving the timeline, or turning the toggle off, restores saved pins. Preview never writes `savePins` or records new history. **Settings → Features → Local History** can pause recording and clear the log. Corrupt bytes are reported and never overwritten.
 
 This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
 
@@ -13,6 +13,7 @@ This environment has no Xcode. Compilation, generated string symbols, and native
 - Pin, unpin, and reorder on one display. Confirm those events scrub on that dock and that a folder Grid/List change does not add an event.
 - Start, pause, resume, and finish a Focus Session. Confirm the events share one session id and remain readable at a glance while scrubbing.
 - Open Browse Local History with no stored events. Confirm the privacy empty state. Pause recording, pin an app, and confirm nothing new appears. Clear history and confirm the empty state returns.
+- With **Show pins while browsing** off, scrub and confirm pins stay as they are. Turn it on, pause on an older pin event, and confirm the dock icons change after a short pause, then return when you leave the timeline. Confirm saved pins did not change.
 - Confirm the system Dock is unchanged and that no Screen Time or other-app activity appears.
 - Exercise keyboard-only operation (H, arrows, Escape), VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and auto-hide while the timeline is open.
 
