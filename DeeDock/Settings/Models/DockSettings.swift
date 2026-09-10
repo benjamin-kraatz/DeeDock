@@ -65,6 +65,8 @@ struct DockSettings: Codable, Equatable {
     var showSessionCapsules: Bool = true
     /// Whether each display dock includes the trailing system Trash tile.
     var showTrash: Bool = true
+    /// Whether dragging a pin or folder stack snaps to screen edges and peer items.
+    var magneticEdges: Bool = true
     /// Whether Empty Trash requires DeeDock's destructive confirmation alert.
     var confirmBeforeEmptyingTrash: Bool = true
     /// Whether hovering a running app can present its windows.
@@ -147,7 +149,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges
-        case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
+        case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference, behavior
@@ -174,6 +176,7 @@ extension DockSettings {
         launcherAtStart = try values.decodeIfPresent(Bool.self, forKey: .launcherAtStart) ?? true
         showSessionCapsules = try values.decodeIfPresent(Bool.self, forKey: .showSessionCapsules) ?? true
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true
+        magneticEdges = try values.decodeIfPresent(Bool.self, forKey: .magneticEdges) ?? true
         confirmBeforeEmptyingTrash = values.contains(.confirmBeforeEmptyingTrash)
             ? try values.decode(Bool.self, forKey: .confirmBeforeEmptyingTrash) : true
         windowPeekEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnabled) ?? true

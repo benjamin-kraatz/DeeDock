@@ -84,7 +84,11 @@ struct DockDragCompletion {
     var cancelled = false
     var committed = false
 
-    func shouldUnpin(isPinned: Bool, distance: CGFloat, overDock: Bool) -> Bool {
-        released && !cancelled && !committed && isPinned && !overDock && distance >= DockDragGeometry.removalDistance
+    /// Unpinning requires a released pin, a drop outside every dock, travel of at least
+    /// ``DockDragGeometry/removalDistance``, and no active magnetic snap. A magnetized
+    /// release parks the item at the snapped frame instead of removing it.
+    func shouldUnpin(isPinned: Bool, distance: CGFloat, overDock: Bool, magnetized: Bool = false) -> Bool {
+        released && !cancelled && !committed && isPinned && !overDock && !magnetized
+            && distance >= DockDragGeometry.removalDistance
     }
 }

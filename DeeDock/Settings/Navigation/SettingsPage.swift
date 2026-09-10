@@ -36,6 +36,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case permissions
     case appSuggestions
     case localHistory
+    case magneticEdges
     case sims
 
     var id: Self { self }
@@ -53,7 +54,8 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
-             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory, .sims: .features
+             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory,
+             .magneticEdges, .sims: .features
         }
     }
 
@@ -88,6 +90,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .secondaryDockTitle
         case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .localHistory: .timelineTitle
+        case .magneticEdges: .settingsMagneticEdges
         case .sims: .simsTitle
         case .permissions: .windowPeekPermissionsTitle
         }
@@ -105,6 +108,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .localHistory: .settingsFeatureTimelineSubtitle
+        case .magneticEdges: .settingsFeatureMagneticSubtitle
         case .sims: .settingsFeatureSimsSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
@@ -133,6 +137,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .symbol("display.2")
         case .appSuggestions: .symbol("sparkles")
         case .localHistory: .symbol("clock.arrow.circlepath")
+        case .magneticEdges: .symbol("arrow.up.and.down.and.arrow.left.and.right")
         case .sims: .symbol("heart.fill")
         case .permissions: .symbol("lock.fill")
         }
@@ -159,6 +164,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
         case .appSuggestions: .indigo
         case .localHistory: Color(red: 0.22, green: 0.48, blue: 0.72)
+        case .magneticEdges: Color(red: 0.18, green: 0.58, blue: 0.78)
         case .sims: Color(red: 0.92, green: 0.42, blue: 0.58)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
@@ -185,6 +191,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
         case .appSuggestions: [.indigo, .purple]
         case .localHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
+        case .magneticEdges: [Color(red: 0.42, green: 0.84, blue: 0.96), Color(red: 0.10, green: 0.46, blue: 0.72)]
         case .sims: [Color(red: 1.0, green: 0.62, blue: 0.72), Color(red: 0.86, green: 0.22, blue: 0.46)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
@@ -196,6 +203,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
+        case .magneticEdges: .settingsMagneticEdgesKeywords
         case .sims: .simsSettingsKeywords
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
