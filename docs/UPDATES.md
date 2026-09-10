@@ -165,7 +165,7 @@ Scheduled runs always use intent `watch`. They print version, secret-presence st
 
 `publish_latest` defaults to false. Turn it on only after Benn confirms a Latest cut. The first smoke path must stay a draft.
 
-`macos-latest` is the public runner. DDock needs Xcode 27 and the macOS 27 SDK. If the hosted image cannot archive, ship fails and tells Esi and Benn to point `runs-on` at a self-hosted Mac they already operate. Do not invent a pool name. Developer ID import can still work on a hosted runner. The archive cannot without the SDK.
+The Release job runs on `xcode-27`. That is the intended image. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, ship fails and tells Esi and Benn. Developer ID import uses a temporary keychain on that runner.
 
 On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline`. Esi may add label `Bot-Nara` once if Nara should fix pipeline code. Nara does not cut the release, hold secrets, or publish Latest.
 

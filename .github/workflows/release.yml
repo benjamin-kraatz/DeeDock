@@ -29,11 +29,9 @@
 #   Sparkle's base64 EdDSA secret. The job writes that line to stdin for
 #   generate_appcast --ed-key-file -. It does not use deprecated -s.
 #
-# Runner: macos-latest is the public stand-in. DDock needs Xcode 27 and the
-# macOS 27 SDK. If the hosted runner cannot archive or import Developer ID,
-# ship fails with a clear message.
-# TODO(Esi/Benn): when you have a self-hosted Mac that already runs Xcode 27,
-# point runs-on at that pool. Do not invent a pool name in this file.
+# Runner: xcode-27 is the intended image (Benn). DDock needs Xcode 27 and
+# the macOS 27 SDK. ship still checks those versions and fails if the
+# image does not provide them.
 
 name: Release
 
@@ -87,9 +85,9 @@ env:
 jobs:
   release:
     name: Archive, notarize, and draft
-    # macos-latest is the public runner. Direct archives need Xcode 27 and a
-    # Developer ID identity. See the header TODO for a later self-hosted pool.
-    runs-on: macos-latest
+    # Benn's Xcode 27 image. Direct archives need that SDK and a Developer ID
+    # identity imported into a temporary keychain for the job.
+    runs-on: xcode-27
     timeout-minutes: 180
     steps:
       - name: Checkout
@@ -223,10 +221,8 @@ jobs:
           sdk_major="${MACOS_SDK%%.*}"
           if [ "$xcode_major" -lt 27 ] || [ "${sdk_major:-0}" -lt 27 ]; then
             echo "DDock archives need Xcode 27 and the macOS 27 SDK."
-            echo "This runner reports Xcode major=$xcode_major macosx SDK=$MACOS_SDK."
-            echo "TODO(Esi/Benn): point runs-on at a self-hosted Mac that already has Xcode 27."
-            echo "Do not invent a pool name in the workflow. macos-latest stays until that name exists."
-            echo "Developer ID import can still work on a hosted runner. The archive cannot without the SDK."
+            echo "This xcode-27 runner reports Xcode major=$xcode_major macosx SDK=$MACOS_SDK."
+            echo "The image labeled xcode-27 did not provide that toolchain. Tell Esi and Benn."
             exit 1
           fi
 
@@ -256,8 +252,8 @@ jobs:
           DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD }}
         run: |
           set -eu
-          # Temporary keychain so the hosted or self-hosted runner does not keep
-          # the Developer ID identity after the job. Never echo the p12 or password.
+          # Temporary keychain so the xcode-27 runner does not keep the
+          # Developer ID identity after the job. Never echo the p12 or password.
           keychain="$RUNNER_TEMP/ddock-signing.keychain-db"
           cert_p12="$RUNNER_TEMP/developer-id.p12"
           password="$(openssl rand -base64 32)"
