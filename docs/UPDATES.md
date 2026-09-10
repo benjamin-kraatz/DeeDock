@@ -32,9 +32,10 @@ Release notes use native text for plain text, Markdown, and HTML. HTML is parsed
 
 ## Prepare the release
 
-1. Increase `CURRENT_PROJECT_VERSION` in `Configuration/App.xcconfig` for every distributed build. Set `MARKETING_VERSION` there too. Both targets share these values and the bundle identifier. Sparkle compares build numbers, not Git tags.
-2. Resolve packages in Xcode. The pinned Sparkle tools are under the resolved packages directory at `artifacts/sparkle/Sparkle/bin`.
-3. Confirm the release machine has the DDock signing key. Run the following command with the actual tools path:
+1. Increase `CURRENT_PROJECT_VERSION` in `Configuration/App.xcconfig` for every distributed build. Set `MARKETING_VERSION` there too. Both targets share these values and the bundle identifier. Sparkle compares build numbers, not Git tags. Versions live only in that xcconfig.
+2. Grep `DeeDock.xcodeproj/project.pbxproj` for `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION`. Delete any copies from target build settings so Xcode inherits from `App.xcconfig`. If a target cannot inherit, copy the same values from the xcconfig into that target. If you open the target in Xcode, confirm Version and Build still come from `App.xcconfig`. The General tab can write those keys back into the pbxproj.
+3. Resolve packages in Xcode. The pinned Sparkle tools are under the resolved packages directory at `artifacts/sparkle/Sparkle/bin`.
+4. Confirm the release machine has the DDock signing key. Run the following command with the actual tools path:
 
    ```sh
    SPARKLE_BIN='/absolute/path/to/SourcePackages/artifacts/sparkle/Sparkle/bin'
@@ -42,7 +43,7 @@ Release notes use native text for plain text, Markdown, and HTML. HTML is parsed
    ```
 
    The public key must match `SPARKLE_PUBLIC_ED_KEY` in the direct target's build settings. The private key stays in the login Keychain under account `de.benjaminkraatz.DeeDock`. Do not generate a replacement key for each release.
-4. Select `DeeDock`, choose Product → Archive, then distribute with Developer ID signing. Use Xcode's notarization and export flow. Preserve the hardened runtime and sign Sparkle's nested code through Xcode's export process. An unsigned local build is not distributable.
+5. Select `DeeDock`, choose Product → Archive, then distribute with Developer ID signing. Use Xcode's notarization and export flow. Preserve the hardened runtime and sign Sparkle's nested code through Xcode's export process. An unsigned local build is not distributable.
 
 For command-line archives, run:
 
@@ -151,7 +152,7 @@ The [Release workflow](../.github/workflows/release.yml) is `workflow_dispatch` 
 
 Esi dispatches it. She chooses `intent=watch` for a dry-run, or `intent=ship` after the release-prep PR is on `main`. Leave **publish_latest** unchecked.
 
-Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` in `Configuration/App.xcconfig` and adds bilingual notes at `docs/releases/<MARKETING_VERSION>.md`. Esi merges that PR before she dispatches. Feature work does not bump those versions.
+Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` only in `Configuration/App.xcconfig` and adds bilingual notes at `docs/releases/<MARKETING_VERSION>.md`. Confirm `DeeDock.xcodeproj/project.pbxproj` target build settings inherit those keys instead of repeating them. Esi merges that PR before she dispatches. Feature work does not bump those versions.
 
 **watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the six secrets by name, and checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section. It does not archive, import a certificate, or start `xcode-27`.
 

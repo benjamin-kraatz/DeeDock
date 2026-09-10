@@ -1,4 +1,5 @@
-// Shared by direct and TestFlight app targets.
+// Shared by direct and TestFlight app targets. These two keys are the
+// only version source. Target build settings must inherit them.
 CURRENT_PROJECT_VERSION = 19
 MARKETING_VERSION = 0.2.2
 PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock
