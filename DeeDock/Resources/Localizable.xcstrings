@@ -20292,13 +20292,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Sims Haustier Stimmung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy sims pet mood"
           }
         }
       }
@@ -22315,6 +22315,582 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "None of the staged items could be found."
+          }
+        }
+      }
+    },
+    "settingsFeatureSimsSubtitle" : {
+      "comment" : "Description of Dock Sims on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeheftete Apps bekommen eine Stimmung und etwas Zuwendung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give pinned apps a mood and a little care."
+          }
+        }
+      }
+    },
+    "simsCheer" : {
+      "comment" : "Context-menu and VoiceOver action that cheers a pinned app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufmuntern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cheer"
+          }
+        }
+      }
+    },
+    "simsEmptyMessage" : {
+      "comment" : "Empty-state body on the Sims settings card while the feature is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimmungen und kleine Idle-Bewegungen bleiben auf diesem Mac. Nichts wird gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moods and small idle motions stay on this Mac. Nothing is sent anywhere."
+          }
+        }
+      }
+    },
+    "simsEmptyTitle" : {
+      "comment" : "Empty-state heading on the Sims settings card while the feature is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sims ist aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sims is off"
+          }
+        }
+      }
+    },
+    "simsEnable" : {
+      "comment" : "Toggle that opts into Sims moods on pinned apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sims-Stimmungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sims moods"
+          }
+        }
+      }
+    },
+    "simsEnableHelp" : {
+      "comment" : "Subtitle under the Sims enable toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeheftete Apps zeigen eine Stimmung und eine kleine Idle-Animation."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinned apps show a mood and a small idle animation."
+          }
+        }
+      }
+    },
+    "simsFeed" : {
+      "comment" : "Context-menu and VoiceOver action that feeds a pinned app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füttern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feed"
+          }
+        }
+      }
+    },
+    "simsIntensity" : {
+      "comment" : "Slider that scales Sims idle-animation strength.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animationsstärke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animation intensity"
+          }
+        }
+      }
+    },
+    "simsMoodAccessibility" : {
+      "comment" : "VoiceOver value fragment naming the pin's current Sims mood. mood is already localized.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimmung: %1$(mood)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mood: %1$(mood)@"
+          }
+        }
+      }
+    },
+    "simsMoodContent" : {
+      "comment" : "Name of the content Sims mood.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zufrieden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Content"
+          }
+        }
+      }
+    },
+    "simsMoodHungry" : {
+      "comment" : "Name of the hungry Sims mood.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hungrig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hungry"
+          }
+        }
+      }
+    },
+    "simsMoodLonely" : {
+      "comment" : "Name of the lonely Sims mood.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einsam"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lonely"
+          }
+        }
+      }
+    },
+    "simsMoodPlayful" : {
+      "comment" : "Name of the playful Sims mood.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verspielt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playful"
+          }
+        }
+      }
+    },
+    "simsPrivacyNote" : {
+      "comment" : "Privacy line on the Sims settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuwendung bleibt auf diesem Mac. DDock nutzt dafür kein Netzwerk."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Care stays on this Mac. DDock does not use a network for Sims."
+          }
+        }
+      }
+    },
+    "simsReset" : {
+      "comment" : "Destructive button that replaces unreadable Sims storage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sims-Daten zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Sims Data"
+          }
+        }
+      }
+    },
+    "simsResetHelp" : {
+      "comment" : "Explains that corrupt Sims storage stays frozen until reset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherten Sims-Daten konnten nicht gelesen werden. Ein Zurücksetzen startet neu. Die Zuwendungshistorie ist dann weg."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stored Sims data could not be read. Reset to start over. Care history cannot be recovered."
+          }
+        }
+      }
+    },
+    "simsResetMoods" : {
+      "comment" : "Button that clears every pin's care timestamps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimmungen zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset moods"
+          }
+        }
+      }
+    },
+    "simsResetMoodsConfirm" : {
+      "comment" : "Confirmation-dialog confirm action for resetting all Sims moods.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Stimmungen zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset All Moods"
+          }
+        }
+      }
+    },
+    "simsResetMoodsHelp" : {
+      "comment" : "Confirmation-dialog message for resetting all Sims moods.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jede angeheftete App startet wieder verspielt. Apps bleiben angeheftet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every pinned app returns to a fresh, playful mood. Apps stay pinned."
+          }
+        }
+      }
+    },
+    "simsSettle" : {
+      "comment" : "Context-menu and VoiceOver action that resets one pin to a fresh mood.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beruhigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settle"
+          }
+        }
+      }
+    },
+    "simsSettingsHelp" : {
+      "comment" : "Footnote on the Dock Sims settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimmungen und Idle-Bewegungen bleiben auf diesem Mac. Sims ausblenden behält die Tiere. „Stimmungen zurücksetzen“ holt jede App auf einen frischen Start."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moods and idle motion stay on this Mac. Turning Sims off hides the pets without deleting them. Reset moods returns every pin to a fresh start."
+          }
+        }
+      }
+    },
+    "simsSettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the Dock Sims settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sims Haustier Stimmung Idle füttern aufmuntern beruhigen Animation Stärke Zuwendung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sims pet mood idle feed cheer settle care animation intensity"
+          }
+        }
+      }
+    },
+    "simsStorageFailed" : {
+      "comment" : "Warning when the last Sims write could not be saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die letzte Sims-Änderung konnte nicht gespeichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The last Sims change could not be saved."
+          }
+        }
+      }
+    },
+    "simsTitle" : {
+      "comment" : "Feature name for the opt-in pin mood and care loop.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock-Sims"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock Sims"
+          }
+        }
+      }
+    },
+    "simsDebugAdvance1h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by one hour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+1 Stunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+1 hour"
+          }
+        }
+      }
+    },
+    "simsDebugAdvance2h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by two hours.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+2 Stunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+2 hours"
+          }
+        }
+      }
+    },
+    "simsDebugAdvance6h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by six hours, to hungry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+6 Stunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+6 hours"
+          }
+        }
+      }
+    },
+    "simsDebugAdvance8h" : {
+      "comment" : "Debug-only button that advances the Sims care clock by eight hours, to lonely if recently fed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+8 Stunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+8 hours"
+          }
+        }
+      }
+    },
+    "simsDebugHelp" : {
+      "comment" : "Footnote on the Debug-only Sims time-simulation card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Debug. Die Zuwendungsuhr läuft vor, ohne zu warten. Füttern und Aufmuntern stempeln diese Zeit. „Uhr zurücksetzen“ holt die echte Zeit zurück; schon geschriebene Stempel bleiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug only. Advance the care clock without waiting. Feed and Cheer stamp this time. Reset clock returns to now; stamps already written stay."
+          }
+        }
+      }
+    },
+    "simsDebugOffset" : {
+      "comment" : "Label for the current debug care-clock offset, shown next to a formatted hour count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorsprung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offset"
+          }
+        }
+      }
+    },
+    "simsDebugResetClock" : {
+      "comment" : "Debug-only button that returns the Sims care clock to wall time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhr zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset clock"
+          }
+        }
+      }
+    },
+    "simsDebugTitle" : {
+      "comment" : "Title of the Debug-only Sims time-simulation card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit simulieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulate time"
           }
         }
       }
