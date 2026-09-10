@@ -2,7 +2,7 @@
 
 ## DEE-21 workspace recipes
 
-Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.
+Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Installed Shortcuts load when the recipe editor appears; **Reload Shortcuts** remains a manual refresh. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.
 
 `WorkspaceRecipeCoordinator` owns one in-memory run with pending, running, succeeded, failed, skipped, and canceled step states. A failed step stops the sequence; Retry and Skip are explicit. Cancel cannot undo apps or Shortcut effects that already ran. The same recipe cannot overlap. A blocked drag, menu, or file picker is reported before any open. Progress is not persisted and is not replayed after launch. Duplicating a mode copies the recipe and starts no action. Deleting a mode does not delete source files. Focus Session startup is unchanged.
 

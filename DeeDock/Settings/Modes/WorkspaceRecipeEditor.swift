@@ -62,6 +62,7 @@ struct WorkspaceRecipeEditor: View {
         } message: {
             Text(.recipeLinkPrompt)
         }
+        .onAppear { actions?.ensureLoaded() }
     }
 
     private func stepRow(_ step: WorkspaceRecipeStep, index: Int) -> some View {
@@ -131,6 +132,7 @@ struct WorkspaceRecipeEditor: View {
             if let actions {
                 Menu(.recipeAddShortcut) {
                     Button(.watchActionLoadShortcuts) { actions.refresh() }
+                        .disabled(actions.loading)
                     if actions.loading {
                         Text(.actionsRunning)
                     }
@@ -139,6 +141,9 @@ struct WorkspaceRecipeEditor: View {
                             replaceOrAppend(.shortcut(id: replacingStepID ?? UUID(), shortcutID: tile.id, name: tile.name))
                             replacingStepID = nil
                         }
+                    }
+                    if actions.discovered, !actions.loading, shortcutChoices(actions).isEmpty {
+                        Text(.watchActionNoShortcuts)
                     }
                 }
             }
@@ -165,7 +170,7 @@ struct WorkspaceRecipeEditor: View {
         step.issue(
             resolvedURL: { applications?.resolvedURL(for: $0) ?? NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleIdentifier ?? "") },
             knowsShortcut: { actions?.knowsShortcut($0) == true },
-            shortcutsEnumerated: actions?.available.isEmpty == false
+            shortcutsEnumerated: actions?.discovered == true
         )
     }
 
@@ -195,7 +200,7 @@ struct WorkspaceRecipeEditor: View {
             if case .link(_, let url) = step { linkDraft = url }
             addingLink = true
         case .shortcut:
-            actions?.refresh()
+            actions?.ensureLoaded()
         }
     }
 
