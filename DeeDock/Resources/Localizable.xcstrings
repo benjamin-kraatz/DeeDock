@@ -354,19 +354,19 @@
       }
     },
     "actionsLoad" : {
-      "comment" : "Read installed shortcut names and identifiers without executing them.",
+      "comment" : "Refresh the installed Shortcut list after automatic discovery. Does not run a shortcut.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kurzbefehle laden"
+            "value" : "Kurzbefehle neu laden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Load Shortcuts"
+            "value" : "Reload Shortcuts"
           }
         }
       }
@@ -24216,19 +24216,19 @@
       }
     },
     "watchActionLoadShortcuts" : {
-      "comment" : "Window watch: explicitly refresh the Shortcut list. Same wording as Action Tiles.",
+      "comment" : "Window watch: refresh the Shortcut list after automatic discovery. Same wording as Action Tiles.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kurzbefehle laden"
+            "value" : "Kurzbefehle neu laden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Load Shortcuts"
+            "value" : "Reload Shortcuts"
           }
         }
       }
@@ -24252,19 +24252,19 @@
       }
     },
     "watchActionNoShortcuts" : {
-      "comment" : "Window watch: empty Shortcut list until the user loads them.",
+      "comment" : "Window watch: empty Shortcut list after discovery.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lade Kurzbefehle, um einen zu wählen. DDock übergibt weder aufgenommenes Bild noch Text."
+            "value" : "Keine Kurzbefehle gefunden. DDock übergibt weder aufgenommenes Bild noch Text."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Load Shortcuts to choose one. DDock does not pass captured pixels or text to it."
+            "value" : "No Shortcuts found. DDock does not pass captured pixels or text to it."
           }
         }
       }

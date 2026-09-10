@@ -8,6 +8,8 @@ final class ActionTilesController {
     private(set) var available: [ActionTile] = []
     private(set) var statuses: [UUID: ActionTileStatus] = [:]
     private(set) var loading = false
+    /// True after the first discovery attempt finishes, including an empty or failed list.
+    private(set) var discovered = false
     private(set) var requiresReset = false
     var error: String?
     @ObservationIgnored var changed: (() -> Void)?
@@ -33,7 +35,18 @@ final class ActionTilesController {
         changed?()
     }
 
-    /// Discovery is explicitly requested from Settings; it never runs a shortcut.
+    /// Starts discovery when Settings or Watch first needs the list. Skips canvas and playground hosts.
+    func ensureLoaded() {
+        guard !loading, !discovered else { return }
+        let environment = ProcessInfo.processInfo.environment
+        if environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+            || environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1" {
+            return
+        }
+        refresh()
+    }
+
+    /// Lists installed shortcuts without running them. Reload and first appearance both use this.
     func refresh() {
         guard !loading else { return }
         loading = true; error = nil
@@ -41,7 +54,7 @@ final class ActionTilesController {
         discovery = job
         job.start(arguments: ["list", "--show-identifiers"], capturesOutput: true, deadline: .seconds(20)) { [weak self] result in
             guard let self else { return }
-            discovery = nil; loading = false
+            discovery = nil; loading = false; discovered = true
             do {
                 let output = try result.get()
                 available = try output.split(separator: "\n").map { line in
