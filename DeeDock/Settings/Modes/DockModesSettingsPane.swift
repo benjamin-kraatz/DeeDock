@@ -41,6 +41,19 @@ struct DockModesSettingsPane: View {
                             if index > 0 { Divider().padding(.leading, 38) }
                             VStack(alignment: .leading, spacing: 8) {
                                 modeRow(mode, index: index)
+                                Toggle(.mode69Title, isOn: Binding(
+                                    get: { mode.mode69Enabled },
+                                    set: { _ = store.setMode69Enabled($0, for: mode.id) }
+                                ))
+                                .disabled(!store.canEdit)
+                                .help(Text(.mode69Help))
+                                Text(.mode69Help).font(.caption).foregroundStyle(.secondary)
+                                Toggle(.mode69PlusTitle, isOn: Binding(
+                                    get: { mode.mode69PlusEnabled },
+                                    set: { _ = store.setMode69PlusEnabled($0, for: mode.id) }
+                                ))
+                                .disabled(!store.canEdit)
+                                Text(.mode69PlusHelp).font(.caption).foregroundStyle(.secondary)
                                 DisclosureGroup {
                                     WorkspaceRecipeEditor(mode: mode, store: store, applications: applications,
                                                           actions: actions,

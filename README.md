@@ -134,6 +134,10 @@ have no guaranteed assignment; the primary dock keeps their apps available. Find
 app icon, not a separate tile per Finder window. This feature does not redirect minimize
 animations or provide system Dock minimize targets.
 
+Enable **Mode 69+** in the same pane for a full-display atmosphere over app windows on every connected desktop. Soft red edge light moves slowly, with candle clusters in the bottom corners and a faint central tint. The overlay passes all clicks through and never takes keyboard focus. Turn it off in Settings or choose **Turn off Mode 69+** in the Dock Mode menu. It is independent of the smaller Mode 69 dock skin and stays visible when the dock hides. Reduce Motion stops movement; Reduce Transparency shows a thin red border and still candles instead of the glow. The effect pauses during sleep and inactive user sessions.
+
+Enable **Mode 69** under a configuration in **Settings → Modes** for red ambient light and small candles at the visible dock ends. It is off by default and follows that mode across displays and restarts. Turn it off, or switch to an undecorated mode, to restore the ordinary dock. The skin follows background visibility and idle fading. Reduce Motion keeps flames still; Reduce Transparency replaces the glow with a solid red rim. No audio plays.
+
 Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DDock keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
 
 Each mode owns the ordered app and folder pins for every remembered display, plus the shared App Visibility choice and any display-specific App Visibility overrides. Pinning, unpinning, reordering, folder presentation changes, and App Visibility edits apply directly to the active mode. Appearance, placement, auto-hide, Trash, Window Peek, and other controls remain independent.
