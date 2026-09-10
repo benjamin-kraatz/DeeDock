@@ -6,10 +6,17 @@ struct FolderStackView: View {
     var forceOpaqueBackground = false
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @FocusState private var searchFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
             header
+            if state.searchAvailable {
+                FolderStackSearchField(state: state, focused: $searchFocused)
+                    .transition(reduceMotion ? .opacity
+                                : .asymmetric(insertion: .push(from: .top).combined(with: .opacity),
+                                              removal: .opacity))
+            }
             Divider()
             if let error = state.error, !state.entries.isEmpty {
                 HStack(spacing: 10) {
@@ -42,6 +49,13 @@ struct FolderStackView: View {
                 content
             }
         }
+        .animation(reduceMotion ? nil : .smooth(duration: 0.28), value: state.searchAvailable)
+        // The panel's key handler drives focus for ⌘F, type-ahead, and Escape; the field reports
+        // every other focus change back so the handler knows when to stop eating text keys.
+        .onChange(of: searchFocused) { _, focused in state.searchFocused = focused }
+        .onChange(of: state.searchFocused) { _, focused in
+            if searchFocused != focused { searchFocused = focused }
+        }
         .overlay(alignment: .bottom) {
             if state.dropTargeted {
                 Text(.folderDropCopyHere).font(.callout)
@@ -53,7 +67,7 @@ struct FolderStackView: View {
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(.folderStackAccessibilityLabel(folderName: state.directoryName)))
         .accessibilityValue(Text(.folderStackItemCount(
-            count: state.entries.count,
+            count: state.visibleEntries.count,
             mode: String(localized: modeTitle(state.presentation))
         )))
     }
@@ -112,6 +126,9 @@ struct FolderStackView: View {
         .accessibilityAddTraits(state.presentation == mode ? .isSelected : [])
     }
 
+    /// Rows animate on identity alone; metrics and media arriving later must not restart the motion.
+    private var visibleIDs: [String] { state.visibleEntries.map(\.id) }
+
     @ViewBuilder private var content: some View {
         if state.loading && state.entries.isEmpty {
             ProgressView().controlSize(.small).frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -126,19 +143,32 @@ struct FolderStackView: View {
             }
         } else if state.entries.isEmpty {
             ContentUnavailableView(.folderStackEmpty, systemImage: "folder")
+        } else if state.visibleEntries.isEmpty {
+            ContentUnavailableView {
+                Label(.folderStackSearchEmptyTitle, systemImage: "magnifyingglass")
+            } description: {
+                Text(.folderStackSearchEmpty(query: state.query))
+            } actions: {
+                Button(.folderStackSearchClear) {
+                    state.clearSearch()
+                    searchFocused = true
+                }
+            }
         } else if state.presentation == .grid {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 82), spacing: 12)], spacing: 14) {
-                    ForEach(state.entries) { entry in item(entry, grid: true) }
+                    ForEach(state.visibleEntries) { entry in item(entry, grid: true) }
                 }
                 .padding(16)
+                .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: visibleIDs)
             }
         } else if state.presentation == .list {
             ScrollView {
                 LazyVStack(spacing: 2) {
-                    ForEach(state.entries) { entry in item(entry, grid: false) }
+                    ForEach(state.visibleEntries) { entry in item(entry, grid: false) }
                 }
                 .padding(8)
+                .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: visibleIDs)
             }
         } else {
             smartContent
@@ -174,6 +204,7 @@ struct FolderStackView: View {
             }
             .padding(8)
             .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: state.semanticSections)
+            .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: visibleIDs)
         }
     }
 
@@ -262,6 +293,15 @@ struct FolderStackView: View {
         FolderStackEntry(reference: .init(url: URL(fileURLWithPath: "/Preview/notes.txt"), name: "notes.txt", isFolder: false,
                                                 contentType: "public.plain-text", byteCount: 1_024), icon: icon)
     ]
+    /// Enough children to cross the search threshold, with a few obvious shared substrings.
+    static let manyEntries: [FolderStackEntry] = (1...14).map { index in
+        let names = ["Invoice", "Screenshot", "Notes"]
+        let name = "\(names[index % names.count]) \(index).txt"
+        return FolderStackEntry(
+            reference: .init(url: URL(fileURLWithPath: "/Preview/\(name)"), name: name, isFolder: false,
+                             contentType: "public.plain-text", byteCount: Int64(index) * 4_096),
+            icon: icon)
+    }
     static func state(_ mode: FolderStackPresentation = .grid, name: String = "Projects",
                       entries suppliedEntries: [FolderStackEntry]? = nil,
                       loading: Bool = false, error: String? = nil,
@@ -306,6 +346,24 @@ struct FolderStackView: View {
 #Preview("Folder contents, list") {
     FolderStackView(state: FolderStackPreviewData.state(.list, entries: FolderStackPreviewData.folderMetricsEntries),
                     keyboard: false)
+        .frame(width: 560, height: 420).padding()
+}
+#Preview("Search available") {
+    FolderStackView(state: FolderStackPreviewData.state(.list, name: "Downloads",
+                                                        entries: FolderStackPreviewData.manyEntries),
+                    keyboard: true)
+        .frame(width: 560, height: 420).padding()
+}
+#Preview("Search filtering") {
+    let state = FolderStackPreviewData.state(.list, name: "Downloads", entries: FolderStackPreviewData.manyEntries)
+    state.query = "invoice"
+    return FolderStackView(state: state, keyboard: true)
+        .frame(width: 560, height: 420).padding().preferredColorScheme(.dark)
+}
+#Preview("Search without matches") {
+    let state = FolderStackPreviewData.state(.grid, name: "Downloads", entries: FolderStackPreviewData.manyEntries)
+    state.query = "keynote"
+    return FolderStackView(state: state, keyboard: true)
         .frame(width: 560, height: 420).padding()
 }
 #Preview("Folder contents, size sort") {

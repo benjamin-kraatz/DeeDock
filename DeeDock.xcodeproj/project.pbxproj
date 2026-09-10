@@ -88,6 +88,7 @@
 		DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */; };
 		DDF7000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */; };
 		DDF7000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */; };
+		DDF700000000000000000000D /* DeeDock/Dock/Stacks/FolderStackSearchFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF800000000000000000000D /* DeeDock/Dock/Stacks/FolderStackSearchFilter.swift */; };
 		DDF7000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */; };
 		DDF7000000000000000000009 /* DeeDock/Dock/Stacks/FolderStackItemDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF8000000000000000000009 /* DeeDock/Dock/Stacks/FolderStackItemDetails.swift */; };
 		DDF700000000000000000000A /* DeeDock/Dock/Stacks/FolderStackMediaMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF800000000000000000000A /* DeeDock/Dock/Stacks/FolderStackMediaMetadata.swift */; };
@@ -225,6 +226,7 @@
 		DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Persistence/DockPinsRepository.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Services/FolderResourceAccess.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Dragging/DockPinImporter.swift; sourceTree = SOURCE_ROOT; };
+		DDF800000000000000000000D /* DeeDock/Dock/Stacks/FolderStackSearchFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackSearchFilter.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackEntry.swift; sourceTree = SOURCE_ROOT; };
 		DDF8000000000000000000009 /* DeeDock/Dock/Stacks/FolderStackItemDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackItemDetails.swift; sourceTree = SOURCE_ROOT; };
 		DDF800000000000000000000A /* DeeDock/Dock/Stacks/FolderStackMediaMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderStackMediaMetadata.swift; sourceTree = SOURCE_ROOT; };
@@ -409,6 +411,7 @@
 				DDF8000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift */,
 				DDF8000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift */,
 				DDF8000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift */,
+				DDF800000000000000000000D /* DeeDock/Dock/Stacks/FolderStackSearchFilter.swift */,
 				DDF8000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift */,
 				DDF8000000000000000000009 /* DeeDock/Dock/Stacks/FolderStackItemDetails.swift */,
 				DDF800000000000000000000A /* DeeDock/Dock/Stacks/FolderStackMediaMetadata.swift */,
@@ -683,6 +686,7 @@
 				DDF7000000000000000000002 /* DeeDock/Dock/Persistence/DockPinsRepository.swift in Sources */,
 				DDF7000000000000000000003 /* DeeDock/Dock/Services/FolderResourceAccess.swift in Sources */,
 				DDF7000000000000000000004 /* DeeDock/Dock/Dragging/DockPinImporter.swift in Sources */,
+				DDF700000000000000000000D /* DeeDock/Dock/Stacks/FolderStackSearchFilter.swift in Sources */,
 				DDF7000000000000000000005 /* DeeDock/Dock/Stacks/FolderStackEntry.swift in Sources */,
 				DDF7000000000000000000009 /* DeeDock/Dock/Stacks/FolderStackItemDetails.swift in Sources */,
 				DDF700000000000000000000A /* DeeDock/Dock/Stacks/FolderStackMediaMetadata.swift in Sources */,

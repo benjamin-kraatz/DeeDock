@@ -64,7 +64,14 @@ final class FolderStackPanelController {
     }
 
     private func handleKey(_ event: NSEvent) -> Bool {
+        if event.modifierFlags.contains(.command),
+           event.charactersIgnoringModifiers?.lowercased() == "f" {
+            guard state.searchAvailable else { return false }
+            state.focusSearch()
+            return true
+        }
         guard event.modifierFlags.intersection([.command, .control]).isEmpty else { return false }
+        if state.searchFocused { return handleSearchKey(event) }
         switch event.keyCode {
         case 48:
             state.presentationFocused.toggle()
@@ -92,8 +99,39 @@ final class FolderStackPanelController {
         case 126:
             state.select(by: state.presentation == .grid ? -5 : -1)
         default:
+            return beginTypeAhead(event)
+        }
+        return true
+    }
+
+    /// Keys while the field holds focus. Only selection and dismissal are claimed; everything else,
+    /// Space and Delete included, belongs to the text being edited.
+    private func handleSearchKey(_ event: NSEvent) -> Bool {
+        switch event.keyCode {
+        case 53:
+            if !state.query.isEmpty { state.clearSearch() }
+            else { state.focusSearch(false) }
+        case 48:
+            state.focusSearch(false)
+        case 36, 76:
+            state.openSelection()
+        case 125:
+            state.select(by: 1)
+        case 126:
+            state.select(by: -1)
+        default:
             return false
         }
+        return true
+    }
+
+    /// Typing over the listing starts a search, the way Finder does, instead of going nowhere.
+    private func beginTypeAhead(_ event: NSEvent) -> Bool {
+        guard state.searchAvailable, state.preview == nil, let characters = event.characters,
+              !characters.isEmpty,
+              characters.unicodeScalars.allSatisfy({ !CharacterSet.controlCharacters.contains($0) })
+        else { return false }
+        state.beginTypeAhead(characters)
         return true
     }
 

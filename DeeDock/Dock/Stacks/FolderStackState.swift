@@ -21,6 +21,15 @@ final class FolderStackState {
     private(set) var organizing = false
     private(set) var semanticError: String?
     var error: String?
+    /// Narrows what the panel shows without touching the loaded listing. Cleared on navigation.
+    var query = "" {
+        didSet {
+            guard query != oldValue else { return }
+            reconcileSelection()
+        }
+    }
+    /// Mirrors the field's focus so the panel's key handler can leave text editing alone.
+    var searchFocused = false
     private(set) var sort: FolderStackSort
     @ObservationIgnored var sortChanged: ((FolderStackSort) -> Void)?
     var presentation: FolderStackPresentation
@@ -112,8 +121,8 @@ final class FolderStackState {
                     )
                 }
                 entries.sort { self.sort.precedes($0.reference, $1.reference) }
-                if self.selectedID == nil || !entries.contains(where: { $0.id == self.selectedID }) {
-                    self.selectedID = entries.first?.id
+                if self.selectedID == nil || !visibleEntries.contains(where: { $0.id == self.selectedID }) {
+                    self.selectedID = visibleEntries.first?.id
                 }
                 if let preview, !entries.contains(where: { $0.reference.url == preview.url }) {
                     self.preview = nil
@@ -145,6 +154,9 @@ final class FolderStackState {
         directory = url
         entries = []
         selectedID = nil
+        // A query belongs to the listing it was typed against, never to the folder opened next.
+        query = ""
+        searchFocused = false
         debounceTask?.cancel()
         cancelSemanticOrganization(clearError: true)
         installMonitor(for: url)
@@ -200,12 +212,53 @@ final class FolderStackState {
         sortChanged?(value)
     }
 
+    /// The field earns its space only on long listings, and stays while a query is still narrowing one.
+    var searchAvailable: Bool { entries.count > FolderStackSearchFilter.threshold || !query.isEmpty }
+
+    /// True while a query actually filters. A whitespace-only query does not.
+    var searching: Bool { !FolderStackSearchFilter.terms(in: query).isEmpty }
+
+    /// The listing after the query, in the current sort order. Grid, list, and smart mode all draw from it.
+    var visibleEntries: [FolderStackEntry] {
+        let terms = FolderStackSearchFilter.terms(in: query)
+        guard !terms.isEmpty else { return entries }
+        return entries.filter { FolderStackSearchFilter.matches($0.reference, terms: terms) }
+    }
+
+    /// Moves keyboard focus into the field, or back out to the listing.
+    func focusSearch(_ focused: Bool = true) {
+        guard !focused || searchAvailable else { return }
+        searchFocused = focused
+    }
+
+    func clearSearch() { query = "" }
+
+    /// Finder-style type-ahead: the first character typed over the listing starts a search.
+    func beginTypeAhead(_ characters: String) {
+        guard searchAvailable else { return }
+        query.append(characters)
+        searchFocused = true
+    }
+
+    /// Keeps the selection on something the user can still see after the query changed.
+    private func reconcileSelection() {
+        let visible = displayedEntries
+        guard !visible.contains(where: { $0.id == selectedID }) else { return }
+        selectedID = visible.first?.id
+        preview = nil
+    }
+
     /// Smart mode keeps its groups and applies the selected order within each group.
+    /// A query narrows every group and hides the ones it empties.
     var sortedSemanticSections: [SemanticStackSection] {
         let ranks = Dictionary(uniqueKeysWithValues: entries.enumerated().map { ($0.element.id, $0.offset) })
-        return semanticSections.map { section in
-            SemanticStackSection(id: section.id, title: section.title,
-                itemIDs: section.itemIDs.sorted { (ranks[$0] ?? Int.max) < (ranks[$1] ?? Int.max) }, kind: section.kind)
+        let searching = searching
+        let visible = searching ? Set(visibleEntries.map(\.id)) : []
+        return semanticSections.compactMap { section in
+            let itemIDs = (searching ? section.itemIDs.filter(visible.contains) : section.itemIDs)
+                .sorted { (ranks[$0] ?? Int.max) < (ranks[$1] ?? Int.max) }
+            guard !searching || !itemIDs.isEmpty else { return nil }
+            return SemanticStackSection(id: section.id, title: section.title, itemIDs: itemIDs, kind: section.kind)
         }
     }
 
@@ -240,7 +293,7 @@ final class FolderStackState {
     }
 
     var displayedEntries: [FolderStackEntry] {
-        guard presentation == .smart else { return entries }
+        guard presentation == .smart else { return visibleEntries }
         let byID = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, $0) })
         return sortedSemanticSections.flatMap(\.itemIDs).compactMap { byID[$0] }
     }
