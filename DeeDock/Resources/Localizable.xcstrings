@@ -17243,6 +17243,96 @@
         }
       }
     },
+    "pinWeatherPreviewClean" : {
+      "comment" : "Caption under the clean pin in the Pin Weather settings preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Gebrauch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In use"
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewHeavy" : {
+      "comment" : "Caption under the fully weathered pin in the Pin Weather settings preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stark verwittert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fully weathered"
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewHelp" : {
+      "comment" : "Explains the three Pin Weather preview swatches.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine benutzte Anheftung bleibt sauber. Nach den unbenutzten Tagen beginnt der Rost und wird stärker, wenn die Anheftung weiter ungenutzt bleibt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A pin in use stays clean. Rust starts after the unused-day setting, then deepens if the pin stays idle."
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewStarts" : {
+      "comment" : "Caption under the first-rust pin in the Pin Weather settings preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rost beginnt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust begins"
+          }
+        }
+      }
+    },
+    "pinWeatherPreviewTitle" : {
+      "comment" : "Heading above the Pin Weather look preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So sieht Rost aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How rust looks"
+          }
+        }
+      }
+    },
     "pinWeatherReset" : {
       "comment" : "Button that replaces an unreadable pin-weather document.",
       "extractionState" : "manual",

@@ -20,14 +20,15 @@ struct PinWeatherChrome: ViewModifier {
     }
 }
 
-/// Visual rust: a desaturated, slightly darkened icon under a warm oxide wash and soft speckles.
+/// Visual rust: the icon loses chroma and picks up a rust hue, then oxide flakes and pits.
 ///
 /// SwiftUI and Core Animation only — no Metal shaders, so the look ships without a shader
-/// toolchain. Intensity `0` renders the artwork untouched, `0.32` is the first visible blush, and
-/// `1` reads as clearly unused while still reading as the app's icon.
+/// toolchain. Intensity `0` renders the artwork untouched. `0.32` is a clear first rust, and
+/// `1` is heavily weathered while the icon still reads.
 ///
-/// Reduce Motion keeps the shorter cross-fade rust needs to appear and disappear but adds no loop
-/// or shimmer. Reduce Transparency thickens the oxide so the weathering survives a solid backdrop.
+/// A color-blend wash is what makes rust visible on blue and teal artwork. Multiply alone
+/// only darkened those icons. Reduce Motion shortens the cross-fade. Reduce Transparency
+/// uses a heavier wash so the rust survives a solid backdrop.
 struct PinWeatherLook: ViewModifier {
     /// Rust amount, clamped to `0...1`.
     var intensity: Double
@@ -37,19 +38,25 @@ struct PinWeatherLook: ViewModifier {
     func body(content: Content) -> some View {
         let amount = min(1, max(0, intensity))
         content
-            .saturation(1 - 0.44 * amount)
-            .brightness(-0.05 * amount)
-            .contrast(1 - 0.08 * amount)
+            .saturation(1 - 0.62 * amount)
+            .hueRotation(.degrees(16 * amount))
+            .brightness(-0.08 * amount)
+            .contrast(1 - 0.05 * amount)
+            .colorMultiply(PinWeatherOxide.tint(amount: amount))
             .overlay {
                 if amount > 0 {
-                    // The oxide is masked by the artwork's own alpha. A multiply wash drawn across
-                    // the tile would otherwise paint a brown square over the transparent margin
-                    // every macOS icon carries, and would square off vector artwork like the
-                    // Session Capsule mark.
+                    // Color blend shifts the artwork toward rust orange while keeping its
+                    // luminance, so a blue pin turns rusty instead of merely dim.
+                    PinWeatherOxide.rust
+                        .opacity((reduceTransparency ? 0.42 : 0.30) + 0.38 * amount)
+                        .blendMode(.color)
+                        .mask { content }
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
                     PinWeatherOxide(level: PinWeatherOxide.quantized(amount), solid: reduceTransparency)
                         .mask { content }
-                        .opacity(amount)
-                        .blendMode(.multiply)
+                        .opacity(0.55 + 0.45 * amount)
+                        .blendMode(reduceTransparency ? .plusDarker : .multiply)
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)
                 }
@@ -60,27 +67,35 @@ struct PinWeatherLook: ViewModifier {
     }
 }
 
-/// The oxide layer: an uneven warm wash plus a field of soft pits, drawn in one `Canvas`.
+/// The oxide layer: an orange rust wash plus flakes and dark pits, drawn in one `Canvas`.
 ///
 /// Alphas here describe fully weathered artwork; ``PinWeatherLook`` fades the whole layer with
 /// `opacity` so the transition is animatable without redrawing the canvas on every frame.
 private struct PinWeatherOxide: View {
-    /// Weathering step, `0...1`, driving how many pits appear and how wide they grow.
+    /// Weathering step, `0...1`, driving how many flakes appear and how wide they grow.
     let level: Double
     /// Reduce Transparency: a heavier, more opaque wash.
     let solid: Bool
 
-    /// Coarse steps for the canvas so pit count and size change a handful of times across the
+    static let rust = Color(red: 0.72, green: 0.28, blue: 0.10)
+    private static let flake = Color(red: 0.78, green: 0.38, blue: 0.12)
+    private static let pit = Color(red: 0.32, green: 0.14, blue: 0.06)
+
+    /// Coarse steps for the canvas so flake count and size change a handful of times across the
     /// whole ramp instead of on every intensity sample.
     static func quantized(_ amount: Double) -> Double {
         (amount * 6).rounded() / 6
     }
 
-    private var oxide: Color { Color(red: 0.55, green: 0.32, blue: 0.17) }
-    private var pit: Color { Color(red: 0.36, green: 0.18, blue: 0.08) }
-    private var washOpacity: Double { solid ? 0.34 : 0.20 }
-    private var rimOpacity: Double { solid ? 0.30 : 0.18 }
-    private var pitOpacity: Double { solid ? 0.52 : 0.38 }
+    /// Pulls RGB toward rust so even a light intensity reads as metal, not as a dimmer icon.
+    static func tint(amount: Double) -> Color {
+        Color(red: 1 - 0.08 * amount, green: 1 - 0.38 * amount, blue: 1 - 0.52 * amount)
+    }
+
+    private var washOpacity: Double { solid ? 0.46 : 0.32 }
+    private var rimOpacity: Double { solid ? 0.40 : 0.28 }
+    private var flakeOpacity: Double { solid ? 0.70 : 0.56 }
+    private var pitOpacity: Double { solid ? 0.64 : 0.50 }
 
     var body: some View {
         Canvas(opaque: false, rendersAsynchronously: false) { context, size in
@@ -90,57 +105,62 @@ private struct PinWeatherOxide: View {
             // Age settles downward, so the wash is lightest at the top edge.
             context.fill(Path(bounds), with: .linearGradient(
                 Gradient(stops: [
-                    .init(color: oxide.opacity(washOpacity * 0.35), location: 0),
-                    .init(color: oxide.opacity(washOpacity * 0.75), location: 0.55),
-                    .init(color: oxide.opacity(washOpacity), location: 1)
+                    .init(color: Self.rust.opacity(washOpacity * 0.25), location: 0),
+                    .init(color: Self.rust.opacity(washOpacity * 0.70), location: 0.48),
+                    .init(color: Self.rust.opacity(washOpacity), location: 1)
                 ]),
-                startPoint: CGPoint(x: size.width * 0.35, y: 0),
-                endPoint: CGPoint(x: size.width * 0.65, y: size.height)))
+                startPoint: CGPoint(x: size.width * 0.28, y: 0),
+                endPoint: CGPoint(x: size.width * 0.72, y: size.height)))
 
-            // Rim bloom: clear at the middle so the icon's subject stays legible, oxide at the
-            // edges where a real finish gives out first. Transparent stops leave the multiply
-            // blend as a no-op, so the center is genuinely untouched.
+            // Rim bloom: clearer in the middle so the glyph stays readable, rust at the
+            // edges where a finish gives out first.
             context.fill(Path(bounds), with: .radialGradient(
                 Gradient(stops: [
                     .init(color: .clear, location: 0),
-                    .init(color: oxide.opacity(rimOpacity * 0.3), location: 0.7),
-                    .init(color: oxide.opacity(rimOpacity), location: 1)
+                    .init(color: Self.rust.opacity(rimOpacity * 0.35), location: 0.62),
+                    .init(color: Self.rust.opacity(rimOpacity), location: 1)
                 ]),
-                center: CGPoint(x: size.width * 0.5, y: size.height * 0.46),
-                startRadius: unit * 0.16,
-                endRadius: unit * 0.72))
+                center: CGPoint(x: size.width * 0.5, y: size.height * 0.44),
+                startRadius: unit * 0.12,
+                endRadius: unit * 0.74))
 
-            let visible = Int((Double(PinWeatherSpeckle.field.count) * level).rounded())
+            let visible = Int((Double(PinWeatherSpeckle.field.count) * max(0.35, level)).rounded())
             guard visible > 0 else { return }
             context.drawLayer { layer in
-                // One blur for the whole field: pits read as corrosion rather than as dots, and
-                // the filter is installed once instead of per pit.
-                layer.addFilter(.blur(radius: unit * 0.014))
+                // A short blur keeps flakes as corrosion, not as hard dots, without wiping
+                // their rust color into a brown fog.
+                layer.addFilter(.blur(radius: unit * 0.010))
                 for speckle in PinWeatherSpeckle.field.prefix(visible) {
-                    let diameter = speckle.radius * unit * (0.6 + 0.4 * level)
+                    let diameter = speckle.radius * unit * (0.7 + 0.5 * level)
                     let rect = CGRect(x: speckle.position.x * size.width - diameter / 2,
                                       y: speckle.position.y * size.height - diameter / 2,
-                                      width: diameter, height: diameter)
-                    layer.fill(Path(ellipseIn: rect),
-                               with: .color(pit.opacity(pitOpacity * speckle.weight)))
+                                      width: diameter * speckle.stretch,
+                                      height: diameter)
+                    let color = speckle.flake ? Self.flake : Self.pit
+                    let alpha = (speckle.flake ? flakeOpacity : pitOpacity) * speckle.weight
+                    layer.fill(Path(ellipseIn: rect), with: .color(color.opacity(alpha)))
                 }
             }
         }
     }
 }
 
-/// One pit in the oxide field, in unit artwork space so the look scales with dock icon size.
+/// One flake or pit in the oxide field, in unit artwork space so the look scales with icon size.
 private struct PinWeatherSpeckle {
     /// Center, `0...1` on each axis of the artwork box.
     let position: CGPoint
     /// Diameter as a fraction of the artwork's shorter edge.
     let radius: Double
-    /// Per-pit opacity multiplier, so the field is not uniformly dark.
+    /// Horizontal stretch; values above 1 read as a rust streak.
+    let stretch: Double
+    /// Per-mark opacity multiplier, so the field is not uniformly dark.
     let weight: Double
+    /// Orange flake when true; darker pit when false.
+    let flake: Bool
 
     /// A fixed field, generated once from a constant seed.
     ///
-    /// Every redraw and every pin at the same level must produce identical pits; drawing fresh
+    /// Every redraw and every pin at the same level must produce identical marks; drawing fresh
     /// random positions would make icons crawl on each canvas invalidation.
     static let field: [PinWeatherSpeckle] = {
         var state: UInt64 = 0x5DEE_D0C_C0FF_EE01
@@ -150,14 +170,16 @@ private struct PinWeatherSpeckle {
             state ^= state << 17
             return Double(state >> 11) * 0x1p-53
         }
-        return (0..<26).map { _ in
+        return (0..<40).map { index in
             let x = next()
             let y = next()
             return PinWeatherSpeckle(
                 // Bias downward: weathering pools along the lower half of a surface.
-                position: CGPoint(x: 0.06 + 0.88 * x, y: 0.10 + 0.86 * pow(y, 0.6)),
-                radius: 0.05 + 0.11 * next(),
-                weight: 0.45 + 0.55 * next())
+                position: CGPoint(x: 0.05 + 0.90 * x, y: 0.08 + 0.88 * pow(y, 0.55)),
+                radius: 0.04 + 0.13 * next(),
+                stretch: index.isMultiple(of: 3) ? 1.6 + 0.8 * next() : 1,
+                weight: 0.50 + 0.50 * next(),
+                flake: index.isMultiple(of: 2))
         }
     }()
 }
@@ -197,9 +219,12 @@ struct PinWeatherPreviewIcon: View {
 
     var body: some View {
         Rectangle()
-            .fill(Color.blue.gradient)
+            .fill(LinearGradient(colors: [
+                Color(red: 0.22, green: 0.62, blue: 0.92),
+                Color(red: 0.10, green: 0.36, blue: 0.78)
+            ], startPoint: .top, endPoint: .bottom))
             .overlay {
-                Image(systemName: "sparkles")
+                Image(systemName: "app.fill")
                     .font(.system(size: size * 0.42, weight: .semibold))
                     .foregroundStyle(.white)
             }

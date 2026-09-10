@@ -50,7 +50,7 @@ struct PinWeatherSettingsCardContent: View {
                               step: 1,
                               defaultValue: Double(PinWeatherLimits.defaultUnusedDays))
                 .disabled(requiresReset || !enabled)
-            SettingsStackedRow {
+            SettingsStackedRow(title: .pinWeatherPreviewTitle, subtitle: .pinWeatherPreviewHelp) {
                 PinWeatherRamp(active: enabled && !requiresReset)
             }
             SettingsStackedRow {
@@ -83,51 +83,61 @@ struct PinWeatherSettingsCardContent: View {
     }
 }
 
-/// A non-interactive ramp showing a clean pin, the first blush, and a fully weathered pin.
-///
-/// Decorative only: the card's copy already explains the setting, so the swatches carry no label
-/// and stay out of the accessibility tree rather than inventing unlocalized text.
+/// Labeled stages: a pin in use, the first rust after the unused-day setting, then heavy weather.
 private struct PinWeatherRamp: View {
     /// Dimmed when weather is off or frozen, so the row matches the disabled controls above it.
     let active: Bool
 
-    /// The intensities the rust model produces: untouched, threshold blush, fully weathered.
-    private let stops: [Double] = [0, 0.32, 1]
+    private var stops: [(intensity: Double, label: LocalizedStringResource)] {
+        [(0, .pinWeatherPreviewClean), (0.32, .pinWeatherPreviewStarts), (1, .pinWeatherPreviewHeavy)]
+    }
 
     var body: some View {
-        HStack(spacing: 10) {
-            ForEach(stops, id: \.self) { intensity in
-                PinWeatherRampSwatch(intensity: intensity)
+        HStack(alignment: .top, spacing: 12) {
+            ForEach(Array(stops.enumerated()), id: \.offset) { _, stop in
+                PinWeatherRampSwatch(intensity: stop.intensity, label: stop.label)
+                    .frame(maxWidth: .infinity)
             }
         }
         .opacity(active ? 1 : 0.45)
         .animation(.easeInOut(duration: 0.2), value: active)
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
     }
 }
 
-/// One swatch of the ramp: stand-in artwork under ``PinWeatherLook``.
+/// One labeled swatch of the ramp: stand-in artwork under ``PinWeatherLook``.
 ///
 /// Drawn from a gradient rather than a real application icon so the Settings page never touches
 /// the workspace or launch services to render a preview.
 private struct PinWeatherRampSwatch: View {
     let intensity: Double
-    private let size: CGFloat = 40
+    let label: LocalizedStringResource
+    private let size: CGFloat = 52
 
     var body: some View {
-        Rectangle()
-            .fill(Color.accentColor.gradient)
-            .overlay {
-                Image(systemName: "pin.fill")
-                    .font(.system(size: size * 0.4, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: size, height: size)
-            // Matches the squircle proportion of macOS artwork so the wash lands where it would
-            // on a real pin.
-            .clipShape(.rect(cornerRadius: size * 0.225, style: .continuous))
-            .modifier(PinWeatherLook(intensity: intensity))
+        VStack(spacing: 8) {
+            Rectangle()
+                .fill(LinearGradient(colors: [
+                    Color(red: 0.22, green: 0.62, blue: 0.92),
+                    Color(red: 0.10, green: 0.36, blue: 0.78)
+                ], startPoint: .top, endPoint: .bottom))
+                .overlay {
+                    Image(systemName: "app.fill")
+                        .font(.system(size: size * 0.42, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                .frame(width: size, height: size)
+                // Matches the squircle proportion of macOS artwork so the wash lands where it would
+                // on a real pin.
+                .clipShape(.rect(cornerRadius: size * 0.225, style: .continuous))
+                .modifier(PinWeatherLook(intensity: intensity))
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(label))
     }
 }
 
