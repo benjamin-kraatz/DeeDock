@@ -8,9 +8,11 @@ The `DeeDock-TestFlight` scheme compiles the same app with `TESTFLIGHT` instead 
 
 ## Who publishes
 
-Esi is the release captain. Esi triggers and watches the [Release workflow](../.github/workflows/release.yml) nightly at 23:00 Europe/Berlin and on an explicit ship. Nara and other bots do not cut releases, hold Sparkle or signing secrets, or publish GitHub Latest.
+Esi is the release captain. Esi alone dispatches the [Release workflow](../.github/workflows/release.yml) from **Actions → Release → Run workflow**. The workflow has no `schedule`, push, or pull_request trigger. If Esi wants a nightly watch, that is her routine, not a GitHub cron.
 
-`intent=watch` and the nightly schedule run only on `ubuntu-latest`. They print the version, secret presence, and notes check. They do not start `xcode-27`.
+Nara and other bots do not dispatch Release, bump `MARKETING_VERSION` or `CURRENT_PROJECT_VERSION` on feature work, hold Sparkle or signing secrets, or publish GitHub Latest. Version bumps and bilingual notes belong in a separate release-prep PR. Esi merges that PR before she dispatches.
+
+`intent=watch` is an optional dry-run on `ubuntu-latest`. It prints the version, secret presence, and notes check. It does not start `xcode-27`.
 
 `intent=ship` preflights on Linux, then archives on `xcode-27`, then opens a draft GitHub Release back on `ubuntu-latest`. It does not publish Latest unless Esi sets `publish_latest`. The first smoke path stays draft-only. The [manual archive path](#prepare-the-release) stays valid.
 
@@ -145,14 +147,13 @@ Existing `docs/releases/0.2.0.md` is German only. Add an `## English` section on
 
 ## Release pipeline
 
-The [Release workflow](../.github/workflows/release.yml) splits cheap checks from the Mac archive.
+The [Release workflow](../.github/workflows/release.yml) is `workflow_dispatch` only. It splits cheap checks from the Mac archive.
 
-Esi triggers it in two ways:
+Esi dispatches it. She chooses `intent=watch` for a dry-run, or `intent=ship` after the release-prep PR is on `main`. Leave **publish_latest** unchecked.
 
-1. Nightly watch at 23:00 Europe/Berlin. The workflow uses cron `0 23 * * *` with `timezone: Europe/Berlin`. GitHub follows Central European Time in winter (23:00 Berlin is 22:00 UTC) and Central European Summer Time in summer (23:00 Berlin is 21:00 UTC). Do not read that cron as 23:00 UTC.
-2. Explicit ship from **Actions → Release → Run workflow**, with intent `ship`. Leave **publish_latest** unchecked.
+Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` in `Configuration/App.xcconfig` and adds bilingual notes at `docs/releases/<MARKETING_VERSION>.md`. Esi merges that PR before she dispatches. Feature work does not bump those versions.
 
-**watch** (`ubuntu-latest`). Scheduled runs and `intent=watch` use this job only. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the six secrets by name, and checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section. It does not archive, import a certificate, or start `xcode-27`.
+**watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the six secrets by name, and checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section. It does not archive, import a certificate, or start `xcode-27`.
 
 **archive** (`xcode-27`). `intent=ship` only, after watch succeeds. Watch fails first if a secret or the bilingual notes file is missing, so the Mac job does not start. Then, in order:
 
@@ -173,7 +174,7 @@ Do not run those archive steps in parallel.
 
 `xcode-27` is Benn's Mac image. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, archive fails and tells Esi and Benn. Developer ID import uses a temporary keychain on that runner.
 
-On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline`. Esi may add label `Bot-Nara` once if Nara should fix pipeline code. Nara does not cut the release, hold secrets, or publish Latest.
+On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline`. Esi may add label `Bot-Nara` once if Nara should fix pipeline code. Nara does not dispatch Release, bump versions on feature work, hold secrets, or publish Latest.
 
 ## Secrets checklist
 

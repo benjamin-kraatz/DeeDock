@@ -1,22 +1,24 @@
 # Direct / Sparkle distribution for the DeeDock scheme.
 #
-# Esi (release captain) triggers and watches this workflow:
-#   - Nightly at 23:00 Europe/Berlin (schedule below)
-#   - Explicit ship via workflow_dispatch with intent=ship
+# Esi (release captain) alone dispatches this workflow. There is no
+# schedule, push, or pull_request trigger. A nightly watch, if Esi wants
+# one, is her routine: she runs workflow_dispatch with intent=watch.
 #
 # Job graph:
-#   watch (ubuntu-latest) always. Version, secret presence, notes check.
-#     Nightly and intent=watch stop here. No Xcode, no certs, no Mac.
+#   watch (ubuntu-latest) on every dispatch. Version, secret presence, notes.
+#     intent=watch stops here. No Xcode, no certs, no Mac.
 #   archive (xcode-27) only for intent=ship, after watch succeeds.
 #     Archive, Developer ID export, notarytool+staple, zip, generate_appcast.
 #   draft (ubuntu-latest) only for intent=ship, after archive.
 #     Draft GitHub Release from artifacts. No Mac. No gh on xcode-27.
 #   remind-on-failure (ubuntu-latest) if any of those fail.
 #
-# Nara and other bots do not cut releases, hold Sparkle or signing secrets,
-# or publish GitHub Latest. On failure, Esi opens a high-priority Linear
-# issue on project or label release-pipeline, and may add Bot-Nara once
-# if Nara should fix pipeline code.
+# Nara and other bots do not dispatch this workflow, bump versions on
+# feature work, hold Sparkle or signing secrets, or publish GitHub Latest.
+# Version bumps and bilingual notes land in a release-prep PR that Esi
+# merges before she dispatches. On failure, Esi opens a high-priority
+# Linear issue on project or label release-pipeline, and may add Bot-Nara
+# once if Nara should fix pipeline code.
 #
 # ship does not mark the release Latest unless publish_latest is true.
 # First smoke stays draft-only.
@@ -59,19 +61,8 @@ on:
         type: boolean
         default: false
 
-  # 23:00 Europe/Berlin every night. The timezone field is IANA, so GitHub
-  # follows Central European Time in winter and Central European Summer Time
-  # in summer. Do not drop timezone. A UTC-only reading of this cron would be
-  # 23:00 UTC, which is 00:00 or 01:00 in Berlin.
-  #
-  # Equivalent UTC hours if timezone support were absent:
-  #   21:00 UTC during CEST (UTC+2), 22:00 UTC during CET (UTC+1).
-  schedule:
-    - cron: "0 23 * * *"
-      timezone: Europe/Berlin
-
 # Draft GitHub Release, assets, and an optional Latest publish. Latest stays
-# off unless Esi sets publish_latest on a workflow_dispatch ship.
+# off unless Esi sets publish_latest on a ship dispatch.
 permissions:
   contents: write
 
@@ -80,8 +71,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Scheduled runs are always watch. Only Esi dispatches ship.
-  INTENT: ${{ github.event_name == 'workflow_dispatch' && inputs.intent || 'watch' }}
+  INTENT: ${{ inputs.intent }}
   XCODE_SCHEME: DeeDock
   XCODE_PROJECT: DeeDock.xcodeproj
   SPARKLE_KEYCHAIN_ACCOUNT: de.benjaminkraatz.DeeDock
@@ -107,7 +97,7 @@ jobs:
       - name: Resolve versions
         id: versions
         env:
-          INPUT_MARKETING_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.marketing_version || '' }}
+          INPUT_MARKETING_VERSION: ${{ inputs.marketing_version }}
         run: |
           set -eu
           marketing="$(awk -F ' *= *' '/^MARKETING_VERSION / { print $2; exit }' Configuration/App.xcconfig)"
@@ -623,7 +613,7 @@ jobs:
           echo "Opened draft GitHub Release $RELEASE_TAG. Latest was not published."
 
       - name: Publish Latest
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_latest == true }}
+        if: ${{ inputs.publish_latest == true }}
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.watch.outputs.release_tag }}

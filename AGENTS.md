@@ -88,6 +88,6 @@ Keep upstream skill files intact. Sources and licenses are recorded in `.agents/
 
 ## Releases
 
-Read `docs/UPDATES.md` when the task is the Release workflow, Sparkle publishing, or a `Bot-Nara` pipeline fix.
+Read `docs/UPDATES.md` when the task is the Release workflow, Sparkle publishing, a release-prep version bump, or a `Bot-Nara` pipeline fix.
 
-Esi triggers and watches Release. Agents keep to pipeline code and docs. They do not cut a release, store Sparkle or signing secrets, or publish GitHub Latest. Nightly watch stays on Linux. `xcode-27` is ship-only. `ship` opens a draft. `publish_latest` stays false until Esi confirms a Latest cut.
+Esi alone dispatches Release. Agents do not bump versions on feature work, dispatch the workflow, hold secrets, or publish Latest. `watch` is Esi's dry-run. `ship` opens a draft. `publish_latest` stays false until Esi confirms.
