@@ -2039,3 +2039,28 @@ run in this environment. Native acceptance still needs Shelf, Finder, and picker
 a real Mac, including mixed types, Shortcut success/failure, folder conflicts, four-edge
 layouts, VoiceOver, Reduce Motion, Spaces, and sleep/wake. Do not mark DEE-24 Done on
 compilation alone.
+
+## DEE-71 Mode 69
+
+Settings → Modes has an opt-in Mode 69 toggle for each configuration. The saved boolean defaults to false for older documents and copies when duplicating a mode. The existing atomic mode save publishes changes only after persistence succeeds. Renaming does not change the skin.
+
+A click-through Canvas draws red ambient light and two upright candles inside the visible dock ends, including scrolling docks. The skin follows background visibility and idle fading. A 24 fps timeline exists only when the dock is fully revealed, the decoration is visible, and Reduce Motion is off. Reduce Transparency uses a solid rim without ambient glow. Launcher presentation omits the skin. No sound, additional windows, permissions, or system preference changes are involved.
+
+Validation: DeeDock Debug compilation passed with signing disabled. Tests, previews, automated visual checks, and native acceptance were not run.
+
+Pending native acceptance:
+
+- Enable and disable the skin, switch modes, duplicate, rename, and relaunch. Confirm independent skin choices and unchanged pins and recipes.
+- Inspect candle placement and icon readability on all four edges, small and crowded docks, multiple displays, and while scrolling or magnifying.
+- Check auto-hide, idle fading, hidden backgrounds, Launcher transitions, Spaces, full-screen apps, display removal, and sleep/wake.
+- Check English and German Settings copy, keyboard toggling, VoiceOver, Reduce Motion, and Reduce Transparency. Confirm decoration does not intercept clicks or obscure focus and running indicators.
+
+### Mode 69+ full-display atmosphere
+
+Mode 69+ is a separate opt-in boolean on each Dock Mode. Mode duplication copies it and older documents default to off. Each drawable, non-mirrored desktop gets a transparent, nonactivating NSPanel at status-bar level, using its full AppKit frame in points. The panels ignore mouse events and cannot become key or main. Public all-Spaces and full-screen-auxiliary collection behaviors request presentation across Spaces. Coverage of other applications' full-screen windows and system-owned UI is not guaranteed by compilation.
+
+The Canvas concentrates red and pink light at display edges, adds a 1.5% central red wash, and draws three small candles in each bottom corner. Movement has a 20 fps ceiling and slow light cycles. Reduce Motion removes the timeline. Reduce Transparency removes the wash and gradients, leaving a solid rim and still candles. Disabling the feature, suspending the session, sleeping displays, or quitting releases hosting views and their timelines. Display reconciliation uses stable IDs and full frames independently of which docks are enabled. The Dock Mode menu offers an immediate off action.
+
+Native acceptance remains pending: full-screen apps, Spaces, menu access, click-through dragging, keyboard focus, lock and unlock, sleep and wake, display rearrangement and removal, mirroring, Retina scaling, readability over light and dark apps, corner overlap, and CPU/GPU cost. Tests and automated visual checks were not run.
+
+Mode 69+ validation: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/deedock-dee71-build CODE_SIGNING_ALLOWED=NO build` succeeded. This proves compilation only.

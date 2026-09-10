@@ -1,6 +1,96 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "mode69PlusStop": {
+    "comment": "Menu action to immediately disable full-display atmosphere.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Turn off Mode 69+"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Modus 69+ ausschalten"
+        }
+      }
+    }
+  },
+  "mode69PlusHelp": {
+    "comment": "Explains full-screen decoration and its exit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Red light over every display, with candles at the edges. Click through and keep working. Turn off here or in the Dock Mode menu."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rotes Licht auf allen Bildschirmen, mit Kerzen am Rand. Klicke hindurch und arbeite weiter. Hier oder im Dock-Modus-Menü ausschalten."
+        }
+      }
+    }
+  },
+  "mode69PlusTitle": {
+    "comment": "Full-display ambient effect toggle.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mode 69+"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Modus 69+"
+        }
+      }
+    }
+  },
+  "mode69Help": {
+    "comment": "Explains the visual-only skin and how to turn it off.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rotes Umgebungslicht und Kerzen für diesen Dock-Modus. Ausschalten stellt das normale Dock wieder her."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Red ambient light and candles for this Dock Mode. Switch off to restore the ordinary dock."
+        }
+      }
+    }
+  },
+  "mode69Title": {
+    "comment": "Toggle for the optional candle and red ambient Dock Mode skin.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Modus 69"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mode 69"
+        }
+      }
+    }
+  },
     "" : {
       "localizations" : {
         "de" : {

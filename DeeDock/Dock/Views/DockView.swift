@@ -52,6 +52,8 @@ struct DockView: View {
                 reduceMotion: reduceMotion,
                 reduceTransparency: reduceTransparency,
                 drawsBackground: drawsBackground,
+                mode69Enabled: store.mode69Enabled,
+                ambientAnimated: visibility.exposesContent && visibility.progress == 0,
                 primaryAppAction: store.performPrimaryAction,
                 openApp: store.open,
                 togglePin: store.toggleFavorite,
