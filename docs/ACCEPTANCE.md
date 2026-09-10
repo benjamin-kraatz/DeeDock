@@ -1979,6 +1979,7 @@ not read to rank actions. Shortcut output is not captured to Shelf.
 - Stale destination bookmarks, missing files, and a removed Shortcut fail without retry.
 - Escape, close, and a second Return during an in-flight action do not start another run.
 - Drag-lease and nested Shelf/folder grants survive the panel transition and cancel cleanly.
+- Choose Files and Choose Folder keep the launcher presented until the panel confirms or cancels.
 
 ### Delivery
 

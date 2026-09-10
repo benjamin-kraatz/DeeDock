@@ -1,6 +1,9 @@
 import AppKit
 
 /// Native file and folder panels for Launcher file actions. A nil response is cancellation.
+///
+/// The panel references are stored before `begin()`, so `isChoosing` is true before the
+/// first click can reach the launcher's outside-click monitors.
 @MainActor
 final class LauncherFileChooser {
     private var fileToken: UUID?
@@ -9,6 +12,11 @@ final class LauncherFileChooser {
     private var folderPanel: NSOpenPanel?
 
     var isChoosing: Bool { filePanel != nil || folderPanel != nil }
+
+    /// Returns whether `window` is this chooser's in-process file or folder panel.
+    func owns(_ window: NSWindow) -> Bool {
+        window === filePanel || window === folderPanel
+    }
 
     func chooseFiles(completion: @escaping ([URL]?) -> Void) {
         if let filePanel {

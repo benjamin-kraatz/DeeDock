@@ -81,7 +81,7 @@ final class DockPanelController {
         panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
         panel.resignedKey = { [weak self] in
             guard let self else { return }
-            if launcher.isPresented { launcherPresentation.close(restoreFocus: false) }
+            if launcher.isPresented { launcherPresentation.noteWindowResignedKey() }
             else { resignedFocus?() }
         }
         interaction.idleFade.refreshInput = { [weak self] in self?.updatePointer() }

@@ -123,9 +123,11 @@ Compilation and remaining native checks are recorded in [acceptance notes](ACCEP
 ## File actions
 
 Choose **Use in Launcher** from a Shelf selection, drop files on the Launcher tile or open
-panel, or choose **Choose Files**. The Launcher shows the ordered batch and actions that can
-use it. Search and the Apps / Shortcuts / Folders filter narrow that list. Hover and keyboard
-selection do not run an action. Return or a click runs it once.
+panel, or choose **Choose Files**. The launcher stays open while the native file or folder
+panel is up. Outside clicks do not dismiss it then, because that would cancel the panel.
+Closing the launcher still cancels an open panel. The Launcher shows the ordered batch and
+actions that can use it. Search and the Apps / Shortcuts / Folders filter narrow that list.
+Hover and keyboard selection do not run an action. Return or a click runs it once.
 
 **Open with** is an app-level handoff. It does not attach files to a window or project; that
 path remains [Window Peek file routing](WINDOW-FILE-HANDOFF.md). An app that declares support

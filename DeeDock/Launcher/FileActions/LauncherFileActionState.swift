@@ -29,6 +29,12 @@ final class LauncherFileActionState {
 
     var isActive: Bool { context != nil }
     var isBusy: Bool { status.isPending || chooser.isChoosing }
+    /// True while a native file or folder panel is open. Presentation monitors must not
+    /// dismiss the launcher for that interval; collapsing it cancels the panel.
+    var isChoosing: Bool { chooser.isChoosing }
+
+    /// In-process file or folder panels this mode presented. Powerbox panels have no window here.
+    func ownsChooserWindow(_ window: NSWindow) -> Bool { chooser.owns(window) }
 
     func configure(destinations: LauncherFileDestinationsStore, actions: ActionTilesController,
                    catalog: ApplicationCatalog) {
