@@ -184,13 +184,11 @@ private struct PinWeatherSpeckle {
 #Preview("Reduce Motion") {
     PinWeatherPreviewIcon().modifier(PinWeatherLook(intensity: 0.8))
         .padding(24)
-        .environment(\.accessibilityReduceMotion, true)
 }
 
 #Preview("Reduce Transparency") {
     PinWeatherPreviewIcon().modifier(PinWeatherLook(intensity: 0.8))
         .padding(24)
-        .environment(\.accessibilityReduceTransparency, true)
 }
 
 /// Stand-in artwork for previews: no workspace lookup, no launching, no preferences.

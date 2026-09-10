@@ -189,6 +189,5 @@ private struct PinWeatherSettingsNotice: View {
                                   clear: {}, reset: {})
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
-        .environment(\.accessibilityReduceTransparency, true)
 }
 #endif
