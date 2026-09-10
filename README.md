@@ -475,7 +475,7 @@ Use generated `LocalizedStringResource` symbols in SwiftUI and defer error-messa
 
 ## Action Tiles
 
-Open **Settings → Features → Action Tiles**, choose **Load Shortcuts**, and pin a shortcut. Tiles appear in the same order on every display, independently of Dock Modes. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
+Open **Settings → Features → Action Tiles** and pin a shortcut. Installed Shortcuts load when that page appears; **Reload Shortcuts** refreshes the list. Tiles appear in the same order on every display, independently of Dock Modes. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
 
 Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DDock never retries a run automatically.
 

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Explicit shortcut discovery and pin management; previews never enumerate real shortcuts.
+/// Pin management with discovery on appear; previews never enumerate real shortcuts.
 struct ActionTilesSettingsCard: View {
     let controller: ActionTilesController
     @State private var confirmsReset = false
@@ -52,6 +52,7 @@ struct ActionTilesSettingsCard: View {
                 }
             }
         }
+        .onAppear { controller.ensureLoaded() }
         .confirmationDialog(.actionsReset, isPresented: $confirmsReset) {
             Button(.actionsReset, role: .destructive) { controller.reset() }
         } message: { Text(.actionsResetHelp) }
