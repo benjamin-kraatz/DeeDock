@@ -327,10 +327,40 @@ final class DockPanelController {
         // The preview can resize and recenter the native panel. Resolving the next boundary
         // against that transient frame makes the preview invalidate its own hit test and cycle.
         // Keep the whole drag session in the pre-preview content coordinate space instead.
-        guard !launcher.isPresented, visibility.exposesContent, restingDragBounds.contains(point), !baseRestingFrame.isEmpty else { return nil }
+        guard !launcher.isPresented, visibility.exposesContent, restingDragBounds.contains(point), !baseRestingFrame.isEmpty else {
+            interaction.stackGravity?.notePendingSnap(nil)
+            return nil
+        }
         let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
-        return DockSectionInsertion.index(point: local, scrollOffset: interaction.scrollOffset,
-            layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
+        guard let raw = DockSectionInsertion.index(point: local, scrollOffset: interaction.scrollOffset,
+            layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility) else {
+            interaction.stackGravity?.notePendingSnap(nil)
+            return nil
+        }
+        let along = baseLayout.edge.along(local) - interaction.scrollOffset
+        let strength = interaction.stackGravity?.effectiveStrength ?? 0
+        guard let result = StackGravityLayout.snappedInsertion(
+            proposed: raw,
+            along: along,
+            pins: store.pins,
+            layout: baseLayout,
+            strength: strength,
+            movingPinID: interaction.dragSourceID
+        ) else {
+            interaction.stackGravity?.notePendingSnap(nil)
+            return raw
+        }
+        let stackName = store.pins.indices.contains(result.snap.wellPinIndex)
+            ? store.pins[result.snap.wellPinIndex].name : result.snap.wellPinIndex.description
+        interaction.stackGravity?.notePendingSnap(
+            StackGravityPendingSnap(
+                displayID: store.displayID,
+                stackName: stackName,
+                pinIndex: result.index,
+                wellPinIndex: result.snap.wellPinIndex
+            )
+        )
+        return result.index
     }
 
     /// Utility boundaries use the original layout, so a moving gap cannot retarget itself.

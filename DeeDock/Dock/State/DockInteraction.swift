@@ -10,6 +10,8 @@ final class DockInteraction {
     @ObservationIgnored var openFocusSession: (() -> Void)?
     /// Shared local-history scrub. Nil in previews that do not browse history.
     var timeline: DockTimelineController?
+    /// Shared stack-gravity settings. Nil in previews that do not apply pull.
+    var stackGravity: StackGravityStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?

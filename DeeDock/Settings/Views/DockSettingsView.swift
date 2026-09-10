@@ -142,6 +142,7 @@ struct DockSettingsView: View {
         switch page {
         case .focusSessions: coordinator?.focusSession != nil
         case .actionTiles: coordinator?.actionTiles != nil
+        case .stackGravity: coordinator != nil
         default: true
         }
     }

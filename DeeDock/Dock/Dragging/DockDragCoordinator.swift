@@ -558,6 +558,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private func clearFeedback() {
         scrollTimer?.invalidate(); scrollTimer = nil
         documentDrag.clear()
+        panels.values.first?.interaction.stackGravity?.notePendingSnap(nil)
         panels.values.forEach {
             $0.interaction.documentTargetID = nil
             $0.interaction.springEmphasized = false

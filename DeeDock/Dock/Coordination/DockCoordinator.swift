@@ -6,6 +6,7 @@ import Observation
 final class DockCoordinator {
     let focusSession = FocusSessionController()
     let localHistory = DockLocalHistoryStore()
+    let stackGravity = StackGravityStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
@@ -141,10 +142,13 @@ final class DockCoordinator {
             endFocus(restore: false)
         }
         focusSession.start()
+        stackGravity.start()
+        stackGravity.setFocusActive(focusSession.isActive)
         localHistory.start(session: focusSession.session)
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
             guard let self else { return }
+            stackGravity.setFocusActive(focusSession.isActive)
             localHistory.noteSession(focusSession.session)
             badgeMemory.synchronize(session: focusSession.session)
             refreshPanels()
@@ -327,7 +331,9 @@ final class DockCoordinator {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles,
                                   focusSession: focusSession, history: localHistory)
+            store.stackGravity = stackGravity
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
+            panel.interaction.stackGravity = stackGravity
             configureLauncherSearch(on: panel)
             panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
             panel.launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }

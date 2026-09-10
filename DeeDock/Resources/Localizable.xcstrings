@@ -587,6 +587,24 @@
         }
       }
     },
+    "actionUndo" : {
+      "comment" : "Reverses the last stack gravity snap on this dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widerrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
     "actionUnpin" : {
       "comment" : "Context-menu and accessibility action. Stop keeping this app pinned; a running app remains in the running section.",
       "extractionState" : "manual",
@@ -20267,6 +20285,24 @@
         }
       }
     },
+    "settingsFeatureStackGravitySubtitle" : {
+      "comment" : "Description of this feature on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nahe Symbole weich zu Ordnerstapeln ziehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gently pull nearby icons toward folder stacks."
+          }
+        }
+      }
+    },
     "settingsFeatureTimelineSubtitle" : {
       "comment" : "Description of this feature on the Features settings overview.",
       "extractionState" : "manual",
@@ -20292,13 +20328,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Gravitation anziehen einrasten Fokus Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack gravity well pull snap focus mute trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy"
           }
         }
       }
@@ -22315,6 +22351,312 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "None of the staged items could be found."
+          }
+        }
+      }
+    },
+    "stackGravityDismissUndo" : {
+      "comment" : "Accessibility label that dismisses the snap undo banner without restoring pins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrasten behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep snap"
+          }
+        }
+      }
+    },
+    "stackGravityFocus" : {
+      "comment" : "How stack gravity behaves during an active Focus Session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Während Fokus-Sitzungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "During Focus Sessions"
+          }
+        }
+      }
+    },
+    "stackGravityFocusDisable" : {
+      "comment" : "Turns stack gravity off while a Focus Session is running or paused.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "stackGravityFocusHelp" : {
+      "comment" : "Explains the Focus Session picker for stack gravity.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dämpfen hält ein Viertel der Stärke. Aus schaltet Ziehen und Einrasten für die Sitzung ab."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mute keeps a quarter of the strength. Off stops pull and snap for the session."
+          }
+        }
+      }
+    },
+    "stackGravityFocusKeep" : {
+      "comment" : "Leaves stack gravity at the configured strength during Focus Sessions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep"
+          }
+        }
+      }
+    },
+    "stackGravityFocusMute" : {
+      "comment" : "Dampens stack gravity during Focus Sessions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dämpfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mute"
+          }
+        }
+      }
+    },
+    "stackGravityGuideHelp" : {
+      "comment" : "Caption under the settings guide that shows icons drifting toward a stack.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nahe Symbole rücken an den Stapel. Loslassen neben einem Stapel heftet daneben an; Widerrufen stellt die vorige Reihenfolge wieder her."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nearby icons ease toward the stack. Releasing beside a stack pins next to it; Undo restores the previous order."
+          }
+        }
+      }
+    },
+    "stackGravityHelp" : {
+      "comment" : "Footnote for the stack gravity settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wirkt nur auf DDock. Angeheftete Ordnerstapel ziehen nahe Symbole an. Reduce Motion lässt die Ruhelage unverändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies to DDock only. Pinned folder stacks attract nearby icons. Reduce Motion leaves resting positions unchanged."
+          }
+        }
+      }
+    },
+    "stackGravityReset" : {
+      "comment" : "Replaces an unreadable stack gravity document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gravitation zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Gravity"
+          }
+        }
+      }
+    },
+    "stackGravityResetHelp" : {
+      "comment" : "Explains that reset discards unreadable stored bytes and starts the default document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gespeicherte Gravitationseinstellung konnte nicht gelesen werden. Zurücksetzen stellt die Standardwerte wieder her."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The stored gravity settings could not be read. Reset restores the defaults."
+          }
+        }
+      }
+    },
+    "stackGravitySettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the stack gravity settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stapel Gravitation Brunnen anziehen einrasten Widerrufen Fokus dämpfen Stärke Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "stack gravity well pull snap undo focus mute dampen strength folder"
+          }
+        }
+      }
+    },
+    "stackGravityStorageFailed" : {
+      "comment" : "Shown when the latest stack gravity edit could not be saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gravitationseinstellung konnte nicht gespeichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gravity settings could not be saved."
+          }
+        }
+      }
+    },
+    "stackGravityStrength" : {
+      "comment" : "Slider that sets how strongly nearby icons drift toward a stack.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stärke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strength"
+          }
+        }
+      }
+    },
+    "stackGravityTitle" : {
+      "comment" : "Settings page and card title for stack gravity wells.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stapelgravitation"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stack Gravity"
+          }
+        }
+      }
+    },
+    "stackGravityToggle" : {
+      "comment" : "Enables soft pull toward pinned folder stacks on DDock chrome.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nahe Symbole zu Stapeln ziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pull nearby icons toward stacks"
+          }
+        }
+      }
+    },
+    "stackGravityUndo" : {
+      "comment" : "Button on the dock banner that restores pins from before the last snap.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrasten widerrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo Snap"
+          }
+        }
+      }
+    },
+    "stackGravityUndoMessage" : {
+      "comment" : "Dock banner after a pin snaps beside a folder stack. stackName is the Finder folder name and is not translated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neben %1$(stackName)@ eingerastet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snapped beside %1$(stackName)@."
           }
         }
       }

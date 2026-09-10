@@ -62,6 +62,8 @@ final class DockStore {
     @ObservationIgnored var applicationOpened: (() -> Void)?
 
     @ObservationIgnored private let history: DockLocalHistoryStore?
+    /// Shared stack-gravity settings and snap undo. Assigned after init to avoid extra store parameters.
+    var stackGravity: StackGravityStore?
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
          trash: TrashController? = nil, shelf: ShelfController? = nil,
@@ -308,7 +310,34 @@ final class DockStore {
     }
 
     func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
-        savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        let previous = persistedPins
+        let pending = stackGravity?.pendingSnap
+        let success = savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        if success, let pending, pending.displayID == displayID, persistedPins != previous {
+            stackGravity?.registerUndo(
+                StackGravityUndo(displayID: displayID, previousPins: previous, stackName: pending.stackName)
+            )
+        } else {
+            stackGravity?.notePendingSnap(nil)
+        }
+        return success
+    }
+
+    /// Restores pins from the last gravity snap on this display.
+    func undoGravitySnap() {
+        guard let record = stackGravity?.consumeUndo(for: displayID) else { return }
+        _ = savePins(record.previousPins)
+    }
+
+    func dismissGravityUndo() {
+        guard stackGravity?.undo(for: displayID) != nil else { return }
+        stackGravity?.dismissUndo()
+    }
+
+    /// Banner copy for the last snap on this display. Nil when another display owns the undo.
+    var gravityUndoMessage: LocalizedStringResource? {
+        guard let undo = stackGravity?.undo(for: displayID) else { return nil }
+        return .stackGravityUndoMessage(stackName: undo.stackName)
     }
 
     func movePin(_ id: String, by distance: Int) {

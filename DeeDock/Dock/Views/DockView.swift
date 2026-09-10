@@ -48,6 +48,7 @@ struct DockView: View {
                 selectedTarget: store.selectedTarget,
                 keyboardFocus: store.keyboardFocus,
                 errorMessage: store.errorMessage,
+                undoMessage: store.gravityUndoMessage,
                 interaction: interaction,
                 reduceMotion: reduceMotion,
                 reduceTransparency: reduceTransparency,
@@ -55,7 +56,9 @@ struct DockView: View {
                 primaryAppAction: store.performPrimaryAction,
                 openApp: store.open,
                 togglePin: store.toggleFavorite,
-                dismissError: { store.errorMessage = nil }
+                dismissError: { store.errorMessage = nil },
+                undo: { store.undoGravitySnap() },
+                dismissUndo: { store.dismissGravityUndo() }
             )
             if let timeline, timeline.isActive(on: store.displayID) {
                 DockTimelineOverlay(
@@ -64,10 +67,10 @@ struct DockView: View {
                     scrollOffset: interaction.scrollOffset,
                     end: { timeline.end() },
                     // The panel accepts mouse events only over reported regions. The glance card
-                    // borrows the callout region so Done stays clickable; an error banner owns the
-                    // same region, and it wins because a failure must remain dismissable.
+                    // borrows the callout region so Done stays clickable; the error and snap-undo
+                    // banners own the same region, and they win because their buttons must work.
                     calloutRectChanged: { rect in
-                        guard store.errorMessage == nil else { return }
+                        guard store.errorMessage == nil, store.gravityUndoMessage == nil else { return }
                         interaction.errorRect = rect
                     }
                 )

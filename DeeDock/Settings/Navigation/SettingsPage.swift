@@ -36,6 +36,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case permissions
     case appSuggestions
     case localHistory
+    case stackGravity
 
     var id: Self { self }
 
@@ -52,7 +53,8 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
-             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory: .features
+             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory,
+             .stackGravity: .features
         }
     }
 
@@ -87,6 +89,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .secondaryDockTitle
         case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .localHistory: .timelineTitle
+        case .stackGravity: .stackGravityTitle
         case .permissions: .windowPeekPermissionsTitle
         }
     }
@@ -103,6 +106,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .localHistory: .settingsFeatureTimelineSubtitle
+        case .stackGravity: .settingsFeatureStackGravitySubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
         }
@@ -130,6 +134,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .symbol("display.2")
         case .appSuggestions: .symbol("sparkles")
         case .localHistory: .symbol("clock.arrow.circlepath")
+        case .stackGravity: .symbol("circle.hexagongrid.fill")
         case .permissions: .symbol("lock.fill")
         }
     }
@@ -155,6 +160,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
         case .appSuggestions: .indigo
         case .localHistory: Color(red: 0.22, green: 0.48, blue: 0.72)
+        case .stackGravity: Color(red: 0.42, green: 0.36, blue: 0.86)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
     }
@@ -180,6 +186,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
         case .appSuggestions: [.indigo, .purple]
         case .localHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
+        case .stackGravity: [Color(red: 0.68, green: 0.58, blue: 1.0), Color(red: 0.32, green: 0.24, blue: 0.78)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
     }
@@ -190,6 +197,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
+        case .stackGravity: .stackGravitySettingsKeywords
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords

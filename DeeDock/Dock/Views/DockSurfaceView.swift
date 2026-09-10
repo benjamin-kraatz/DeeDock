@@ -39,7 +39,15 @@ struct DockSurfaceView: View {
         )
     }
 
-    private var centers: [CGFloat] { layout.centers(sizes: sizes) }
+    private var centers: [CGFloat] {
+        StackGravityLayout.pulledCenters(
+            layout: layout,
+            sizes: sizes,
+            slots: slots,
+            strength: interaction.stackGravity?.effectiveStrength ?? 0,
+            reduceMotion: reduceMotion
+        )
+    }
 
     var body: some View {
         ZStack(alignment: .topLeading) {

@@ -462,6 +462,7 @@ The shared `DeeDock` scheme includes `DeeDockTests`, an unhosted Swift Testing t
 - `DeeDock/Dock/Shelf` holds the staged-item model, its repository, the shared controller, security-scoped access, the panel state and view, the native drag sources, and the coordinator.
 - `DeeDock/Dock/SemanticStacks` owns metadata-only grouping, streamed result repair, process-lifetime caching, and the Foundation Models adapter shared by folder stacks and the Shelf. Identical live requests share one generation. When Smart is selected, Shelf edits silently prepare the next grouping after a short debounce unless Low Power Mode is active.
 - `DeeDock/Dock/History` owns the shared DDock-local pin and Focus Session event model, persistence, and dock-axis scrub mapping. DEE-45 can reuse the same events for session playback.
+- `DeeDock/Dock/Gravity` owns stack gravity wells: soft pull toward pinned folder stacks, snap-on-release, Focus mute, and the isolated settings document.
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
 - `DeeDock/Modes` owns named configurations, the keyboard picker, and optional workspace recipes. Recipe execution lives in `WorkspaceRecipeCoordinator` with per-run state that is never persisted.

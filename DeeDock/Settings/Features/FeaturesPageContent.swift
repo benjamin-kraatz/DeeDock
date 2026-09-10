@@ -62,6 +62,10 @@ struct FeaturesPageContent: View {
                 DockTimelineSettingsCard(history: coordinator.localHistory,
                                          browse: { coordinator.browseLocalHistory() })
             }
+        case .stackGravity:
+            if let coordinator = context.coordinator {
+                StackGravitySettingsCard(store: coordinator.stackGravity)
+            }
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)

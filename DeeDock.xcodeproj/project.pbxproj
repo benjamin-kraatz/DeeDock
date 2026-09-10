@@ -39,6 +39,10 @@
 		DE36B0000000000000000003 /* DeeDock/Dock/History/DockLocalHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE36F0000000000000000003 /* DeeDock/Dock/History/DockLocalHistoryStore.swift */; };
 		DE36B0000000000000000004 /* DeeDock/Dock/History/DockTimelineController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE36F0000000000000000004 /* DeeDock/Dock/History/DockTimelineController.swift */; };
 		DE36B0000000000000000005 /* DeeDock/Dock/History/DockTimelinePinReplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE36F0000000000000000005 /* DeeDock/Dock/History/DockTimelinePinReplay.swift */; };
+		DE34B0000000000000000001 /* DeeDock/Dock/Gravity/StackGravityPhysics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE34F0000000000000000001 /* DeeDock/Dock/Gravity/StackGravityPhysics.swift */; };
+		DE34B0000000000000000002 /* DeeDock/Dock/Gravity/StackGravitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE34F0000000000000000002 /* DeeDock/Dock/Gravity/StackGravitySettings.swift */; };
+		DE34B0000000000000000003 /* DeeDock/Dock/Gravity/StackGravityRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE34F0000000000000000003 /* DeeDock/Dock/Gravity/StackGravityRepository.swift */; };
+		DE34B0000000000000000004 /* DeeDock/Dock/Gravity/StackGravityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE34F0000000000000000004 /* DeeDock/Dock/Gravity/StackGravityStore.swift */; };
 		AC7200000000000000000001 /* DeeDock/Dock/Focus/FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7200000000000000000002 /* DeeDock/Dock/Focus/FocusSession.swift */; };
 		DD1000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */; };
 		DD1000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2000000000000000000001 /* DeeDock/Dock/Models/DockOrdering.swift */; };
@@ -182,6 +186,10 @@
 		DE36F0000000000000000003 /* DeeDock/Dock/History/DockLocalHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/History/DockLocalHistoryStore.swift; sourceTree = SOURCE_ROOT; };
 		DE36F0000000000000000004 /* DeeDock/Dock/History/DockTimelineController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/History/DockTimelineController.swift; sourceTree = SOURCE_ROOT; };
 		DE36F0000000000000000005 /* DeeDock/Dock/History/DockTimelinePinReplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/History/DockTimelinePinReplay.swift; sourceTree = SOURCE_ROOT; };
+		DE34F0000000000000000001 /* DeeDock/Dock/Gravity/StackGravityPhysics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Gravity/StackGravityPhysics.swift; sourceTree = SOURCE_ROOT; };
+		DE34F0000000000000000002 /* DeeDock/Dock/Gravity/StackGravitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Gravity/StackGravitySettings.swift; sourceTree = SOURCE_ROOT; };
+		DE34F0000000000000000003 /* DeeDock/Dock/Gravity/StackGravityRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Gravity/StackGravityRepository.swift; sourceTree = SOURCE_ROOT; };
+		DE34F0000000000000000004 /* DeeDock/Dock/Gravity/StackGravityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Gravity/StackGravityStore.swift; sourceTree = SOURCE_ROOT; };
 		AC7200000000000000000002 /* DeeDock/Dock/Focus/FocusSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Focus/FocusSession.swift; sourceTree = SOURCE_ROOT; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2000000000000000000000 /* DeeDock/Dock/Models/ApplicationReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Models/ApplicationReference.swift; sourceTree = SOURCE_ROOT; };
@@ -416,6 +424,10 @@
 				DE36F0000000000000000003 /* DeeDock/Dock/History/DockLocalHistoryStore.swift */,
 				DE36F0000000000000000004 /* DeeDock/Dock/History/DockTimelineController.swift */,
 				DE36F0000000000000000005 /* DeeDock/Dock/History/DockTimelinePinReplay.swift */,
+				DE34F0000000000000000001 /* DeeDock/Dock/Gravity/StackGravityPhysics.swift */,
+				DE34F0000000000000000002 /* DeeDock/Dock/Gravity/StackGravitySettings.swift */,
+				DE34F0000000000000000003 /* DeeDock/Dock/Gravity/StackGravityRepository.swift */,
+				DE34F0000000000000000004 /* DeeDock/Dock/Gravity/StackGravityStore.swift */,
 				AC7200000000000000000002 /* DeeDock/Dock/Focus/FocusSession.swift */,
 				AC7100000000000000000002 /* DeeDock/Dock/Actions/ActionTile.swift */,
 				DEE250000000000000000011 /* DeeDock/Dock/Watch/Presets/WindowWatchPreset.swift */,
@@ -697,6 +709,10 @@
 				DE36B0000000000000000003 /* DeeDock/Dock/History/DockLocalHistoryStore.swift in Sources */,
 				DE36B0000000000000000004 /* DeeDock/Dock/History/DockTimelineController.swift in Sources */,
 				DE36B0000000000000000005 /* DeeDock/Dock/History/DockTimelinePinReplay.swift in Sources */,
+				DE34B0000000000000000001 /* DeeDock/Dock/Gravity/StackGravityPhysics.swift in Sources */,
+				DE34B0000000000000000002 /* DeeDock/Dock/Gravity/StackGravitySettings.swift in Sources */,
+				DE34B0000000000000000003 /* DeeDock/Dock/Gravity/StackGravityRepository.swift in Sources */,
+				DE34B0000000000000000004 /* DeeDock/Dock/Gravity/StackGravityStore.swift in Sources */,
 				AC7200000000000000000001 /* DeeDock/Dock/Focus/FocusSession.swift in Sources */,
 				AC7100000000000000000001 /* DeeDock/Dock/Actions/ActionTile.swift in Sources */,
 				DEE250000000000000000001 /* DeeDock/Dock/Watch/Presets/WindowWatchPreset.swift in Sources */,

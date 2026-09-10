@@ -8,6 +8,8 @@ struct DockContentView: View {
     let selectedTarget: DockEntryID?
     let keyboardFocus: Bool
     let errorMessage: LocalizedStringResource?
+    /// Copy for the last gravity snap on this display; nil when there is nothing to undo.
+    var undoMessage: LocalizedStringResource? = nil
     let interaction: DockInteraction
     let reduceMotion: Bool
     let reduceTransparency: Bool
@@ -17,6 +19,8 @@ struct DockContentView: View {
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
     let dismissError: () -> Void
+    var undo: () -> Void = {}
+    var dismissUndo: () -> Void = {}
 
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollPosition = ScrollPosition(x: 0)
@@ -141,10 +145,13 @@ struct DockContentView: View {
             }
             DockCalloutsView(
                 errorMessage: errorMessage,
+                undoMessage: undoMessage,
                 dragMessage: interaction.dragMessage,
                 layout: layout,
                 interaction: interaction,
-                dismissError: dismissError
+                dismissError: dismissError,
+                undo: undo,
+                dismissUndo: dismissUndo
             )
         }
         .frame(
