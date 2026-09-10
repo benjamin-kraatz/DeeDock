@@ -63,6 +63,20 @@ final class DockStore {
     /// Fired on app click and after a pin click or drop that changed this display's pins.
     @ObservationIgnored var soapBubblePlay: ((String) -> Void)?
 
+    /// Pin IDs parked on a magnetic edge. Those items stay favorites but leave the
+    /// linear dock until the user drops them back onto the glass.
+    var pinIDsHiddenFromDock: Set<String> = [] {
+        didSet {
+            guard pinIDsHiddenFromDock != oldValue else { return }
+            refreshEntries()
+            presentationDidChange?()
+        }
+    }
+
+    /// Called when favorites are inserted or removed so magnetic placements for
+    /// those IDs can be cleared.
+    @ObservationIgnored var willMutateFavoriteIDs: (([String]) -> Void)?
+
     @ObservationIgnored private let history: DockLocalHistoryStore?
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
@@ -147,7 +161,11 @@ final class DockStore {
     }
 
     private func refreshEntries() {
-        var content = DockSectionProjection.entries(items: items, folders: folders, pins: pins,
+        let hidden = pinIDsHiddenFromDock
+        let visiblePins = pins.filter { !hidden.contains($0.id) }
+        let visibleItems = items.filter { !$0.isFavorite || !hidden.contains($0.reference.id) }
+        let visibleFolders = folders.filter { !hidden.contains($0.id) }
+        var content = DockSectionProjection.entries(items: visibleItems, folders: visibleFolders, pins: visiblePins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
                                                   actions: actions?.dockItems ?? [], focus: focusSession?.item,
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
@@ -288,8 +306,13 @@ final class DockStore {
     /// Saves this display's pins; the coordinator refreshes panels only after the write succeeds.
     func toggleFavorite(_ item: DockItem) {
         var pins = profiles.pinLists[displayID] ?? []
-        if pins.contains(where: { $0.application?.id == item.id }) { pins.removeAll { $0.application?.id == item.id } }
-        else { pins.append(.application(item.reference)) }
+        if pins.contains(where: { $0.application?.id == item.id }) {
+            willMutateFavoriteIDs?([item.id])
+            pinIDsHiddenFromDock.remove(item.id)
+            pins.removeAll { $0.application?.id == item.id }
+        } else {
+            pins.append(.application(item.reference))
+        }
         notePinInteraction(item.id, previous: persistedPins, succeeded: savePins(pins))
     }
 
@@ -311,6 +334,8 @@ final class DockStore {
 
     func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
         let previous = persistedPins
+        willMutateFavoriteIDs?(incoming.map(\.id))
+        pinIDsHiddenFromDock.subtract(incoming.map(\.id))
         let succeeded = savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
         if let itemID = incoming.compactMap(\.application?.id).first {
             notePinInteraction(itemID, previous: previous, succeeded: succeeded)
@@ -327,7 +352,24 @@ final class DockStore {
         return pins.indices.contains(index + distance)
     }
 
-    func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
+    func removePin(_ id: String) -> Bool {
+        willMutateFavoriteIDs?([id])
+        pinIDsHiddenFromDock.remove(id)
+        return savePins(pins.filter { $0.id != id })
+    }
+
+    /// Maps a drop index among visible pinned tiles onto the persisted pin list,
+    /// skipping IDs parked off the linear dock.
+    func persistedInsertionIndex(forVisibleIndex visual: Int) -> Int {
+        let hidden = pinIDsHiddenFromDock
+        var visible = 0
+        for (index, pin) in pins.enumerated() {
+            if hidden.contains(pin.id) { continue }
+            if visible == visual { return index }
+            visible += 1
+        }
+        return pins.count
+    }
 
     /// Plays soap-bubble feedback only when the write landed and the pin list actually changed.
     private func notePinInteraction(_ itemID: String, previous: [DockPin], succeeded: Bool) {
@@ -364,6 +406,14 @@ final class DockStore {
             guard let self, session.accepts(token) else { return }
             errorMessage = error
             if error == nil { applicationOpened?() }
+        }
+    }
+
+    /// Artwork for a favorite that may be hidden from the linear dock.
+    func icon(for pin: DockPin) -> NSImage? {
+        switch pin {
+        case .application(let reference): items.first { $0.reference.id == reference.id }?.icon
+        case .folder(let reference): folders.first { $0.reference.id == reference.id }?.icon
         }
     }
 
@@ -420,5 +470,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

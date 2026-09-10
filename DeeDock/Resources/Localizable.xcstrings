@@ -20195,6 +20195,24 @@
         }
       }
     },
+    "settingsFeatureMagneticSubtitle" : {
+      "comment" : "Description of this feature on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pins und Stapel beim Ziehen an Kanten und Nachbarn ausrichten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align pins and stacks to edges and neighbors while dragging."
+          }
+        }
+      }
+    },
     "settingsFeaturePeekSubtitle" : {
       "comment" : "Description of this feature on the Features settings overview.",
       "extractionState" : "manual",
@@ -20292,13 +20310,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Sims Haustier Stimmung Seifenblasen Effekt anheften ablegen"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy sims pet mood soap bubble pin drop click pop"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop"
           }
         }
       }
@@ -20911,6 +20929,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Couldn’t read saved settings. Defaults are being used. Choose Restore Defaults to replace the unreadable settings; your pinned apps will be kept."
+          }
+        }
+      }
+    },
+    "settingsMagneticEdges" : {
+      "comment" : "Settings page title for snapping pins and stacks while dragging.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magnetische Kanten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magnetic Edges"
+          }
+        }
+      }
+    },
+    "settingsMagneticEdgesHelp" : {
+      "comment" : "Footnote under the Magnetic Edges settings card. Explains snap, park-on-release, return-to-dock, and Option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Ziehen eines Pins oder Stapels rastet er an Bildschirmkanten und anderen Pins oder Stapeln ein. Loslassen bei sichtbaren Hilfslinien heftet ihn dort an. Ziehe ihn zurück auf das Dock, um ihn wieder einzureihen. Halte die Wahltaste, um frei zu ziehen oder zu lösen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While you drag a pin or stack, it snaps to screen edges and other pins or stacks. Release while guide lines are visible to park it there. Drag it back onto the dock to return it. Hold Option to drag freely or unpin."
+          }
+        }
+      }
+    },
+    "settingsMagneticEdgesKeywords" : {
+      "comment" : "Space-separated search synonyms for magnetic edges.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "magnet magnetisch einrasten ausrichten Hilfslinie Kante Nachbar Wahltaste frei ziehen Snap heften parken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "magnet magnetic snap align guide edge peer neighbor option alt free drag park attach"
+          }
+        }
+      }
+    },
+    "settingsMagneticEdgesSubtitle" : {
+      "comment" : "Secondary line under the snap-while-dragging toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wahltaste hebt das Einrasten für diesen Zug auf."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Option disables snapping for that drag."
+          }
+        }
+      }
+    },
+    "settingsMagneticEdgesToggle" : {
+      "comment" : "Toggle that enables edge and peer magnetism while dragging pins or stacks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Ziehen einrasten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snap while dragging"
           }
         }
       }

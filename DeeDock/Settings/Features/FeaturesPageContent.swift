@@ -62,6 +62,8 @@ struct FeaturesPageContent: View {
                 DockTimelineSettingsCard(history: coordinator.localHistory,
                                          browse: { coordinator.browseLocalHistory() })
             }
+        case .magneticEdges:
+            MagneticEdgesSettingsCard(source: source, locked: locked)
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)
