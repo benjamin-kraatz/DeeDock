@@ -51,7 +51,8 @@ final class DockMagneticGuideController {
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
         // Sit just under the native drag image so guides never steal the icon or the pointer.
-        panel.level = NSWindow.Level(rawValue: NSWindow.Level.dragging.rawValue - 1)
+        let draggingLevel = Int(CGWindowLevelForKey(.draggingWindow))
+        panel.level = NSWindow.Level(rawValue: draggingLevel - 1)
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenAuxiliary]
         self.panel = panel
         return panel

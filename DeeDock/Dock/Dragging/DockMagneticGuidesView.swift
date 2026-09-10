@@ -122,7 +122,6 @@ private struct GuidePreviewDesktop<Content: View>: View {
             ],
             canvasSize: CGSize(width: 400, height: 300)
         )
-        .environment(\.accessibilityReduceTransparency, true)
     }
 }
 
