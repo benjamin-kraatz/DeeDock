@@ -168,6 +168,9 @@ private struct DockTimelineGlanceCard: View {
                 Text(event.glanceTitle)
                     .font(.callout.weight(.semibold))
                     .lineLimit(2)
+                    .contentTransition(.numericText())
+                    .animation(.default, value: event.glanceTitle)
+
                 Spacer(minLength: 8)
                 Button(.timelineClose, action: end)
                     .controlSize(.small)
@@ -175,6 +178,8 @@ private struct DockTimelineGlanceCard: View {
             Text(event.occurredAt, format: .relative(presentation: .named))
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .contentTransition(.numericText())
+                .animation(.default, value: event.occurredAt)
             Text(.timelineScrubHint)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
