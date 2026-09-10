@@ -341,8 +341,8 @@ struct DockLocalHistoryTests {
                                             displayID: "display.primary") == [safari.id])
     }
 
-    @Test("Pin reconstruction stays on the browsed display")
-    func reconstructIgnoresOtherDisplays() {
+    @Test("A selected event's snapshot is used even when it was recorded on another display")
+    func reconstructUsesEventSnapshotAcrossDisplays() {
         let safari = pin("safari")
         let mail = pin("mail")
         let onPrimary = DockLocalHistoryEvent(
@@ -355,9 +355,20 @@ struct DockLocalHistoryTests {
         )
         let events = [onPrimary, onOther]
         #expect(DockTimelinePinReplay.pinIDs(at: 1, events: events, currentIDs: [safari.id],
-                                            displayID: "display.primary") == [safari.id])
+                                            displayID: "display.primary") == [mail.id])
         #expect(DockTimelinePinReplay.pinIDs(at: 1, events: events, currentIDs: [mail.id],
                                             displayID: "display.other") == [mail.id])
+    }
+
+    @Test("Move-only history without snapshots keeps the live pin order")
+    func reconstructUnknownMovesKeepCurrent() {
+        let moved = DockLocalHistoryEvent(
+            id: UUID(), occurredAt: Date(timeIntervalSince1970: 1), kind: .pinMoved,
+            displayID: "display.primary", subjectID: pin("safari").id
+        )
+        let current = [pin("safari").id, pin("mail").id]
+        #expect(DockTimelinePinReplay.pinIDs(at: 0, events: [moved], currentIDs: current,
+                                            displayID: "display.primary") == current)
     }
 
     @Test("Timeline preview does not persist pins or record new history")
@@ -418,26 +429,27 @@ struct DockLocalHistoryTests {
         timeline.begin(on: "display.primary", currentPins: current, archive: history.pinArchive)
         timeline.nudge(by: -1)
         #expect(applied.isEmpty)
-        #expect(timeline.replayPending)
+        #expect(!timeline.replayPending)
         try await Task.sleep(for: .milliseconds(80))
         #expect(applied.isEmpty)
         #expect(!timeline.isReplayingPins)
 
         history.setReplayEnabled(true)
         timeline.begin(on: "display.primary", currentPins: current, archive: history.pinArchive)
-        timeline.nudge(by: -1)
+        timeline.update(progress: 0)
         #expect(applied.isEmpty)
+        #expect(timeline.replayPending)
         try await Task.sleep(for: .milliseconds(80))
         #expect(applied == [[pin("one").id]])
         #expect(timeline.isReplayingPins)
 
+        applied = []
         timeline.nudge(by: 1)
-        try await Task.sleep(for: .milliseconds(80))
-        #expect(applied == [[pin("one").id], [pin("one").id, pin("two").id]])
+        #expect(applied == [[pin("one").id, pin("two").id]])
 
         applied = []
-        timeline.nudge(by: -1)
-        timeline.nudge(by: 1)
+        timeline.update(progress: 0)
+        timeline.update(progress: 1)
         try await Task.sleep(for: .milliseconds(80))
         #expect(applied.isEmpty)
 

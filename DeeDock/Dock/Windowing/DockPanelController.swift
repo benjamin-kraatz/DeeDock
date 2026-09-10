@@ -143,18 +143,23 @@ final class DockPanelController {
         // A mouse-up can occur while asleep or during display reconfiguration; do not retain a stale hold.
         if resetVisibility && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
         let reference = DockGeometry.referenceFrame(screenFrame: display.frame, visibleFrame: display.visibleFrame, settings: settings)
+        let timelineCallout = interaction.timeline?.isActive(on: store.displayID) == true
+            ? (settings.edge.isVertical ? 260 : 168)
+            : nil
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
                                          utilityCount: store.entries.filter(\.isUtility).count - (settings.launcherAtStart ? 1 : 0),
                                          leadingUtilityCount: settings.launcherAtStart ? 1 : 0,
                                          availableLength: settings.edge.length(of: reference.size),
-                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings)
+                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings,
+                                         calloutReserve: timelineCallout)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                  utilityCount: slots.filter(\.isUtility).count - (settings.launcherAtStart ? 1 : 0),
                                                  leadingUtilityCount: settings.launcherAtStart ? 1 : 0,
                                                  availableLength: settings.edge.length(of: reference.size),
-                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings)
+                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings,
+                                         calloutReserve: timelineCallout)
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
         let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
@@ -197,7 +202,11 @@ final class DockPanelController {
         // magnification and hover without changing the dock's visible hold region.
         // Timeline scrub keeps the resting axis stable, so magnification is suppressed.
         interaction.setPointer(inside && !popoverHeld && !modePickerHeld && !timelineHeld ? sample.inverse(point) : nil)
-        if timelineHeld, inside || mouseHeld {
+        // Scrub only on the glass, and only from real pointer events. The glance card is a
+        // rest area: mapping its X/Y onto the axis jumped the playhead and cancelled pin dwell.
+        // Geometry-only refresh (apply preview, catalog) must not rematerialize the playhead.
+        let onGlanceCard = !interaction.errorRect.isEmpty && sample.paintedRect(interaction.errorRect).contains(point)
+        if timelineHeld, eventType != nil, (inside || mouseHeld), !onGlanceCard {
             let dockPoint = sample.inverse(point)
             let edge = interaction.layout.edge
             let rect = interaction.surfaceRect
@@ -528,6 +537,12 @@ final class DockPanelController {
     func closeLauncher() { launcherPresentation.close(animated: false, restoreFocus: false) }
 
     func owns(_ window: NSWindow?) -> Bool { window === panel }
+    /// Rebuilds the panel envelope after timeline browsing starts or ends so the glance card fits.
+    func refreshLayout() {
+        guard let display = lastDisplay, let settings = lastSettings else { return }
+        update(display: display, settings: settings)
+    }
+
     func focus() {
         launcherPresentation.close(animated: false, restoreFocus: false)
         store.keyboardFocus = true

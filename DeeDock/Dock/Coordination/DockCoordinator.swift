@@ -114,7 +114,10 @@ final class DockCoordinator {
         localHistory.replayEnabledDidChange = { [weak self] in
             self?.timeline.replayPreferenceDidChange()
         }
-        timeline.onEnd = { [weak self] in self?.endFocus(restore: true) }
+        timeline.onEnd = { [weak self] in
+            self?.panels.values.forEach { $0.refreshLayout() }
+            self?.endFocus(restore: true)
+        }
     }
 
     func start() {
@@ -624,6 +627,7 @@ final class DockCoordinator {
         focusedID = id
         let pins = panels[id]?.store.persistedPins ?? []
         timeline.begin(on: id, currentPins: pins, archive: localHistory.pinArchive)
+        panels[id]?.refreshLayout()
         panels[id]?.focus()
     }
 

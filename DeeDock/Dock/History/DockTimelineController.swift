@@ -93,7 +93,7 @@ final class DockTimelineController {
         let current = DockTimelineMapping.eventIndex(at: progress, in: events) ?? events.count - 1
         let next = min(events.count - 1, max(0, current + step))
         progress = DockTimelineMapping.progress(for: events[next], in: events)
-        schedulePreviewIfNeeded()
+        schedulePreviewIfNeeded(immediate: true)
     }
 
     func end() {
@@ -151,9 +151,9 @@ final class DockTimelineController {
         pinLookup = DockTimelinePinReplay.lookup(archive: archive, current: currentPins)
     }
 
-    /// Applies pins only after the playhead stays on one event. Pointer motion on the same
-    /// event does not restart the timer, so dragging does not thrash the dock.
-    private func schedulePreviewIfNeeded() {
+    /// Applies pins after the playhead stays on one event, or immediately for keyboard nudges.
+    /// Pointer motion on the same event does not restart the timer.
+    private func schedulePreviewIfNeeded(immediate: Bool = false) {
         guard isActive, history.replayEnabled, displayID != nil else {
             cancelDwell()
             replayPending = false
@@ -174,20 +174,25 @@ final class DockTimelineController {
             replayPending = false
             return
         }
+        if immediate {
+            cancelDwell()
+            applySettledPreview(eventID: event.id)
+            return
+        }
         if pendingEventID == event.id { return }
         dwellTask?.cancel()
         pendingEventID = event.id
         replayPending = true
         let eventID = event.id
         let dwell = previewDwell
-        dwellTask = Task { @concurrent in
+        dwellTask = Task { @MainActor [weak self] in
             do {
                 try await Task.sleep(for: dwell)
             } catch {
                 return
             }
             guard !Task.isCancelled else { return }
-            await applySettledPreview(eventID: eventID)
+            self?.applySettledPreview(eventID: eventID)
         }
     }
 
@@ -202,7 +207,14 @@ final class DockTimelineController {
             replayPending = false
             return
         }
-        applyPreview?(displayID, ids.compactMap { pinLookup[$0] })
+        let pins = ids.compactMap { pinLookup[$0] }
+        // Unknown IDs are dropped. An empty result that was not an explicit empty snapshot
+        // would wipe the dock, so keep the current pins instead.
+        if pins.isEmpty, !ids.isEmpty {
+            replayPending = false
+            return
+        }
+        applyPreview?(displayID, pins)
         lastAppliedIDs = ids
         replayPending = false
         isReplayingPins = true

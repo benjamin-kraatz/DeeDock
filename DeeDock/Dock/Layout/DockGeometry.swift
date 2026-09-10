@@ -26,15 +26,17 @@ enum DockGeometry {
         let itemSpacing: CGFloat
         let edge: DockEdge
         let availableDepth: CGFloat
+        /// Inward space reserved for labels, errors, and the timeline glance card.
+        let calloutReserve: CGFloat
         /// Stable envelope accommodates the largest icon, running indicator, and hover label.
         var panelDepth: CGFloat {
-            // The 72 points reserve room for the hover label inward of the glass or a raised icon.
-            // Increasing the inner padding must not clip either in the transparent panel envelope.
+            // Horizontal docks keep 72 points for hover labels. Timeline browsing raises that so
+            // the glance card stays inside the transparent panel instead of clipping at the top.
             let contentHeight = max(surfaceDepth, ceil(iconSize * magnification)
                                     + DockGeometry.crossPadding + DockGeometry.indicatorAreaDepth)
             return edge.isVertical
-                ? min(availableDepth, contentHeight + DockGeometry.outerMargin + 260)
-                : max(128, contentHeight + DockGeometry.outerMargin + 72)
+                ? min(availableDepth, contentHeight + DockGeometry.outerMargin + calloutReserve)
+                : max(128, contentHeight + DockGeometry.outerMargin + calloutReserve)
         }
         /// Resting glass thickness. Magnification never changes it.
         var surfaceDepth: CGFloat {
@@ -126,7 +128,9 @@ enum DockGeometry {
     ///   - availableLength: Chosen reference frame length along the selected edge, in logical points.
     ///   - availableDepth: Reference frame dimension perpendicular to the selected edge.
     ///   - settings: Requested appearance; invalid values fall back to defaults.
-    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults) -> Layout {
+    ///   - calloutReserve: Override the inward label band. Timeline browsing passes a taller
+    ///     reserve so the glance card is not clipped by the panel envelope.
+    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults, calloutReserve: CGFloat? = nil) -> Layout {
         let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableLength - 16)
         let utilityCount = min(max(0, utilityCount), count)
@@ -145,10 +149,11 @@ enum DockGeometry {
         // so two extra icon widths cover the supported maximum 2× scale, including the spring.
         let canvas = restingWidth + size * 2
         let viewport = min(viewportLimit, canvas)
-        let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), viewportLength: viewport, canvasLength: canvas,
+        let reserve = calloutReserve ?? (settings.edge.isVertical ? 260 : 72)
+        let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), calloutReserve: reserve, viewportLength: viewport, canvasLength: canvas,
                              restingCenters: [], separatorIndices: separators)
         let centers = initial.centers(sizes: Array(repeating: size, count: count))
-        return Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), viewportLength: viewport, canvasLength: canvas,
+        return Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), calloutReserve: reserve, viewportLength: viewport, canvasLength: canvas,
                       restingCenters: centers, separatorIndices: separators)
     }
 }
