@@ -60,6 +60,8 @@ final class DockStore {
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
+    /// Fired after a successful pin click or drop that changed this display's pins.
+    @ObservationIgnored var pinInteraction: ((String) -> Void)?
 
     @ObservationIgnored private let history: DockLocalHistoryStore?
 
@@ -288,7 +290,7 @@ final class DockStore {
         var pins = profiles.pinLists[displayID] ?? []
         if pins.contains(where: { $0.application?.id == item.id }) { pins.removeAll { $0.application?.id == item.id } }
         else { pins.append(.application(item.reference)) }
-        _ = savePins(pins)
+        notePinInteraction(item.id, previous: persistedPins, succeeded: savePins(pins))
     }
 
     /// Persists one completed edit. Preview state must never call this method.
@@ -308,7 +310,12 @@ final class DockStore {
     }
 
     func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
-        savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        let previous = persistedPins
+        let succeeded = savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        if let itemID = incoming.compactMap(\.application?.id).first {
+            notePinInteraction(itemID, previous: previous, succeeded: succeeded)
+        }
+        return succeeded
     }
 
     func movePin(_ id: String, by distance: Int) {
@@ -321,6 +328,12 @@ final class DockStore {
     }
 
     func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
+
+    /// Plays soap-bubble feedback only when the write landed and the pin list actually changed.
+    private func notePinInteraction(_ itemID: String, previous: [DockPin], succeeded: Bool) {
+        guard succeeded, persistedPins != previous else { return }
+        pinInteraction?(itemID)
+    }
 
     func setFolderPresentation(_ presentation: FolderStackPresentation, for id: UUID) -> Bool {
         if id == DownloadsDockItem.id {
@@ -406,5 +419,5 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; pinInteraction = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

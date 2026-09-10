@@ -393,6 +393,12 @@ final class DockCoordinator {
                 self?.windowPeeks.close(returnFocus: false)
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
             }
+            store.pinInteraction = { [weak panel] itemID in
+                panel?.interaction.soapBubbles.play(
+                    itemID: itemID,
+                    reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+                )
+            }
             panel.connectDragging(dragging)
             panel.interaction.openFiles = { [weak self, weak panel] item in
                 guard let self, let panel else { return }

@@ -124,6 +124,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.windowPeekIncludeMinimized = defaults.windowPeekIncludeMinimized
         result.windowPeekIncludeUntitled = defaults.windowPeekIncludeUntitled
         result.windowPeekHoverDelay = defaults.windowPeekHoverDelay
+        result.soapBubbleEffects = defaults.soapBubbleEffects
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground
         result.backgroundOpacity = backgroundOpacity ?? defaults.backgroundOpacity

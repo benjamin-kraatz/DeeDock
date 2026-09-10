@@ -17,6 +17,7 @@ struct DockSettingsTests {
         #expect(settings.windowPeekLayout == .grid)
         #expect(settings.windowPeekStyle == .glass)
         #expect(settings.windowPeekHoverDelay == 0.4)
+        #expect(!settings.soapBubbleEffects)
     }
 
     @Test("Launch animation settings migrate, round-trip, and resume inheritance")
