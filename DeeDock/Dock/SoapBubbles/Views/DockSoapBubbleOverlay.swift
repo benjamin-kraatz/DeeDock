@@ -319,12 +319,10 @@ private enum DockSoapBubbleOverlayPreview {
 
 #Preview("Reduce Motion, empty") {
     DockSoapBubbleOverlayPreview.stage(enabled: true)
-        .environment(\.accessibilityReduceMotion, true)
 }
 
 #Preview("Reduce Transparency") {
     DockSoapBubbleOverlayPreview.stage(enabled: true)
-        .environment(\.accessibilityReduceTransparency, true)
 }
 
 #Preview("Light appearance") {
