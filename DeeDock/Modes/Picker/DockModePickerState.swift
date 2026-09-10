@@ -7,6 +7,7 @@ final class DockModePickerState {
     let activeModeID: UUID
     var selectedID: UUID?
     @ObservationIgnored var choose: ((UUID) -> Void)?
+    @ObservationIgnored var prepare: ((UUID) -> Void)?
 
     init(modes: [DockMode], activeModeID: UUID) {
         self.modes = modes
@@ -23,5 +24,10 @@ final class DockModePickerState {
     func chooseSelection() {
         guard let selectedID else { return }
         choose?(selectedID)
+    }
+
+    func prepareSelection() {
+        guard let selectedID else { return }
+        prepare?(selectedID)
     }
 }

@@ -102,25 +102,58 @@ final class ActionTilesController {
     /// Runs only after a click, keyboard action, or accepted drop. No uncertain run is retried.
     @discardableResult
     func run(_ id: UUID, files: DocumentResourceAccess? = nil, finished: (() -> Void)? = nil) -> Bool {
-        guard tiles.contains(where: { $0.id == id }), runs[id] == nil else { return false }
+        tiles.contains(where: { $0.id == id }) && start(id, files: files) { _ in finished?() }
+    }
+
+    /// One explicit run of a configured Shortcut ID. The Shortcut need not be pinned.
+    /// A second overlapping run of the same identifier is rejected and never retried.
+    func runConfigured(_ id: UUID) async -> Result<Void, Error> {
+        await withCheckedContinuation { continuation in
+            guard start(id, completion: { result in
+                continuation.resume(returning: result.map { _ in () })
+            }) else {
+                continuation.resume(returning: .failure(CocoaError(.coderInvalidValue)))
+                return
+            }
+        }
+    }
+
+    func knownShortcutName(for id: UUID) -> String? {
+        tiles.first { $0.id == id }?.name ?? available.first { $0.id == id }?.name
+    }
+
+    func knowsShortcut(_ id: UUID) -> Bool {
+        tiles.contains { $0.id == id } || available.contains { $0.id == id }
+    }
+
+    @discardableResult
+    private func start(_ id: UUID, files: DocumentResourceAccess? = nil,
+                       completion: @escaping (Result<String, Error>) -> Void) -> Bool {
+        guard runs[id] == nil else { return false }
         let job = ShortcutProcess()
-        runs[id] = job; statuses[id] = .running; changed?()
+        runs[id] = job
+        if tiles.contains(where: { $0.id == id }) { statuses[id] = .running }
+        changed?()
         var arguments = ["run", id.uuidString]
         if let files, !files.urls.isEmpty { arguments += ["--input-path"] + files.urls.map(\.path) }
         job.start(arguments: arguments) { [weak self] result in
             // File access outlives the helper's completion, including errors and cancellation.
             defer { withExtendedLifetime(files) {} }
-            guard let self else { return }
+            guard let self else {
+                completion(result)
+                return
+            }
             runs[id] = nil
             switch result {
-            case .success: statuses[id] = .succeeded
+            case .success:
+                if tiles.contains(where: { $0.id == id }) { statuses[id] = .succeeded }
             case .failure(let error):
                 let message = error is CancellationError ? String(localized: .actionsCancelled) : error.localizedDescription
-                statuses[id] = .failed(message)
+                if tiles.contains(where: { $0.id == id }) { statuses[id] = .failed(message) }
                 self.error = message
             }
             changed?()
-            finished?()
+            completion(result)
         }
         return true
     }

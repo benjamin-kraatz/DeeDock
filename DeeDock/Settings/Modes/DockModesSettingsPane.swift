@@ -7,6 +7,10 @@ struct DockModesSettingsPane: View {
     var deleteMode: ((UUID) -> Bool)?
     var startFocus: ((DockMode) -> Void)?
     var canStartFocus = false
+    var applications: (any ApplicationServicing)?
+    var actions: ActionTilesController?
+    var prepareWorkspace: ((DockMode) -> Void)?
+    var canPrepareWorkspace = false
     @State private var draftName = ""
     @State private var namingAction: NamingAction?
     @State private var deletingMode: DockMode?
@@ -35,7 +39,19 @@ struct DockModesSettingsPane: View {
                     VStack(spacing: 0) {
                         ForEach(Array(store.modes.enumerated()), id: \.element.id) { index, mode in
                             if index > 0 { Divider().padding(.leading, 38) }
-                            modeRow(mode, index: index)
+                            VStack(alignment: .leading, spacing: 8) {
+                                modeRow(mode, index: index)
+                                DisclosureGroup {
+                                    WorkspaceRecipeEditor(mode: mode, store: store, applications: applications,
+                                                          actions: actions,
+                                                          prepare: prepareWorkspace.map { prepare in { prepare(mode) } },
+                                                          canPrepare: canPrepareWorkspace)
+                                } label: {
+                                    Text(mode.hasRecipe ? .recipeTitle : .recipeEmpty)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
                         }
                     }
                 }
@@ -75,6 +91,11 @@ struct DockModesSettingsPane: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer(minLength: 10)
+            if let prepareWorkspace, mode.hasRecipe {
+                Button(.recipeTitle, systemImage: "briefcase") { prepareWorkspace(mode) }
+                    .labelStyle(.iconOnly).disabled(!canPrepareWorkspace)
+                    .help(Text(.recipePrepareHelp))
+            }
             if let startFocus {
                 Button(.focusStart, systemImage: "timer") { startFocus(mode) }
                     .labelStyle(.iconOnly).disabled(!canStartFocus)
@@ -159,6 +180,11 @@ private enum DockModesPreview {
                           legacyVisibilityOverrides: [:])
         _ = store.duplicateActive(named: longNames ? "A carefully arranged presentation workspace" : "Work")
         _ = store.duplicateActive(named: longNames ? "Writing without notifications or distractions" : "Writing")
+        if let work = store.modes.first(where: { $0.name == "Work" || $0.name.hasPrefix("A carefully") }) {
+            _ = store.updateRecipe(work.id, WorkspaceRecipe(steps: [
+                .link(id: UUID(), url: "https://example.com")
+            ]))
+        }
         return store
     }
 

@@ -25,6 +25,12 @@ struct DockModesMenu: View {
                     Button(mode.name) { coordinator.startFocus(mode) }
                 }
             }.disabled(!coordinator.canStartFocus)
+            Menu(.recipeMenuTitle) {
+                ForEach(coordinator.profiles.modes.modes) { mode in
+                    Button(mode.name) { coordinator.prepareWorkspace(mode) }
+                        .disabled(!mode.hasRecipe)
+                }
+            }
             Divider()
             if let previous = coordinator.profiles.modes.previousMode {
                 Button(.dockModesPrevious(modeName: previous.name)) { _ = coordinator.activatePreviousMode() }

@@ -10,6 +10,7 @@
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */; };
 		AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */; };
+		DE21B0000000000000000001 /* DeeDock/Modes/Models/WorkspaceRecipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE21F0000000000000000001 /* DeeDock/Modes/Models/WorkspaceRecipe.swift */; };
 		AB0100000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */; };
 		AB0100000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift */; };
 		AB0100000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0200000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift */; };
@@ -147,6 +148,7 @@
 		525BD98535225C6EE024849D /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Settings/Models/WindowPeekSettings.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Models/DockMode.swift; sourceTree = SOURCE_ROOT; };
+		DE21F0000000000000000001 /* DeeDock/Modes/Models/WorkspaceRecipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Models/WorkspaceRecipe.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Persistence/DockModesRepository.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/State/DockModesStore.swift; sourceTree = SOURCE_ROOT; };
 		AB0200000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Modes/Picker/DockModePickerGeometry.swift; sourceTree = SOURCE_ROOT; };
@@ -368,6 +370,7 @@
 				DEE8F0000000000000000004 /* DeeDock/Launcher/Windowing/LauncherGeometry.swift */,
 				AB0200000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift */,
 				AB0200000000000000000001 /* DeeDock/Modes/Models/DockMode.swift */,
+				DE21F0000000000000000001 /* DeeDock/Modes/Models/WorkspaceRecipe.swift */,
 				AB0200000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift */,
 				AB0200000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift */,
 				AB0200000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift */,
@@ -643,6 +646,7 @@
 				DEE8B0000000000000000004 /* DeeDock/Launcher/Windowing/LauncherGeometry.swift in Sources */,
 				AB0100000000000000000000 /* DeeDock/Settings/Models/WindowPeekSettings.swift in Sources */,
 				AB0100000000000000000001 /* DeeDock/Modes/Models/DockMode.swift in Sources */,
+				DE21B0000000000000000001 /* DeeDock/Modes/Models/WorkspaceRecipe.swift in Sources */,
 				AB0100000000000000000002 /* DeeDock/Modes/Persistence/DockModesRepository.swift in Sources */,
 				AB0100000000000000000003 /* DeeDock/Modes/State/DockModesStore.swift in Sources */,
 				AB0100000000000000000004 /* DeeDock/Modes/Picker/DockModePickerGeometry.swift in Sources */,

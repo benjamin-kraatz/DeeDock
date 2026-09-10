@@ -7,18 +7,51 @@ struct DockModeDisplayConfiguration: Codable, Equatable {
 }
 
 /// A named configuration applied to every display in one switch.
-struct DockMode: Codable, Equatable, Identifiable {
+struct DockMode: Equatable, Identifiable {
     let id: UUID
     var name: String
     var appVisibility: DockAppVisibility
     var displays: [String: DockModeDisplayConfiguration]
+    /// Optional ordered prepare steps. Ordinary activation never runs them.
+    var recipe: WorkspaceRecipe
 
     init(id: UUID = UUID(), name: String, appVisibility: DockAppVisibility = .showAll,
-         displays: [String: DockModeDisplayConfiguration] = [:]) {
+         displays: [String: DockModeDisplayConfiguration] = [:],
+         recipe: WorkspaceRecipe = .empty) {
         self.id = id
         self.name = name
         self.appVisibility = appVisibility
         self.displays = displays
+        self.recipe = recipe.sanitized
+    }
+
+    var hasRecipe: Bool { !recipe.isEmpty }
+}
+
+extension DockMode: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case id, name, appVisibility, displays, recipe
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        appVisibility = try container.decode(DockAppVisibility.self, forKey: .appVisibility)
+        displays = try container.decode([String: DockModeDisplayConfiguration].self, forKey: .displays)
+        // A corrupt recipe must not lock pins or visibility. Missing recipes stay empty.
+        recipe = ((try? container.decodeIfPresent(WorkspaceRecipe.self, forKey: .recipe)) ?? .empty).sanitized
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(appVisibility, forKey: .appVisibility)
+        try container.encode(displays, forKey: .displays)
+        if !recipe.isEmpty {
+            try container.encode(recipe.sanitized, forKey: .recipe)
+        }
     }
 }
 
@@ -46,7 +79,7 @@ struct DockModesDocument: Codable, Equatable {
             guard previousModeID != activeModeID, modes.contains(where: { $0.id == previousModeID }) else { return false }
         }
         return modes.allSatisfy { mode in
-            mode.displays.allSatisfy { id, configuration in
+            mode.recipe.isPersistable && mode.displays.allSatisfy { id, configuration in
                 id.hasPrefix("display.") && DockPinEditing.unique(configuration.pins) == configuration.pins
             }
         }
