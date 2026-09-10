@@ -1,7 +1,7 @@
 import Foundation
 
 /// Bounds for unused-pin weather. The look is polish, so the threshold stays in days, not hours.
-enum PinWeatherLimits {
+nonisolated enum PinWeatherLimits {
     /// Inclusive unused-day range offered in Settings.
     static let unusedDays = 1...90
     /// Factory default: rust starts after a month of leaving a pin untouched.
