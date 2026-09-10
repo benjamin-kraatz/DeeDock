@@ -57,6 +57,11 @@ struct FeaturesPageContent: View {
                 LauncherSuggestionsSettingsView(store: coordinator.launcherSuggestions,
                                                 applications: coordinator.launcherApplications)
             }
+        case .localHistory:
+            if let coordinator = context.coordinator {
+                DockTimelineSettingsCard(history: coordinator.localHistory,
+                                         browse: { coordinator.browseLocalHistory() })
+            }
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)

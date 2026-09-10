@@ -36,22 +36,44 @@ struct DockView: View {
         let size = interaction.layout.viewportSize
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
                                                   size: size, reduceMotion: reduceMotion, edge: interaction.layout.edge)
-        DockContentView(
-            items: store.items,
-            entries: store.entries,
-            launchingIDs: store.launching,
-            selectedTarget: store.selectedTarget,
-            keyboardFocus: store.keyboardFocus,
-            errorMessage: store.errorMessage,
-            interaction: interaction,
-            reduceMotion: reduceMotion,
-            reduceTransparency: reduceTransparency,
-            drawsBackground: drawsBackground,
-            primaryAppAction: store.performPrimaryAction,
-            openApp: store.open,
-            togglePin: store.toggleFavorite,
-            dismissError: { store.errorMessage = nil }
-        )
+        // The dock clone inside the launcher is inert artwork, so history browsing stays with the
+        // real dock. Both layers share the viewport, and the presentation transform below moves
+        // them together, which keeps the track over the glass it measures.
+        let timeline = drawsBackground ? interaction.timeline : nil
+        ZStack(alignment: .topLeading) {
+            DockContentView(
+                items: store.items,
+                entries: store.entries,
+                launchingIDs: store.launching,
+                selectedTarget: store.selectedTarget,
+                keyboardFocus: store.keyboardFocus,
+                errorMessage: store.errorMessage,
+                interaction: interaction,
+                reduceMotion: reduceMotion,
+                reduceTransparency: reduceTransparency,
+                drawsBackground: drawsBackground,
+                primaryAppAction: store.performPrimaryAction,
+                openApp: store.open,
+                togglePin: store.toggleFavorite,
+                dismissError: { store.errorMessage = nil }
+            )
+            if let timeline, timeline.isActive(on: store.displayID) {
+                DockTimelineOverlay(
+                    presentation: timeline.presentation,
+                    layout: interaction.layout,
+                    scrollOffset: interaction.scrollOffset,
+                    end: { timeline.end() },
+                    // The panel accepts mouse events only over reported regions. The glance card
+                    // borrows the callout region so Done stays clickable; an error banner owns the
+                    // same region, and it wins because a failure must remain dismissable.
+                    calloutRectChanged: { rect in
+                        guard store.errorMessage == nil else { return }
+                        interaction.errorRect = rect
+                    }
+                )
+            }
+        }
+        .frame(width: size.width, height: size.height, alignment: .topLeading)
         .id(interaction.layout.edge.isVertical)
         .modifier(DockPresentationModifier(sample: sample, size: size))
         .accessibilityHidden(!visibility.exposesContent)

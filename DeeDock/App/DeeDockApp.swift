@@ -34,6 +34,8 @@ struct DeeDockApp: App {
         MenuBarExtra {
             Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
+            Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
+                .disabled(!delegate.coordinator.canBrowseLocalHistory)
             Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
 
             Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
@@ -69,6 +71,8 @@ struct DeeDockApp: App {
                     .keyboardShortcut("f", modifiers: [.command, .shift])
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
+                Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
+                    .disabled(!delegate.coordinator.canBrowseLocalHistory)
             }
         }
         Window(Text(.actionSettings), id: "settings") {
