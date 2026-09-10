@@ -233,8 +233,8 @@ final class WorkspaceRecipeCoordinator {
     }
 
     private func runShortcut(_ id: UUID) async -> Outcome {
-        if actions.available.isEmpty == false || actions.tiles.isEmpty == false,
-           actions.knowsShortcut(id) == false, !actions.available.isEmpty {
+        // Prepare does not start discovery. A missing ID fails only after a list attempt has finished.
+        if actions.discovered, !actions.knowsShortcut(id) {
             return .failed(.recipeShortcutMissing)
         }
         runningShortcutID = id

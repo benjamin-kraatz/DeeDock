@@ -103,11 +103,7 @@ struct WindowWatchCompletionSetupView: View {
                         .disabled(actions.loading)
                     if actions.loading { ProgressView().controlSize(.small) }
                 }
-                if actions.available.isEmpty {
-                    Text(.watchActionNoShortcuts)
-                        .font(.caption).foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                } else {
+                if !actions.available.isEmpty {
                     Picker(.watchActionChooseShortcut, selection: shortcutBinding(actions: actions, current: id)) {
                         Text(.watchActionChooseShortcut).tag(Optional<UUID>.none)
                         ForEach(actions.available) { tile in
@@ -115,6 +111,10 @@ struct WindowWatchCompletionSetupView: View {
                         }
                     }
                     .labelsHidden()
+                } else if actions.discovered, !actions.loading {
+                    Text(.watchActionNoShortcuts)
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 if let error = actions.error {
                     Text(verbatim: error).font(.caption).foregroundStyle(.red).textSelection(.enabled)
@@ -123,6 +123,8 @@ struct WindowWatchCompletionSetupView: View {
                 Text(verbatim: name).font(.callout)
             }
         }
+        // Load when this row appears. Opening the form on No action must not start the Shortcuts CLI.
+        .onAppear { actions?.ensureLoaded() }
     }
 
     private func shortcutBinding(actions: ActionTilesController, current: UUID?) -> Binding<UUID?> {

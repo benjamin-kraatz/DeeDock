@@ -2,7 +2,7 @@
 
 ## DEE-21 workspace recipes
 
-Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.
+Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Installed Shortcuts load when the recipe editor appears; **Reload Shortcuts** remains a manual refresh. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.
 
 `WorkspaceRecipeCoordinator` owns one in-memory run with pending, running, succeeded, failed, skipped, and canceled step states. A failed step stops the sequence; Retry and Skip are explicit. Cancel cannot undo apps or Shortcut effects that already ran. The same recipe cannot overlap. A blocked drag, menu, or file picker is reported before any open. Progress is not persisted and is not replayed after launch. Duplicating a mode copies the recipe and starts no action. Deleting a mode does not delete source files. Focus Session startup is unchanged.
 
@@ -1126,7 +1126,7 @@ Required hands-on acceptance:
 
 ## Action Tiles
 
-Implemented app-wide shortcut pins, explicit discovery, ordering, one active run per tile, file-drop input, and keyboard activation. Pins store stable Shortcuts UUIDs under `dock.action-tiles.v1`. Corrupt or unknown documents block edits until an explicit reset. Execution state is transient and is never replayed after launch. Native source grants are retained until the helper exits. CLI output uses temporary files to avoid pipe backpressure; ordinary shortcut output is discarded, so the shortcut owns saving or displaying results.
+Implemented app-wide shortcut pins, discovery when Action Tiles settings appear, a Reload control, ordering, one active run per tile, file-drop input, and keyboard activation. Pins store stable Shortcuts UUIDs under `dock.action-tiles.v1`. Corrupt or unknown documents block edits until an explicit reset. Execution state is transient and is never replayed after launch. Native source grants are retained until the helper exits. CLI output uses temporary files to avoid pipe backpressure; ordinary shortcut output is discarded, so the shortcut owns saving or displaying results.
 
 Xcode MCP `BuildProject`, with `buildForTesting: false`, built the app successfully with no errors. Shortcut listing was inspected to confirm identifier parsing; no shortcut was executed. No tests or native UI acceptance were run.
 
