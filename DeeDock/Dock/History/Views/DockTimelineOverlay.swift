@@ -84,24 +84,16 @@ struct DockTimelineOverlay: View {
                     .animation(.easeInOut(duration: 0.18), value: event.id)
             }
         }
-        .frame(maxWidth: max(80, region.width - 24), alignment: .leading)
-        .frame(width: max(1, region.width), height: max(1, region.height), alignment: cardAlignment)
+        // Size to the text, then pin the card's center to the callout midpoint so it
+        // sits over the dock. Filling the region with a leading alignment shoved it aside.
+        .frame(maxWidth: min(460, max(80, region.width - 24)))
+        .fixedSize(horizontal: false, vertical: true)
         .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(Self.space))         } action: { rect in
             let visible = rect.intersection(viewport)
             calloutRectChanged?(visible.isNull ? .zero : visible)
         }
         .onDisappear { calloutRectChanged?(.zero) }
         .position(x: region.midX, y: region.midY)
-    }
-
-    /// Sit the card against the glass so extra height grows inward, not off the panel.
-    private var cardAlignment: Alignment {
-        switch edge {
-        case .bottom: .bottom
-        case .top: .top
-        case .left: .leading
-        case .right: .trailing
-        }
     }
 
     /// Local space for reporting the card's bounds; the overlay is a sibling of the dock's own root.
