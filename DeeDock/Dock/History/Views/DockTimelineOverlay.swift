@@ -182,8 +182,15 @@ private struct DockTimelineGlanceCard: View {
                     .animation(.default, value: event.glanceTitle)
 
                 Spacer(minLength: 8)
-                Button(.timelineClose, action: end)
+                Button(.timelineClose, systemImage: "xmark", action: end)
+                    .font(.caption)
+                    .buttonStyle(.plain)
                     .controlSize(.small)
+                    .labelStyle(.iconOnly)
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 2)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 69))
+                    .glassEffect()
             }
             Text(event.occurredAt, format: .relative(presentation: .named))
                 .font(.caption)

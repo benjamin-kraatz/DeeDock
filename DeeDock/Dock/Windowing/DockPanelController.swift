@@ -143,7 +143,7 @@ final class DockPanelController {
         // A mouse-up can occur while asleep or during display reconfiguration; do not retain a stale hold.
         if resetVisibility && NSEvent.pressedMouseButtons == 0 { mouseHeld = false }
         let reference = DockGeometry.referenceFrame(screenFrame: display.frame, visibleFrame: display.visibleFrame, settings: settings)
-        let timelineCallout = interaction.timeline?.isActive(on: store.displayID) == true
+        let timelineCallout: CGFloat? = interaction.timeline?.isActive(on: store.displayID) == true
             ? (settings.edge.isVertical ? 260 : 168)
             : nil
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
