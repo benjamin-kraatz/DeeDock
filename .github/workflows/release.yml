@@ -1,0 +1,219 @@
+# Direct / Sparkle distribution for the DeeDock scheme.
+#
+# Esi (release captain) triggers and watches this workflow:
+#   - Nightly at 23:00 Europe/Berlin (schedule below)
+#   - Explicit ship via workflow_dispatch with intent=ship
+#
+# Nara and other bots do not cut releases, hold Sparkle or signing secrets,
+# or publish GitHub Latest. On failure, Esi opens a high-priority Linear
+# issue on project or label release-pipeline, and may add Bot-Nara once
+# if Nara should fix pipeline code.
+#
+# This file is a placeholder. Signing, notarization, generate_appcast, and
+# GitHub Latest steps are stubs. Do not put secret values in this file.
+# The six repository secrets are APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD,
+# APPLE_TEAM_ID, DEVELOPER_ID_APPLICATION_CERTIFICATE,
+# DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD, and SPARKLE_PRIVATE_ED_KEY.
+# Notarization uses Apple ID plus app-specific password plus team ID.
+# Do not add App Store Connect API keys. TestFlight stays on Xcode Cloud.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      intent:
+        description: watch prints status only. ship is reserved for Esi after secrets and real steps exist.
+        type: choice
+        options:
+          - watch
+          - ship
+        default: watch
+      marketing_version:
+        description: Optional MARKETING_VERSION override such as 0.2.1. Leave empty to read Configuration/App.xcconfig.
+        type: string
+        required: false
+
+  # 23:00 Europe/Berlin every night. The timezone field is IANA, so GitHub
+  # follows Central European Time in winter and Central European Summer Time
+  # in summer. Do not drop timezone. A UTC-only reading of this cron would be
+  # 23:00 UTC, which is 00:00 or 01:00 in Berlin.
+  #
+  # Equivalent UTC hours if timezone support were absent:
+  #   21:00 UTC during CEST (UTC+2), 22:00 UTC during CET (UTC+1).
+  schedule:
+    - cron: "0 23 * * *"
+      timezone: Europe/Berlin
+
+# Later draft GitHub Release, assets, and Latest. Latest publish stays
+# Esi-gated in the ship job even with this permission.
+permissions:
+  contents: write
+
+concurrency:
+  group: ddock-release
+  cancel-in-progress: false
+
+env:
+  # Scheduled runs are always watch. Only Esi dispatches ship.
+  INTENT: ${{ github.event_name == 'workflow_dispatch' && inputs.intent || 'watch' }}
+  XCODE_SCHEME: DeeDock
+  XCODE_PROJECT: DeeDock.xcodeproj
+  SPARKLE_KEYCHAIN_ACCOUNT: de.benjaminkraatz.DeeDock
+
+jobs:
+  release:
+    name: Archive, notarize, and publish
+    # macos-latest is a placeholder. Direct archives need Xcode 27 and a
+    # Developer ID identity. Esi can point this at a self-hosted Mac pool later.
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve versions
+        id: versions
+        env:
+          INPUT_MARKETING_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.marketing_version || '' }}
+        run: |
+          set -eu
+          marketing="$(awk -F ' *= *' '/^MARKETING_VERSION / { print $2; exit }' Configuration/App.xcconfig)"
+          build="$(awk -F ' *= *' '/^CURRENT_PROJECT_VERSION / { print $2; exit }' Configuration/App.xcconfig)"
+          if [ -n "${INPUT_MARKETING_VERSION:-}" ]; then
+            marketing="$INPUT_MARKETING_VERSION"
+          fi
+          echo "marketing_version=$marketing" >> "$GITHUB_OUTPUT"
+          echo "build_number=$build" >> "$GITHUB_OUTPUT"
+          echo "release_tag=v${marketing}" >> "$GITHUB_OUTPUT"
+          echo "Resolved MARKETING_VERSION=$marketing CURRENT_PROJECT_VERSION=$build intent=$INTENT"
+
+      - name: Report required secrets by name
+        env:
+          HAS_APPLE_ID: ${{ secrets.APPLE_ID != '' }}
+          HAS_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD != '' }}
+          HAS_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID != '' }}
+          HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE != '' }}
+          HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD != '' }}
+          HAS_SPARKLE_PRIVATE_ED_KEY: ${{ secrets.SPARKLE_PRIVATE_ED_KEY != '' }}
+        run: |
+          set -eu
+          echo "Secret presence only. Values are never printed."
+          echo "APPLE_ID=$HAS_APPLE_ID"
+          echo "APPLE_APP_SPECIFIC_PASSWORD=$HAS_APPLE_APP_SPECIFIC_PASSWORD"
+          echo "APPLE_TEAM_ID=$HAS_APPLE_TEAM_ID"
+          echo "DEVELOPER_ID_APPLICATION_CERTIFICATE=$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE"
+          echo "DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD=$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD"
+          echo "SPARKLE_PRIVATE_ED_KEY=$HAS_SPARKLE_PRIVATE_ED_KEY"
+          echo "GITHUB_TOKEN is the default token for a later draft release."
+
+      - name: Locate bilingual Sparkle notes
+        env:
+          MARKETING_VERSION: ${{ steps.versions.outputs.marketing_version }}
+        run: |
+          set -eu
+          notes="docs/releases/${MARKETING_VERSION}.md"
+          if [ -f "$notes" ]; then
+            echo "Found $notes"
+            if grep -Eq '^## English$' "$notes"; then
+              echo "English section is present for the later GitHub Release body."
+            else
+              echo "Warning: $notes has no ## English heading. Sparkle notes must be bilingual German and English."
+            fi
+          else
+            echo "Warning: $notes is missing. Add it before a real ship."
+          fi
+
+      - name: Block ship until real steps replace the stubs
+        if: env.INTENT == 'ship'
+        run: |
+          echo "intent=ship is reserved for Esi after the stub steps below are implemented."
+          echo "This placeholder does not archive, notarize, or publish GitHub Latest."
+          exit 1
+
+      - name: Resolve Sparkle tools
+        # TODO(Esi): resolve SourcePackages/artifacts/sparkle/Sparkle/bin after xcodebuild -resolvePackageDependencies.
+        if: false
+        run: echo "TODO resolve SPARKLE_BIN"
+
+      - name: Import Developer ID certificate
+        # TODO(Esi): create a temporary keychain and import DEVELOPER_ID_APPLICATION_CERTIFICATE.
+        # Never echo the certificate or DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD.
+        if: false
+        env:
+          DEVELOPER_ID_APPLICATION_CERTIFICATE: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE }}
+          DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD }}
+        run: echo "TODO import Developer ID Application certificate"
+
+      - name: Archive DeeDock
+        # TODO(Esi): xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Release archive
+        if: false
+        run: echo "TODO archive DeeDock scheme"
+
+      - name: Export Developer ID, notarize, and staple
+        # TODO(Esi): exportArchive with Developer ID options, then
+        # xcrun notarytool submit --apple-id APPLE_ID --password APPLE_APP_SPECIFIC_PASSWORD
+        # --team-id APPLE_TEAM_ID --wait
+        # Do not use an App Store Connect API key. TestFlight stays on Xcode Cloud.
+        # Never echo APPLE_APP_SPECIFIC_PASSWORD.
+        # Staple, then recreate DDock.zip. Never modify the app after the signed archive.
+        if: false
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: echo "TODO export, notarize, staple"
+
+      - name: Verify signature and ticket
+        # TODO(Esi): codesign --verify --deep --strict and xcrun stapler validate
+        if: false
+        run: echo "TODO verify codesign and stapler"
+
+      - name: Package DDock.zip
+        # TODO(Esi): /usr/bin/ditto -c -k --sequesterRsrc --keepParent DDock.app DDock.zip
+        if: false
+        run: echo "TODO package DDock.zip"
+
+      - name: Stage bilingual Sparkle notes
+        # TODO(Esi): copy docs/releases/<version>.md to the staging folder as DDock.md
+        # so generate_appcast embeds German and English notes. GitHub Release body
+        # uses only the English section.
+        if: false
+        run: echo "TODO stage DDock.md beside DDock.zip"
+
+      - name: Generate appcast
+        # TODO(Esi): generate_appcast --ed-key-file from SPARKLE_PRIVATE_ED_KEY
+        # (or --account de.benjaminkraatz.DeeDock on a Keychain-equipped runner)
+        # --download-url-prefix https://github.com/benjamin-kraatz/DeeDock/releases/download/<tag>/
+        # --maximum-deltas 0
+        # Never print SPARKLE_PRIVATE_ED_KEY or the generated EdDSA signature payload.
+        if: false
+        env:
+          SPARKLE_PRIVATE_ED_KEY: ${{ secrets.SPARKLE_PRIVATE_ED_KEY }}
+        run: echo "TODO generate_appcast"
+
+      - name: Open a draft GitHub Release
+        # TODO(Esi): create a draft with English-only body, attach DDock.zip and appcast.xml.
+        # Use GITHUB_TOKEN.
+        if: false
+        run: echo "TODO draft GitHub Release"
+
+      - name: Publish Latest
+        # TODO(Esi): publish the draft as Latest only for intent=ship after asset checks.
+        # Nara and other bots must not run this step.
+        if: false
+        run: echo "TODO publish Latest"
+
+  remind-on-failure:
+    name: Remind Esi to file a Linear issue
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: release
+    steps:
+      - name: Print Linear follow-up
+        run: |
+          echo "The Release workflow failed."
+          echo "Esi: open a high-priority Linear issue on project or label release-pipeline."
+          echo "Add label Bot-Nara once only if Nara should fix pipeline code."
+          echo "Nara does not cut the release or publish GitHub Latest."

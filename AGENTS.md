@@ -85,3 +85,9 @@ Keep upstream skill files intact. Sources and licenses are recorded in `.agents/
 - Preserve existing staged and unstaged work. Never reset, stash, switch, or rewrite unrelated changes.
 - Do not stage, commit, or push unless requested. Use Conventional Commits when a commit is authorized, and the `codex/` prefix for new branches unless the user specifies another name.
 - Keep changes focused. Do not add a release pipeline, signing changes, entitlements, dependencies, or a license for DDock itself as incidental setup work.
+
+## Releases
+
+Read `docs/UPDATES.md` when the task is the Release workflow, Sparkle publishing, or a `Bot-Nara` pipeline fix.
+
+Esi triggers and watches Release. Agents keep to pipeline code and docs. They do not cut a release, store Sparkle or signing secrets, or publish GitHub Latest.

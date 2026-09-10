@@ -498,7 +498,7 @@ Running timers use a saved wall-clock deadline, so sleep and app downtime count.
 
 ## App updates
 
-Direct builds use Sparkle’s update engine with a DDock-owned native update window. Consent, release notes, download progress, errors, and installation choices use DDock’s UI. Choose **Check for Updates…** from the DDock menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DDock quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. See [release instructions](docs/UPDATES.md) for signing, publishing, and the required archive scheme.
+Direct builds use Sparkle’s update engine with a DDock-owned native update window. Consent, release notes, download progress, errors, and installation choices use DDock’s UI. Choose **Check for Updates…** from the DDock menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DDock quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. Esi owns the Release workflow and GitHub Latest. See [release instructions](docs/UPDATES.md) for signing, publishing, the required archive scheme, and the secrets checklist.
 
 ## App badges
 
