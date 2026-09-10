@@ -145,7 +145,6 @@ private struct StackGravitySettingsNotice: View {
                                     requiresReset: false, storageFailed: true,
                                     setEnabled: { _ in }, setStrength: { _ in },
                                     setFocusBehavior: { _ in }, reset: {})
-        .environment(\.accessibilityReduceTransparency, true)
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
         .preferredColorScheme(.dark)

@@ -116,14 +116,12 @@ private struct StackGravityGuideIcon: View {
 
 #Preview("Gravity guide — Reduce Motion") {
     StackGravityGuide()
-        .environment(\.accessibilityReduceMotion, true)
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
 }
 
 #Preview("Gravity guide — dark, Reduce Transparency") {
     StackGravityGuide()
-        .environment(\.accessibilityReduceTransparency, true)
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
         .preferredColorScheme(.dark)
