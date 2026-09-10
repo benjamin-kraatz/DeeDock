@@ -17,8 +17,9 @@
 # feature work, hold Sparkle or signing secrets, or publish GitHub Latest.
 # Version bumps and bilingual notes land in a release-prep PR that Esi
 # merges before she dispatches. On failure, Esi opens a high-priority
-# Linear issue on project or label release-pipeline, and may add Bot-Nara
-# once if Nara should fix pipeline code.
+# Linear issue on project or label release-pipeline and SendToAgent-pings
+# Nara with the failure blob. Do not add Bot-Nara on that issue.
+# Bot-Nara stays on feature tickets only.
 #
 # ship does not mark the release Latest unless publish_latest is true.
 # First smoke stays draft-only.
@@ -196,7 +197,8 @@ jobs:
 
   archive:
     name: Archive, notarize, and appcast
-    if: env.INTENT == 'ship'
+    # Job-level if cannot use env. workflow_dispatch exposes inputs.intent.
+    if: inputs.intent == 'ship'
     needs: watch
     # Benn's Xcode 27 image. Only this job uses it.
     runs-on: xcode-27
@@ -529,7 +531,8 @@ jobs:
 
   draft:
     name: Draft GitHub Release
-    if: env.INTENT == 'ship'
+    # Job-level if cannot use env. workflow_dispatch exposes inputs.intent.
+    if: inputs.intent == 'ship'
     needs: [watch, archive]
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -635,5 +638,6 @@ jobs:
         run: |
           echo "The Release workflow failed."
           echo "Esi: open a high-priority Linear issue on project or label release-pipeline."
-          echo "Add label Bot-Nara once only if Nara should fix pipeline code."
+          echo "SendToAgent-ping Nara with the failure blob. Do not add Bot-Nara on that issue."
+          echo "Bot-Nara stays on feature tickets only."
           echo "Nara does not cut the release or publish GitHub Latest."
