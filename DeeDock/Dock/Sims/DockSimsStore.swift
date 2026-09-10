@@ -1,0 +1,160 @@
+import Foundation
+import Observation
+
+/// App-wide opt-in Sims moods and the light care loop.
+///
+/// All state stays on this Mac. There is no rumour feed, no account, and no network call.
+/// Moods are clocks: the store writes care timestamps and the overlay derives the face
+/// from elapsed time. Turning the feature off hides overlays without deleting pets.
+@MainActor @Observable
+final class DockSimsStore {
+    private(set) var document = DockSimsDocument.empty
+    private(set) var requiresReset = false
+    private(set) var storageFailed = false
+    @ObservationIgnored private let repository: DockSimsRepository
+
+    var isEnabled: Bool { document.isEnabled }
+    var intensity: Double { document.intensity }
+    var hasPets: Bool { !document.pets.isEmpty }
+    /// Session-only care-clock shift. Zero in Release. Not written to `dock.sims.v1`.
+    private(set) var debugTimeOffset: TimeInterval = 0
+
+    /// Wall clock plus the debug offset, used when a caller does not pass an explicit instant.
+    var currentTime: Date { Date.now.addingTimeInterval(sanitizedOffset) }
+
+    private var sanitizedOffset: TimeInterval {
+        debugTimeOffset.isFinite ? debugTimeOffset : 0
+    }
+
+    init(repository: DockSimsRepository = DockSimsRepository()) {
+        self.repository = repository
+    }
+
+    /// Loads stored moods. A missing key leaves the opt-in off.
+    func start() {
+        do {
+            if let stored = try repository.load() {
+                document = stored
+            }
+        } catch {
+            requiresReset = true
+            storageFailed = true
+        }
+    }
+
+    func setEnabled(_ enabled: Bool, at date: Date? = nil) {
+        guard !requiresReset, document.isEnabled != enabled else { return }
+        let instant = date ?? currentTime
+        document.isEnabled = enabled
+        if enabled, document.baselineAt == nil {
+            document.baselineAt = instant
+        }
+        persist()
+    }
+
+    func setIntensity(_ value: Double) {
+        guard !requiresReset else { return }
+        let clamped = DockSimsLimits.clampIntensity(value)
+        guard document.intensity != clamped else { return }
+        document.intensity = clamped
+        persist()
+    }
+
+    /// Feed, cheer, or settle one pinned app. Unpinned running tiles are ignored.
+    func care(_ action: DockSimsCareAction, pinID: String, at date: Date? = nil) {
+        let instant = date ?? currentTime
+        guard !requiresReset, document.isEnabled, DockSimsLimits.isValidPinID(pinID),
+              instant.timeIntervalSince1970.isFinite else { return }
+        let clocks = document.clocks(for: pinID, at: instant) ?? (instant, instant)
+        var pet = DockSimsPet(pinID: pinID, lastFedAt: clocks.fed, lastCheeredAt: clocks.cheered)
+        switch action {
+        case .feed:
+            pet.lastFedAt = instant
+        case .cheer:
+            pet.lastCheeredAt = instant
+        case .settle:
+            pet.lastFedAt = instant
+            pet.lastCheeredAt = instant
+        }
+        document.pets[pinID] = pet
+        prunePets()
+        persist()
+    }
+
+    /// Returns nil when Sims is off, frozen, or the tile is not a pin.
+    ///
+    /// Passing `date` is for tests and previews; the live dock omits it so the debug clock applies.
+    func pinState(for pinID: String, isFavorite: Bool, at date: Date? = nil) -> DockSimsPinState? {
+        let usesLiveClock = date == nil
+        let instant = date ?? currentTime
+        guard !requiresReset, document.isEnabled, isFavorite,
+              let clocks = document.clocks(for: pinID, at: instant) else { return nil }
+        return DockSimsPinState(
+            pinID: pinID,
+            lastFedAt: clocks.fed,
+            lastCheeredAt: clocks.cheered,
+            intensity: document.intensity / 100,
+            clockOffset: usesLiveClock ? sanitizedOffset : 0
+        )
+    }
+
+    /// Moves the session care clock forward. Release builds keep the offset at zero.
+    func debugAdvanceTime(by interval: TimeInterval) {
+        guard interval.isFinite, interval != 0 else { return }
+        debugTimeOffset = sanitizedOffset + interval
+    }
+
+    /// Returns the care clock to the wall clock. Written care stamps are left as they are.
+    func debugResetTime() {
+        debugTimeOffset = 0
+    }
+
+    /// Clears every pin's care history. The feature stays on; moods start playful again.
+    func resetMoods(at date: Date? = nil) {
+        guard !requiresReset else { return }
+        document.pets = [:]
+        document.baselineAt = date ?? currentTime
+        storageFailed = false
+        persistRemovingIfEmpty()
+    }
+
+    /// Replaces a corrupt document after an explicit reset. Sims starts disabled.
+    func reset() {
+        document = .empty
+        requiresReset = false
+        storageFailed = false
+        debugTimeOffset = 0
+        repository.remove()
+    }
+
+    private func prunePets() {
+        let limit = DockSimsLimits.maximumPets
+        guard document.pets.count > limit else { return }
+        let kept = document.pets.values
+            .sorted { lhs, rhs in
+                if lhs.lastCaredAt != rhs.lastCaredAt { return lhs.lastCaredAt > rhs.lastCaredAt }
+                return lhs.pinID < rhs.pinID
+            }
+            .prefix(limit)
+        document.pets = Dictionary(uniqueKeysWithValues: kept.map { ($0.pinID, $0) })
+    }
+
+    private func persist() {
+        do {
+            try repository.save(document)
+            storageFailed = false
+        } catch {
+            storageFailed = true
+        }
+    }
+
+    private func persistRemovingIfEmpty() {
+        if !document.isEnabled, document.pets.isEmpty, document.baselineAt == nil,
+           document.intensity == DockSimsLimits.defaultIntensity {
+            repository.remove()
+            storageFailed = false
+            return
+        }
+        persist()
+    }
+}

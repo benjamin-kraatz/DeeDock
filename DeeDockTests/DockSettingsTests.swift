@@ -13,10 +13,12 @@ struct DockSettingsTests {
         #expect(settings.alongEdgeOffset == 0)
         #expect(settings.edgeDistance == 8)
         #expect(settings.windowPeekEnabled)
+        #expect(settings.magneticEdges)
         #expect(settings.windowPeekSize == .medium)
         #expect(settings.windowPeekLayout == .grid)
         #expect(settings.windowPeekStyle == .glass)
         #expect(settings.windowPeekHoverDelay == 0.4)
+        #expect(!settings.soapBubbleEffects)
     }
 
     @Test("Launch animation settings migrate, round-trip, and resume inheritance")
@@ -51,6 +53,19 @@ struct DockSettingsTests {
         let decoded = try JSONDecoder().decode(DockSettings.self,
             from: JSONSerialization.data(withJSONObject: object))
         #expect(WindowPeekPreset.matching(decoded) == .balanced)
+    }
+
+    @Test("Settings saved before magnetic edges keep the snap-on default")
+    func magneticEdgesBackwardDecode() throws {
+        let encoded = try JSONEncoder().encode(DockSettings.defaults)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "magneticEdges")
+        let decoded = try JSONDecoder().decode(DockSettings.self,
+            from: JSONSerialization.data(withJSONObject: object))
+        #expect(decoded.magneticEdges)
+        var disabled = DockSettings.defaults
+        disabled.magneticEdges = false
+        #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(disabled)) == disabled)
     }
 
     @Test("Invalid numeric values cannot reach geometry or persistence")

@@ -134,6 +134,10 @@ final class DockPanelController {
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.animateIndicators = settings.animateIndicators
         interaction.launchAnimation = settings.launchAnimation
+        interaction.soapBubbles.isEnabled = settings.soapBubbleEffects
+        if !settings.soapBubbleEffects || NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            interaction.soapBubbles.removeAll()
+        }
         interaction.idleFade.configure(settings,
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
@@ -297,6 +301,30 @@ final class DockPanelController {
     /// Resting glass in AppKit screen coordinates, including the current viewport clip.
     var restingDragBounds: CGRect {
         DockGeometry.restingGlass(frame: baseRestingFrame, layout: baseLayout, scrollOffset: interaction.scrollOffset)
+    }
+
+    /// Resting pin and folder-stack artwork in AppKit screen space, for peer magnetism.
+    ///
+    /// Uses the pre-preview layout so an insertion gap cannot make peers chase the drag.
+    /// Running-only apps are omitted; the dragged pin is omitted when `pinID` matches.
+    func magneticPeerFrames(excluding pinID: String?) -> [CGRect] {
+        guard !stopped, visibility.exposesContent, !baseRestingFrame.isEmpty else { return [] }
+        let size = baseLayout.iconSize
+        return zip(store.entries.indices, store.entries).compactMap { index, entry in
+            guard index < baseLayout.restingCenters.count else { return nil }
+            let isPeer: Bool
+            if let pin = entry.pin {
+                isPeer = pin.id != pinID
+            } else if case .folder = entry {
+                isPeer = true
+            } else {
+                isPeer = false
+            }
+            guard isPeer else { return nil }
+            let along = baseLayout.restingCenters[index] - interaction.scrollOffset
+            let local = baseLayout.buttonFrame(centerAlong: along, size: size)
+            return DockEdge.screenRect(local, in: baseRestingFrame)
+        }
     }
 
     func containsDragRegion(_ point: CGPoint) -> Bool {
@@ -648,6 +676,7 @@ final class DockPanelController {
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil; exclusiveInteractionBegan = nil
         timelineRequested = nil
         interaction.timeline = nil
+        interaction.sims = nil
         windowSearchRequested = nil
         modePickerRequested = nil
         accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; modePickerHeld = false

@@ -65,6 +65,13 @@ struct DockAppButton: View {
                         DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
                             .allowsHitTesting(false)
                     }
+                    if let interaction, let sims = interaction.sims,
+                       let state = sims.pinState(for: item.id, isFavorite: item.isFavorite) {
+                        DockSimsOverlay(state: state, size: size, edge: interaction.layout.edge,
+                                        artworkOpacity: artworkOpacity, animated: indicatorAnimated)
+                            .allowsHitTesting(false)
+                            .accessibilityHidden(true)
+                    }
                 }
                 .contentShape(.rect)
         }
@@ -152,6 +159,11 @@ struct DockAppButton: View {
                     interaction?.performApplicationMenuAction?(.selectWindow(window.token), item)
                 }
             }
+            if item.isFavorite, interaction?.sims?.isEnabled == true {
+                Button(.simsFeed) { interaction?.sims?.care(.feed, pinID: item.id) }
+                Button(.simsCheer) { interaction?.sims?.care(.cheer, pinID: item.id) }
+                Button(.simsSettle) { interaction?.sims?.care(.settle, pinID: item.id) }
+            }
             if item.isFavorite {
                 Button {
                     interaction?.movePin?(item.id, -1)
@@ -180,8 +192,18 @@ struct DockAppButton: View {
         let status = String(localized: item.isAvailable
             ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusNotRunning)
             : .appStatusUnavailable)
+        let mood = interaction?.sims?.pinState(for: item.id, isFavorite: item.isFavorite).map {
+            String(localized: $0.mood(at: .now).title)
+        }
         if let badgeLabel {
+            let badge = String(localized: .appBadgeAccessibility(status: status, badge: badgeLabel))
+            if let mood {
+                return Text(verbatim: "\(badge), \(String(localized: .simsMoodAccessibility(mood: mood)))")
+            }
             return Text(.appBadgeAccessibility(status: status, badge: badgeLabel))
+        }
+        if let mood {
+            return Text(verbatim: "\(status), \(String(localized: .simsMoodAccessibility(mood: mood)))")
         }
         return Text(verbatim: status)
     }

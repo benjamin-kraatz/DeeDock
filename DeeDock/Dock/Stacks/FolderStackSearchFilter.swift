@@ -25,7 +25,7 @@ nonisolated enum FolderStackSearchFilter {
 }
 
 private extension StringProtocol {
-    var folded: String {
+    nonisolated var folded: String {
         folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: .current)
     }
 }

@@ -7,6 +7,7 @@ final class DockCoordinator {
     let focusSession = FocusSessionController()
     let localHistory = DockLocalHistoryStore()
     let pinWeather = PinWeatherStore()
+    let sims = DockSimsStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
@@ -144,6 +145,7 @@ final class DockCoordinator {
         focusSession.start()
         localHistory.start(session: focusSession.session)
         pinWeather.start()
+        sims.start()
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
             guard let self else { return }
@@ -181,6 +183,7 @@ final class DockCoordinator {
             }
             windowPeeks.showKeyboard(item, on: panel, documents: documents)
         }
+        dragging.magnetismEnabled = { [weak self] in self?.settings.value.magneticEdges ?? true }
         dragging.springDragEnded = { [weak self] in
             self?.folderStacks.dragEnded()
             self?.windowPeeks.endFileDrag()
@@ -339,6 +342,7 @@ final class DockCoordinator {
             panel.interaction.actionTiles = actionTiles
             panel.interaction.timeline = timeline
             panel.interaction.pinWeather = pinWeather
+            panel.interaction.sims = sims
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
                 focusPopover.toggle(on: panel)
@@ -392,6 +396,12 @@ final class DockCoordinator {
             store.applicationOpened = { [weak self] in
                 self?.windowPeeks.close(returnFocus: false)
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
+            }
+            store.soapBubblePlay = { [weak panel] itemID in
+                panel?.interaction.soapBubbles.play(
+                    itemID: itemID,
+                    reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+                )
             }
             panel.connectDragging(dragging)
             panel.interaction.openFiles = { [weak self, weak panel] item in
@@ -510,6 +520,9 @@ final class DockCoordinator {
         dragging.setPanels(panels)
         for (id, panel) in panels {
             panel.store.pinDestinations = enabledDisplays.filter { $0.id != id }.map { DockPinDestination(id: $0.id, name: $0.name) }
+            panel.store.willMutateFavoriteIDs = { [weak self] ids in
+                self?.dragging.forgetPlacements(ids, on: id)
+            }
         }
         refreshPanels(resetVisibility: resetVisibility)
     }
@@ -521,9 +534,11 @@ final class DockCoordinator {
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
         badges.configure(enabled: settings.value.showAppBadges && !enabledDisplays.isEmpty)
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)
+        dragging.applyMagneticPinHiding()
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
+            panel.interaction.sims = sims
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil
             panel.store.refresh()
@@ -541,6 +556,7 @@ final class DockCoordinator {
         catalog.pruneIcons(items: panels.values.flatMap { $0.store.items },
                            folders: panels.values.flatMap { $0.store.folders })
         pinWeather.synchronize(pinIDs: Set(profiles.pinLists.values.flatMap { $0.map(\.id) }))
+        dragging.syncMagneticChrome()
     }
     private func updatePointers(eventType: NSEvent.EventType) {
         panels.values.forEach { $0.updatePointer(eventType: eventType) }

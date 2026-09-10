@@ -154,6 +154,12 @@ struct DockSurfaceView: View {
                     )
                 }
             }
+            // Canvas space, same as tooltips, so a scrolled pin still owns its burst.
+            DockSoapBubbleOverlay(
+                bursts: interaction.soapBubbles.bursts,
+                frames: interaction.renderedFrames,
+                enabled: interaction.soapBubbles.isEnabled
+            )
             DockTooltipsOverlay(
                 slots: slots,
                 frames: interaction.renderedFrames,

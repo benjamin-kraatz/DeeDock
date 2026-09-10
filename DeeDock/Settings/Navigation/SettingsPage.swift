@@ -37,6 +37,9 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case appSuggestions
     case localHistory
     case pinWeather
+    case magneticEdges
+    case sims
+    case soapBubbles
 
     var id: Self { self }
 
@@ -53,7 +56,8 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
-             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory, .pinWeather: .features
+             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory,
+             .pinWeather, .magneticEdges, .sims, .soapBubbles: .features
         }
     }
 
@@ -89,6 +93,9 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .localHistory: .timelineTitle
         case .pinWeather: .pinWeatherTitle
+        case .magneticEdges: .settingsMagneticEdges
+        case .sims: .simsTitle
+        case .soapBubbles: .soapBubblesTitle
         case .permissions: .windowPeekPermissionsTitle
         }
     }
@@ -106,6 +113,9 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .localHistory: .settingsFeatureTimelineSubtitle
         case .pinWeather: .settingsFeaturePinWeatherSubtitle
+        case .magneticEdges: .settingsFeatureMagneticSubtitle
+        case .sims: .settingsFeatureSimsSubtitle
+        case .soapBubbles: .settingsFeatureSoapBubblesSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
         }
@@ -134,6 +144,9 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appSuggestions: .symbol("sparkles")
         case .localHistory: .symbol("clock.arrow.circlepath")
         case .pinWeather: .symbol("leaf.fill")
+        case .magneticEdges: .symbol("arrow.up.and.down.and.arrow.left.and.right")
+        case .sims: .symbol("heart.fill")
+        case .soapBubbles: .symbol("circle.dotted")
         case .permissions: .symbol("lock.fill")
         }
     }
@@ -160,6 +173,9 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appSuggestions: .indigo
         case .localHistory: Color(red: 0.22, green: 0.48, blue: 0.72)
         case .pinWeather: Color(red: 0.62, green: 0.40, blue: 0.24)
+        case .magneticEdges: Color(red: 0.18, green: 0.58, blue: 0.78)
+        case .sims: Color(red: 0.92, green: 0.42, blue: 0.58)
+        case .soapBubbles: Color(red: 0.38, green: 0.72, blue: 0.88)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
     }
@@ -186,6 +202,9 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appSuggestions: [.indigo, .purple]
         case .localHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
         case .pinWeather: [Color(red: 0.86, green: 0.62, blue: 0.38), Color(red: 0.48, green: 0.28, blue: 0.16)]
+        case .magneticEdges: [Color(red: 0.42, green: 0.84, blue: 0.96), Color(red: 0.10, green: 0.46, blue: 0.72)]
+        case .sims: [Color(red: 1.0, green: 0.62, blue: 0.72), Color(red: 0.86, green: 0.22, blue: 0.46)]
+        case .soapBubbles: [Color(red: 0.72, green: 0.94, blue: 1.0), Color(red: 0.78, green: 0.52, blue: 0.96)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
     }
@@ -197,6 +216,9 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
         case .pinWeather: .pinWeatherSettingsKeywords
+        case .magneticEdges: .settingsMagneticEdgesKeywords
+        case .sims: .simsSettingsKeywords
+        case .soapBubbles: .soapBubblesSettingsKeywords
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords

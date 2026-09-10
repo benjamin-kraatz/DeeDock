@@ -14,6 +14,10 @@ final class DockInteraction {
     var pinWeather: PinWeatherStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
+    /// Shared opt-in Sims moods. Nil in previews that do not play the care loop.
+    var sims: DockSimsStore?
+    /// Optional soap-bubble bursts for pin click and drop. Owned per panel.
+    let soapBubbles = DockSoapBubbleController()
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?
     let tooltips = DockTooltipController()
     var tooltipPreset: DockTooltipPreset = .classic
