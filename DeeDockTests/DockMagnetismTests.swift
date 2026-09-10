@@ -45,8 +45,8 @@ struct DockMagnetismTests {
 
     @Test("The closer candidate wins when two alignments compete")
     func closestCandidateWins() {
-        let peer = CGRect(x: 20, y: 0, width: 48, height: 48)
-        // 4 pt from the screen's left edge, 8 pt from the peer's left edge.
+        let peer = CGRect(x: 10, y: 0, width: 48, height: 48)
+        // 4 pt from the screen's left edge, 6 pt from the peer's left edge.
         let frame = CGRect(origin: CGPoint(x: 4, y: 200), size: icon)
         let snap = DockMagnetism.snap(frame: frame, screens: [screen], peers: [peer])
         #expect(snap.frame.minX == 0)
