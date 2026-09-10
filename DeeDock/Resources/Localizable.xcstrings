@@ -8357,6 +8357,276 @@
         }
       }
     },
+    "greenhouseEmpty" : {
+      "comment" : "Greenhouse empty state when no Action Tiles are pinned.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinne einen Kurzbefehl an, um eine Pflanze wachsen zu lassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin a shortcut to grow a plant."
+          }
+        }
+      }
+    },
+    "greenhouseEnable" : {
+      "comment" : "Settings toggle for the optional Shortcut greenhouse. Off by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl-Gewächshaus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut Greenhouse"
+          }
+        }
+      }
+    },
+    "greenhouseEnableHelp" : {
+      "comment" : "Explains that the greenhouse is optional plant chrome over Action Tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn dies eingeschaltet ist, erscheinen angepinnte Kurzbefehle als Pflanzen. Gießen führt den Kurzbefehl aus. Fehlende Kurzbefehle verwelken. Standardmäßig aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When this is on, pinned shortcuts appear as plants. Watering runs the shortcut. Missing shortcuts wilt. Off by default."
+          }
+        }
+      }
+    },
+    "greenhouseHealthy" : {
+      "comment" : "Plant state when the shortcut is still installed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Healthy"
+          }
+        }
+      }
+    },
+    "greenhouseHealthyValue" : {
+      "comment" : "Accessible plant value; argument is the Action Tile status title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesund · %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Healthy · %@"
+          }
+        }
+      }
+    },
+    "greenhouseHelp" : {
+      "comment" : "Settings card footnote for the Shortcut greenhouse.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionale Pflanzendarstellung für Aktionskacheln. Es gelten dieselbe Kurzbefehl-Liste und derselbe Starter. Ausschalten entfernt jede Pflanze."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional plant chrome for Action Tiles. The same Shortcuts list and runner apply. Turning this off removes every plant."
+          }
+        }
+      }
+    },
+    "greenhouseReset" : {
+      "comment" : "Explicit recovery from an unreadable greenhouse preference.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewächshaus zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Greenhouse"
+          }
+        }
+      }
+    },
+    "greenhouseResetHelp" : {
+      "comment" : "Reset confirmation. Shortcut pins stay; only the greenhouse preference is cleared.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gewächshaus-Einstellung konnte nicht gelesen werden. Zurücksetzen schaltet sie aus. Deine angepinnten Kurzbefehle bleiben erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The greenhouse setting could not be read. Resetting turns it off. Your pinned shortcuts stay."
+          }
+        }
+      }
+    },
+    "greenhouseStorageFailed" : {
+      "comment" : "Shown when the greenhouse preference could not be saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gewächshaus-Einstellung konnte nicht gespeichert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The greenhouse setting could not be saved."
+          }
+        }
+      }
+    },
+    "greenhouseTitle" : {
+      "comment" : "Settings card title for the optional Shortcut greenhouse.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewächshaus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Greenhouse"
+          }
+        }
+      }
+    },
+    "greenhouseWater" : {
+      "comment" : "Runs the shortcut represented by a plant.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gießen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Water"
+          }
+        }
+      }
+    },
+    "greenhouseWaterHint" : {
+      "comment" : "Accessible hint for watering a plant. Does not mention file drop.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gieße diese Pflanze, um den Kurzbefehl auszuführen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Water this plant to run the shortcut."
+          }
+        }
+      }
+    },
+    "greenhouseWilted" : {
+      "comment" : "Plant state when the shortcut is missing or unavailable after discovery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwelkt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wilted"
+          }
+        }
+      }
+    },
+    "greenhouseWiltedHelp" : {
+      "comment" : "Explains a wilted plant. The shortcut name is supplied by Shortcuts and is not translated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Kurzbefehl fehlt oder ist nicht verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This shortcut is missing or unavailable."
+          }
+        }
+      }
+    },
+    "greenhouseWiltedValue" : {
+      "comment" : "Accessible wilted plant value; argument is the Action Tile status title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwelkt · %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wilted · %@"
+          }
+        }
+      }
+    },
     "folderDetailsCalculating" : {
       "comment" : "Shown while a folder's contents size is still being measured.",
       "extractionState" : "manual",
