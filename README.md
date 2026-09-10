@@ -58,8 +58,12 @@ Current configuration:
 | Approachable concurrency | Enabled |
 | App Sandbox | Disabled in the current targets |
 | External package dependencies | Sparkle 2.9.6 for direct distribution |
+| Release identity | `de.benjaminkraatz.DeeDock`, display name **DDock** |
+| Debug and Preview identity | `de.benjaminkraatz.DeeDock.debug`, display name **DDock Debug** |
 
 Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For direct updates and the separate TestFlight build, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DDock requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DDock does not change the system Dock’s preferences.
+
+Debug and Preview builds use a separate bundle identifier and display name so a Run from Xcode does not collide with an installed production DDock for Accessibility, Screen Recording, Launch Services, or Dock identity. `PRODUCT_NAME` stays `DDock`, so the wrapper is still `DDock.app`. Identity lives in `Configuration/App.xcconfig` (Release) and `Configuration/Debug.xcconfig` (Debug and Preview). The Sparkle key account and release feed stay on the production identifier. Do not archive Debug or Preview for distribution.
 
 ## Working in this repository
 

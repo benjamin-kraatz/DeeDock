@@ -20,7 +20,7 @@ Release notes use native text for plain text, Markdown, and HTML. HTML is parsed
 
 ## Prepare the release
 
-1. Increase `CURRENT_PROJECT_VERSION` in `Configuration/App.xcconfig` for every distributed build. Set `MARKETING_VERSION` there too. Both targets share these values and the bundle identifier. Sparkle compares build numbers, not Git tags.
+1. Increase `CURRENT_PROJECT_VERSION` in `Configuration/App.xcconfig` for every distributed build. Set `MARKETING_VERSION` there too. Both targets share these values. Release archives use `de.benjaminkraatz.DeeDock` and display name `DDock`. Debug and Preview use `de.benjaminkraatz.DeeDock.debug` and must not be archived. Sparkle compares build numbers, not Git tags. The Sparkle key account stays `de.benjaminkraatz.DeeDock`.
 2. Resolve packages in Xcode. The pinned Sparkle tools are under the resolved packages directory at `artifacts/sparkle/Sparkle/bin`.
 3. Confirm the release machine has the DDock signing key. Run the following command with the actual tools path:
 
