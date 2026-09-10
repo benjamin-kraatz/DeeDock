@@ -41,7 +41,10 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var dragImageSize = CGSize.zero
     private var dragImageBaseFrame = CGRect.zero
     private var lastSnapOffset = CGSize.zero
+    private var lastSnap: DockMagneticSnap?
     private let magneticGuides = DockMagneticGuideController()
+    private let placementStore = DockMagneticPlacementStore()
+    private let magneticAttachments = DockMagneticAttachmentController()
     private var importTask: Task<Void, Never>?
     private var cleanupTask: Task<Void, Never>?
     private var importSession = DockSession()
@@ -108,6 +111,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         installMonitor()
         nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)
         nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
+        magneticAttachments.hideDuringDrag(displayID: displayID, pinID: pin.id)
         update(at: NSEvent.mouseLocation)
     }
 
@@ -241,7 +245,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.cancelled, destinationID == displayID, let index = destinationIndex,
               let panel = panels[displayID], !pins.isEmpty else { return false }
         committing = true
-        let success = panel.store.insertPins(pins, at: index)
+        let success = panel.store.insertPins(pins, at: panel.store.persistedInsertionIndex(forVisibleIndex: index))
         committing = false
         // A rejected save must not be reinterpreted as dragging out to unpin the source.
         completion.committed = true
@@ -370,29 +374,38 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     /// Targeting follows the snapped center only while that center still sits in a dock's drag
     /// region, so a screen-edge snap cannot unpin a pin whose pointer is still over the glass.
     private func magnetizedPoint(_ point: CGPoint) -> CGPoint {
-        guard sourcePin != nil, sourceUtilityID == nil else {
+        guard let snap = computeSnap(at: point) else {
+            lastSnap = nil
             magneticGuides.hide()
             applyDragImageOffset(.zero)
             return point
         }
-        let enabled = magnetismEnabled() && !NSEvent.modifierFlags.contains(.option)
-        guard enabled else {
-            magneticGuides.hide()
-            applyDragImageOffset(.zero)
-            return point
-        }
+        lastSnap = snap
+        magneticGuides.show(snap.guides)
         let size = dragImageSize == .zero ? CGSize(width: 48, height: 48) : dragImageSize
         let proposed = CGRect(x: point.x - size.width / 2, y: point.y - size.height / 2,
                               width: size.width, height: size.height)
-        let peers = panels.values.flatMap { $0.magneticPeerFrames(excluding: sourcePin?.id) }
-        let snap = DockMagnetism.snap(frame: proposed, screens: NSScreen.screens.map(\.frame), peers: peers)
-        magneticGuides.show(snap.guides)
         applyDragImageOffset(CGSize(width: snap.frame.minX - proposed.minX, height: snap.frame.minY - proposed.minY))
         let center = CGPoint(x: snap.frame.midX, y: snap.frame.midY)
         if snap.isMagnetized, panels.values.contains(where: { $0.containsDragRegion(center) }) {
             return center
         }
         return point
+    }
+
+    /// Current snap for `point`, or `nil` when magnetism does not apply to this drag.
+    private func computeSnap(at point: CGPoint) -> DockMagneticSnap? {
+        guard sourcePin != nil, sourceUtilityID == nil else { return nil }
+        let enabled = magnetismEnabled() && !NSEvent.modifierFlags.contains(.option)
+        guard enabled else { return nil }
+        let size = dragImageSize == .zero ? CGSize(width: 48, height: 48) : dragImageSize
+        let proposed = CGRect(x: point.x - size.width / 2, y: point.y - size.height / 2,
+                              width: size.width, height: size.height)
+        let peers = panels.values.flatMap { panel in
+            panel.magneticPeerFrames(excluding: sourcePin?.id)
+                + placementStore.frames(for: panel.store.displayID, excluding: sourcePin?.id)
+        }
+        return DockMagnetism.snap(frame: proposed, screens: NSScreen.screens.map(\.frame), peers: peers)
     }
 
     private func applyDragImageOffset(_ offset: CGSize) {
@@ -531,9 +544,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             destinationID = candidate.store.displayID; destinationIndex = index
         }
         let overDock = panels.contains { id, panel in panel.protectsDragRemoval(at: point, isSource: id == sourceID) }
+        let magnetized = lastSnap?.isMagnetized == true
         let removing = sourcePin.map { pin in
             sourceID.flatMap { panels[$0] }?.store.pins.contains(where: { $0.id == pin.id }) == true
-        } == true && !overDock && DockDragGeometry.distance(point, outside: sourceBounds) >= DockDragGeometry.removalDistance
+        } == true && !overDock && !magnetized
+            && DockDragGeometry.distance(point, outside: sourceBounds) >= DockDragGeometry.removalDistance
         for (id, panel) in panels {
             let targeted = candidate === panel
             let proposal = id == destinationID ? DockDragProposal(pins: pins, index: destinationIndex!) : nil
@@ -545,12 +560,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             panel.setDragPresentation(proposal: proposal, source: id == sourceID ? sourcePin?.id : nil,
                                       targeted: targeted, message: message)
         }
-        nativeSession?.animatesToStartingPositionsOnCancelOrFail = !removing
+        nativeSession?.animatesToStartingPositionsOnCancelOrFail = !removing && !magnetized
         if let nativeSession, lastRemovalCue != removing {
             lastRemovalCue = removing
             nativeSession.enumerateDraggingItems(options: [], for: nil, classes: [NSPasteboardItem.self], searchOptions: [:]) { item, _, _ in
                 guard let pin = self.sourcePin,
-                      let icon = self.panels[self.sourceID ?? ""]?.store.entries.first(where: { $0.pin?.id == pin.id })?.icon else { return }
+                      let icon = self.panels[self.sourceID ?? ""]?.store.icon(for: pin) else { return }
                 let imageSize = item.draggingFrame.size
                 item.imageComponentsProvider = {
                     let component = NSDraggingImageComponent(key: .icon)
@@ -602,15 +617,23 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if event.type == .leftMouseUp { completion.released = true }
             if event.type == .keyDown, event.keyCode == 53 { completion.cancelled = true }
         }
-        if let sourceID, let sourcePin, let panel = panels[sourceID],
+        let snap = computeSnap(at: screenPoint)
+        let magnetized = snap?.isMagnetized == true
+        if magnetized, let sourceID, let sourcePin, let frame = snap?.frame, !completion.cancelled, !completion.committed {
+            session.animatesToStartingPositionsOnCancelOrFail = false
+            placementStore.place(DockMagneticPlacement(pinID: sourcePin.id, frame: frame), on: sourceID)
+            completion.committed = true
+        } else if let sourceID, let sourcePin, let panel = panels[sourceID],
            completion.shouldUnpin(isPinned: panel.store.pins.contains { $0.id == sourcePin.id },
                                   distance: DockDragGeometry.distance(screenPoint, outside: sourceBounds),
-                                  overDock: panels.contains { id, target in target.protectsDragRemoval(at: screenPoint, isSource: id == sourceID) }) {
+                                  overDock: panels.contains { id, target in target.protectsDragRemoval(at: screenPoint, isSource: id == sourceID) },
+                                  magnetized: magnetized) {
             committing = true
             _ = panel.store.removePin(sourcePin.id)
             committing = false
         }
         cancel()
+        syncMagneticChrome()
     }
 
     private func clearFeedback() {
@@ -629,7 +652,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     }
 
     /// Invalidates late imports and native completion callbacks without committing an edit.
-    func cancel() {
+    func cancel(revealAttachments: Bool = true) {
         guard !cancelling else { return }
         cancelling = true
         defer { cancelling = false }
@@ -641,13 +664,81 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         clearFeedback()
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
         nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; sourceUtilityID = nil; token = nil
-        dragImageSize = .zero; dragImageBaseFrame = .zero; lastSnapOffset = .zero
+        dragImageSize = .zero; dragImageBaseFrame = .zero; lastSnapOffset = .zero; lastSnap = nil
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
         unpinDestinationID = nil
         trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; shelfSourceIDs = []
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }
         pasteboardChange = nil
+        if revealAttachments { magneticAttachments.revealAfterDrag() }
     }
 
-    func stop() { cancel(); magneticGuides.stop(); panels = [:] }
+    /// Drops stored frames for pins that returned to the linear dock or were unpinned.
+    func forgetPlacements(_ pinIDs: [String], on displayID: String) {
+        for pinID in pinIDs { placementStore.clear(pinID: pinID, on: displayID) }
+    }
+
+    /// Applies parked-pin hiding before a dock relayout so those tiles never flash
+    /// back onto the glass.
+    func applyMagneticPinHiding() {
+        let enabled = magnetismEnabled()
+        for (displayID, panel) in panels {
+            placementStore.retain(pinIDs: Set(panel.store.persistedPins.map(\.id)), on: displayID)
+            let placed = enabled && !panel.store.isPreviewingTimeline
+                ? placementStore.placements(for: displayID) : []
+            panel.store.pinIDsHiddenFromDock = Set(placed.map(\.pinID))
+        }
+    }
+
+    /// Hides parked pins from the linear dock and rebuilds their floating chrome.
+    ///
+    /// Turning magnetism off returns those pins to the dock without deleting the
+    /// stored frames, so enabling the setting again restores them.
+    func syncMagneticChrome() {
+        applyMagneticPinHiding()
+        guard magnetismEnabled() else {
+            magneticAttachments.sync([])
+            return
+        }
+        let attachments = panels.values.flatMap { panel in
+            placementStore.placements(for: panel.store.displayID).compactMap { attachment(for: $0, on: panel) }
+        }
+        magneticAttachments.sync(attachments)
+    }
+
+    private func attachment(for placement: DockMagneticPlacement, on panel: DockPanelController) -> DockMagneticAttachment? {
+        guard let pin = panel.store.pins.first(where: { $0.id == placement.pinID }),
+              let icon = panel.store.icon(for: pin) else { return nil }
+        let app = panel.store.items.first { $0.reference.id == pin.application?.id }
+        let folder = panel.store.folders.first { $0.id == pin.id }
+        let displayID = panel.store.displayID
+        return DockMagneticAttachment(
+            displayID: displayID,
+            pinID: placement.pinID,
+            frame: placement.frame,
+            icon: icon,
+            name: pin.name,
+            available: app?.isAvailable ?? folder?.isAvailable ?? true,
+            showsStackBadge: folder != nil,
+            open: { [weak self, weak panel] in
+                guard let panel, self?.panels[displayID] === panel else { return }
+                if let app { panel.store.performPrimaryAction(app) }
+                else if let folder { panel.interaction.openFolder?(folder, false) }
+            },
+            begin: { [weak self, weak panel] view, event in
+                guard let self, let panel, self.panels[displayID] === panel else { return }
+                if let app { self.begin(app, from: displayID, view: view, event: event) }
+                else if let folder { self.begin(folder, from: displayID, view: view, event: event) }
+                else { self.begin(pin: pin, icon: icon, from: displayID, view: view, event: event) }
+            },
+            tracking: { [weak self] tracking in self?.trackSource(tracking) }
+        )
+    }
+
+    func stop() {
+        cancel(revealAttachments: false)
+        magneticGuides.stop()
+        magneticAttachments.stop()
+        panels = [:]
+    }
 }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// App-wide control for pin and stack magnetism while dragging.
+/// App-wide control for pin and stack magnetism while dragging and after release.
 ///
 /// Magnetism is deliberately not per-display: a drag can cross screens, so the setting is read
 /// from the shared store even when a display profile is being edited. `locked` dims the switch

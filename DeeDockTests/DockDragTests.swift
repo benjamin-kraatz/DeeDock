@@ -41,6 +41,9 @@ struct DockDragTests {
         #expect(!completion.shouldUnpin(isPinned: true, distance: 100, overDock: false))
         completion.cancelled = false; completion.committed = true
         #expect(!completion.shouldUnpin(isPinned: true, distance: 100, overDock: false))
+        completion.cancelled = false; completion.committed = false
+        #expect(!completion.shouldUnpin(isPinned: true, distance: 100, overDock: false, magnetized: true))
+        #expect(completion.shouldUnpin(isPinned: true, distance: 100, overDock: false, magnetized: false) == released)
     }
 
     @Test("Insertion uses resting canvas coordinates and accounts for horizontal scrolling")
@@ -139,6 +142,29 @@ struct DockDragTests {
         session = DockSession()
         #expect(!session.accepts(original))
         #expect(session.accepts(session.token))
+    }
+
+    @Test("Parked pins stay favorites but leave the linear dock")
+    func hiddenPinsLeaveEntries() {
+        let profiles = DisplayProfilesStore(defaults: DockSettingsStore(repository: nil), repository: nil)
+        let display = DisplayFixtures.screen("one", runtimeID: 1, primary: true)
+        profiles.synchronize([display]) { [a, b] }
+        let catalog = ApplicationCatalog(service: DragFixtureService(running: []))
+        catalog.refresh()
+        let dock = DockStore(displayID: display.id, catalog: catalog, profiles: profiles)
+        #expect(dock.entries.contains { $0.pin?.id == a.id })
+        #expect(dock.entries.contains { $0.pin?.id == b.id })
+
+        dock.pinIDsHiddenFromDock = [a.id]
+        #expect(dock.pins.contains { $0.id == a.id })
+        #expect(!dock.entries.contains { $0.pin?.id == a.id })
+        #expect(dock.entries.contains { $0.pin?.id == b.id })
+        #expect(dock.persistedInsertionIndex(forVisibleIndex: 0) == 1)
+        #expect(dock.persistedInsertionIndex(forVisibleIndex: 1) == 2)
+
+        #expect(dock.insertPins([.application(a)], at: dock.persistedInsertionIndex(forVisibleIndex: 1)))
+        #expect(dock.pinIDsHiddenFromDock.isEmpty)
+        #expect(dock.pins.map(\.id) == [b.id, a.id])
     }
 
     @Test("Drag visibility holds can be released without a stale delayed hide")

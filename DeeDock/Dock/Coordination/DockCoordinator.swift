@@ -509,6 +509,9 @@ final class DockCoordinator {
         dragging.setPanels(panels)
         for (id, panel) in panels {
             panel.store.pinDestinations = enabledDisplays.filter { $0.id != id }.map { DockPinDestination(id: $0.id, name: $0.name) }
+            panel.store.willMutateFavoriteIDs = { [weak self] ids in
+                self?.dragging.forgetPlacements(ids, on: id)
+            }
         }
         refreshPanels(resetVisibility: resetVisibility)
     }
@@ -520,6 +523,7 @@ final class DockCoordinator {
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
         badges.configure(enabled: settings.value.showAppBadges && !enabledDisplays.isEmpty)
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)
+        dragging.applyMagneticPinHiding()
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
@@ -540,6 +544,7 @@ final class DockCoordinator {
         }
         catalog.pruneIcons(items: panels.values.flatMap { $0.store.items },
                            folders: panels.values.flatMap { $0.store.folders })
+        dragging.syncMagneticChrome()
     }
     private func updatePointers(eventType: NSEvent.EventType) {
         panels.values.forEach { $0.updatePointer(eventType: eventType) }

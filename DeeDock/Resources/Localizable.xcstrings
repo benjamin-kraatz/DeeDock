@@ -20952,19 +20952,19 @@
       }
     },
     "settingsMagneticEdgesHelp" : {
-      "comment" : "Footnote under the Magnetic Edges settings card.",
+      "comment" : "Footnote under the Magnetic Edges settings card. Explains snap, park-on-release, return-to-dock, and Option.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beim Ziehen eines Pins oder Stapels rastet er an Bildschirmkanten und anderen Pins oder Stapeln ein. Halte die Wahltaste, um frei zu ziehen. Hilfslinien erscheinen nur, während etwas einrastet."
+            "value" : "Beim Ziehen eines Pins oder Stapels rastet er an Bildschirmkanten und anderen Pins oder Stapeln ein. Loslassen bei sichtbaren Hilfslinien heftet ihn dort an. Ziehe ihn zurück auf das Dock, um ihn wieder einzureihen. Halte die Wahltaste, um frei zu ziehen oder zu lösen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "While you drag a pin or stack, it snaps to screen edges and other pins or stacks. Hold Option to drag freely. Guide lines appear only while something is snapped."
+            "value" : "While you drag a pin or stack, it snaps to screen edges and other pins or stacks. Release while guide lines are visible to park it there. Drag it back onto the dock to return it. Hold Option to drag freely or unpin."
           }
         }
       }
@@ -20976,13 +20976,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "magnet magnetisch einrasten ausrichten Hilfslinie Kante Nachbar Wahltaste frei ziehen Snap"
+            "value" : "magnet magnetisch einrasten ausrichten Hilfslinie Kante Nachbar Wahltaste frei ziehen Snap heften parken"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "magnet magnetic snap align guide edge peer neighbor option alt free drag"
+            "value" : "magnet magnetic snap align guide edge peer neighbor option alt free drag park attach"
           }
         }
       }
