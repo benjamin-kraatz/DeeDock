@@ -1,5 +1,28 @@
 # DeeDock acceptance record
 
+## DEE-21 workspace recipes
+
+Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Installed Shortcuts load when the recipe editor appears; **Reload Shortcuts** remains a manual refresh. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.
+
+`WorkspaceRecipeCoordinator` owns one in-memory run with pending, running, succeeded, failed, skipped, and canceled step states. A failed step stops the sequence; Retry and Skip are explicit. Cancel cannot undo apps or Shortcut effects that already ran. The same recipe cannot overlap. A blocked drag, menu, or file picker is reported before any open. Progress is not persisted and is not replayed after launch. Duplicating a mode copies the recipe and starts no action. Deleting a mode does not delete source files. Focus Session startup is unchanged.
+
+Window arrangement, Launcher Prepare actions, startup replay, shell commands, forced quit, and unsaved-document restoration are out of scope.
+
+Model cases worth later tests, not run here: missing recipe keys on v1 documents, unknown step kinds dropped without locking pins, duplicate step IDs sanitized, the 12-step bound, HTTP(S)-only links, bookmark size rejection, duplicate-mode recipe copy, and blocked-prepare reporting with no side effects.
+
+No Xcode build or tests were run. This environment has no Xcode. Compilation and native interaction remain pending.
+
+### Required hands-on acceptance
+
+- Build a recipe with an app, folder, HTTP(S) link, and Shortcut. Prepare it and confirm each real outcome.
+- Switch the same mode from the menu bar and Focus Dock. Confirm no recipe step runs.
+- Cancel between steps and during a Shortcut. Completed effects remain. Pending steps do not run.
+- Restart after a partial run. Confirm it does not replay.
+- Rename a Shortcut, remove an app, move a file, duplicate and delete a mode. Repair the broken step without losing the rest of the recipe. Deleting a mode must leave source files on disk.
+- Invoke Prepare during a drag, menu, or file picker. Confirm the blocked state is reported and nothing opens.
+- Confirm Prepare does not start a Focus Session timer.
+- Exercise keyboard-only operation, VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and rapid repeated Prepare of the same recipe.
+
 ## DEE-32 Metal running indicators withdrawn
 
 Removed on 2026-09-10 so Release archive on `xcode-27` does not need MetalToolchain.

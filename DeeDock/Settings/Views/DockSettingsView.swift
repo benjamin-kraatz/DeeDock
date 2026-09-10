@@ -112,7 +112,11 @@ struct DockSettingsView: View {
             DockModesSettingsPane(store: profiles.modes,
                                   activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
                                   deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
-                                  startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true)
+                                  startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true,
+                                  applications: coordinator?.recipeApplications,
+                                  actions: coordinator?.actionTiles,
+                                  prepareWorkspace: { coordinator?.prepareWorkspace($0) },
+                                  canPrepareWorkspace: coordinator?.canPrepareWorkspace == true)
         case .display(let id):
             displayOverview(SettingsOverrideContext(profiles: profiles, id: id)).id(id)
         case nil:
