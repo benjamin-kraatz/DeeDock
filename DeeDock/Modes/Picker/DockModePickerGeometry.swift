@@ -13,8 +13,8 @@ nonisolated enum DockModePickerGeometry {
 
     static func frame(anchor: DockModePickerAnchor, modeCount: Int) -> CGRect {
         let available = anchor.visibleFrame.insetBy(dx: margin, dy: margin)
-        let size = CGSize(width: min(320, available.width),
-                          height: min(CGFloat(max(1, min(modeCount, 7))) * 42 + 58, available.height))
+        let size = CGSize(width: min(360, available.width),
+                          height: min(CGFloat(max(1, min(modeCount, 7))) * 42 + 78, available.height))
         let proposed: CGPoint
         switch anchor.edge {
         case .bottom:

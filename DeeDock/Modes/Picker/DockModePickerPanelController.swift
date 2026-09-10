@@ -83,6 +83,7 @@ final class DockModePickerPanelController {
     private func handleKey(_ event: NSEvent) -> Bool {
         switch event.keyCode {
         case 36, 76: state.chooseSelection()
+        case 35: state.prepareSelection()
         case 53: close(returnFocus: true)
         case 125: state.select(by: 1)
         case 126: state.select(by: -1)

@@ -6426,19 +6426,19 @@
       }
     },
     "dockModesDeleteMessage" : {
-      "comment" : "Confirmation message before deleting a mode. modeName is user-provided.",
+      "comment" : "Confirmation before deleting a mode. modeName is user-provided. Source files stay on disk.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "„%1$(modeName)@“ löschen? Das kann nicht rückgängig gemacht werden tun."
+            "value" : "„%1$(modeName)@“ löschen? Die Dock-Layouts und das Rezept können nicht wiederhergestellt werden. Quelldateien und Kurzbefehle werden nicht gelöscht."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete %1$(modeName)@? Its dock layouts cannot be recovered."
+            "value" : "Delete %1$(modeName)@? Its dock layouts and recipe cannot be recovered. Source files and Shortcuts are not deleted."
           }
         }
       }
@@ -6498,19 +6498,19 @@
       }
     },
     "dockModesHelp" : {
-      "comment" : "Explanation under the active Dock Mode card.",
+      "comment" : "Explanation under the active Dock Mode card, including optional recipes.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein Dock-Modus speichert angepinnte Apps und Ordner. Andere Einstellungen werden derzeit nicht gespeichert."
+            "value" : "Ein Dock-Modus speichert angepinnte Apps und Ordner. Ein optionales Rezept kann Apps, Dateien, Links und Kurzbefehle vorbereiten. Das gewöhnliche Umschalten führt das Rezept nicht aus."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A mode saves every display's pins and app visibility. Other dock settings stay unchanged."
+            "value" : "A mode saves every display's pins and app visibility. An optional recipe can prepare apps, files, links, and Shortcuts. Ordinary switching does not run the recipe."
           }
         }
       }
@@ -6522,13 +6522,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modi Konfigurationen Profile Arbeit Privat Schreiben Präsentation angeheftet Layouts"
+            "value" : "Modi Konfigurationen Profile Arbeit Privat Schreiben Präsentation angeheftet Layouts Rezept Arbeitsbereich vorbereiten Kurzbefehle"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "modes configurations profiles work personal writing presentation pins layouts"
+            "value" : "modes configurations profiles work personal writing presentation pins layouts recipe workspace prepare shortcuts"
           }
         }
       }
@@ -16951,6 +16951,870 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Top"
+          }
+        }
+      }
+    },
+    "recipeAdd" : {
+      "comment" : "Menu that adds a step to a workspace recipe.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Step"
+          }
+        }
+      }
+    },
+    "recipeAddApp" : {
+      "comment" : "Adds an application bundle chosen in the native picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App hinzufügen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add App…"
+          }
+        }
+      }
+    },
+    "recipeAddFile" : {
+      "comment" : "Adds a file or folder chosen in the native picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei oder Ordner hinzufügen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add File or Folder…"
+          }
+        }
+      }
+    },
+    "recipeAddLink" : {
+      "comment" : "Adds an http or https link step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link hinzufügen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Link…"
+          }
+        }
+      }
+    },
+    "recipeAddPinnedApp" : {
+      "comment" : "Adds an app already pinned in this Dock Mode.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeheftete App hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Pinned App"
+          }
+        }
+      }
+    },
+    "recipeAddShortcut" : {
+      "comment" : "Adds a configured Shortcut by its stable identifier.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Shortcut"
+          }
+        }
+      }
+    },
+    "recipeAppMissing" : {
+      "comment" : "Preflight and failure when a recipe app cannot be resolved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App ist nicht verfügbar. Wähle sie erneut, um den Schritt zu reparieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is not available. Choose it again to repair the step."
+          }
+        }
+      }
+    },
+    "recipeAppOpened" : {
+      "comment" : "Success after macOS accepted an app open. Documents may still be loading.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App wurde geöffnet. Das bedeutet nicht, dass ihre Dokumente fertig geladen sind."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened the app. That does not mean its documents finished loading."
+          }
+        }
+      }
+    },
+    "recipeBookmarkStale" : {
+      "comment" : "Preflight and failure when a file or folder bookmark is stale or missing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle diese Datei oder diesen Ordner erneut. Die gespeicherte Referenz ist nicht mehr gültig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose this file or folder again. The saved reference is no longer valid."
+          }
+        }
+      }
+    },
+    "recipeCancelHelp" : {
+      "comment" : "Explains that cancel cannot undo apps or Shortcuts that already ran.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bricht die restlichen Schritte ab. Bereits geöffnete Apps und ausgeführte Kurzbefehle bleiben unverändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel remaining steps. Apps and Shortcuts that already ran stay as they are."
+          }
+        }
+      }
+    },
+    "recipeCanceled" : {
+      "comment" : "Status for a step that did not run because preparation was canceled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgebrochen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canceled"
+          }
+        }
+      }
+    },
+    "recipeCanceledMessage" : {
+      "comment" : "Shown after the user cancels an incomplete prepare.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die restlichen Schritte wurden abgebrochen. Bereits geöffnete Apps und ausgeführte Kurzbefehle können nicht rückgängig gemacht werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remaining steps were canceled. Already opened apps and Shortcut actions cannot be undone."
+          }
+        }
+      }
+    },
+    "recipeCompleted" : {
+      "comment" : "Shown when every recipe step succeeded or was skipped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Arbeitsbereich ist vorbereitet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workspace is prepared."
+          }
+        }
+      }
+    },
+    "recipeDismiss" : {
+      "comment" : "Closes the prepare progress window after the run ends.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "recipeEditorHelp" : {
+      "comment" : "Explains that a recipe is optional and that ordinary mode switching does not run it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Rezept ist optional. Das Umschalten dieses Modus ändert nur Anheftungen und die App-Sichtbarkeit. Arbeitsbereich vorbereiten ist eine eigene Aktion und startet keine Fokus-Sitzung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A recipe is optional. Switching this mode only updates pins and app visibility. Prepare workspace is a separate action and does not start a Focus Session."
+          }
+        }
+      }
+    },
+    "recipeEmpty" : {
+      "comment" : "Empty recipe placeholder in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Schritte."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No steps yet."
+          }
+        }
+      }
+    },
+    "recipeFailed" : {
+      "comment" : "Status for a step that stopped preparation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehlgeschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        }
+      }
+    },
+    "recipeKindApp" : {
+      "comment" : "Caption identifying an application recipe step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        }
+      }
+    },
+    "recipeKindFile" : {
+      "comment" : "Caption identifying a file or folder recipe step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei oder Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File or folder"
+          }
+        }
+      }
+    },
+    "recipeKindLink" : {
+      "comment" : "Caption identifying a web link recipe step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link"
+          }
+        }
+      }
+    },
+    "recipeKindShortcut" : {
+      "comment" : "Caption identifying a Shortcut recipe step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut"
+          }
+        }
+      }
+    },
+    "recipeLinkField" : {
+      "comment" : "Text field label for an http or https recipe link.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        }
+      }
+    },
+    "recipeLinkOpened" : {
+      "comment" : "Success after macOS accepted opening a recipe link.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Link wurde geöffnet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened the link."
+          }
+        }
+      }
+    },
+    "recipeLinkPrompt" : {
+      "comment" : "Alert guidance when adding a recipe link.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib einen http- oder https-Link ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an http or https link."
+          }
+        }
+      }
+    },
+    "recipeMaxSteps" : {
+      "comment" : "Error when a recipe would exceed the persisted step limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Rezept kann höchstens 12 Schritte enthalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A recipe can have at most 12 steps."
+          }
+        }
+      }
+    },
+    "recipeMenuTitle" : {
+      "comment" : "Menu-bar submenu that starts Prepare workspace for a named mode.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbeitsbereich vorbereiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepare Workspace"
+          }
+        }
+      }
+    },
+    "recipeNoSteps" : {
+      "comment" : "Reported when Prepare workspace is invoked on a mode with no recipe.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Modus hat kein Arbeitsbereich-Rezept."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This mode has no workspace recipe."
+          }
+        }
+      }
+    },
+    "recipePending" : {
+      "comment" : "Status for a recipe step that has not started.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausstehend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        }
+      }
+    },
+    "recipePickerHint" : {
+      "comment" : "Keyboard hint in the Focus Dock mode picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Return wechselt den Modus. P bereitet den Arbeitsbereich vor."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Return switches the mode. P prepares its workspace."
+          }
+        }
+      }
+    },
+    "recipePickerPrepare" : {
+      "comment" : "Compact prepare action in the mode picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorbereiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepare"
+          }
+        }
+      }
+    },
+    "recipePrepareBlocked" : {
+      "comment" : "Reported when prepare cannot start because a drag, menu, or picker is active.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beende den aktuellen Drag, das Menü oder die Dateiauswahl, bevor du einen Arbeitsbereich vorbereitest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finish the current drag, menu, or file picker before preparing a workspace."
+          }
+        }
+      }
+    },
+    "recipePrepareHelp" : {
+      "comment" : "Help text for Prepare workspace on a mode row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviert diesen Modus und öffnet die konfigurierten Apps, Dateien, Links und Kurzbefehle. Startet keine Fokus-Sitzung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate this mode and open its configured apps, files, links, and Shortcuts. Does not start a Focus Session."
+          }
+        }
+      }
+    },
+    "recipeProgressTitle" : {
+      "comment" : "Progress window title. modeName is user-provided.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorbereiten: %1$(modeName)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing %1$(modeName)@"
+          }
+        }
+      }
+    },
+    "recipeRemove" : {
+      "comment" : "Removes one step from a workspace recipe. Source files are not deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Step"
+          }
+        }
+      }
+    },
+    "recipeRepair" : {
+      "comment" : "Replaces a missing app, stale bookmark, invalid link, or removed Shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace…"
+          }
+        }
+      }
+    },
+    "recipeResourceOpened" : {
+      "comment" : "Success after macOS accepted opening a file or folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS wurde gebeten, dieses Objekt zu öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asked macOS to open this item."
+          }
+        }
+      }
+    },
+    "recipeRetry" : {
+      "comment" : "Retries only the failed recipe step after an explicit click.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt wiederholen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry Step"
+          }
+        }
+      }
+    },
+    "recipeRunning" : {
+      "comment" : "Status for the recipe step currently executing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running"
+          }
+        }
+      }
+    },
+    "recipeShortcutMissing" : {
+      "comment" : "Preflight when a configured Shortcut is no longer available.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Kurzbefehl ist nicht mehr verfügbar. Wähle einen anderen, um den Schritt zu reparieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This Shortcut is no longer available. Choose another to repair the step."
+          }
+        }
+      }
+    },
+    "recipeShortcutRan" : {
+      "comment" : "Success after the Shortcuts CLI finished a configured run.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kurzbefehl ist fertig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Shortcut finished."
+          }
+        }
+      }
+    },
+    "recipeShortcutUncertain" : {
+      "comment" : "Failure after a Shortcut did not finish. It is never retried automatically.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kurzbefehl ist nicht fertig geworden. Er wird nur nach einem erneuten Versuch ausgeführt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Shortcut did not finish. It will not run again unless you retry."
+          }
+        }
+      }
+    },
+    "recipeSkip" : {
+      "comment" : "Skips the failed recipe step and continues the remaining sequence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt überspringen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip Step"
+          }
+        }
+      }
+    },
+    "recipeSkipped" : {
+      "comment" : "Status for a step the user skipped after a failure.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersprungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped"
+          }
+        }
+      }
+    },
+    "recipeStepActions" : {
+      "comment" : "VoiceOver label for a recipe step's actions menu. stepName is user-provided or a URL.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionen für %1$(stepName)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions for %1$(stepName)@"
+          }
+        }
+      }
+    },
+    "recipeStoppedOnFailure" : {
+      "comment" : "Shown when preparation stops on a failed step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Vorbereitung hat bei diesem Schritt angehalten. Wiederhole ihn, überspringe ihn oder brich den Rest ab."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparation stopped on this step. Retry it, skip it, or cancel the rest."
+          }
+        }
+      }
+    },
+    "recipeSucceeded" : {
+      "comment" : "Status for a recipe step that macOS accepted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolgreich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Succeeded"
+          }
+        }
+      }
+    },
+    "recipeTitle" : {
+      "comment" : "Name of the Prepare workspace action and progress window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbeitsbereich vorbereiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepare workspace"
+          }
+        }
+      }
+    },
+    "recipeURLInvalid" : {
+      "comment" : "Preflight and failure when a recipe link is not http or https.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwende einen http- oder https-Link."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use an http or https link."
           }
         }
       }

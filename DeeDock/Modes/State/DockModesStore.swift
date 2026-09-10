@@ -185,7 +185,8 @@ final class DockModesStore {
         let name = requestedName.map(DockModeNaming.normalized)
             ?? DockModeNaming.copyName(for: source.name, in: document.modes)
         guard DockModeNaming.isAvailable(name, in: document.modes) else { return nil }
-        let duplicate = DockMode(name: name, appVisibility: source.appVisibility, displays: source.displays)
+        let duplicate = DockMode(name: name, appVisibility: source.appVisibility,
+                                 displays: source.displays, recipe: source.recipe)
         var proposed = document
         let sourceIndex = proposed.modes.firstIndex(where: { $0.id == source.id }) ?? proposed.modes.endIndex - 1
         proposed.modes.insert(duplicate, at: proposed.modes.index(after: sourceIndex))
@@ -210,6 +211,16 @@ final class DockModesStore {
               document.modes.indices.contains(index + distance) else { return false }
         var proposed = document
         proposed.modes.swapAt(index, index + distance)
+        return commit(proposed)
+    }
+
+    /// Replaces the mode's recipe. Source files and Shortcuts are never deleted.
+    @discardableResult
+    func updateRecipe(_ id: UUID, _ recipe: WorkspaceRecipe) -> Bool {
+        guard canEdit else { return false }
+        var proposed = document
+        guard let index = proposed.modes.firstIndex(where: { $0.id == id }) else { return false }
+        proposed.modes[index].recipe = recipe.sanitized
         return commit(proposed)
     }
 

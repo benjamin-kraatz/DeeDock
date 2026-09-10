@@ -8,7 +8,7 @@ final class DockModePickerCoordinator {
     var isKeyboardActive: Bool { controller != nil && sourcePanel?.store.keyboardFocus == true }
 
     func show(modes: [DockMode], activeModeID: UUID, on panel: DockPanelController,
-              choose: @escaping (UUID) -> Bool) {
+              choose: @escaping (UUID) -> Bool, prepare: @escaping (UUID) -> Void) {
         close(returnFocus: false)
         guard let anchor = panel.modePickerAnchor() else { return }
         let next = DockModePickerPanelController(modes: modes, activeModeID: activeModeID, anchor: anchor)
@@ -19,6 +19,12 @@ final class DockModePickerCoordinator {
             guard let self, let panel else { return }
             close(returnFocus: false)
             _ = choose(id)
+            panel.focus()
+        }
+        next.state.prepare = { [weak self, weak panel] id in
+            guard let self, let panel else { return }
+            close(returnFocus: false)
+            prepare(id)
             panel.focus()
         }
         next.closed = { [weak self, weak panel] returnFocus in

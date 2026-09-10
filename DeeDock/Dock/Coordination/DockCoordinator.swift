@@ -7,6 +7,8 @@ final class DockCoordinator {
     let focusSession = FocusSessionController()
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
+    let recipes: WorkspaceRecipeCoordinator
+    @ObservationIgnored private lazy var recipeProgress = WorkspaceRecipeProgressController(recipes: recipes)
     let watchPresets = WindowWatchPresetStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
@@ -40,6 +42,7 @@ final class DockCoordinator {
     @ObservationIgnored private let catalog: ApplicationCatalog
     var launcherSuggestions: LauncherSuggestionsStore { catalog.suggestions }
     var launcherApplications: [LauncherApplication] { catalog.launcherLibrary.applications }
+    var recipeApplications: any ApplicationServicing { catalog.service }
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
     @ObservationIgnored private let capsules = SessionCapsuleController()
@@ -68,6 +71,7 @@ final class DockCoordinator {
         let applicationService = ApplicationService()
         catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory(),
                                      suggestions: LauncherSuggestionsStore())
+        recipes = WorkspaceRecipeCoordinator(applications: catalog.service, actions: actionTiles)
         let menus = ApplicationMenuController(
             access: windowAccess,
             applications: ApplicationMenuService(applications: applicationService),
@@ -105,6 +109,11 @@ final class DockCoordinator {
         occupancy.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
+        recipes.didChange = { [weak self] in
+            guard let self, recipes.run != nil else { return }
+            recipeProgress.show()
+        }
+        recipeProgress.openSettings = { [weak self] in self?.settingsModesRequest = true }
         watchPresets.start()
         badges.focusSession = { [weak self] in self?.focusSession.session }
         focusPopover.showDigest = { [weak self] in self?.showBadgeMemory(digest: true) }
@@ -330,7 +339,12 @@ final class DockCoordinator {
                 guard let self, let panel, canSwitchModes else { return }
                 modePicker.show(modes: profiles.modes.modes,
                                 activeModeID: profiles.modes.document.activeModeID,
-                                on: panel) { [weak self] id in self?.activateMode(id) ?? false }
+                                on: panel,
+                                choose: { [weak self] id in self?.activateMode(id) ?? false },
+                                prepare: { [weak self] id in
+                                    guard let self, let mode = profiles.modes.modes.first(where: { $0.id == id }) else { return }
+                                    prepareWorkspace(mode)
+                                })
             }
             panel.escape = { [weak self] in self?.endFocus(restore: true) }
             store.applicationOpened = { [weak self] in
@@ -556,12 +570,24 @@ final class DockCoordinator {
     }
 
     var canStartFocus: Bool { canSwitchModes && !focusSession.isActive && !focusSession.requiresReset }
+    /// Prepare stays available so a blocked drag or menu can be reported before any side effect.
+    var canPrepareWorkspace: Bool { profiles.modes.canEdit }
 
     func startFocus(_ mode: DockMode) {
         guard canStartFocus, let current = profiles.modes.modes.first(where: { $0.id == mode.id }) else { return }
         // Activating the already-active mode is a no-op in DockModesStore, not a failed start.
         if current.id != profiles.modes.document.activeModeID, !activateMode(current.id) { return }
         focusSession.begin(modeID: current.id, name: current.name)
+    }
+
+    func prepareWorkspace(_ mode: DockMode) {
+        guard let current = profiles.modes.modes.first(where: { $0.id == mode.id }) else { return }
+        recipes.prepare(mode: current, canActivate: canSwitchModes) { [weak self] id in
+            guard let self else { return false }
+            if id == profiles.modes.document.activeModeID { return true }
+            return activateMode(id)
+        }
+        if recipes.run != nil { recipeProgress.show() }
     }
 
     /// Called only from a badge click, menu/keyboard command, Settings or the Focus panel.
@@ -638,6 +664,7 @@ final class DockCoordinator {
     @discardableResult
     func deleteMode(_ id: UUID) -> Bool {
         guard canSwitchModes else { return false }
+        if recipes.run?.modeID == id { recipes.cancel() }
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
@@ -677,6 +704,8 @@ final class DockCoordinator {
         focusPopover.stop()
         focusSession.stop()
         actionTiles.stop()
+        recipes.stop()
+        recipeProgress.stop()
         watchPresets.stop()
         fusion.stop()
         sessionCapsules.stop()
