@@ -139,7 +139,9 @@ animations or provide system Dock minimize targets.
 **Settings → Atmosphere** adds optional ambient light to every drawable display, independently
 of Dock Modes. It starts off. Choose 69 for candles and hearts, Minimal for a subtle color
 wash, Focus for a soft glow, or Party for party décor and denser particles. Density controls
-particles. Click corner décor to toggle its light; hold it to change its appearance.
+particles. Light intensity scales the edge wash from a faint rim to a stronger glow
+without covering the desktop. Click corner décor to toggle its light; hold it to
+change its appearance.
 
 Choose one color source: Manual, Wallpaper, Focused app icon, or Mood. Wallpaper sampling
 refreshes every eight seconds and offers prominent-to-average, average-only, and corner

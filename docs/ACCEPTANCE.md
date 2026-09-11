@@ -2051,9 +2051,12 @@ compilation alone.
 Atmosphere replaces the internal DEE-71 skin. Mode-owned fields, setters, controls, menu
 commands, and both old renderers are removed. Existing mode documents ignore the retired
 fields; no preferences migrate. The new app-wide settings document defaults to disabled.
-English and German Settings include all four presets, density, idle-only dimming, layout,
-and exclusive color sources. Atmosphere does not share intensity or activation state with
-Dock Modes, Sims, or soap bubbles.
+English and German Settings include all four presets, density, light intensity, idle-only
+dimming, layout, and exclusive color sources. Intensity is a 0…1 slider. The midpoint keeps
+the original 0.07 Minimal and 0.18 other-preset wash. The low end stays a faint rim, and
+the high end stays short of a full-screen overlay. Documents saved before intensity decode
+the midpoint default without dropping other Atmosphere fields. Atmosphere does not share
+intensity or activation state with Dock Modes, Sims, or soap bubbles.
 
 Each drawable non-mirrored display owns a full-frame click-through ambient panel. Only two
 84-point corner panels accept input for 69 and Party. These panels cannot become key or
@@ -2100,8 +2103,9 @@ acceptance were not run.
 
 Pending native acceptance:
 
-- DE/EN Settings, default-off persistence, all presets, density endpoints, and exclusive
-  color sources across relaunches. Confirm Mode switches do not change Atmosphere.
+- DE/EN Settings, default-off persistence, all presets, density and intensity endpoints,
+  and exclusive color sources across relaunches. Confirm Mode switches do not change
+  Atmosphere.
 - Multi-display negative origins, Retina scaling, mirroring, hot-plug, panorama extremes,
   and fallback layouts. Check shared bezels and the full-display gradient.
 - Idle dimming, fullscreen on one display, Space changes, sleep/wake, lock/unlock, and

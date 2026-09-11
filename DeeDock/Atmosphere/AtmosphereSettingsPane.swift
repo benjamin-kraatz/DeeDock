@@ -17,6 +17,7 @@ struct AtmosphereSettingsPane: View {
                     ForEach(AtmospherePreset.allCases, id: \.self) { Text($0.title).tag($0) }
                 }
                 Slider(value: $store.settings.density, in: 0...1) { Text(.atmosphereDensity) }
+                Slider(value: $store.settings.intensity, in: AtmosphereLimits.intensityRange) { Text(.atmosphereIntensity) }
                 Toggle(.atmosphereIdle, isOn: $store.settings.idleOnly)
                 Text(.atmosphereGateHelp).font(.caption).foregroundStyle(.secondary)
                 Picker(.atmosphereLayout, selection: $store.settings.panorama) {

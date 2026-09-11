@@ -937,6 +937,24 @@
       }
     }
   },
+  "atmosphereIntensity": {
+    "comment": "Atmosphere Settings or corner decoration. Ambient light intensity",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Light intensity"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lichtstärke"
+        }
+      }
+    }
+  },
   "atmosphereIdle": {
     "comment": "Atmosphere Settings or corner decoration. Only while idle",
     "extractionState": "manual",
