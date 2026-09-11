@@ -21,6 +21,9 @@ struct FeaturesPageContent: View {
                 SettingsToggleRow(title: .settingsShowTrash, isOn: source.binding(\.showTrash))
                 SettingsToggleRow(title: .settingsConfirmBeforeEmptyingTrash,
                                   isOn: source.binding(\.confirmBeforeEmptyingTrash))
+                #if DEBUG
+                TrashRefreshIntervalDebugRow()
+                #endif
             }
             .disabled(locked)
         case .capsules:

@@ -568,8 +568,12 @@ final class DockCoordinator {
         dragging.syncMagneticChrome()
     }
     private func updatePointers(eventType: NSEvent.EventType) {
+        let wasOverDock = panels.values.contains { $0.interaction.pointer != nil }
         panels.values.forEach { $0.updatePointer(eventType: eventType) }
         windowPeeks.updatePointer()
+        if !wasOverDock, panels.values.contains(where: { $0.interaction.pointer != nil }) {
+            trash.refreshForDockAttention()
+        }
     }
 
     /// Only connected enabled desktop surfaces have a live zone to outline.

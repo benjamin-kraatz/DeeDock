@@ -2,6 +2,28 @@ import AppKit
 import CoreServices
 import Observation
 
+/// How often DDock asks Finder for the Trash count when nothing more specific has happened.
+///
+/// Finder publishes no Trash-change notification, and each read is an Apple event that also wakes
+/// Finder. Changes usually follow Finder activity, DDock's own Trash actions, or the pointer moving to
+/// the dock, and each of those triggers its own read, so the periodic read is only a fallback.
+enum TrashRefreshInterval {
+    static let standard: Double = 30
+    /// Two seconds was the fixed interval before the fallback became event-assisted.
+    static let range: ClosedRange<Double> = 2...120
+    static let defaultsKey = "debug.trashRefreshInterval"
+
+    /// Release builds always use `standard`. Debug builds honor the value set in Settings.
+    static var current: Double {
+        #if DEBUG
+        let stored = UserDefaults.standard.double(forKey: defaultsKey)
+        return stored > 0 ? min(max(stored, range.lowerBound), range.upperBound) : standard
+        #else
+        standard
+        #endif
+    }
+}
+
 /// Owns the shared Finder Trash snapshot and user-initiated Trash operations.
 @MainActor @Observable
 final class TrashController {
@@ -13,6 +35,12 @@ final class TrashController {
     @ObservationIgnored private var monitoringTask: Task<Void, Never>?
     @ObservationIgnored private var actionTask: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
+    @ObservationIgnored private var lastRead: ContinuousClock.Instant?
+    @ObservationIgnored private var attentionTask: Task<Void, Never>?
+    #if DEBUG
+    @ObservationIgnored private var intervalObserver: Any?
+    @ObservationIgnored private var observedInterval = TrashRefreshInterval.current
+    #endif
 
     init() {
         item = TrashDockItem(state: .unknown, icon: Self.icon(for: .unknown))
@@ -22,6 +50,37 @@ final class TrashController {
     func start() {
         generation = UUID()
         refreshIfAuthorized()
+        #if DEBUG
+        // Restart the fallback loop when the Debug interval changes, rather than after the old wait.
+        intervalObserver = NotificationCenter.default.addObserver(
+            forName: UserDefaults.didChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.intervalMayHaveChanged() }
+        }
+        #endif
+    }
+
+    #if DEBUG
+    private func intervalMayHaveChanged() {
+        guard observedInterval != TrashRefreshInterval.current else { return }
+        observedInterval = TrashRefreshInterval.current
+        guard monitoringTask != nil else { return }
+        monitoringTask?.cancel(); monitoringTask = nil
+        startMonitoring()
+    }
+    #endif
+
+    /// Reads the count when the pointer reaches a dock, the moment a stale Trash icon would be noticed.
+    /// At most one read per few seconds, and only after Automation access is known to exist.
+    func refreshForDockAttention() {
+        guard monitoringTask != nil, attentionTask == nil else { return }
+        if let lastRead, lastRead.duration(to: .now) < .seconds(5) { return }
+        let token = generation
+        attentionTask = Task { [weak self] in
+            guard let self, generation == token else { return }
+            await refreshAuthorizedState()
+            attentionTask = nil
+        }
     }
 
     /// Opens Finder's Trash. Finder owns the protected directory and external-volume Trash.
@@ -72,6 +131,12 @@ final class TrashController {
         queryTask = nil
         monitoringTask?.cancel()
         monitoringTask = nil
+        attentionTask?.cancel()
+        attentionTask = nil
+        #if DEBUG
+        if let intervalObserver { NotificationCenter.default.removeObserver(intervalObserver) }
+        intervalObserver = nil
+        #endif
         actionTask?.cancel()
         actionTask = nil
         didChange = nil
@@ -109,15 +174,16 @@ final class TrashController {
         }
     }
 
-    /// Finder does not publish a public Trash-change notification. Once Automation access exists,
-    /// use a low-frequency serialized read so changes made by Finder or the system Dock stay visible.
+    /// Finder does not publish a public Trash-change notification. Once Automation access exists, a
+    /// serialized fallback read at `TrashRefreshInterval.current` catches changes no event announced,
+    /// such as emptying Trash from the system Dock while DDock sits untouched.
     private func startMonitoring() {
         guard monitoringTask == nil else { return }
         let token = generation
         monitoringTask = Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled, generation == token {
-                try? await Task.sleep(for: .seconds(2))
+                try? await Task.sleep(for: .seconds(TrashRefreshInterval.current))
                 guard !Task.isCancelled, generation == token else { return }
                 await refreshAuthorizedState()
             }
@@ -125,6 +191,7 @@ final class TrashController {
     }
 
     private func refreshAuthorizedState() async {
+        lastRead = .now
         if let count = await automation.itemCountIfAuthorized() {
             setState(count == 0 ? .empty : .full)
         }
@@ -159,7 +226,7 @@ private struct FinderTrashResult: Sendable {
 /// Serializes Finder scripting and keeps AppleScript objects off the main actor.
 private actor FinderTrashAutomation {
     private static let finderIdentifier = "com.apple.finder"
-    /// Reuse the read-only script while monitoring. Recompiling it every two seconds causes
+    /// Reuse the read-only script while monitoring. Recompiling it for every read causes
     /// macOS to repeatedly rescan the same source through XProtect.
     private lazy var countScript = NSAppleScript(source: "tell application id \"com.apple.finder\" to count items of trash")
 
