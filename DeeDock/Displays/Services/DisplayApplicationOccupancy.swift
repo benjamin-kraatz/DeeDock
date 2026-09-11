@@ -3,11 +3,12 @@ import ScreenCaptureKit
 
 /// Enumerates metadata only. Window titles, screenshots, and native handles are never retained.
 actor DisplayApplicationOccupancyService {
-    func applicationsByDisplay(identities: [pid_t: String]) async throws -> [UInt32: Set<String>] {
+    /// Processes owning an on-screen, normal-layer window, grouped by the display showing most of each window.
+    func processesByDisplay() async throws -> [UInt32: Set<pid_t>] {
         guard CGPreflightScreenCaptureAccess() else { throw WindowThumbnailServiceError.permissionRequired }
         let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: true)
         try Task.checkCancellation()
-        var result: [UInt32: Set<String>] = [:]
+        var result: [UInt32: Set<pid_t>] = [:]
         for display in content.displays { result[display.displayID] = [] }
         let displays = content.displays.sorted { $0.displayID < $1.displayID }
         for window in content.windows {
@@ -20,9 +21,7 @@ actor DisplayApplicationOccupancyService {
                 Self.area(window.frame.intersection($0.frame)) < Self.area(window.frame.intersection($1.frame))
             }
             guard let display, Self.area(window.frame.intersection(display.frame)) > 0 else { continue }
-            if let identity = identities[owner.processID] {
-                result[display.displayID, default: []].insert(identity)
-            }
+            result[display.displayID, default: []].insert(owner.processID)
         }
         return result
     }
@@ -40,6 +39,10 @@ final class DisplayApplicationOccupancy {
     private let service = DisplayApplicationOccupancyService()
     private var task: Task<Void, Never>?
     private var generation = UUID()
+    /// Application identity per window-owning process; `nil` records a process that belongs to no regular
+    /// application. A process's bundle never changes, but an owner can quit or change activation policy, so
+    /// workspace changes clear this through `invalidate()`.
+    private var identities: [pid_t: String?] = [:]
 
     func configure(enabled: Bool) {
         if !enabled { stop(); return }
@@ -47,32 +50,45 @@ final class DisplayApplicationOccupancy {
         let generation = generation
         task = Task { [weak self, service] in
             while !Task.isCancelled {
-                guard let identities = self?.processIdentities() else { return }
-                let snapshot = try? await service.applicationsByDisplay(identities: identities)
+                let processes = try? await service.processesByDisplay()
                 guard !Task.isCancelled, let self, self.generation == generation else { return }
+                let snapshot = processes.map(resolve)
                 if applications != snapshot { applications = snapshot; changed?() }
                 do { try await Task.sleep(for: .seconds(3)) } catch { return }
             }
         }
     }
 
+    /// Maps window-owning processes to application identities. Only processes with on-screen windows are
+    /// resolved, and each only once: `NSRunningApplication` properties are LaunchServices round trips, and
+    /// standardizing bundle URLs touches the file system. Hidden applications need no check here, because
+    /// their windows are off screen and the enumeration asks for on-screen windows only.
+    private func resolve(_ processes: [UInt32: Set<pid_t>]) -> [UInt32: Set<String>] {
+        let current = processes.values.reduce(into: Set<pid_t>()) { $0.formUnion($1) }
+        identities = identities.filter { current.contains($0.key) }
+        var roots: [(pid: pid_t, path: String, identity: String)]?
+        for pid in current where identities[pid] == nil {
+            if roots == nil { roots = Self.regularRoots() }
+            identities[pid] = Self.identity(of: pid, in: roots ?? [])
+        }
+        return processes.mapValues { pids in Set(pids.compactMap { identities[$0] ?? nil }) }
+    }
+
+    private static func regularRoots() -> [(pid: pid_t, path: String, identity: String)] {
+        NSWorkspace.shared.runningApplications.compactMap { app in
+            guard app.activationPolicy == .regular, let url = app.bundleURL?.standardizedFileURL else { return nil }
+            return (app.processIdentifier, url.path, app.bundleIdentifier ?? url.path)
+        }
+    }
+
     /// Helpers nested inside a regular app bundle share its icon identity. Avoid guessing
     /// ownership from a name or bundle-ID prefix, which can conflate unrelated apps.
-    private func processIdentities() -> [pid_t: String] {
-        let processes = NSWorkspace.shared.runningApplications
-        let regular = processes.filter { $0.activationPolicy == .regular && $0.bundleURL != nil }
-        var result: [pid_t: String] = [:]
-        for process in processes {
-            guard !process.isHidden, let url = process.bundleURL?.standardizedFileURL else { continue }
-            let owner = regular.first { candidate in
-                guard let root = candidate.bundleURL?.standardizedFileURL else { return false }
-                return candidate.processIdentifier == process.processIdentifier
-                    || root == url || url.path.hasPrefix(root.path + "/")
-            }
-            guard let owner, !owner.isHidden, let root = owner.bundleURL else { continue }
-            result[process.processIdentifier] = owner.bundleIdentifier ?? root.standardizedFileURL.path
+    private static func identity(of pid: pid_t, in roots: [(pid: pid_t, path: String, identity: String)]) -> String? {
+        if let own = roots.first(where: { $0.pid == pid }) { return own.identity }
+        guard let path = NSRunningApplication(processIdentifier: pid)?.bundleURL?.standardizedFileURL.path else {
+            return nil
         }
-        return result
+        return roots.first { $0.path == path || path.hasPrefix($0.path + "/") }?.identity
     }
 
     func invalidate() {
@@ -90,5 +106,6 @@ final class DisplayApplicationOccupancy {
         task?.cancel()
         task = nil
         applications = nil
+        identities = [:]
     }
 }

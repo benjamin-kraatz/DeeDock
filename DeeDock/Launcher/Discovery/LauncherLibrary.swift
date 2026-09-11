@@ -32,9 +32,12 @@ final class LauncherLibrary {
                 guard let self, self.queryGeneration == queryToken,
                       let query = self.query, !self.owners.isEmpty else { return }
                 query.disableUpdates()
-                let urls = query.results.compactMap { ($0 as? NSMetadataItem)?.value(forAttribute: NSMetadataItemPathKey) as? String }.map { URL(fileURLWithPath: $0) }
+                // Application bundles are directories. Saying so avoids a file-system check per result.
+                let urls = query.results.compactMap { ($0 as? NSMetadataItem)?.value(forAttribute: NSMetadataItemPathKey) as? String }
+                    .map { URL(fileURLWithPath: $0, isDirectory: true) }
                 query.stop()
-                self.extraURLs = extraURLs + urls.filter { LauncherDiscovery.isUserFacingLocation($0) }
+                let home = FileManager.default.homeDirectoryForCurrentUser
+                self.extraURLs = extraURLs + urls.filter { LauncherDiscovery.isUserFacingLocation($0, home: home) }
                 self.refresh()
             }
         }
