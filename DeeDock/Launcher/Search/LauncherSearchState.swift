@@ -27,6 +27,8 @@ final class LauncherSearchState {
     @ObservationIgnored private var activation: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var queryGeneration = UUID()
+    /// Open from a query change until its ranked results are committed; a newer query supersedes it.
+    @ObservationIgnored private var queryInterval: PerformanceSignposts.Interval?
 
     var visible: [LauncherSearchResult] { Array(results.prefix(limit)) }
     var incompleteStores: Bool {
@@ -73,6 +75,8 @@ final class LauncherSearchState {
 
     func invalidateQuery() {
         queryGeneration = UUID(); results = []; limit = 40; ranking = true
+        PerformanceSignposts.cancel(queryInterval)
+        queryInterval = active ? PerformanceSignposts.begin(.launcherQuery) : nil
         // Retain a selection tombstone until ranking confirms it, or the user moves again.
         // Return must never turn a disappearing selected object into a different first result.
     }
@@ -83,9 +87,14 @@ final class LauncherSearchState {
         let token = queryGeneration, session = generation
         ranking = true
         do { try await Task.sleep(for: .milliseconds(120)) } catch { return }
+        let rank = PerformanceSignposts.begin(.launcherRank)
         let next = await LauncherSearchIndex.results(input, windows: sources)
-        guard !Task.isCancelled, active, queryGeneration == token, generation == session else { return }
+        guard !Task.isCancelled, active, queryGeneration == token, generation == session else {
+            PerformanceSignposts.cancel(rank); return
+        }
+        PerformanceSignposts.end(rank)
         results = next; ranking = false
+        PerformanceSignposts.endAfterCommit(queryInterval); queryInterval = nil
         if let selectedID, let index = next.firstIndex(where: { $0.id == selectedID }) {
             limit = max(limit, ((index / 40) + 1) * 40)
         }
@@ -159,6 +168,7 @@ final class LauncherSearchState {
 
     func stop() {
         active = false; generation = UUID(); queryGeneration = UUID()
+        PerformanceSignposts.cancel(queryInterval); queryInterval = nil
         discovery?.cancel(); discovery = nil; activation?.cancel(); activation = nil
         sources = []; results = []; selectedID = nil; ranking = false; discovering = false; actionBusy = false
         let service = service; self.service = nil

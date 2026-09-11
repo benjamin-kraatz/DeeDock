@@ -195,6 +195,8 @@ final class WindowPeekCoordinator {
               !QuarantineStore.shared.contains(item.id, url: item.resolvedURL ?? item.reference.url),
               !QuarantineStore.shared.unreadable else { return }
         guard let context = panel.windowPeekContext(for: item.id), context.settings.windowPeekEnabled else { return }
+        // Measures the panel appearing; window discovery and thumbnails fill it in afterwards.
+        let interval = PerformanceSignposts.begin(.peekOpen)
         let next = WindowPeekPanelController(item: item, anchor: context.anchor,
                                              settings: context.settings, keyboard: keyboard)
         controller = next
@@ -266,6 +268,7 @@ final class WindowPeekCoordinator {
             next.state.addToFusion = nil
         }
         next.show()
+        PerformanceSignposts.endAfterCommit(interval)
         discover(item)
     }
 

@@ -21,8 +21,12 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
             || environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
     }
 
+    /// Present only when launched with benchmark arguments by `benchmarks/run.sh`.
+    private var benchmark: BenchmarkRunner?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !isRunningForCanvasPreview else { return }
+        benchmark = BenchmarkRunner.fromLaunchArguments()
         NSApp.setActivationPolicy(.accessory)
         AppDockPresence.shared.start()
         loginItems.refresh()
@@ -30,8 +34,13 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         screenCapture.refresh()
         coordinator.start()
         #if DIRECT_DISTRIBUTION
-        updater.start()
+        // An update prompt would interrupt a benchmark and skew its timing.
+        if benchmark == nil { updater.start() }
         #endif
+        if let benchmark {
+            benchmark.run(coordinator)
+            return
+        }
         // After the docks exist, so a first-time reader sees the real thing behind the tour
         // rather than an empty desktop and a description of one.
         onboarding.presentIfNeeded()

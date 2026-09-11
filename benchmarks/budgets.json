@@ -1,0 +1,17 @@
+[
+  { "key": "resources.ddock.cpuPercent", "max": 0.1, "label": "Idle CPU (% of one core)" },
+  { "key": "resources.ddock.wakeupsPerSecond", "max": 1, "label": "Idle wakeups per second" },
+  { "key": "resources.ddock.footprintMiB", "max": 150, "label": "Idle memory (MiB, median)" },
+  { "key": "launch", "stat": "p95", "max": 1000, "label": "Launch to first dock frame, p95 (ms)" },
+  { "key": "hoverResponse", "stat": "p95", "max": 33, "label": "Hover to magnified frame, p95 (ms)" },
+  { "key": "dockRevealOverDelay", "stat": "p95", "max": 50, "label": "Dock reveal beyond configured delay, p95 (ms)" },
+  { "key": "magnifyUpdate", "stat": "p95", "max": 8, "label": "Magnification update, p95 (ms)" },
+  { "key": "launcherOpen", "stat": "p95", "max": 50, "label": "Launcher first frame, p95 (ms)" },
+  { "key": "launcherOpenFromClick", "stat": "p95", "max": 66, "label": "Click to Launcher first frame, p95 (ms)" },
+  { "key": "launcherRank", "stat": "p95", "max": 16, "label": "Launcher ranking, p95 (ms)" },
+  { "key": "launcherQuery", "stat": "p95", "max": 170, "label": "Keystroke to results incl. 120 ms debounce, p95 (ms)" },
+  { "key": "stackOpen", "stat": "p95", "max": 50, "label": "Folder stack opens, p95 (ms)" },
+  { "key": "peekOpen", "stat": "p95", "max": 50, "label": "Window Peek opens, p95 (ms)" },
+  { "key": "frames.magnify.hitchRatio", "max": 5, "label": "Magnification hitch ratio (ms/s)" },
+  { "key": "frames.launcher.hitchRatio", "max": 5, "label": "Launcher hitch ratio (ms/s)" }
+]

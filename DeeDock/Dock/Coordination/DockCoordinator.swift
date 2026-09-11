@@ -298,11 +298,15 @@ final class DockCoordinator {
         let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
                                          .scrollWheel, .leftMouseDown, .rightMouseDown, .otherMouseDown,
                                          .leftMouseUp, .rightMouseUp, .otherMouseUp]
-        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] event in self?.updatePointers(eventType: event.type); self?.dragging.observe(event) }) {
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] event in
+            PerformanceSignposts.noteInput(event)
+            self?.updatePointers(eventType: event.type); self?.dragging.observe(event)
+        }) {
             monitors.append(monitor)
         }
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: mask.union(.keyDown), handler: { [weak self] event in
             guard let self else { return event }
+            PerformanceSignposts.noteInput(event)
             if event.type == .keyDown, !dragging.isDragging, let id = focusedID, let panel = panels[id], panel.owns(event.window), panel.handleKey(event) { return nil }
             updatePointers(eventType: event.type)
             dragging.observe(event)
@@ -783,6 +787,18 @@ final class DockCoordinator {
     }
 
     func showFusion() { fusion.show() }
+
+    // MARK: Benchmark support
+
+    /// Dock panels in display order. Only the benchmark runner uses these hooks.
+    var benchmarkPanels: [DockPanelController] { enabledDisplays.compactMap { panels[$0.id] } }
+    func benchmarkShowStack(_ folder: FolderDockItem, on panel: DockPanelController) {
+        folderStacks.show(folder, on: panel, keyboard: false)
+    }
+    func benchmarkCloseStack() { folderStacks.close() }
+    func benchmarkShowPeek(_ item: DockItem, on panel: DockPanelController) { windowPeeks.showKeyboard(item, on: panel) }
+    func benchmarkClosePeek() { windowPeeks.close(returnFocus: false) }
+    func benchmarkCloseWindowSearch() { windowSearch.stop() }
 
     func stop() {
         atmosphere.stop()

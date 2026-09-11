@@ -85,7 +85,7 @@ The production baseline scored the same 1,000-example and 10,000-example inputs 
 
 These are single-run developer-machine measurements. Each scale update uses one synthetic batch to measure rebuild cost. They do not measure background energy, app memory peaks, or incremental updates under UI load. Initial evaluation budgets are 10,000 examples, a 16 MB compiled model, a 250 ms rebuild, and 5 ms p95 inference. These are engineering limits, not product guarantees. The selectable production engine now uses batches of at most 256. Its full 10,000-example rebuild took roughly one second in focused behavior tests, exceeding the original 250 ms target. That test duration is not an optimized benchmark; cumulative rebuild cost under UI load remains unmeasured.
 
-The reproducible files are [the seed generator](../scripts/generate-suggestions-model.py), [the synthetic prototype](../scripts/benchmark-suggestions-model.swift), and [the empty seed](../scripts/fixtures/LauncherSuggestions.mlmodel). The generator requires `coremltools==9.0` in separate development tooling. The app has no Python dependency or packaged personalized model. These commands compile and run the prototype from the repository root. The prototype uses temporary model directories and reads no app-use history.
+The reproducible files are [the seed generator](../scripts/generate-suggestions-model.py), [the synthetic prototype](../benchmarks/micro/suggestions-model.swift), and [the empty seed](../scripts/fixtures/LauncherSuggestions.mlmodel). The generator requires `coremltools==9.0` in separate development tooling. The app has no Python dependency or packaged personalized model. These commands compile and run the prototype from the repository root. The prototype uses temporary model directories and reads no app-use history.
 
 ```sh
 DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcrun swiftc -O \
@@ -93,7 +93,7 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcrun swiftc -O \
   DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionBaseline.swift \
   DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionRanking.swift \
   DeeDock/Launcher/Suggestions/Prediction/LauncherSuggestionCoreML.swift \
-  scripts/benchmark-suggestions-model.swift -o /tmp/dee26-benchmark
+  benchmarks/micro/suggestions-model.swift -o /tmp/dee26-benchmark
 /tmp/dee26-benchmark scripts/fixtures/LauncherSuggestions.mlmodel
 ```
 

@@ -128,6 +128,9 @@
 		DE28B0000000000000000003 /* DeeDock/Dock/Shelf/Clipboard/ShelfClipboardImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE28F0000000000000000003 /* DeeDock/Dock/Shelf/Clipboard/ShelfClipboardImporter.swift */; };
 		DE31B0000000000000000001 /* DeeDock/Dock/Stacks/FolderContentsMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE31F0000000000000000001 /* DeeDock/Dock/Stacks/FolderContentsMetrics.swift */; };
 		DE31B0000000000000000002 /* DeeDock/Dock/Stacks/FolderContentsEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE31F0000000000000000002 /* DeeDock/Dock/Stacks/FolderContentsEnumerator.swift */; };
+		BE0CB0000000000000000001 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0CF0000000000000000001 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkStatistics.swift */; };
+		BE0CB0000000000000000002 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0CF0000000000000000002 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkReport.swift */; };
+		BE0CB0000000000000000003 /* DeeDock/App/Diagnostics/Benchmark/ProcessResourceUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0CF0000000000000000003 /* DeeDock/App/Diagnostics/Benchmark/ProcessResourceUsage.swift */; };
 		DE31B0000000000000000003 /* DeeDock/Dock/Stacks/FolderContentsMetricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE31F0000000000000000003 /* DeeDock/Dock/Stacks/FolderContentsMetricsService.swift */; };
 		DE33B0000000000000000001 /* DeeDock/Dock/Sims/DockSimsMood.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE33F0000000000000000001 /* DeeDock/Dock/Sims/DockSimsMood.swift */; };
 		DE33B0000000000000000002 /* DeeDock/Dock/Sims/DockSimsDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE33F0000000000000000002 /* DeeDock/Dock/Sims/DockSimsDocument.swift */; };
@@ -276,6 +279,9 @@
 		DE28F0000000000000000003 /* DeeDock/Dock/Shelf/Clipboard/ShelfClipboardImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Shelf/Clipboard/ShelfClipboardImporter.swift; sourceTree = SOURCE_ROOT; };
 		DE31F0000000000000000001 /* DeeDock/Dock/Stacks/FolderContentsMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderContentsMetrics.swift; sourceTree = SOURCE_ROOT; };
 		DE31F0000000000000000002 /* DeeDock/Dock/Stacks/FolderContentsEnumerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderContentsEnumerator.swift; sourceTree = SOURCE_ROOT; };
+		BE0CF0000000000000000001 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/App/Diagnostics/Benchmark/BenchmarkStatistics.swift; sourceTree = SOURCE_ROOT; };
+		BE0CF0000000000000000002 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/App/Diagnostics/Benchmark/BenchmarkReport.swift; sourceTree = SOURCE_ROOT; };
+		BE0CF0000000000000000003 /* DeeDock/App/Diagnostics/Benchmark/ProcessResourceUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/App/Diagnostics/Benchmark/ProcessResourceUsage.swift; sourceTree = SOURCE_ROOT; };
 		DE31F0000000000000000003 /* DeeDock/Dock/Stacks/FolderContentsMetricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Stacks/FolderContentsMetricsService.swift; sourceTree = SOURCE_ROOT; };
 		DE33F0000000000000000001 /* DeeDock/Dock/Sims/DockSimsMood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Sims/DockSimsMood.swift; sourceTree = SOURCE_ROOT; };
 		DE33F0000000000000000002 /* DeeDock/Dock/Sims/DockSimsDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeDock/Dock/Sims/DockSimsDocument.swift; sourceTree = SOURCE_ROOT; };
@@ -453,6 +459,9 @@
 				DE31F0000000000000000001 /* DeeDock/Dock/Stacks/FolderContentsMetrics.swift */,
 				DE31F0000000000000000002 /* DeeDock/Dock/Stacks/FolderContentsEnumerator.swift */,
 				DE31F0000000000000000003 /* DeeDock/Dock/Stacks/FolderContentsMetricsService.swift */,
+				BE0CF0000000000000000001 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkStatistics.swift */,
+				BE0CF0000000000000000002 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkReport.swift */,
+				BE0CF0000000000000000003 /* DeeDock/App/Diagnostics/Benchmark/ProcessResourceUsage.swift */,
 				DDF6000000000000000000000 /* DeeDock/Onboarding/Models/OnboardingStep.swift */,
 				DDF6000000000000000000001 /* DeeDock/Onboarding/Models/SystemDockReservation.swift */,
 				DDF6000000000000000000002 /* DeeDock/Onboarding/Persistence/OnboardingRepository.swift */,
@@ -738,6 +747,9 @@
 				DE31B0000000000000000001 /* DeeDock/Dock/Stacks/FolderContentsMetrics.swift in Sources */,
 				DE31B0000000000000000002 /* DeeDock/Dock/Stacks/FolderContentsEnumerator.swift in Sources */,
 				DE31B0000000000000000003 /* DeeDock/Dock/Stacks/FolderContentsMetricsService.swift in Sources */,
+				BE0CB0000000000000000001 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkStatistics.swift in Sources */,
+				BE0CB0000000000000000002 /* DeeDock/App/Diagnostics/Benchmark/BenchmarkReport.swift in Sources */,
+				BE0CB0000000000000000003 /* DeeDock/App/Diagnostics/Benchmark/ProcessResourceUsage.swift in Sources */,
 				DDF5000000000000000000000 /* DeeDock/Onboarding/Models/OnboardingStep.swift in Sources */,
 				DDF5000000000000000000001 /* DeeDock/Onboarding/Models/SystemDockReservation.swift in Sources */,
 				DDF5000000000000000000002 /* DeeDock/Onboarding/Persistence/OnboardingRepository.swift in Sources */,
