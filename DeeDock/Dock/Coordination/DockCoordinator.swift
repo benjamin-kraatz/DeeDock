@@ -18,7 +18,7 @@ final class DockCoordinator {
     let watchPresets = WindowWatchPresetStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
-    @ObservationIgnored private let mode69Ambient = Mode69AmbientController()
+    let atmosphere = AtmosphereController()
     let zonePreview = DockZonePreviewController()
     let displayIndicator = DisplaySelectionIndicatorController()
     /// One-shot navigation consumed by Settings, including when its window is first created.
@@ -127,7 +127,7 @@ final class DockCoordinator {
     func start() {
         guard !started else { return }
         started = true
-        mode69Ambient.start()
+        atmosphere.start()
         occupancy.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
@@ -320,7 +320,7 @@ final class DockCoordinator {
         reconciling = true
         defer { reconciling = false }
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
-        mode69Ambient.update(displays: displays, enabled: profiles.modes.activeMode.mode69PlusEnabled)
+        atmosphere.update(displays: displays)
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
         let desired = Set(enabledDisplays.map(\.id))
         for id in Array(panels.keys) where !desired.contains(id) {
@@ -785,7 +785,7 @@ final class DockCoordinator {
     func showFusion() { fusion.show() }
 
     func stop() {
-        mode69Ambient.stop()
+        atmosphere.stop()
         guard started else { return }
         started = false
         occupancy.stop()

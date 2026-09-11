@@ -186,8 +186,7 @@ final class DockModesStore {
             ?? DockModeNaming.copyName(for: source.name, in: document.modes)
         guard DockModeNaming.isAvailable(name, in: document.modes) else { return nil }
         let duplicate = DockMode(name: name, appVisibility: source.appVisibility,
-                                 displays: source.displays, recipe: source.recipe, mode69Enabled: source.mode69Enabled,
-                                 mode69PlusEnabled: source.mode69PlusEnabled)
+                                 displays: source.displays, recipe: source.recipe)
         var proposed = document
         let sourceIndex = proposed.modes.firstIndex(where: { $0.id == source.id }) ?? proposed.modes.endIndex - 1
         proposed.modes.insert(duplicate, at: proposed.modes.index(after: sourceIndex))
@@ -212,26 +211,6 @@ final class DockModesStore {
               document.modes.indices.contains(index + distance) else { return false }
         var proposed = document
         proposed.modes.swapAt(index, index + distance)
-        return commit(proposed)
-    }
-
-    /// Persists the full-display effect without changing the smaller dock skin.
-    @discardableResult
-    func setMode69PlusEnabled(_ enabled: Bool, for id: UUID) -> Bool {
-        guard canEdit else { return false }
-        var proposed = document
-        guard let index = proposed.modes.firstIndex(where: { $0.id == id }) else { return false }
-        proposed.modes[index].mode69PlusEnabled = enabled
-        return commit(proposed)
-    }
-
-    /// Saves the skin before publishing it to connected docks.
-    @discardableResult
-    func setMode69Enabled(_ enabled: Bool, for id: UUID) -> Bool {
-        guard canEdit else { return false }
-        var proposed = document
-        guard let index = proposed.modes.firstIndex(where: { $0.id == id }) else { return false }
-        proposed.modes[index].mode69Enabled = enabled
         return commit(proposed)
     }
 

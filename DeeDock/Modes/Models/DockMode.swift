@@ -14,21 +14,15 @@ struct DockMode: Equatable, Identifiable {
     var displays: [String: DockModeDisplayConfiguration]
     /// Optional ordered prepare steps. Ordinary activation never runs them.
     var recipe: WorkspaceRecipe
-    /// Opt-in ambient decoration, independent of the mode name.
-    var mode69Enabled: Bool
-    /// Full-display ambient overlay, separately opt-in from the dock decoration.
-    var mode69PlusEnabled: Bool
 
     init(id: UUID = UUID(), name: String, appVisibility: DockAppVisibility = .showAll,
          displays: [String: DockModeDisplayConfiguration] = [:],
-         recipe: WorkspaceRecipe = .empty, mode69Enabled: Bool = false, mode69PlusEnabled: Bool = false) {
+         recipe: WorkspaceRecipe = .empty) {
         self.id = id
         self.name = name
         self.appVisibility = appVisibility
         self.displays = displays
         self.recipe = recipe.sanitized
-        self.mode69Enabled = mode69Enabled
-        self.mode69PlusEnabled = mode69PlusEnabled
     }
 
     var hasRecipe: Bool { !recipe.isEmpty }
@@ -36,7 +30,7 @@ struct DockMode: Equatable, Identifiable {
 
 extension DockMode: Codable {
     private enum CodingKeys: String, CodingKey {
-        case id, name, appVisibility, displays, recipe, mode69Enabled, mode69PlusEnabled
+        case id, name, appVisibility, displays, recipe
     }
 
     init(from decoder: Decoder) throws {
@@ -45,8 +39,6 @@ extension DockMode: Codable {
         name = try container.decode(String.self, forKey: .name)
         appVisibility = try container.decode(DockAppVisibility.self, forKey: .appVisibility)
         displays = try container.decode([String: DockModeDisplayConfiguration].self, forKey: .displays)
-        mode69PlusEnabled = (try? container.decodeIfPresent(Bool.self, forKey: .mode69PlusEnabled)) ?? false
-        mode69Enabled = (try? container.decodeIfPresent(Bool.self, forKey: .mode69Enabled)) ?? false
         // A corrupt recipe must not lock pins or visibility. Missing recipes stay empty.
         recipe = ((try? container.decodeIfPresent(WorkspaceRecipe.self, forKey: .recipe)) ?? .empty).sanitized
     }
@@ -57,8 +49,6 @@ extension DockMode: Codable {
         try container.encode(name, forKey: .name)
         try container.encode(appVisibility, forKey: .appVisibility)
         try container.encode(displays, forKey: .displays)
-        if mode69PlusEnabled { try container.encode(true, forKey: .mode69PlusEnabled) }
-        if mode69Enabled { try container.encode(true, forKey: .mode69Enabled) }
         if !recipe.isEmpty {
             try container.encode(recipe.sanitized, forKey: .recipe)
         }
