@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+@testable import DeeDock
 
 @MainActor struct DockEdgeGeometryTests {
     private let screen = CGRect(x: -1800, y: -400, width: 1600, height: 1000)

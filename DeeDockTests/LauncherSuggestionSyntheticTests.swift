@@ -1,6 +1,7 @@
 #if DEBUG
 import Foundation
 import Testing
+@testable import DeeDock
 
 struct LauncherSuggestionSyntheticTests {
     @MainActor @Test("Advancing the synthetic clock preserves remaining daily event spacing")

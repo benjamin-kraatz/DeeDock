@@ -1,4 +1,5 @@
 import Testing
+@testable import DeeDock
 
 struct LauncherSuggestionNavigationTests {
     @Test("Suggested duplicates keep separate selection and continuous reading order")

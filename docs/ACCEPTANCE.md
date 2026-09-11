@@ -2281,3 +2281,32 @@ Pending hands-on acceptance:
   Confirm the stamp remains visible outside DDock while armed and disappears after exit or a forced crash.
 - Listen to arm, stamp, and release; check system mute, Reduce Motion, English and German,
   VoiceOver, focus retention, Spaces, and fullscreen behavior.
+
+## Hosted test target
+
+`DeeDockTests` stopped compiling on 2026-09-03 (`d947cc6`). It compiled a hand-kept list of app
+sources, unhosted. `OnboardingTests` and later suites imported the `DeeDock` module, which that
+target could not resolve, and listed sources later used types from unlisted files.
+
+The target is now hosted in the app. It depends on the app target, sets `TEST_HOST` and
+`BUNDLE_LOADER`, signs with the app's Apple Development identity (the hardened runtime refuses an
+ad hoc bundle from a different team), and every suite uses `@testable import DeeDock`. The copied
+source list, the **Test Model Sources** and **Recovered References** groups, and the test-only
+strings and Core ML resources are gone; the Core ML tests read the seed from the app bundle.
+`HostEnvironment.isTestHost` starts an empty Settings-only scene instead of the menu-bar app, and
+`QuarantineStore.shared` keeps flags in memory there, as in previews. The host shares DDock's
+preferences domain, so tests must keep injecting their own suites and directories.
+
+Tests that had never run needed fixes: two `#expect` forms that did not compile
+(`WindowWatchPresetTests`, `DockLocalHistoryTests`), a preset fixture that ignored its app name,
+and a regression from `0399425`: `DockExternalPayload.read` accepted an empty batch. It throws
+again, as the original importer did.
+
+Run on 2026-09-11 with the user's approval, on macOS 27.0 (26A428), Xcode 27: 377 tests in 53
+suites, 376 passing. The DDock preferences domain was exported before and after each run and was
+byte-identical. The pin-replay timing test failed once out of four runs.
+
+Open: "Image, PDF, and audio headers load" fails because `AVURLAsset` cannot load the duration of
+WAV or AIFF files on this macOS build, including `/System/Library/Sounds/Ping.aiff` outside DDock
+(error −11800, underlying −17770). M4A works. Folder stacks therefore show no duration for those
+files on this build.

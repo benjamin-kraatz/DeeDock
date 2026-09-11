@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+@testable import DeeDock
 
 @MainActor struct DockBehaviorGeometryTests {
     @Test("Activation anchors and offsets use logical screen points, with clamping that preserves requests")

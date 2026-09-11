@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import DeeDock
 
 @MainActor struct DockBehaviorPersistenceTests {
     @Test("Old documents receive behavior defaults, while malformed behavior preserves saved bytes")

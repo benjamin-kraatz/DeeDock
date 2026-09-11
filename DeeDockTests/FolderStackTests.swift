@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import PDFKit
 import Testing
+@testable import DeeDock
 
 struct FolderStackTests {
     @Test("V2 applications migrate to typed v3 pins without changing legacy bytes")

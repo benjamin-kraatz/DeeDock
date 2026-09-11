@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import DeeDock
 
 /// Bundle fixtures live only in a temporary directory and never request persistent sandbox access.
 @MainActor

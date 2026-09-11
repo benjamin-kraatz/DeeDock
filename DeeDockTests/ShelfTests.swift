@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+@testable import DeeDock
 
 @MainActor
 struct ShelfTests {

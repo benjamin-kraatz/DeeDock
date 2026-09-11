@@ -1,4 +1,5 @@
 import Foundation
+@testable import DeeDock
 
 /// Pure display/application fixtures, independent of the host's actual hardware or applications.
 enum DisplayFixtures {
