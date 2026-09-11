@@ -1,0 +1,9 @@
+Kenney Interface Sounds
+https://kenney.nl/assets/interface-sounds
+License: Creative Commons CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Source files supplied with Linear DEE-46:
+quarantine_stamp_arm.wav = switch_001
+quarantine_stamp_stamp.wav = click_001
+quarantine_stamp_undo.wav = bong_001

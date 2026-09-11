@@ -1,6 +1,582 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "quarantineTagline": {
+    "comment": "Quarantine settings hero subtitle.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Set items aside in the dock without moving, deleting, or changing them."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stelle Objekte im Dock zurück, ohne sie zu verschieben, zu löschen oder zu verändern."
+        }
+      }
+    }
+  },
+  "quarantineHowTitle": {
+    "comment": "Quarantine settings section heading for the usage steps.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "How it works"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "So funktioniert’s"
+        }
+      }
+    }
+  },
+  "quarantineStepArm": {
+    "comment": "Quarantine usage step title: arming the stamp.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arm"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktivieren"
+        }
+      }
+    }
+  },
+  "quarantineStepArmDetail": {
+    "comment": "Quarantine usage step detail for arming.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "From the DDock menu or right here."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Über das DDock-Menü oder direkt hier."
+        }
+      }
+    }
+  },
+  "quarantineStepStamp": {
+    "comment": "Quarantine usage step title: stamping an item.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stamp"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stempeln"
+        }
+      }
+    }
+  },
+  "quarantineStepStampDetail": {
+    "comment": "Quarantine usage step detail for stamping.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Click an item to set it aside."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Klicke auf ein Objekt, um es zurückzustellen."
+        }
+      }
+    }
+  },
+  "quarantineStepRelease": {
+    "comment": "Quarantine usage step title: releasing an item.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Release"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Freigeben"
+        }
+      }
+    }
+  },
+  "quarantineStepReleaseDetail": {
+    "comment": "Quarantine usage step detail for releasing.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stamp it again so it opens again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stemple es erneut, damit es sich wieder öffnen lässt."
+        }
+      }
+    }
+  },
+  "quarantinePutAwayHint": {
+    "comment": "Quarantine settings hint shown next to the arm button while the stamp is not armed.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Press Esc or right-click to put the stamp away."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Drücke Esc oder klicke mit der rechten Maustaste, um den Stempel wegzulegen."
+        }
+      }
+    }
+  },
+  "quarantineSoundsTitle": {
+    "comment": "Quarantine settings section heading for sound toggles.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sounds"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Töne"
+        }
+      }
+    }
+  },
+  "quarantineSoundPreview": {
+    "comment": "Accessibility label and tooltip for the button that plays a quarantine sound once.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Play sound"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ton abspielen"
+        }
+      }
+    }
+  },
+  "quarantineItemsTitle": {
+    "comment": "Quarantine settings section heading for the list of stamped items.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Set aside"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zurückgestellt"
+        }
+      }
+    }
+  },
+  "quarantineItemsEmpty": {
+    "comment": "Quarantine settings empty state when no item is stamped.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nothing is set aside."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nichts ist zurückgestellt."
+        }
+      }
+    }
+  },
+  "quarantineItemsArmHint": {
+    "comment": "Quarantine settings hint above the stamped items while the stamp is not armed.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arm the stamp to release items from this list."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiviere den Stempel, um Objekte aus dieser Liste freizugeben."
+        }
+      }
+    }
+  },
+  "quarantineRelease": {
+    "comment": "Quarantine settings button that releases one stamped item.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Release"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Freigeben"
+        }
+      }
+    }
+  },
+  "quarantineDisabledPending": {
+    "comment": "Quarantine settings notice when the feature is off but items are still stamped.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Some items are still set aside. Turn the stamp on to release them."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einige Objekte sind noch zurückgestellt. Schalte den Stempel ein, um sie freizugeben."
+        }
+      }
+    }
+  },
+  "quarantineNotice": {
+    "comment": "Quarantine item notice. This item is in quarantine.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This item is in quarantine."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieses Objekt ist in Quarantäne."
+        }
+      }
+    }
+  },
+  "quarantineNoticeHint": {
+    "comment": "Quarantine item notice. Arm the stamp to release this item.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arm the stamp to release this item."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiviere den Stempel, um dieses Objekt freizugeben."
+        }
+      }
+    }
+  },
+  "quarantineEnable": {
+    "comment": "Quarantine feature Settings preference. Enable quarantine stamp",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable quarantine stamp"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quarantäne-Stempel aktivieren"
+        }
+      }
+    }
+  },
+  "quarantineSoundArm": {
+    "comment": "Quarantine feature Settings preference. Sound when arming",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sound when arming"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ton beim Aktivieren"
+        }
+      }
+    }
+  },
+  "quarantineSoundStamp": {
+    "comment": "Quarantine feature Settings preference. Sound when stamping",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sound when stamping"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ton beim Stempeln"
+        }
+      }
+    }
+  },
+  "quarantineSoundRelease": {
+    "comment": "Quarantine feature Settings preference. Sound when releasing",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sound when releasing"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ton beim Freigeben"
+        }
+      }
+    }
+  },
+  "quarantineTitle": {
+    "comment": "Quarantine stamp control, item state, or help. Quarantine stamp",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quarantine stamp"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quarantäne-Stempel"
+        }
+      }
+    }
+  },
+  "quarantineArm": {
+    "comment": "Quarantine stamp control, item state, or help. Arm stamp",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arm stamp"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stempel aktivieren"
+        }
+      }
+    }
+  },
+  "quarantineDisarm": {
+    "comment": "Quarantine stamp control, item state, or help. Put stamp away",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Put stamp away"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stempel weglegen"
+        }
+      }
+    }
+  },
+  "quarantineArmed": {
+    "comment": "Quarantine stamp control, item state, or help. Stamp armed · Esc to exit",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stamp armed · Esc to exit"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stempel aktiv · Esc zum Beenden"
+        }
+      }
+    }
+  },
+  "quarantineMarked": {
+    "comment": "Quarantine stamp control, item state, or help. Set aside in DDock quarantine",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Set aside in DDock quarantine"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In DDock-Quarantäne zurückgestellt"
+        }
+      }
+    }
+  },
+  "quarantineGestureHelp": {
+    "comment": "Quarantine stamp control, item state, or help. Click an item to stamp it. Stamp again to release. Right-click anywhere to put the stamp away.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Click an item to stamp it. Stamp again to release. Right-click anywhere to put the stamp away."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Klicke auf ein Objekt, um es zu stempeln. Erneut stempeln gibt es frei. Ein Rechtsklick legt den Stempel überall weg."
+        }
+      }
+    }
+  },
+  "quarantineReleaseHelp": {
+    "comment": "Quarantine stamp control, item state, or help. Click to release this item from DDock quarantine.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Click to release this item from DDock quarantine."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Klicke, um dieses Objekt aus der DDock-Quarantäne freizugeben."
+        }
+      }
+    }
+  },
+  "quarantineSettingsHelp": {
+    "comment": "Quarantine stamp control, item state, or help. Enable this feature to show the stamp action in the DDock menu bar. It is off by default. While armed, the dock shows only stampable icons. Marked items stay in place and cannot open until released. Files and macOS quarantine attributes stay untouched.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Quarantine is a DDock-only flag. Stamped items stay where they are and won’t open until released. Files and macOS quarantine attributes are never touched."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Quarantäne ist eine reine DDock-Markierung. Gestempelte Objekte bleiben an ihrem Platz und öffnen sich erst nach der Freigabe. Dateien und macOS-Quarantäneattribute bleiben unverändert."
+        }
+      }
+    }
+  },
+  "quarantineBlocked": {
+    "comment": "Quarantine stamp control, item state, or help. Release this item from DDock quarantine before opening it.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Release this item from DDock quarantine before opening it."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gib dieses Objekt zuerst aus der DDock-Quarantäne frei, um es zu öffnen."
+        }
+      }
+    }
+  },
+  "quarantineStorageError": {
+    "comment": "Quarantine stamp control, item state, or help. DDock could not read or save quarantine flags. Existing data has been preserved.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock could not read or save quarantine flags. Existing data has been preserved."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock konnte die Quarantäne-Markierungen nicht lesen oder speichern. Vorhandene Daten bleiben erhalten."
+        }
+      }
+    }
+  },
   "atmosphereTitle": {
     "comment": "Atmosphere Settings or corner decoration. Atmosphere",
     "extractionState": "manual",
@@ -23657,13 +24233,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dateien griffbereit halten und den Papierkorb verwalten."
+            "value" : "Dateien ablegen, den Papierkorb verwalten und Objekte in Quarantäne zurückstellen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keep files at hand and manage the Trash."
+            "value" : "Stage files, manage the Trash, and set items aside in quarantine."
           }
         }
       }
@@ -24863,13 +25439,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ablage & Papierkorb"
+            "value" : "Ablage, Papierkorb, Quarantäne"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shelf & Trash"
+            "value" : "Shelf, Trash, Quarantine"
           }
         }
       }

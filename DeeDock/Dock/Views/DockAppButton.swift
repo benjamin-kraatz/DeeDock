@@ -186,6 +186,8 @@ struct DockAppButton: View {
                 }
             }
         }
+        .modifier(QuarantineItemModifier(id: item.id, url: item.resolvedURL ?? item.reference.url,
+                                         name: item.reference.name, eligible: item.isFavorite))
     }
 
     private var accessibilityStatus: Text {

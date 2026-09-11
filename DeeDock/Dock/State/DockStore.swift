@@ -26,6 +26,7 @@ final class DockStore {
         get { if case .app(let id) = selectedTarget { return id }; return nil }
         set { selectedTarget = newValue.map(DockEntryID.app) }
     }
+    @ObservationIgnored private var stampObserver: NSObjectProtocol?
     let sections = DockSectionState()
     private(set) var entries: [DockRenderSlot] = []
     @ObservationIgnored var presentationDidChange: (() -> Void)?
@@ -99,6 +100,13 @@ final class DockStore {
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
+        stampObserver = NotificationCenter.default.addObserver(forName: QuarantineStampController.modeChanged,
+                                                              object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.refreshEntries()
+                self?.presentationDidChange?()
+            }
+        }
     }
 
     /// Shows `pins` on this dock without saving them or recording history.
@@ -185,7 +193,12 @@ final class DockStore {
             (order.firstIndex(of: $0.id) ?? order.count) < (order.firstIndex(of: $1.id) ?? order.count)
         }
         for (index, slot) in zip(positions, utilities) { content[index] = slot }
-        let next: [DockRenderSlot] = launcherAtStart ? [.launcher] + content : content + [.launcher]
+        let ordinary: [DockRenderSlot] = launcherAtStart ? [.launcher] + content : content + [.launcher]
+        // Use the same projection for rendering, layout, keyboard selection, and native targets.
+        // Utility actions and running-only apps cannot be stamped and must not remain clickable.
+        let next = QuarantineStampController.shared.armed
+            ? ordinary.filter { $0.item?.isFavorite == true || $0.folder != nil }
+            : ordinary
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
     }
@@ -404,6 +417,12 @@ final class DockStore {
 
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
     func performPrimaryAction(_ item: DockItem) {
+        if QuarantineStampController.shared.armed {
+            if item.isFavorite {
+                QuarantineStampController.shared.stamp(id: item.id, url: item.resolvedURL ?? item.reference.url, name: item.reference.name)
+            }
+            return
+        }
         if item.isFavorite { pinWeather?.recordUse(item.id) }
         soapBubblePlay?(item.id)
         let token = session.token
@@ -424,6 +443,7 @@ final class DockStore {
 
     /// Opens or activates an app without applying the app-icon hide toggle.
     func open(_ item: DockItem) {
+        guard !QuarantineStampController.shared.armed else { return }
         if item.isFavorite { pinWeather?.recordUse(item.id) }
         let token = session.token
         catalog.open(item.reference) { [weak self] error in
@@ -435,6 +455,7 @@ final class DockStore {
 
     /// Captures this panel's session, not its mutable selection or display index.
     func openDocuments(_ documents: DocumentResourceAccess, with reference: ApplicationReference) {
+        guard !QuarantineStampController.shared.armed else { return }
         if persistedPins.contains(where: { $0.id == reference.id }) { pinWeather?.recordUse(reference.id) }
         let token = session.token
         catalog.openDocuments(documents, with: reference) { [weak self] error in
@@ -446,6 +467,7 @@ final class DockStore {
 
     /// A spring activation may outlive hover, but late failures must not reveal an abandoned target.
     func springOpen(_ item: DockItem, isCurrent: @escaping () -> Bool) {
+        guard !QuarantineStampController.shared.armed else { return }
         if item.isFavorite { pinWeather?.recordUse(item.id) }
         let token = session.token
         catalog.springOpen(item.reference, isCurrent: { [weak self] in
@@ -478,5 +500,8 @@ final class DockStore {
     }
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
-    func stop() { previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+    func stop() {
+        if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
+        stampObserver = nil
+        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

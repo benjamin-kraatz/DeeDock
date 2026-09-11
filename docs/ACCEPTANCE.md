@@ -2223,3 +2223,61 @@ first seal; Vision on screenshots, photos, and receipts in English and German; c
 a Mac with Apple Intelligence enabled and absence without it; save panels; slideshow on multiple
 displays, in Spaces, with Reduce Motion, and when exiting with the green button; and rename by
 every entry point with VoiceOver.
+
+## DEE-46: Quarantine stamp
+
+The feature is off by default. **Settings → Features → Shelf, Trash, Quarantine** contains the
+opt-in, instructions, independent arm/stamp/release sound switches, and saved marks for
+release. Enabling it exposes a direct **Arm stamp** action at the root of the DDock
+menu bar, plus controls in Shelf and folder-stack headers. Menus contain no instructions.
+While armed, the dock projects only app pins and folder icons. Running-only apps and
+nonstampable utility controls are absent from layout, keyboard selection, and hit testing.
+Disarming restores the ordinary dock without changing pins or visibility preferences.
+Marked items stay at their original positions.
+Clicking a marked item outside stamp mode shows a nonactivating glass notice for 2.2 seconds.
+It leaves the mark intact. Release requires stamp mode, including release from Settings. Saved flags apply across displays and Dock Modes to matching
+item identities or file URLs. A removed pin's flag remains releasable from Settings.
+
+The stamp follows the pointer across panel headers, menus, and other apps while armed.
+A red forbidden badge and reduced stamp opacity indicate that the pointer is not over a
+visible, unobscured eligible DDock item. The badge disappears over stampable items.
+A 64-point click-through overlay augments the system cursor without changing its hide count.
+Only eligible DDock items handle stamping. Right-click anywhere disarms the stamp. DDock
+consumes that click in its own windows; other apps retain their normal right-click behavior.
+Escape while DDock receives keyboard input,
+**Put stamp away**, disabling the feature, session resignation, sleep, and termination
+end stamp mode and remove its overlay and event monitors. Arming is never persisted.
+The overlay uses the same pad-center anchor for idle and press; there is no lift/highlight frame.
+Folder and Shelf headers use a separate 20-point stamp glyph in a compact button.
+
+`QuarantineStore` saves flags, item IDs, names, URLs, and timestamps in
+`quarantine.records.v1`. Pin, Shelf, and filesystem placement stays in its existing owner.
+Application opening and document handoff, app-menu commands, stack opening and preview,
+and Shelf resource resolution reject marked items. Shelf batch opening rejects the batch
+if it includes a marked item. This is a set-aside convenience, not a security boundary.
+It does not stop an existing process, scan files, modify Gatekeeper, or set xattrs.
+A renamed stack entry can acquire a different URL identity; its old mark remains in the
+Settings release list. Unreadable flag data is preserved and blocks these opening routes.
+
+The locked PNGs are downscaled from `one`, `too`, `vor`, and `wife` into asset
+catalog images. The three locked Kenney WAVs and CC0 notice are bundled resources. Playback
+uses NSSound and system output volume. DDock has no existing Focus-specific sound gate.
+Reduce Motion disables notice fades. The cursor uses only idle and press frames, without
+bounce or lift motion, and Reduce Motion does not mute audio.
+
+Validation: the Debug app target built with `CODE_SIGNING_ALLOWED=NO` using Xcode 27.
+No tests, previews, app launch, or automated visual checks were run.
+
+Pending hands-on acceptance:
+
+- Arm from each control; stamp and release an app pin, folder pin, Shelf item, and stack
+  entry. Confirm placement survives release and restart, and all four images read at size.
+- Check idle and press pad alignment on Retina and non-Retina displays, each dock
+  edge, mixed display origins, and unplugging a display while armed.
+- Try keyboard opening, app context commands, file drops, Shelf bulk opening and dragging,
+  and Window Peek while an item is marked. Confirm no marked item opens.
+- Exit with right-click inside DDock and over another app, Escape, the menu, sleep, logout,
+  and quitting during the press.
+  Confirm the stamp remains visible outside DDock while armed and disappears after exit or a forced crash.
+- Listen to arm, stamp, and release; check system mute, Reduce Motion, English and German,
+  VoiceOver, focus retention, Spaces, and fullscreen behavior.

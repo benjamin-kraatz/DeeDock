@@ -12,6 +12,7 @@ struct FeaturesPageContent: View {
     var body: some View {
         switch page {
         case .shelfAndTrash:
+            QuarantineSettingsCard()
             SettingsCard(title: .settingsShelf, footnote: .settingsShelfHelp) {
                 SettingsToggleRow(title: .settingsShowShelf, isOn: source.binding(\.showShelf))
             }

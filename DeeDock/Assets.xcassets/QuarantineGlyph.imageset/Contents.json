@@ -1,0 +1,18 @@
+{
+  "images": [
+    {
+      "filename": "QuarantineGlyph@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
+    },
+    {
+      "filename": "QuarantineGlyph@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

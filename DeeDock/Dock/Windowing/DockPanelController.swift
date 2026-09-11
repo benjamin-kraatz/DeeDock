@@ -90,6 +90,7 @@ final class DockPanelController {
         visibility.didChange = { [weak self] in self?.present() }
         store.presentationDidChange = { [weak self] in
             guard let self, !updatingGeometry, let display = lastDisplay, let settings = lastSettings else { return }
+            if QuarantineStampController.shared.armed, launcher.isPresented { closeLauncher() }
             interaction.tooltips.clear()
             withAnimation(visibility.reduceMotion ? nil : .easeOut(duration: 0.18)) {
                 self.update(display: display, settings: settings, animateSectionChange: true)
@@ -151,16 +152,16 @@ final class DockPanelController {
             ? (settings.edge.isVertical ? 260 : 168)
             : nil
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
-                                         utilityCount: store.entries.filter(\.isUtility).count - (settings.launcherAtStart ? 1 : 0),
-                                         leadingUtilityCount: settings.launcherAtStart ? 1 : 0,
+                                         utilityCount: store.entries.filter(\.isUtility).count - (settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0),
+                                         leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
                                          availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
                                          calloutReserve: timelineCallout)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                                                 utilityCount: slots.filter(\.isUtility).count - (settings.launcherAtStart ? 1 : 0),
-                                                 leadingUtilityCount: settings.launcherAtStart ? 1 : 0,
+                                                 utilityCount: slots.filter(\.isUtility).count - (settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0),
+                                                 leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
                                                  availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
                                          calloutReserve: timelineCallout)

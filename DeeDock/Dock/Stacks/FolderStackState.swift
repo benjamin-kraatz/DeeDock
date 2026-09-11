@@ -139,6 +139,7 @@ final class FolderStackState {
 
     /// Keeps the root bookmark alive while browsing only real descendants, never aliases or packages.
     func navigate(to url: URL) {
+        guard !QuarantineStore.shared.blocks(url) else { return }
         guard !copying, entries.contains(where: { $0.reference.url == url && $0.reference.isFolder }) else { return }
         history.append(directory)
         changeDirectory(url)
@@ -170,6 +171,7 @@ final class FolderStackState {
     }
 
     func showPreview(_ entry: FolderStackEntryReference) {
+        guard !QuarantineStore.shared.blocks(entry.url) else { return }
         guard let access else { return }
         selectedID = entry.id
         showPreview(entry, access: access)

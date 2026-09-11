@@ -94,6 +94,11 @@ final class ApplicationMenuController {
     func perform(_ action: ApplicationMenuAction,
                  for item: DockItem,
                  completion: @escaping (LocalizedStringResource?) -> Void) -> UUID? {
+        guard !QuarantineStore.shared.contains(item.id, url: item.resolvedURL ?? item.reference.url),
+              !QuarantineStore.shared.unreadable else {
+            completion(.quarantineBlocked)
+            return nil
+        }
         switch action {
         case .showInFinder, .setHidden, .bringAllToFront, .quit:
             do {

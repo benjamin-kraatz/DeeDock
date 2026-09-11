@@ -43,6 +43,7 @@ struct DeeDockApp: App {
                 .keyboardShortcut("f", modifiers: [.command, .shift])
             Text(delegate.coordinator.searchShortcutAvailable ? .windowSearchShortcutHelp : .windowSearchShortcutUnavailable)
             Button(.fusionTitle) { delegate.coordinator.showFusion() }
+            QuarantineMenu()
             DockModesMenu(coordinator: delegate.coordinator)
             Divider()
             OpenDockSettingsButton()
