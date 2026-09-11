@@ -20,6 +20,7 @@ final class AtmosphereStore {
         decorImage = defaults?.data(forKey: "atmosphere.decor.v1").flatMap(NSImage.init(data:))
         settings = defaults?.data(forKey: Self.key).flatMap { try? JSONDecoder().decode(AtmosphereSettings.self, from: $0) } ?? .init()
         settings.density = settings.density.isFinite ? min(1, max(0, settings.density)) : 0.5
+        settings.intensity = AtmosphereLimits.clamped(settings.intensity)
     }
     /// Copy the system sheet result into a bounded PNG before its temporary URL expires.
     func saveDecor(from url: URL) -> Bool {

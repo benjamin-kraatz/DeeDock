@@ -12,7 +12,7 @@ struct AtmosphereAmbientView: View {
                         rim.move(to: CGPoint(x: 0, y: size.height)); rim.addLine(to: CGPoint(x: size.width, y: size.height))
                         if scene.leftEdge { rim.move(to: .zero); rim.addLine(to: CGPoint(x: 0, y: size.height)) }
                         if scene.rightEdge { rim.move(to: CGPoint(x: size.width, y: 0)); rim.addLine(to: CGPoint(x: size.width, y: size.height)) }
-                        context.stroke(rim, with: .color(scene.palette.first.color), lineWidth: 2)
+                        context.stroke(rim, with: .color(scene.palette.first.color), lineWidth: AtmosphereLimits.rimWidth(intensity: scene.settings.intensity))
                     }
                 } else {
                     let width = max(proxy.size.width, scene.canvasWidth)
@@ -29,7 +29,7 @@ struct AtmosphereAmbientView: View {
                             }
                         }
                         .offset(x: -scene.offset)
-                        .opacity(scene.settings.preset == .minimal ? 0.07 : 0.18)
+                        .opacity(AtmosphereLimits.ambientOpacity(preset: scene.settings.preset, intensity: scene.settings.intensity))
                 }
                 if scene.settings.preset.hasDecor && scene.settings.density > 0 {
                     if scene.reduceMotion || scene.reduceTransparency || scene.paused {
@@ -86,6 +86,25 @@ struct AtmosphereAmbientView: View {
                     if preset.hasDecor { AtmosphereDecorView(scene: scene) }
                 }.frame(width: 500, height: 180)
             }
+        }
+    }.padding()
+}
+
+#Preview("Atmosphere intensity") {
+    HStack(spacing: 12) {
+        ForEach([0.0, AtmosphereLimits.defaultIntensity, 1.0], id: \.self) { intensity in
+            let scene = {
+                let scene = AtmosphereScene()
+                scene.settings.intensity = intensity
+                scene.reduceMotion = true
+                scene.canvasWidth = 220
+                return scene
+            }()
+            ZStack {
+                Color.black
+                AtmosphereAmbientView(scene: scene)
+            }
+            .frame(width: 220, height: 140)
         }
     }.padding()
 }
