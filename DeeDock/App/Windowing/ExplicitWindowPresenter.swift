@@ -11,8 +11,10 @@ final class ExplicitWindowPresenter {
     /// A focus owner may restore its previous app only while this request identity is unchanged.
     private(set) var generation = UUID()
     private weak var settingsWindow: NSWindow?
+    private weak var cloneWindow: NSWindow?
     private weak var target: NSWindow?
     private var awaitingSettings = false
+    private var awaitingClone = false
     private var observers: [NSObjectProtocol] = []
     private var inputMonitor: Any?
     private var timeout: Task<Void, Never>?
@@ -34,6 +36,23 @@ final class ExplicitWindowPresenter {
     func registerSettings(_ window: NSWindow) {
         settingsWindow = window
         if awaitingSettings { attach(window) }
+    }
+
+    /// Starts a request before SwiftUI creates or reuses the System Settings Clone scene.
+    func openSystemSettingsClone(using openWindow: OpenWindowAction, source: String) {
+        begin(source: source)
+        awaitingClone = true
+        if let cloneWindow {
+            attach(cloneWindow)
+        } else {
+            openWindow(id: SystemSettingsCloneWindow.id)
+        }
+    }
+
+    /// Registers the clone scene window without activating it during ordinary view updates.
+    func registerSystemSettingsClone(_ window: NSWindow) {
+        cloneWindow = window
+        if awaitingClone { attach(window) }
     }
 
     /// Reuses and deminiaturizes an owned window, then requests keyboard focus after menu tracking.
@@ -131,6 +150,7 @@ final class ExplicitWindowPresenter {
         inputMonitor = nil
         target = nil
         awaitingSettings = false
+        awaitingClone = false
     }
 
     private func log(_ event: String) {

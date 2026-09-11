@@ -48,6 +48,7 @@ struct DeeDockApp: App {
             Divider()
             OpenDockSettingsButton()
                 .keyboardShortcut(",")
+            OpenSystemSettingsCloneButton()
             #if DIRECT_DISTRIBUTION
             CheckForUpdatesButton(updater: delegate.updater)
             #endif
@@ -76,6 +77,7 @@ struct DeeDockApp: App {
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                     .disabled(!delegate.coordinator.canBrowseLocalHistory)
                 Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
+                OpenSystemSettingsCloneButton()
             }
         }
         Window(Text(.actionSettings), id: "settings") {
@@ -92,6 +94,13 @@ struct DeeDockApp: App {
         .windowToolbarStyle(.unified)
         .defaultLaunchBehavior(.suppressed)
         .defaultSize(width: 820, height: 650)
+        Window(Text(.systemSettingsCloneTitle), id: SystemSettingsCloneWindow.id) {
+            SystemSettingsCloneView()
+                .background { SystemSettingsCloneWindowRegistration() }
+        }
+        .windowToolbarStyle(.unified)
+        .defaultLaunchBehavior(.suppressed)
+        .defaultSize(width: 920, height: 720)
     }
 }
 

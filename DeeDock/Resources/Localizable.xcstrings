@@ -34515,6 +34515,1752 @@
           }
         }
       }
+    },
+    "systemSettingsCloneMenu" : {
+      "comment" : "Menu command that opens the System Settings Clone window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen-Klon"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Settings Clone"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneTitle" : {
+      "comment" : "Title of the System Settings Clone window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen-Klon"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Settings Clone"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneSearchPrompt" : {
+      "comment" : "Placeholder in the System Settings Clone search field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search settings"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneFooter" : {
+      "comment" : "Footer reminder that the clone only opens System Settings and never writes values.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet die macOS-Systemeinstellungen. DDock ändert diese Werte nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens macOS System Settings. DDock does not change these values."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneSubtitle" : {
+      "comment" : "Row subtitle. pane is the System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet Systemeinstellungen → %1$(pane)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens System Settings → %1$(pane)@"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneEmptySearch" : {
+      "comment" : "Title when System Settings Clone search matches no rows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Treffer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No settings match"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneEmptySearchDescription" : {
+      "comment" : "Explains a search miss. query is the text the person typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In diesem Überblick gibt es nichts zu „%1$(query)@“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing in this guide matches “%1$(query)@”."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneClearSearch" : {
+      "comment" : "Button that clears the System Settings Clone search field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Search"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneOpenFailed" : {
+      "comment" : "Non-blocking error when System Settings cannot be opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Systemeinstellungen konnten nicht geöffnet werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Settings could not be opened."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneOpenedRoot" : {
+      "comment" : "Shown when a pane URL failed and System Settings opened at its root instead.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen geöffnet. Dieser Bereich ist in dieser macOS-Version möglicherweise woanders."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened System Settings. That pane may have moved on this macOS version."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneOpenRoot" : {
+      "comment" : "Sidebar button that opens System Settings without a pane.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Settings"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneOpenRootSubtitle" : {
+      "comment" : "Explains the sidebar button that opens System Settings at its root.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet die macOS-App auf der ersten Seite."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the macOS app at its first pane."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryMePrivacy" : {
+      "comment" : "Clone category: Apple Account, iCloud, privacy.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich & Datenschutz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me & Privacy"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryMePrivacySummary" : {
+      "comment" : "Summary for the Me & Privacy category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple-Account, iCloud, Passwörter und die Datenschutzbereiche für Zugriffe."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Account, iCloud, passwords, and the privacy panes that grant access."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryNetwork" : {
+      "comment" : "Clone category: Wi-Fi, Bluetooth, Network.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Netzwerk & Funk"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network & Wireless"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryNetworkSummary" : {
+      "comment" : "Summary for the Network & Wireless category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WLAN, Bluetooth, VPN, AirDrop und Freigaben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi-Fi, Bluetooth, VPN, AirDrop, and sharing."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryDisplays" : {
+      "comment" : "Clone category: Displays, Appearance, Wallpaper, Dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Displays & Erscheinungsbild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Displays & Look"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryDisplaysSummary" : {
+      "comment" : "Summary for the Displays & Look category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Displays, Erscheinungsbild, Hintergrund, Schreibtisch & Dock und Kontrollzentrum."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Displays, appearance, wallpaper, Desktop & Dock, and Control Center."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategorySound" : {
+      "comment" : "Clone category: Sound, Keyboard, Trackpad, Mouse.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton & Eingabe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound & Input"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategorySoundSummary" : {
+      "comment" : "Summary for the Sound & Input category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton, Tastatur, Trackpad, Maus, Kopfhörer und Drucker."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound, keyboard, trackpad, mouse, headphones, and printers."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryFocus" : {
+      "comment" : "Clone category: Focus, Notifications, Screen Time, Siri.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus & Mitteilungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus & Notifications"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryFocusSummary" : {
+      "comment" : "Summary for the Focus & Notifications category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus, Mitteilungen, Bildschirmzeit, Apple Intelligence & Siri und Spotlight."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus, notifications, Screen Time, Apple Intelligence & Siri, and Spotlight."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryAccessibility" : {
+      "comment" : "Clone category: Accessibility.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryAccessibilitySummary" : {
+      "comment" : "Summary for the Accessibility category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver, Zoomen, Anzeige, Untertitel und alternative Eingaben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver, zoom, display, captions, and input alternatives."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryGeneral" : {
+      "comment" : "Clone category: About, Updates, Storage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein, Info & Speicher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General, About & Storage"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryGeneralSummary" : {
+      "comment" : "Summary for the General category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über diesen Mac, Softwareupdates, Speicher, Sprache, Backups und Anmeldeobjekte."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About this Mac, software updates, storage, language, backups, and login items."
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryPower" : {
+      "comment" : "Clone category: Battery, Lock Screen, Users.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batterie, Sperrbildschirm & Benutzer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Battery, Lock Screen & Users"
+          }
+        }
+      }
+    },
+    "systemSettingsCloneCategoryPowerSummary" : {
+      "comment" : "Summary for the Battery, Lock Screen & Users category.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batterie, Energiesparmodus, Sperrbildschirm, Touch ID und Benutzerkonten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Battery, Energy Saver, lock screen, Touch ID, and user accounts."
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneAppleAccount" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple-Account"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Account"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneICloud" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneFamily" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Family"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePasswords" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwords"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneWallet" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallet & Apple Pay"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallet & Apple Pay"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneInternetAccounts" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internetaccounts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internet Accounts"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneGameCenter" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Center"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Center"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacy" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz & Sicherheit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy & Security"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyLocation" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ortungsdienste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location Services"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyCamera" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyMicrophone" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mikrofon"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Microphone"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyAccessibility" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf Bedienungshilfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility Access"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyScreen" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirm- und Systemaudioaufnahme"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen & System Audio Recording"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyFullDisk" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voller Festplattenzugriff"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full Disk Access"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyFileVault" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FileVault"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FileVault"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrivacyLockdown" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperrmodus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lockdown Mode"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneWiFi" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WLAN"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi-Fi"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneBluetooth" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneNetwork" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Netzwerk"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneVPN" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneAirDrop" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AirDrop & Handoff"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AirDrop & Handoff"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneSharing" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freigaben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneDisplays" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Displays"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Displays"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneAppearance" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheinungsbild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneWallpaper" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallpaper"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneScreenSaver" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmschoner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Saver"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneDesktopDock" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreibtisch & Dock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desktop & Dock"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneControlCenter" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrollzentrum"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control Center"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneSound" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneKeyboard" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastatur"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneTrackpad" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trackpad"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trackpad"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneMouse" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mouse"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneHeadphones" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopfhörer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Headphones"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneGameController" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spielcontroller"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Controller"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePrinters" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drucker & Scanner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Printers & Scanners"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneCDs" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CDs & DVDs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CDs & DVDs"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneFocus" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneNotifications" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneScreenTime" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Time"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneSiri" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence & Siri"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence & Siri"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneSpotlight" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneAccessibility" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneVoiceOver" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneZoom" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoomen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneAXDisplay" : {
+      "comment" : "System Settings destination name. Accessibility display options, not the Displays pane.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzeige (Bedienungshilfen)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display (Accessibility)"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneSpokenContent" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesprochene Inhalte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spoken Content"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneCaptions" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untertitel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captions"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneVoiceControl" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprachsteuerung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice Control"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneAXKeyboard" : {
+      "comment" : "System Settings destination name. Accessibility keyboard options.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastatur (Bedienungshilfen)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard (Accessibility)"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePanePointerControl" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigersteuerung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pointer Control"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneLiveSpeech" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Sprache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Speech"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneGeneral" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneAbout" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneSoftwareUpdate" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Softwareupdate"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Software Update"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneStorage" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speicher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneCoverage" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AppleCare & Garantie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AppleCare & Warranty"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneLanguage" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprache & Region"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language & Region"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneDateTime" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum & Uhrzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date & Time"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneTimeMachine" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time Machine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time Machine"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneTransferReset" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übertragen oder zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer or Reset"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneStartupDisk" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startvolume"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startup Disk"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneLoginItems" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldeobjekte & Erweiterungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login Items & Extensions"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneProfiles" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geräteverwaltung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device Management"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneExtensions" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extensions"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneBattery" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batterie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Battery"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneEnergySaver" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energiesparmodus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energy Saver"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneLockScreen" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperrbildschirm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock Screen"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneTouchID" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID & Passwort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID & Password"
+          }
+        }
+      }
+    },
+    "systemSettingsClonePaneUsers" : {
+      "comment" : "System Settings destination name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzer & Gruppen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Users & Groups"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"
