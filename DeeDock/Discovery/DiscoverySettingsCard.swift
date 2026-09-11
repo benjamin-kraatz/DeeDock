@@ -9,5 +9,14 @@ struct DiscoverySettingsCard: View {
             SettingsToggleRow(title: .discoveryEnabled,
                 isOn: Binding(get: { discovery.engine.enabled }, set: discovery.setEnabled))
         }
+        #if DEBUG
+        SettingsCard(title: .discoveryDebugTitle, footnote: .discoveryDebugHelp) {
+            ForEach(DiscoveryProposal.catalog) { proposal in
+                SettingsRow(title: proposal.title) {
+                    Button(.discoveryDebugShow) { discovery.debugShow(proposal) }
+                }
+            }
+        }
+        #endif
     }
 }

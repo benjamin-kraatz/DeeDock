@@ -12,6 +12,20 @@ final class DiscoveryController {
     private var timer: Timer?
     private var panel: DiscoveryPanel?
     private var shownAt: Date?
+    #if DEBUG
+    private var isDebugPresentation = false
+
+    /// Shows real callout chrome without consuming eligibility, cooldowns, or dismissals.
+    /// Ordinary Settings windows may remain open; drag, sheets, and fullscreen still gate it.
+    func debugShow(_ proposal: DiscoveryProposal) {
+        guard engine.visible == nil, !suspended, menuDepth == 0, !interactionBlocked(),
+              let screen = targetScreen() ?? NSScreen.main,
+              !nativeBlocked(on: screen, allowOrdinaryWindows: true) else { return }
+        closePanel()
+        isDebugPresentation = true
+        present(proposal, on: screen)
+    }
+    #endif
     private var observers: [NSObjectProtocol] = []
     private var monitors: [Any] = []
     private var appObservers: [NSObjectProtocol] = []
@@ -82,6 +96,15 @@ final class DiscoveryController {
     }
 
     private func refresh() {
+        #if DEBUG
+        if isDebugPresentation {
+            if suspended || menuDepth > 0 || interactionBlocked()
+                || nativeBlocked(on: panel?.screen, allowOrdinaryWindows: true) {
+                finish()
+            }
+            return
+        }
+        #endif
         guard !suspended, engine.enabled else { watcher.stop(); closePanel(); return }
         if engine.needsClipboardSignal { watcher.start() } else { watcher.stop() }
         guard engine.visible != nil || !engine.queue.isEmpty else { return }
@@ -102,12 +125,12 @@ final class DiscoveryController {
         }
     }
 
-    private func nativeBlocked(on screen: NSScreen?) -> Bool {
+    private func nativeBlocked(on screen: NSScreen?, allowOrdinaryWindows: Bool = false) -> Bool {
         guard let screen else { return true }
         let pointerInCallout = panel?.frame.contains(NSEvent.mouseLocation) == true
         if NSEvent.pressedMouseButtons != 0 && !pointerInCallout { return true }
         if NSApp.modalWindow != nil || NSApp.windows.contains(where: {
-            $0 !== panel && $0.isVisible && ($0.attachedSheet != nil || $0.level == .normal)
+            $0 !== panel && $0.isVisible && ($0.attachedSheet != nil || (!allowOrdinaryWindows && $0.level == .normal))
         }) { return true }
         guard let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements],
                                                        kCGNullWindowID) as? [[String: Any]] else { return true }
@@ -155,11 +178,17 @@ final class DiscoveryController {
     }
 
     private func finish(forever: Bool = false) {
+        #if DEBUG
+        if isDebugPresentation { closePanel(); return }
+        #endif
         engine.finish(forever: forever, at: .now)
         closePanel()
     }
 
     private func closePanel() {
+        #if DEBUG
+        isDebugPresentation = false
+        #endif
         monitors.forEach(NSEvent.removeMonitor); monitors.removeAll()
         panel?.close(); panel = nil; shownAt = nil
     }

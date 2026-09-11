@@ -1,6 +1,60 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "discoveryDebugTitle": {
+    "comment": "Debug-only Discovery settings card title.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Callout previews"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hinweise ausprobieren"
+        }
+      }
+    }
+  },
+  "discoveryDebugHelp": {
+    "comment": "Debug-only callout trigger explanation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show any tip without waiting or changing its dismissal state. Works with Discovery off. The Open button opens the real feature."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeige jeden Hinweis ohne Wartezeit und ohne seinen Ausblendestatus zu ändern. Funktioniert auch bei ausgeschaltetem Discovery. Die Öffnen-Taste öffnet die echte Funktion."
+        }
+      }
+    }
+  },
+  "discoveryDebugShow": {
+    "comment": "Debug-only button showing a catalog proposal.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show callout"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hinweis anzeigen"
+        }
+      }
+    }
+  },
   "discoveryTitle": {
     "comment": "Feature suggestions title.",
     "extractionState": "manual",
