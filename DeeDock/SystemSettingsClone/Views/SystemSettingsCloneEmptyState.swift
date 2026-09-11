@@ -11,7 +11,7 @@ struct SystemSettingsCloneEmptyState: View {
                 Text(.systemSettingsCloneEmptySearch)
             } icon: {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(SystemSettingsClonePalette.copper)
+                    .foregroundStyle(.secondary)
             }
         } description: {
             Text(.systemSettingsCloneEmptySearchDescription(query: query))

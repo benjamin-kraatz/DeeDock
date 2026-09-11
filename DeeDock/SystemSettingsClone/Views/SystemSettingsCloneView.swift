@@ -1,6 +1,10 @@
 import SwiftUI
 
-/// Searchable guide that only deep-links into macOS System Settings.
+/// Searchable springboard that only deep-links into macOS System Settings.
+///
+/// Two modes share one window. Browsing shows the whole catalog as a scrolling canvas
+/// with a sidebar that follows it. Typing swaps the canvas for ranked results that
+/// ↑/↓ and Return drive without leaving the search field.
 struct SystemSettingsCloneView: View {
     var openPane: (SystemSettingsClonePane) -> SystemSettingsDeepLinkOpenResult = {
         SystemSettingsDeepLinkOpener.open($0)
@@ -9,158 +13,235 @@ struct SystemSettingsCloneView: View {
         SystemSettingsDeepLinkOpener.openRoot()
     }
 
-    @State private var selection: SystemSettingsCloneCategory.ID? = .meAndPrivacy
+    @AppStorage(SystemSettingsCloneRecents.storageKey) private var recentPaneIDs = ""
+    @State private var searchIndex = SystemSettingsCloneSearchIndex()
     @State private var searchText = ""
-    @State private var notice: SystemSettingsCloneNotice?
+    @State private var selectedResult = 0
+    @State private var focusRequest = 0
+    /// Topmost section on the canvas, bound to its scroll position.
+    @State private var scrolledSection: SystemSettingsCloneSection? = .quickAccess
+    /// Section the sidebar highlights. Lags `scrolledSection` briefly after a click so the
+    /// highlight does not bounce back when the last sections cannot reach the top.
+    @State private var highlightedSection: SystemSettingsCloneSection = .quickAccess
+    @State private var jumpLockUntil = Date.distantPast
+    /// Frozen while the window is in use so tiles never move under the pointer.
+    @State private var quickAccess: [SystemSettingsClonePane] = []
+    @State private var launchCounts: [String: Int] = [:]
+    @State private var toast: SystemSettingsCloneToast?
+    @State private var toastTask: Task<Void, Never>?
+    @Environment(\.appearsActive) private var appearsActive
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var query: String { searchText.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var isSearching: Bool { !query.isEmpty }
-
-    private var visibleGroups: [SystemSettingsCloneCategory] {
-        if isSearching {
-            return SystemSettingsDeepLinkCatalog.categories.compactMap { category in
-                let panes = category.panesMatching(query)
-                guard !panes.isEmpty else { return nil }
-                return SystemSettingsCloneCategory(
-                    id: category.id,
-                    title: category.title,
-                    summary: category.summary,
-                    symbolName: category.symbolName,
-                    panes: panes
-                )
-            }
-        }
-        guard let selection, let category = SystemSettingsDeepLinkCatalog.category(id: selection) else {
-            return []
-        }
-        return [category]
-    }
+    private var results: [SystemSettingsCloneSearchResult] { searchIndex.search(query) }
+    private var motion: Animation? { .systemSettingsClone(reduceMotion: reduceMotion) }
 
     var body: some View {
-        NavigationSplitView {
+        HStack(spacing: 0) {
             SystemSettingsCloneSidebar(
-                selection: $selection,
-                query: query,
-                openRoot: { handle(openRoot()) }
+                highlighted: highlightedSection,
+                isSearching: isSearching,
+                jump: jumpFromSidebar,
+                openRoot: { present(openRoot(), for: nil) }
             )
-            .navigationSplitViewColumnWidth(min: 210, ideal: SystemSettingsCloneMetrics.sidebarIdeal, max: 300)
-        } detail: {
-            detail
-                .navigationTitle(Text(.systemSettingsCloneTitle))
-                .safeAreaInset(edge: .bottom, spacing: 0) { footer }
+            .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+            content
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // An inset rather than a stacked row: the scroll views keep running under the
+                // floating search capsule, so content shows through its glass as it scrolls.
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    SystemSettingsCloneSearchField(text: $searchText, focusRequest: focusRequest, onCommand: handle)
+                        .frame(maxWidth: SystemSettingsCloneMetrics.contentMaxWidth - 120)
+                        .padding(.horizontal, 28)
+                        .padding(.top, 10)
+                        .padding(.bottom, 12)
+                }
         }
-        .searchable(text: $searchText, placement: .toolbar, prompt: Text(.systemSettingsCloneSearchPrompt))
-        .frame(minWidth: 760, minHeight: 540)
+        // Content runs under the hidden titlebar; the sidebar reserves room for the traffic lights.
+        .ignoresSafeArea(.container, edges: .top)
+        .background { SystemSettingsCloneAmbience(tint: isSearching ? results.first?.pane.tint : highlightedSection.ambientTint) }
+        .overlay(alignment: .bottom) { toastOverlay }
+        .background { keyboardShortcuts }
+        .frame(minWidth: 820, minHeight: 560)
+        .onAppear {
+            quickAccess = SystemSettingsCloneRecents.quickAccess(from: recentPaneIDs)
+            focusRequest += 1
+        }
+        .onChange(of: appearsActive) { _, active in
+            // Refresh recents only when the person comes back, never mid-click.
+            guard active else { return }
+            withAnimation(motion) { quickAccess = SystemSettingsCloneRecents.quickAccess(from: recentPaneIDs) }
+        }
+        .onChange(of: query) { _, _ in selectedResult = 0 }
+        .onChange(of: scrolledSection) { _, section in
+            guard let section, Date.now >= jumpLockUntil else { return }
+            highlightedSection = section
+        }
     }
 
     @ViewBuilder
-    private var detail: some View {
-        if visibleGroups.isEmpty {
-            SystemSettingsCloneEmptyState(query: query) {
-                searchText = ""
+    private var content: some View {
+        ZStack {
+            if !isSearching {
+                SystemSettingsCloneCanvas(
+                    quickAccess: quickAccess,
+                    scrolledSection: $scrolledSection,
+                    launchCounts: launchCounts,
+                    open: open
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.985, anchor: .top)))
+            } else if results.isEmpty {
+                SystemSettingsCloneEmptyState(query: query) { searchText = "" }
+                    .transition(.opacity)
+            } else {
+                SystemSettingsCloneSearchResults(
+                    results: results,
+                    selectedIndex: $selectedResult,
+                    launchCounts: launchCounts,
+                    open: open
+                )
+                .transition(.opacity.combined(with: .offset(y: 10)))
             }
-        } else {
-            SystemSettingsCloneCategoryDetail(groups: visibleGroups, open: { handle(openPane($0)) })
+        }
+        .animation(motion, value: isSearching)
+        .animation(motion, value: results.isEmpty)
+    }
+
+    @ViewBuilder
+    private var toastOverlay: some View {
+        if let toast {
+            SystemSettingsCloneToastView(toast: toast) { dismissToast() }
+                .padding(.bottom, 18)
+                .padding(.leading, SystemSettingsCloneMetrics.sidebarWidth + 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .id(toast)
         }
     }
 
-    private var footer: some View {
-        VStack(spacing: 0) {
-            if let notice {
-                SystemSettingsCloneNoticeBanner(notice: notice) {
-                    self.notice = nil
+    /// Invisible buttons that own window-level shortcuts: ⌘F focuses search, ⌘1–⌘9 jump to a category.
+    private var keyboardShortcuts: some View {
+        ZStack {
+            Button("") { focusRequest += 1 }
+                .keyboardShortcut("f", modifiers: .command)
+            ForEach(Array(SystemSettingsDeepLinkCatalog.categories.prefix(9).enumerated()), id: \.element.id) { index, category in
+                Button("") {
+                    searchText = ""
+                    jump(to: .category(category.id))
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
+                .keyboardShortcut(KeyEquivalent(Character(String(index + 1))), modifiers: .command)
             }
-            HStack(alignment: .top, spacing: 8) {
-                Image(systemName: "lock.shield")
-                    .foregroundStyle(SystemSettingsClonePalette.copper)
-                    .accessibilityHidden(true)
-                Text(.systemSettingsCloneFooter)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 22)
-            .padding(.vertical, 12)
         }
-        .background(.bar)
+        .opacity(0)
+        .frame(width: 0, height: 0)
+        .accessibilityHidden(true)
     }
 
-    private func handle(_ result: SystemSettingsDeepLinkOpenResult) {
+    // MARK: Actions
+
+    private func handle(_ command: SystemSettingsCloneSearchCommand) {
+        switch command {
+        case .moveDown:
+            guard isSearching, !results.isEmpty else { return }
+            selectedResult = min(selectedResult + 1, results.count - 1)
+        case .moveUp:
+            guard isSearching else { return }
+            selectedResult = max(selectedResult - 1, 0)
+        case .submit:
+            let current = results
+            guard current.indices.contains(selectedResult) else { return }
+            open(current[selectedResult].pane)
+        case .cancel:
+            searchText = ""
+        }
+    }
+
+    private func jumpFromSidebar(_ section: SystemSettingsCloneSection) {
+        searchText = ""
+        jump(to: section)
+    }
+
+    private func jump(to section: SystemSettingsCloneSection) {
+        highlightedSection = section
+        jumpLockUntil = .now.addingTimeInterval(0.9)
+        withAnimation(reduceMotion ? nil : .spring(duration: 0.55, bounce: 0.1)) {
+            scrolledSection = section
+        }
+    }
+
+    private func open(_ pane: SystemSettingsClonePane) {
+        launchCounts[pane.id, default: 0] += 1
+        recentPaneIDs = SystemSettingsCloneRecents.recording(pane.id, in: recentPaneIDs)
+        present(openPane(pane), for: pane)
+    }
+
+    private func present(_ result: SystemSettingsDeepLinkOpenResult, for pane: SystemSettingsClonePane?) {
         switch result {
         case .opened:
-            notice = nil
+            if let pane { show(.opening(pane)) } else { dismissToast() }
         case .openedRoot:
-            notice = .openedRoot
+            // Opening the root on purpose is not a fallback worth warning about.
+            if pane == nil { dismissToast() } else { show(.openedRoot) }
         case .failed:
-            notice = .failed
+            show(.failed)
         }
+    }
+
+    private func show(_ newToast: SystemSettingsCloneToast) {
+        toastTask?.cancel()
+        withAnimation(motion) { toast = newToast }
+        toastTask = Task { @MainActor in
+            try? await Task.sleep(for: newToast.lifetime)
+            guard !Task.isCancelled else { return }
+            dismissToast()
+        }
+    }
+
+    private func dismissToast() {
+        toastTask?.cancel()
+        toastTask = nil
+        withAnimation(motion) { toast = nil }
     }
 }
 
-/// Non-blocking result of a deep-link attempt.
-enum SystemSettingsCloneNotice: Equatable {
-    case openedRoot
-    case failed
-
-    var message: LocalizedStringResource {
-        switch self {
-        case .openedRoot: .systemSettingsCloneOpenedRoot
-        case .failed: .systemSettingsCloneOpenFailed
-        }
-    }
-}
-
-/// Dismissible banner for a fallback or failed open.
-struct SystemSettingsCloneNoticeBanner: View {
-    let notice: SystemSettingsCloneNotice
-    var dismiss: () -> Void
-
-    private var isFailure: Bool { notice == .failed }
+/// Soft color field behind the content that takes the hue of the current section.
+private struct SystemSettingsCloneAmbience: View {
+    let tint: SystemSettingsCloneTint?
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(alignment: .top, spacing: 9) {
-            Image(systemName: isFailure ? "exclamationmark.triangle.fill" : "info.circle.fill")
-                .foregroundStyle(isFailure ? .orange : SystemSettingsClonePalette.copper)
-                .accessibilityHidden(true)
-            Text(notice.message)
-                .font(.callout)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Button(action: dismiss) { Image(systemName: "xmark") }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .accessibilityLabel(Text(.actionDismissError))
-                .help(Text(.actionDismissError))
+        GeometryReader { proxy in
+            let color = (tint ?? .gray).accent
+            Ellipse()
+                .fill(color.opacity(colorScheme == .dark ? 0.22 : 0.14))
+                .frame(width: proxy.size.width * 0.9, height: proxy.size.height * 0.55)
+                .offset(x: proxy.size.width * 0.3, y: -proxy.size.height * 0.28)
+                .blur(radius: 90)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.8), value: tint)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(
-            (isFailure ? Color.orange : SystemSettingsClonePalette.copper).opacity(0.12),
-            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-        )
-        .accessibilityAddTraits(.updatesFrequently)
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
 #if DEBUG
-#Preview("Clone window") {
+#Preview("Springboard") {
     SystemSettingsCloneView(openPane: { _ in .opened }, openRoot: { .openedRoot })
-        .frame(width: 920, height: 700)
+        .frame(width: 1040, height: 760)
 }
 
 #Preview("German") {
     SystemSettingsCloneView(openPane: { _ in .opened }, openRoot: { .openedRoot })
         .environment(\.locale, Locale(identifier: "de"))
-        .frame(width: 920, height: 700)
+        .frame(width: 1040, height: 760)
 }
 
-#Preview("Dark") {
-    SystemSettingsCloneView(openPane: { _ in .opened }, openRoot: { .openedRoot })
+#Preview("Dark, fallback toast") {
+    SystemSettingsCloneView(openPane: { _ in .openedRoot }, openRoot: { .openedRoot })
         .preferredColorScheme(.dark)
-        .frame(width: 920, height: 700)
+        .frame(width: 1040, height: 760)
 }
 #endif

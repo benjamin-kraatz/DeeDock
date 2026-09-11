@@ -7,72 +7,74 @@ import Foundation
 /// `/System/Applications/System Settings.app/Contents/Resources/Sidebar.plist` and
 /// community lists (bvanpeski/SystemPreferences, sigo/macos-settings-urls). Update this
 /// file when a row opens the wrong pane or only the Settings root.
+///
+/// Categories group destinations by what people want to do, not by Apple's sidebar.
+/// Privacy permissions live together; "This Mac" collects hardware and maintenance.
 enum SystemSettingsDeepLinkCatalog {
-    /// Categories in sidebar order. Not Apple's sidebar order.
+    /// Categories in canvas order.
     static let categories: [SystemSettingsCloneCategory] = [
-        meAndPrivacy, network, displays, sound, focus, accessibility, general, powerAndPeople,
+        you, connections, lookAndFeel, devices, attention, privacy, accessibility, thisMac, general,
     ]
 
-    static var allPanes: [SystemSettingsClonePane] {
-        categories.flatMap(\.panes)
-    }
+    static let allPanes: [SystemSettingsClonePane] = categories.flatMap(\.panes)
 
     static func category(id: SystemSettingsCloneCategory.ID) -> SystemSettingsCloneCategory? {
         categories.first { $0.id == id }
     }
+
+    static func pane(id: String) -> SystemSettingsClonePane? {
+        allPanes.first { $0.id == id }
+    }
+
+    static func category(containing pane: SystemSettingsClonePane) -> SystemSettingsCloneCategory? {
+        categories.first { $0.panes.contains(pane) }
+    }
+
+    /// Everyday destinations that fill Quick Access before the person has recents.
+    static let popularPaneIDs = ["wifi", "bluetooth", "displays", "sound", "notifications", "privacy", "battery", "desktop-dock"]
 }
 
-/// One sidebar group in the clone's information architecture.
+/// One section in the clone's information architecture.
 struct SystemSettingsCloneCategory: Identifiable, Hashable {
     enum ID: String, CaseIterable, Sendable {
-        case meAndPrivacy
-        case network
-        case displays
-        case sound
-        case focus
+        case you
+        case connections
+        case lookAndFeel
+        case devices
+        case attention
+        case privacy
         case accessibility
+        case thisMac
         case general
-        case powerAndPeople
     }
 
     let id: ID
     let title: LocalizedStringResource
     let summary: LocalizedStringResource
     let symbolName: String
+    let tint: SystemSettingsCloneTint
     let panes: [SystemSettingsClonePane]
 
     static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
-/// A single row that deep-links into System Settings.
+/// A single destination that deep-links into System Settings.
 struct SystemSettingsClonePane: Identifiable, Hashable {
     /// Stable catalog identity. Independent of Apple's pane ID, which can change.
     let id: String
     let title: LocalizedStringResource
+    /// One line describing what the person finds inside the pane.
+    let detail: LocalizedStringResource
     let symbolName: String
+    let tint: SystemSettingsCloneTint
     /// Extension or preference-pane identifier after `x-apple.systempreferences:`.
     let paneIdentifier: String
     /// Optional fragment after `?`. Omitted when the pane has no reliable anchor.
     let anchor: String?
-    /// English lookup tokens so search still finds a row after translation.
+    /// English and German lookup tokens. They are never displayed, so they stay out of
+    /// the string catalog; they let "dark mode" or "Dunkelmodus" find Appearance in any UI language.
     let searchHints: [String]
-
-    init(
-        id: String,
-        title: LocalizedStringResource,
-        symbolName: String,
-        paneIdentifier: String,
-        anchor: String? = nil,
-        searchHints: [String] = []
-    ) {
-        self.id = id
-        self.title = title
-        self.symbolName = symbolName
-        self.paneIdentifier = paneIdentifier
-        self.anchor = anchor
-        self.searchHints = searchHints
-    }
 
     static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
@@ -85,161 +87,213 @@ struct SystemSettingsClonePane: Identifiable, Hashable {
         }
         return URL(string: specification)
     }
-
-    func matches(_ query: String) -> Bool {
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return true }
-        if String(localized: title).localizedStandardContains(trimmed) { return true }
-        if paneIdentifier.localizedStandardContains(trimmed) { return true }
-        if let anchor, anchor.localizedStandardContains(trimmed) { return true }
-        return searchHints.contains { $0.localizedStandardContains(trimmed) }
-    }
 }
 
-extension SystemSettingsCloneCategory {
-    func matches(_ query: String) -> Bool {
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return true }
-        if String(localized: title).localizedStandardContains(trimmed) { return true }
-        if String(localized: summary).localizedStandardContains(trimmed) { return true }
-        return panes.contains { $0.matches(trimmed) }
-    }
-
-    func panesMatching(_ query: String) -> [SystemSettingsClonePane] {
-        panes.filter { $0.matches(query) }
-    }
-}
-
-// MARK: - Catalog rows
+// MARK: - Catalog
 
 private extension SystemSettingsDeepLinkCatalog {
-    static let meAndPrivacy = SystemSettingsCloneCategory(
-        id: .meAndPrivacy,
-        title: .systemSettingsCloneCategoryMePrivacy,
-        summary: .systemSettingsCloneCategoryMePrivacySummary,
+    static let privacyExtension = "com.apple.settings.PrivacySecurity.extension"
+    static let accessibilityExtension = "com.apple.Accessibility-Settings.extension"
+
+    static let you = SystemSettingsCloneCategory(
+        id: .you,
+        title: .systemSettingsCloneCategoryYou,
+        summary: .systemSettingsCloneCategoryYouSummary,
         symbolName: "person.crop.circle.fill",
+        tint: .blue,
         panes: [
-            pane("apple-account", .systemSettingsClonePaneAppleAccount, "person.crop.circle",
-                 "com.apple.systempreferences.AppleIDSettings", hints: ["apple id", "apple account"]),
-            pane("icloud", .systemSettingsClonePaneICloud, "icloud",
-                 "com.apple.systempreferences.AppleIDSettings", anchor: "iCloud", hints: ["icloud"]),
-            pane("family", .systemSettingsClonePaneFamily, "figure.2.and.child.holdinghands",
-                 "com.apple.Family-Settings.extension", hints: ["family sharing"]),
-            pane("passwords", .systemSettingsClonePanePasswords, "key.fill",
-                 "com.apple.Passwords-Settings.extension", hints: ["autofill", "keychain"]),
-            pane("wallet", .systemSettingsClonePaneWallet, "creditcard.fill",
-                 "com.apple.WalletSettingsExtension", hints: ["apple pay"]),
-            pane("internet-accounts", .systemSettingsClonePaneInternetAccounts, "at",
-                 "com.apple.Internet-Accounts-Settings.extension", hints: ["mail", "calendars"]),
-            pane("game-center", .systemSettingsClonePaneGameCenter, "gamecontroller.fill",
-                 "com.apple.Game-Center-Settings.extension"),
-            pane("privacy", .systemSettingsClonePanePrivacy, "hand.raised.fill",
-                 "com.apple.settings.PrivacySecurity.extension", hints: ["security", "tcc"]),
-            pane("privacy-location", .systemSettingsClonePanePrivacyLocation, "location.fill",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "Privacy_LocationServices"),
-            pane("privacy-camera", .systemSettingsClonePanePrivacyCamera, "camera.fill",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "Privacy_Camera"),
-            pane("privacy-microphone", .systemSettingsClonePanePrivacyMicrophone, "mic.fill",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "Privacy_Microphone"),
-            pane("privacy-accessibility", .systemSettingsClonePanePrivacyAccessibility, "accessibility",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "Privacy_Accessibility"),
-            pane("privacy-screen", .systemSettingsClonePanePrivacyScreen, "rectangle.dashed.badge.record",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "Privacy_ScreenCapture",
-                 hints: ["screen recording"]),
-            pane("privacy-full-disk", .systemSettingsClonePanePrivacyFullDisk, "externaldrive.fill.badge.checkmark",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "Privacy_AllFiles",
-                 hints: ["full disk access"]),
-            pane("privacy-filevault", .systemSettingsClonePanePrivacyFileVault, "lock.rectangle.stack.fill",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "FileVault"),
-            pane("privacy-lockdown", .systemSettingsClonePanePrivacyLockdown, "lock.shield.fill",
-                 "com.apple.settings.PrivacySecurity.extension", anchor: "LockdownMode"),
+            pane("apple-account", .systemSettingsClonePaneAppleAccount, .systemSettingsClonePaneAppleAccountDetail,
+                 "person.crop.circle.fill", .blue, "com.apple.systempreferences.AppleIDSettings",
+                 hints: ["apple id", "sign in", "anmelden", "konto", "devices", "geräte"]),
+            pane("icloud", .systemSettingsClonePaneICloud, .systemSettingsClonePaneICloudDetail,
+                 "icloud.fill", .cyan, "com.apple.systempreferences.AppleIDSettings", anchor: "iCloud",
+                 hints: ["drive", "sync", "photos", "fotos", "backup"]),
+            pane("family", .systemSettingsClonePaneFamily, .systemSettingsClonePaneFamilyDetail,
+                 "figure.2.and.child.holdinghands", .teal, "com.apple.Family-Settings.extension",
+                 hints: ["family sharing", "familienfreigabe", "kids", "kinder", "parental"]),
+            pane("passwords", .systemSettingsClonePanePasswords, .systemSettingsClonePanePasswordsDetail,
+                 "key.fill", .graphite, "com.apple.Passwords-Settings.extension",
+                 hints: ["autofill", "keychain", "schlüsselbund", "passkey"]),
+            pane("wallet", .systemSettingsClonePaneWallet, .systemSettingsClonePaneWalletDetail,
+                 "wallet.pass.fill", .graphite, "com.apple.WalletSettingsExtension",
+                 hints: ["apple pay", "credit card", "kreditkarte", "payment", "bezahlen"]),
+            pane("internet-accounts", .systemSettingsClonePaneInternetAccounts, .systemSettingsClonePaneInternetAccountsDetail,
+                 "at", .blue, "com.apple.Internet-Accounts-Settings.extension",
+                 hints: ["mail", "calendar", "kalender", "google", "exchange", "contacts", "kontakte"]),
+            pane("game-center", .systemSettingsClonePaneGameCenter, .systemSettingsClonePaneGameCenterDetail,
+                 "gamecontroller.fill", .pink, "com.apple.Game-Center-Settings.extension",
+                 hints: ["games", "spiele", "friends", "freunde"]),
+            pane("users", .systemSettingsClonePaneUsers, .systemSettingsClonePaneUsersDetail,
+                 "person.2.fill", .indigo, "com.apple.Users-Groups-Settings.extension",
+                 hints: ["accounts", "guest", "gast", "admin", "benutzer"]),
         ]
     )
 
-    static let network = SystemSettingsCloneCategory(
-        id: .network,
-        title: .systemSettingsCloneCategoryNetwork,
-        summary: .systemSettingsCloneCategoryNetworkSummary,
+    static let connections = SystemSettingsCloneCategory(
+        id: .connections,
+        title: .systemSettingsCloneCategoryConnections,
+        summary: .systemSettingsCloneCategoryConnectionsSummary,
         symbolName: "wifi",
+        tint: .cyan,
         panes: [
-            pane("wifi", .systemSettingsClonePaneWiFi, "wifi",
-                 "com.apple.wifi-settings-extension", hints: ["wireless"]),
-            pane("bluetooth", .systemSettingsClonePaneBluetooth, "airpodspro",
-                 "com.apple.BluetoothSettings"),
-            pane("network", .systemSettingsClonePaneNetwork, "network",
-                 "com.apple.Network-Settings.extension", hints: ["ethernet", "tcp"]),
-            pane("vpn", .systemSettingsClonePaneVPN, "lock.shield",
-                 "com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension"),
-            pane("airdrop", .systemSettingsClonePaneAirDrop, "dot.radiowaves.left.and.right",
-                 "com.apple.AirDrop-Handoff-Settings.extension", hints: ["handoff", "continuity"]),
-            pane("sharing", .systemSettingsClonePaneSharing, "shared.with.you",
-                 "com.apple.Sharing-Settings.extension", hints: ["file sharing", "remote"]),
+            pane("wifi", .systemSettingsClonePaneWiFi, .systemSettingsClonePaneWiFiDetail,
+                 "wifi", .blue, "com.apple.wifi-settings-extension",
+                 hints: ["wireless", "wlan", "internet", "hotspot", "funk"]),
+            pane("bluetooth", .systemSettingsClonePaneBluetooth, .systemSettingsClonePaneBluetoothDetail,
+                 "dot.radiowaves.forward", .blue, "com.apple.BluetoothSettings",
+                 hints: ["airpods", "pair", "koppeln", "accessories", "zubehör"]),
+            pane("network", .systemSettingsClonePaneNetwork, .systemSettingsClonePaneNetworkDetail,
+                 "network", .blue, "com.apple.Network-Settings.extension",
+                 hints: ["ethernet", "tcp", "dns", "firewall", "proxy", "lan"]),
+            pane("vpn", .systemSettingsClonePaneVPN, .systemSettingsClonePaneVPNDetail,
+                 "lock.shield.fill", .indigo, "com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension",
+                 hints: ["tunnel", "wireguard"]),
+            pane("airdrop", .systemSettingsClonePaneAirDrop, .systemSettingsClonePaneAirDropDetail,
+                 "airplay.audio", .cyan, "com.apple.AirDrop-Handoff-Settings.extension",
+                 hints: ["handoff", "continuity", "airplay", "universal clipboard"]),
+            pane("sharing", .systemSettingsClonePaneSharing, .systemSettingsClonePaneSharingDetail,
+                 "folder.fill.badge.person.crop", .gray, "com.apple.Sharing-Settings.extension",
+                 hints: ["file sharing", "dateifreigabe", "remote", "ssh", "screen sharing", "computer name", "hostname"]),
         ]
     )
 
-    static let displays = SystemSettingsCloneCategory(
-        id: .displays,
-        title: .systemSettingsCloneCategoryDisplays,
-        summary: .systemSettingsCloneCategoryDisplaysSummary,
-        symbolName: "display",
+    static let lookAndFeel = SystemSettingsCloneCategory(
+        id: .lookAndFeel,
+        title: .systemSettingsCloneCategoryLookAndFeel,
+        summary: .systemSettingsCloneCategoryLookAndFeelSummary,
+        symbolName: "paintpalette.fill",
+        tint: .orange,
         panes: [
-            pane("displays", .systemSettingsClonePaneDisplays, "display",
-                 "com.apple.Displays-Settings.extension", hints: ["monitor", "resolution"]),
-            pane("appearance", .systemSettingsClonePaneAppearance, "circle.lefthalf.filled",
-                 "com.apple.Appearance-Settings.extension", hints: ["dark mode", "accent"]),
-            pane("wallpaper", .systemSettingsClonePaneWallpaper, "photo.fill",
-                 "com.apple.Wallpaper-Settings.extension"),
-            pane("screen-saver", .systemSettingsClonePaneScreenSaver, "moon.stars.fill",
-                 "com.apple.ScreenSaver-Settings.extension"),
-            pane("desktop-dock", .systemSettingsClonePaneDesktopDock, "dock.rectangle",
-                 "com.apple.Desktop-Settings.extension", hints: ["dock", "menu bar"]),
-            pane("control-center", .systemSettingsClonePaneControlCenter, "switch.2",
-                 "com.apple.ControlCenter-Settings.extension"),
+            pane("appearance", .systemSettingsClonePaneAppearance, .systemSettingsClonePaneAppearanceDetail,
+                 "circle.lefthalf.filled", .graphite, "com.apple.Appearance-Settings.extension",
+                 hints: ["dark mode", "dunkelmodus", "light mode", "accent", "akzentfarbe", "theme", "icon"]),
+            pane("wallpaper", .systemSettingsClonePaneWallpaper, .systemSettingsClonePaneWallpaperDetail,
+                 "photo.fill", .cyan, "com.apple.Wallpaper-Settings.extension",
+                 hints: ["background", "hintergrundbild", "desktop picture"]),
+            pane("displays", .systemSettingsClonePaneDisplays, .systemSettingsClonePaneDisplaysDetail,
+                 "sun.max.fill", .blue, "com.apple.Displays-Settings.extension",
+                 hints: ["monitor", "resolution", "auflösung", "brightness", "helligkeit", "night shift", "bildschirm"]),
+            pane("screen-saver", .systemSettingsClonePaneScreenSaver, .systemSettingsClonePaneScreenSaverDetail,
+                 "moon.stars.fill", .teal, "com.apple.ScreenSaver-Settings.extension"),
+            pane("desktop-dock", .systemSettingsClonePaneDesktopDock, .systemSettingsClonePaneDesktopDockDetail,
+                 "dock.rectangle", .graphite, "com.apple.Desktop-Settings.extension",
+                 hints: ["dock", "stage manager", "hot corners", "aktive ecken", "windows", "fenster", "widgets", "mission control"]),
+            pane("control-center", .systemSettingsClonePaneControlCenter, .systemSettingsClonePaneControlCenterDetail,
+                 "switch.2", .gray, "com.apple.ControlCenter-Settings.extension",
+                 hints: ["menu bar", "menüleiste", "clock", "battery percentage"]),
         ]
     )
 
-    static let sound = SystemSettingsCloneCategory(
-        id: .sound,
-        title: .systemSettingsCloneCategorySound,
-        summary: .systemSettingsCloneCategorySoundSummary,
+    static let devices = SystemSettingsCloneCategory(
+        id: .devices,
+        title: .systemSettingsCloneCategoryDevices,
+        summary: .systemSettingsCloneCategoryDevicesSummary,
         symbolName: "speaker.wave.2.fill",
+        tint: .pink,
         panes: [
-            pane("sound", .systemSettingsClonePaneSound, "speaker.wave.2.fill",
-                 "com.apple.Sound-Settings.extension", hints: ["output", "input", "volume"]),
-            pane("keyboard", .systemSettingsClonePaneKeyboard, "keyboard.fill",
-                 "com.apple.Keyboard-Settings.extension", hints: ["shortcuts", "input source"]),
-            pane("trackpad", .systemSettingsClonePaneTrackpad, "hand.point.up.left.fill",
-                 "com.apple.Trackpad-Settings.extension", hints: ["gestures"]),
-            pane("mouse", .systemSettingsClonePaneMouse, "computermouse.fill",
-                 "com.apple.Mouse-Settings.extension"),
-            pane("headphones", .systemSettingsClonePaneHeadphones, "beats.headphones",
-                 "com.apple.HeadphoneSettings", hints: ["airpods"]),
-            pane("game-controller", .systemSettingsClonePaneGameController, "gamecontroller",
-                 "com.apple.Game-Controller-Settings.extension"),
+            pane("sound", .systemSettingsClonePaneSound, .systemSettingsClonePaneSoundDetail,
+                 "speaker.wave.2.fill", .pink, "com.apple.Sound-Settings.extension",
+                 hints: ["audio", "volume", "lautstärke", "output", "input", "alert", "speaker", "lautsprecher"]),
+            pane("headphones", .systemSettingsClonePaneHeadphones, .systemSettingsClonePaneHeadphonesDetail,
+                 "airpodspro", .indigo, "com.apple.HeadphoneSettings",
+                 hints: ["airpods", "spatial audio", "noise cancellation"]),
+            pane("keyboard", .systemSettingsClonePaneKeyboard, .systemSettingsClonePaneKeyboardDetail,
+                 "keyboard.fill", .graphite, "com.apple.Keyboard-Settings.extension",
+                 hints: ["shortcuts", "kurzbefehle", "input source", "dictation", "diktat", "backlight", "key repeat"]),
+            pane("trackpad", .systemSettingsClonePaneTrackpad, .systemSettingsClonePaneTrackpadDetail,
+                 "rectangle.and.hand.point.up.left.fill", .gray, "com.apple.Trackpad-Settings.extension",
+                 hints: ["gestures", "gesten", "tap to click", "scroll", "force click"]),
+            pane("mouse", .systemSettingsClonePaneMouse, .systemSettingsClonePaneMouseDetail,
+                 "computermouse.fill", .gray, "com.apple.Mouse-Settings.extension",
+                 hints: ["scroll direction", "natural scrolling", "rechtsklick", "right click"]),
+            pane("game-controller", .systemSettingsClonePaneGameController, .systemSettingsClonePaneGameControllerDetail,
+                 "gamecontroller.fill", .green, "com.apple.Game-Controller-Settings.extension",
+                 hints: ["playstation", "xbox", "gamepad"]),
             // Tahoe+ lists `com.apple.preference.printfax`; Ventura used Print-Scan-Settings.extension.
-            pane("printers", .systemSettingsClonePanePrinters, "printer.fill",
-                 "com.apple.preference.printfax", hints: ["scanner", "print-scan"]),
-            pane("cds", .systemSettingsClonePaneCDs, "opticaldisc.fill",
-                 "com.apple.CD-DVD-Settings.extension"),
+            pane("printers", .systemSettingsClonePanePrinters, .systemSettingsClonePanePrintersDetail,
+                 "printer.fill", .gray, "com.apple.preference.printfax",
+                 hints: ["scanner", "print", "drucken"]),
+            pane("cds", .systemSettingsClonePaneCDs, .systemSettingsClonePaneCDsDetail,
+                 "opticaldisc.fill", .gray, "com.apple.CD-DVD-Settings.extension"),
         ]
     )
 
-    static let focus = SystemSettingsCloneCategory(
-        id: .focus,
-        title: .systemSettingsCloneCategoryFocus,
-        summary: .systemSettingsCloneCategoryFocusSummary,
-        symbolName: "moon.fill",
+    static let attention = SystemSettingsCloneCategory(
+        id: .attention,
+        title: .systemSettingsCloneCategoryAttention,
+        summary: .systemSettingsCloneCategoryAttentionSummary,
+        symbolName: "bell.badge.fill",
+        tint: .red,
         panes: [
-            pane("focus", .systemSettingsClonePaneFocus, "moon.fill",
-                 "com.apple.Focus-Settings.extension", hints: ["do not disturb"]),
-            pane("notifications", .systemSettingsClonePaneNotifications, "bell.badge.fill",
-                 "com.apple.Notifications-Settings.extension"),
-            pane("screen-time", .systemSettingsClonePaneScreenTime, "hourglass",
-                 "com.apple.Screen-Time-Settings.extension"),
-            pane("siri", .systemSettingsClonePaneSiri, "sparkles",
-                 "com.apple.Siri-Settings.extension", hints: ["apple intelligence", "siri"]),
-            pane("spotlight", .systemSettingsClonePaneSpotlight, "magnifyingglass",
-                 "com.apple.Spotlight-Settings.extension"),
+            pane("notifications", .systemSettingsClonePaneNotifications, .systemSettingsClonePaneNotificationsDetail,
+                 "bell.badge.fill", .red, "com.apple.Notifications-Settings.extension",
+                 hints: ["banner", "badges", "alerts", "benachrichtigungen", "hinweise"]),
+            pane("focus", .systemSettingsClonePaneFocus, .systemSettingsClonePaneFocusDetail,
+                 "moon.fill", .indigo, "com.apple.Focus-Settings.extension",
+                 hints: ["do not disturb", "nicht stören", "dnd", "silence"]),
+            pane("screen-time", .systemSettingsClonePaneScreenTime, .systemSettingsClonePaneScreenTimeDetail,
+                 "hourglass", .purple, "com.apple.Screen-Time-Settings.extension",
+                 hints: ["app limits", "downtime", "auszeit", "parental controls", "kindersicherung"]),
+            pane("siri", .systemSettingsClonePaneSiri, .systemSettingsClonePaneSiriDetail,
+                 "sparkles", .iris, "com.apple.Siri-Settings.extension",
+                 hints: ["apple intelligence", "assistant", "ai", "ki", "hey siri", "chatgpt"]),
+            pane("spotlight", .systemSettingsClonePaneSpotlight, .systemSettingsClonePaneSpotlightDetail,
+                 "magnifyingglass", .gray, "com.apple.Spotlight-Settings.extension",
+                 hints: ["search", "suche", "index"]),
+        ]
+    )
+
+    static let privacy = SystemSettingsCloneCategory(
+        id: .privacy,
+        title: .systemSettingsCloneCategoryPrivacy,
+        summary: .systemSettingsCloneCategoryPrivacySummary,
+        symbolName: "hand.raised.fill",
+        tint: .teal,
+        panes: [
+            pane("privacy", .systemSettingsClonePanePrivacy, .systemSettingsClonePanePrivacyDetail,
+                 "hand.raised.fill", .blue, privacyExtension,
+                 hints: ["security", "sicherheit", "permissions", "berechtigungen", "tcc", "gatekeeper"]),
+            pane("privacy-location", .systemSettingsClonePanePrivacyLocation, .systemSettingsClonePanePrivacyLocationDetail,
+                 "location.fill", .blue, privacyExtension, anchor: "Privacy_LocationServices",
+                 hints: ["gps", "standort", "location"]),
+            pane("privacy-camera", .systemSettingsClonePanePrivacyCamera, .systemSettingsClonePanePrivacyCameraDetail,
+                 "camera.fill", .graphite, privacyExtension, anchor: "Privacy_Camera",
+                 hints: ["webcam", "facetime"]),
+            pane("privacy-microphone", .systemSettingsClonePanePrivacyMicrophone, .systemSettingsClonePanePrivacyMicrophoneDetail,
+                 "mic.fill", .orange, privacyExtension, anchor: "Privacy_Microphone",
+                 hints: ["mic", "recording", "aufnahme"]),
+            pane("privacy-screen", .systemSettingsClonePanePrivacyScreen, .systemSettingsClonePanePrivacyScreenDetail,
+                 "record.circle", .purple, privacyExtension, anchor: "Privacy_ScreenCapture",
+                 hints: ["screen recording", "bildschirmaufnahme", "screenshot", "capture"]),
+            pane("privacy-accessibility", .systemSettingsClonePanePrivacyAccessibility, .systemSettingsClonePanePrivacyAccessibilityDetail,
+                 "accessibility", .blue, privacyExtension, anchor: "Privacy_Accessibility",
+                 hints: ["control computer", "automation", "window manager"]),
+            pane("privacy-input-monitoring", .systemSettingsClonePanePrivacyInputMonitoring,
+                 .systemSettingsClonePanePrivacyInputMonitoringDetail,
+                 "keyboard.badge.eye", .gray, privacyExtension, anchor: "Privacy_ListenEvent",
+                 hints: ["keylogger", "eingabeüberwachung", "listen event"]),
+            pane("privacy-automation", .systemSettingsClonePanePrivacyAutomation, .systemSettingsClonePanePrivacyAutomationDetail,
+                 "gearshape.2.fill", .gray, privacyExtension, anchor: "Privacy_Automation",
+                 hints: ["applescript", "apple events", "automatisierung"]),
+            pane("privacy-app-management", .systemSettingsClonePanePrivacyAppManagement,
+                 .systemSettingsClonePanePrivacyAppManagementDetail,
+                 "square.stack.3d.up.fill", .blue, privacyExtension, anchor: "Privacy_AppBundles",
+                 hints: ["app verwaltung", "updater"]),
+            pane("privacy-full-disk", .systemSettingsClonePanePrivacyFullDisk, .systemSettingsClonePanePrivacyFullDiskDetail,
+                 "externaldrive.fill", .gray, privacyExtension, anchor: "Privacy_AllFiles",
+                 hints: ["full disk access", "festplattenvollzugriff", "files"]),
+            pane("privacy-filevault", .systemSettingsClonePanePrivacyFileVault, .systemSettingsClonePanePrivacyFileVaultDetail,
+                 "lock.rectangle.stack.fill", .graphite, privacyExtension, anchor: "FileVault",
+                 hints: ["encryption", "verschlüsselung", "encrypt"]),
+            pane("privacy-lockdown", .systemSettingsClonePanePrivacyLockdown, .systemSettingsClonePanePrivacyLockdownDetail,
+                 "lock.shield.fill", .blue, privacyExtension, anchor: "LockdownMode",
+                 hints: ["spyware", "targeted attack"]),
+            pane("lock-screen", .systemSettingsClonePaneLockScreen, .systemSettingsClonePaneLockScreenDetail,
+                 "lock.fill", .graphite, "com.apple.Lock-Screen-Settings.extension",
+                 hints: ["screen lock", "bildschirmsperre", "sleep", "ruhezustand", "require password"]),
+            pane("touch-id", .systemSettingsClonePaneTouchID, .systemSettingsClonePaneTouchIDDetail,
+                 "touchid", .red, "com.apple.Touch-ID-Settings.extension",
+                 hints: ["fingerprint", "fingerabdruck", "login password", "passwort ändern", "change password"]),
         ]
     )
 
@@ -248,29 +302,76 @@ private extension SystemSettingsDeepLinkCatalog {
         title: .systemSettingsCloneCategoryAccessibility,
         summary: .systemSettingsCloneCategoryAccessibilitySummary,
         symbolName: "accessibility",
+        tint: .purple,
         panes: [
-            pane("accessibility", .systemSettingsClonePaneAccessibility, "accessibility",
-                 "com.apple.Accessibility-Settings.extension"),
-            pane("voiceover", .systemSettingsClonePaneVoiceOver, "ear.fill",
-                 "com.apple.Accessibility-Settings.extension", anchor: "VoiceOver"),
-            pane("zoom", .systemSettingsClonePaneZoom, "plus.magnifyingglass",
-                 "com.apple.Accessibility-Settings.extension", anchor: "Zoom"),
-            pane("ax-display", .systemSettingsClonePaneAXDisplay, "circle.lefthalf.striped.horizontal.inverse",
-                 "com.apple.Accessibility-Settings.extension", anchor: "Display",
-                 hints: ["increase contrast", "reduce motion"]),
-            pane("spoken-content", .systemSettingsClonePaneSpokenContent, "text.bubble.fill",
-                 "com.apple.Accessibility-Settings.extension", anchor: "SpokenContent"),
-            pane("captions", .systemSettingsClonePaneCaptions, "captions.bubble.fill",
-                 "com.apple.Accessibility-Settings.extension", anchor: "Captions"),
-            pane("voice-control", .systemSettingsClonePaneVoiceControl, "mic.badge.plus",
-                 "com.apple.Accessibility-Settings.extension", anchor: "VoiceControl"),
-            pane("ax-keyboard", .systemSettingsClonePaneAXKeyboard, "keyboard.badge.ellipsis",
-                 "com.apple.Accessibility-Settings.extension", anchor: "Keyboard"),
-            pane("pointer-control", .systemSettingsClonePanePointerControl, "cursorarrow.click",
-                 "com.apple.Accessibility-Settings.extension", anchor: "PointerControl",
-                 hints: ["mouse keys"]),
-            pane("live-speech", .systemSettingsClonePaneLiveSpeech, "quote.bubble.fill",
-                 "com.apple.Accessibility-Settings.extension", anchor: "LiveSpeech"),
+            pane("accessibility", .systemSettingsClonePaneAccessibility, .systemSettingsClonePaneAccessibilityDetail,
+                 "accessibility", .blue, accessibilityExtension,
+                 hints: ["a11y", "barrierefreiheit"]),
+            pane("voiceover", .systemSettingsClonePaneVoiceOver, .systemSettingsClonePaneVoiceOverDetail,
+                 "speaker.wave.2.bubble.fill", .graphite, accessibilityExtension, anchor: "VoiceOver",
+                 hints: ["screen reader", "bildschirmleser", "braille"]),
+            pane("zoom", .systemSettingsClonePaneZoom, .systemSettingsClonePaneZoomDetail,
+                 "plus.magnifyingglass", .graphite, accessibilityExtension, anchor: "Zoom",
+                 hints: ["magnifier", "lupe", "vergrößern"]),
+            pane("ax-display", .systemSettingsClonePaneAXDisplay, .systemSettingsClonePaneAXDisplayDetail,
+                 "circle.lefthalf.striped.horizontal.inverse", .blue, accessibilityExtension, anchor: "Display",
+                 hints: ["increase contrast", "kontrast", "reduce motion", "bewegung reduzieren",
+                         "reduce transparency", "transparenz", "color filter", "cursor size"]),
+            pane("spoken-content", .systemSettingsClonePaneSpokenContent, .systemSettingsClonePaneSpokenContentDetail,
+                 "text.bubble.fill", .teal, accessibilityExtension, anchor: "SpokenContent",
+                 hints: ["text to speech", "vorlesen", "speak selection"]),
+            pane("captions", .systemSettingsClonePaneCaptions, .systemSettingsClonePaneCaptionsDetail,
+                 "captions.bubble.fill", .graphite, accessibilityExtension, anchor: "Captions",
+                 hints: ["subtitles", "live captions"]),
+            pane("voice-control", .systemSettingsClonePaneVoiceControl, .systemSettingsClonePaneVoiceControlDetail,
+                 "mic.badge.plus", .blue, accessibilityExtension, anchor: "VoiceControl",
+                 hints: ["voice commands", "sprachbefehle"]),
+            pane("ax-keyboard", .systemSettingsClonePaneAXKeyboard, .systemSettingsClonePaneAXKeyboardDetail,
+                 "keyboard.badge.ellipsis", .graphite, accessibilityExtension, anchor: "Keyboard",
+                 hints: ["sticky keys", "slow keys", "full keyboard access", "einrastfunktion", "tastaturnavigation"]),
+            pane("pointer-control", .systemSettingsClonePanePointerControl, .systemSettingsClonePanePointerControlDetail,
+                 "cursorarrow.click.2", .blue, accessibilityExtension, anchor: "PointerControl",
+                 hints: ["mouse keys", "maustasten", "head pointer", "dwell"]),
+            pane("live-speech", .systemSettingsClonePaneLiveSpeech, .systemSettingsClonePaneLiveSpeechDetail,
+                 "quote.bubble.fill", .teal, accessibilityExtension, anchor: "LiveSpeech",
+                 hints: ["type to speak", "personal voice"]),
+        ]
+    )
+
+    static let thisMac = SystemSettingsCloneCategory(
+        id: .thisMac,
+        title: .systemSettingsCloneCategoryThisMac,
+        summary: .systemSettingsCloneCategoryThisMacSummary,
+        symbolName: "laptopcomputer",
+        tint: .graphite,
+        panes: [
+            pane("about", .systemSettingsClonePaneAbout, .systemSettingsClonePaneAboutDetail,
+                 "info.circle.fill", .gray, "com.apple.SystemProfiler.AboutExtension",
+                 hints: ["serial", "seriennummer", "macos version", "chip", "model", "about this mac", "über diesen mac"]),
+            pane("software-update", .systemSettingsClonePaneSoftwareUpdate, .systemSettingsClonePaneSoftwareUpdateDetail,
+                 "arrow.down.circle.fill", .blue, "com.apple.Software-Update-Settings.extension",
+                 hints: ["update", "upgrade", "aktualisieren", "beta"]),
+            pane("storage", .systemSettingsClonePaneStorage, .systemSettingsClonePaneStorageDetail,
+                 "internaldrive.fill", .gray, "com.apple.settings.Storage",
+                 hints: ["disk space", "speicherplatz", "free up", "platz", "ssd"]),
+            pane("battery", .systemSettingsClonePaneBattery, .systemSettingsClonePaneBatteryDetail,
+                 "battery.100percent", .green, "com.apple.Battery-Settings.extension",
+                 hints: ["energy", "akku", "low power", "stromsparen", "charging", "laden", "battery health"]),
+            pane("energy-saver", .systemSettingsClonePaneEnergySaver, .systemSettingsClonePaneEnergySaverDetail,
+                 "bolt.fill", .yellow, "com.apple.preferences.EnergySaverPrefPane",
+                 hints: ["desktop", "sleep", "wake", "power", "strom"]),
+            pane("time-machine", .systemSettingsClonePaneTimeMachine, .systemSettingsClonePaneTimeMachineDetail,
+                 "clock.arrow.circlepath", .green, "com.apple.Time-Machine-Settings.extension",
+                 hints: ["backup", "sicherung", "restore"]),
+            pane("coverage", .systemSettingsClonePaneCoverage, .systemSettingsClonePaneCoverageDetail,
+                 "checkmark.seal.fill", .red, "com.apple.Coverage-Settings.extension",
+                 hints: ["applecare", "warranty", "garantie", "repair", "reparatur"]),
+            pane("startup-disk", .systemSettingsClonePaneStartupDisk, .systemSettingsClonePaneStartupDiskDetail,
+                 "externaldrive.fill.badge.checkmark", .gray, "com.apple.Startup-Disk-Settings.extension",
+                 hints: ["boot", "booten"]),
+            pane("transfer-reset", .systemSettingsClonePaneTransferReset, .systemSettingsClonePaneTransferResetDetail,
+                 "arrow.triangle.2.circlepath", .gray, "com.apple.Transfer-Reset-Settings.extension",
+                 hints: ["erase", "löschen", "factory reset", "migration", "sell", "verkaufen"]),
         ]
     )
 
@@ -279,59 +380,34 @@ private extension SystemSettingsDeepLinkCatalog {
         title: .systemSettingsCloneCategoryGeneral,
         summary: .systemSettingsCloneCategoryGeneralSummary,
         symbolName: "gearshape.fill",
+        tint: .gray,
         panes: [
-            pane("general", .systemSettingsClonePaneGeneral, "gearshape.fill",
-                 "com.apple.systempreferences.GeneralSettings"),
-            pane("about", .systemSettingsClonePaneAbout, "info.circle.fill",
-                 "com.apple.SystemProfiler.AboutExtension", hints: ["serial", "macos version"]),
-            pane("software-update", .systemSettingsClonePaneSoftwareUpdate, "gear.badge",
-                 "com.apple.Software-Update-Settings.extension"),
-            pane("storage", .systemSettingsClonePaneStorage, "internaldrive.fill",
-                 "com.apple.settings.Storage"),
-            pane("coverage", .systemSettingsClonePaneCoverage, "checkmark.seal.fill",
-                 "com.apple.Coverage-Settings.extension", hints: ["applecare", "warranty"]),
-            pane("language", .systemSettingsClonePaneLanguage, "globe",
-                 "com.apple.Localization-Settings.extension", hints: ["region", "locale"]),
-            pane("date-time", .systemSettingsClonePaneDateTime, "clock.fill",
-                 "com.apple.Date-Time-Settings.extension"),
-            pane("time-machine", .systemSettingsClonePaneTimeMachine, "clock.arrow.circlepath",
-                 "com.apple.Time-Machine-Settings.extension", hints: ["backup"]),
-            pane("transfer-reset", .systemSettingsClonePaneTransferReset, "arrow.triangle.2.circlepath",
-                 "com.apple.Transfer-Reset-Settings.extension", hints: ["erase", "migration"]),
-            pane("startup-disk", .systemSettingsClonePaneStartupDisk, "internaldrive",
-                 "com.apple.Startup-Disk-Settings.extension"),
-            pane("login-items", .systemSettingsClonePaneLoginItems, "list.bullet.rectangle.portrait.fill",
-                 "com.apple.LoginItems-Settings.extension", hints: ["open at login", "background"]),
-            pane("profiles", .systemSettingsClonePaneProfiles, "doc.badge.gearshape",
-                 "com.apple.Profiles-Settings.extension", hints: ["mdm", "device management"]),
-            pane("extensions", .systemSettingsClonePaneExtensions, "puzzlepiece.extension.fill",
-                 "com.apple.ExtensionsPreferences"),
-        ]
-    )
-
-    static let powerAndPeople = SystemSettingsCloneCategory(
-        id: .powerAndPeople,
-        title: .systemSettingsCloneCategoryPower,
-        summary: .systemSettingsCloneCategoryPowerSummary,
-        symbolName: "battery.100percent",
-        panes: [
-            pane("battery", .systemSettingsClonePaneBattery, "battery.100percent",
-                 "com.apple.Battery-Settings.extension", hints: ["energy", "low power"]),
-            pane("energy-saver", .systemSettingsClonePaneEnergySaver, "leaf.fill",
-                 "com.apple.preferences.EnergySaverPrefPane", hints: ["desktop"]),
-            pane("lock-screen", .systemSettingsClonePaneLockScreen, "lock.fill",
-                 "com.apple.Lock-Screen-Settings.extension"),
-            pane("touch-id", .systemSettingsClonePaneTouchID, "touchid",
-                 "com.apple.Touch-ID-Settings.extension", hints: ["password", "login password"]),
-            pane("users", .systemSettingsClonePaneUsers, "person.2.fill",
-                 "com.apple.Users-Groups-Settings.extension", hints: ["accounts", "guest"]),
+            pane("general", .systemSettingsClonePaneGeneral, .systemSettingsClonePaneGeneralDetail,
+                 "gearshape.fill", .gray, "com.apple.systempreferences.GeneralSettings"),
+            pane("language", .systemSettingsClonePaneLanguage, .systemSettingsClonePaneLanguageDetail,
+                 "globe", .blue, "com.apple.Localization-Settings.extension",
+                 hints: ["region", "locale", "sprache", "format", "calendar", "temperature", "celsius"]),
+            pane("date-time", .systemSettingsClonePaneDateTime, .systemSettingsClonePaneDateTimeDetail,
+                 "clock.fill", .blue, "com.apple.Date-Time-Settings.extension",
+                 hints: ["time zone", "zeitzone", "clock", "uhr", "24-hour"]),
+            pane("login-items", .systemSettingsClonePaneLoginItems, .systemSettingsClonePaneLoginItemsDetail,
+                 "power", .gray, "com.apple.LoginItems-Settings.extension",
+                 hints: ["open at login", "startup apps", "autostart", "background", "hintergrund"]),
+            pane("extensions", .systemSettingsClonePaneExtensions, .systemSettingsClonePaneExtensionsDetail,
+                 "puzzlepiece.extension.fill", .gray, "com.apple.ExtensionsPreferences",
+                 hints: ["share menu", "finder extensions", "quick look"]),
+            pane("profiles", .systemSettingsClonePaneProfiles, .systemSettingsClonePaneProfilesDetail,
+                 "checkmark.shield.fill", .gray, "com.apple.Profiles-Settings.extension",
+                 hints: ["mdm", "device management", "configuration profile", "profile", "profil"]),
         ]
     )
 
     static func pane(
         _ id: String,
         _ title: LocalizedStringResource,
+        _ detail: LocalizedStringResource,
         _ symbolName: String,
+        _ tint: SystemSettingsCloneTint,
         _ paneIdentifier: String,
         anchor: String? = nil,
         hints: [String] = []
@@ -339,7 +415,9 @@ private extension SystemSettingsDeepLinkCatalog {
         SystemSettingsClonePane(
             id: id,
             title: title,
+            detail: detail,
             symbolName: symbolName,
+            tint: tint,
             paneIdentifier: paneIdentifier,
             anchor: anchor,
             searchHints: hints

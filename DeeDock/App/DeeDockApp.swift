@@ -98,9 +98,10 @@ struct DeeDockApp: App {
             SystemSettingsCloneView()
                 .background { SystemSettingsCloneWindowRegistration() }
         }
-        .windowToolbarStyle(.unified)
+        .windowStyle(.hiddenTitleBar)
+        .windowBackgroundDragBehavior(.enabled)
         .defaultLaunchBehavior(.suppressed)
-        .defaultSize(width: 920, height: 720)
+        .defaultSize(width: 1080, height: 760)
     }
 }
 
