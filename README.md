@@ -69,6 +69,8 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 ## Using DDock
 
+**DDock Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. Disable tips in **Settings → Features → DDock Discovery**. See [Discovery](docs/DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+
 The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes
 grid and list app browsing plus unified search for apps, windows, Capsules/Breadcrumbs, Shelf files,
 pinned Shortcuts, and Dock Modes. App browsing retains filters, sorting, grouping, and launch history.

@@ -81,6 +81,10 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 DockSimsSettingsCard(sims: coordinator.sims)
             }
+        case .discovery:
+            if let coordinator = context.coordinator {
+                DiscoverySettingsCard(discovery: coordinator.discovery)
+            }
         case .soapBubbles:
             SettingsCard(title: .soapBubblesTitle, footnote: .soapBubblesSettingsHelp) {
                 SettingsToggleRow(title: .soapBubblesEnable, subtitle: .soapBubblesEnableHelp,
