@@ -2,7 +2,7 @@ import SwiftUI
 
 /// A top-level sidebar entry. Selecting one shows its overview; the overview pushes `SettingsPage`s.
 ///
-/// The four fixed sections are app-scoped groupings. A `display` section edits one profile's
+/// The five fixed sections are app-scoped groupings. A `display` section edits one profile's
 /// overrides and offers the same pages as `dock`, so a person moves between "for everything" and
 /// "for this screen" without learning a second layout.
 enum SettingsSection: Hashable, Identifiable {
@@ -10,10 +10,11 @@ enum SettingsSection: Hashable, Identifiable {
     case dock
     case features
     case modes
+    case atmosphere
     case display(String)
 
     /// Sections that always exist, in sidebar order. Displays are appended from the profile store.
-    static let fixed: [SettingsSection] = [.general, .dock, .features, .modes]
+    static let fixed: [SettingsSection] = [.general, .dock, .features, .atmosphere, .modes]
 
     var id: String {
         switch self {
@@ -21,6 +22,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock: "dock"
         case .features: "features"
         case .modes: "modes"
+        case .atmosphere: "atmosphere"
         case .display(let id): "display.\(id)"
         }
     }
@@ -32,6 +34,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock: .settingsGroupDock
         case .features: .settingsFeatures
         case .modes: .dockModesTitle
+        case .atmosphere: .atmosphereTitle
         case .display: nil
         }
     }
@@ -42,6 +45,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock: .settingsDockSummary
         case .features: .settingsFeaturesSummary
         case .modes: .settingsModesSummary
+        case .atmosphere: .atmosphereSummary
         case .display: .settingsDisplaySummary
         }
     }
@@ -52,6 +56,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock: .dock
         case .features: .symbol("puzzlepiece.extension.fill")
         case .modes: .symbol("square.stack.3d.up.fill")
+        case .atmosphere: .symbol("sparkles")
         case .display: .symbol("display")
         }
     }
@@ -63,6 +68,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock, .display: [Color(red: 0.32, green: 0.78, blue: 1.0), Color(red: 0.06, green: 0.42, blue: 0.94)]
         case .features: [Color(red: 1.0, green: 0.47, blue: 0.72), Color(red: 0.83, green: 0.15, blue: 0.52)]
         case .modes: [.indigo, .purple]
+        case .atmosphere: [.pink, .orange]
         }
     }
 
@@ -83,7 +89,7 @@ enum SettingsSection: Hashable, Identifiable {
              [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
              [.localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles],
              [.multipleDisplays, .permissions]]
-        case .modes:
+        case .modes, .atmosphere:
             []
         }
     }
@@ -100,6 +106,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock: [.settingsAppearanceKeywords, .settingsPositionKeywords, .settingsBehaviorKeywords]
         case .features: [.settingsFeaturesKeywords]
         case .modes: [.dockModesKeywords]
+        case .atmosphere: [.atmosphereSummary]
         case .display: []
         }
     }

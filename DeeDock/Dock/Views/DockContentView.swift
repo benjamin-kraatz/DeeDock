@@ -13,7 +13,6 @@ struct DockContentView: View {
     let reduceTransparency: Bool
     /// False while the dock's contents are crossfading inside the launcher's own material.
     var drawsBackground = true
-    var mode69Enabled = false
     var ambientAnimated = false
     let primaryAppAction: (DockItem) -> Void
     let openApp: (DockItem) -> Void
@@ -146,15 +145,6 @@ struct DockContentView: View {
                         }
                     }
                 }
-            }
-            if mode69Enabled && drawsBackground && !viewportSurface.isNull {
-                Mode69Overlay(vertical: edge.isVertical,
-                              reduceTransparency: reduceTransparency,
-                              animated: ambientAnimated && !reduceMotion && ambientOpacity > 0,
-                              cornerRadius: interaction.idleFade.settings.cornerRadius)
-                    .frame(width: viewportSurface.width, height: viewportSurface.height)
-                    .position(x: viewportSurface.midX, y: viewportSurface.midY)
-                    .opacity(ambientOpacity)
             }
             DockCalloutsView(
                 errorMessage: errorMessage,

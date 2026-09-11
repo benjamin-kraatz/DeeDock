@@ -19,12 +19,6 @@ struct DockModesMenu: View {
                 }
                 .disabled(!coordinator.canSwitchModes || mode.id == coordinator.profiles.modes.document.activeModeID)
             }
-            if coordinator.profiles.modes.activeMode.mode69PlusEnabled {
-                Button(.mode69PlusStop) {
-                    _ = coordinator.profiles.modes.setMode69PlusEnabled(
-                        false, for: coordinator.profiles.modes.activeMode.id)
-                }
-            }
             Divider()
             Menu(.focusStart) {
                 ForEach(coordinator.profiles.modes.modes) { mode in

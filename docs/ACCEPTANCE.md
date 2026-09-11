@@ -2040,30 +2040,72 @@ a real Mac, including mixed types, Shortcut success/failure, folder conflicts, f
 layouts, VoiceOver, Reduce Motion, Spaces, and sleep/wake. Do not mark DEE-24 Done on
 compilation alone.
 
-## DEE-71 Mode 69
+## DEE-73 Atmosphere
 
-Settings → Modes has an opt-in Mode 69 toggle for each configuration. The saved boolean defaults to false for older documents and copies when duplicating a mode. The existing atomic mode save publishes changes only after persistence succeeds. Renaming does not change the skin.
+Atmosphere replaces the internal DEE-71 skin. Mode-owned fields, setters, controls, menu
+commands, and both old renderers are removed. Existing mode documents ignore the retired
+fields; no preferences migrate. The new app-wide settings document defaults to disabled.
+English and German Settings include all four presets, density, idle-only dimming, layout,
+and exclusive color sources. Atmosphere does not share intensity or activation state with
+Dock Modes, Sims, or soap bubbles.
 
-A click-through Canvas draws red ambient light and two upright candles inside the visible dock ends, including scrolling docks. The skin follows background visibility and idle fading. A 24 fps timeline exists only when the dock is fully revealed, the decoration is visible, and Reduce Motion is off. Reduce Transparency uses a solid rim without ambient glow. Launcher presentation omits the skin. No sound, additional windows, permissions, or system preference changes are involved.
+Each drawable non-mirrored display owns a full-frame click-through ambient panel. Only two
+84-point corner panels accept input for 69 and Party. These panels cannot become key or
+main windows. Click toggles the decoration's light; a long press changes candle colors or
+party shape. Generated décor uses the same light toggle and a tilt on long press. Minimal
+and Focus have no corner panels or particles. Reduce Motion removes the animation timeline;
+Reduce Transparency uses a static rim. The ordinary particle timeline has a 20 fps ceiling.
 
-Validation: DeeDock Debug compilation passed with signing disabled. Tests, previews, automated visual checks, and native acceptance were not run.
+Panorama requires a contiguous horizontal row with equal vertical extents in AppKit points.
+The canvas spans the row, and corner panels and vertical edge light appear only at its true
+extremes. L-shaped, vertical, overlapping, gapped, and unequal-height arrangements fall
+back to per-display edges. Mirrored destinations do not duplicate decoration.
+
+Wallpaper colors come from a bounded thumbnail of the URL returned by NSWorkspace, sampled
+at most once every eight seconds. The three modes select a dominant color plus an average,
+a single average, or left/right corner-region averages. These sample the source image,
+not a screenshot of the composited desktop. Dynamic wallpaper rendering and display-specific
+crop effects are not captured. Missing or unreadable images use the manual palette.
+Panorama shares the outer displays' palette endpoints to avoid seams, or one mean color
+for average-only sampling. Focused-app colors
+sample the active app icon on activation, plus once when selecting that source. Color
+changes blend over three seconds; Reduce Motion applies them immediately.
+
+Mood runs Foundation Models only after Apply, keeps its radio selected, caches the text
+and palette, and supports Edit as Manual. Changing source or dismissing Settings cancels
+pending generation. Failed generation preserves the previous palette. The optional Image
+Playground control uses only the system sheet and copies its output to a PNG thumbnail of
+at most 256 pixels before saving it locally. Both AI controls are hidden when unavailable.
+No headless ImageCreator path exists.
+
+Idle-only dimming uses 30 seconds since any input. A two-second timer checks idle time and
+on-screen window bounds only while Atmosphere is enabled and the session is awake. A normal
+window covering the entire display hides its panels and pauses particles. This conservative
+permission-free approximation also hides the effect for borderless display-filling windows.
+A full-screen transition can take up to one timer interval to register. Native Space
+behavior and window-metadata availability still need acceptance. The panels also request
+AppKit fullScreenNone behavior. Disabling, sleeping, suspending the session, or stopping the
+controller cancels sampling, invalidates the timer, and releases panels and hosting views.
+
+Validation: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-destination 'platform=macOS' -derivedDataPath /tmp/deedock-dee73-build
+CODE_SIGNING_ALLOWED=NO build` passed. Tests, previews, automated visual checks, and native
+acceptance were not run.
 
 Pending native acceptance:
 
-- Enable and disable the skin, switch modes, duplicate, rename, and relaunch. Confirm independent skin choices and unchanged pins and recipes.
-- Inspect candle placement and icon readability on all four edges, small and crowded docks, multiple displays, and while scrolling or magnifying.
-- Check auto-hide, idle fading, hidden backgrounds, Launcher transitions, Spaces, full-screen apps, display removal, and sleep/wake.
-- Check English and German Settings copy, keyboard toggling, VoiceOver, Reduce Motion, and Reduce Transparency. Confirm decoration does not intercept clicks or obscure focus and running indicators.
-
-### Mode 69+ full-display atmosphere
-
-Mode 69+ is a separate opt-in boolean on each Dock Mode. Mode duplication copies it and older documents default to off. Each drawable, non-mirrored desktop gets a transparent, nonactivating NSPanel at status-bar level, using its full AppKit frame in points. The panels ignore mouse events and cannot become key or main. Public all-Spaces and full-screen-auxiliary collection behaviors request presentation across Spaces. Coverage of other applications' full-screen windows and system-owned UI is not guaranteed by compilation.
-
-The Canvas concentrates red and pink light at display edges, adds a 1.5% central red wash, and draws three small candles in each bottom corner. Movement has a 20 fps ceiling and slow light cycles. Reduce Motion removes the timeline. Reduce Transparency removes the wash and gradients, leaving a solid rim and still candles. Disabling the feature, suspending the session, sleeping displays, or quitting releases hosting views and their timelines. Display reconciliation uses stable IDs and full frames independently of which docks are enabled. The Dock Mode menu offers an immediate off action.
-
-Native acceptance remains pending: full-screen apps, Spaces, menu access, click-through dragging, keyboard focus, lock and unlock, sleep and wake, display rearrangement and removal, mirroring, Retina scaling, readability over light and dark apps, corner overlap, and CPU/GPU cost. Tests and automated visual checks were not run.
-
-Mode 69+ validation: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/deedock-dee71-build CODE_SIGNING_ALLOWED=NO build` succeeded. This proves compilation only.
+- DE/EN Settings, default-off persistence, all presets, density endpoints, and exclusive
+  color sources across relaunches. Confirm Mode switches do not change Atmosphere.
+- Multi-display negative origins, Retina scaling, mirroring, hot-plug, panorama extremes,
+  and fallback layouts. Check shared bezels and the full-display gradient.
+- Idle dimming, fullscreen on one display, Space changes, sleep/wake, lock/unlock, and
+  unavailable window metadata. Confirm unaffected displays continue independently.
+- Click versus long press, app focus, pointer passage outside corner panels, VoiceOver
+  actions, and simultaneous Sims and soap bubbles. Check CPU/GPU cost and readability.
+- Wallpaper replacement and unreadable URLs, app activation, palette interpolation,
+  Mood availability and cancellation, and Image Playground completion/cancellation.
+- Reduce Motion and Reduce Transparency during live use. Confirm disabling leaves no
+  window, input interception, timer, or particle timeline behind.
 
 ## DEE-41 Clipboard Museum
 

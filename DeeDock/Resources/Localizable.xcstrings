@@ -1,6 +1,708 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "atmosphereTitle": {
+    "comment": "Atmosphere Settings or corner decoration. Atmosphere",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Atmosphere"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Atmosphäre"
+        }
+      }
+    }
+  },
+  "atmosphereSummary": {
+    "comment": "Atmosphere Settings or corner decoration. Optional ambient light and décor at the edges of all displays.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Optional ambient light and décor at the edges of all displays."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Optionales Licht und Dekoration an den Rändern aller Bildschirme."
+        }
+      }
+    }
+  },
+  "atmosphereEnabled": {
+    "comment": "Atmosphere Settings or corner decoration. Enable Atmosphere",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable Atmosphere"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Atmosphäre aktivieren"
+        }
+      }
+    }
+  },
+  "atmospherePreset": {
+    "comment": "Atmosphere Settings or corner decoration. Preset",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preset"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Voreinstellung"
+        }
+      }
+    }
+  },
+  "atmosphere69": {
+    "comment": "Atmosphere Settings or corner decoration. 69",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "69"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "69"
+        }
+      }
+    }
+  },
+  "atmosphereMinimal": {
+    "comment": "Atmosphere Settings or corner decoration. Minimal",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Minimal"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Minimal"
+        }
+      }
+    }
+  },
+  "atmosphereFocus": {
+    "comment": "Atmosphere Settings or corner decoration. Focus",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Focus"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fokus"
+        }
+      }
+    }
+  },
+  "atmosphereParty": {
+    "comment": "Atmosphere Settings or corner decoration. Party",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Party"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Party"
+        }
+      }
+    }
+  },
+  "atmosphereDensity": {
+    "comment": "Atmosphere Settings or corner decoration. Particle density",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Particle density"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Partikeldichte"
+        }
+      }
+    }
+  },
+  "atmosphereIdle": {
+    "comment": "Atmosphere Settings or corner decoration. Only while idle",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Only while idle"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nur bei Inaktivität"
+        }
+      }
+    }
+  },
+  "atmosphereGateHelp": {
+    "comment": "Atmosphere Settings or corner decoration. Dim until there has been no input for 30 seconds. Full-display apps hide the effect on their display.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dim until there has been no input for 30 seconds. Full-display apps hide the effect on their display."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bis zu 30 Sekunden ohne Eingabe dimmen. Bildschirmfüllende Apps blenden den Effekt auf ihrem Bildschirm aus."
+        }
+      }
+    }
+  },
+  "atmosphereLayout": {
+    "comment": "Atmosphere Settings or corner decoration. Display layout",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Display layout"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bildschirmanordnung"
+        }
+      }
+    }
+  },
+  "atmospherePerDisplay": {
+    "comment": "Atmosphere Settings or corner decoration. Per display",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Per display"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pro Bildschirm"
+        }
+      }
+    }
+  },
+  "atmospherePanorama": {
+    "comment": "Atmosphere Settings or corner decoration. Panorama, left to right",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Panorama, left to right"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Panorama, links nach rechts"
+        }
+      }
+    }
+  },
+  "atmosphereLayoutHelp": {
+    "comment": "Atmosphere Settings or corner decoration. Panorama joins a continuous row of equal-height displays. Other arrangements use separate edges.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Panorama joins a continuous row of equal-height displays. Other arrangements use separate edges."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Panorama verbindet eine durchgehende Reihe gleich hoher Bildschirme. Andere Anordnungen erhalten separate Ränder."
+        }
+      }
+    }
+  },
+  "atmosphereSource": {
+    "comment": "Atmosphere Settings or corner decoration. Color source",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Color source"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Farbquelle"
+        }
+      }
+    }
+  },
+  "atmosphereManual": {
+    "comment": "Atmosphere Settings or corner decoration. Manual",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manual"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manuell"
+        }
+      }
+    }
+  },
+  "atmosphereWallpaper": {
+    "comment": "Atmosphere Settings or corner decoration. Wallpaper",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wallpaper"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hintergrundbild"
+        }
+      }
+    }
+  },
+  "atmosphereAppIcon": {
+    "comment": "Atmosphere Settings or corner decoration. Focused app icon",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Focused app icon"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Symbol der aktiven App"
+        }
+      }
+    }
+  },
+  "atmosphereMood": {
+    "comment": "Atmosphere Settings or corner decoration. Mood",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mood"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stimmung"
+        }
+      }
+    }
+  },
+  "atmosphereFirstColor": {
+    "comment": "Atmosphere Settings or corner decoration. First color",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "First color"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erste Farbe"
+        }
+      }
+    }
+  },
+  "atmosphereSecondColor": {
+    "comment": "Atmosphere Settings or corner decoration. Second color",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Second color"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zweite Farbe"
+        }
+      }
+    }
+  },
+  "atmosphereWallpaperMode": {
+    "comment": "Atmosphere Settings or corner decoration. Wallpaper sampling",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wallpaper sampling"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Farben aus Hintergrundbild"
+        }
+      }
+    }
+  },
+  "atmosphereGradient": {
+    "comment": "Atmosphere Settings or corner decoration. Prominent to average gradient",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prominent to average gradient"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verlauf von dominanter zu durchschnittlicher Farbe"
+        }
+      }
+    }
+  },
+  "atmosphereAverage": {
+    "comment": "Atmosphere Settings or corner decoration. Average only",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Average only"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nur Durchschnittsfarbe"
+        }
+      }
+    }
+  },
+  "atmosphereCorners": {
+    "comment": "Atmosphere Settings or corner decoration. Corner samples",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Corner samples"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eckfarben"
+        }
+      }
+    }
+  },
+  "atmosphereAppHelp": {
+    "comment": "Atmosphere Settings or corner decoration. Colors update when the active app changes.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Colors update when the active app changes."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Farben ändern sich beim Wechsel der aktiven App."
+        }
+      }
+    }
+  },
+  "atmosphereMoodPrompt": {
+    "comment": "Atmosphere Settings or corner decoration. Describe a mood",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Describe a mood"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stimmung beschreiben"
+        }
+      }
+    }
+  },
+  "atmosphereApply": {
+    "comment": "Atmosphere Settings or corner decoration. Apply",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apply"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Anwenden"
+        }
+      }
+    }
+  },
+  "atmosphereEditManual": {
+    "comment": "Atmosphere Settings or corner decoration. Edit as Manual",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Edit as Manual"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Manuell bearbeiten"
+        }
+      }
+    }
+  },
+  "atmosphereMoodError": {
+    "comment": "Atmosphere Settings or corner decoration. The palette could not be generated. Try another description.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The palette could not be generated. Try another description."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Palette konnte nicht erstellt werden. Versuche eine andere Beschreibung."
+        }
+      }
+    }
+  },
+  "atmosphereInteractionHelp": {
+    "comment": "Atmosphere Settings or corner decoration. Click candles to extinguish or relight them; hold to change their colors. Click party décor to dim it; hold to switch its shape.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Click candles to extinguish or relight them; hold to change their colors. Click party décor to dim it; hold to switch its shape."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Klicke Kerzen zum Löschen oder Anzünden; halte sie gedrückt, um die Farben zu ändern. Klicke Party-Deko zum Dimmen; halte sie gedrückt, um die Form zu wechseln."
+        }
+      }
+    }
+  },
+  "atmosphereDecorLabel": {
+    "comment": "Atmosphere Settings or corner decoration. Atmosphere corner décor",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Atmosphere corner décor"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Atmosphäre-Eckdekoration"
+        }
+      }
+    }
+  },
+  "atmosphereDecorOn": {
+    "comment": "Atmosphere Settings or corner decoration. Lit",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lit"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "An"
+        }
+      }
+    }
+  },
+  "atmosphereDecorOff": {
+    "comment": "Atmosphere Settings or corner decoration. Dimmed",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dimmed"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gedimmt"
+        }
+      }
+    }
+  },
+  "atmosphereDecorAlternate": {
+    "comment": "Atmosphere Settings or corner decoration. Change decoration",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Change decoration"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dekoration ändern"
+        }
+      }
+    }
+  },
+  "atmosphereGenerateDecor": {
+    "comment": "Atmosphere system Image Playground action or result.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Generate corner décor…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eckdekoration erstellen …"
+        }
+      }
+    }
+  },
+  "atmosphereRemoveDecor": {
+    "comment": "Atmosphere system Image Playground action or result.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove generated décor"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erstellte Dekoration entfernen"
+        }
+      }
+    }
+  },
+  "atmosphereDecorError": {
+    "comment": "Atmosphere system Image Playground action or result.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The decoration could not be saved."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Dekoration konnte nicht gespeichert werden."
+        }
+      }
+    }
+  },
   "clipboardMuseumRename": {
     "comment": "Action that starts renaming an exhibit.",
     "extractionState": "manual",
@@ -2089,96 +2791,11 @@
       }
     }
   },
-  "mode69PlusStop": {
-    "comment": "Menu action to immediately disable full-display atmosphere.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Turn off Mode 69+"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Modus 69+ ausschalten"
-        }
-      }
-    }
-  },
-  "mode69PlusHelp": {
-    "comment": "Explains full-screen decoration and its exit.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Red light over every display, with candles at the edges. Click through and keep working. Turn off here or in the Dock Mode menu."
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Rotes Licht auf allen Bildschirmen, mit Kerzen am Rand. Klicke hindurch und arbeite weiter. Hier oder im Dock-Modus-Menü ausschalten."
-        }
-      }
-    }
-  },
-  "mode69PlusTitle": {
-    "comment": "Full-display ambient effect toggle.",
-    "extractionState": "manual",
-    "localizations": {
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Mode 69+"
-        }
-      },
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Modus 69+"
-        }
-      }
-    }
-  },
-  "mode69Help": {
-    "comment": "Explains the visual-only skin and how to turn it off.",
-    "extractionState": "manual",
-    "localizations": {
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Rotes Umgebungslicht und Kerzen für diesen Dock-Modus. Ausschalten stellt das normale Dock wieder her."
-        }
-      },
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Red ambient light and candles for this Dock Mode. Switch off to restore the ordinary dock."
-        }
-      }
-    }
-  },
-  "mode69Title": {
-    "comment": "Toggle for the optional candle and red ambient Dock Mode skin.",
-    "extractionState": "manual",
-    "localizations": {
-      "de": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Modus 69"
-        }
-      },
-      "en": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "Mode 69"
-        }
-      }
-    }
-  },
+
+
+
+
+
     "" : {
       "localizations" : {
         "de" : {

@@ -108,6 +108,10 @@ struct DockSettingsView: View {
             SettingsOverviewView(section: .features, isAvailable: isAvailable, open: open)
         case .dock:
             SettingsOverviewView(section: .dock, open: open)
+        case .atmosphere:
+            if let atmosphere = coordinator?.atmosphere {
+                AtmosphereSettingsPane(store: atmosphere.store)
+            }
         case .modes:
             DockModesSettingsPane(store: profiles.modes,
                                   activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },

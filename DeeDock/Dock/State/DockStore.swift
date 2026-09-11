@@ -42,7 +42,6 @@ final class DockStore {
     /// Presentation pins. Historical preview replaces this list without touching persistence.
     var pins: [DockPin] { previewPins ?? persistedPins }
     /// Saved pins for this display. Pin edits and history recording always use this list.
-    var mode69Enabled: Bool { profiles.modes.activeMode.mode69Enabled }
 
     var persistedPins: [DockPin] { profiles.pinLists[displayID] ?? [] }
     /// Temporary pin order shown while Browse Local History is replaying. Never written to disk.
