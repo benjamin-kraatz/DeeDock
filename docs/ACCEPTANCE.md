@@ -1,5 +1,11 @@
 # DeeDock acceptance record
 
+## DEE-74 DDock Discovery
+
+Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.
+
+Validation on 2026-09-11: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-74-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. Generated string symbols and new source target membership compiled. The final build reported only the App Intents metadata warning. Automated tests, previews, and native interaction checks were not run. Compilation does not establish native acceptance.
+
 ## DEE-44 rust on unused pins
 
 Implemented on `feature/dee-44`. Pins take a gentle rust after N unused days. Last-used times are written only when a pin is used from DDock (open, hide, spring-open, open files, open or reveal a folder). Hover, magnification, Downloads, Shelf, Trash, and apps launched outside DDock do not write timestamps. Missing times evaluate as now, so existing pins do not rust on upgrade. Using a pin writes now and the rust clears.

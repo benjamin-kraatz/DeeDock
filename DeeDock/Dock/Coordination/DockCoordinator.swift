@@ -19,6 +19,7 @@ final class DockCoordinator {
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
     let atmosphere = AtmosphereController()
+    let discovery = DiscoveryController()
     let zonePreview = DockZonePreviewController()
     let displayIndicator = DisplaySelectionIndicatorController()
     /// One-shot navigation consumed by Settings, including when its window is first created.
@@ -149,6 +150,26 @@ final class DockCoordinator {
         localHistory.start(session: focusSession.session)
         pinWeather.start()
         clipboardMuseum.start()
+        clipboardMuseum.didUse = { [weak self] in self?.discovery.markUsed(.clipboardMuseum) }
+        if clipboardMuseum.store.captureEnabled || !clipboardMuseum.store.exhibits.isEmpty {
+            discovery.markUsed(.clipboardMuseum)
+        }
+        discovery.interactionBlocked = { [weak self] in
+            guard let self else { return true }
+            return !canSwitchModes || popovers.isOpen || focusedID != nil || focusSession.isActive
+        }
+        discovery.targetScreen = { [weak self] in
+            guard let self else { return nil }
+            let screens = NSScreen.screens.filter { screen in
+                let id = (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+                return self.enabledDisplays.contains { $0.runtimeID == id }
+            }
+            return screens.first { $0.frame.contains(NSEvent.mouseLocation) } ?? screens.first
+        }
+        discovery.openDestination = { [weak self] destination in
+            switch destination { case .clipboardMuseum: self?.showClipboardMuseum() }
+        }
+        discovery.start()
         sims.start()
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
@@ -789,6 +810,8 @@ final class DockCoordinator {
     func showFusion() { fusion.show() }
 
     func stop() {
+        discovery.stop()
+        clipboardMuseum.didUse = nil
         atmosphere.stop()
         guard started else { return }
         started = false

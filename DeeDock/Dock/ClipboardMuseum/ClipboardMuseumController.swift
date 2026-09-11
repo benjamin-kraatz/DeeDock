@@ -19,6 +19,8 @@ final class ClipboardMuseumController {
     /// Curator labels, chained so the model runs one request at a time.
     private var curatorTask: Task<Void, Never>?
     private var started = false
+    /// Reports explicit use for local feature-tip suppression, even when tips are disabled.
+    var didUse: (() -> Void)?
 
     /// Default arguments are evaluated outside the main actor, so the store is built in the body.
     init(store: ClipboardMuseumStore? = nil, pasteboard: NSPasteboard = .general) {
@@ -54,6 +56,7 @@ final class ClipboardMuseumController {
     }
 
     func setCaptureEnabled(_ enabled: Bool) {
+        if enabled { didUse?() }
         store.setCaptureEnabled(enabled)
         updateWatcher()
     }
@@ -69,6 +72,7 @@ final class ClipboardMuseumController {
 
     /// Opens the museum from an explicit command. Hover never opens it.
     func show(returningTo application: NSRunningApplication?) {
+        didUse?()
         let windowController = windowController
             ?? ClipboardMuseumWindowController(store: store, actions: actions)
         self.windowController = windowController

@@ -1,6 +1,204 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "discoveryDebugTitle": {
+    "comment": "Debug-only Discovery settings card title.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Callout previews"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hinweise ausprobieren"
+        }
+      }
+    }
+  },
+  "discoveryDebugHelp": {
+    "comment": "Debug-only callout trigger explanation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show any tip without waiting or changing its dismissal state. Works with Discovery off. The Open button opens the real feature."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeige jeden Hinweis ohne Wartezeit und ohne seinen Ausblendestatus zu ändern. Funktioniert auch bei ausgeschaltetem Discovery. Die Öffnen-Taste öffnet die echte Funktion."
+        }
+      }
+    }
+  },
+  "discoveryDebugShow": {
+    "comment": "Debug-only button showing a catalog proposal.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show callout"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hinweis anzeigen"
+        }
+      }
+    }
+  },
+  "discoveryTitle": {
+    "comment": "Feature suggestions title.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock Discovery"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock Discovery"
+        }
+      }
+    }
+  },
+  "discoveryMuseumTitle": {
+    "comment": "Museum discovery callout headline.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Make room for your copies"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein Platz für deine Kopien"
+        }
+      }
+    }
+  },
+  "discoveryMuseumMessage": {
+    "comment": "Museum proposal body. Capture stays opt-in.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Copying a few things? Clipboard Museum can keep a local collection so you can find them again. You choose whether to start collecting."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Du kopierst gerade mehrere Dinge? Das Clipboard Museum kann sie lokal sammeln, damit du sie wiederfindest. Du entscheidest, ob du das Sammeln einschaltest."
+        }
+      }
+    }
+  },
+  "discoveryMuseumOpen": {
+    "comment": "Explicit action opening Clipboard Museum.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open Museum"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Museum öffnen"
+        }
+      }
+    }
+  },
+  "discoverySnooze": {
+    "comment": "Snooze this proposal for 24 hours.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tomorrow"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Morgen"
+        }
+      }
+    }
+  },
+  "discoveryDismiss": {
+    "comment": "Permanently dismiss this proposal.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Don’t show again"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nicht mehr anzeigen"
+        }
+      }
+    }
+  },
+  "discoveryEnabled": {
+    "comment": "Global Discovery switch, on by default.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Suggest useful features"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Passende Funktionen vorschlagen"
+        }
+      }
+    }
+  },
+  "discoverySettingsHelp": {
+    "comment": "Discovery settings explanation and privacy scope.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Occasional tips after a quiet moment. At most two per session and three per day. Uses local clipboard change counts, never clipboard contents."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gelegentliche Tipps in einem ruhigen Moment. Höchstens zwei pro Sitzung und drei pro Tag. Nutzt lokale Änderungszähler der Zwischenablage, niemals deren Inhalt."
+        }
+      }
+    }
+  },
   "quarantineTagline": {
     "comment": "Quarantine settings hero subtitle.",
     "extractionState": "manual",

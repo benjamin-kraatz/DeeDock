@@ -88,7 +88,7 @@ enum SettingsSection: Hashable, Identifiable {
             [[.shelfAndTrash, .capsules, .badges],
              [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
              [.localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles],
-             [.multipleDisplays, .permissions]]
+             [.discovery, .multipleDisplays, .permissions]]
         case .modes, .atmosphere:
             []
         }
