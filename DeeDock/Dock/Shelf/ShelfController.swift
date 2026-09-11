@@ -127,9 +127,11 @@ final class ShelfController {
 
     /// Resolves one staged item, refreshing a stale bookmark in place when it can.
     func resolve(_ id: UUID) -> ShelfResourceAccess? {
-        guard let staged = item(with: id) else { return nil }
+        guard let staged = item(with: id),
+              !QuarantineStore.shared.contains(id.uuidString, url: staged.url),
+              !QuarantineStore.shared.unreadable else { return nil }
         let access = ShelfResourceAccess(staged)
-        guard access.isAvailable else { return nil }
+        guard access.isAvailable, !QuarantineStore.shared.blocks(access.url) else { return nil }
         if access.bookmarkIsStale, let refreshed = try? bookmark(access.url),
            let index = items.firstIndex(where: { $0.id == id }) {
             var updated = items

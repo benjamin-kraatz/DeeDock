@@ -87,5 +87,6 @@ struct DockFolderButton: View {
                 }
             }
         }
+        .modifier(QuarantineItemModifier(id: item.id, url: item.reference.url, name: item.reference.name))
     }
 }

@@ -22,6 +22,11 @@ final class FolderStackCoordinator {
     }
 
     func show(_ folder: FolderDockItem, on panel: DockPanelController, keyboard: Bool, spring: Bool = false) {
+        guard !QuarantineStore.shared.contains(folder.id, url: folder.reference.url),
+              !QuarantineStore.shared.unreadable else {
+            panel.store.errorMessage = .quarantineBlocked
+            return
+        }
         springCleanup?.cancel()
         if folderID == folder.reference.id, displayID == panel.store.displayID {
             if spring { return }

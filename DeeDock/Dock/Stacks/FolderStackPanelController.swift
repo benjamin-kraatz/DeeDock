@@ -50,6 +50,14 @@ final class FolderStackPanelController {
     func close(returnFocus: Bool) { popover.close(returnFocus: returnFocus) }
 
     func open(_ entry: FolderStackEntryReference) {
+        if QuarantineStampController.shared.armed {
+            QuarantineStampController.shared.stamp(id: entry.url.standardizedFileURL.path, url: entry.url, name: entry.name)
+            return
+        }
+        guard !QuarantineStore.shared.blocks(entry.url) else {
+            state.report(String(localized: .quarantineBlocked)) { }
+            return
+        }
         guard FileManager.default.fileExists(atPath: entry.url.path) else {
             state.report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.open(entry) }
             return

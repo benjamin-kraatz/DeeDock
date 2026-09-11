@@ -64,6 +64,8 @@ final class ApplicationService: ApplicationServicing {
     /// The live foreground process is checked at click time. Dock snapshots intentionally track
     /// only running state and may lag behind activation changes by one main-run-loop turn.
     func performPrimaryAction(_ reference: ApplicationReference) async throws -> ApplicationPrimaryActionOutcome {
+        try QuarantineStore.shared.requireAllowed(reference.url, id: reference.id)
+        if let resolved = resolvedURL(for: reference) { try QuarantineStore.shared.requireAllowed(resolved) }
         // Hiding ourselves would also hide the user's replacement dock. The self tile always
         // restores the requested app window, even when DDock already owns keyboard focus.
         if AppDockPresence.representsCurrentApplication(reference) {
@@ -127,6 +129,8 @@ final class ApplicationService: ApplicationServicing {
     /// - Throws: A missing-bundle error or the failure reported by Launch Services.
     /// - Note: Cancellation cannot undo a launch already submitted to macOS.
     func open(_ reference: ApplicationReference) async throws {
+        try QuarantineStore.shared.requireAllowed(reference.url, id: reference.id)
+        if let resolved = resolvedURL(for: reference) { try QuarantineStore.shared.requireAllowed(resolved) }
         if AppDockPresence.representsCurrentApplication(reference),
            let window = AppDockPresence.shared.windowToReopen {
             ExplicitWindowPresenter.shared.present(window)
@@ -144,6 +148,9 @@ final class ApplicationService: ApplicationServicing {
     }
 
     func openDocuments(_ urls: [URL], with reference: ApplicationReference) async throws {
+        try QuarantineStore.shared.requireAllowed(reference.url, id: reference.id)
+        if let resolved = resolvedURL(for: reference) { try QuarantineStore.shared.requireAllowed(resolved) }
+        for url in urls { try QuarantineStore.shared.requireAllowed(url) }
         let documents = DocumentResourceAccess(urls)
         let access = ApplicationResourceAccess(reference)
         defer { withExtendedLifetime((documents, access)) {} }
@@ -159,6 +166,8 @@ final class ApplicationService: ApplicationServicing {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
         configuration.createsNewApplicationInstance = false
+        try QuarantineStore.shared.requireAllowed(url, id: reference.id)
+        for document in documents.urls { try QuarantineStore.shared.requireAllowed(document) }
         _ = try await workspace.open(documents.urls, withApplicationAt: url, configuration: configuration)
     }
 

@@ -164,6 +164,10 @@ final class ShelfCoordinator {
 
     /// Shared Launcher route. Resolve the current stored ID and retain its scope through Workspace completion.
     func openReference(_ id: UUID, reveal: Bool, completion: @escaping (String?) -> Void) {
+        if let item = shelf.item(with: id), QuarantineStore.shared.contains(id.uuidString, url: item.url) {
+            completion(String(localized: .quarantineBlocked))
+            return
+        }
         guard let access = shelf.resolve(id) else {
             completion(String(localized: .shelfUnavailableItems)); return
         }
@@ -182,6 +186,10 @@ final class ShelfCoordinator {
 
     /// Opens each item with its default application, exactly as double-clicking it in Finder does.
     private func open(_ items: [ShelfItem]) {
+        guard !items.contains(where: { QuarantineStore.shared.contains($0.id.uuidString, url: $0.url) }) else {
+            state?.report(String(localized: .quarantineBlocked)) { }
+            return
+        }
         let resolved = items.compactMap { shelf.resolve($0.id) }
         guard !resolved.isEmpty else {
             state?.report(String(localized: .shelfUnavailableItems)) { [weak self] in self?.reload() }
