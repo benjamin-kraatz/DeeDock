@@ -9,6 +9,7 @@ final class DockCoordinator {
     let pinWeather = PinWeatherStore()
     let clipboardMuseum = ClipboardMuseumController()
     let sims = DockSimsStore()
+    let greenhouse = ShortcutGreenhouseStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
@@ -150,6 +151,13 @@ final class DockCoordinator {
         pinWeather.start()
         clipboardMuseum.start()
         sims.start()
+        greenhouse.start()
+        greenhouse.changed = { [weak self] in
+            guard let self else { return }
+            if greenhouse.isEnabled { actionTiles.ensureLoaded() }
+            refreshPanels()
+        }
+        if greenhouse.isEnabled { actionTiles.ensureLoaded() }
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
             guard let self else { return }
@@ -348,6 +356,7 @@ final class DockCoordinator {
             panel.interaction.timeline = timeline
             panel.interaction.pinWeather = pinWeather
             panel.interaction.sims = sims
+            panel.interaction.greenhouse = greenhouse
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
                 focusPopover.toggle(on: panel)
@@ -544,6 +553,7 @@ final class DockCoordinator {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
             panel.interaction.sims = sims
+            panel.interaction.greenhouse = greenhouse
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil
             panel.store.refresh()
@@ -807,6 +817,7 @@ final class DockCoordinator {
         focusPopover.stop()
         focusSession.stop()
         actionTiles.stop()
+        greenhouse.stop()
         recipes.stop()
         recipeProgress.stop()
         watchPresets.stop()

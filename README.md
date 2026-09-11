@@ -501,6 +501,8 @@ Use generated `LocalizedStringResource` symbols in SwiftUI and defer error-messa
 
 Open **Settings → Features → Action Tiles** and pin a shortcut. Installed Shortcuts load when that page appears; **Reload Shortcuts** refreshes the list. Tiles appear in the same order on every display, independently of Dock Modes. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
 
+**Shortcut Greenhouse** is an optional Easter egg on that same page and is off by default. When it is on, pinned shortcuts draw as plants. Watering a plant runs the shortcut through the existing Action Tiles runner. After Shortcuts are listed, a pin whose identifier is missing wilts. Turning the greenhouse off removes every plant and restores the ordinary tiles.
+
 Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DDock never retries a run automatically.
 
 Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DDock does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.

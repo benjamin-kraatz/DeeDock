@@ -44,4 +44,21 @@ enum ActionTileStatus: Equatable {
 struct ActionDockItem {
     let tile: ActionTile
     let status: ActionTileStatus
+    /// True after discovery when the pinned identifier is no longer installed.
+    let wilted: Bool
+
+    init(tile: ActionTile, status: ActionTileStatus, wilted: Bool = false) {
+        self.tile = tile
+        self.status = status
+        self.wilted = wilted
+    }
+
+    /// Plant used when Shortcut greenhouse chrome is on.
+    var plant: ShortcutGreenhousePlant {
+        ShortcutGreenhousePlant(
+            tile: tile,
+            status: status,
+            health: wilted ? .wilted : .healthy
+        )
+    }
 }

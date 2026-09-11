@@ -16,6 +16,8 @@ final class DockInteraction {
     var badges: DockBadgeController?
     /// Shared opt-in Sims moods. Nil in previews that do not play the care loop.
     var sims: DockSimsStore?
+    /// Shared opt-in Shortcut greenhouse. Nil in previews that do not show plants.
+    var greenhouse: ShortcutGreenhouseStore?
     /// Optional soap-bubble bursts for pin click and drop. Owned per panel.
     let soapBubbles = DockSoapBubbleController()
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?

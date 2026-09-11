@@ -19,7 +19,19 @@ final class ActionTilesController {
     private static let key = "dock.action-tiles.v1"
 
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }
-    var dockItems: [ActionDockItem] { tiles.map { ActionDockItem(tile: $0, status: statuses[$0.id] ?? .idle) } }
+    var dockItems: [ActionDockItem] {
+        let availableIDs = Set(available.map(\.id))
+        return tiles.map { tile in
+            ActionDockItem(
+                tile: tile,
+                status: statuses[tile.id] ?? .idle,
+                wilted: discovered && !availableIDs.contains(tile.id)
+            )
+        }
+    }
+
+    /// Pinned shortcuts as greenhouse plants. Watering calls ``water(_:)``.
+    var plants: [ShortcutGreenhousePlant] { dockItems.map(\.plant) }
 
     func start() {
         guard let data = defaults.data(forKey: Self.key) else { return }
@@ -35,8 +47,8 @@ final class ActionTilesController {
         changed?()
     }
 
-    /// Starts discovery when Settings, Watch, or Launcher file actions first need the list.
-    /// Skips canvas and playground hosts.
+    /// Starts discovery when Settings, Watch, Launcher file actions, or an enabled greenhouse
+    /// first need the list. Skips canvas and playground hosts.
     func ensureLoaded() {
         guard !loading, !discovered else { return }
         let environment = ProcessInfo.processInfo.environment
@@ -66,6 +78,7 @@ final class ActionTilesController {
                     return ActionTile(id: id, name: String(line[..<split.lowerBound]))
                 }.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
             } catch { self.error = String(localized: .actionsDiscoveryFailed(error.localizedDescription)) }
+            changed?()
         }
     }
 
@@ -104,6 +117,10 @@ final class ActionTilesController {
     func run(_ id: UUID, files: DocumentResourceAccess? = nil, finished: (() -> Void)? = nil) -> Bool {
         tiles.contains(where: { $0.id == id }) && start(id, files: files) { _ in finished?() }
     }
+
+    /// Waters a plant by running the pinned shortcut through the existing Action Tiles runner.
+    @discardableResult
+    func water(_ id: UUID) -> Bool { run(id) }
 
     /// One explicit run of a configured Shortcut ID. The Shortcut need not be pinned.
     /// A second overlapping run of the same identifier is rejected and never retried.
