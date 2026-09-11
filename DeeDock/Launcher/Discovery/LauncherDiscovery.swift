@@ -59,12 +59,14 @@ nonisolated enum LauncherDiscovery {
 
     /// Spotlight also indexes framework helpers, caches named .app, and device build products.
     /// Known pins and running-app URLs bypass this location filter, but still require a runnable Mac bundle.
+    /// Runs on every Spotlight result when the Launcher opens, so it uses lexical path checks only.
+    /// `standardizedFileURL` and `URL(fileURLWithPath:)` both query the file system.
     static func isUserFacingLocation(_ url: URL, home: URL = FileManager.default.homeDirectoryForCurrentUser) -> Bool {
-        let path = url.standardizedFileURL.path
-        let components = url.pathComponents.dropLast()
-        if components.contains(where: { ["app", "framework", "bundle", "xpc"].contains(URL(fileURLWithPath: $0).pathExtension.lowercased()) }) { return false }
+        let path = url.standardized.path
+        let components = (path as NSString).pathComponents.dropLast()
+        if components.contains(where: { ["app", "framework", "bundle", "xpc"].contains(($0 as NSString).pathExtension.lowercased()) }) { return false }
         if components.contains(where: { [".Trash", ".Trashes", ".git", "node_modules", "DerivedData"].contains($0) }) { return false }
-        if path.hasPrefix(home.appendingPathComponent("Library").path + "/") || path.hasPrefix("/Library/") { return false }
+        if path.hasPrefix(home.standardized.path + "/Library/") || path.hasPrefix("/Library/") { return false }
         if path.hasPrefix("/System/") {
             return path.hasPrefix("/System/Applications/")
                 || path.hasPrefix("/System/Library/CoreServices/Applications/")

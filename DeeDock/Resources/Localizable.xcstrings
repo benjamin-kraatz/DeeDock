@@ -25594,6 +25594,24 @@
         }
       }
     },
+    "settingsTrashRefreshInterval" : {
+      "comment" : "Debug builds only. Slider for how many seconds pass between fallback reads of Finder's Trash count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Papierkorb-Prüfintervall (Debug)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trash check interval (Debug)"
+          }
+        }
+      }
+    },
     "settingsUsableDesktop" : {
       "comment" : "Frame excluding space reserved by macOS, including the system Dock.",
       "extractionState" : "manual",
