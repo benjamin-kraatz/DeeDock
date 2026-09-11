@@ -19,8 +19,6 @@ final class WindowSearchController: NSObject, NSWindowDelegate {
             focusGeneration = ExplicitWindowPresenter.shared.generation
             return
         }
-        let interval = PerformanceSignposts.begin(.windowSearchOpen)
-        defer { PerformanceSignposts.endAfterCommit(interval) }
         previousApplication = application ?? NSWorkspace.shared.frontmostApplication
         restoresFocus = true
         let state = WindowSearchState(capsules: capsules)

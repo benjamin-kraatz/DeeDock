@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
-"""Measure the production metadata ranker against synthetic, in-memory stores. Does not launch DDock.
-
-Usage: python3 benchmarks/micro/launcher-search.py [--json PATH]
-With --json, also writes a `micro` stage report that `benchmarks/run.sh` merges into RESULTS.md.
-"""
-import argparse
+"""Measure the production metadata ranker against synthetic, in-memory stores. Does not launch DDock."""
 import pathlib
 import subprocess
 import tempfile
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--json", help="write a benchmark stage report to this path")
-parser.add_argument("--iterations", type=int, default=100)
-options = parser.parse_args()
-root = pathlib.Path(__file__).resolve().parents[2]
+root = pathlib.Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="dee20-benchmark-") as directory:
     work = pathlib.Path(directory)
     subprocess.run(["xcrun", "xcstringstool", "generate-symbols", "--language", "swift",
@@ -46,29 +37,20 @@ import Foundation
                     processIdentifier: 0, title: "Invoice window \(index)", frame: .zero, isMinimized: false, isMain: false), candidate: nil)
         }
         print("Dataset: 10000 apps, 200 windows, 30 capsules, 50 Shelf files, 30 Shortcuts, 100 modes. In-memory metadata only.")
-        let iterations = Int(CommandLine.arguments[1])!
-        var report = BenchmarkStageReport(stage: "micro")
-        report.context["launcherSearchDataset"] = "10000 apps, 200 windows, 30 capsules, 50 Shelf files, 30 Shortcuts, 100 modes"
         for query in ["invoice", "Invoice Tool 9999", "invocie", "büro", "no-such-result"] {
             let input = LauncherSearchInput(query: query, kind: .all, applications: apps, capsules: capsules,
                 shelf: shelf, shortcuts: shortcuts, modes: modes, windowRevision: UUID())
             _ = await LauncherSearchIndex.results(input, windows: windows)
             var milliseconds: [Double] = []
             var count = 0
-            for _ in 0..<iterations {
+            for _ in 0..<20 {
                 let start = ContinuousClock.now
                 count = await LauncherSearchIndex.results(input, windows: windows).count
                 let duration = start.duration(to: .now).components
                 milliseconds.append(Double(duration.seconds) * 1_000 + Double(duration.attoseconds) / 1e15)
             }
-            let summary = BenchmarkDistribution(samples: milliseconds)!
-            report.metrics["launcherSearch[\(query)]"] = summary
-            print("\(query): \(count) results; p50 \(String(format: "%.2f", summary.p50)) ms; p95 \(String(format: "%.2f", summary.p95)) ms; max \(String(format: "%.2f", summary.max)) ms")
-        }
-        if CommandLine.arguments.count > 2 {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            try! encoder.encode(report).write(to: URL(fileURLWithPath: CommandLine.arguments[2]))
+            milliseconds.sort()
+            print("\(query): \(count) results; median \(String(format: "%.2f", milliseconds[10])) ms; p95 \(String(format: "%.2f", milliseconds[18])) ms; max \(String(format: "%.2f", milliseconds[19])) ms")
         }
     }
 }
@@ -79,12 +61,9 @@ import Foundation
         "DeeDock/Dock/Actions/ActionTile.swift", "DeeDock/Dock/Search/WindowSearchModels.swift",
         "DeeDock/Dock/Search/WindowSearchIndex.swift", "DeeDock/Launcher/Models/LauncherApplication.swift",
         "DeeDock/Launcher/Models/LauncherOptions.swift", "DeeDock/Launcher/Search/LauncherSearchResult.swift", "DeeDock/Launcher/Search/LauncherSearchIndex.swift",
-        "DeeDock/App/Diagnostics/Benchmark/BenchmarkStatistics.swift", "DeeDock/App/Diagnostics/Benchmark/BenchmarkReport.swift",
-        "DeeDock/App/Diagnostics/Benchmark/ProcessResourceUsage.swift",
     ]
     binary = work / "benchmark"
     subprocess.run(["xcrun", "swiftc", "-O", "-parse-as-library", "-swift-version", "5", "-o", str(binary)]
                    + [str(root / source) for source in sources]
                    + [str(path) for path in work.glob("*.swift")], check=True)
-    subprocess.run([str(binary), str(options.iterations)]
-                   + ([str(pathlib.Path(options.json).resolve())] if options.json else []), check=True)
+    subprocess.run([str(binary)], check=True)

@@ -1787,7 +1787,7 @@ need hands-on acceptance. Do not mark DEE-20 Done on compilation alone.
 
 ### Search measurement
 
-`python3 benchmarks/micro/launcher-search.py` compiles the production ranker with `swiftc -O`
+`python3 scripts/benchmark-launcher-search.py` compiles the production ranker with `swiftc -O`
 and runs synthetic in-memory metadata on an Apple M4 with macOS 27.0. Dataset: 10,000 apps,
 200 windows, 30 capsules, 50 Shelf references, 30 pinned Shortcuts, and 100 modes. Capsule
 summaries contain 6,000 characters; matching consumes the existing bounded field prefixes.
@@ -2281,37 +2281,3 @@ Pending hands-on acceptance:
   Confirm the stamp remains visible outside DDock while armed and disappears after exit or a forced crash.
 - Listen to arm, stamp, and release; check system mute, Reduce Motion, English and German,
   VoiceOver, focus retention, Spaces, and fullscreen behavior.
-
-## Performance benchmark suite
-
-`benchmarks/run.sh` runs five stages and writes `benchmarks/RESULTS.md`, `results/latest.json`, and
-`results/latest.svg`; `benchmarks/README.md` records the method. `PerformanceSignposts` adds
-Points of Interest intervals for launch, hover, reveal, magnification, stacks, Window Peek,
-Launcher open, query and ranking, and window search. Interval ends are timed after Core Animation's
-commit observer. A benchmark launch argument creates the in-app runner; a normal launch does not,
-and records nothing unless Instruments is attached.
-
-Validation on a Mac16,3 (M4, 32 GB), macOS 27.0, three displays at 60 Hz, AC power, with the
-Release build from `benchmarks/.build`:
-
-- `run.sh --quick --skip-e2e` completed: 3 launches, one 30-iteration scenario run, 60 s of
-  idle sampling next to the macOS Dock, and the micro ranker. It produced the Markdown, JSON,
-  and SVG. The chart was rendered and inspected in dark mode.
-- The end-to-end stage ran separately for 8 iterations with auto-hide off. Before it posted
-  input, its reported dock and Launcher rectangles were checked against a screenshot.
-  Hover, click-to-Launcher, and Launcher-open samples were recorded, one per iteration.
-- The shared statistics, report schema, and resource sampling passed their 8 tests in a
-  standalone Swift package. `DeeDockTests` itself does not build on `main`: its explicit
-  source list lacks the Quarantine and window-action types that listed sources now use.
-  The benchmark sources were added to that list.
-
-Findings from the quick run, not yet repeated or published: DDock idled at 73 MiB,
-1.2 % CPU, and 2.5 wakeups/s, against the macOS Dock's 57 MiB, 0.07 %, and 0.4/s. The
-Launcher's first frame took 142 ms at p50. The magnification sweep had a main-thread
-hitch ratio of 81 ms/s, and the Launcher loop 270 ms/s. These exceed the initial budgets.
-
-Pending:
-
-- A full run with the notarized build, three scenario passes, and 10 minutes of idle sampling.
-- An end-to-end run with auto-hide on, for reveal latency.
-- A ProMotion display, a single display, and a cross-check of intervals and hitches in Instruments.

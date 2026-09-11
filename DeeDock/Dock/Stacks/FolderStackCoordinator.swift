@@ -49,7 +49,6 @@ final class FolderStackCoordinator {
             if !panel.store.refreshFolderReference(reference) { return }
         }
 
-        let interval = PerformanceSignposts.begin(.stackOpen)
         let sortKey = "folderStackSort.\(panel.store.displayID).\(reference.id.uuidString)"
         let sort = UserDefaults.standard.string(forKey: sortKey).flatMap(FolderStackSort.init(rawValue:))
             ?? (folder.isDownloads ? .recency : .alphabetical)
@@ -78,7 +77,6 @@ final class FolderStackCoordinator {
             else if keyboard, let sourceID { self?.keyboardDismissed?(sourceID) }
         }
         next.show()
-        PerformanceSignposts.endAfterCommit(interval)
     }
 
     func receive(_ info: NSDraggingInfo, folder: FolderDockItem, on panel: DockPanelController) -> Bool {

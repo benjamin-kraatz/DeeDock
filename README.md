@@ -460,10 +460,6 @@ Reveal reverses the selected hiding sequence. **Play Preview** runs an inert sam
 
 Auto-hide does not inspect overlapping app windows, use pressure gestures, modify the system Dock, or request permissions. Screen-edge triggering may also reveal the system Dock. Runtime acceptance for these interactions is still pending.
 
-## Performance
-
-`benchmarks/run.sh` measures DDock's idle memory, CPU, and wakeups next to the macOS Dock on the same Mac. It also measures response times (p50 through p99) for hovering, revealing, stacks, Window Peek, the Launcher, and window search. It writes `benchmarks/RESULTS.md` and a summary chart. No numbers are published yet. See [benchmarks/README.md](benchmarks/README.md) for the method and how to reproduce a run.
-
 ## Implementation and validation
 
 One application catalog owns workspace observation, running order, icon caching, and duplicate-suppressed launches. A coordinator reconciles display snapshots and owns global pointer monitoring and exclusive keyboard focus. Each panel keeps its own pins, selection, hover, scroll state, geometry, and error feedback. Removing a dock invalidates its launch callbacks without cancelling shared work; quitting cancels pending tasks and removes observers, monitors, and panels. Geometry, identity resolution, ordering, focus routing, and visibility policy are independent of native windows. Each panel owns a cancellable visibility controller with monotonic deadlines and finite animation ticks; idle settled docks schedule no visibility work. Drawing and native click passthrough share the same animation sample, while context-menu tracking is scoped to the owning dock.

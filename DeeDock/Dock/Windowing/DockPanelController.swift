@@ -29,13 +29,6 @@ final class DockPanelController {
     private var stopped = false
     private var idleSuspended = false
     private var updatingGeometry = false
-    /// Benchmark scenarios drive the pointer themselves; real pointer input must not override them.
-    var benchmarkHold = false {
-        didSet {
-            guard benchmarkHold != oldValue else { return }
-            if benchmarkHold { visibility.showImmediately() } else { interaction.setPointer(nil); updatePointer() }
-        }
-    }
     var resignedFocus: (() -> Void)?
     var escape: (() -> Void)?
     var exclusiveInteractionBegan: (() -> Void)?
@@ -195,7 +188,7 @@ final class DockPanelController {
 
     /// Native events and animation samples share top-left content coordinates after inverse transformation.
     func updatePointer(eventType: NSEvent.EventType? = nil) {
-        guard !stopped, !updatingGeometry, !benchmarkHold, let geometry else { return }
+        guard !stopped, !updatingGeometry, let geometry else { return }
         if launcher.isPresented {
             panel.ignoresMouseEvents = false
             interaction.setPointer(nil)
@@ -213,9 +206,7 @@ final class DockPanelController {
         // An open stack makes every dock dismissal-only. Clearing the pointer settles
         // magnification and hover without changing the dock's visible hold region.
         // Timeline scrub keeps the resting axis stable, so magnification is suppressed.
-        let magnifies = inside && !popoverHeld && !modePickerHeld && !timelineHeld
-        if magnifies, interaction.pointer == nil { PerformanceSignposts.commitSinceInput(.hoverResponse) }
-        interaction.setPointer(magnifies ? sample.inverse(point) : nil)
+        interaction.setPointer(inside && !popoverHeld && !modePickerHeld && !timelineHeld ? sample.inverse(point) : nil)
         // Scrub only on the glass, and only from real pointer events. The glance card is a
         // rest area: mapping its X/Y onto the axis jumped the playhead and cancelled pin dwell.
         // Geometry-only refresh (apply preview, catalog) must not rematerialize the playhead.
@@ -262,11 +253,7 @@ final class DockPanelController {
             panel.ignoresMouseEvents = true; interaction.setPointer(nil)
             if panel.isVisible { panel.orderOut(nil) }
         } else {
-            if !panel.isVisible {
-                panel.orderFrontRegardless()
-                PerformanceSignposts.dockPanelOrderedFront()
-                PerformanceSignposts.commitSinceInput(.dockReveal, within: visibility.settings.revealDelay + 1)
-            }
+            if !panel.isVisible { panel.orderFrontRegardless() }
             updatePointer()
         }
     }
@@ -560,11 +547,6 @@ final class DockPanelController {
             else { launcherPresentation.close() }
             return
         }
-        let interval = PerformanceSignposts.begin(.launcherOpen)
-        defer { PerformanceSignposts.endAfterCommit(interval) }
-        if let event = NSApp.currentEvent, [.leftMouseUp, .leftMouseDown].contains(event.type) {
-            PerformanceSignposts.commitSince(event, .launcherOpenFromClick)
-        }
         let origin = restingDragBounds
         let previousApplication = launcherWillOpen?() ?? NSWorkspace.shared.frontmostApplication
         invalidateDrag?()
@@ -701,50 +683,4 @@ final class DockPanelController {
         accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; modePickerHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }
-
-    // MARK: Benchmark support
-
-    /// Content-space pointer positions across the application icons, for an in-process magnification sweep.
-    func benchmarkSweep(steps: Int) -> [CGPoint] {
-        let rects = store.items.compactMap { interaction.iconRects[DockEntryID.app($0.id).hitID] }
-        guard let first = rects.first, let last = rects.last, steps > 1 else { return [] }
-        let edge = interaction.layout.edge
-        let start = CGPoint(x: first.midX, y: first.midY), end = CGPoint(x: last.midX, y: last.midY)
-        return (0..<steps).map { step in
-            let t = CGFloat(step) / CGFloat(steps - 1)
-            return edge.isVertical ? CGPoint(x: start.x, y: start.y + (end.y - start.y) * t)
-                : CGPoint(x: start.x + (end.x - start.x) * t, y: start.y)
-        }
-    }
-
-    /// Resting dock positions in Quartz global coordinates for the end-to-end input runner.
-    func benchmarkGeometry() -> BenchmarkDockGeometry? {
-        guard let geometry, let primary = NSScreen.screens.first?.frame, let display = lastDisplay else { return nil }
-        let window = geometry.windowFrame
-        // Content space is top-left and y-down inside the window; see `updatePointer`.
-        func screen(_ rect: CGRect) -> CGRect {
-            let appKit = CGRect(x: window.minX + geometry.contentOrigin.x + rect.minX,
-                                y: window.maxY - geometry.contentOrigin.y - rect.maxY,
-                                width: rect.width, height: rect.height)
-            return quartz(appKit)
-        }
-        // AppKit's global origin is the primary display's bottom-left; Quartz's is its top-left.
-        func quartz(_ rect: CGRect) -> CGRect {
-            CGRect(x: rect.minX, y: primary.maxY - rect.maxY, width: rect.width, height: rect.height)
-        }
-        let icons = store.items.compactMap { interaction.iconRects[DockEntryID.app($0.id).hitID] }.map(screen)
-        let visible = quartz(display.visibleFrame)
-        let behavior = visibility.settings
-        return BenchmarkDockGeometry(
-            displayID: store.displayID, dock: screen(interaction.surfaceRect),
-            activationZone: quartz(geometry.activation.zone),
-            iconCenters: icons.map { CGPoint(x: $0.midX, y: $0.midY) },
-            launcher: interaction.iconRects[DockEntryID.launcher.hitID].map(screen),
-            restingPoint: CGPoint(x: visible.midX, y: visible.midY),
-            autoHide: behavior.autoHide, revealDelay: behavior.revealDelay, hideDelay: behavior.hideDelay,
-            animationDuration: behavior.animationDuration)
-    }
-
-    /// Hosting view for display-link frame pacing.
-    var benchmarkView: NSView? { panel.contentView }
 }
