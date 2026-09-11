@@ -1,6 +1,7 @@
 import CoreGraphics
 import Foundation
 import Testing
+@testable import DeeDock
 
 struct WindowPortalExportTests {
     private func image(width: Int, height: Int) -> CGImage {

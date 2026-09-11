@@ -5,12 +5,8 @@ import Observation
 /// in their owning stores, so releasing a flag restores the same placement without a file move.
 @MainActor @Observable
 final class QuarantineStore {
-    static let shared: QuarantineStore = {
-        let environment = ProcessInfo.processInfo.environment
-        let preview = environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
-            || environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
-        return QuarantineStore(defaults: preview ? nil : .standard)
-    }()
+    static let shared = QuarantineStore(
+        defaults: HostEnvironment.isPreview || HostEnvironment.isTestHost ? nil : .standard)
 
     struct Record: Codable, Identifiable {
         let id: String

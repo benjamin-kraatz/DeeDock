@@ -1,6 +1,7 @@
 import AppKit
 import ImageIO
 import Testing
+@testable import DeeDock
 
 @MainActor
 struct ShelfClipboardTests {

@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+@testable import DeeDock
 
 @MainActor struct DockEdgeInteractionTests {
     @Test("All animation styles use the same invertible oriented masks for painting and input", arguments: DockEdge.allCases, DockAnimationStyle.allCases)

@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+@testable import DeeDock
 
 struct DockMagnetismTests {
     private let screen = CGRect(x: 0, y: 0, width: 1440, height: 900)

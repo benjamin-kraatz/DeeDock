@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+@testable import DeeDock
 
 @MainActor
 struct LauncherTests {

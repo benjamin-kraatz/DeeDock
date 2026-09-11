@@ -39,6 +39,8 @@ nonisolated enum DockExternalPayload: Sendable {
                          try $0.bookmarkData(options: [.withSecurityScope, .securityScopeAllowOnlyReadAccess],
                                              includingResourceValuesForKeys: nil, relativeTo: nil)
                      }) throws -> Self {
+        // An empty batch would otherwise count as all-pinnable and return an empty selection.
+        guard !access.urls.isEmpty else { throw CocoaError(.fileReadUnknown) }
         let kinds = try access.urls.map(DockPinImporter.kind)
         let hasApplication = kinds.contains { if case .application = $0 { return true }; return false }
         let allPinnable = kinds.allSatisfy { kind in

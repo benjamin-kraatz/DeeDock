@@ -8,10 +8,10 @@ private enum DeeDockEntryPoint {
         #if DDOCK_CANVAS_HOST
         DeeDockPreviewApp.main()
         #else
-        let environment = ProcessInfo.processInfo.environment
-        if environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
-            || environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1" {
+        if HostEnvironment.isPreview {
             DeeDockPreviewApp.main()
+        } else if HostEnvironment.isTestHost {
+            DeeDockTestHostApp.main()
         } else {
             DeeDockApp.main()
         }
@@ -23,6 +23,14 @@ private enum DeeDockEntryPoint {
 private struct DeeDockPreviewApp: App {
     var body: some Scene {
         WindowGroup { EmptyView() }
+    }
+}
+
+/// Hosts `DeeDockTests` without the production delegate, so a test run shows no dock, menu-bar item,
+/// or window, starts no services, and touches no preferences. A Settings scene opens no window by itself.
+private struct DeeDockTestHostApp: App {
+    var body: some Scene {
+        Settings { EmptyView() }
     }
 }
 

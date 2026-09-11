@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import Darwin
+@testable import DeeDock
 
 struct LauncherSuggestionCoreMLTests {
     @Test("Simultaneous displays share a completed Core ML update")
@@ -172,15 +173,13 @@ struct LauncherSuggestionCoreMLTests {
     }
 }
 
-/// Isolated runner supplies its compiled model; the Xcode test bundle owns the same seed.
-private final class LauncherSuggestionTestBundle: NSObject { }
-
+/// The isolated runner supplies its compiled model. Xcode runs the tests hosted in DDock, so the
+/// seed comes from the app bundle, the same place the app loads it from.
 enum LauncherSuggestionTestSeed {
     static func url() throws -> URL {
         if let path = ProcessInfo.processInfo.environment["DEE26_COREML_SEED_URL"] {
             return URL(fileURLWithPath: path)
         }
-        return try #require(Bundle(for: LauncherSuggestionTestBundle.self)
-            .url(forResource: "LauncherSuggestions", withExtension: "mlmodelc"))
+        return try #require(Bundle.main.url(forResource: "LauncherSuggestions", withExtension: "mlmodelc"))
     }
 }

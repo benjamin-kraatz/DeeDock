@@ -1,4 +1,5 @@
 import Foundation
+@testable import DeeDock
 
 /// Runs only when a test advances time. Retained callbacks deliberately simulate cancellation races.
 @MainActor final class ManualDockScheduler: DockVisibilityScheduling {

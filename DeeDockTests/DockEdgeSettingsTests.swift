@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import DeeDock
 
 @MainActor struct DockEdgeSettingsTests {
     private let legacy = Data(#"{"iconSize":48,"magnification":1.4,"alignment":"right","horizontalOffset":-72,"bottomDistance":35,"positionReference":"usableDesktop","behavior":{"autoHide":true,"activationLocation":"screenEdge","widthMode":"custom","customWidth":450,"zoneHeight":12,"zoneOffset":80,"revealDelay":0.1,"hideDelay":0.4,"animationStyle":"leftFade","animationDuration":0.2}}"#.utf8)

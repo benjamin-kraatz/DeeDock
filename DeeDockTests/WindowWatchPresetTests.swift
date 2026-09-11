@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import DeeDock
 
 @MainActor
 struct WindowWatchPresetTests {
@@ -17,7 +18,7 @@ struct WindowWatchPresetTests {
     }
 
     private func preset(name: String = "Export done", bundle: String? = "com.apple.dt.Xcode",
-                        phrase: String = "Export complete",
+                        appName: String = "Xcode", phrase: String = "Export complete",
                         completion: WindowWatchCompletionAction = .none) -> WindowWatchPreset {
         WindowWatchPreset(
             id: UUID(),
@@ -28,7 +29,7 @@ struct WindowWatchPresetTests {
                 phrase: phrase,
                 playSound: true,
                 completion: completion,
-                appHint: WindowWatchAppHint(bundleIdentifier: bundle, appName: "Xcode", title: "Export")
+                appHint: WindowWatchAppHint(bundleIdentifier: bundle, appName: appName, title: "Export")
             ).normalized(),
             createdAt: Date(timeIntervalSince1970: 100),
             updatedAt: Date(timeIntervalSince1970: 100)
@@ -142,7 +143,7 @@ struct WindowWatchPresetTests {
     @Test("App hints suggest candidates and never resolve a window by themselves")
     func suggestionMatching() throws {
         let xcode = preset(bundle: "com.apple.dt.Xcode")
-        let preview = preset(name: "Preview", bundle: "com.apple.Preview", phrase: "Saved")
+        let preview = preset(name: "Preview", bundle: "com.apple.Preview", appName: "Preview", phrase: "Saved")
         #expect(xcode.matching(bundleIdentifier: "com.apple.dt.Xcode", appName: "Xcode"))
         #expect(!xcode.matching(bundleIdentifier: "com.apple.Preview", appName: "Preview"))
         #expect(preview.matching(bundleIdentifier: nil, appName: "Preview"))
@@ -153,33 +154,42 @@ struct WindowWatchPresetTests {
     func actionGate() {
         let action = WindowWatchCompletionAction.runShortcut(id: UUID(), name: "Notify")
         let run = UUID()
+        // `begin` mutates the gate, and `#expect` captures its argument immutably, so each call runs first.
         var gate = WindowWatchActionGate(runID: run, outcome: .watching, action: action)
         #expect(!gate.canOffer)
-        #expect(!gate.begin(run))
+        let began1 = gate.begin(run)
+        #expect(!began1)
 
         gate.outcome = .cancelled
         #expect(!gate.canOffer)
-        #expect(!gate.begin(run))
+        let began2 = gate.begin(run)
+        #expect(!began2)
 
         gate.outcome = .failed
         #expect(!gate.canOffer)
-        #expect(!gate.begin(run))
+        let began3 = gate.begin(run)
+        #expect(!began3)
 
         gate.outcome = .detected
         #expect(gate.canOffer)
-        #expect(!gate.begin(UUID()))
-        #expect(gate.begin(run))
+        let began4 = gate.begin(UUID())
+        #expect(!began4)
+        let began5 = gate.begin(run)
+        #expect(began5)
         #expect(gate.phase == .running)
         #expect(!gate.canOffer)
-        #expect(!gate.begin(run))
+        let began6 = gate.begin(run)
+        #expect(!began6)
 
         gate.finish(success: false)
         #expect(gate.phase == .failed)
         #expect(gate.canOffer)
-        #expect(gate.begin(run))
+        let began7 = gate.begin(run)
+        #expect(began7)
         gate.finish(success: true)
         #expect(gate.phase == .succeeded)
         #expect(!gate.canOffer)
-        #expect(!gate.begin(run))
+        let began8 = gate.begin(run)
+        #expect(!began8)
     }
 }

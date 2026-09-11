@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import DeeDock
 
 struct FolderContentsMetricsTests {
     @Test("An empty folder reports zero items and zero bytes")

@@ -1,6 +1,7 @@
 import Foundation
 import Synchronization
 import Testing
+@testable import DeeDock
 
 struct DockDocumentPayloadTests {
     @Test("Files, folders, and packages retain their original URLs and batch order")

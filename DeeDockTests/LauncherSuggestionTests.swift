@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import DeeDock
 
 struct LauncherSuggestionTests {
     private let now = Date(timeIntervalSince1970: 1_800_000_000)

@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+@testable import DeeDock
 
 struct WindowPeekTests {
     @Test("Named presets apply exact values and custom combinations have no name",

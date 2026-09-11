@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+@testable import DeeDock
 
 @MainActor
 struct DockLocalHistoryTests {
@@ -56,7 +57,7 @@ struct DockLocalHistoryTests {
         history.noteSession(session)
 
         #expect(history.events.allSatisfy { $0.isPinEvent || $0.isSessionEvent })
-        #expect(history.events.allSatisfy(\.kind.isRecognized))
+        #expect(history.events.allSatisfy { $0.kind.isRecognized })
         #expect(history.events.contains { $0.kind == .pinAdded && $0.subjectName == "safari" })
         #expect(history.events.contains { $0.kind == .sessionStarted && $0.subjectName == "Deep Work" })
         #expect(history.events.contains { $0.kind == .sessionPaused })
