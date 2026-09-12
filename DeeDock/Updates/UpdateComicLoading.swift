@@ -155,9 +155,13 @@ nonisolated enum UpdateComicLoader {
 nonisolated private final class UpdateComicRedirectGate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     func urlSession(_ session: URLSession, task: URLSessionTask,
                     willPerformHTTPRedirection response: HTTPURLResponse,
-                    newRequest request: URLRequest) async -> URLRequest? {
-        guard let url = request.url, UpdateComicResourcePolicy.allowsRedirect(url) else { return nil }
-        return request
+                    newRequest request: URLRequest,
+                    completionHandler: @escaping @Sendable (URLRequest?) -> Void) {
+        guard let url = request.url, UpdateComicResourcePolicy.allowsRedirect(url) else {
+            completionHandler(nil)
+            return
+        }
+        completionHandler(request)
     }
 }
 #endif
