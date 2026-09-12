@@ -10,6 +10,8 @@ struct WorkspaceRecipeEditor: View {
     var actions: ActionTilesController?
     var prepare: (() -> Void)?
     var canPrepare = false
+    /// Draft editors replace their in-memory recipe here. Saved-mode editors keep immediate persistence.
+    var editDraft: ((WorkspaceRecipe) -> Void)?
     @State private var isPicking = false
     @State private var pickerKind = ResourcePicker.resource
     @State private var replacingStepID: UUID?
@@ -285,7 +287,11 @@ struct WorkspaceRecipeEditor: View {
 
     private func commit(_ recipe: WorkspaceRecipe) {
         editorError = nil
-        _ = store.updateRecipe(mode.id, recipe)
+        if let editDraft {
+            editDraft(recipe)
+        } else {
+            _ = store.updateRecipe(mode.id, recipe)
+        }
     }
 }
 
