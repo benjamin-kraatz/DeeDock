@@ -57,6 +57,26 @@ This environment has no Xcode. Compilation, generated string symbols, and native
 - Confirm the system Dock is unchanged and that no Screen Time or other-app activity appears.
 - Exercise keyboard-only operation (H, arrows, Escape), VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and auto-hide while the timeline is open.
 
+## DEE-67 recipe photography
+
+Implemented on `feature/dee-67`. Settings → Modes → **Snapshot workspace…** captures running apps, eligible visible window metadata, and the active mode's pins into an in-memory draft. The draft can be named, edited, and saved as a new inactive mode using the existing DEE-21 recipe format. See [recipe photography](RECIPE-PHOTOGRAPHY.md) for the save contract, API choices, and limits.
+
+Window metadata is optional and requires existing Screen Recording access. Apps and pins remain available after denied access, unavailable discovery, or no visible windows. Window titles remain ephemeral. No screenshot, OCR, exact window restoration, or automatic preparation is included.
+
+The focused Debug app build passed with Xcode 27 using `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/deedock-dee67-build CODE_SIGNING_ALLOWED=NO build`. The final build emitted no Swift diagnostics for this change. The App Intents metadata tool reported its usual skipped-extraction warning. Static catalog inspection confirmed 17 new English/German keys and no changes to existing entries. `git diff --check` passed. No tests, app launch, previews, or automated visual checks were run. Compilation does not establish native acceptance.
+
+Required native acceptance remains pending:
+
+- Capture with and without Screen Recording access, with no visible windows, and after revoking access. Confirm accurate fallback copy and no permission request.
+- Capture multiple windows of one app, duplicate app pins, pinned folders, and more than 12 choices. Confirm deduplication, visible overflow, and selection after removing a step.
+- Edit the name and steps, cancel, and compare saved modes. Save a second draft and confirm one new mode, unchanged active and previous modes, and no app or Shortcut launch.
+- Repair a stale folder bookmark through the native picker. Add a link and a Shortcut, reorder steps, save, and explicitly Prepare Workspace through the existing DEE-21 action.
+- Inspect connected, disconnected, and session-only display pin layouts. Change or delete the source mode while a draft is open and confirm that the draft retains its captured layout.
+- Dismiss during discovery, reopen, exercise sleep/wake, and change Spaces or full-screen windows during capture. A dismissed draft must not receive a late result.
+- Exercise keyboard-only editing, VoiceOver, German copy, Reduce Motion, Reduce Transparency, and a short Settings window.
+
+Model cases worth later tests: app identity deduplication and pin bookmark precedence, folder path deduplication, empty and oversized bookmarks, the 12-step selection boundary, duplicate and whitespace-only names, draft cancellation without persistence, one-write save failure, and preservation of active/previous IDs and captured session display state. These tests were not added or run.
+
 ## DEE-21 workspace recipes
 
 Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Installed Shortcuts load when the recipe editor appears; **Reload Shortcuts** remains a manual refresh. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.

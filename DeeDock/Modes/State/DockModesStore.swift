@@ -178,6 +178,30 @@ final class DockModesStore {
         duplicate(activeMode.id, named: requestedName)
     }
 
+    /// Takes a value copy of the active layout without writing or activating a mode.
+    func makeRecipeDraft(runningApplications: [ApplicationReference]) -> WorkspaceRecipeDraft {
+        WorkspaceRecipeDraft(source: activeMode, sessionDisplays: sessionDisplays[activeMode.id] ?? [:],
+                             name: DockModeNaming.copyName(for: activeMode.name, in: modes),
+                             runningApplications: runningApplications)
+    }
+
+    /// Saves the reviewed recipe and captured layout in one write. A failure leaves the draft open.
+    /// Active and previous mode IDs stay unchanged, and no preparation action runs.
+    @discardableResult
+    func saveRecipeDraft(_ draft: WorkspaceRecipeDraft) -> Bool {
+        guard canEdit, draft.windowStatus != .loading, !draft.mode.recipe.isEmpty,
+              draft.mode.recipe.isPersistable,
+              DockModeNaming.isAvailable(draft.mode.name, in: modes),
+              !modes.contains(where: { $0.id == draft.mode.id }) else { return false }
+        var saved = draft.mode
+        saved.name = DockModeNaming.normalized(saved.name)
+        var proposed = document
+        proposed.modes.append(saved)
+        guard commit(proposed) else { return false }
+        sessionDisplays[saved.id] = draft.sessionDisplays
+        return true
+    }
+
     @discardableResult
     func duplicate(_ sourceID: UUID, named requestedName: String? = nil) -> UUID? {
         guard canEdit else { return nil }

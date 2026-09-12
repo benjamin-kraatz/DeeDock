@@ -14,6 +14,7 @@ struct DockModesSettingsPane: View {
     @State private var draftName = ""
     @State private var namingAction: NamingAction?
     @State private var deletingMode: DockMode?
+    @State private var recipeDraft: WorkspaceRecipeDraft?
 
     private enum NamingAction: Identifiable {
         case create
@@ -32,6 +33,8 @@ struct DockModesSettingsPane: View {
                 SettingsActionRow {
                     Button(.dockModesNew, systemImage: "plus", action: beginCreate)
                         .disabled(!store.canEdit)
+                    Button(.recipeSnapshotTitle, systemImage: "camera", action: beginSnapshot)
+                        .disabled(!store.canEdit || applications == nil)
                 }
             }
             SettingsCard(title: .dockModesConfigurationsTitle) {
@@ -66,6 +69,9 @@ struct DockModesSettingsPane: View {
             }
         }
         .navigationTitle(Text(.dockModesTitle))
+        .sheet(item: $recipeDraft) { draft in
+            WorkspaceRecipeDraftSheet(draft: draft, store: store, applications: applications, actions: actions)
+        }
         .alert(namingTitle, isPresented: namingPresented) {
             TextField(String(localized: .dockModesNameField), text: $draftName)
             Button(.actionCancel, role: .cancel) { namingAction = nil }
@@ -144,6 +150,13 @@ struct DockModesSettingsPane: View {
     private func beginCreate() {
         draftName = DockModeNaming.copyName(for: store.activeMode.name, in: store.modes)
         namingAction = .create
+    }
+    private func beginSnapshot() {
+        guard store.canEdit, let applications else { return }
+        let running = applications.runningApplications().filter {
+            $0.url.standardizedFileURL != Bundle.main.bundleURL.standardizedFileURL
+        }
+        recipeDraft = store.makeRecipeDraft(runningApplications: running)
     }
     private func beginRename(_ mode: DockMode) { draftName = mode.name; namingAction = .rename(mode) }
     private func saveName() {

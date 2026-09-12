@@ -541,6 +541,312 @@
       }
     }
   },
+  "recipeSnapshotTitle": {
+    "comment": "Button and sheet title for creating an unsaved recipe from the current desktop context.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Snapshot workspace…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Arbeitsbereich aufnehmen …"
+        }
+      }
+    }
+  },
+  "recipeSnapshotHelp": {
+    "comment": "Explains the draft save contract and separate playback action. Ordinary mode activation also remains available.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review what is open now and choose what to reopen later. Save creates a new Dock Mode with the current pins and app visibility. Saving opens nothing and leaves the active mode unchanged. Choose Prepare Workspace later to run the recipe."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prüfe den aktuellen Arbeitsbereich und wähle aus, was später geöffnet werden soll. Beim Sichern entsteht ein neuer Dock-Modus mit den aktuellen Anheftungen und der App-Sichtbarkeit. Beim Sichern wird nichts geöffnet und der aktive Modus bleibt unverändert. Wähle später Arbeitsbereich vorbereiten, um das Rezept auszuführen."
+        }
+      }
+    }
+  },
+  "recipeSnapshotLoading": {
+    "comment": "Progress message while discovering window metadata, without screenshots.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reading visible window context…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbaren Fensterkontext lesen …"
+        }
+      }
+    }
+  },
+  "recipeSnapshotWindowsHelp": {
+    "comment": "Explains ephemeral window metadata and the existing playback limitations.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible window titles help you review app choices and are discarded when this draft closes. Recipes reopen apps, not exact windows, browser tabs, unsaved documents, or window positions. Add files and links below when needed."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbare Fenstertitel helfen bei der App-Auswahl und werden beim Schließen dieses Entwurfs verworfen. Rezepte öffnen Apps, stellen aber keine bestimmten Fenster, Browser-Tabs, ungesicherten Dokumente oder Fensterpositionen wieder her. Ergänze unten bei Bedarf Dateien und Links."
+        }
+      }
+    }
+  },
+  "recipeSnapshotPermission": {
+    "comment": "Permission fallback. This action never requests access automatically.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Window context is unavailable without Screen Recording access. Apps and DDock pins are included. To include visible window titles, enable access in Settings → Features, then take a new snapshot."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ohne Bildschirmaufnahme-Zugriff ist kein Fensterkontext verfügbar. Apps und DDock-Anheftungen sind enthalten. Erlaube den Zugriff unter Einstellungen → Funktionen und erstelle eine neue Aufnahme, um sichtbare Fenstertitel einzubeziehen."
+        }
+      }
+    }
+  },
+  "recipeSnapshotUnavailable": {
+    "comment": "Recoverable window discovery failure without losing app and pin choices.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Window context could not be read. Apps and DDock pins are still available for this draft."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Fensterkontext konnte nicht gelesen werden. Apps und DDock-Anheftungen stehen für diesen Entwurf weiterhin bereit."
+        }
+      }
+    }
+  },
+  "recipeSnapshotNoWindows": {
+    "comment": "Empty window discovery result.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No eligible visible windows were found. Apps and DDock pins are still available for this draft."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Es wurden keine geeigneten sichtbaren Fenster gefunden. Apps und DDock-Anheftungen stehen für diesen Entwurf weiterhin bereit."
+        }
+      }
+    }
+  },
+  "recipeSnapshotSteps": {
+    "comment": "Heading above the editable preparation sequence.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Draft steps"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entwurfsschritte"
+        }
+      }
+    }
+  },
+  "recipeSnapshotSave": {
+    "comment": "Saves the reviewed draft as an inactive Dock Mode.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Save as new mode"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Als neuen Modus sichern"
+        }
+      }
+    }
+  },
+  "recipeSnapshotChoices": {
+    "comment": "Heading for deduplicated app and pinned folder candidates.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captured choices"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erfasste Auswahl"
+        }
+      }
+    }
+  },
+  "recipeSnapshotSelectionHelp": {
+    "comment": "Explains that recipe selection is separate from captured dock pins and gives the persisted step limit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Select up to 12 steps. Removing a choice here only changes the recipe. The new mode keeps the captured pin layout. Use the editor below to add, repair, remove, or reorder steps."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle bis zu 12 Schritte. Das Abwählen ändert nur das Rezept. Der neue Modus behält die erfasste Anordnung der Anheftungen. Unten kannst du Schritte ergänzen, reparieren, entfernen oder umsortieren."
+        }
+      }
+    }
+  },
+  "recipeSnapshotOverflow": {
+    "comment": "Explains initial selection when the snapshot exceeds the recipe limit; all candidates remain visible.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This snapshot has more than 12 choices. A recipe holds up to 12 steps. Remove a step to include another captured choice."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Aufnahme enthält mehr als 12 Einträge. Ein Rezept umfasst bis zu 12 Schritte. Entferne einen Schritt, um einen anderen erfassten Eintrag aufzunehmen."
+        }
+      }
+    }
+  },
+  "recipeSnapshotSkippedPins": {
+    "comment": "Explains skipped empty or oversized folder bookmarks. A stale bookmark that can be copied is repairable in the editor.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Some pinned folders have no usable saved bookmark and could not become recipe steps. Add them with the file picker below. Their dock pins remain in the new mode."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einige angeheftete Ordner haben kein verwendbares gespeichertes Lesezeichen und konnten nicht als Rezeptschritte übernommen werden. Füge sie unten über die Dateiauswahl hinzu. Ihre Anheftungen bleiben im neuen Modus erhalten."
+        }
+      }
+    }
+  },
+  "recipeSnapshotRunning": {
+    "comment": "Candidate provenance from running apps or visible window owners.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open app"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Geöffnete App"
+        }
+      }
+    }
+  },
+  "recipeSnapshotPinned": {
+    "comment": "Candidate provenance from DDock mode pins, never system Dock preferences.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock pin"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock-Anheftung"
+        }
+      }
+    }
+  },
+  "recipeSnapshotWindows": {
+    "comment": "Disclosure for captured, ephemeral window titles under an app choice.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Visible windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sichtbare Fenster"
+        }
+      }
+    }
+  },
+  "recipeSnapshotUntitledWindow": {
+    "comment": "Fallback for a captured visible window whose app provides no title.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Untitled window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fenster ohne Titel"
+        }
+      }
+    }
+  },
   "discoveryDebugTitle": {
     "comment": "Debug-only Discovery settings card title.",
     "extractionState": "manual",
