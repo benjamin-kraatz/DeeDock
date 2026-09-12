@@ -78,6 +78,11 @@ struct DockSettingsView: View {
             // Window Peek and its permissions are app-wide, so there is no display to select.
             select(.features, page: .windowPeek)
         }
+        .onChange(of: coordinator?.settingsAppSuggestionsRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsAppSuggestionsRequest = false
+            select(.features, page: .appSuggestions)
+        }
         .onDisappear {
             settingsActive = false
             coordinator?.zonePreview.stop()

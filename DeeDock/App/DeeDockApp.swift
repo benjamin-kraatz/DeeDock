@@ -51,6 +51,8 @@ struct DeeDockApp: App {
                 .keyboardShortcut("f", modifiers: [.command, .shift])
             Text(delegate.coordinator.searchShortcutAvailable ? .windowSearchShortcutHelp : .windowSearchShortcutUnavailable)
             Button(.fusionTitle) { delegate.coordinator.showFusion() }
+            Button(.pinJuryTitle) { delegate.coordinator.showPinJury() }
+                .disabled(!delegate.coordinator.canFocus)
             QuarantineMenu()
             DockModesMenu(coordinator: delegate.coordinator)
             Divider()
@@ -85,6 +87,8 @@ struct DeeDockApp: App {
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                     .disabled(!delegate.coordinator.canBrowseLocalHistory)
                 Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
+                Button(.pinJuryTitle) { delegate.coordinator.showPinJury() }
+                    .disabled(!delegate.coordinator.canFocus)
                 OpenSystemSettingsCloneButton()
             }
         }

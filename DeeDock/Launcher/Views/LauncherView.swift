@@ -106,6 +106,13 @@ struct LauncherView: View {
     }
 
     @ViewBuilder private var status: some View {
+        if state.juryCrowded, state.query.isEmpty, !state.usesFileActions, !state.usesMixedResults {
+            Button { state.openPinJury?() } label: {
+                Label(.pinJuryCrowdedPrompt, systemImage: "person.3.sequence.fill")
+                    .font(.callout)
+            }
+            .buttonStyle(.bordered)
+        }
         if state.query.isEmpty, !state.usesMixedResults, state.catalog.suggestions.isActive {
             if state.catalog.suggestions.engineBusy {
                 HStack(spacing: 8) {

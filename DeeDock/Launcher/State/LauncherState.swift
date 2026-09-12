@@ -5,6 +5,9 @@ import SwiftUI
 /// One presentation's search, selection, and cancellable intelligence, sharing discovery and history across displays.
 @MainActor @Observable
 final class LauncherState {
+    /// Updated from stable dock geometry, never from a transient drag insertion gap.
+    var juryCrowded = false
+    @ObservationIgnored var openPinJury: (() -> Void)?
     let catalog: ApplicationCatalog
     let suggestions = LauncherSuggestionPresentation()
     @ObservationIgnored var suggestionModeID: (() -> String?)?

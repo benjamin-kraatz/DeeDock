@@ -1,6 +1,1320 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "pinJury.title": {
+    "comment": "Title of the native Apple Intelligence pin-succession conversation window.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin Jury"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin-Jury"
+        }
+      }
+    }
+  },
+  "pinJury.subtitle": {
+    "comment": "Subtitle describing the three model jurors and the user-controlled final decision.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Three perspectives on your next pin. You make the call."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Drei Perspektiven auf deinen nächsten Pin. Du entscheidest."
+        }
+      }
+    }
+  },
+  "pinJury.onDevice": {
+    "comment": "Privacy badge for the on-device Foundation Models conversation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence · On this Mac"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence · Auf diesem Mac"
+        }
+      }
+    }
+  },
+  "pinJury.keeperName": {
+    "comment": "Name of the juror who values stable app habits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keeper"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bewahrer"
+        }
+      }
+    }
+  },
+  "pinJury.scoutName": {
+    "comment": "Name of the juror who notices recently useful apps.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Scout"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entdeckerin"
+        }
+      }
+    }
+  },
+  "pinJury.stewardName": {
+    "comment": "Name of the juror who weighs limited dock space and evidence.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Steward"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vermittler"
+        }
+      }
+    }
+  },
+  "pinJury.keeperPerspective": {
+    "comment": "Short description of the Keeper juror.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Protects familiar habits"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bewahrt vertraute Gewohnheiten"
+        }
+      }
+    }
+  },
+  "pinJury.scoutPerspective": {
+    "comment": "Short description of the Scout juror.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Looks for new favorites"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entdeckt neue Favoriten"
+        }
+      }
+    }
+  },
+  "pinJury.stewardPerspective": {
+    "comment": "Short description of the Steward juror.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Makes every place count"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wägt den Platz im Dock ab"
+        }
+      }
+    }
+  },
+  "pinJury.meetJurors": {
+    "comment": "Accessibility group label for the three named jurors.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jurors"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury"
+        }
+      }
+    }
+  },
+  "pinJury.voteKeep": {
+    "comment": "A model juror ballot to retain the incumbent pin. Never an action.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keep the pin"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin behalten"
+        }
+      }
+    }
+  },
+  "pinJury.voteReplace": {
+    "comment": "A model juror ballot to replace the incumbent with the challenger. Never an action.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Promote the challenger"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kandidaten pinnen"
+        }
+      }
+    }
+  },
+  "pinJury.incumbent": {
+    "comment": "Label identifying the currently pinned app in the evidence card.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Current pin"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktueller Pin"
+        }
+      }
+    }
+  },
+  "pinJury.challenger": {
+    "comment": "Label identifying the currently unpinned app proposed as a replacement.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Challenger"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kandidat"
+        }
+      }
+    }
+  },
+  "pinJury.activations": {
+    "comment": "Number of observed settled app activations in the last 30 days, not duration or launches.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Activations"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktivierungen"
+        }
+      }
+    }
+  },
+  "pinJury.recentActivations": {
+    "comment": "Number of observed activations in the recent seven-day window.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In the last 7 days"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In den letzten 7 Tagen"
+        }
+      }
+    }
+  },
+  "pinJury.activeDays": {
+    "comment": "Number of local calendar days with at least one observed activation in the 30-day window.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Active days"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktive Tage"
+        }
+      }
+    }
+  },
+  "pinJury.daysSinceUse": {
+    "comment": "Recency of the latest observed activation. Placeholder is a count of calendar days; zero means today.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Days since last activity: %lld"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Tage seit letzter Aktivität: %lld"
+        }
+      }
+    }
+  },
+  "pinJury.noRecordedUse": {
+    "comment": "Shown when the 30-day local history contains no observed activation for the app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No activity recorded in this period"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine Aktivität in diesem Zeitraum erfasst"
+        }
+      }
+    }
+  },
+  "pinJury.speaking": {
+    "comment": "Visible and accessible status of the juror whose text is currently streaming.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Speaking"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Spricht gerade"
+        }
+      }
+    }
+  },
+  "pinJury.consideringEvidence": {
+    "comment": "Placeholder while a juror has started but no generated text has arrived.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Considering the evidence…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prüft die Nutzungsdaten …"
+        }
+      }
+    }
+  },
+  "pinJury.round": {
+    "comment": "Conversation round number beside the juror name.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Round %lld"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Runde %lld"
+        }
+      }
+    }
+  },
+  "pinJury.cancel": {
+    "comment": "Stops the current model conversation without a decision or pin mutation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cancel"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abbrechen"
+        }
+      }
+    }
+  },
+  "pinJury.reject": {
+    "comment": "Explicit user action to dismiss the proposed decision without changing pins.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reject"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ablehnen"
+        }
+      }
+    }
+  },
+  "pinJury.accept": {
+    "comment": "Explicit user action accepting the exact proposed pin decision shown beside it.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Accept"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Annehmen"
+        }
+      }
+    }
+  },
+  "pinJury.openHistorySettings": {
+    "comment": "Opens the existing app suggestions consent and local history settings.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App suggestion settings"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einstellungen für App-Vorschläge"
+        }
+      }
+    }
+  },
+  "pinJury.nextCase": {
+    "comment": "Refreshes candidates after a decision; does not start another model conversation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Check for another case"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Weiteren Fall suchen"
+        }
+      }
+    }
+  },
+  "pinJury.refresh": {
+    "comment": "Re-evaluates availability, current pins, and current local usage evidence.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Refresh"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktualisieren"
+        }
+      }
+    }
+  },
+  "pinJury.refreshHelp": {
+    "comment": "Help text for the refresh button.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Check current pins, local activity, and Apple Intelligence availability."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktuelle Pins, lokale Aktivität und die Verfügbarkeit von Apple Intelligence prüfen."
+        }
+      }
+    }
+  },
+  "pinJury.start": {
+    "comment": "Explicit action to begin the on-device model conversation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Let the jury discuss"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Jury beraten lassen"
+        }
+      }
+    }
+  },
+  "pinJury.retry": {
+    "comment": "Explicit action to retry an interrupted or failed model conversation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Try the conversation again"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beratung erneut starten"
+        }
+      }
+    }
+  },
+  "pinJury.decisionAccepted": {
+    "comment": "Footer heading after an explicit successful user acceptance.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Decision accepted"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entscheidung angenommen"
+        }
+      }
+    }
+  },
+  "pinJury.decisionRejected": {
+    "comment": "Footer heading after explicit user rejection.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Decision rejected"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entscheidung abgelehnt"
+        }
+      }
+    }
+  },
+  "pinJury.deliberating": {
+    "comment": "Progress label during on-device generation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jury is discussing"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury berät"
+        }
+      }
+    }
+  },
+  "pinJury.yourDecision": {
+    "comment": "Footer heading before a valid recommendation exists.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Your dock. Your decision."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dein Dock. Deine Entscheidung."
+        }
+      }
+    }
+  },
+  "pinJury.replaceProposal": {
+    "comment": "Exact proposed replacement. First placeholder is the current app name; second is the challenger app name. Do not translate app names.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Replace %@ with %@"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%@ durch %@ ersetzen"
+        }
+      }
+    }
+  },
+  "pinJury.keepProposal": {
+    "comment": "Exact proposed decision to retain the current app. Placeholder is its system-provided name; do not translate.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keep %@ pinned"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%@ gepinnt lassen"
+        }
+      }
+    }
+  },
+  "pinJury.replacementApplied": {
+    "comment": "Footer detail after the user explicitly accepted and applied a replacement.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The new app now has this place in your dock."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die neue App hat jetzt diesen Platz in deinem Dock."
+        }
+      }
+    }
+  },
+  "pinJury.keepApplied": {
+    "comment": "Footer detail after the user explicitly accepted keeping the incumbent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The current pin stays in place."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der aktuelle Pin bleibt an seinem Platz."
+        }
+      }
+    }
+  },
+  "pinJury.rejectedDetail": {
+    "comment": "Footer detail after rejecting a recommendation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Your pins stay as they are."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Deine Pins bleiben unverändert."
+        }
+      }
+    }
+  },
+  "pinJury.generatingDetail": {
+    "comment": "Footer detail while the conversation is still in progress.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "You can stop at any time. Your pins stay in place during the conversation."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Du kannst jederzeit abbrechen. Deine Pins bleiben während der Beratung unverändert."
+        }
+      }
+    }
+  },
+  "pinJury.acceptDetail": {
+    "comment": "Footer explanation beside the exact proposed change and Accept/Reject controls.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review the arguments, then accept or reject this recommendation."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lies die Argumente und nimm die Empfehlung an oder lehne sie ab."
+        }
+      }
+    }
+  },
+  "pinJury.readyDetail": {
+    "comment": "Footer explanation before starting a hearing.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jury recommends. Only your acceptance can change a pin."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury empfiehlt. Nur deine Zustimmung kann einen Pin ändern."
+        }
+      }
+    }
+  },
+  "pinJury.onePlace": {
+    "comment": "Section heading above the incumbent and challenger evidence cards.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "One place in your dock"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein Platz in deinem Dock"
+        }
+      }
+    }
+  },
+  "pinJury.evidenceWindow": {
+    "comment": "Evidence date window label above the two candidate cards.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Local activity · Last 30 days"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lokale Aktivität · Letzte 30 Tage"
+        }
+      }
+    }
+  },
+  "pinJury.conversation": {
+    "comment": "Heading above the live chronological model transcript.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The conversation"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Beratung"
+        }
+      }
+    }
+  },
+  "pinJury.followConversation": {
+    "comment": "Checkbox controlling automatic scrolling to newly generated text.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Follow live"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Live folgen"
+        }
+      }
+    }
+  },
+  "pinJury.preparingTitle": {
+    "comment": "Conversation placeholder while the first model turn is being prepared.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jury takes its seats"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury nimmt Platz"
+        }
+      }
+    }
+  },
+  "pinJury.conversationEmptyTitle": {
+    "comment": "Conversation placeholder before the user explicitly starts generation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The floor is open"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Beratung kann beginnen"
+        }
+      }
+    }
+  },
+  "pinJury.conversationEmptyDetail": {
+    "comment": "Explanation of the two-round three-juror conversation before it starts.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jurors will compare these apps, respond to each other, and cast their votes. You can watch every argument here."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury vergleicht diese Apps, geht auf die Argumente der anderen ein und stimmt ab. Hier kannst du die ganze Beratung verfolgen."
+        }
+      }
+    }
+  },
+  "pinJury.noCaseDetail": {
+    "comment": "Empty conversation explanation when no eligible candidate pair exists.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A conversation needs a crowded dock and enough recent activity to compare two apps."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Für eine Beratung braucht es ein volles Dock und genügend aktuelle Aktivität, um zwei Apps zu vergleichen."
+        }
+      }
+    }
+  },
+  "pinJury.crowdedPrompt": {
+    "comment": "Pin Jury crowdedPrompt message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dock getting crowded? Ask the Pin Jury"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wird das Dock voll? Frag die Pin-Jury"
+        }
+      }
+    }
+  },
+  "pinJury.timeout": {
+    "comment": "Pin Jury timeout message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jury took too long. Your pins are unchanged. Try again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury hat zu lange gebraucht. Deine Pins sind unverändert. Versuche es erneut."
+        }
+      }
+    }
+  },
+  "pinJury.cancelled": {
+    "comment": "Pin Jury cancelled message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hearing stopped. Your pins are unchanged."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beratung gestoppt. Deine Pins sind unverändert."
+        }
+      }
+    }
+  },
+  "pinJury.rejected": {
+    "comment": "Pin Jury rejected message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recommendation rejected. Your pins are unchanged."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Empfehlung abgelehnt. Deine Pins sind unverändert."
+        }
+      }
+    }
+  },
+  "pinJury.kept": {
+    "comment": "Pin Jury kept message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Decision accepted. The existing pin stays."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entscheidung angenommen. Der bisherige Pin bleibt."
+        }
+      }
+    }
+  },
+  "pinJury.applied": {
+    "comment": "Pin Jury applied message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Decision accepted. The new app now occupies this pin’s place."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entscheidung angenommen. Die neue App ist jetzt an diesem Platz gepinnt."
+        }
+      }
+    }
+  },
+  "pinJury.saveFailed": {
+    "comment": "Pin Jury saveFailed message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The swap could not be saved. Your pins are unchanged. Close any dock menu or drag, then try Accept again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Tausch konnte nicht gespeichert werden. Deine Pins sind unverändert. Beende offene Dock-Menüs oder Ziehvorgänge und versuche Annehmen erneut."
+        }
+      }
+    }
+  },
+  "pinJury.stale": {
+    "comment": "Pin Jury stale message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This hearing is out of date. Refresh to review the current dock and usage history."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Beratung ist nicht mehr aktuell. Aktualisiere, um das aktuelle Dock und den Nutzungsverlauf zu prüfen."
+        }
+      }
+    }
+  },
+  "pinJury.deviceNotEligible": {
+    "comment": "Pin Jury deviceNotEligible message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This Mac does not support Apple Intelligence. The Pin Jury needs an eligible Mac."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieser Mac unterstützt Apple Intelligence nicht. Die Pin-Jury benötigt einen kompatiblen Mac."
+        }
+      }
+    }
+  },
+  "pinJury.intelligenceDisabled": {
+    "comment": "Pin Jury intelligenceDisabled message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Turn on Apple Intelligence in macOS System Settings, then try again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiviere Apple Intelligence in den macOS-Systemeinstellungen und versuche es erneut."
+        }
+      }
+    }
+  },
+  "pinJury.modelNotReady": {
+    "comment": "Pin Jury modelNotReady message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence is still preparing its on-device model. Try again when it is ready."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence bereitet das lokale Modell noch vor. Versuche es erneut, sobald es bereit ist."
+        }
+      }
+    }
+  },
+  "pinJury.unsupported": {
+    "comment": "Pin Jury unsupported message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jury needs guided generation and a language supported by Apple Intelligence on this Mac."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury benötigt strukturierte Generierung und eine Sprache, die Apple Intelligence auf diesem Mac unterstützt."
+        }
+      }
+    }
+  },
+  "pinJury.contextLimit": {
+    "comment": "Pin Jury contextLimit message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The discussion exceeded the model’s limit. Start a new hearing."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Diskussion hat das Limit des Modells überschritten. Starte eine neue Beratung."
+        }
+      }
+    }
+  },
+  "pinJury.refused": {
+    "comment": "Pin Jury refused message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence could not complete this hearing. Your pins are unchanged."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Apple Intelligence konnte diese Beratung nicht abschließen. Deine Pins sind unverändert."
+        }
+      }
+    }
+  },
+  "pinJury.generationFailed": {
+    "comment": "Pin Jury generationFailed message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The jury could not complete all six statements and votes. Your pins are unchanged. Try again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Jury konnte nicht alle sechs Beiträge und Stimmen abschließen. Deine Pins sind unverändert. Versuche es erneut."
+        }
+      }
+    }
+  },
+  "pinJury.notCrowded": {
+    "comment": "Pin Jury notCrowded message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This dock has room at its chosen icon size. The jury meets when icons shrink or the dock needs scrolling."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieses Dock hat bei der gewählten Symbolgröße genug Platz. Die Jury berät, wenn Symbole schrumpfen oder das Dock gescrollt werden muss."
+        }
+      }
+    }
+  },
+  "pinJury.historyRequired": {
+    "comment": "Pin Jury historyRequired message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable or resume App suggestions to use its local usage history. The jury only uses observed app activations; it never turns collection on for you."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiviere App-Vorschläge oder setze sie fort, um den lokalen Nutzungsverlauf zu verwenden. Die Jury nutzt nur beobachtete App-Aktivierungen und schaltet die Aufzeichnung nicht selbst ein."
+        }
+      }
+    }
+  },
+  "pinJury.insufficientEvidence": {
+    "comment": "Pin Jury insufficientEvidence message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No supported swap yet. A challenger needs at least 6 activations across 3 days, including 3 in the last week, and stronger evidence than an observed pin. Apps without history keep their place."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Noch kein ausreichend belegter Tausch. Ein Kandidat braucht mindestens 6 Aktivierungen an 3 Tagen, davon 3 in der letzten Woche, und mehr Nutzung als ein beobachteter Pin. Apps ohne Verlauf behalten ihren Platz."
+        }
+      }
+    }
+  },
+  "pinJury.settingsHelp": {
+    "comment": "Pin Jury settingsHelp message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "When a dock is crowded, three Apple Intelligence jurors discuss local app usage. Watch the conversation and accept or reject their recommendation. Only Accept can swap a pin."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wenn ein Dock voll ist, diskutieren drei Juroren mit Apple Intelligence die lokale App-Nutzung. Verfolge die Diskussion und nimm ihre Empfehlung an oder lehne sie ab. Nur Annehmen kann einen Pin tauschen."
+        }
+      }
+    }
+  },
+  "pinJury.open": {
+    "comment": "Pin Jury open message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open Pin Jury"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin-Jury öffnen"
+        }
+      }
+    }
+  },
+  "pinJury.previewKeeper": {
+    "comment": "Pin Jury previewKeeper message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Safari was used on four days. A deliberate pin deserves some stability."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Safari wurde an vier Tagen genutzt. Ein bewusst gesetzter Pin verdient etwas Beständigkeit."
+        }
+      }
+    }
+  },
+  "pinJury.previewChallenger": {
+    "comment": "Pin Jury previewChallenger message. App usage is local, opt-in, and recommendation-only.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notes has 18 activations this week. That recent demand makes it a strong candidate for this place."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notizen wurde diese Woche 18-mal aktiviert. Diese aktuelle Nutzung spricht für einen Platz im Dock."
+        }
+      }
+    }
+  },
   "discoveryDebugTitle": {
     "comment": "Debug-only Discovery settings card title.",
     "extractionState": "manual",

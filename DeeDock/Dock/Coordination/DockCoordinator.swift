@@ -26,6 +26,8 @@ final class DockCoordinator {
     var settingsDisplayRequest: String?
     /// One-shot route used by Window Peek's permission fallback.
     var settingsFeaturesRequest = false
+    /// Pin Jury routes directly to the existing opt-in history controls.
+    var settingsAppSuggestionsRequest = false
     /// One-shot route opened from the menu-bar mode submenu.
     var settingsModesRequest = false
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
@@ -41,6 +43,7 @@ final class DockCoordinator {
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
     @ObservationIgnored private let shelves: ShelfCoordinator
     @ObservationIgnored private let fusion: FusionCoordinator
+    @ObservationIgnored private var pinJuries: [String: PinJuryWindowController] = [:]
     @ObservationIgnored private let sessionCapsules: SessionCapsuleCoordinator
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
@@ -307,6 +310,7 @@ final class DockCoordinator {
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
                 self?.fusion.suspend()
+                self?.pinJuries.values.forEach { $0.stop() }
                 self?.timeline.end()
                 self?.popovers.closeAll()
                 self?.windowPeeks.dismissFileHandoff()
@@ -345,6 +349,7 @@ final class DockCoordinator {
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
         let desired = Set(enabledDisplays.map(\.id))
         for id in Array(panels.keys) where !desired.contains(id) {
+            pinJuries.removeValue(forKey: id)?.stop()
             filePicker.cancel(for: id)
             folderStacks.close(for: id, returnFocus: false)
             shelves.close(for: id, returnFocus: false)
@@ -362,6 +367,7 @@ final class DockCoordinator {
             configureLauncherSearch(on: panel)
             panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
             panel.launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
+            panel.launcher.openPinJury = { [weak self] in self?.showPinJury(on: display.id) }
             panel.launcher.suggestionVisibility = { [weak self] in
                 self?.profiles.modes.effectiveVisibility(for: display.id) ?? .showAll
             }
@@ -809,6 +815,28 @@ final class DockCoordinator {
 
     func showFusion() { fusion.show() }
 
+    /// Explicit menu or crowded Launcher action, scoped to the chosen display and Dock Mode.
+    func showPinJury(on displayID: String? = nil) {
+        guard let id = displayID ?? DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation),
+              let panel = panels[id], let display = enabledDisplays.first(where: { $0.id == id }) else { return }
+        popovers.closeAll()
+        windowPeeks.close(returnFocus: false)
+        modePicker.close(returnFocus: false)
+        panel.launcher.close?()
+        endFocus(restore: false)
+        if pinJuries[id] == nil {
+            let context = PinJuryContext(store: panel.store, catalog: catalog, profiles: profiles,
+                isCurrent: { [weak self, weak panel] in
+                    guard let self, let panel else { return false }
+                    return panels[id] === panel && enabledDisplays.contains { $0.id == id }
+                }, isCrowded: { [weak panel] in panel?.launcher.juryCrowded == true },
+                canApply: { [weak self] in self?.canSwitchModes == true })
+            let state = PinJuryState(displayName: display.name) { context.prepare() }
+            pinJuries[id] = PinJuryWindowController(state: state) { [weak self] in self?.settingsAppSuggestionsRequest = true }
+        }
+        pinJuries[id]?.show(returningTo: lastExternalApplication)
+    }
+
     func stop() {
         discovery.stop()
         clipboardMuseum.didUse = nil
@@ -826,6 +854,7 @@ final class DockCoordinator {
         displayIndicator.stop()
         settingsDisplayRequest = nil
         settingsFeaturesRequest = false
+        settingsAppSuggestionsRequest = false
         settingsModesRequest = false
         filePicker.stop()
         dragging.stop()
@@ -838,6 +867,8 @@ final class DockCoordinator {
         recipeProgress.stop()
         watchPresets.stop()
         fusion.stop()
+        pinJuries.values.forEach { $0.stop() }
+        pinJuries.removeAll()
         sessionCapsules.stop()
         shelfSemanticWarmup.stop()
         popovers.stop()

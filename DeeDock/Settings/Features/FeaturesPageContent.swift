@@ -60,6 +60,12 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 LauncherSuggestionsSettingsView(store: coordinator.launcherSuggestions,
                                                 applications: coordinator.launcherApplications)
+                SettingsCard(title: .pinJuryTitle, footnote: .pinJurySettingsHelp) {
+                    SettingsActionRow {
+                        Button(.pinJuryOpen) { coordinator.showPinJury() }
+                            .disabled(!coordinator.canFocus)
+                    }
+                }
             }
         case .localHistory:
             if let coordinator = context.coordinator {

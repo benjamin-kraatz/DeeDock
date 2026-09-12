@@ -84,6 +84,11 @@ Optional **App suggestions** learn from local app activity after opt-in under **
 An empty Launcher query can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.
 See [app suggestions](docs/LAUNCHER-SUGGESTIONS.md) for the 90-day retention policy and observation limits.
 
+**Pin Jury** uses Apple Intelligence to debate one pin replacement when a dock is crowded.
+Open it from Launcher, DDock's menu, or App suggestions settings. Review local usage evidence,
+watch three jurors discuss the pair, then Accept or Reject. Pins change only on Accept.
+See [Pin Jury](docs/PIN-JURY.md) for admission rules, privacy and model availability.
+
 DDock starts as a menu-bar app without an icon in the macOS system Dock. DDock appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DDock's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DDock; dedicated coexistence controls are future work.
 
 - Choose **Appearance → App launch animation** for Classic Bounce, Spring, Pulse, Wobble, Flip, or Indicator only. Classic Bounce is the default. Select a preset to preview it; shared defaults and per-display overrides are supported. Reduce Motion keeps the loading indicator.
