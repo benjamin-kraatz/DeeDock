@@ -32098,6 +32098,60 @@
         }
       }
     },
+    "updatesComicEnglish" : {
+      "comment" : "Custom DDock update window: English column label on a What’s New comic panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Englisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        }
+      }
+    },
+    "updatesComicGerman" : {
+      "comment" : "Custom DDock update window: German column label on a What’s New comic panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deutsch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "German"
+          }
+        }
+      }
+    },
+    "updatesComicImageMissing" : {
+      "comment" : "VoiceOver label when a What’s New comic panel image could not be loaded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeichnung nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artwork unavailable"
+          }
+        }
+      }
+    },
     "updatesCritical" : {
       "comment" : "Custom DDock update window: This release contains a critical update.",
       "extractionState" : "manual",
@@ -33066,6 +33120,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Waiting for DDock to quit. If it remains open, you can ask it to quit again."
+          }
+        }
+      }
+    },
+    "updatesWhatsNew" : {
+      "comment" : "Custom DDock update window: What’s New heading above an authored release comic.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was ist neu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What’s New"
           }
         }
       }

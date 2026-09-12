@@ -37,6 +37,8 @@ final class UpdatePresentation {
     var notes: [UpdateReleaseNoteBlock]?
     var loadingNotes = false
     var notesUnavailable = false
+    /// Parsed What’s New comic when a companion `DDock-comic.md` loaded. Nil keeps notes-only layout.
+    var comic: UpdateComic?
     var message: LocalizedStringResource?
     var diagnostic: String?
     var canRetryTermination = false

@@ -1,7 +1,8 @@
 #if DIRECT_DISTRIBUTION
 import SwiftUI
 
-/// Native release notes, progress and recovery details; no Sparkle view or remote styling is used.
+/// Native release notes, optional What’s New comic, progress, and recovery details.
+/// No Sparkle view or remote styling is used.
 struct UpdateWindowDetails: View {
     let presentation: UpdatePresentation
 
@@ -28,18 +29,31 @@ struct UpdateWindowDetails: View {
             }
 
             if presentation.phase == .available {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(.updatesReleaseNotes).font(.headline).accessibilityAddTraits(.isHeader)
-                    if let notes = presentation.notes {
-                        UpdateReleaseNotesView(blocks: notes)
-                    } else if presentation.loadingNotes {
-                        ProgressView { Text(.updatesLoadingNotes) }.controlSize(.small)
-                    } else {
-                        Text(presentation.notesUnavailable ? .updatesNotesFailed : .updatesNoNotes)
-                            .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 16) {
+                    if let comic = presentation.comic {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(.updatesWhatsNew).font(.headline).accessibilityAddTraits(.isHeader)
+                            UpdateComicView(comic: comic)
+                        }
                     }
-                    if let url = presentation.offer?.releaseNotesURL {
-                        Link(.updatesReadReleaseNotes, destination: url)
+                    if presentation.notes != nil || presentation.loadingNotes
+                        || presentation.notesUnavailable || presentation.offer?.releaseNotesURL != nil
+                        || presentation.comic == nil {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(.updatesReleaseNotes).font(.headline).accessibilityAddTraits(.isHeader)
+                            if let notes = presentation.notes {
+                                UpdateReleaseNotesView(blocks: notes)
+                            } else if presentation.loadingNotes {
+                                ProgressView { Text(.updatesLoadingNotes) }.controlSize(.small)
+                            } else if presentation.notesUnavailable {
+                                Text(.updatesNotesFailed).foregroundStyle(.secondary)
+                            } else if presentation.comic == nil {
+                                Text(.updatesNoNotes).foregroundStyle(.secondary)
+                            }
+                            if let url = presentation.offer?.releaseNotesURL {
+                                Link(.updatesReadReleaseNotes, destination: url)
+                            }
+                        }
                     }
                 }
             }

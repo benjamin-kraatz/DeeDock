@@ -146,6 +146,20 @@ private struct UpdateWindowActions: View {
     return UpdateWindowView(presentation: model).frame(width: 580, height: 600)
 }
 
+#Preview("What’s New comic") {
+    let model = UpdatePresentation()
+    model.phase = .available
+    model.offer = UpdateOffer(version: "9.9.9", stage: .notDownloaded, critical: false, major: false,
+                              informational: false, informationURL: nil,
+                              releaseNotesURL: URL(string: "https://github.com/benjamin-kraatz/DeeDock/releases/download/v9.9.9/DDock.md"))
+    model.comic = UpdateComicPreviewData.sample
+    model.notes = [
+        UpdateReleaseNoteBlock(id: 0, style: .heading(2), text: AttributedString("A quieter dock.")),
+        UpdateReleaseNoteBlock(id: 1, text: AttributedString("Preview notes stay below the comic."), marker: "•")
+    ]
+    return UpdateWindowView(presentation: model).frame(width: 720, height: 780)
+}
+
 #Preview("Permission") {
     let model = UpdatePresentation()
     model.phase = .permission

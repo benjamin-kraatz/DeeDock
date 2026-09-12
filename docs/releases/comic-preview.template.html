@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDock What’s New</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f1e6;
+    --ink: #2a2754;
+    --lilac: #c9b8e0;
+    --mint: #b7dcc8;
+    --coral: #f2b6a8;
+  }
+  html { background: var(--paper); color: var(--ink); }
+  body {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding: 2rem 1.25rem 4rem;
+    font: 1.05rem/1.5 "Source Serif 4", "Iowan Old Style", Palatino, serif;
+  }
+  h1 { font-size: 1.6rem; font-weight: 600; margin: 0 0 0.35rem; }
+  h2 { font-size: 1.15rem; font-weight: 600; margin: 0 0 0.75rem; }
+  p { margin: 0.4rem 0; }
+  a { color: var(--ink); }
+  .lede { margin-bottom: 2rem; }
+  .panel {
+    border: 2px solid var(--ink);
+    border-radius: 1rem;
+    padding: 1rem 1rem 1.15rem;
+    margin: 0 0 1.5rem;
+    background: #fffdf8;
+  }
+  .art {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.6rem;
+    margin-bottom: 1rem;
+    background: var(--paper);
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.25rem;
+  }
+  @media (max-width: 640px) {
+    .cols { grid-template-columns: 1fr; }
+  }
+  .lang { min-width: 0; }
+  .lang h3 {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 0.4rem;
+    color: #5c5878;
+  }
+  .title { font-weight: 650; margin: 0 0 0.35rem; }
+  .speech {
+    margin: 0 0 0.45rem;
+    padding: 0.45rem 0.65rem;
+    background: var(--lilac);
+    border-radius: 0.7rem;
+  }
+  .caption { margin: 0; }
+  .mint { background: var(--mint); }
+  .coral { background: var(--coral); }
+  .note {
+    font-size: 0.9rem;
+    color: #5c5878;
+  }
+</style>
+</head>
+<body>
+<h1>DDock &lt;version&gt; What’s New</h1>
+<p class="lede">Review preview for <a href="VERSION.md">VERSION.md</a>. Art is shared. Copy is selectable. German left, English right. Google Fonts (Source Serif 4) are for this static file only. The native Update window does not load this stylesheet.</p>
+
+<article class="panel">
+<h2>01 / German topic</h2>
+<img class="art" src="assets/VERSION/panel-01.png" alt="German alt. / English alt.">
+<div class="cols">
+  <div class="lang">
+    <h3>Deutsch</h3>
+    <p class="title">German title</p>
+    <p class="speech">German speech</p>
+    <p class="caption">German caption.</p>
+  </div>
+  <div class="lang">
+    <h3>English</h3>
+    <p class="title">English title</p>
+    <p class="speech">English speech</p>
+    <p class="caption">English caption.</p>
+  </div>
+</div>
+</article>
+
+<p class="note">Replace VERSION, topics, alt, titles, speech, captions, and image paths. Add or remove panels. Use mint or coral on later speech bubbles. Do not paste this HTML into Sparkle notes.</p>
+</body>
+</html>
