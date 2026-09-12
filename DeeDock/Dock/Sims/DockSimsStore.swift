@@ -15,6 +15,9 @@ final class DockSimsStore {
     @ObservationIgnored private let repository: DockSimsRepository
     @ObservationIgnored private let rumourComposer = FoundationModelsRumourComposer()
     @ObservationIgnored private var rumourConsentGeneration = UUID()
+    // Shared across displays and unaffected by style/consent changes. Monotonic time includes sleep.
+    @ObservationIgnored private var nextGroupRumourAt: ContinuousClock.Instant?
+    @ObservationIgnored private var groupRumourInFlight = false
     @ObservationIgnored private var recentRumours: [String] = []
     private(set) var rumourStatus: DockRumourStatus = .ready
     private(set) var lastRumourDiagnostic: DockRumourDiagnostic?
@@ -45,6 +48,7 @@ final class DockSimsStore {
 
     var isEnabled: Bool { document.isEnabled }
     var aiRumoursEnabled: Bool { document.aiRumoursEnabled }
+    var gossipIntensity: DockRumourIntensity { document.gossipIntensity }
     var intensity: Double { document.intensity }
     var hasPets: Bool { !document.pets.isEmpty }
     /// Session-only care-clock shift. Zero in Release. Not written to `dock.sims.v1`.
@@ -92,6 +96,13 @@ final class DockSimsStore {
         persist()
     }
 
+    func setGossipIntensity(_ value: DockRumourIntensity) {
+        guard !requiresReset, document.gossipIntensity != value else { return }
+        document.gossipIntensity = value
+        invalidateRumours()
+        persist()
+    }
+
     /// Grants consent for on-device AI rumours. Playback also requires Sims and an idle, visible dock.
     func setAIRumoursEnabled(_ enabled: Bool) {
         guard !requiresReset, document.aiRumoursEnabled != enabled else { return }
@@ -109,8 +120,21 @@ final class DockSimsStore {
 
     /// Model work stays in the composer actor. Consent and cancellation are checked on both sides
     /// of the await so disabling then re-enabling cannot revive an older response.
-    func generateRumour(participants: [DockRumourParticipant], locale: Locale) async -> DockRumour? {
+    func generateRumour(participants: [DockRumourParticipant], locale: Locale, manualRound: Bool = false) async -> DockRumour? {
         guard isEnabled, aiRumoursEnabled, !requiresReset, !Task.isCancelled else { return nil }
+        let style = gossipIntensity
+        let isGroup = style == .egregiousEchoing
+        var bypassCooldown = false
+        #if DEBUG
+        bypassCooldown = manualRound
+        #endif
+        if isGroup {
+            guard !groupRumourInFlight else { return nil }
+            guard bypassCooldown || nextGroupRumourAt.map({ ContinuousClock.now >= $0 }) != false else { return nil }
+            // Reserve before suspending so another display cannot start a second group round.
+            groupRumourInFlight = true
+        }
+        defer { if isGroup { groupRumourInFlight = false } }
         #if DEBUG
         debugRumourRequestsInFlight += 1
         defer { debugRumourRequestsInFlight -= 1 }
@@ -120,12 +144,13 @@ final class DockSimsStore {
         let startedAt = Date.now
         Self.rumourLogger.info("Generation started request=\(requestID.uuidString, privacy: .public) candidates=\(participants.count) locale=\(locale.identifier, privacy: .public)")
         do {
-            let result = try await rumourComposer.compose(participants: participants, locale: locale, recent: recentRumours)
+            let result = try await rumourComposer.compose(participants: participants, locale: locale, recent: recentRumours, intensity: style)
             guard !Task.isCancelled, consent == rumourConsentGeneration, isEnabled, aiRumoursEnabled else { return nil }
+            if isGroup { nextGroupRumourAt = ContinuousClock.now.advanced(by: .seconds(300)) }
             rumourStatus = .ready
             lastRumourDiagnostic = nil
-            Self.rumourLogger.info("Generation succeeded request=\(requestID.uuidString, privacy: .public) seconds=\(Date.now.timeIntervalSince(startedAt)) openingCharacters=\(result.opening.count) replyCharacters=\(result.reply.count)")
-            recentRumours.append(result.opening + " / " + result.reply)
+            Self.rumourLogger.info("Generation succeeded request=\(requestID.uuidString, privacy: .public) seconds=\(Date.now.timeIntervalSince(startedAt)) turns=\(result.turns.count)")
+            recentRumours.append(result.turns.map(\.message).joined(separator: " / "))
             recentRumours = Array(recentRumours.suffix(3))
             return result
         } catch {
@@ -255,7 +280,7 @@ final class DockSimsStore {
 
     private func persistRemovingIfEmpty() {
         if !document.isEnabled, !document.aiRumoursEnabled, document.pets.isEmpty, document.baselineAt == nil,
-           document.intensity == DockSimsLimits.defaultIntensity {
+           document.intensity == DockSimsLimits.defaultIntensity, document.gossipIntensity == .lightChatter {
             repository.remove()
             storageFailed = false
             return

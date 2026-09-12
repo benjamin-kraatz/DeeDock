@@ -9,10 +9,12 @@ nonisolated struct DockRumourParticipant: Codable, Equatable, Sendable {
 
 /// A complete, validated exchange. Generated text is displayed verbatim, never localized as a key.
 nonisolated struct DockRumour: Sendable {
-    let speakerID: String
-    let listenerID: String
-    let opening: String
-    let reply: String
+    let turns: [Turn]
+
+    struct Turn: Sendable {
+        let speakerID: String
+        let message: String
+    }
 }
 
 /// Availability and failures are explained in Settings without interrupting dock interaction.

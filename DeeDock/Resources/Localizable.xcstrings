@@ -1999,6 +1999,132 @@
       }
     }
   },
+    "sims.gossip.intensity" : {
+      "comment": "Label for the three-position gossip style slider, independent of animation strength.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lästerstärke"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gossip intensity"
+          }
+        }
+      }
+    },
+    "sims.gossip.light" : {
+      "comment": "Default gossip style, two gentle turns.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leichtes Geplauder"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light chatter"
+          }
+        }
+      }
+    },
+    "sims.gossip.loud" : {
+      "comment": "Middle gossip style, three sharper turns between two mascots.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lautes Flüstern"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loud whispering"
+          }
+        }
+      }
+    },
+    "sims.gossip.egregious" : {
+      "comment": "Strongest gossip style, a biting fictional group roast.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unverschämtes Geläster"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egregious echoing"
+          }
+        }
+      }
+    },
+    "sims.gossip.light.help" : {
+      "comment": "Help for the default gossip style.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwei Icons tauschen ein verspieltes Gerücht aus. Zwei Beiträge. Standard."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two icons trade a playful rumour. Two turns. Default."
+          }
+        }
+      }
+    },
+    "sims.gossip.loud.help" : {
+      "comment": "Help for the middle gossip style.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwei Icons lästern bissiger in drei Beiträgen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two icons exchange sharper gossip over three turns."
+          }
+        }
+      }
+    },
+    "sims.gossip.egregious.help" : {
+      "comment": "Help for the strongest gossip style; the target is fictional, never the user.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bis zu fünf sichtbare angeheftete Apps ziehen über ein erfundenes Maskottchen her, mit je zwei Beiträgen. Höchstens eine Gruppenrunde alle fünf Minuten."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to five visible pinned apps roast a fictional mascot, with two turns each. At most one group round every five minutes."
+          }
+        }
+      }
+    },
     "simsDebugRumoursTitle" : {
       "comment": "Debug-only settings card title for manually triggering AI rumours.",
       "extractionState": "manual",

@@ -37,7 +37,7 @@ Existing `ApplicationCatalogTests` assertions were updated to distinguish succes
 
 ## DEE-43 icon rumours
 
-Implemented on `feature/dee-43` after DEE-33 was Done and its merged implementation was present. The user subsequently authorized replacing the canned slice with Apple Foundation Models. The on-device model chooses two visible pinned apps and generates their exchange after separate opt-in under **Settings → Features → Dock Sims → AI icon rumours**. See [Icon rumours](ICON-RUMOURS.md) for instructions, timing, cancellation, consent, and data boundaries.
+Implemented on `feature/dee-43` after DEE-33 was Done and its merged implementation was present. The user subsequently authorized replacing the canned slice with Apple Foundation Models. The on-device model chooses visible pinned apps and generates their exchange after separate opt-in under **Settings → Features → Dock Sims → AI icon rumours**. See [Icon rumours](ICON-RUMOURS.md) for instructions, timing, cancellation, consent, and data boundaries.
 
 AI revision validation on 2026-09-12: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-43-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. This compiled the Foundation Models composer, guided-generation schema, generated localization symbols, and consent integration. The first sandboxed attempt could not access Xcode package caches; the permitted retry passed. Warnings were in existing Quarantine and Clipboard Museum code, plus App Intents metadata extraction. Automated tests, previews, native interaction, and live model generation were not run. Compilation does not establish model quality or native acceptance.
 
@@ -46,7 +46,15 @@ Follow-up diagnosis on 2026-09-12: an isolated live Foundation Models call with 
 
 Debug-trigger follow-up on 2026-09-12: added a Debug-only next-round button and stronger fictional-gossip instructions. Debug and Release app builds passed using the same Xcode command above with their respective configurations. The button, request state, claim method, and idle-wait override are conditionally compiled under `DEBUG`. This follow-up did not run tests, previews, live generation, or native button acceptance.
 
+Gossip-intensity follow-up on 2026-09-12: added a production three-position slider with a persisted Light chatter default. Loud whispering requires three alternating turns between two apps. Egregious echoing uses up to five visible pinned apps, two turns each, with an app-wide five-minute session cooldown and a one-attempt Debug bypass. Changing style cancels an older round. Generation validates exact turn counts and participant coverage before playback. Debug and Release app builds passed with the Xcode command above and their respective configurations. Warnings remained in existing Badge, Clipboard Museum, Quarantine, and App Intents metadata code. Live generation, native interaction, tests, and previews were not run for this follow-up.
+
+Length-tolerance follow-up: removed the 65-character rejection and length-only model revisions. The bubble allows four lines and gives longer turns up to 15 seconds of reading time. Empty dialogue and invalid conversation structure still receive validation. Native layout and live generation remain unverified.
+
 ### Required hands-on acceptance
+
+- In Debug and Release, select each gossip style, restart, and confirm persistence. Existing preferences should start at Light chatter. Check keyboard and VoiceOver operation of the slider.
+- Confirm two turns for Light chatter, three alternating turns for Loud whispering, and two turns per selected app for Egregious echoing. Exercise 2, 3, 5, and more than 5 eligible pins; all participate up to the five-app cap. Assess whether the tone grows sharper while remaining coherent and fictional.
+- With multiple displays, confirm group rounds stay at least five minutes apart, including after style or consent changes and sleep/wake. Use the Debug button within that interval; confirm it permits one round and subsequent automatic rounds respect the renewed limit. Change intensity during generation and playback; no previous-style line should return.
 
 - In Debug, enable Sims and AI rumours, then use **Nächste Gerüchterunde starten**. Confirm one eligible dock begins generation without the idle wait. Repeat during a displayed exchange and during cooldown. Confirm the button is disabled during generation and absent in Release.
 - Request a round while all docks are hidden or blocked. Confirm one pending round waits for eligibility, repeated clicks do not queue extra rounds, and disabling Sims or AI rumours clears it.

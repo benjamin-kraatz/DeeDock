@@ -20,6 +20,7 @@ struct DockRumoursOverlay: View {
         let participants: [String]
         let localeIdentifier: String
         let revision: Int
+        let intensity: DockRumourIntensity
         #if DEBUG
         var debugRoundID: UUID? = nil
         #endif
@@ -51,7 +52,8 @@ struct DockRumoursOverlay: View {
         let participants = allowed ? store.items.filter {
             $0.isFavorite && frame(for: $0.id).map { viewport.contains($0) } == true
         }.map(\.id) : []
-        let request = Request(participants: participants.count >= 2 ? participants : [], localeIdentifier: locale.identifier, revision: revision)
+        let request = Request(participants: participants.count >= 2 ? participants : [], localeIdentifier: locale.identifier, revision: revision,
+                              intensity: interaction.sims?.gossipIntensity ?? .lightChatter)
         #if DEBUG
         var debugRequest = request
         debugRequest.debugRoundID = interaction.sims?.debugRumourRoundID
@@ -116,8 +118,9 @@ struct DockRumoursOverlay: View {
         line = nil
         guard request.participants.count >= 2 else { return }
         do {
+            var manualRound = false
             #if DEBUG
-            let manualRound = interaction.sims?.claimDebugRumourRound(request.debugRoundID) == true
+            manualRound = interaction.sims?.claimDebugRumourRound(request.debugRoundID) == true
             if !manualRound { try await Task.sleep(for: .seconds(30)) }
             #else
             try await Task.sleep(for: .seconds(30))
@@ -128,8 +131,11 @@ struct DockRumoursOverlay: View {
                     DockRumourParticipant(id: item.id, name: String(item.reference.name.prefix(160)),
                         mood: sims.pinState(for: item.id, isFavorite: true)?.mood(at: .now).rawValue ?? "unknown")
                 }
+                let bypass = manualRound
+                manualRound = false
                 guard let rumour = await sims.generateRumour(participants: participants,
-                                                            locale: Locale(identifier: request.localeIdentifier)) else {
+                                                            locale: Locale(identifier: request.localeIdentifier),
+                                                            manualRound: bypass) else {
                     try Task.checkCancellation()
                     // No canned fallback or immediate retry loop. Other docks and failures skip this opportunity.
                     try await Task.sleep(for: .seconds(90))
@@ -137,12 +143,16 @@ struct DockRumoursOverlay: View {
                 }
                 try Task.checkCancellation()
                 guard self.request == request else { return }
-                line = Line(request: request, speakerID: rumour.speakerID, listenerID: rumour.listenerID, message: rumour.opening)
-                try await Task.sleep(for: .seconds(5))
-                try Task.checkCancellation()
-                line = Line(request: request, speakerID: rumour.listenerID, listenerID: rumour.speakerID, message: rumour.reply)
-                try await Task.sleep(for: .seconds(5))
-                try Task.checkCancellation()
+                for (index, turn) in rumour.turns.enumerated() {
+                    // Address the next speaker, wrapping for the final line of the round.
+                    let nextTurns = Array(rumour.turns.dropFirst(index + 1)) + rumour.turns
+                    guard let listener = nextTurns.first(where: { $0.speakerID != turn.speakerID })?.speakerID else { return }
+                    line = Line(request: request, speakerID: turn.speakerID, listenerID: listener, message: turn.message)
+                    // Longer model phrasing gets more reading time without delaying interaction.
+                    let readingSeconds = min(15, max(5, Double(turn.message.count) / 18))
+                    try await Task.sleep(for: .seconds(readingSeconds))
+                    try Task.checkCancellation()
+                }
                 line = nil
                 try await Task.sleep(for: .seconds(90))
             }

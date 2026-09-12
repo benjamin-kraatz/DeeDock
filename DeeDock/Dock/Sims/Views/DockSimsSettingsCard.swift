@@ -14,6 +14,7 @@ struct DockSimsSettingsCard: View {
             DockSimsSettingsCardContent(
                 isEnabled: sims.isEnabled,
                 aiRumoursEnabled: sims.aiRumoursEnabled,
+                gossipIntensity: sims.gossipIntensity,
                 rumourNotice: sims.rumourStatus.message,
                 rumourDiagnostic: sims.lastRumourDiagnostic?.report,
                 intensity: sims.intensity,
@@ -22,6 +23,7 @@ struct DockSimsSettingsCard: View {
                 storageFailed: sims.storageFailed,
                 setEnabled: { sims.setEnabled($0) },
                 setAIRumoursEnabled: { sims.setAIRumoursEnabled($0) },
+                setGossipIntensity: { sims.setGossipIntensity($0) },
                 setIntensity: { sims.setIntensity($0) },
                 resetMoods: { sims.resetMoods() },
                 reset: { sims.reset() }
@@ -51,6 +53,7 @@ struct DockSimsSettingsCard: View {
 struct DockSimsSettingsCardContent: View {
     let isEnabled: Bool
     var aiRumoursEnabled = false
+    var gossipIntensity: DockRumourIntensity = .lightChatter
     var rumourNotice: LocalizedStringResource? = nil
     var rumourDiagnostic: String? = nil
     /// Percent, matching the other Features sliders.
@@ -62,6 +65,7 @@ struct DockSimsSettingsCardContent: View {
     let storageFailed: Bool
     let setEnabled: (Bool) -> Void
     var setAIRumoursEnabled: (Bool) -> Void = { _ in }
+    var setGossipIntensity: (DockRumourIntensity) -> Void = { _ in }
     let setIntensity: (Double) -> Void
     let resetMoods: () -> Void
     let reset: () -> Void
@@ -83,6 +87,10 @@ struct DockSimsSettingsCardContent: View {
             SettingsToggleRow(title: .simsRumoursEnable, subtitle: .simsRumoursHelp,
                               isOn: Binding(get: { aiRumoursEnabled }, set: setAIRumoursEnabled))
                 .disabled(!isEnabled || requiresReset)
+            SettingsStackedRow {
+                DockRumourIntensitySlider(value: gossipIntensity, setValue: setGossipIntensity)
+                    .disabled(!isEnabled || !aiRumoursEnabled || requiresReset)
+            }
             if let rumourNotice {
                 SettingsStackedRow { DockSimsSettingsNotice(message: rumourNotice) }
             }

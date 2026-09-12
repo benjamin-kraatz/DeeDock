@@ -16,7 +16,7 @@ struct DockRumourBubble: View {
                 .lineLimit(1)
             Text(verbatim: message)
                 .font(.caption)
-                .lineLimit(2)
+                .lineLimit(4)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)

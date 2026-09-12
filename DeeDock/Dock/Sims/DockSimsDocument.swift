@@ -55,6 +55,7 @@ nonisolated struct DockSimsPinState: Equatable, Sendable {
 nonisolated struct DockSimsDocument: Codable, Equatable, Sendable {
     var version: Int
     var isEnabled: Bool
+    var gossipIntensity: DockRumourIntensity
     /// AI consent is separate from the earlier canned-rumour preference. Missing consent stays off.
     var aiRumoursEnabled: Bool
     var intensity: Double
@@ -70,14 +71,15 @@ nonisolated struct DockSimsDocument: Codable, Equatable, Sendable {
     )
 
     enum CodingKeys: String, CodingKey {
-        case version, isEnabled, aiRumoursEnabled, intensity, baselineAt, pets
+        case version, isEnabled, gossipIntensity, aiRumoursEnabled, intensity, baselineAt, pets
     }
 
     init(version: Int = DockSimsLimits.version, isEnabled: Bool = false,
          intensity: Double = DockSimsLimits.defaultIntensity, baselineAt: Date? = nil,
-         pets: [String: DockSimsPet] = [:], aiRumoursEnabled: Bool = false) {
+         pets: [String: DockSimsPet] = [:], aiRumoursEnabled: Bool = false, gossipIntensity: DockRumourIntensity = .lightChatter) {
         self.version = version
         self.isEnabled = isEnabled
+        self.gossipIntensity = gossipIntensity
         self.aiRumoursEnabled = aiRumoursEnabled
         self.intensity = intensity
         self.baselineAt = baselineAt
@@ -88,6 +90,7 @@ nonisolated struct DockSimsDocument: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         version = try container.decodeIfPresent(Int.self, forKey: .version) ?? DockSimsLimits.version
         isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? false
+        gossipIntensity = try container.decodeIfPresent(DockRumourIntensity.self, forKey: .gossipIntensity) ?? .lightChatter
         aiRumoursEnabled = try container.decodeIfPresent(Bool.self, forKey: .aiRumoursEnabled) ?? false
         intensity = try container.decodeIfPresent(Double.self, forKey: .intensity)
             ?? DockSimsLimits.defaultIntensity
@@ -99,6 +102,7 @@ nonisolated struct DockSimsDocument: Codable, Equatable, Sendable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(version, forKey: .version)
         try container.encode(isEnabled, forKey: .isEnabled)
+        try container.encode(gossipIntensity, forKey: .gossipIntensity)
         try container.encode(aiRumoursEnabled, forKey: .aiRumoursEnabled)
         try container.encode(intensity, forKey: .intensity)
         try container.encodeIfPresent(baselineAt, forKey: .baselineAt)

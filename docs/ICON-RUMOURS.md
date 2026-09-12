@@ -4,7 +4,15 @@ DEE-43 uses Apple Foundation Models to invent short fictional exchanges between 
 
 ## Playback
 
-Each visible dock waits for 30 uninterrupted seconds without dock interaction, then requests an exchange for its fully visible pinned apps. The model chooses the speakers, topic, opening, and reply. After generation finishes, the first app speaks for five seconds and the second replies for five seconds. Another generation opportunity follows after 90 quiet seconds. These timing limits bound background work and give each line reading time. Folder pins, utility tiles, and running apps without pins do not participate.
+Each visible dock waits for 30 uninterrupted seconds without dock interaction, then requests an exchange for its fully visible pinned apps. The model chooses the speakers, topic, and dialogue. Each turn is shown for 5–15 seconds according to its length and can wrap across four lines. Another generation opportunity follows after 90 quiet seconds. These timing limits bound background work and give each line reading time. Folder pins, utility tiles, and running apps without pins do not participate.
+
+The **Gossip intensity** slider is available in production and persists independently of animation strength. Older preferences default to **Light chatter**.
+
+- **Light chatter**: two icons, one turn each, affectionate gossip.
+- **Loud whispering**: two icons, three alternating turns, sharper shade and a cutting comeback.
+- **Egregious echoing**: every eligible app when there are at most five, otherwise five model-selected apps. Each speaks twice, giving 4–10 turns of an escalating roast about an invented absent mascot.
+
+Group rounds have a shared five-minute cooldown across displays, measured from successful generation. It survives style and consent changes during the app session, includes sleep time, and resets when DDock quits. A reservation prevents concurrent group requests. The Debug button bypasses the cooldown for one attempt; automatic rounds after it still observe the limit. Changing intensity discards current generation and playback. The sharper styles target fictional mascots, never the user or real people.
 
 The callout sits beside the speaking icon in DDock's existing tooltip space. It stays still, makes no sound, takes no focus, and passes clicks through. Move the pointer into the dock to skip an exchange. Keyboard focus, dragging, menus, popovers, errors, app launches, and timeline browsing also interrupt playback. An interrupted exchange is discarded.
 
@@ -30,9 +38,9 @@ The button, pending request, claim mechanism, and timing override compile only u
 
 The user's follow-up on 2026-09-12 authorized AI generation in this slice, superseding the issue's original canned-only scope. AI still requires its own in-app opt-in.
 
-`FoundationModelsRumourComposer` creates a fresh session for each exchange. Its instructions require a specific fictional secret or rumour about the app mascots, followed by mock disbelief, a knowing tease, or another juicy detail. The gossip stays affectionate and low-stakes, with idiomatic language and varied topics relative to recent dialogue. App names and prior model output are explicitly untrusted data. The model must not claim to have observed private activity or pressure the user to care for the pets.
+`FoundationModelsRumourComposer` creates a fresh session for each exchange. Its instructions require a specific fictional secret or rumour about the app mascots, followed by mock disbelief, a knowing tease, or another juicy detail. The selected style controls tone and turn count, from affectionate gossip to a theatrical fictional roast. Language stays idiomatic and topics vary relative to recent dialogue. App names and prior model output are explicitly untrusted data. The model must not claim to have observed private activity or pressure the user to care for the pets.
 
-[Apple's guided generation](https://developer.apple.com/documentation/foundationmodels/generating-swift-data-structures-with-guided-generation) supplies typed candidate numbers and dialogue fields. The app validates candidate numbers, nonempty single-line dialogue, and a 65-character display limit. If the first draft fails validation, the model receives one concrete revision request with the failure reason and a shorter word target. An invalid revision is discarded. These are identity and display constraints, not a heuristic dialogue generator. Model output is rendered verbatim as text.
+[Apple's guided generation](https://developer.apple.com/documentation/foundationmodels/generating-swift-data-structures-with-guided-generation) supplies typed candidate numbers and dialogue fields. The app validates candidate numbers, the exact turn count, distinct speaker coverage, alternating speakers, and nonempty dialogue. Group rounds require two turns from every selected participant. If the first draft fails validation, the model receives one concrete revision request with the structural failure reason. An invalid revision is discarded. Line length and line breaks do not reject an exchange; concise phrasing is advisory. These are identity and conversation-structure constraints, not a heuristic dialogue generator. Model output is rendered verbatim as text.
 
 One shared composer permits a single in-flight request across display docks. Other docks skip that opportunity. Cancellation and consent are checked after generation before displaying anything. The model is checked for availability, guided-generation capability, and support for the requested locale before every request. A refusal, framework error, or still-invalid revision leaves the dock quiet until a later opportunity. Settings shows an explanation. No fallback model or canned line runs.
 
