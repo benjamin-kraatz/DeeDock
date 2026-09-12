@@ -10,6 +10,7 @@ DEE-5 covers every numeric control currently exposed in Settings. The 17 slider 
 | Behavior | Custom activation length, zone depth, zone offset, reveal delay, hide delay, animation duration | Corresponding properties of `DockSettings.defaults.behavior` |
 | Features, Window Peek | Hover delay | `DockSettings.defaults.windowPeekHoverDelay` |
 | Features, Focus Sessions | Default duration in minutes | `FocusSessionsDocument().minutes` |
+| Modes or Features, Focus Sessions | Focus breathing intensity | `FocusBreathingStore.defaultIntensity`, 30 percent |
 
 Reset appears beside the value only when the stored effective value differs from the factory value. It assigns the exact model value through the existing binding or controller. Slider snapping does not alter the reset value. The existing model normalization and persistence remain authoritative.
 

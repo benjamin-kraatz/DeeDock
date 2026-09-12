@@ -43,6 +43,7 @@ struct FeaturesPageContent: View {
         case .focusSessions:
             if let coordinator = context.coordinator {
                 FocusSessionSettingsCard(controller: coordinator.focusSession)
+                FocusBreathingSettingsCard(store: coordinator.focusBreathing, modes: coordinator.profiles.modes)
                 BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
             }
         case .actionTiles:

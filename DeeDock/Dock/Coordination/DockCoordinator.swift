@@ -5,6 +5,7 @@ import Observation
 @MainActor @Observable
 final class DockCoordinator {
     let focusSession = FocusSessionController()
+    let focusBreathing = FocusBreathingStore.shared
     let localHistory = DockLocalHistoryStore()
     let pinWeather = PinWeatherStore()
     let clipboardMuseum = ClipboardMuseumController()
@@ -147,6 +148,7 @@ final class DockCoordinator {
             endFocus(restore: false)
         }
         focusSession.start()
+        focusBreathing.start()
         localHistory.start(session: focusSession.session)
         pinWeather.start()
         clipboardMuseum.start()
@@ -368,6 +370,9 @@ final class DockCoordinator {
             panel.interaction.actionTiles = actionTiles
             panel.interaction.timeline = timeline
             panel.interaction.pinWeather = pinWeather
+            panel.interaction.focusBreathing = focusBreathing
+            panel.interaction.focusSession = focusSession
+            panel.interaction.dockModes = profiles.modes
             panel.interaction.sims = sims
             store.openFocusSession = { [weak self, weak panel] in
                 guard let self, let panel else { return }
@@ -833,6 +838,7 @@ final class DockCoordinator {
         shelves.stop()
         focusPopover.stop()
         focusSession.stop()
+        focusBreathing.stop()
         actionTiles.stop()
         recipes.stop()
         recipeProgress.stop()

@@ -1,5 +1,21 @@
 # DeeDock acceptance record
 
+## DEE-37 Focus breathing
+
+Implemented as an app-wide opt-in under Modes and Features → Focus Sessions, off by default.
+The intensity slider ranges from 0 to 100 percent and resets to 30 percent. Running Focus
+Sessions, explicitly selected Dock Modes, and a configured public macOS Focus filter can
+trigger a six-second highlight inside DDock's background. Reduce Motion removes it.
+Hidden docks and backgrounds stop the timeline. Icons and dock geometry are unaffected.
+
+On 2026-09-12, the unsigned Debug `DeeDock` scheme build succeeded with Xcode 27 and the
+macOS 27 SDK. App Intent metadata exported successfully. English and German strings are
+included in the app. Static diff review passed. Tests, preview rendering, app launch,
+and native visual or interaction acceptance were not run.
+
+System Settings filter discovery and on/off delivery remain unverified on this macOS build.
+See [Focus breathing](FOCUS-BREATHING.md) for configuration and the pending native checks.
+
 ## DEE-74 DDock Discovery
 
 Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.

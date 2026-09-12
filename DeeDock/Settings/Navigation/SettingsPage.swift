@@ -246,6 +246,8 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     func matches(_ query: String) -> Bool {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return true }
-        return [title, keywords].contains { String(localized: $0).localizedStandardContains(query) }
+        let copy: [LocalizedStringResource] = [title, keywords]
+            + (self == .focusSessions ? [.focusBreathingTitle, .focusBreathingHelp] : [])
+        return copy.contains { String(localized: $0).localizedStandardContains(query) }
     }
 }

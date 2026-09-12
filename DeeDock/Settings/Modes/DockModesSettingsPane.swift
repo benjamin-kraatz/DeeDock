@@ -3,6 +3,7 @@ import SwiftUI
 /// App-wide management for named configurations. Pin and visibility edits remain on their existing surfaces.
 struct DockModesSettingsPane: View {
     let store: DockModesStore
+    var focusBreathing: FocusBreathingStore?
     var activateMode: ((UUID) -> Bool)?
     var deleteMode: ((UUID) -> Bool)?
     var startFocus: ((DockMode) -> Void)?
@@ -58,6 +59,9 @@ struct DockModesSettingsPane: View {
                         }
                     }
                 }
+            }
+            if let focusBreathing {
+                FocusBreathingSettingsCard(store: focusBreathing, modes: store)
             }
             if let error = store.errorMessage { SettingsErrorBanner(message: error) }
             if store.requiresReset {

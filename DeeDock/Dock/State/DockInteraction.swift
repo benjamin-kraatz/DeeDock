@@ -12,6 +12,10 @@ final class DockInteraction {
     var timeline: DockTimelineController?
     /// Unused-pin weather. Nil in previews that do not persist last-used times.
     var pinWeather: PinWeatherStore?
+    /// Shared attention signals. Nil keeps previews independent of live app state.
+    var focusBreathing: FocusBreathingStore?
+    var focusSession: FocusSessionController?
+    var dockModes: DockModesStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
     /// Shared opt-in Sims moods. Nil in previews that do not play the care loop.

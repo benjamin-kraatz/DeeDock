@@ -120,6 +120,12 @@ Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to 
 
 ## Dock Modes
 
+**Settings → Modes → Focus breathing** adds an optional six-second highlight inside the dock
+background. It starts off. Choose its intensity and the Dock Modes that trigger it, or use
+running Focus Sessions. A public macOS Focus filter also supplies a trigger after you add DDock
+to that Focus in System Settings. Reduce Motion disables the effect.
+See [Focus breathing](docs/FOCUS-BREATHING.md) for setup and native acceptance limits.
+
 In **Settings → Features → Multi-monitor docks**, enable secondary docks to show only apps
 with visible windows on their display in the running section. Only the running-only app list
 is filtered; pins, folders, utility tiles, and Behavior → App Visibility keep their normal
