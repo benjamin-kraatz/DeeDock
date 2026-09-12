@@ -14,6 +14,7 @@ final class WindowPeekCoordinator {
     var validatedFileDrop: ((NSDraggingInfo) -> DocumentResourceAccess?)?
     var fileDropAccepted: (() -> Void)?
     var fileDragEnded: (() -> Void)?
+    private let history: PeekHistoryStore
     private let watches: WindowWatchController
     private let portals = WindowPortalCoordinator()
     private let menus: ApplicationMenuController
@@ -42,7 +43,8 @@ final class WindowPeekCoordinator {
     init(menus: ApplicationMenuController, screenCapture: ScreenCaptureAccessController,
          applications: any ApplicationServicing,
          thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService(),
-         watchPresets: WindowWatchPresetStore, actions: ActionTilesController) {
+         watchPresets: WindowWatchPresetStore, actions: ActionTilesController, history: PeekHistoryStore) {
+        self.history = history
         fileHandoff = WindowFileHandoffController(menus: menus, applications: applications)
         self.menus = menus
         self.screenCapture = screenCapture
@@ -182,6 +184,7 @@ final class WindowPeekCoordinator {
     func focusNextPortal() { portals.focusNext() }
 
     func stop() {
+        history.stop()
         fileHandoff.stop()
         portals.stop()
         close(returnFocus: false)
@@ -390,7 +393,11 @@ final class WindowPeekCoordinator {
             requestedThumbnailIDs.formUnion(ids)
             let windows = allWindows.filter { ids.contains($0.token) }
             guard let size = controller?.state.settings.windowPeekSize.thumbnailSize else { return }
-            let images = await thumbnails.capture(windows, size: size)
+            let historyEpoch = history.collectionEpoch
+            // The same displayed capture carries more detail after OCR opt-in. The service doubles
+            // logical dimensions, so this bounds the raster to 1600 × 1000 without a second screenshot.
+            let captureSize = historyEpoch == nil ? size : CGSize(width: 800, height: 500)
+            let images = await thumbnails.capture(windows, size: captureSize)
             guard !Task.isCancelled,
                   WindowPeekLifecycle.acceptsResult(expected: currentGeneration, current: generation),
                   let controller else { return }
@@ -401,6 +408,10 @@ final class WindowPeekCoordinator {
                 updated.thumbnail = images[card.id]
                 return updated
             }
+            let historyCards = controller.state.cards.filter { card in
+                images[card.id] != nil && windows.contains { $0 == card.window }
+            }
+            history.record(historyCards, appName: controller.state.appName, epoch: historyEpoch)
             captureTask = nil
             scheduleCapture()
         }

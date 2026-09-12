@@ -59,6 +59,7 @@ final class DockCoordinator {
     private(set) var searchShortcutAvailable = false
     @ObservationIgnored private lazy var windowSearch = WindowSearchController(capsules: capsules)
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
+    let peekHistory = PeekHistoryStore.live()
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
     @ObservationIgnored private let modePicker = DockModePickerCoordinator()
     @ObservationIgnored private let displayService = DisplayService()
@@ -88,7 +89,7 @@ final class DockCoordinator {
         )
         applicationMenus = menus
         windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture, applications: catalog.service,
-                                            watchPresets: watchPresets, actions: actionTiles)
+                                            watchPresets: watchPresets, actions: actionTiles, history: peekHistory)
         let semanticStacks = CoalescingSemanticStackOrganizer(
             base: FoundationModelsSemanticStackOrganizer()
         )

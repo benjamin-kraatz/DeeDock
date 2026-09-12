@@ -40,6 +40,9 @@ struct FeaturesPageContent: View {
         case .windowPeek:
             // Permissions stay usable on their own page even when unreadable settings block edits.
             WindowPeekSettingsPane(source: source, persistentSettingsDisabled: locked)
+            if let coordinator = context.coordinator {
+                PeekHistorySettingsCard(history: coordinator.peekHistory)
+            }
         case .focusSessions:
             if let coordinator = context.coordinator {
                 FocusSessionSettingsCard(controller: coordinator.focusSession)

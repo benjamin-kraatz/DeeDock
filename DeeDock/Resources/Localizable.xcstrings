@@ -1135,6 +1135,258 @@
       }
     }
   },
+  "peekHistoryTitle": {
+    "comment": "Title for the local OCR history feature.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Peek history"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Peek-Verlauf"
+        }
+      }
+    }
+  },
+  "peekHistoryEnable": {
+    "comment": "Opt-in toggle for local OCR collection; off by default.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Save text from peeks"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text aus Peeks speichern"
+        }
+      }
+    }
+  },
+  "peekHistoryPrivacy": {
+    "comment": "Privacy disclosure shown before opt-in and in the history browser.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock saves recognized text, app names, window titles, and capture times on this Mac so you can search past peeks. Images are not saved. Nothing is uploaded. Text may include private messages or passwords; there is no automatic redaction. Turning collection off keeps existing history. Search covers the last seven days, with up to 500 entries. Expired entries are removed at the next app launch or capture. Clear history to remove all saved text."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock speichert erkannten Text, App-Namen, Fenstertitel und Aufnahmezeiten auf diesem Mac, damit du vergangene Peeks durchsuchen kannst. Bilder werden nicht gespeichert. Nichts wird hochgeladen. Der Text kann private Nachrichten oder Passwörter enthalten; es gibt keine automatische Schwärzung. Wenn du die Sammlung ausschaltest, bleibt der bisherige Verlauf erhalten. Die Suche umfasst die letzten sieben Tage mit bis zu 500 Einträgen. Abgelaufene Einträge werden beim nächsten App-Start oder bei der nächsten Aufnahme entfernt. Mit „Verlauf löschen“ entfernst du alle gespeicherten Texte."
+        }
+      }
+    }
+  },
+  "peekHistoryCaptureHelp": {
+    "comment": "Explains permission, bounded OCR processing and thumbnail accuracy limits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Requires Screen Recording access under Features → Permissions. Only displayed Peek thumbnails are read, with up to eight cards per batch. Busy OCR skips new batches. Small, protected, or unreadable text may be missing or incorrect."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Benötigt Bildschirmaufnahme-Zugriff unter Funktionen → Berechtigungen. Nur angezeigte Peek-Vorschaubilder werden gelesen, bis zu acht Karten pro Durchlauf. Während die Texterkennung arbeitet, werden neue Durchläufe übersprungen. Kleiner, geschützter oder unleserlicher Text kann fehlen oder falsch erkannt werden."
+        }
+      }
+    }
+  },
+  "peekHistoryBrowse": {
+    "comment": "Button opening local history search.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Search peek history…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Peek-Verlauf durchsuchen …"
+        }
+      }
+    }
+  },
+  "peekHistoryClear": {
+    "comment": "Destructive button deleting all OCR history, including recovery from unreadable storage.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear history"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verlauf löschen"
+        }
+      }
+    }
+  },
+  "peekHistoryClearHelp": {
+    "comment": "Confirmation explaining irreversible history deletion and continued collection.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete all saved peek text from this Mac? This cannot be undone. Collection keeps its current on/off setting. Future peeks can be saved again while collection is on."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alle gespeicherten Peek-Texte von diesem Mac löschen? Das lässt sich nicht rückgängig machen. Die Sammlung bleibt ein- oder ausgeschaltet. Wenn sie eingeschaltet ist, können künftige Peeks erneut gespeichert werden."
+        }
+      }
+    }
+  },
+  "peekHistoryDelete": {
+    "comment": "Delete one historical text record.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete entry"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eintrag löschen"
+        }
+      }
+    }
+  },
+  "peekHistoryDone": {
+    "comment": "Close history browser.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Done"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fertig"
+        }
+      }
+    }
+  },
+  "peekHistorySearch": {
+    "comment": "Accessible placeholder for local history search.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Search text, app, or window title"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Text, App oder Fenstertitel suchen"
+        }
+      }
+    }
+  },
+  "peekHistoryEmpty": {
+    "comment": "Empty history or no search results.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No matching peeks"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Keine passenden Peeks"
+        }
+      }
+    }
+  },
+  "peekHistoryEmptyHelp": {
+    "comment": "Empty history and no results guidance.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable collection and open a Peek with readable text, or try another search. Only peeks collected after opt-in appear here."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiviere die Sammlung und öffne einen Peek mit lesbarem Text oder versuche eine andere Suche. Hier erscheinen nur Peeks, die nach der Aktivierung gesammelt wurden."
+        }
+      }
+    }
+  },
+  "peekHistoryStorageError": {
+    "comment": "Storage failure and explicit recovery guidance; no private error details.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Peek history could not be read or saved. Collection stops if the saved history cannot be read. You can use Clear history to delete it and start again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Peek-Verlauf konnte nicht gelesen oder gespeichert werden. Wenn der gespeicherte Verlauf nicht lesbar ist, wird die Sammlung gestoppt. Mit „Verlauf löschen“ kannst du ihn entfernen und neu beginnen."
+        }
+      }
+    }
+  },
+  "peekHistoryCaptureError": {
+    "comment": "OCR or save failure without exposing recognized content.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Some peek text could not be recognized or saved. Open another Peek to retry, or clear history if saving continues to fail."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einige Peek-Texte konnten nicht erkannt oder gespeichert werden. Öffne einen weiteren Peek, um es erneut zu versuchen, oder lösche den Verlauf, wenn das Speichern weiterhin fehlschlägt."
+        }
+      }
+    }
+  },
   "discoveryDebugTitle": {
     "comment": "Debug-only Discovery settings card title.",
     "extractionState": "manual",
