@@ -71,6 +71,8 @@ struct DockSettings: Codable, Equatable {
     var confirmBeforeEmptyingTrash: Bool = true
     /// Whether hovering a running app can present its windows.
     var windowPeekEnabled: Bool = true
+    /// Shows two captured windows from the same app together. Shared across displays and opt-in.
+    var windowPeekSplitEnabled: Bool = false
     var windowPeekSize: WindowPeekSize = .medium
     var windowPeekLayout: WindowPeekLayout = .grid
     var windowPeekStyle: WindowPeekStyle = .glass
@@ -153,7 +155,7 @@ extension DockSettings {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges
         case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
-        case windowPeekEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
+        case windowPeekEnabled, windowPeekSplitEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
@@ -183,6 +185,7 @@ extension DockSettings {
         confirmBeforeEmptyingTrash = values.contains(.confirmBeforeEmptyingTrash)
             ? try values.decode(Bool.self, forKey: .confirmBeforeEmptyingTrash) : true
         windowPeekEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnabled) ?? true
+        windowPeekSplitEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekSplitEnabled) ?? false
         windowPeekSize = try values.decodeIfPresent(WindowPeekSize.self, forKey: .windowPeekSize) ?? .medium
         windowPeekLayout = try values.decodeIfPresent(WindowPeekLayout.self, forKey: .windowPeekLayout) ?? .grid
         windowPeekStyle = try values.decodeIfPresent(WindowPeekStyle.self, forKey: .windowPeekStyle) ?? .glass

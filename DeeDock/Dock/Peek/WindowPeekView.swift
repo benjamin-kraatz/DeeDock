@@ -6,6 +6,7 @@ struct WindowPeekView: View {
     let keyboard: Bool
     var edge: DockEdge = .bottom
     var contentHeightChanged: ((CGFloat) -> Void)? = nil
+    var splitPresentationChanged: (() -> Void)? = nil
     var reduceTransparencyOverride: Bool? = nil
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
@@ -26,6 +27,11 @@ struct WindowPeekView: View {
         card
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeightChanged?($0) }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
+            .onChange(of: state.splitCards.isEmpty) { splitPresentationChanged?() }
+            .onChange(of: state.splitCandidates.map(\.id), initial: true) {
+                // A candidate outside the ordinary lazy layout must also receive a capture request.
+                for card in state.splitCandidates { state.thumbnailNeeded?(card.id) }
+            }
     }
 
     private var card: some View {
@@ -73,14 +79,20 @@ struct WindowPeekView: View {
             HStack(spacing: 10) { ProgressView().controlSize(.small); Text(.windowPeekLoading) }
                 .frame(maxWidth: .infinity, minHeight: 72)
         case .windows:
-            VStack(alignment: .leading, spacing: 8) {
-                cards
-                if state.usesApplicationSelection {
-                    Text(state.routingFiles ? .fileRouteCaptureFallback : .windowPeekApplicationSelectionHelp)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+            if state.splitCards.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    cards
+                    applicationSelectionHelp
                 }
+            } else {
+                // Captions and permission guidance remain reachable on constrained displays.
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        WindowPeekSplitView(state: state)
+                        applicationSelectionHelp
+                    }
+                }
+                .scrollIndicators(.hidden)
             }
         case .appFallback:
             fallback(message: .windowPeekWindowAccessFallback, settings: true)
@@ -96,6 +108,15 @@ struct WindowPeekView: View {
                     Button(.windowPeekShowAll) { state.showAll?() }
                 }
             }
+        }
+    }
+
+    @ViewBuilder private var applicationSelectionHelp: some View {
+        if state.usesApplicationSelection {
+            Text(state.routingFiles ? .fileRouteCaptureFallback : .windowPeekApplicationSelectionHelp)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -120,7 +141,7 @@ struct WindowPeekView: View {
                     }.scrollIndicators(.hidden)
                 }
             }
-            .onChange(of: state.selectedID) { _, id in
+            .onChange(of: state.selectedID, initial: true) { _, id in
                 if let id { proxy.scrollTo(id, anchor: .center) }
             }
         }
@@ -180,84 +201,6 @@ private extension ApplicationWindowDiscoveryFailure {
         case .applicationUnavailable, .windowUnavailable, .accessibility, .unknown:
             .windowPeekDiscoveryFailed
         }
-    }
-}
-
-/// One card plus the affordances that belong to it, so the card owns its own hover state.
-///
-/// The Add to Fusion control is revealed by the pointer being anywhere on the card, not only on the
-/// control itself, which is what makes hiding it at rest acceptable.
-private struct WindowPeekCardSlot: View {
-    let card: WindowPeekCard
-    let appIcon: NSImage
-    let settings: DockSettings
-    let selected: Bool
-    let size: CGSize
-    let manage: () -> Void
-    let choose: () -> Void
-    let watch: () -> Void
-    let addToFusion: () -> Void
-    let pinPortal: () -> Void
-    @State private var hovering = false
-
-    var body: some View {
-        WindowPeekCardView(card: card, appIcon: appIcon, settings: settings,
-                           selected: selected, action: choose)
-            .contextMenu {
-                Button(.peekActionTitle, systemImage: "ellipsis", action: manage)
-                Divider()
-                Button(.watchTitle, systemImage: "eye", action: watch)
-                Button(.portalPin, systemImage: "pin", action: pinPortal)
-                Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
-            }
-            .accessibilityAction(named: Text(.peekActionTitle), manage)
-            .accessibilityAction(named: Text(.watchTitle), watch)
-            .accessibilityAction(named: Text(.fusionAdd), addToFusion)
-            .accessibilityAction(named: Text(.portalPin), pinPortal)
-            .overlay(alignment: .topTrailing) {
-                HStack(spacing: 4) {
-                    WindowPeekActionButton(revealed: hovering || selected, label: .peekActionTitle,
-                                           symbol: "ellipsis", action: manage)
-                    WindowPeekActionButton(revealed: hovering || selected, label: .watchTitle,
-                                           symbol: "eye", action: watch)
-                    WindowPeekActionButton(revealed: hovering || selected, label: .fusionAdd,
-                                           symbol: "plus.square.on.square", action: addToFusion)
-                }
-                .padding(7)
-            }
-            .frame(width: size.width, height: size.height)
-            .onHover { hovering = $0 }
-    }
-}
-
-/// Presents explicit window actions on the card that is already showing the source.
-///
-/// A bordered button sat as a grey slab on top of every thumbnail; this is a round glass control
-/// that stays out of the picture until the pointer is on the card. Keyboard selection reveals it
-/// too, and the card's context menu and accessibility action reach the same place.
-private struct WindowPeekActionButton: View {
-    let revealed: Bool
-    let label: LocalizedStringResource
-    let symbol: String
-    let action: () -> Void
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: 11, weight: .semibold))
-                .frame(width: 24, height: 24)
-                .contentShape(.circle)
-        }
-        .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .circle)
-        .opacity(revealed ? 1 : 0)
-        .scaleEffect(revealed ? 1 : 0.9)
-        .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: revealed)
-        // Hidden means gone: an invisible target must not swallow clicks meant for the card.
-        .allowsHitTesting(revealed)
-        .help(Text(label))
-        .accessibilityLabel(Text(label))
     }
 }
 
@@ -327,10 +270,12 @@ struct WindowPeekCardView: View {
 @MainActor private func windowPeekPreviewState(
     preset: WindowPeekPreset = .balanced,
     phase: WindowPeekPhase = .windows,
-    longText: Bool = false
+    longText: Bool = false,
+    split: Bool = false
 ) -> WindowPeekState {
     var settings = DockSettings.defaults
     preset.apply(to: &settings)
+    settings.windowPeekSplitEnabled = split
     let item = longText ? DockPreviewData.longNameItems[0] : DockPreviewData.items[0]
     let state = WindowPeekState(item: item, settings: settings)
     state.phase = phase
@@ -346,11 +291,47 @@ struct WindowPeekCardView: View {
                 frame: CGRect(x: index * 20, y: index * 20, width: 960, height: 600),
                 isMinimized: index == 2,
                 isMain: index == 0
-            ), thumbnail: nil)
+            ), thumbnail: split ? windowPeekPreviewImage(index: index) : nil)
         }
         state.selectedID = state.cards.first?.id
     }
     return state
+}
+
+/// Synthetic document images. Preview rendering never captures the user's windows.
+private func windowPeekPreviewImage(index: Int) -> CGImage? {
+    guard let context = CGContext(data: nil, width: 480, height: 300, bitsPerComponent: 8,
+                                  bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+                                  bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue) else { return nil }
+    context.setFillColor(CGColor(gray: 0.96, alpha: 1))
+    context.fill(CGRect(x: 0, y: 0, width: 480, height: 300))
+    context.setFillColor(index.isMultiple(of: 2)
+        ? CGColor(red: 0.2, green: 0.4, blue: 0.7, alpha: 1)
+        : CGColor(red: 0.3, green: 0.55, blue: 0.4, alpha: 1))
+    context.fill(CGRect(x: 0, y: 260, width: 480, height: 40))
+    context.setFillColor(CGColor(gray: 0.65, alpha: 1))
+    for row in 0..<6 {
+        context.fill(CGRect(x: 32, y: 220 - row * 30, width: 320 - row * 20, height: 8))
+    }
+    return context.makeImage()
+}
+
+#Preview("Split-peek with captured windows") {
+    WindowPeekView(state: windowPeekPreviewState(split: true), keyboard: true)
+        .frame(width: 529, height: 320)
+}
+#Preview("Split-peek, German, opaque background") {
+    WindowPeekView(state: windowPeekPreviewState(longText: true, split: true), keyboard: false,
+                   reduceTransparencyOverride: true)
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.dark)
+        .frame(width: 529, height: 340)
+}
+#Preview("Split-peek with one missing capture") {
+    let state = windowPeekPreviewState(split: true)
+    state.cards[1].thumbnail = nil
+    return WindowPeekView(state: state, keyboard: true)
+        .frame(width: 790, height: 520)
 }
 
 #Preview("Compact · Small · List · Minimal") {

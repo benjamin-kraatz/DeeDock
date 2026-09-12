@@ -18,6 +18,11 @@ struct WindowPeekSettingsPane: View {
                                   isOn: source.binding(\.windowPeekEnabled))
                 WindowPeekPresetPicker(settings: settings) { source.apply($0) }
             }
+            SettingsCard(title: .windowPeekSplitTitle, footnote: .windowPeekSplitHelp) {
+                SettingsToggleRow(title: .windowPeekSplitEnabled,
+                                  isOn: source.binding(\.windowPeekSplitEnabled))
+                    .disabled(!settings.windowPeekEnabled)
+            }
             SettingsCard(title: .windowPeekDesignTitle) {
                 SettingsPickerRow(title: .windowPeekSize,
                                   options: WindowPeekSize.settingsOptions,

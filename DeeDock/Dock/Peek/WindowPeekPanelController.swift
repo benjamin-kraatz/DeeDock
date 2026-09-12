@@ -22,6 +22,7 @@ final class WindowPeekPanelController {
     private let panel: WindowPeekPanel
     private let keyboard: Bool
     private var placement: WindowPeekPlacement
+    private var anchor: WindowPeekAnchor
     private var localMonitor: Any?
     private var globalMonitor: Any?
     private var stopped = false
@@ -30,6 +31,7 @@ final class WindowPeekPanelController {
     init(item: DockItem, anchor: WindowPeekAnchor, settings: DockSettings, keyboard: Bool) {
         state = WindowPeekState(item: item, settings: settings)
         self.keyboard = keyboard
+        self.anchor = anchor
         placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: 1)
         panel = WindowPeekPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
                                 backing: .buffered, defer: false)
@@ -45,6 +47,10 @@ final class WindowPeekPanelController {
                                                                      edge: anchor.edge))
         panel.contentView = hosting
         hosting.rootView.contentHeightChanged = { [weak self] height in self?.fit(contentHeight: height) }
+        hosting.rootView.splitPresentationChanged = { [weak self] in
+            guard let self, !self.stopped else { return }
+            self.update(anchor: self.anchor, settings: self.state.settings, count: self.state.cards.count)
+        }
         panel.keyboardHandler = { [weak self] event in self?.handleKey(event) ?? false }
         panel.setFrame(placement.frame, display: false)
     }
@@ -66,8 +72,14 @@ final class WindowPeekPanelController {
     }
 
     func update(anchor: WindowPeekAnchor, settings: DockSettings, count: Int) {
+        self.anchor = anchor
         state.settings = settings
-        placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: count, routingFiles: state.routingFiles)
+        state.splitFitsDisplay = anchor.visibleFrame.width - 2 * WindowPeekGeometry.screenMargin
+            >= WindowPeekGeometry.minimumSplitWidth
+            && anchor.visibleFrame.height - 2 * WindowPeekGeometry.screenMargin
+                >= WindowPeekGeometry.cardSize(WindowPeekGeometry.splitSettings(settings)).height + 128
+        placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: count,
+                                                routingFiles: state.routingFiles, split: !state.splitCards.isEmpty)
         (panel.contentView as? WindowPeekHostingView<WindowPeekView>)?.rootView.edge = anchor.edge
         panel.setFrame(placement.frame, display: true)
     }

@@ -847,6 +847,114 @@
       }
     }
   },
+  "windowPeekSplitTitle": {
+    "comment": "Title for the optional two-window Window Peek view and its settings card.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Split-peek"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Split-peek"
+        }
+      }
+    }
+  },
+  "windowPeekSplitEnabled": {
+    "comment": "Opt-in switch for two panes in Window Peek. Off by default and shared by all displays.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show two windows together"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zwei Fenster zusammen anzeigen"
+        }
+      }
+    }
+  },
+  "windowPeekSplitHelp": {
+    "comment": "Explains the supported same-app window pair and fallback for Split-peek. Window Peek is a feature name.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show two captured windows from the same app side by side. Requires Screen Recording access and two available previews. Otherwise, Window Peek uses your usual layout. File handoff always uses the usual layout."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeigt zwei aufgenommene Fenster derselben App nebeneinander. Benötigt Zugriff auf die Bildschirmaufnahme und zwei verfügbare Vorschauen. Andernfalls verwendet Window Peek dein gewohntes Layout. Die Dateiübergabe verwendet immer das gewohnte Layout."
+        }
+      }
+    }
+  },
+  "windowPeekSplitShowAll": {
+    "comment": "Returns to the ordinary Window Peek layout for this presentation, without changing the Split-peek preference.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Show all windows"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alle Fenster anzeigen"
+        }
+      }
+    }
+  },
+  "windowPeekSplitPrevious": {
+    "comment": "Selects the previous window in Split-peek without activating it.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Previous window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vorheriges Fenster"
+        }
+      }
+    }
+  },
+  "windowPeekSplitNext": {
+    "comment": "Selects the next window in Split-peek without activating it.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Next window"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nächstes Fenster"
+        }
+      }
+    }
+  },
   "discoveryDebugTitle": {
     "comment": "Debug-only Discovery settings card title.",
     "extractionState": "manual",

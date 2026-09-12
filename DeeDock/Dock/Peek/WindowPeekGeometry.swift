@@ -4,22 +4,38 @@ import CoreGraphics
 nonisolated enum WindowPeekGeometry {
     static let screenMargin: CGFloat = 12
     static let anchorGap: CGFloat = 10
+    /// Two small panes, the divider, and the panel's padding must fit without horizontal clipping.
+    static let minimumSplitWidth: CGFloat = 369
 
-    static func placement(anchor: WindowPeekAnchor, settings: DockSettings, count: Int, routingFiles: Bool = false) -> WindowPeekPlacement {
+    static func splitSettings(_ settings: DockSettings) -> DockSettings {
+        var result = settings
+        result.windowPeekLayout = .grid
+        // Both windows need visible names even when the ordinary layout hides captions.
+        if result.windowPeekStyle == .minimal { result.windowPeekStyle = .captioned }
+        return result
+    }
+
+    static func placement(anchor: WindowPeekAnchor, settings: DockSettings, count: Int, routingFiles: Bool = false,
+                          split: Bool = false) -> WindowPeekPlacement {
         let card = cardSize(settings)
         let safeCount = max(1, count)
         let requested: CGSize
-        switch settings.windowPeekLayout {
-        case .list:
-            requested = CGSize(width: card.width, height: card.height * CGFloat(min(safeCount, 4)) + 52)
-        case .grid:
-            let columns = min(safeCount, settings.windowPeekSize == .large ? 2 : 3)
-            let rows = min(3, Int(ceil(Double(safeCount) / Double(columns))))
-            requested = CGSize(width: card.width * CGFloat(columns) + CGFloat(max(0, columns - 1)) * 10,
-                               height: card.height * CGFloat(rows) + CGFloat(max(0, rows - 1)) * 10 + 52)
-        case .filmstrip:
-            requested = CGSize(width: card.width * CGFloat(min(safeCount, 3)) + CGFloat(max(0, min(safeCount, 3) - 1)) * 10,
-                               height: card.height + 52)
+        if split {
+            let pane = cardSize(splitSettings(settings))
+            requested = CGSize(width: pane.width * 2 + 13 + 12, height: pane.height + 104)
+        } else {
+            switch settings.windowPeekLayout {
+            case .list:
+                requested = CGSize(width: card.width, height: card.height * CGFloat(min(safeCount, 4)) + 52)
+            case .grid:
+                let columns = min(safeCount, settings.windowPeekSize == .large ? 2 : 3)
+                let rows = min(3, Int(ceil(Double(safeCount) / Double(columns))))
+                requested = CGSize(width: card.width * CGFloat(columns) + CGFloat(max(0, columns - 1)) * 10,
+                                   height: card.height * CGFloat(rows) + CGFloat(max(0, rows - 1)) * 10 + 52)
+            case .filmstrip:
+                requested = CGSize(width: card.width * CGFloat(min(safeCount, 3)) + CGFloat(max(0, min(safeCount, 3) - 1)) * 10,
+                                   height: card.height + 52)
+            }
         }
         let available = anchor.visibleFrame.insetBy(dx: screenMargin, dy: screenMargin)
         let size = CGSize(width: min(max(requested.width + 24, routingFiles ? 430 : 0), available.width),
