@@ -1,6 +1,9 @@
 # Patch bay ports and limits
 
-Patch bay v0 connects an app pin's successful open event to a folder pin's **Open in Finder** action. The editor is in **Settings → Features → Patch bay**. Cable actions are off by default. Creating or replacing a cable saves the connection without running it.
+This feature is deprecated and will be removed in version 1.0.0. Launch turns cable actions off.
+The editor stays under **Settings → Features → Deprecated → Patch bay**.
+
+Patch bay v0 connects an app pin's successful open event to a folder pin's **Open in Finder** action. Cable actions are off by default. Creating or replacing a cable saves the connection without running it.
 
 ## Supported ports
 

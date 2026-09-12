@@ -2,15 +2,16 @@ import Foundation
 
 /// Local unused-pin weather preferences and last-used times.
 ///
-/// Timestamps are written only by DDock pin use. Nothing is imported from Screen Time,
-/// Launch Services recents, or other applications. A missing last-used date is treated as
-/// "just now" so existing pins do not rust on upgrade.
+/// Weather starts off. Launch also forces the enable flag off. Timestamps are written
+/// only by DDock pin use. Nothing is imported from Screen Time, Launch Services recents,
+/// or other applications. A missing last-used date is treated as "just now" so existing
+/// pins do not rust on upgrade.
 nonisolated struct PinWeatherDocument: Codable, Equatable, Sendable {
     var enabled: Bool
     var unusedDays: Int
     var lastUsed: [String: Date]
 
-    init(enabled: Bool = true, unusedDays: Int = PinWeatherLimits.defaultUnusedDays,
+    init(enabled: Bool = false, unusedDays: Int = PinWeatherLimits.defaultUnusedDays,
          lastUsed: [String: Date] = [:]) {
         self.enabled = enabled
         self.unusedDays = unusedDays
@@ -28,7 +29,7 @@ nonisolated struct PinWeatherDocument: Codable, Equatable, Sendable {
     /// Absent keys take defaults so an older empty document can gain the feature without failing.
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        enabled = try values.decodeIfPresent(Bool.self, forKey: .enabled) ?? true
+        enabled = try values.decodeIfPresent(Bool.self, forKey: .enabled) ?? false
         unusedDays = try values.decodeIfPresent(Int.self, forKey: .unusedDays) ?? PinWeatherLimits.defaultUnusedDays
         lastUsed = try values.decodeIfPresent([String: Date].self, forKey: .lastUsed) ?? [:]
     }
