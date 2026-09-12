@@ -2474,3 +2474,30 @@ Remaining hands-on acceptance:
 - Browse with keyboard and VoiceOver, including confirmation dialogs and long German names.
   Check all four dock edges, crowded displays, auto-hide, Spaces, and display removal.
 - Inspect the leaf animation and row transition with normal and reduced accessibility effects.
+
+## DEE-62: OCR history for peeks
+
+Added opt-in Vision OCR of accepted Window Peek thumbnails, a bounded local text index, and
+search under **Settings → Features → Window Peek**. Results include app, title, timestamp,
+and recognized text. Individual deletion, confirmed clear, pause, and unreadable-store recovery
+are available. English and German copy explains sensitive text, retention, and capture limits.
+See [Peek history](PEEK-HISTORY.md).
+
+Validation on 2026-09-12: the DeeDock Debug target built with Xcode 27 and code signing disabled.
+No tests, app launch, automated visual checks, or native acceptance were run for this issue.
+
+Pending native acceptance:
+
+- With collection off, open several peeks and confirm no history file is created.
+- Enable collection, grant or deny Screen Recording explicitly, and inspect recognizable text
+  from several apps, font sizes, and languages. Check empty and protected captures.
+- Search for text, app names, and window titles. Confirm ordering, empty results, keyboard
+  operation, text selection, VoiceOver, longer German copy, and both appearances.
+- Pause or clear during capture, OCR, and disk saving. Confirm old work cannot restore deleted
+  text. Delete one result while another batch finishes and confirm unrelated results survive.
+- Relaunch to inspect persistence, seven-day pruning, capacity eviction, and corrupt-file recovery.
+- Switch displays, Spaces, and full-screen apps, then sleep and wake. Confirm Peek still
+  preserves focus and history accepts only thumbnails from the current presentation.
+
+Compilation does not establish OCR accuracy, visual quality, deletion behavior at runtime,
+or permission handling on a user's Mac.
