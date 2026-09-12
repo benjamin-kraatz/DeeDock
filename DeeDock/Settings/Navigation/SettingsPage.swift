@@ -31,6 +31,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case badges
     case windowPeek
     case focusSessions
+    case patchBay
     case actionTiles
     case multipleDisplays
     case permissions
@@ -58,7 +59,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
-             .focusSessions, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory,
+             .focusSessions, .patchBay, .actionTiles, .multipleDisplays, .permissions, .appSuggestions, .localHistory,
              .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles, .discovery: .features
         }
     }
@@ -90,6 +91,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .badges: .appBadgesTitle
         case .windowPeek: .windowPeekTitle
         case .focusSessions: .focusTitle
+        case .patchBay: .patchBayTitle
         case .actionTiles: .actionsTitle
         case .multipleDisplays: .secondaryDockTitle
         case .appSuggestions: .launcherSuggestionsSettingsTitle
@@ -112,6 +114,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .badges: .settingsFeatureBadgesSubtitle
         case .windowPeek: .settingsFeaturePeekSubtitle
         case .focusSessions: .settingsFeatureFocusSubtitle
+        case .patchBay: .patchBaySubtitle
         case .actionTiles: .settingsFeatureActionsSubtitle
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
@@ -145,6 +148,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .badges: .symbol("app.badge.fill")
         case .windowPeek: .symbol("macwindow.on.rectangle")
         case .focusSessions: .symbol("timer")
+        case .patchBay: .symbol("point.3.connected.trianglepath.dotted")
         case .actionTiles: .symbol("bolt.fill")
         case .multipleDisplays: .symbol("display.2")
         case .appSuggestions: .symbol("sparkles")
@@ -176,6 +180,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .badges: Color(red: 0.88, green: 0.24, blue: 0.28)
         case .windowPeek: Color(red: 0.24, green: 0.50, blue: 0.94)
         case .focusSessions: Color(red: 0.92, green: 0.38, blue: 0.24)
+        case .patchBay: .teal
         case .actionTiles: Color(red: 0.60, green: 0.34, blue: 0.90)
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
         case .appSuggestions: .indigo
@@ -207,6 +212,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .badges: [Color(red: 1.0, green: 0.44, blue: 0.42), Color(red: 0.80, green: 0.14, blue: 0.20)]
         case .windowPeek: [Color(red: 0.44, green: 0.68, blue: 1.0), Color(red: 0.14, green: 0.36, blue: 0.88)]
         case .focusSessions: [Color(red: 1.0, green: 0.58, blue: 0.34), Color(red: 0.84, green: 0.24, blue: 0.16)]
+        case .patchBay: [.mint, .teal]
         case .actionTiles: [Color(red: 0.78, green: 0.54, blue: 1.0), Color(red: 0.48, green: 0.22, blue: 0.84)]
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
         case .appSuggestions: [.indigo, .purple]
@@ -225,6 +231,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     /// not only by its title.
     private var keywords: LocalizedStringResource {
         switch self {
+        case .patchBay: .patchBayHelp
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
         case .pinWeather: .pinWeatherSettingsKeywords

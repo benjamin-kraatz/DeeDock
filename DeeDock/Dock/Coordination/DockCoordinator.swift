@@ -14,6 +14,7 @@ final class DockCoordinator {
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
     let fileDestinations = LauncherFileDestinationsStore()
+    let patchBay: PatchBayController
     let recipes: WorkspaceRecipeCoordinator
     @ObservationIgnored private lazy var recipeProgress = WorkspaceRecipeProgressController(recipes: recipes)
     let watchPresets = WindowWatchPresetStore()
@@ -78,6 +79,7 @@ final class DockCoordinator {
         self.settings = settings
         profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository(),
                                          modesRepository: DockModesRepository())
+        patchBay = PatchBayController(profiles: profiles)
         let applicationService = ApplicationService()
         catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory(),
                                      suggestions: LauncherSuggestionsStore())
@@ -316,6 +318,7 @@ final class DockCoordinator {
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
                 self?.applicationMenus.cancelAllDiscoveries()
+                self?.patchBay.stop()
                 self?.panels.values.forEach { $0.suspendIdleFading() }
             } })
         }
@@ -344,6 +347,7 @@ final class DockCoordinator {
         reconciling = true
         defer { reconciling = false }
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
+        patchBay.reconcile()
         atmosphere.update(displays: displays)
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
         let desired = Set(enabledDisplays.map(\.id))
@@ -428,6 +432,9 @@ final class DockCoordinator {
             store.applicationOpened = { [weak self] in
                 self?.windowPeeks.close(returnFocus: false)
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
+            }
+            store.patchBayAppOpened = { [weak self] appID, modeID in
+                self?.patchBay.appOpened(appID, displayID: display.id, modeID: modeID)
             }
             store.soapBubblePlay = { [weak panel] itemID in
                 panel?.interaction.soapBubbles.play(
@@ -841,6 +848,7 @@ final class DockCoordinator {
         focusSession.stop()
         focusBreathing.stop()
         actionTiles.stop()
+        patchBay.stop()
         recipes.stop()
         recipeProgress.stop()
         watchPresets.stop()

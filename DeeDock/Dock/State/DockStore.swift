@@ -62,6 +62,8 @@ final class DockStore {
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
+    /// Successful explicit app opens only, excluding hide, spring loading, and file drops.
+    @ObservationIgnored var patchBayAppOpened: ((String, UUID) -> Void)?
     /// Fired on app click and after a pin click or drop that changed this display's pins.
     @ObservationIgnored var soapBubblePlay: ((String) -> Void)?
 
@@ -426,10 +428,15 @@ final class DockStore {
         if item.isFavorite { pinWeather?.recordUse(item.id) }
         soapBubblePlay?(item.id)
         let token = session.token
-        catalog.performPrimaryAction(item.reference) { [weak self] error in
+        let modeID = profiles.modes.activeMode.id
+        let isPatchBaySource = item.isFavorite && !isPreviewingTimeline
+        catalog.performPrimaryAction(item.reference) { [weak self] error, opened in
             guard let self, session.accepts(token) else { return }
             errorMessage = error
-            if error == nil { applicationOpened?() }
+            if error == nil {
+                applicationOpened?()
+                if opened, isPatchBaySource, !isPreviewingTimeline { patchBayAppOpened?(item.id, modeID) }
+            }
         }
     }
 
@@ -446,10 +453,15 @@ final class DockStore {
         guard !QuarantineStampController.shared.armed else { return }
         if item.isFavorite { pinWeather?.recordUse(item.id) }
         let token = session.token
+        let modeID = profiles.modes.activeMode.id
+        let isPatchBaySource = item.isFavorite && !isPreviewingTimeline
         catalog.open(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
             errorMessage = error
-            if error == nil { applicationOpened?() }
+            if error == nil {
+                applicationOpened?()
+                if isPatchBaySource, !isPreviewingTimeline { patchBayAppOpened?(item.id, modeID) }
+            }
         }
     }
 
@@ -503,5 +515,5 @@ final class DockStore {
     func stop() {
         if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
         stampObserver = nil
-        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

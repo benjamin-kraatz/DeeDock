@@ -49,6 +49,10 @@ struct FeaturesPageContent: View {
                 FocusBreathingSettingsCard(store: coordinator.focusBreathing, modes: coordinator.profiles.modes)
                 BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
             }
+        case .patchBay:
+            if let coordinator = context.coordinator {
+                PatchBaySettingsView(controller: coordinator.patchBay, profiles: coordinator.profiles)
+            }
         case .actionTiles:
             if let actions = context.coordinator?.actionTiles { ActionTilesSettingsCard(controller: actions) }
             if let destinations = context.coordinator?.fileDestinations {

@@ -69,16 +69,17 @@ final class ApplicationCatalog {
     }
 
     /// Owns app-icon toggle work so all display docks share duplicate suppression and teardown.
+    /// Completion reports an error and whether the action opened the app, rather than hiding it.
     func performPrimaryAction(_ reference: ApplicationReference,
-                              completion: @escaping (LocalizedStringResource?) -> Void) {
+                              completion: @escaping (LocalizedStringResource?, Bool) -> Void) {
         submit(reference, operation: { service in try await service.performPrimaryAction(reference) == .opened }) { error in
             if error is ApplicationPrimaryActionError {
-                completion(.errorHideApp(appName: reference.name))
+                completion(.errorHideApp(appName: reference.name), false)
             } else {
-                completion(.errorOpenApp(appName: reference.name, details: error.localizedDescription))
+                completion(.errorOpenApp(appName: reference.name, details: error.localizedDescription), false)
             }
-        } completion: {
-            completion(nil)
+        } completion: { opened in
+            completion(nil, opened)
         }
     }
 
@@ -87,13 +88,13 @@ final class ApplicationCatalog {
               completion: @escaping (LocalizedStringResource?) -> Void) {
         submit(reference, ifCurrent: ifCurrent, operation: { service in try await service.open(reference); return true }) { error in
             completion(.errorOpenApp(appName: reference.name, details: error.localizedDescription))
-        } completion: { completion(nil) }
+        } completion: { _ in completion(nil) }
     }
 
     private func submit(_ reference: ApplicationReference, ifCurrent: @escaping () -> Bool = { true },
                         operation: @escaping (any ApplicationServicing) async throws -> Bool,
                         failure: @escaping (any Error) -> Void,
-                        completion: @escaping () -> Void) {
+                        completion: @escaping (Bool) -> Void) {
         guard tasks[reference.id] == nil else { return }
         let currentGeneration = generation
         launching.insert(reference.id)
@@ -112,7 +113,7 @@ final class ApplicationCatalog {
                 let opened = try await operation(service)
                 guard !Task.isCancelled, generation == currentGeneration else { return }
                 if opened { launcherHistory.record(reference) }
-                completion()
+                completion(opened)
                 refresh()
             } catch {
                 guard !Task.isCancelled, generation == currentGeneration else { return }

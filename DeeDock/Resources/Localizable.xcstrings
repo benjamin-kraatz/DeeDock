@@ -1,6 +1,618 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "patchBayTitle": {
+    "comment": "Settings page title for scoped cable automations.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Patch bay"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Patchbay"
+        }
+      }
+    }
+  },
+  "patchBaySubtitle": {
+    "comment": "Feature overview subtitle.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Connect app pins to folder actions"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App-Pins mit Ordneraktionen verbinden"
+        }
+      }
+    }
+  },
+  "patchBayHelp": {
+    "comment": "Explains the sole supported automation path and opt-in.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "After an app pin opens from DDock, its cable opens a pinned folder in Finder without taking focus. Cables apply only to their display and Dock Mode. Nothing runs until enabled."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wenn du einen App-Pin über DDock öffnest, öffnet sein Kabel einen angepinnten Ordner im Finder, ohne den Fokus zu übernehmen. Kabel gelten nur für ihren Bildschirm und Dock Mode. Erst nach dem Aktivieren werden Aktionen ausgeführt."
+        }
+      }
+    }
+  },
+  "patchBayEnabled": {
+    "comment": "Global automation toggle, off by default.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable cable actions"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kabelaktionen aktivieren"
+        }
+      }
+    }
+  },
+  "patchBayRoutingHelp": {
+    "comment": "Pointer and keyboard routing instructions.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Select an app output, then a folder input, or drag between them. A new cable replaces that app’s previous connection."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle einen App-Ausgang und dann einen Ordner-Eingang oder ziehe ein Kabel zwischen ihnen. Ein neues Kabel ersetzt die bisherige Verbindung dieser App."
+        }
+      }
+    }
+  },
+  "patchBayOutput": {
+    "comment": "Source port column heading.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App opened · output"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App geöffnet · Ausgang"
+        }
+      }
+    }
+  },
+  "patchBayInput": {
+    "comment": "Destination port column heading.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open folder · input"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ordner öffnen · Eingang"
+        }
+      }
+    }
+  },
+  "patchBayOutputNamed": {
+    "comment": "Accessible app port name. name is the untranslated app name.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@: app opened output"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@: Ausgang für App geöffnet"
+        }
+      }
+    }
+  },
+  "patchBayInputNamed": {
+    "comment": "Accessible folder port name. name is the folder name.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@: open folder input"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@: Eingang für Ordner öffnen"
+        }
+      }
+    }
+  },
+  "patchBayInputHint": {
+    "comment": "Keyboard and VoiceOver hint for folder port.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Select an app output first, then activate this input to connect the cable."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle zuerst einen App-Ausgang und aktiviere dann diesen Eingang, um das Kabel zu verbinden."
+        }
+      }
+    }
+  },
+  "patchBayCancelRouting": {
+    "comment": "Cancels the selected, unsaved output port.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cancel routing"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verbindung abbrechen"
+        }
+      }
+    }
+  },
+  "patchBayDisplay": {
+    "comment": "Picker for connected enabled display docks.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Display"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bildschirm"
+        }
+      }
+    }
+  },
+  "patchBayMode": {
+    "comment": "Current mode scope; name is a user-entered mode name.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dock Mode: %1$(name)@"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dock Mode: %1$(name)@"
+        }
+      }
+    }
+  },
+  "patchBayEmptyTitle": {
+    "comment": "Empty patch bay heading.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin an app and a folder"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App und Ordner anpinnen"
+        }
+      }
+    }
+  },
+  "patchBayEmptyHelp": {
+    "comment": "Explains how to supply ports.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Add an app pin and a folder pin to an enabled dock in this mode. Their ports appear here."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Füge einem aktivierten Dock in diesem Modus einen App-Pin und einen Ordner-Pin hinzu. Ihre Anschlüsse erscheinen hier."
+        }
+      }
+    }
+  },
+  "patchBaySavedCables": {
+    "comment": "List of all persisted routes including unavailable modes and displays.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Saved cables"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gespeicherte Kabel"
+        }
+      }
+    }
+  },
+  "patchBayLimitsHelp": {
+    "comment": "v0 bounds and non-goals.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Up to 8 cables across all displays and modes, one folder per app output. One action runs at a time; additional triggers are ignored. No chains, schedules, scripts, or system-wide app monitoring."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bis zu 8 Kabel über alle Bildschirme und Modi, ein Ordner pro App-Ausgang. Es läuft jeweils eine Aktion; weitere Auslöser werden ignoriert. Keine Ketten, Zeitpläne, Skripte oder systemweite App-Beobachtung."
+        }
+      }
+    }
+  },
+  "patchBayNoCables": {
+    "comment": "Empty saved routes list.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No cables yet."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Noch keine Kabel."
+        }
+      }
+    }
+  },
+  "patchBayConnection": {
+    "comment": "Readable cable with names supplied by the OS.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(appName)@ → Open %2$(folderName)@ in Finder"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(appName)@ → %2$(folderName)@ im Finder öffnen"
+        }
+      }
+    }
+  },
+  "patchBayScope": {
+    "comment": "Saved route display and mode names.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(display)@ · %2$(mode)@"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(display)@ · %2$(mode)@"
+        }
+      }
+    }
+  },
+  "patchBayRun": {
+    "comment": "Runs the wired folder action without launching the source app.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Run folder action"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ordneraktion ausführen"
+        }
+      }
+    }
+  },
+  "patchBayDisconnect": {
+    "comment": "Removes a cable without removing pins.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Disconnect"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Trennen"
+        }
+      }
+    }
+  },
+  "patchBayStop": {
+    "comment": "Cancels pending work; cannot undo an OS request.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stop pending action"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ausstehende Aktion stoppen"
+        }
+      }
+    }
+  },
+  "patchBayReset": {
+    "comment": "Destructive recovery for corrupt routing preferences.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reset patch bay"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Patchbay zurücksetzen"
+        }
+      }
+    }
+  },
+  "patchBayResetHelp": {
+    "comment": "Reset confirmation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete all saved cables and turn cable actions off? Pins and folders stay in place."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alle gespeicherten Kabel löschen und Kabelaktionen ausschalten? Pins und Ordner bleiben erhalten."
+        }
+      }
+    }
+  },
+  "patchBayStorageError": {
+    "comment": "Storage error; no silent overwrite.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cable preferences could not be read or saved. Unreadable data stays untouched until you reset the patch bay."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kabeleinstellungen konnten nicht gelesen oder gespeichert werden. Unlesbare Daten bleiben bis zum Zurücksetzen der Patchbay erhalten."
+        }
+      }
+    }
+  },
+  "patchBayUnavailable": {
+    "comment": "Inactive cable due to pin or scope mismatch.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unavailable. Use the cable’s Dock Mode and enabled display, with both pins still present."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nicht verfügbar. Verwende den Dock Mode und den aktivierten Bildschirm dieses Kabels. Beide Pins müssen noch vorhanden sein."
+        }
+      }
+    }
+  },
+  "patchBayLimit": {
+    "comment": "Global route limit error.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "All 8 cable slots are in use. Disconnect a cable first."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Alle 8 Kabelplätze sind belegt. Trenne zuerst ein Kabel."
+        }
+      }
+    }
+  },
+  "patchBayRunning": {
+    "comment": "Transient action progress.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Opening the folder…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ordner wird geöffnet …"
+        }
+      }
+    }
+  },
+  "patchBayOpened": {
+    "comment": "OS acknowledgement; does not claim visible window verification.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Finder accepted the folder-open request."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Finder hat die Anfrage zum Öffnen des Ordners angenommen."
+        }
+      }
+    }
+  },
+  "patchBayOpenFailed": {
+    "comment": "Bookmark or Finder failure with recovery advice.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The folder could not be opened. Check that it is available and pin it again if its saved access has expired."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Ordner konnte nicht geöffnet werden. Prüfe, ob er verfügbar ist, und pinne ihn erneut an, falls der gespeicherte Zugriff abgelaufen ist."
+        }
+      }
+    }
+  },
+  "patchBayCanceled": {
+    "comment": "Cancellation limit.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pending action stopped. A request already sent to Finder cannot be undone."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ausstehende Aktion gestoppt. Eine bereits an Finder gesendete Anfrage kann nicht rückgängig gemacht werden."
+        }
+      }
+    }
+  },
+  "patchBayMissingMode": {
+    "comment": "Fallback when a cable mode was deleted.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Removed mode"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Entfernter Modus"
+        }
+      }
+    }
+  },
+  "patchBayMissingDisplay": {
+    "comment": "Fallback when a saved display no longer exists.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unavailable display"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nicht verfügbarer Bildschirm"
+        }
+      }
+    }
+  },
   "compostAlreadyStaged": {
     "comment": "Duplicate restore failure; nothing is silently forgotten.",
     "extractionState": "manual",

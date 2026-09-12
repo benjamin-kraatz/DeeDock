@@ -16,6 +16,25 @@ and native visual or interaction acceptance were not run.
 System Settings filter discovery and on/off delivery remain unverified on this macOS build.
 See [Focus breathing](FOCUS-BREATHING.md) for configuration and the pending native checks.
 
+## DEE-58 patch-bay automations
+
+Implemented on `feature/dee-58`. **Settings → Features → Patch bay** offers app-open output ports and pinned-folder input ports, visual cable dragging, button-based keyboard routing, saved-cable controls, and English/German copy. Successful app-pin opens can request the wired folder in Finder with activation disabled. Hiding an app never fires the cable. See [supported ports and limits](PATCH-BAY.md).
+
+Cable actions are off by default. Connections are scoped by display, Dock Mode, and pin identity. There are eight cables maximum, one folder per app output, and one running action with no queue. Editing, disabling, sleep, session suspension, shutdown, or an unavailable scope cancels pending work. Strict bookmark resolution rejects stale access. Corrupt preferences freeze execution and edits until confirmed reset. No system Dock settings are changed.
+
+Validation on 2026-09-12: the Debug app build succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. Command: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-58-build CODE_SIGNING_ALLOWED=NO build`. New files use the existing synchronized app target. English and German string resources and generated symbols compiled. `git diff --check` passed.
+
+Existing `ApplicationCatalogTests` assertions were updated to distinguish successful open from hide. Tests, previews, automated visual checks, and native app interaction were not run. Compilation does not prove an end-to-end Finder window or native routing acceptance.
+
+### Required hands-on acceptance
+
+- Pin an app and a folder to an enabled display. Create a cable by dragging and by selecting its ports. Confirm cable endpoints stay attached while scrolling, resizing, and using long names. Escape cancels an unfinished cable.
+- Confirm wiring while disabled opens nothing. Enable cable actions and open the source pin by mouse and keyboard. Confirm Finder opens the target folder in the background and the source app retains focus. Confirm clicking to hide that app opens no folder. Exercise Window Peek's Show App path separately.
+- Run the saved folder action directly. Confirm the source app does not launch. Disconnect and reconnect the cable, then relaunch DDock and confirm persistence without startup execution.
+- Change modes, unplug or disable the display, and remove either pin. Confirm an unavailable cable does not execute and remains removable. Confirm returning to its valid scope restores eligibility without running automatically.
+- Exercise missing and stale folder bookmarks, the eight-cable limit, overlapping triggers, corrupt stored data and confirmed reset, cancellation, sleep, and screen lock. Confirm no delayed action replays on wake.
+- Check VoiceOver, keyboard-only operation, English and German, Light and Dark Mode, Reduce Motion, Reduce Transparency, Spaces, and multiple displays. Cables are static apart from direct pointer dragging.
+
 ## DEE-74 DDock Discovery
 
 Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.

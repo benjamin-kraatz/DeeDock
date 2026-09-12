@@ -86,7 +86,7 @@ enum SettingsSection: Hashable, Identifiable {
             SettingsPage.dockGroups
         case .features:
             [[.shelfAndTrash, .capsules, .badges],
-             [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
+             [.windowPeek, .focusSessions, .actionTiles, .patchBay, .appSuggestions],
              [.localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles],
              [.discovery, .multipleDisplays, .permissions]]
         case .modes, .atmosphere:
