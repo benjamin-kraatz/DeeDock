@@ -26,6 +26,8 @@ final class LauncherSuggestionsStore {
     private(set) var engineBusy = false
     private(set) var engineUnavailable = false
     private(set) var revision = UUID()
+    /// Exclusion changes retire every jury transcript, even when an app is immediately included again.
+    private(set) var pinJuryPrivacyRevision = UUID()
     private var promptRevision = 0
     private var revokedAt: [String: Date] = [:]
     var isActive: Bool { enabled && !paused && ready && !storageUnavailable }
@@ -99,6 +101,40 @@ final class LauncherSuggestionsStore {
     }
 
     func prepare() async { await loadTask?.value }
+
+    /// Returns aggregate stable activations for a Pin Jury hearing while usage consent is active.
+    /// Only the real retained examples are read, including in Debug with a synthetic source selected.
+    /// No raw context leaves this store, and this read never starts observation or changes consent.
+    /// Counts cover the preceding 30 days and seven days; active dates use the current local calendar.
+    /// The latest 10,000 retained examples bound work and counts. Future-dated evidence is ignored.
+    func pinJuryEvidence(now: Date = Date()) -> [String: PinJuryEvidence]? {
+        guard isActive, now.timeIntervalSinceReferenceDate.isFinite else { return nil }
+        let cutoff = now.addingTimeInterval(-30 * 24 * 60 * 60)
+        let recentCutoff = now.addingTimeInterval(-7 * 24 * 60 * 60)
+        let calendar = Calendar.autoupdatingCurrent
+        let today = calendar.startOfDay(for: now)
+        var values: [String: (activations: Int, recent: Int, days: Set<Date>, lastUse: Date)] = [:]
+        for example in document.examples.suffix(PinJuryPolicy.maximumActivations) {
+            guard example.date > cutoff, example.date <= now,
+                  example.context.date.timeIntervalSinceReferenceDate.isFinite,
+                  example.context.date <= example.date,
+                  let id = eligible(example.targetID), contextIsEligible(example.context),
+                  revokedAt[id].map({ example.date > $0 }) ?? true else { continue }
+            var aggregate = values[id] ?? (0, 0, [], example.date)
+            aggregate.activations += 1
+            if example.date > recentCutoff { aggregate.recent += 1 }
+            aggregate.days.insert(calendar.startOfDay(for: example.date))
+            aggregate.lastUse = max(aggregate.lastUse, example.date)
+            values[id] = aggregate
+        }
+        return values.mapValues { aggregate in
+            let age = calendar.dateComponents([.day], from: calendar.startOfDay(for: aggregate.lastUse), to: today).day
+            return PinJuryEvidence(activations: aggregate.activations,
+                recentActivations: aggregate.recent,
+                activeDays: min(PinJuryPolicy.maximumActiveDays, aggregate.days.count),
+                daysSinceUse: age.map { min(30, max(0, $0)) })
+        }
+    }
 
     func setEnabled(_ value: Bool) {
         guard !value || !storageUnavailable else { return }
@@ -177,6 +213,7 @@ final class LauncherSuggestionsStore {
 
     func exclude(appID: String) {
         guard Self.validIdentity(appID) else { return }
+        pinJuryPrivacyRevision = UUID()
         excludedIDs.insert(appID)
         revokedAt[appID] = Date()
         // Remove all effective learning involving the app, including contextual identifiers.
@@ -188,6 +225,7 @@ final class LauncherSuggestionsStore {
     }
 
     func include(appID: String) {
+        pinJuryPrivacyRevision = UUID()
         excludedIDs.remove(appID)
         cancelLearning(); savePreferences()
     }

@@ -2292,6 +2292,32 @@ Pending hands-on acceptance:
 - Listen to arm, stamp, and release; check system mute, Reduce Motion, English and German,
   VoiceOver, focus retention, Spaces, and fullscreen behavior.
 
+## DEE-39 Pin Jury
+
+Implemented with Apple Foundation Models from the first slice, overriding the original
+heuristics-only issue text. Crowded Launcher, menu and App suggestions settings open
+a native conversation window for the selected display. The window presents two apps'
+local usage evidence and streams six statements from three jurors. Only an explicit
+Accept can swap one pin. Reject, keeping the current pin, cancellation and failed
+generation write no pins. A swap uses one persistence call and records Local History.
+
+Admission uses real opt-in App suggestions history, with bounded 30-day and seven-day
+signals and configurable thresholds. Excluded, unavailable, quarantined, hidden and
+magnetically parked pins are protected, as are Finder, DDock, folders and pins with
+no observed use. The state rejects incomplete votes and revalidates consent, exclusion
+epochs, display, Dock Mode and exact pin snapshots. Transcripts are memory-only and
+clear on close, privacy revocation, expiry, sleep, session resignation or display removal.
+See [Pin Jury](PIN-JURY.md) for scoring, model boundaries and recovery behavior.
+
+Validation: Debug app build passed with Xcode 27, `CODE_SIGNING_ALLOWED=NO`.
+Focused state and policy regression cases were added but not run. No app launch,
+Foundation Models runtime session, previews, tests or automated visual checks were run.
+
+Pending hands-on acceptance: real-model availability and bilingual responses, live
+streaming, Accept/Reject and failed persistence, privacy changes during generation,
+all four dock edges and multiple displays, keyboard/VoiceOver, reduced motion and
+transparency, narrow windows, focus restoration, Spaces/fullscreen and sleep/wake.
+
 ## Hosted test target
 
 `DeeDockTests` stopped compiling on 2026-09-03 (`d947cc6`). It compiled a hand-kept list of app

@@ -158,6 +158,8 @@ final class DockPanelController {
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
                                          calloutReserve: timelineCallout)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
+        launcher.juryCrowded = baseLayout.iconSize < settings.iconSize - 0.5
+            || baseLayout.canvasLength > baseLayout.viewportLength + 0.5
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                  utilityCount: slots.filter(\.isUtility).count - (settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0),
