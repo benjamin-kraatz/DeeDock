@@ -69,6 +69,8 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 ## Using DDock
 
+**Patch bay** in **Settings → Features** connects app-pin opens to pinned-folder actions in Finder. Cable actions are off by default and scoped to a display and Dock Mode, with eight cables maximum. See [supported ports and limits](docs/PATCH-BAY.md).
+
 **DDock Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. Disable tips in **Settings → Features → DDock Discovery**. See [Discovery](docs/DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes
