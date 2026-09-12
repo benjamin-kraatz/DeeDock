@@ -29,6 +29,8 @@ struct FocusSessionSettingsCard: View {
                         .disabled(controller.requiresReset)
                     Divider()
                     BossFightSettingsView(controller: controller)
+                    Divider()
+                    FocusDebtSettingsView(controller: controller)
                     if let session = controller.session {
                         Text(.focusCurrentMode(session.modeName)).font(.callout)
                         if session.phase == .running { Button(.focusPause) { controller.pause() } }

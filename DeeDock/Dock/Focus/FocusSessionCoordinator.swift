@@ -24,7 +24,8 @@ final class FocusSessionCoordinator {
         let keyboard = panel.store.keyboardFocus
         let chrome = FocusSessionPanelChrome()
         let next = DockPopoverPanelController(anchor: anchor, keyboard: true,
-                                              ideal: CGSize(width: 400, height: focus.bossFight.enabled ? 440 : 330),
+                                              ideal: CGSize(width: 400, height: (focus.bossFight.enabled ? 440 : 330)
+                                                            + (focus.focusDebt.enabled ? 180 : 0)),
                                               chromeChanged: { chrome.value = $0 }) {
             FocusSessionPanelView(controller: focus, chrome: chrome, showDigest: { [weak self] in self?.showDigest?() }, saveCapsule: { [weak self, weak panel] in
                 guard let self, let panel else { return }
