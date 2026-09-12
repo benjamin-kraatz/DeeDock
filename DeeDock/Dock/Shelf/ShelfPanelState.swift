@@ -38,6 +38,16 @@ final class ShelfPanelState {
     var rowFrames: [UUID: CGRect] = [:]
     var preview: DockFilePreviewItem?
     var error: String?
+    var showingCompost = false
+    var compost: [ShelfCompostEntry] = []
+    var compostPolicy: ShelfCompostPolicy = .off
+    var compostFailure: String?
+    var compostRequiresReset = false
+    var compostRestoration = 0
+    var compostNotice: String?
+    @ObservationIgnored var compostPolicyChanged: ((ShelfCompostPolicy) -> Void)?
+    @ObservationIgnored var restoreCompost: ((UUID) -> Void)?
+    @ObservationIgnored var forgetCompost: ((UUID) -> Void)?
     var chrome = DockPopoverChrome(
         edge: .bottom,
         attachment: DockPopoverGeometry.idealSize.width / 2
@@ -265,6 +275,9 @@ final class ShelfPanelState {
         revealItems = nil
         copyItems = nil
         clearAll = nil
+        compostPolicyChanged = nil
+        restoreCompost = nil
+        forgetCompost = nil
         beginDrag = nil
         sortChanged = nil
         presentationChanged = nil

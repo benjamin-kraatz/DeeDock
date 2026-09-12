@@ -2360,3 +2360,49 @@ Open: "Image, PDF, and audio headers load" fails because `AVURLAsset` cannot loa
 WAV or AIFF files on this macOS build, including `/System/Library/Sounds/Ping.aiff` outside DDock
 (error −11800, underlying −17770). M4A works. Folder stacks therefore show no duration for those
 files on this build.
+
+## DEE-55: Compost Shelf
+
+Compost is available inside the shared Shelf panel. Automatic aging starts off, with 7-, 14-,
+and 30-day rules. A day is 24 elapsed hours from addition or restoration, including app downtime.
+Choosing a rule archives eligible entries immediately. Startup, wake, clock changes, app activation,
+panel opening, and a single next-deadline timer reconcile age. The timer uses the default run-loop
+mode so native menus and drags can finish first. Shutdown removes the timer and observers.
+
+Active entries and Compost references are saved together under the existing `dock.shelf.v1` key.
+Document version 2 adds the archive and rule. Version 1 loads with aging off, preserving its items
+and presentation. Unsupported or malformed data refuses writes. Older DDock versions reject the
+new document version instead of silently saving away the archive.
+
+Compost retains each item's identity, bookmark, path, and name. Restore starts a fresh age and
+works for unavailable file references too. Re-adding the same file restores its archived identity.
+Archived entries are excluded from active Shelf actions, bulk drags, and Launcher search. Quarantine
+checks apply again through the existing Shelf resource resolver after restoration.
+
+The Shelf still holds 50 active entries. Compost holds 500 references, then pauses aging and leaves
+remaining items on the Shelf. Neither limit evicts existing data. Clear Shelf preserves Compost.
+The archive's separate Forget reference command requires confirmation and never deletes the file.
+A full Shelf refuses restoration while retaining the archived entry.
+
+The Compost view uses SwiftUI shapes, a native background, and an SF Symbol leaf. Restore gives the
+leaf one bounce and announces the result to VoiceOver. Reduce Motion removes the bounce and row
+transition. The parent Shelf chrome respects Reduce Transparency. No Metal or shaders were added.
+The archive uses native buttons and a picker. Escape returns to the Shelf, and hidden Shelf
+selection shortcuts cannot act on active entries while Compost is displayed.
+
+Validation on 2026-09-12: the DeeDock Debug app build passed with `CODE_SIGNING_ALLOWED=NO`.
+The new regression test file passed standalone Swift type-checking against the built app module.
+Regression tests were authored for age boundaries, opt-in, migration, corrupt storage, restart,
+restoration, both capacity limits, duplicate identities, re-adding files, and explicit removal.
+Tests, previews, automated visual checks, and native interaction acceptance were not run.
+
+Remaining hands-on acceptance:
+
+- Enable and change each rule with old and recent references. Restart and sleep across a deadline.
+- Restore available, moved, missing, and quarantined references. Verify normal open and drag behavior
+  after restoration, a fresh age, and the same archive on every display.
+- Fill both collections and confirm that no entries disappear. Cancel and confirm Forget reference,
+  then check that the original file and clipboard-created artifacts remain intact.
+- Browse with keyboard and VoiceOver, including confirmation dialogs and long German names.
+  Check all four dock edges, crowded displays, auto-hide, Spaces, and display removal.
+- Inspect the leaf animation and row transition with normal and reduced accessibility effects.

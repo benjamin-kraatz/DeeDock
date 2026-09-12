@@ -3,57 +3,81 @@ import Observation
 
 /// Owns the shared Shelf: one staging bin visible on every display's dock.
 ///
-/// Unlike Trash there is no external authority to observe, so state changes only through the
-/// user's own actions and nothing polls. Items are references; the Shelf never copies, moves, or
-/// deletes a file.
+/// Items are references; the Shelf never copies, moves, or deletes a file. Opt-in Compost
+/// aging uses one deadline plus wake notifications, independently of panel visibility.
 @MainActor @Observable
 final class ShelfController {
     private(set) var items: [ShelfItem] = []
     private(set) var sort: ShelfSort = .dateAdded
     private(set) var presentation: ShelfPresentation = .list
+    private(set) var compost: [ShelfCompostEntry] = []
+    private(set) var compostPolicy: ShelfCompostPolicy = .off
+    private(set) var compostFailure: String?
     private(set) var item: ShelfDockItem
     /// Set when stored bytes could not be read. Further writes are refused until `reset()`.
     private(set) var requiresReset = false
     private(set) var loadFailure: String?
     @ObservationIgnored var didChange: (() -> Void)?
 
+    @ObservationIgnored private let compostScheduler = ShelfCompostScheduler()
+    @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private let repository: ShelfRepository
     @ObservationIgnored private let bookmark: (URL) throws -> Data
 
     init(repository: ShelfRepository = ShelfRepository(),
+         now: @escaping () -> Date = Date.init,
          bookmark: @escaping (URL) throws -> Data = {
              try $0.bookmarkData(options: [.withSecurityScope, .securityScopeAllowOnlyReadAccess],
                                  includingResourceValuesForKeys: nil, relativeTo: nil)
          }) {
+        self.now = now
         self.repository = repository
         self.bookmark = bookmark
         item = ShelfDockItem(count: 0, icon: Self.icon(empty: true))
     }
 
     func start() {
+        compostScheduler.stop()
+        compostFailure = nil
         do {
             let document = try repository.load() ?? ShelfDocument()
             items = document.items
             sort = document.sort
             presentation = document.presentation
+            compost = document.compost
+            compostPolicy = document.compostPolicy
             requiresReset = false
             loadFailure = nil
         } catch {
             // The stored bytes stay untouched so the user's items can still be recovered.
             items = []
+            compost = []
+            compostPolicy = .off
             requiresReset = true
             loadFailure = error.localizedDescription
         }
         refreshItem()
+        if !requiresReset {
+            compostScheduler.start { [weak self] in self?.refreshCompost() }
+            refreshCompost()
+        }
     }
 
     /// Discards unreadable storage at the user's explicit request and re-enables writes.
     func reset() throws {
         try repository.save(ShelfDocument())
         items = []
+        compost = []
+        compostPolicy = .off
+        compostFailure = nil
+        sort = .dateAdded
+        presentation = .list
+        compostScheduler.schedule(nil)
         requiresReset = false
         loadFailure = nil
         refreshItem()
+        compostScheduler.start { [weak self] in self?.refreshCompost() }
+        didChange?()
     }
 
     var isEmpty: Bool { items.isEmpty }
@@ -98,16 +122,27 @@ final class ShelfController {
                 rejected += 1
                 continue
             }
+            if let archived = compost.first(where: { $0.item.url.standardizedFileURL == standardized }) {
+                var restored = archived.item
+                restored.addedAt = now()
+                restored.bookmarkData = try bookmark(standardized)
+                accepted.append(restored)
+                continue
+            }
             accepted.append(ShelfItem(url: standardized,
                                       name: FileManager.default.displayName(atPath: standardized.path),
                                       bookmarkData: try bookmark(standardized),
+                                      addedAt: now(),
                                       isDirectory: isDirectory.boolValue))
         }
         guard !accepted.isEmpty else {
             if rejected > 0 { return rejected }
             return 0
         }
-        try commit(accepted.reversed() + items)
+        var next = document(accepted.reversed() + items)
+        let restoredIDs = Set(accepted.map(\.id))
+        next.compost.removeAll { restoredIDs.contains($0.id) }
+        try commit(next)
         return rejected
     }
 
@@ -151,18 +186,77 @@ final class ShelfController {
         ShelfResourceAccess(item, startAccess: { _ in false }, stopAccess: { _ in }).isAvailable
     }
 
-    func stop() { didChange = nil }
+    /// Applies a visible rule and its first aging pass in one persisted update.
+    func setCompostPolicy(_ policy: ShelfCompostPolicy) throws {
+        var next = document(items)
+        next.compostPolicy = policy
+        next.compostAgedItems(at: now())
+        try commit(next)
+    }
+
+    /// Restores even unavailable files as references. A full Shelf leaves the archive untouched.
+    func restoreFromCompost(_ id: UUID) throws {
+        guard let entry = compost.first(where: { $0.id == id }) else { return }
+        guard items.count < ShelfDocument.capacity else { throw ShelfCompostError.shelfFull }
+        guard !items.contains(where: { $0.url.standardizedFileURL == entry.item.url.standardizedFileURL }) else {
+            throw ShelfCompostError.alreadyStaged
+        }
+        var restored = entry.item
+        restored.addedAt = now()
+        var next = document([restored] + items)
+        next.compost.removeAll { $0.id == id }
+        try commit(next)
+    }
+
+    /// Forgets one archived reference only after the UI's explicit confirmation. Files stay put.
+    func forgetCompost(_ id: UUID) throws {
+        var next = document(items)
+        next.compost.removeAll { $0.id == id }
+        guard next.compost != compost else { return }
+        try commit(next)
+        refreshCompost()
+    }
+
+    /// Reconciles elapsed time at startup, wake, panel opening, and the next aging deadline.
+    func refreshCompost() {
+        guard !requiresReset else { return }
+        var next = document(items)
+        next.compostAgedItems(at: now())
+        do {
+            if next.items != items { try commit(next) }
+            else { compostScheduler.schedule(next.nextCompostDate) }
+        } catch {
+            compostFailure = String(localized: .errorSaveShelf(details: error.localizedDescription))
+            // Retry on wake, opening, or an explicit action, without a tight failure loop.
+            compostScheduler.schedule(nil)
+            didChange?()
+        }
+    }
+
+    func stop() { compostScheduler.stop(); didChange = nil }
 
     // MARK: - Private
 
     private func document(_ items: [ShelfItem]) -> ShelfDocument {
-        ShelfDocument(items: items, sort: sort, presentation: presentation)
+        ShelfDocument(items: items, sort: sort, presentation: presentation,
+                      compost: compost, compostPolicy: compostPolicy)
     }
 
     private func commit(_ next: [ShelfItem], notify: Bool = true) throws {
+        try commit(document(next), notify: notify)
+    }
+
+    /// Publish only after the entire active/archive document has been saved successfully.
+    private func commit(_ next: ShelfDocument, notify: Bool = true) throws {
         guard !requiresReset else { throw CocoaError(.coderReadCorrupt) }
-        try repository.save(document(next))
-        items = next
+        try repository.save(next)
+        items = next.items
+        sort = next.sort
+        presentation = next.presentation
+        compost = next.compost
+        compostPolicy = next.compostPolicy
+        compostFailure = nil
+        compostScheduler.schedule(next.nextCompostDate)
         refreshItem()
         if notify { didChange?() }
     }

@@ -14,8 +14,8 @@ nonisolated struct ShelfItem: Codable, Equatable, Identifiable, Sendable {
     let name: String
     /// Persistent read access created from a user-initiated Finder drop.
     var bookmarkData: Data
-    /// Staging order. The Shelf lists newest first.
-    let addedAt: Date
+    /// Most recent staging or restoration time. Also starts the Compost age threshold.
+    var addedAt: Date
     /// Affects wording and icon only; the Shelf treats folders and files the same way.
     let isDirectory: Bool
 
@@ -61,8 +61,8 @@ nonisolated enum ShelfPresentation: String, Codable, CaseIterable, Sendable {
 
 /// The persisted Shelf. One shared bin, independent of display and of the active Dock Mode.
 nonisolated struct ShelfDocument: Codable, Equatable, Sendable {
-    /// Forward hook for a future layout change. Nothing predates version 1.
-    static let currentVersion = 1
+    /// Version 2 adds Compost. Older apps must refuse it rather than discard the archive.
+    static let currentVersion = 2
     /// Refusing a larger batch keeps the panel usable and the drag image meaningful.
     static let capacity = 50
 
@@ -70,22 +70,39 @@ nonisolated struct ShelfDocument: Codable, Equatable, Sendable {
     var items: [ShelfItem]
     var sort: ShelfSort
     var presentation: ShelfPresentation
+    var compost: [ShelfCompostEntry]
+    var compostPolicy: ShelfCompostPolicy
 
     init(version: Int = ShelfDocument.currentVersion, items: [ShelfItem] = [],
-         sort: ShelfSort = .dateAdded, presentation: ShelfPresentation = .list) {
+         sort: ShelfSort = .dateAdded, presentation: ShelfPresentation = .list,
+         compost: [ShelfCompostEntry] = [], compostPolicy: ShelfCompostPolicy = .off) {
         self.version = version
         self.items = items
         self.sort = sort
         self.presentation = presentation
+        self.compost = compost
+        self.compostPolicy = compostPolicy
     }
 
     /// Both view choices default rather than fail, so an older document still opens.
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         version = try values.decode(Int.self, forKey: .version)
+        guard version == 1 || version == Self.currentVersion else {
+            throw CocoaError(.coderReadCorrupt)
+        }
         items = try values.decode([ShelfItem].self, forKey: .items)
         sort = try values.decodeIfPresent(ShelfSort.self, forKey: .sort) ?? .dateAdded
         presentation = try values.decodeIfPresent(ShelfPresentation.self, forKey: .presentation) ?? .list
+        if version == 1 {
+            compost = []
+            compostPolicy = .off
+            version = Self.currentVersion
+        } else {
+            // Missing archive data in a current document is corruption, never an empty archive.
+            compost = try values.decode([ShelfCompostEntry].self, forKey: .compost)
+            compostPolicy = try values.decode(ShelfCompostPolicy.self, forKey: .compostPolicy)
+        }
     }
 
     /// The staged items in the order the panel shows them.
@@ -98,7 +115,9 @@ nonisolated struct ShelfDocument: Codable, Equatable, Sendable {
 
     /// A document that fails this is reported rather than silently read as an empty Shelf.
     var isValid: Bool {
-        guard version == Self.currentVersion, items.count <= Self.capacity else { return false }
-        return Set(items.map(\.id)).count == items.count
+        guard version == Self.currentVersion, items.count <= Self.capacity,
+              compost.count <= ShelfCompostEntry.capacity else { return false }
+        let all = items + compost.map(\.item)
+        return Set(all.map(\.id)).count == all.count
     }
 }

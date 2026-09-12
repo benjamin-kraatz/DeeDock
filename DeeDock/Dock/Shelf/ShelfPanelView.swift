@@ -17,15 +17,19 @@ struct ShelfPanelView: View {
         VStack(spacing: 0) {
             header
             Divider()
-            if let error = state.error, !state.isEmpty {
+            compostNavigation
+            Divider()
+            if let error = state.error, !state.isEmpty, !state.showingCompost {
                 errorBanner(error)
                 Divider()
             }
-            if let error = state.semanticError, state.sort == .smart {
+            if let error = state.semanticError, state.sort == .smart, !state.showingCompost {
                 semanticErrorBanner(error)
                 Divider()
             }
-            if let preview = state.preview {
+            if state.showingCompost {
+                ShelfCompostView(state: state)
+            } else if let preview = state.preview {
                 DockFilePreview(item: preview) { state.preview = nil }
             } else {
                 content
@@ -34,7 +38,9 @@ struct ShelfPanelView: View {
         .dockPopoverChrome(state.chrome, opaque: reduceTransparency || forceOpaqueBackground)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(.shelfName))
-        .accessibilityValue(Text(.shelfItemCount(count: state.entries.count)))
+        .accessibilityValue(Text(state.showingCompost
+                                  ? .compostCount(count: state.compost.count)
+                                  : .shelfItemCount(count: state.entries.count)))
     }
 
     private func errorBanner(_ error: String) -> some View {
@@ -63,6 +69,24 @@ struct ShelfPanelView: View {
 
     // MARK: - Header
 
+    private var compostNavigation: some View {
+        HStack {
+            Button {
+                state.preview = nil
+                state.showingCompost.toggle()
+            } label: {
+                Label(state.showingCompost ? .compostBack : .compostName,
+                      systemImage: state.showingCompost ? "chevron.backward" : "leaf.fill")
+            }
+            .buttonStyle(.borderless)
+            .tint(.green)
+            Spacer()
+            Text(.compostCount(count: state.compost.count))
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 16).padding(.vertical, 8)
+    }
+
     private var header: some View {
         HStack(spacing: 8) {
             Image(systemName: state.isEmpty ? "rectangle.stack" : "rectangle.stack.fill")
@@ -75,14 +99,16 @@ struct ShelfPanelView: View {
                 .contentTransition(.numericText())
                 .layoutPriority(-1)
             Spacer(minLength: 8)
-            if !state.isEmpty {
+            if !state.isEmpty, !state.showingCompost {
                 sortMenu
                 if state.sort != .smart { presentationControl }
             }
-            QuarantineToolbarButton()
-            Button(.shelfClear) { state.clearAll?() }
-                .controlSize(.small)
-                .disabled(state.isEmpty)
+            if !state.showingCompost {
+                QuarantineToolbarButton()
+                Button(.shelfClear) { state.clearAll?() }
+                    .controlSize(.small)
+                    .disabled(state.isEmpty)
+            }
         }
         .padding(.horizontal, 16).padding(.vertical, 12)
     }
