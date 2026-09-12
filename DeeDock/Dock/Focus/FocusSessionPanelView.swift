@@ -18,6 +18,12 @@ struct FocusSessionPanelView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
+                if controller.focusDebt.enabled {
+                    FocusDebtStatusView(count: controller.focusDebt.count) {
+                        controller.configureFocusDebt(enabled: false)
+                    }
+                    Divider()
+                }
                 if let session = controller.session {
                     Text(verbatim: session.modeName).font(.title2.bold()).lineLimit(2)
                     if session.phase == .running {

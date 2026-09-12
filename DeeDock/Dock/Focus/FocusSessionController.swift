@@ -24,6 +24,7 @@ final class FocusSessionController {
     var session: FocusSession? { document.session }
     var isActive: Bool { session != nil && session?.phase != .completed }
     var bossFight: BossFightConfiguration { document.bossFight ?? BossFightConfiguration() }
+    var focusDebt: FocusDebtState { document.focusDebt ?? FocusDebtState() }
     var item: FocusDockItem? {
         session.map { FocusDockItem(session: $0, celebrationID: celebrationID,
                                    bossFightEnabled: bossFight.enabled, bossVictoryID: bossVictoryID) }
@@ -35,7 +36,7 @@ final class FocusSessionController {
                 guard let data = stored as? Data else { throw CocoaError(.coderReadCorrupt) }
                 let saved = try JSONDecoder().decode(FocusSessionsDocument.self, from: data)
                 guard saved.version == 1, (1...180).contains(saved.minutes), saved.session?.isValid != false,
-                      saved.bossFight?.isValid != false else {
+                      saved.bossFight?.isValid != false, saved.focusDebt?.isValid != false else {
                     throw CocoaError(.coderReadCorrupt)
                 }
                 document = saved
@@ -55,8 +56,12 @@ final class FocusSessionController {
         guard !isActive, !requiresReset else { return }
         let duration = Double(document.minutes * 60)
         var next = document
-        next.session = FocusSession(id: UUID(), modeID: modeID, modeName: name, duration: duration,
+        let id = UUID()
+        next.session = FocusSession(id: id, modeID: modeID, modeName: name, duration: duration,
                                     remainingWhenPaused: duration, deadline: Date().addingTimeInterval(duration), phase: .running)
+        var debt = focusDebt
+        debt.begin(sessionID: id)
+        next.focusDebt = debt
         celebrationID = nil
         dismissVictory()
         save(next)
@@ -81,13 +86,38 @@ final class FocusSessionController {
         setSession(session)
     }
     func finish(celebrate: Bool = true) {
-        guard var session, session.phase != .completed else { return }
+        guard var session, session.phase != .completed, !requiresReset else { return }
+        var next = document
+        var debt = focusDebt
+        // Record against the original phase/deadline, in the same save as completion.
+        debt.end(session, at: .now)
+        next.focusDebt = debt
         session.phase = .completed; session.deadline = nil; session.remainingWhenPaused = 0
         if celebrate && document.celebrates && !bossFight.enabled { celebrationID = UUID() }
-        setSession(session)
+        next.session = session
+        save(next)
         if celebrate && bossFight.enabled && !requiresReset { startVictory() }
     }
-    func dismiss() { celebrationID = nil; dismissVictory(); setSession(nil) }
+    func dismiss() {
+        guard !requiresReset else { return }
+        var next = document
+        var debt = focusDebt
+        if let session { debt.end(session, at: .now) }
+        next.focusDebt = debt
+        next.session = nil
+        celebrationID = nil; dismissVictory()
+        save(next)
+    }
+
+    /// Applies to new sessions only. Turning off immediately clears all meter state without ending the timer.
+    func configureFocusDebt(enabled: Bool) {
+        guard !requiresReset else { return }
+        var next = document
+        var debt = focusDebt
+        debt.configure(enabled: enabled)
+        next.focusDebt = debt
+        save(next)
+    }
     func configure(minutes: Int? = nil, celebrates: Bool? = nil) {
         guard !requiresReset else { return }
         var next = document

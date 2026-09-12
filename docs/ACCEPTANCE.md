@@ -1191,6 +1191,46 @@ Remaining hands-on acceptance: pin and reorder shortcuts, restart, rename or rem
 
 ## Focus Sessions
 
+### DEE-48: opt-in focus debt
+
+Focus debt is off by default in Settings → Features → Focus Sessions. A session started
+while enabled is a promise. Finish or Cancel before its remaining time reaches zero adds
+one to the shared local count. Pausing, resuming, extending, switching apps or modes,
+quitting DDock, and natural completion do not add debt. Running deadlines still include
+sleep and app downtime. Enabling during a session applies from the next session.
+
+Settings and the timer panel display a numeric count and soft English or German feedback.
+Turn off and clear immediately disables the meter and forgets its count and active promise,
+without changing the timer. Re-enabling during that timer does not restore the promise.
+Cancellation closes the timer panel as before; its updated count remains available in Settings.
+No alerts, sounds, escalating language, app monitoring, system Dock changes, or external
+writebacks are added. The static text uses system styles and native keyboard-accessible controls.
+
+The optional `focusDebt` field in `dock.focus-sessions.v1` stores only the enabled flag,
+count, and current promised session ID. Older documents decode with the meter off.
+Ending a session consumes its promise in the same saved document as the timer change,
+preventing a second increment when the completed session is dismissed.
+
+Regression cases were added for migration, early and natural endings, duplicate endings,
+mid-session opt-in, promise persistence, and immediate clearing without timer changes.
+On 2026-09-12, the Debug app target built successfully with Xcode 27 and signing disabled:
+
+```sh
+xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
+  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-DEE48-build \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+All seven new strings match the packaged English and German values in `DDock.app`.
+The build reports existing warnings in Badges, Quarantine, Clipboard Museum, and App Intents extraction.
+Tests, previews, app launch, automated visual checks, and native acceptance were not run.
+
+Pending hands-on acceptance: opt in, finish and cancel running and paused sessions, let a
+timer expire, restart before and after expiry, and disable from Settings and the panel.
+Check both languages, VoiceOver, keyboard access, Reduce Motion and Reduce Transparency,
+Boss Fight enabled and disabled, all dock edges, small displays, and multiple displays.
+Confirm clearing updates every open view and that no count returns after re-enabling or restart.
+
 ### DEE-18: optional Boss Fight skin
 
 Implemented disabled-by-default Boss Fight preferences, a bounded work-app party picker,

@@ -37,6 +37,7 @@ nonisolated struct FocusSessionsDocument: Codable {
     var celebrates = false
     var session: FocusSession?
     var bossFight: BossFightConfiguration?
+    var focusDebt: FocusDebtState?
 }
 
 struct FocusDockItem {

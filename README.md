@@ -520,7 +520,13 @@ Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or us
 
 The timer tile appears on every display. Its ring shows time remaining. Click it for **Pause**, **Resume**, **Add 5 Minutes**, and **Finish**. A finished session keeps a checkmark tile until dismissed or replaced by a new session. **Save Session Capsule** opens the usual window-selection and draft-review flow; finishing never captures or saves anything automatically.
 
-Set the next session's duration, from 1 to 180 minutes, in **Settings → Features → Focus Sessions**. The default is 25 minutes. Completion animation is optional and off by default, and Reduce Motion suppresses it. There are no streaks or history scores.
+Set the next session's duration, from 1 to 180 minutes, in **Settings → Features → Focus Sessions**. The default is 25 minutes. Completion animation is optional and off by default, and Reduce Motion suppresses it. There are no streaks.
+
+**Focus debt** is off by default in the same settings page. When enabled, each new session
+is a promise to let its timer finish. Finishing or cancelling early adds one to a local count.
+Pauses, app changes, and Dock Mode changes do not count. Settings and the timer panel show
+gentle feedback with **Turn off and clear**, which immediately disables and resets the meter
+without changing the timer. The meter never sends data to Linear or other services.
 
 ## Local History
 

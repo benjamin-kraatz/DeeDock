@@ -1,6 +1,132 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "focusDebtTitle": {
+    "comment": "Title of the optional, gentle count of sessions ended early.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Focus debt"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fokus-Zähler"
+        }
+      }
+    }
+  },
+  "focusDebtEnable": {
+    "comment": "Opt-in toggle. Off by default; disabling also clears the count.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable focus debt"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fokus-Zähler aktivieren"
+        }
+      }
+    }
+  },
+  "focusDebtHelp": {
+    "comment": "Explains opt-in timing, which actions count, exclusions, clearing, and local-only storage.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Off by default. When enabled, each new Focus Session is a promise to let its timer finish. Finishing or cancelling early adds one to this local count. Pauses and app or mode changes do not count. Turning this off clears the count. Nothing is sent to Linear or other services."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Standardmäßig aus. Wenn aktiviert, gilt jede neue Fokus-Sitzung als Versprechen, den Timer zu Ende laufen zu lassen. Vorzeitiges Beenden oder Abbrechen erhöht diesen lokalen Zähler um eins. Pausen sowie App- oder Moduswechsel zählen nicht. Ausschalten löscht den Zählerstand. Es wird nichts an Linear oder andere Dienste gesendet."
+        }
+      }
+    }
+  },
+  "focusDebtCount": {
+    "comment": "Numeric focus debt meter. Argument is the number of promised sessions ended early since enabling.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sessions ended early: %lld"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vorzeitig beendete Sitzungen: %lld"
+        }
+      }
+    }
+  },
+  "focusDebtEmpty": {
+    "comment": "Gentle feedback when the meter is enabled and zero.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A fresh start. Take the time you need."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein neuer Anfang. Nimm dir die Zeit, die du brauchst."
+        }
+      }
+    }
+  },
+  "focusDebtFeedback": {
+    "comment": "Non-punitive feedback when one or more promised sessions ended early. No escalation or shame.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Plans change. You can try a shorter session, or clear this whenever you like."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pläne ändern sich. Probiere eine kürzere Sitzung oder setze den Zähler zurück, wann du möchtest."
+        }
+      }
+    }
+  },
+  "focusDebtDisable": {
+    "comment": "Immediate kill switch for focus debt. Clears the count and active promise without affecting the timer. No confirmation.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Turn off and clear"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ausschalten und zurücksetzen"
+        }
+      }
+    }
+  },
   "discoveryDebugTitle": {
     "comment": "Debug-only Discovery settings card title.",
     "extractionState": "manual",
