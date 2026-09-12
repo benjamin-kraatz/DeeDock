@@ -18,6 +18,7 @@ struct DockAppButton: View {
     var menuTracking: (Bool) -> Void = { _ in }
     var accessibilityFocus: (Bool) -> Void = { _ in }
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var artworkOpacity: Double {
         guard let fade = interaction?.idleFade else { return 1 }
         return DockAppearanceOpacity(settings: fade.settings, idleFraction: fade.fraction,
@@ -72,6 +73,15 @@ struct DockAppButton: View {
                             .allowsHitTesting(false)
                             .accessibilityHidden(true)
                     }
+                    #if DIRECT_DISTRIBUTION
+                    if AppDockPresence.representsCurrentApplication(item.reference),
+                       interaction?.updateAwareness?.showsIndicators == true {
+                        UpdateAwarenessPip(reduceMotion: reduceMotion)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                            .padding(2)
+                            .allowsHitTesting(false)
+                    }
+                    #endif
                 }
                 .contentShape(.rect)
         }

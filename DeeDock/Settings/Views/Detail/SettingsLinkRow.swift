@@ -7,11 +7,22 @@ import SwiftUI
 struct SettingsLinkRow: View {
     let page: SettingsPage
     let open: (SettingsPage) -> Void
+    #if DIRECT_DISTRIBUTION
+    @Environment(\.appUpdater) private var updater
+    #endif
 
     var body: some View {
         Button { open(page) } label: {
             HStack(spacing: 11) {
                 SettingsIconTile(glyph: page.glyph, colors: page.tileColors, size: 22)
+                    .overlay(alignment: .topTrailing) {
+                        #if DIRECT_DISTRIBUTION
+                        if page == .softwareUpdate, updater?.awareness.showsIndicators == true {
+                            UpdateAwarenessBadge(diameter: 8)
+                                .offset(x: 2, y: -2)
+                        }
+                        #endif
+                    }
                 VStack(alignment: .leading, spacing: 3) {
                     Text(page.title)
                     if let subtitle = page.subtitle {

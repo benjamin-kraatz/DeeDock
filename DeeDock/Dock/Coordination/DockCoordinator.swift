@@ -38,6 +38,40 @@ final class DockCoordinator {
         profiles.modes.canEdit && !dragging.isDragging && !filePicker.isActive
             && !panels.values.contains(where: \.isMenuTracking)
     }
+    #if DIRECT_DISTRIBUTION
+    /// Shared with the updater so every dock can draw the waiting-update pip.
+    var updateAwareness: UpdateAwarenessStore? {
+        didSet { refreshPanels() }
+    }
+
+    /// Main-display screen for the update callout. Falls back to `NSScreen.main`.
+    var primaryEnabledScreen: NSScreen? {
+        let primary = enabledDisplays.first(where: \.isPrimary) ?? enabledDisplays.first
+        guard let primary else { return NSScreen.main }
+        return NSScreen.screens.first { screen in
+            let number = (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+            return number == primary.runtimeID
+        } ?? NSScreen.main
+    }
+
+    /// Strict idle-install gates plus picker, popover, and menu tracking.
+    var updateIdleGate: UpdateIdleGate {
+        UpdateIdleGate(
+            isDragging: dragging.isDragging,
+            isFocusSessionPanelOpen: focusPopover.isOpen,
+            isFilePickerActive: filePicker.isActive,
+            isPopoverOpen: popovers.isOpen,
+            isMenuTracking: panels.values.contains(where: \.isMenuTracking),
+            secondsSinceInput: UpdateIdleGate.secondsSinceLastInput()
+        )
+    }
+
+    /// Hides the main-display callout while the pointer is in a dock interaction.
+    var isUpdateAwarenessBlocked: Bool {
+        dragging.isDragging || focusPopover.isOpen || filePicker.isActive || popovers.isOpen
+            || panels.values.contains(where: \.isMenuTracking)
+    }
+    #endif
     @ObservationIgnored private let dragging = DockDragCoordinator()
     @ObservationIgnored private let popovers = DockPopoverPresenter()
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
@@ -578,6 +612,9 @@ final class DockCoordinator {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
             panel.interaction.sims = sims
+            #if DIRECT_DISTRIBUTION
+            panel.interaction.updateAwareness = updateAwareness
+            #endif
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil
             panel.store.refresh()
@@ -879,5 +916,8 @@ final class DockCoordinator {
         badges.focusSession = nil
         catalog.stop()
         trash.stop()
+        #if DIRECT_DISTRIBUTION
+        updateAwareness = nil
+        #endif
     }
 }

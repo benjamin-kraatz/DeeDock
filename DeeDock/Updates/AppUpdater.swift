@@ -1,4 +1,5 @@
 #if DIRECT_DISTRIBUTION
+import AppKit
 import Combine
 import Observation
 import Sparkle
@@ -12,7 +13,10 @@ final class AppUpdater {
     private(set) var allowsAutomaticUpdates = false
     private(set) var startupFailed = false
     private var engineCanCheck = false
-    private let driver = UpdateUserDriver()
+    let awareness = UpdateAwarenessStore()
+    @ObservationIgnored private lazy var driver = UpdateUserDriver(awareness: awareness)
+    @ObservationIgnored private lazy var idleInstall = UpdateIdleInstallController(awareness: awareness)
+    @ObservationIgnored private lazy var callout = UpdateAwarenessController(awareness: awareness)
     @ObservationIgnored private var updater: SPUUpdater?
     @ObservationIgnored private var observations = Set<AnyCancellable>()
 
@@ -46,6 +50,20 @@ final class AppUpdater {
             startupFailed = true
             // Startup failures remain in Settings; do not present an unsolicited error on launch.
         }
+        idleInstall.isReadyToInstall = { [weak self] in self?.driver.presentation.phase == .ready }
+        idleInstall.isWindowVisible = { [weak self] in self?.driver.isWindowVisible ?? false }
+        idleInstall.install = { [weak self] in self?.driver.attemptIdleInstall() }
+        idleInstall.start()
+        callout.openUpdate = { [weak self] in self?.checkForUpdates() }
+        callout.start()
+    }
+
+    /// Idle and callout gates that need dock state. Call after the coordinator exists.
+    func bindDesktop(isBusy: @escaping () -> Bool, isIdleBusy: @escaping () -> UpdateIdleGate,
+                     targetScreen: @escaping () -> NSScreen?) {
+        idleInstall.gateSnapshot = isIdleBusy
+        callout.isBlocked = isBusy
+        callout.targetScreen = targetScreen
     }
 
     /// Reopens the current custom session or asks Sparkle to start a fresh user-initiated check.
@@ -59,6 +77,11 @@ final class AppUpdater {
         updater?.automaticallyChecksForUpdates = enabled
     }
 
+    /// DDock-owned idle relaunch. Sparkle is not involved until an install is requested.
+    func setInstallWhenIdle(_ enabled: Bool) {
+        awareness.setInstallWhenIdle(enabled)
+    }
+
     /// Sparkle persists this preference and uses its silent driver for scheduled checks.
     func setAutomaticallyInstallsUpdates(_ enabled: Bool) {
         updater?.automaticallyDownloadsUpdates = enabled
@@ -66,6 +89,8 @@ final class AppUpdater {
 
     /// Process termination releases presentation, pending responses, and UI observers.
     func stop() {
+        callout.stop()
+        idleInstall.stop()
         driver.stop()
         observations.removeAll()
     }

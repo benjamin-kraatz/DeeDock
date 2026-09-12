@@ -66,6 +66,9 @@ struct DeeDockApp: App {
                 .keyboardShortcut("q")
         } label: {
             MenuBarExtraLabel(controller: delegate.menuBarIcon)
+            #if DIRECT_DISTRIBUTION
+                .environment(\.appUpdater, delegate.updater)
+            #endif
         }
         .commands {
             CommandGroup(replacing: .appSettings) {
@@ -116,9 +119,23 @@ struct DeeDockApp: App {
 /// Isolated so Observation tracks the controller when the extra's label refreshes.
 private struct MenuBarExtraLabel: View {
     let controller: MenuBarIconController
+    #if DIRECT_DISTRIBUTION
+    @Environment(\.appUpdater) private var updater
+    #endif
 
     var body: some View {
         Image(nsImage: DDockMenuBarMark.image(for: controller.style))
+            .overlay(alignment: .topTrailing) {
+                #if DIRECT_DISTRIBUTION
+                if updater?.awareness.showsIndicators == true {
+                    UpdateAwarenessBadge(diameter: 7)
+                        .offset(x: 1, y: -1)
+                }
+                #endif
+            }
             .accessibilityLabel(Text(.appName))
+            #if DIRECT_DISTRIBUTION
+            .accessibilityValue(updater?.awareness.showsIndicators == true ? Text(.updatesAwarenessBadge) : Text(""))
+            #endif
     }
 }

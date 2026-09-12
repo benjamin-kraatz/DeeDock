@@ -28,8 +28,10 @@ struct UpdateSettingsCard: View {
     let updateAvailable: Bool
     let startupFailed: Bool
     var updateInProgress: Bool = false
+    var installWhenIdle: Bool = false
     var setAutomaticallyChecks: (Bool) -> Void = { _ in }
     var setAutomaticallyInstalls: (Bool) -> Void = { _ in }
+    var setInstallWhenIdle: (Bool) -> Void = { _ in }
     var check: () -> Void = {}
 
     private var automaticInstallationDescription: LocalizedStringResource {
@@ -62,6 +64,15 @@ struct UpdateSettingsCard: View {
                 .controlSize(.small)
                 .disabled(startupFailed || !allowsAutomaticInstalls)
             }
+            SettingsRow(title: .updatesIdleInstall, subtitle: .updatesIdleInstallDescription) {
+                Toggle(isOn: Binding(get: { installWhenIdle }, set: setInstallWhenIdle)) {
+                    Text(.updatesIdleInstall)
+                }
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .disabled(startupFailed)
+            }
             SettingsActionRow {
                 Button(action: check) {
                     Text(updateAvailable ? .updatesAvailable : updateInProgress ? .updatesShowProgress : .updatesCheck)
@@ -80,7 +91,8 @@ struct UpdateSettingsCard: View {
 #Preview("Update available") {
     UpdateSettingsCard(currentVersion: "0.1.3 (9)", automaticallyChecks: true,
                        automaticallyInstalls: true, allowsAutomaticInstalls: true,
-                       canCheck: true, updateAvailable: true, startupFailed: false)
+                       canCheck: true, updateAvailable: true, startupFailed: false,
+                       installWhenIdle: true)
         .padding().frame(width: 560)
 }
 

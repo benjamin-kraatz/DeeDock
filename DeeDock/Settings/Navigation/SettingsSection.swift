@@ -99,7 +99,7 @@ enum SettingsSection: Hashable, Identifiable {
         switch self {
         case .general:
             #if DIRECT_DISTRIBUTION
-            [.settingsGeneralKeywords, .updatesAutomatic, .updatesAutomaticInstallation, .updatesCheck]
+            [.settingsGeneralKeywords, .updatesAutomatic, .updatesAutomaticInstallation, .updatesIdleInstall, .updatesCheck]
             #else
             [.settingsGeneralKeywords]
             #endif
