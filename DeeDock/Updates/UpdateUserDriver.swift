@@ -22,6 +22,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
     private var response: Response?
     private var notesTask: Task<Void, Never>?
+    private var comicTask: Task<Void, Never>?
 
     func show(_ request: SPUUpdatePermissionRequest,
                                      reply: @escaping (SUUpdatePermissionResponse) -> Void) {
@@ -37,6 +38,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState,
                          reply: @escaping (SPUUserUpdateChoice) -> Void) {
         notesTask?.cancel()
+        comicTask?.cancel()
         transition(.available, response: .choice(reply))
         let stage: UpdateOffer.Stage
         switch state.stage {
@@ -51,9 +53,14 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             releaseNotesURL: UpdateReleaseNotes.safeLink(appcastItem.releaseNotesURL))
         presentation.notes = nil
         presentation.notesUnavailable = false
+        presentation.comic = nil
         presentation.loadingNotes = appcastItem.releaseNotesURL != nil
         if let text = appcastItem.itemDescription, !text.isEmpty {
             loadNotes(text, format: appcastItem.itemDescriptionFormat ?? "html")
+        }
+        if let relatedURL = UpdateReleaseNotes.safeLink(appcastItem.releaseNotesURL)
+            ?? UpdateReleaseNotes.safeLink(appcastItem.fileURL) {
+            loadComic(from: relatedURL)
         }
         // A scheduled offer is retained for the menu, never brought in front of another app.
         if state.userInitiated { window.present(activate: true) }
@@ -148,11 +155,14 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func dismissUpdateInstallation() {
         notesTask?.cancel()
         notesTask = nil
+        comicTask?.cancel()
+        comicTask = nil
         response = nil
         presentation.phase = .idle
         presentation.actionToken = UUID()
         presentation.offer = nil
         presentation.notes = nil
+        presentation.comic = nil
         presentation.loadingNotes = false
         presentation.notesUnavailable = false
         presentation.receivedBytes = 0
@@ -193,6 +203,16 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             self?.presentation.notes = notes
             self?.presentation.loadingNotes = false
             self?.presentation.notesUnavailable = notes == nil
+        }
+    }
+
+    /// Quiet companion fetch. A miss leaves the existing notes layout unchanged.
+    private func loadComic(from relatedURL: URL) {
+        comicTask?.cancel()
+        comicTask = Task { [weak self] in
+            let comic = await UpdateComicLoader.load(fromRelatedURL: relatedURL)
+            guard !Task.isCancelled else { return }
+            self?.presentation.comic = comic
         }
     }
 
