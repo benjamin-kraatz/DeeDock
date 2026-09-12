@@ -83,7 +83,7 @@ Comic for the [release notes](<version>.md).
 <English caption>
 ```
 
-Repeat the panel headings for 02 and 03 (or 02 only, or through 04). Link the full notes from the comic.
+Repeat the panel headings for 02 and 03 (or 02 only, or through 04). Link the full notes from the comic. Link the comic from the notes only when that helps Esi review.
 
 ## Native Update window
 
@@ -93,7 +93,7 @@ Do not put remote stylesheets, scripts, or Google Fonts in the markdown. The app
 
 ## Preview HTML
 
-Optional. Copy [comic-preview.template.html](comic-preview.template.html) to `*-comic.html` for review: art on top, German column, English column.
+Optional. Copy [comic-preview.template.html](comic-preview.template.html) to `*-comic.html` for review: art on top, German column, English column. No app chrome.
 
 That static file may load one Google Fonts family. Use Source Serif 4. Do not load a pile of families. Put this in the preview `<head>` only:
 
@@ -112,8 +112,8 @@ When `docs/releases/<MARKETING_VERSION>-comic.md` exists on the shipped commit, 
 - `DDock-comic.md` from `docs/releases/<MARKETING_VERSION>-comic.md`
 - `panel-0N.png` from `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png`
 
-A missing comic file is skipped. The notes-only ship still succeeds. The renderer PR does not add `0.4.1-comic.md` or `assets/0.4.1/`. A 0.5.0 Focus, Compost, and Gossip comic belongs only to 0.5.0.
+A missing comic file is skipped. The notes-only ship still succeeds. Do not add `0.4.1-comic.md` or `assets/0.4.1/`. A 0.5.0 Focus, Compost, and Gossip comic belongs only to 0.5.0.
 
 ## Process
 
-Land the native renderer first, with no version-specific comic content. Author the first real comic in the 0.5.0 release-prep PR, next to that version bump and `docs/releases/0.5.0.md`. Do not dispatch Release from a feature PR. Esi merges, then ships. The workflow attaches comic assets on the draft when that later cut has one.
+Land the native renderer first, with no version-specific comic content. Author the first real comic in the same 0.5.0 release-prep PR as the version bump and `docs/releases/0.5.0.md`. Do not dispatch Release from that PR. Esi merges, then ships. The workflow attaches comic assets on the draft when that cut has one.
