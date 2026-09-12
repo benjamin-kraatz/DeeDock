@@ -20,11 +20,17 @@ Playback requires the existing Sims store to be enabled and readable. The `aiRum
 
 The composer uses `SystemLanguageModel.default` on this Mac. Input consists of visible app names, fictional pet moods, the app locale, and recent generated dialogue. App identities are replaced with candidate numbers before prompting. It reads no app content, sends no network requests, and changes no system Dock settings. There is no cloud provider, tool calling, scripted dialogue, or canned fallback.
 
+## Debug trigger
+
+Debug builds add **Gerüchterunden → Nächste Gerüchterunde starten** in Dock Sims settings. The button skips the initial wait or the current cooldown for one round on the first eligible visible dock. It can replace an exchange already on screen. Hidden or busy docks wait until eligible; the button does not reveal them or override consent, Focus Sessions, or Reduce Motion. It is disabled while generation is in flight. Repeated clicks coalesce into one pending round. Turning Sims or AI rumours off clears that request.
+
+The button, pending request, claim mechanism, and timing override compile only under `DEBUG`. Nothing is persisted.
+
 ## Generation contract
 
 The user's follow-up on 2026-09-12 authorized AI generation in this slice, superseding the issue's original canned-only scope. AI still requires its own in-app opt-in.
 
-`FoundationModelsRumourComposer` creates a fresh session for each exchange. Its instructions ask for understated, varied fictional voices, a reply that responds to the opening, idiomatic language, and new topics relative to recent dialogue. App names and prior model output are explicitly untrusted data. The model must not claim to have observed private activity or pressure the user to care for the pets.
+`FoundationModelsRumourComposer` creates a fresh session for each exchange. Its instructions require a specific fictional secret or rumour about the app mascots, followed by mock disbelief, a knowing tease, or another juicy detail. The gossip stays affectionate and low-stakes, with idiomatic language and varied topics relative to recent dialogue. App names and prior model output are explicitly untrusted data. The model must not claim to have observed private activity or pressure the user to care for the pets.
 
 [Apple's guided generation](https://developer.apple.com/documentation/foundationmodels/generating-swift-data-structures-with-guided-generation) supplies typed candidate numbers and dialogue fields. The app validates candidate numbers, nonempty single-line dialogue, and a 65-character display limit. If the first draft fails validation, the model receives one concrete revision request with the failure reason and a shorter word target. An invalid revision is discarded. These are identity and display constraints, not a heuristic dialogue generator. Model output is rendered verbatim as text.
 

@@ -21,6 +21,28 @@ final class DockSimsStore {
     private static let rumourLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.deedock",
                                              category: "IconRumours")
 
+    #if DEBUG
+    /// One pending manual round, claimed by the first eligible display. Never persisted.
+    private(set) var debugRumourRoundID: UUID?
+    @ObservationIgnored private var claimedDebugRumourRoundID: UUID?
+    private var debugRumourRequestsInFlight = 0
+    var canTriggerDebugRumour: Bool {
+        isEnabled && aiRumoursEnabled && !requiresReset && debugRumourRequestsInFlight == 0
+    }
+
+    func triggerDebugRumourRound() {
+        guard canTriggerDebugRumour else { return }
+        debugRumourRoundID = UUID()
+    }
+
+    /// Claiming is deliberately not observable: it must not cancel the task consuming the round.
+    func claimDebugRumourRound(_ id: UUID?) -> Bool {
+        guard let id, id == debugRumourRoundID, id != claimedDebugRumourRoundID else { return false }
+        claimedDebugRumourRoundID = id
+        return true
+    }
+    #endif
+
     var isEnabled: Bool { document.isEnabled }
     var aiRumoursEnabled: Bool { document.aiRumoursEnabled }
     var intensity: Double { document.intensity }
@@ -89,6 +111,10 @@ final class DockSimsStore {
     /// of the await so disabling then re-enabling cannot revive an older response.
     func generateRumour(participants: [DockRumourParticipant], locale: Locale) async -> DockRumour? {
         guard isEnabled, aiRumoursEnabled, !requiresReset, !Task.isCancelled else { return nil }
+        #if DEBUG
+        debugRumourRequestsInFlight += 1
+        defer { debugRumourRequestsInFlight -= 1 }
+        #endif
         let consent = rumourConsentGeneration
         let requestID = UUID()
         let startedAt = Date.now
@@ -128,6 +154,10 @@ final class DockSimsStore {
     }
 
     private func invalidateRumours() {
+        #if DEBUG
+        debugRumourRoundID = nil
+        claimedDebugRumourRoundID = nil
+        #endif
         rumourConsentGeneration = UUID()
         recentRumours = []
         rumourStatus = .ready

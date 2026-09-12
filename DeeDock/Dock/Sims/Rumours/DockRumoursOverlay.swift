@@ -20,6 +20,9 @@ struct DockRumoursOverlay: View {
         let participants: [String]
         let localeIdentifier: String
         let revision: Int
+        #if DEBUG
+        var debugRoundID: UUID? = nil
+        #endif
     }
 
     private struct Line {
@@ -48,7 +51,14 @@ struct DockRumoursOverlay: View {
         let participants = allowed ? store.items.filter {
             $0.isFavorite && frame(for: $0.id).map { viewport.contains($0) } == true
         }.map(\.id) : []
-        return Request(participants: participants.count >= 2 ? participants : [], localeIdentifier: locale.identifier, revision: revision)
+        let request = Request(participants: participants.count >= 2 ? participants : [], localeIdentifier: locale.identifier, revision: revision)
+        #if DEBUG
+        var debugRequest = request
+        debugRequest.debugRoundID = interaction.sims?.debugRumourRoundID
+        return debugRequest
+        #else
+        return request
+        #endif
     }
 
     var body: some View {
@@ -106,7 +116,12 @@ struct DockRumoursOverlay: View {
         line = nil
         guard request.participants.count >= 2 else { return }
         do {
+            #if DEBUG
+            let manualRound = interaction.sims?.claimDebugRumourRound(request.debugRoundID) == true
+            if !manualRound { try await Task.sleep(for: .seconds(30)) }
+            #else
             try await Task.sleep(for: .seconds(30))
+            #endif
             while !Task.isCancelled {
                 guard let sims = interaction.sims else { return }
                 let participants = store.items.filter { request.participants.contains($0.id) }.map { item in

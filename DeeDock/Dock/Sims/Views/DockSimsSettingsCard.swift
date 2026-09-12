@@ -27,6 +27,12 @@ struct DockSimsSettingsCard: View {
                 reset: { sims.reset() }
             )
             #if DEBUG
+            SettingsCard(title: .simsDebugRumoursTitle, footnote: .simsDebugRumoursHelp) {
+                SettingsActionRow {
+                    Button(.simsDebugRumoursNext) { sims.triggerDebugRumourRound() }
+                        .disabled(!sims.canTriggerDebugRumour)
+                }
+            }
             DockSimsDebugClockCard(
                 offset: sims.debugTimeOffset,
                 advance: { sims.debugAdvanceTime(by: $0) },

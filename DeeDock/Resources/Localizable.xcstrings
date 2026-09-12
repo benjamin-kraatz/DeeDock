@@ -1999,6 +1999,60 @@
       }
     }
   },
+    "simsDebugRumoursTitle" : {
+      "comment": "Debug-only settings card title for manually triggering AI rumours.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gerüchterunden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rumour rounds"
+          }
+        }
+      }
+    },
+    "simsDebugRumoursNext" : {
+      "comment": "Debug-only button that skips the idle wait for one eligible dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Gerüchterunde starten"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trigger next rumour round"
+          }
+        }
+      }
+    },
+    "simsDebugRumoursHelp" : {
+      "comment": "Explain the Debug-only next-round trigger, consent, and unchanged eligibility requirements.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Debug. Überspringt die Wartezeit einmal am nächsten geeigneten sichtbaren Dock. Erfordert Sims und KI-Gerüchte. Ruhemodi gelten weiter. Bewege den Zeiger vom Dock weg; ausgeblendete Docks müssen zuerst sichtbar sein."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Debug only. Skips the idle wait once on the next eligible visible dock. Requires Sims and AI rumours. Quiet modes still apply. Move the pointer away from the dock; hidden docks must be visible first."
+          }
+        }
+      }
+    },
     "simsRumourInvalidOutput" : {
       "comment": "Shown when model dialogue fails identity, length, or format validation after one revision.",
       "extractionState": "manual",

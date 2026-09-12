@@ -44,7 +44,13 @@ AI revision validation on 2026-09-12: `xcodebuild -project DeeDock.xcodeproj -sc
 Follow-up diagnosis on 2026-09-12: an isolated live Foundation Models call with synthetic Safari, Notizen, and Finder candidates in `de_DE` reproduced the generic failure. Generation returned 79- and 72-character lines; the app rejected them against its 65-character limit. Added one model revision for invalid drafts, distinct validation diagnostics, selectable Settings error details, and unified logging under `IconRumours`. A subsequent live call returned a valid German exchange. A focused follow-up exercised the revision path: an initial 70/70-character draft became a valid 53/43-character exchange after one revision. The corrected Debug app build passed with the same existing warnings. No unit suite, automated visual checks, or native dock acceptance was run. The diagnostic probe did not launch DDock or modify its preferences.
 
 
+Debug-trigger follow-up on 2026-09-12: added a Debug-only next-round button and stronger fictional-gossip instructions. Debug and Release app builds passed using the same Xcode command above with their respective configurations. The button, request state, claim method, and idle-wait override are conditionally compiled under `DEBUG`. This follow-up did not run tests, previews, live generation, or native button acceptance.
+
 ### Required hands-on acceptance
+
+- In Debug, enable Sims and AI rumours, then use **Nächste Gerüchterunde starten**. Confirm one eligible dock begins generation without the idle wait. Repeat during a displayed exchange and during cooldown. Confirm the button is disabled during generation and absent in Release.
+- Request a round while all docks are hidden or blocked. Confirm one pending round waits for eligibility, repeated clicks do not queue extra rounds, and disabling Sims or AI rumours clears it.
+- Assess whether new dialogue contains a specific fictional secret and a gossip reaction rather than generic small talk.
 
 - Load preferences saved before DEE-43 or with only the earlier canned-rumour flag enabled. Confirm AI rumours start off and Sims moods and care history remain intact. Enable rumours, restart, and confirm the switch persists.
 - With Sims and AI rumours on and at least two visible pinned apps, leave the pointer outside a visible dock for 30 seconds plus generation time. Confirm a model-selected opening and reply appear beside their respective icons for five seconds each. Wait 90 more seconds plus generation time for a fresh exchange. Assess coherence, brevity, variation, English and German fluency, and response latency.

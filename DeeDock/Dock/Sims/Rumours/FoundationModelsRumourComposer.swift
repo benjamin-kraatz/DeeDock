@@ -8,9 +8,9 @@ private struct GeneratedDockRumour {
     var speakerIndex: Int
     @Guide(description: "A different candidate number for the app that replies.")
     var listenerIndex: Int
-    @Guide(description: "One brief spoken sentence, at most 65 characters, in the requested language. No speaker label.")
+    @Guide(description: "One juicy fictional rumour whispered by an app mascot, at most 65 characters, in the requested language. No speaker label.")
     var opening: String
-    @Guide(description: "One brief spoken reply, at most 65 characters, in the requested language. Respond to the opening with a fresh twist. No speaker label.")
+    @Guide(description: "One brief spoken reply, at most 65 characters, in the requested language. React to the gossip with disbelief, a knowing tease, or a new detail. No speaker label.")
     var reply: String
 }
 
@@ -51,10 +51,15 @@ actor FoundationModelsRumourComposer {
         defer { isGenerating = false }
 
         let session = LanguageModelSession(model: SystemLanguageModel.default, instructions: """
-            You write tiny improvised conversations for fictional pets living in a macOS dock.
-            Choose two distinct candidate apps whose names or pet moods suggest an amusing relationship.
-            Let their voices differ subtly. The opening offers a playful observation, question, or imaginary rumour;
-            the reply must respond directly and add a small surprise. Warm, understated wit, never a generic greeting.
+            You write whispered gossip between fictional app mascots who are nosy neighbours in a macOS dock.
+            Choose two distinct candidate apps whose names or pet moods suggest a fun social relationship.
+            The opening MUST share a specific invented secret or rumour from their tiny imaginary social world:
+            a secret crush, unlikely alliance, petty rivalry, suspicious disappearance, or harmless scandal.
+            Make it feel like one neighbour leaning over to share something they just heard. Be concrete, not philosophical.
+            The reply MUST react to that exact rumour with mock disbelief, a knowing tease, or an extra juicy detail.
+            Give the two voices different attitudes. Keep the mischief affectionate and the stakes delightfully trivial.
+            This should feel like gossip, not a greeting, generic small talk, a tech-support exchange, or an abstract joke.
+            Use varied whispered phrasing appropriate to the language; do not start every exchange with the same formula.
             Use natural spoken language in the requested locale, with idiomatic phrasing rather than translated English.
             Keep each line within 65 characters including spaces. No labels, markdown, emoji, stage directions, or explanations.
             Consider the recent exchanges and choose a fresh topic, wording, and pairing where possible.
@@ -90,7 +95,7 @@ actor FoundationModelsRumourComposer {
             logger.notice("Revising rumour after validation: \(reason, privacy: .public)")
             let revision = try await session.respond(to: Prompt {
                 "Revise the previous exchange. Validation reported: \(reason)."
-                "Keep two distinct valid candidate numbers. Keep the same language and conversational idea."
+                "Keep two distinct valid candidate numbers. Keep the same language, specific fictional secret, and gossip reaction."
                 "Use only four to six short words per line, never more than 65 characters including spaces."
                 "Return complete spoken sentences. No line breaks or labels. Return the revised structured exchange."
             }, generating: GeneratedDockRumour.self, options: GenerationOptions(maximumResponseTokens: 240))
