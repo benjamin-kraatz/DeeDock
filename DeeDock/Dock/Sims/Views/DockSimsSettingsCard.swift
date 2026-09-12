@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// Dock Sims controls: the opt-in, how strongly pins move, and recovery from a bad document.
@@ -6,21 +7,34 @@ import SwiftUI
 /// in ``DockSimsSettingsCardContent`` so every state is previewable without touching storage.
 struct DockSimsSettingsCard: View {
     let sims: DockSimsStore
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
             DockSimsSettingsCardContent(
                 isEnabled: sims.isEnabled,
+                aiRumoursEnabled: sims.aiRumoursEnabled,
+                gossipIntensity: sims.gossipIntensity,
+                rumourNotice: sims.rumourStatus.message,
+                rumourDiagnostic: sims.lastRumourDiagnostic?.report,
                 intensity: sims.intensity,
                 hasPets: sims.hasPets,
                 requiresReset: sims.requiresReset,
                 storageFailed: sims.storageFailed,
                 setEnabled: { sims.setEnabled($0) },
+                setAIRumoursEnabled: { sims.setAIRumoursEnabled($0) },
+                setGossipIntensity: { sims.setGossipIntensity($0) },
                 setIntensity: { sims.setIntensity($0) },
                 resetMoods: { sims.resetMoods() },
                 reset: { sims.reset() }
             )
             #if DEBUG
+            SettingsCard(title: .simsDebugRumoursTitle, footnote: .simsDebugRumoursHelp) {
+                SettingsActionRow {
+                    Button(.simsDebugRumoursNext) { sims.triggerDebugRumourRound() }
+                        .disabled(!sims.canTriggerDebugRumour)
+                }
+            }
             DockSimsDebugClockCard(
                 offset: sims.debugTimeOffset,
                 advance: { sims.debugAdvanceTime(by: $0) },
@@ -28,12 +42,20 @@ struct DockSimsSettingsCard: View {
             )
             #endif
         }
+        .task(id: locale.identifier) { sims.refreshRumourAvailability(locale: locale) }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            sims.refreshRumourAvailability(locale: locale)
+        }
     }
 }
 
 /// The card's rendering, driven by plain values so each state is previewable and testable.
 struct DockSimsSettingsCardContent: View {
     let isEnabled: Bool
+    var aiRumoursEnabled = false
+    var gossipIntensity: DockRumourIntensity = .lightChatter
+    var rumourNotice: LocalizedStringResource? = nil
+    var rumourDiagnostic: String? = nil
     /// Percent, matching the other Features sliders.
     let intensity: Double
     /// True once at least one pin has been fed, cheered, or settled.
@@ -42,6 +64,8 @@ struct DockSimsSettingsCardContent: View {
     let requiresReset: Bool
     let storageFailed: Bool
     let setEnabled: (Bool) -> Void
+    var setAIRumoursEnabled: (Bool) -> Void = { _ in }
+    var setGossipIntensity: (DockRumourIntensity) -> Void = { _ in }
     let setIntensity: (Double) -> Void
     let resetMoods: () -> Void
     let reset: () -> Void
@@ -60,6 +84,28 @@ struct DockSimsSettingsCardContent: View {
                               minimumSymbol: "tortoise", maximumSymbol: "hare",
                               defaultValue: DockSimsLimits.defaultIntensity)
                 .disabled(!isEnabled || requiresReset)
+            SettingsToggleRow(title: .simsRumoursEnable, subtitle: .simsRumoursHelp,
+                              isOn: Binding(get: { aiRumoursEnabled }, set: setAIRumoursEnabled))
+                .disabled(!isEnabled || requiresReset)
+            SettingsStackedRow {
+                DockRumourIntensitySlider(value: gossipIntensity, setValue: setGossipIntensity)
+                    .disabled(!isEnabled || !aiRumoursEnabled || requiresReset)
+            }
+            if let rumourNotice {
+                SettingsStackedRow { DockSimsSettingsNotice(message: rumourNotice) }
+            }
+            if let rumourDiagnostic {
+                SettingsStackedRow {
+                    DisclosureGroup {
+                        Text(verbatim: rumourDiagnostic)
+                            .font(.caption.monospaced())
+                            .textSelection(.enabled)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } label: {
+                        Text(.simsRumourDiagnosticDetails)
+                    }
+                }
+            }
             if !isEnabled && !requiresReset {
                 SettingsStackedRow {
                     ContentUnavailableView {
@@ -114,6 +160,17 @@ private struct DockSimsSettingsNotice: View {
 }
 
 #if DEBUG
+#Preview("Rumour failure details") {
+    DockSimsSettingsCardContent(isEnabled: true, aiRumoursEnabled: true,
+                                rumourNotice: .simsRumourInvalidOutput,
+                                rumourDiagnostic: "IconRumours\nreason: line-length opening=79 reply=72 limit=65",
+                                intensity: 55, hasPets: true,
+                                requiresReset: false, storageFailed: false,
+                                setEnabled: { _ in }, setIntensity: { _ in }, resetMoods: {}, reset: {})
+        .padding(24)
+        .frame(width: SettingsMetrics.columnWidth)
+}
+
 #Preview("Enabled with pets") {
     DockSimsSettingsCardContent(isEnabled: true, intensity: 55, hasPets: true,
                                 requiresReset: false, storageFailed: false,
