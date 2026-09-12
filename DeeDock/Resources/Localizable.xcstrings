@@ -1,6 +1,420 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "compostAlreadyStaged": {
+    "comment": "Duplicate restore failure; nothing is silently forgotten.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Diese Datei ist bereits in der Ablage. Ihr archivierter Verweis bleibt erhalten."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This file is already on the Shelf. Its archived reference has been kept."
+        }
+      }
+    }
+  },
+  "compostArchiveFull": {
+    "comment": "Archive limit reached; active entries stay active and no archive entries are evicted.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Kompost ist voll. Das Archivieren pausiert. Stelle einen Eintrag wieder her oder vergiss ausdrücklich einen Verweis, um Platz zu schaffen."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Compost is full. Aging is paused. Restore an entry or explicitly forget a reference to make room."
+        }
+      }
+    }
+  },
+  "compostArchived": {
+    "comment": "Archive date label. date is a system-formatted date.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Archiviert am %1$(date)@"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Archived %1$(date)@"
+        }
+      }
+    }
+  },
+  "compostBack": {
+    "comment": "Returns from Compost to active Shelf items.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zurück zur Ablage"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Back to Shelf"
+        }
+      }
+    }
+  },
+  "compostCount": {
+    "comment": "Compost count. count is the number of retained references.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Archiviert: %1$(count)lld"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Archived: %1$(count)lld"
+        }
+      }
+    }
+  },
+  "compostEmptyMessage": {
+    "comment": "Empty archive help.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wähle eine Altersregel, damit ältere Ablage-Einträge hier ruhen. Beim Wiederherstellen beginnt ihre Zeit in der Ablage von vorn."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Choose an age rule to let older Shelf entries rest here. Restoring gives them a fresh start on the Shelf."
+        }
+      }
+    }
+  },
+  "compostEmptyTitle": {
+    "comment": "Empty Compost archive heading.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Platz zum Wachsen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Room to grow"
+        }
+      }
+    }
+  },
+  "compostForget": {
+    "comment": "Opens confirmation before permanently forgetting one archived reference. Does not delete files.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verweis vergessen …"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Forget reference…"
+        }
+      }
+    }
+  },
+  "compostForgetMessage": {
+    "comment": "Explicit final removal confirmation, distinguishing reference from file.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieser Eintrag wird endgültig aus dem Kompost entfernt. Die Datei bleibt an ihrem Ort. Du kannst sie im Finder erneut zur Ablage hinzufügen."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This removes the entry from Compost permanently. The file stays where it is. You can add it to the Shelf again from Finder."
+        }
+      }
+    }
+  },
+  "compostForgetTitle": {
+    "comment": "Confirmation title and accessibility action. name is the file name.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@ vergessen?"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Forget %1$(name)@?"
+        }
+      }
+    }
+  },
+  "compostName": {
+    "comment": "Name of the reversible Shelf archive. Compost uses a gardening metaphor.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kompost"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Compost"
+        }
+      }
+    }
+  },
+  "compostRestore": {
+    "comment": "Restores an archived reference.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In Ablage wiederherstellen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restore to Shelf"
+        }
+      }
+    }
+  },
+  "compostRestoreNamed": {
+    "comment": "VoiceOver action. name is a Finder-provided file name; do not translate.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@ in Ablage wiederherstellen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Restore %1$(name)@ to Shelf"
+        }
+      }
+    }
+  },
+  "compostRestored": {
+    "comment": "Successful restoration announcement. name is the file name.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@ ist wieder in der Ablage."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%1$(name)@ is back on the Shelf."
+        }
+      }
+    }
+  },
+  "compostRule": {
+    "comment": "Age rule picker label.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatisch kompostieren"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Compost automatically"
+        }
+      }
+    }
+  },
+  "compostRuleFortnight": {
+    "comment": "Archive after fourteen elapsed days on Shelf.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach 14 Tagen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "After 14 days"
+        }
+      }
+    }
+  },
+  "compostRuleHelp": {
+    "comment": "Explain immediate effect, aging basis, and reference-only archive.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Alter zählt ab dem Hinzufügen oder Wiederherstellen. Eine Regel archiviert passende Einträge sofort. Dateien bleiben an ihrem Ort und werden nie gelöscht. Jederzeit wiederherstellbar."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Age starts when added or restored. Choosing a rule archives matching items now. Files stay in place and are never deleted. Restore anytime."
+        }
+      }
+    }
+  },
+  "compostRuleMonth": {
+    "comment": "Archive after thirty elapsed days on Shelf.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach 30 Tagen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "After 30 days"
+        }
+      }
+    }
+  },
+  "compostRuleOff": {
+    "comment": "No automatic archiving.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aus"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Off"
+        }
+      }
+    }
+  },
+  "compostRuleWeek": {
+    "comment": "Archive after seven elapsed days on Shelf.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nach 7 Tagen"
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "After 7 days"
+        }
+      }
+    }
+  },
+  "compostShelfFull": {
+    "comment": "Recoverable restore failure at the active Shelf capacity.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Ablage ist voll. Entferne einen aktiven Eintrag und stelle diesen dann wieder her. Bis dahin bleibt er im Kompost."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The Shelf is full. Remove an active entry, then restore this one. It will stay in Compost until then."
+        }
+      }
+    }
+  },
+  "compostStorageUnavailable": {
+    "comment": "Fail-closed archive storage message.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Der Ablage-Speicher konnte nicht gelesen werden. Kehre zur Ablage zurück und versuche es erneut, bevor du den Kompost änderst."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Shelf storage could not be read. Return to the Shelf and retry before changing Compost."
+        }
+      }
+    }
+  },
+  "compostTagline": {
+    "comment": "Playful archive subtitle, paired with explicit restoration controls.",
+    "extractionState": "manual",
+    "localizations": {
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein Ruheplatz für alte Dateien. Bereit, wieder zu sprießen."
+        }
+      },
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A resting place for old files. Ready to sprout again."
+        }
+      }
+    }
+  },
   "focusDebtTitle": {
     "comment": "Title of the optional, gentle count of sessions ended early.",
     "extractionState": "manual",

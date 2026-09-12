@@ -40,7 +40,9 @@ final class ShelfCoordinator {
             return
         }
 
+        shelf.refreshCompost()
         let state = ShelfPanelState(organizer: organizer)
+        applyCompost(to: state)
         state.apply(shelf.ordered, sort: shelf.sort, presentation: shelf.presentation,
                     animated: false) { [shelf] in shelf.resolve($0.id) }
         if let failure = shelf.loadFailure {
@@ -81,6 +83,28 @@ final class ShelfCoordinator {
             reload(animated: false)
         }
         state.reloadSemantic = { [weak self] in self?.reload(animated: false) }
+        state.compostPolicyChanged = { [weak self] value in
+            guard let self else { return }
+            performCompost { try self.shelf.setCompostPolicy(value) }
+        }
+        state.restoreCompost = { [weak self, weak state] id in
+            guard let self, let state else { return }
+            performCompost {
+                guard let entry = self.shelf.compost.first(where: { $0.id == id }) else { return }
+                try self.shelf.restoreFromCompost(id)
+                state.compostRestoration += 1
+                let message = String(localized: .compostRestored(name: entry.item.name))
+                state.compostNotice = message
+                NSAccessibility.post(element: NSApplication.shared, notification: .announcementRequested,
+                                     userInfo: [.announcement: message,
+                                                .priority: NSAccessibilityPriorityLevel.medium.rawValue])
+            }
+        }
+        state.forgetCompost = { [weak self] id in
+            guard let self, let entry = shelf.compost.first(where: { $0.id == id }),
+                  confirmForget(entry) else { return }
+            performCompost { try self.shelf.forgetCompost(id) }
+        }
         state.requestThumbnail = { [weak self, weak panel] item, size in
             guard let self else { return }
             thumbnails.load(item, size: size, scale: panel?.backingScaleFactor ?? 2,
@@ -125,6 +149,7 @@ final class ShelfCoordinator {
     /// Reflects an edit made anywhere, including from another display's dock.
     func reload(animated: Bool = true) {
         guard let state else { return }
+        applyCompost(to: state)
         state.apply(shelf.ordered, sort: shelf.sort, presentation: shelf.presentation,
                     animated: animated) { [shelf] in shelf.resolve($0.id) }
         thumbnails.retain(Set(state.order))
@@ -280,6 +305,34 @@ final class ShelfCoordinator {
 
     // MARK: - Private
 
+    private func applyCompost(to state: ShelfPanelState) {
+        state.compost = shelf.compost
+        state.compostPolicy = shelf.compostPolicy
+        state.compostFailure = shelf.compostFailure
+        state.compostRequiresReset = shelf.requiresReset
+    }
+
+    private func performCompost(_ edit: () throws -> Void) {
+        state?.compostNotice = nil
+        do {
+            try edit()
+            reload()
+        } catch {
+            state?.compostFailure = error.localizedDescription
+        }
+    }
+
+    private func confirmForget(_ entry: ShelfCompostEntry) -> Bool {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = String(localized: .compostForgetTitle(name: entry.item.name))
+        alert.informativeText = String(localized: .compostForgetMessage)
+        alert.addButton(withTitle: String(localized: .compostForget)).hasDestructiveAction = true
+        alert.addButton(withTitle: String(localized: .shelfClearCancel))
+        NSApp.activate()
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+
     private func beginDrag(items: [ShelfItem], from view: NSView, event: NSEvent,
                            panel: DockPanelController? = nil) {
         let resolved = items.compactMap { item -> (ShelfResourceAccess, ShelfItem)? in
@@ -315,6 +368,12 @@ final class ShelfCoordinator {
 
     private func handleKey(_ event: NSEvent) -> Bool {
         guard let state else { return false }
+        if state.showingCompost {
+            if event.keyCode == 53 { state.showingCompost = false; return true }
+            // Let the native picker and buttons receive their keys. Hidden Shelf selections
+            // must never open or remove files while the user is browsing Compost.
+            return false
+        }
         if event.modifierFlags.contains(.command) {
             switch event.charactersIgnoringModifiers {
             case "a": state.selectAll(); return true

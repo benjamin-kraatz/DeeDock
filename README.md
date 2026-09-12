@@ -285,7 +285,18 @@ Keyboard, while the panel is open: Up and Down select, Return shows the selected
 
 Select a Shelf item and press Space, or choose Quick Look from its context menu, to preview it inside the panel. Space or Escape returns to the list. Up and Down preview the previous or next item. A preview holds the file access until its native view closes.
 
-Reordering, auto-expiry, and multiple named shelves remain planned.
+Open **Shelf → Compost** to enable automatic archiving after 7, 14, or 30 days. It starts off.
+Age counts from the last addition or restoration, including time while DDock is closed.
+Choosing a rule archives eligible entries immediately. Compost keeps the file references and
+bookmarks, with a leaf-and-soil illustration and a brief leaf bounce when an item is restored.
+
+**Restore to Shelf** returns an entry and restarts its age. **Clear Shelf** keeps Compost intact.
+The archive holds 500 entries, then pauses aging without discarding anything. A full Shelf
+refuses restoration until you make room. **Forget reference…** requires confirmation and
+removes only that archived reference. Files remain where they are. See
+[Compost acceptance](docs/ACCEPTANCE.md#dee-55-compost-shelf) for validation limits.
+
+Reordering individual Shelf entries and multiple named shelves remain planned.
 
 ## Trash
 
