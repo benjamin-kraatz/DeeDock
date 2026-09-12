@@ -26825,13 +26825,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dateien ablegen, den Papierkorb verwalten und Objekte in Quarantäne zurückstellen."
+            "value" : "Dateien ablegen und den Papierkorb verwalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stage files, manage the Trash, and set items aside in quarantine."
+            "value" : "Stage files and manage the Trash."
           }
         }
       }
@@ -26879,13 +26879,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen veraltet abgekündigt Quarantäne Stempel Patchbay Atem Fokus-Zähler"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop deprecated quarantine stamp patch bay breathing focus debt"
           }
         }
       }
@@ -29046,6 +29046,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Optional pops when you click, pin, or drop an app."
+          }
+        }
+      }
+    },
+    "settingsDeprecated" : {
+      "comment" : "Badge and Features-overview group heading for personality features that will be removed in version 1.0.0.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veraltet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deprecated"
+          }
+        }
+      }
+    },
+    "settingsDeprecatedFeatureNotice" : {
+      "comment" : "Warning banner on every deprecated feature's settings page. The version number is the planned removal release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Funktion wird in Version 1.0.0 entfernt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This feature will be removed in version 1.0.0."
+          }
+        }
+      }
+    },
+    "settingsFeatureFocusBreathingSubtitle" : {
+      "comment" : "Description of Focus breathing on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein langsamer Lichtakzent im Dock-Hintergrund während Fokus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A slow highlight in the dock background during Focus."
+          }
+        }
+      }
+    },
+    "settingsFeatureFocusDebtSubtitle" : {
+      "comment" : "Description of the Focus debt meter on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zählt lokal, wie oft eine Fokus-Sitzung vor dem Ende abgebrochen wurde."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counts locally how often a Focus session ended early."
+          }
+        }
+      }
+    },
+    "settingsFeatureQuarantineSubtitle" : {
+      "comment" : "Description of Quarantine stamp on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markiert Dock-Objekte, damit sie sich erst nach der Freigabe öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marks dock items so they will not open until you release them."
           }
         }
       }

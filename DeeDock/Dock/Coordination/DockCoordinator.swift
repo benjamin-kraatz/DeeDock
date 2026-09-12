@@ -210,6 +210,14 @@ final class DockCoordinator {
         }
         discovery.start()
         sims.start()
+        DeprecatedFeaturesRetirement.disableEnabledFlags(
+            sims: sims,
+            focusBreathing: focusBreathing,
+            focusSession: focusSession,
+            pinWeather: pinWeather,
+            quarantine: .shared,
+            patchBay: patchBay
+        )
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in
             guard let self else { return }

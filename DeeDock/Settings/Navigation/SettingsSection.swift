@@ -86,9 +86,10 @@ enum SettingsSection: Hashable, Identifiable {
             SettingsPage.dockGroups
         case .features:
             [[.shelfAndTrash, .capsules, .badges],
-             [.windowPeek, .focusSessions, .actionTiles, .patchBay, .appSuggestions],
-             [.localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles],
-             [.discovery, .multipleDisplays, .permissions]]
+             [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
+             [.localHistory, .clipboardMuseum, .magneticEdges, .soapBubbles],
+             [.discovery, .multipleDisplays, .permissions],
+             SettingsPage.deprecatedPages]
         case .modes, .atmosphere:
             []
         }
@@ -104,7 +105,7 @@ enum SettingsSection: Hashable, Identifiable {
             [.settingsGeneralKeywords]
             #endif
         case .dock: [.settingsAppearanceKeywords, .settingsPositionKeywords, .settingsBehaviorKeywords]
-        case .features: [.settingsFeaturesKeywords]
+        case .features: [.settingsFeaturesKeywords, .settingsDeprecated]
         case .modes: [.dockModesKeywords]
         case .atmosphere: [.atmosphereSummary]
         case .display: []

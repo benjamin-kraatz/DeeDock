@@ -1,6 +1,10 @@
 # Icon rumours
 
-DEE-43 uses Apple Foundation Models to invent short fictional exchanges between pinned application icons. Enable **Sims moods** and **AI icon rumours** in **Settings → Features → Dock Sims**. AI rumours are off by default. Disabling them keeps moods and care history.
+Dock Sims and AI icon rumours are deprecated and will be removed in version 1.0.0.
+Launch turns Sims moods off, which also stops rumours. Settings remain under
+**Settings → Features → Deprecated → Dock Sims**.
+
+DEE-43 uses Apple Foundation Models to invent short fictional exchanges between pinned application icons. Enable **Sims moods** and **AI icon rumours** on that Deprecated page. AI rumours are off by default. Disabling them keeps moods and care history.
 
 ## Playback
 
@@ -30,7 +34,7 @@ The composer uses `SystemLanguageModel.default` on this Mac. Input consists of v
 
 ## Debug trigger
 
-Debug builds add **Gerüchterunden → Nächste Gerüchterunde starten** in Dock Sims settings. The button skips the initial wait or the current cooldown for one round on the first eligible visible dock. It can replace an exchange already on screen. Hidden or busy docks wait until eligible; the button does not reveal them or override consent, Focus Sessions, or Reduce Motion. It is disabled while generation is in flight. Repeated clicks coalesce into one pending round. Turning Sims or AI rumours off clears that request.
+Debug builds add **Gerüchterunden → Nächste Gerüchterunde starten** in Deprecated Dock Sims settings. The button skips the initial wait or the current cooldown for one round on the first eligible visible dock. It can replace an exchange already on screen. Hidden or busy docks wait until eligible; the button does not reveal them or override consent, Focus Sessions, or Reduce Motion. It is disabled while generation is in flight. Repeated clicks coalesce into one pending round. Turning Sims or AI rumours off clears that request.
 
 The button, pending request, claim mechanism, and timing override compile only under `DEBUG`. Nothing is persisted.
 
@@ -49,7 +53,7 @@ Compile checks cannot establish humour quality, localization quality, model late
 
 ## Diagnostics
 
-Generation failures appear under **Settings → Features → Dock Sims → Fehlerdetails / Error details**. The selectable report includes a timestamp, request ID, failure reason, and error domain and code. Opening Settings preserves the last failure. A successful exchange or disabling Sims or AI rumours clears it.
+Generation failures appear under **Settings → Features → Deprecated → Dock Sims → Fehlerdetails / Error details**. The selectable report includes a timestamp, request ID, failure reason, and error domain and code. Opening Settings preserves the last failure. A successful exchange or disabling Sims or AI rumours clears it.
 
 Unified logs use the `IconRumours` category under the app bundle identifier. Starts and successes are info events, a validation revision is a notice, and final failures are error events. Cancellation and a busy composer are debug events. Public diagnostic records exclude app names, prompts, and dialogue. Framework descriptions are private debug fields.
 

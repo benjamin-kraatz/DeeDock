@@ -69,9 +69,11 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 ## Using DDock
 
-**Patch bay** in **Settings → Features** connects app-pin opens to pinned-folder actions in Finder. Cable actions are off by default and scoped to a display and Dock Mode, with eight cables maximum. See [supported ports and limits](docs/PATCH-BAY.md).
+These personality extras are deprecated and turn off on launch: Dock Sims and AI icon rumours, Focus breathing, Focus debt, Pin weather (icon rust), Quarantine stamp, and Patch bay. Their settings stay under **Settings → Features → Deprecated**, with a notice that they will be removed in version 1.0.0. Atmosphere and soap bubbles stay in the ordinary Features list.
 
-**AI icon rumours** uses on-device Apple Foundation Models to invent conversations between pinned apps after enabling both Sims moods and AI icon rumours in **Settings → Features → Dock Sims**. The model chooses speakers and dialogue from app names and Sims moods. Chatter is skippable and pauses during Focus Sessions and Reduce Motion. See [Icon rumours](docs/ICON-RUMOURS.md) for consent, model availability, and data boundaries.
+**Patch bay** is deprecated. Launch turns cable actions off. The editor stays under **Settings → Features → Deprecated**. See [supported ports and limits](docs/PATCH-BAY.md).
+
+**AI icon rumours** and Dock Sims are deprecated. Launch turns Sims moods off, which also stops rumours. Settings stay under **Settings → Features → Deprecated → Dock Sims**. See [Icon rumours](docs/ICON-RUMOURS.md) for the old consent and data boundaries.
 
 **DDock Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. Disable tips in **Settings → Features → DDock Discovery**. See [Discovery](docs/DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
@@ -125,11 +127,9 @@ Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to 
 
 ## Dock Modes
 
-**Settings → Modes → Focus breathing** adds an optional six-second highlight inside the dock
-background. It starts off. Choose its intensity and the Dock Modes that trigger it, or use
-running Focus Sessions. A public macOS Focus filter also supplies a trigger after you add DDock
-to that Focus in System Settings. Reduce Motion disables the effect.
-See [Focus breathing](docs/FOCUS-BREATHING.md) for setup and native acceptance limits.
+**Focus breathing** is deprecated and will be removed in version 1.0.0. Launch turns it off.
+The controls live under **Settings → Features → Deprecated**, not on Modes.
+See [Focus breathing](docs/FOCUS-BREATHING.md) for the old setup and native acceptance limits.
 
 In **Settings → Features → Multi-monitor docks**, enable secondary docks to show only apps
 with visible windows on their display in the running section. Only the running-only app list
@@ -547,11 +547,9 @@ The timer tile appears on every display. Its ring shows time remaining. Click it
 
 Set the next session's duration, from 1 to 180 minutes, in **Settings → Features → Focus Sessions**. The default is 25 minutes. Completion animation is optional and off by default, and Reduce Motion suppresses it. There are no streaks.
 
-**Focus debt** is off by default in the same settings page. When enabled, each new session
-is a promise to let its timer finish. Finishing or cancelling early adds one to a local count.
-Pauses, app changes, and Dock Mode changes do not count. Settings and the timer panel show
-gentle feedback with **Turn off and clear**, which immediately disables and resets the meter
-without changing the timer. The meter never sends data to Linear or other services.
+**Focus debt** is deprecated and will be removed in version 1.0.0. Launch turns the meter off.
+Its page is under **Settings → Features → Deprecated**. When it was enabled, each new session
+was a promise to let its timer finish. Finishing or cancelling early added one to a local count.
 
 ## Local History
 

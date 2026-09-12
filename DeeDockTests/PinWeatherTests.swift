@@ -36,6 +36,7 @@ struct PinWeatherTests {
         let (weather, defaults) = try store(suite)
         defer { defaults.removePersistentDomain(forName: suite) }
         weather.start()
+        weather.setEnabled(true)
         let start = Date(timeIntervalSince1970: 1_000)
         weather.synchronize(pinIDs: ["safari"], at: start)
         let unused = start.addingTimeInterval(Double(weather.unusedDays) * 2 * PinWeatherLimits.secondsPerDay)
@@ -95,7 +96,7 @@ struct PinWeatherTests {
         #expect(String(data: leftover, encoding: .utf8) == "not-json")
         frozen.reset()
         #expect(!frozen.requiresReset)
-        #expect(frozen.enabled)
+        #expect(!frozen.enabled)
         #expect(defaults.object(forKey: "dock.pin-weather.v1") == nil)
     }
 
@@ -108,7 +109,7 @@ struct PinWeatherTests {
         defaults.set(try JSONEncoder().encode([String: String]()), forKey: "dock.pin-weather.v1")
         let weather = PinWeatherStore(repository: PinWeatherRepository(defaults: defaults))
         weather.start()
-        #expect(weather.enabled)
+        #expect(!weather.enabled)
         #expect(weather.unusedDays == 30)
         #expect(weather.isEmpty)
     }

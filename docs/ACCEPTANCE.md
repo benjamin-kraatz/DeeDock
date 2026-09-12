@@ -1,5 +1,16 @@
 # DeeDock acceptance record
 
+## Deprecated personality features
+
+Dock Sims (including AI icon rumours), Focus breathing, Focus debt, Pin weather / icon rust,
+Quarantine stamp, and Patch bay are deprecated. They will be removed in version 1.0.0.
+Launch coerces each enable flag to off and persists that. Settings keeps a **Deprecated**
+group at the bottom of Features so the removal notice stays reachable. Atmosphere and
+soap bubbles stay first-class.
+
+The slices below remain the record of how those features were built. Hands-on checks that
+assume they stay on after launch no longer apply.
+
 ## DEE-76 update awareness and idle install
 
 Implemented for direct distribution only. A scheduled Sparkle offer shows a dismissible
@@ -32,7 +43,7 @@ proves the types build. It does not prove Sparkle discovery, callout placement, 
 
 ## DEE-37 Focus breathing
 
-Implemented as an app-wide opt-in under Modes and Features → Focus Sessions, off by default.
+Implemented as an app-wide opt-in, now under **Settings → Features → Deprecated**, off by default. Launch turns it off. It is no longer hosted on Modes or Focus Sessions.
 The intensity slider ranges from 0 to 100 percent and resets to 30 percent. Running Focus
 Sessions, explicitly selected Dock Modes, and a configured public macOS Focus filter can
 trigger a six-second highlight inside DDock's background. Reduce Motion removes it.
@@ -48,7 +59,7 @@ See [Focus breathing](FOCUS-BREATHING.md) for configuration and the pending nati
 
 ## DEE-58 patch-bay automations
 
-Implemented on `feature/dee-58`. **Settings → Features → Patch bay** offers app-open output ports and pinned-folder input ports, visual cable dragging, button-based keyboard routing, saved-cable controls, and English/German copy. Successful app-pin opens can request the wired folder in Finder with activation disabled. Hiding an app never fires the cable. See [supported ports and limits](PATCH-BAY.md).
+Implemented on `feature/dee-58`. **Settings → Features → Deprecated → Patch bay** still offers app-open output ports and pinned-folder input ports, visual cable dragging, button-based keyboard routing, saved-cable controls, and English/German copy. Launch turns cable actions off. Successful app-pin opens can request the wired folder in Finder with activation disabled. Hiding an app never fires the cable. See [supported ports and limits](PATCH-BAY.md).
 
 Cable actions are off by default. Connections are scoped by display, Dock Mode, and pin identity. There are eight cables maximum, one folder per app output, and one running action with no queue. Editing, disabling, sleep, session suspension, shutdown, or an unavailable scope cancels pending work. Strict bookmark resolution rejects stale access. Corrupt preferences freeze execution and edits until confirmed reset. No system Dock settings are changed.
 
@@ -67,7 +78,7 @@ Existing `ApplicationCatalogTests` assertions were updated to distinguish succes
 
 ## DEE-43 icon rumours
 
-Implemented on `feature/dee-43` after DEE-33 was Done and its merged implementation was present. The user subsequently authorized replacing the canned slice with Apple Foundation Models. The on-device model chooses visible pinned apps and generates their exchange after separate opt-in under **Settings → Features → Dock Sims → AI icon rumours**. See [Icon rumours](ICON-RUMOURS.md) for instructions, timing, cancellation, consent, and data boundaries.
+Implemented on `feature/dee-43` after DEE-33 was Done and its merged implementation was present. The user subsequently authorized replacing the canned slice with Apple Foundation Models. The on-device model chooses visible pinned apps and generates their exchange after separate opt-in under **Settings → Features → Deprecated → Dock Sims → AI icon rumours**. Launch turns Sims moods off. See [Icon rumours](ICON-RUMOURS.md) for instructions, timing, cancellation, consent, and data boundaries.
 
 AI revision validation on 2026-09-12: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-43-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. This compiled the Foundation Models composer, guided-generation schema, generated localization symbols, and consent integration. The first sandboxed attempt could not access Xcode package caches; the permitted retry passed. Warnings were in existing Quarantine and Clipboard Museum code, plus App Intents metadata extraction. Automated tests, previews, native interaction, and live model generation were not run. Compilation does not establish model quality or native acceptance.
 
@@ -109,7 +120,7 @@ Validation on 2026-09-11: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock
 
 Implemented on `feature/dee-44`. Pins take a gentle rust after N unused days. Last-used times are written only when a pin is used from DDock (open, hide, spring-open, open files, open or reveal a folder). Hover, magnification, Downloads, Shelf, Trash, and apps launched outside DDock do not write timestamps. Missing times evaluate as now, so existing pins do not rust on upgrade. Using a pin writes now and the rust clears.
 
-Settings live in **Settings → Features → Pin Weather**, not in `DockSettings`, so the threshold is app-wide and parallel slices do not share that document. Weather is on by default at 30 unused days (1...90). Rust starts at a 0.32 blush on day N and reaches 1 after another N days. The look is SwiftUI Canvas oxide (no Metal). Timestamps stay in `dock.pin-weather.v1`. Corrupt bytes freeze edits and are not overwritten.
+Settings live in **Settings → Features → Deprecated → Pin Weather**, not in `DockSettings`, so the threshold is app-wide and parallel slices do not share that document. Weather now starts off. Launch turns it off on existing installs. The unused-day range remains 1...90, default 30. Rust starts at a 0.32 blush on day N and reaches 1 after another N days. The look is SwiftUI Canvas oxide (no Metal). Timestamps stay in `dock.pin-weather.v1`. Corrupt bytes freeze edits and are not overwritten.
 
 This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
 
@@ -124,7 +135,7 @@ This environment has no Xcode. Compilation, generated string symbols, and native
 
 ## DEE-33 Dock Sims / pet mini-game
 
-Implemented on `cursor/dee-33-dock-sims-af28`. Settings → Features → Dock Sims is off by default. When it is on, each favorite application pin shows a mood mark and a small idle motion (playful bounce, content breathe, hungry or lonely sway). Intensity is a 15–100% slider. Feed, Cheer, and Settle live on the pin’s context menu and VoiceOver actions. Settle and **Reset moods** undo care without unpinning. Turning Sims off hides overlays and keeps pets. Storage is `dock.sims.v1` in UserDefaults. Debug builds add a **Simulate time** card that advances a session-only care clock (+1 / +2 / +6 / +8 hours) so moods can be checked without waiting; the offset is not persisted. Corrupt bytes freeze edits until an explicit reset. There is no network path. AI rumours are a separate opt-in added by [DEE-43](ICON-RUMOURS.md).
+Implemented on `cursor/dee-33-dock-sims-af28`. Settings → Features → Deprecated → Dock Sims is off by default. Launch turns it off. When it is on, each favorite application pin shows a mood mark and a small idle motion (playful bounce, content breathe, hungry or lonely sway). Intensity is a 15–100% slider. Feed, Cheer, and Settle live on the pin’s context menu and VoiceOver actions. Settle and **Reset moods** undo care without unpinning. Turning Sims off hides overlays and keeps pets. Storage is `dock.sims.v1` in UserDefaults. Debug builds add a **Simulate time** card that advances a session-only care clock (+1 / +2 / +6 / +8 hours) so moods can be checked without waiting; the offset is not persisted. Corrupt bytes freeze edits until an explicit reset. There is no network path. AI rumours are a separate opt-in added by [DEE-43](ICON-RUMOURS.md).
 
 Folder pins, running-only unpinned tiles, and AI rumours are out of scope.
 
@@ -1344,7 +1355,7 @@ Remaining hands-on acceptance: pin and reorder shortcuts, restart, rename or rem
 
 ### DEE-48: opt-in focus debt
 
-Focus debt is off by default in Settings → Features → Focus Sessions. A session started
+Focus debt is deprecated. It is off by default under Settings → Features → Deprecated. Launch turns it off. A session started
 while enabled is a promise. Finish or Cancel before its remaining time reaches zero adds
 one to the shared local count. Pausing, resuming, extending, switching apps or modes,
 quitting DDock, and natural completion do not add debt. Running deadlines still include
@@ -2427,9 +2438,9 @@ every entry point with VoiceOver.
 
 ## DEE-46: Quarantine stamp
 
-The feature is off by default. **Settings → Features → Shelf, Trash, Quarantine** contains the
-opt-in, instructions, independent arm/stamp/release sound switches, and saved marks for
-release. Enabling it exposes a direct **Arm stamp** action at the root of the DDock
+The feature is off by default and deprecated. **Settings → Features → Deprecated → Quarantine stamp**
+contains the opt-in, instructions, independent arm/stamp/release sound switches, and saved marks for
+release. Shelf & Trash stays an ordinary Features page. Launch turns stamp mode off. Enabling it exposes a direct **Arm stamp** action at the root of the DDock
 menu bar, plus controls in Shelf and folder-stack headers. Menus contain no instructions.
 While armed, the dock projects only app pins and folder icons. Running-only apps and
 nonstampable utility controls are absent from layout, keyboard selection, and hit testing.

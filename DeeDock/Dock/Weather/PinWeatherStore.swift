@@ -107,7 +107,7 @@ final class PinWeatherStore {
         persistRemovingIfEmpty()
     }
 
-    /// Replaces a corrupt document after an explicit reset. Weather starts enabled.
+    /// Replaces a corrupt document after an explicit reset. Weather starts disabled.
     func reset() {
         document = PinWeatherDocument()
         requiresReset = false
@@ -129,7 +129,7 @@ final class PinWeatherStore {
     }
 
     private func persistRemovingIfEmpty() {
-        if document.lastUsed.isEmpty, document.enabled, document.unusedDays == PinWeatherLimits.defaultUnusedDays {
+        if document == PinWeatherDocument() {
             repository.remove()
             storageFailed = false
             return

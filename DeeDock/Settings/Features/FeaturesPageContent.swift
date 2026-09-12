@@ -12,7 +12,6 @@ struct FeaturesPageContent: View {
     var body: some View {
         switch page {
         case .shelfAndTrash:
-            QuarantineSettingsCard()
             SettingsCard(title: .settingsShelf, footnote: .settingsShelfHelp) {
                 SettingsToggleRow(title: .settingsShowShelf, isOn: source.binding(\.showShelf))
             }
@@ -46,9 +45,22 @@ struct FeaturesPageContent: View {
         case .focusSessions:
             if let coordinator = context.coordinator {
                 FocusSessionSettingsCard(controller: coordinator.focusSession)
-                FocusBreathingSettingsCard(store: coordinator.focusBreathing, modes: coordinator.profiles.modes)
                 BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
             }
+        case .focusBreathing:
+            if let coordinator = context.coordinator {
+                FocusBreathingSettingsCard(store: coordinator.focusBreathing, modes: coordinator.profiles.modes)
+            }
+        case .focusDebt:
+            if let coordinator = context.coordinator {
+                SettingsCard(title: .focusDebtTitle) {
+                    SettingsStackedRow {
+                        FocusDebtSettingsView(controller: coordinator.focusSession)
+                    }
+                }
+            }
+        case .quarantine:
+            QuarantineSettingsCard()
         case .patchBay:
             if let coordinator = context.coordinator {
                 PatchBaySettingsView(controller: coordinator.patchBay, profiles: coordinator.profiles)
