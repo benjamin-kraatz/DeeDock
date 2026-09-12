@@ -107,13 +107,13 @@ The Update window never uses that `<link>`. Do not add Google Fonts to Sparkle n
 
 ## GitHub Release names
 
-At ship time, Esi uploads these next to `DDock.md`:
+When `docs/releases/<MARKETING_VERSION>-comic.md` exists on the shipped commit, the Release workflow uploads these next to `DDock.md`:
 
 - `DDock-comic.md` from `docs/releases/<MARKETING_VERSION>-comic.md`
 - `panel-0N.png` from `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png`
 
-The Release workflow does not copy those files yet. The renderer PR does not add `0.4.1-comic.md` or `assets/0.4.1/`. A 0.5.0 Focus, Compost, and Gossip comic belongs only to 0.5.0.
+A missing comic file is skipped. The notes-only ship still succeeds. The renderer PR does not add `0.4.1-comic.md` or `assets/0.4.1/`. A 0.5.0 Focus, Compost, and Gossip comic belongs only to 0.5.0.
 
 ## Process
 
-Land the native renderer first, with no version-specific comic content. Author the first real comic in the 0.5.0 release-prep PR, next to that version bump and `docs/releases/0.5.0.md`. Do not dispatch Release from the renderer PR. Esi merges, then ships, then attaches comic assets on the draft when that later cut has one.
+Land the native renderer first, with no version-specific comic content. Author the first real comic in the 0.5.0 release-prep PR, next to that version bump and `docs/releases/0.5.0.md`. Do not dispatch Release from a feature PR. Esi merges, then ships. The workflow attaches comic assets on the draft when that later cut has one.

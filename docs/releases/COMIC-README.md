@@ -13,14 +13,14 @@ The renderer is a platform capability. It does not ship a version-specific comic
 
 ## GitHub Release assets
 
-Esi attaches these files to the draft next to `DDock.md`. The Release workflow does not upload them yet.
+When `docs/releases/<MARKETING_VERSION>-comic.md` is on the shipped commit, the Release workflow copies it to staging as `DDock-comic.md` and copies each `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` beside it as a flat `panel-0N.png`. Those files go into the Sparkle artifact upload and onto the draft GitHub Release next to `DDock.zip`, `appcast.xml`, and `DDock.md`. The staged markdown rewrites `assets/<ver>/panel-0N.png` links to `panel-0N.png` so the Update window can load art from the same directory. If that comic file is missing, the ship stays notes-only and does not fail.
 
 | File on the release | Source in the repo |
 | --- | --- |
 | `DDock-comic.md` | `docs/releases/<MARKETING_VERSION>-comic.md` |
-| `panel-01.png` … `panel-04.png` | `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` |
+| `panel-01.png` … `panel-0N.png` | `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` |
 
-The Update window requests `DDock-comic.md` from the same directory as Sparkle’s `releaseNotesURL`, or from the enclosure ZIP directory when that notes URL is missing. Relative image paths in the markdown resolve against that directory. A same-directory `panel-0N.png` fallback covers the flat GitHub Release layout.
+The Update window requests `DDock-comic.md` from the same directory as Sparkle’s `releaseNotesURL`, or from the enclosure ZIP directory when that notes URL is missing. Relative image paths in the markdown resolve against that directory. A same-directory `panel-0N.png` fallback still covers a comic that kept the authored `assets/<ver>/` path.
 
 ## Security
 
