@@ -20,6 +20,10 @@ final class DockInteraction {
     var badges: DockBadgeController?
     /// Shared opt-in Sims moods. Nil in previews that do not play the care loop.
     var sims: DockSimsStore?
+    #if DIRECT_DISTRIBUTION
+    /// Waiting-update pip on this dock's glass. Nil in previews and TestFlight.
+    var updateAwareness: UpdateAwarenessStore?
+    #endif
     /// Optional soap-bubble bursts for pin click and drop. Owned per panel.
     let soapBubbles = DockSoapBubbleController()
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?

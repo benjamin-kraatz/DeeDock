@@ -41,6 +41,16 @@ struct DockSurfaceView: View {
 
     private var centers: [CGFloat] { layout.centers(sizes: sizes) }
 
+    /// Inward-trailing corner of DDock glass, not an app pin.
+    private var pipAlignment: Alignment {
+        switch layout.edge {
+        case .bottom: .topTrailing
+        case .top: .bottomTrailing
+        case .left: .trailing
+        case .right: .leading
+        }
+    }
+
     var body: some View {
         ZStack(alignment: .topLeading) {
             if drawsBackground {
@@ -70,6 +80,15 @@ struct DockSurfaceView: View {
                             backgroundOpacity: opacity.background
                         )
                     }
+                }
+                .overlay(alignment: pipAlignment) {
+                    #if DIRECT_DISTRIBUTION
+                    if interaction.updateAwareness?.showsIndicators == true {
+                        UpdateAwarenessPip(reduceMotion: reduceMotion)
+                            .padding(7)
+                            .allowsHitTesting(false)
+                    }
+                    #endif
                 }
                 .frame(width: surface.width, height: surface.height)
                 .position(x: surface.midX, y: surface.midY)

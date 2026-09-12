@@ -7,11 +7,18 @@ import Sparkle
 @MainActor
 final class UpdateUserDriver: NSObject, SPUUserDriver {
     let presentation = UpdatePresentation()
+    let awareness: UpdateAwarenessStore
+    var isWindowVisible: Bool { window.isVisible }
     // Cache artwork before the app bundle can be replaced by an installation.
     private let icon = NSImage(named: NSImage.applicationIconName)
-    private lazy var window = UpdateWindowController(presentation: presentation, icon: icon,
+    private lazy var window = UpdateWindowController(presentation: presentation, awareness: awareness, icon: icon,
         action: { [weak self] action, token in self?.perform(action, token: token) },
         close: { [weak self] in self?.closeWindow() })
+
+    init(awareness: UpdateAwarenessStore) {
+        self.awareness = awareness
+        super.init()
+    }
 
     private enum Response {
         case permission((SUUpdatePermissionResponse) -> Void)
@@ -46,11 +53,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         case .installing: stage = .installing
         default: stage = .notDownloaded
         }
-        presentation.offer = UpdateOffer(version: appcastItem.displayVersionString, stage: stage,
+        presentation.offer = UpdateOffer(version: appcastItem.displayVersionString,
+            identity: appcastItem.versionString, stage: stage,
             critical: appcastItem.isCriticalUpdate, major: appcastItem.isMajorUpgrade,
             informational: appcastItem.isInformationOnlyUpdate,
             informationURL: UpdateReleaseNotes.safeLink(appcastItem.infoURL),
             releaseNotesURL: UpdateReleaseNotes.safeLink(appcastItem.releaseNotesURL))
+        awareness.noteWaitingOffer(identity: appcastItem.versionString,
+                                   version: appcastItem.displayVersionString,
+                                   userInitiated: state.userInitiated)
         presentation.notes = nil
         presentation.notesUnavailable = false
         presentation.comic = nil
@@ -63,7 +74,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             loadComic(from: relatedURL)
         }
         // A scheduled offer is retained for the menu, never brought in front of another app.
-        if state.userInitiated { window.present(activate: true) }
+        if state.userInitiated {
+            awareness.noteWindowOpened()
+            window.present(activate: true)
+        }
     }
 
     func showUpdateReleaseNotes(with downloadData: SPUDownloadData) {
@@ -138,6 +152,9 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
         transition(.ready, response: .choice(reply))
+        if let offer = presentation.offer, !offer.informational {
+            awareness.noteWaitingOffer(identity: offer.identity, version: offer.version, userInitiated: false)
+        }
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool,
@@ -171,12 +188,20 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         presentation.canRetryTermination = false
         presentation.message = nil
         presentation.diagnostic = nil
+        awareness.noteSessionEnded()
         window.dismiss()
     }
 
     func showUpdateInFocus() {
         guard presentation.isActive else { return }
+        if presentation.updateAvailable { awareness.noteWindowOpened() }
         window.present(activate: true)
+    }
+
+    /// One idle-install attempt. No-ops when the ready reply is no longer valid.
+    func attemptIdleInstall() {
+        guard presentation.phase == .ready, presentation.actions.contains(.install) else { return }
+        perform(.install, token: presentation.actionToken)
     }
 
     /// Called only at process termination. Does not synthesize an install/skip reply.

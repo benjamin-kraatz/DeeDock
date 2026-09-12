@@ -11,12 +11,26 @@ enum UpdatePhase: Equatable {
 struct UpdateOffer {
     enum Stage { case notDownloaded, downloaded, installing }
     let version: String
+    /// Sparkle build identity, distinct from the marketing version shown in the window.
+    let identity: String
     let stage: Stage
     let critical: Bool
     let major: Bool
     let informational: Bool
     let informationURL: URL?
     let releaseNotesURL: URL?
+
+    init(version: String, identity: String? = nil, stage: Stage, critical: Bool, major: Bool,
+         informational: Bool, informationURL: URL?, releaseNotesURL: URL?) {
+        self.version = version
+        self.identity = identity ?? version
+        self.stage = stage
+        self.critical = critical
+        self.major = major
+        self.informational = informational
+        self.informationURL = informationURL
+        self.releaseNotesURL = releaseNotesURL
+    }
 }
 
 /// Actions carry no Sparkle callbacks; the driver validates their generation before responding.

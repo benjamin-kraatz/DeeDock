@@ -4,6 +4,7 @@ import SwiftUI
 /// DDock's update window composition. Rendering never starts a check or acknowledges a callback.
 struct UpdateWindowView: View {
     let presentation: UpdatePresentation
+    var awareness: UpdateAwarenessStore? = nil
     var icon: NSImage? = nil
     var action: (UpdateAction, UUID) -> Void = { _, _ in }
     var close: () -> Void = {}
@@ -16,7 +17,7 @@ struct UpdateWindowView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     UpdateWindowHeader(presentation: presentation, icon: icon, tint: tint)
-                    UpdateWindowDetails(presentation: presentation)
+                    UpdateWindowDetails(presentation: presentation, awareness: awareness)
                 }
                 .padding(.horizontal, 32)
                 .padding(.top, 42)
@@ -130,7 +131,9 @@ private struct UpdateWindowActions: View {
 #Preview("Update ready") {
     let model = UpdatePresentation()
     model.phase = .ready
-    return UpdateWindowView(presentation: model).frame(width: 580, height: 600)
+    model.offer = UpdateOffer(version: "0.6.0", stage: .downloaded, critical: false, major: false,
+                              informational: false, informationURL: nil, releaseNotesURL: nil)
+    return UpdateWindowView(presentation: model, awareness: .previewStore()).frame(width: 580, height: 600)
 }
 
 #Preview("Release notes") {

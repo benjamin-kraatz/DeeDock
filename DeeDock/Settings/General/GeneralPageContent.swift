@@ -45,8 +45,10 @@ struct GeneralPageContent: View {
                                allowsAutomaticInstalls: updater.allowsAutomaticUpdates,
                                canCheck: updater.canCheckForUpdates, updateAvailable: updater.updateAvailable,
                                startupFailed: updater.startupFailed, updateInProgress: updater.updateInProgress,
+                               installWhenIdle: updater.awareness.installWhenIdle,
                                setAutomaticallyChecks: updater.setAutomaticallyChecksForUpdates,
                                setAutomaticallyInstalls: updater.setAutomaticallyInstallsUpdates,
+                               setInstallWhenIdle: updater.setInstallWhenIdle,
                                check: updater.checkForUpdates)
         }
         #endif

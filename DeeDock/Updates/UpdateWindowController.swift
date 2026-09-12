@@ -6,15 +6,18 @@ import SwiftUI
 @MainActor
 final class UpdateWindowController: NSObject, NSWindowDelegate {
     private let presentation: UpdatePresentation
+    private let awareness: UpdateAwarenessStore
     private let action: (UpdateAction, UUID) -> Void
     private let close: () -> Void
     // Capture artwork before installation; Sparkle may replace the bundle before its final callback.
     private let icon: NSImage?
     private var window: NSWindow?
+    var isVisible: Bool { window?.isVisible == true }
 
-    init(presentation: UpdatePresentation, icon: NSImage?, action: @escaping (UpdateAction, UUID) -> Void,
-         close: @escaping () -> Void) {
+    init(presentation: UpdatePresentation, awareness: UpdateAwarenessStore, icon: NSImage?,
+         action: @escaping (UpdateAction, UUID) -> Void, close: @escaping () -> Void) {
         self.presentation = presentation
+        self.awareness = awareness
         self.icon = icon
         self.action = action
         self.close = close
@@ -32,7 +35,7 @@ final class UpdateWindowController: NSObject, NSWindowDelegate {
             window.contentMinSize = NSSize(width: 520, height: 540)
             window.delegate = self
             window.contentView = NSHostingView(rootView: UpdateWindowView(presentation: presentation,
-                icon: icon, action: action, close: close))
+                awareness: awareness, icon: icon, action: action, close: close))
             window.center()
             self.window = window
         }
@@ -42,10 +45,12 @@ final class UpdateWindowController: NSObject, NSWindowDelegate {
             if let window { AppDockPresence.shared.windowWillOpen(window) }
             window?.orderFront(nil)
         }
+        if activate, presentation.updateAvailable { awareness.noteWindowOpened() }
     }
 
     /// Hiding progress retains the same session; dismissal never implies permission to install.
     func dismiss() {
+        awareness.noteWindowClosed()
         if let window {
             ExplicitWindowPresenter.shared.cancel(window)
             window.orderOut(nil)

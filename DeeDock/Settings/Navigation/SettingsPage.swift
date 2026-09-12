@@ -255,6 +255,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         guard !query.isEmpty else { return true }
         let copy: [LocalizedStringResource] = [title, keywords]
             + (self == .focusSessions ? [.focusBreathingTitle, .focusBreathingHelp] : [])
+            + (self == .softwareUpdate ? [.updatesIdleInstall] : [])
         return copy.contains { String(localized: $0).localizedStandardContains(query) }
     }
 }

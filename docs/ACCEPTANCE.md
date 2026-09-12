@@ -1,5 +1,35 @@
 # DeeDock acceptance record
 
+## DEE-76 update awareness and idle install
+
+Implemented for direct distribution only. A scheduled Sparkle offer shows a dismissible
+callout on the main display, a menu-bar badge, a Settings badge on General and Software
+Update, and a soft indigo-to-coral pip on DDock glass plus DDock’s own tile. Reduce Motion
+keeps the pip static. Dismiss, opening the Update window, install, and skip clear the
+indicators. The same offer stays quiet until a later identity or the next launch.
+
+**Install & relaunch when idle** is off by default. Settings and the ready-to-install Update
+window share the switch. The ready-window switch is not on the onboarding tour. Idle install
+waits for a 30-second quiet period and blocks on pin drag, an open Focus panel, the Update
+window, a file picker, a dock popover, or menu tracking. One attempt; otherwise install-on-quit.
+
+Validation: English and German strings are in the catalog. Model tests cover dismiss policy,
+cold discovery, idle gates, and the one-shot install. Tests, preview rendering, app launch,
+and native visual or interaction acceptance were not run. Compilation, if performed later,
+proves the types build. It does not prove Sparkle discovery, callout placement, or relaunch.
+
+### Required hands-on acceptance
+
+- Let a scheduled check find an update. Confirm the main-display callout, menu-bar badge,
+  Settings badges, and dock pip. Dismiss the callout and confirm the marks stay gone until
+  quit and relaunch, or until a different offer.
+- Open the Update window from the callout, menu, and Settings. Confirm the marks clear.
+- Enable idle install in Settings and on the ready screen. Confirm it does not run while
+  dragging a pin, while the Focus panel is open, or while the Update window is up. Confirm
+  one relaunch when idle, and install-on-quit if idle never comes.
+- Confirm Reduce Motion keeps the pip static. Confirm German and English. Confirm onboarding
+  does not show the idle switch.
+
 ## DEE-37 Focus breathing
 
 Implemented as an app-wide opt-in under Modes and Features → Focus Sessions, off by default.

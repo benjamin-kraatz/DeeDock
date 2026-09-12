@@ -31,6 +31,12 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         coordinator.start()
         #if DIRECT_DISTRIBUTION
         updater.start()
+        coordinator.updateAwareness = updater.awareness
+        updater.bindDesktop(
+            isBusy: { [weak coordinator] in coordinator?.isUpdateAwarenessBlocked ?? true },
+            isIdleBusy: { [weak coordinator] in coordinator?.updateIdleGate ?? UpdateIdleGate() },
+            targetScreen: { [weak coordinator] in coordinator?.primaryEnabledScreen }
+        )
         #endif
         // After the docks exist, so a first-time reader sees the real thing behind the tour
         // rather than an empty desktop and a description of one.

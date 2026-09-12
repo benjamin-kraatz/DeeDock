@@ -5,6 +5,7 @@ import SwiftUI
 /// No Sparkle view or remote styling is used.
 struct UpdateWindowDetails: View {
     let presentation: UpdatePresentation
+    var awareness: UpdateAwarenessStore? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -58,6 +59,10 @@ struct UpdateWindowDetails: View {
                 }
             }
 
+            if presentation.phase == .ready, let awareness {
+                UpdateIdleInstallSwitch(awareness: awareness)
+            }
+
             if presentation.phase == .permission {
                 Label { Text(.updatesPermissionPrivacy) } icon: { Image(systemName: "hand.raised") }
                     .font(.callout).foregroundStyle(.secondary)
@@ -71,6 +76,44 @@ struct UpdateWindowDetails: View {
             }
         }
     }
+}
+
+/// Ready-to-install opt-in. The same preference lives in Settings. Not shown during onboarding.
+struct UpdateIdleInstallSwitch: View {
+    let awareness: UpdateAwarenessStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Toggle(isOn: Binding(
+                get: { awareness.installWhenIdle },
+                set: { awareness.setInstallWhenIdle($0) }
+            )) {
+                Text(.updatesIdleInstallAlso)
+            }
+            .toggleStyle(.switch)
+            .controlSize(.small)
+            Text(.updatesIdleInstallFootnote)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary, in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+#Preview("Idle install switch") {
+    UpdateIdleInstallSwitch(awareness: .previewStore())
+        .padding()
+        .frame(width: 480)
+}
+
+#Preview("Idle install switch, German") {
+    UpdateIdleInstallSwitch(awareness: .previewStore(idleInstall: true))
+        .environment(\.locale, Locale(identifier: "de"))
+        .padding()
+        .frame(width: 480)
 }
 
 private struct UpdateProgressView: View {

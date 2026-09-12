@@ -32026,6 +32026,114 @@
         }
       }
     },
+    "updatesAwarenessBadge" : {
+      "comment" : "Accessibility label for the menu-bar and Settings update-waiting badge.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update available"
+          }
+        }
+      }
+    },
+    "updatesAwarenessBody" : {
+      "comment" : "Main-display update callout. The placeholder is the offered marketing version.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock %1$(version)@ ist verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock %1$(version)@ is available."
+          }
+        }
+      }
+    },
+    "updatesAwarenessDismiss" : {
+      "comment" : "Dismisses the update callout until the next new offer or launch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        }
+      }
+    },
+    "updatesAwarenessOpen" : {
+      "comment" : "Opens the custom Update window from the main-display callout.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Update"
+          }
+        }
+      }
+    },
+    "updatesAwarenessPip" : {
+      "comment" : "Accessibility label for the dock-adjacent update pip on DDock chrome.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update available"
+          }
+        }
+      }
+    },
+    "updatesAwarenessTitle" : {
+      "comment" : "Title of the dismissible main-display update callout.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update available"
+          }
+        }
+      }
+    },
     "updatesCancel" : {
       "comment" : "Custom DDock update window: Cancel",
       "extractionState" : "manual",
@@ -32418,6 +32526,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hide"
+          }
+        }
+      }
+    },
+    "updatesIdleInstall" : {
+      "comment" : "Settings toggle for installing a downloaded update when DDock is idle. Default is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Leerlauf installieren und neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Install & relaunch when idle"
+          }
+        }
+      }
+    },
+    "updatesIdleInstallAlso" : {
+      "comment" : "Ready-to-install Update window switch. Same preference as Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auch installieren und neu starten, wenn DDock im Leerlauf ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Also install and relaunch when DDock is idle"
+          }
+        }
+      }
+    },
+    "updatesIdleInstallDescription" : {
+      "comment" : "Explains the idle install Settings toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein heruntergeladenes Update wird installiert, sobald DDock im Leerlauf ist. Bleibt DDock beschäftigt, wird beim Beenden installiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When an update is downloaded, install and restart DDock after it has been idle. If DDock stays busy, the update still installs when you quit."
+          }
+        }
+      }
+    },
+    "updatesIdleInstallFootnote" : {
+      "comment" : "One-line footnote under the ready-to-install idle switch. Not shown during onboarding.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird übersprungen, während du Pins ziehst, das Fokus-Panel offen ist oder dieses Fenster geöffnet bleibt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped while you drag pins, keep Focus open, or leave this window up."
           }
         }
       }
