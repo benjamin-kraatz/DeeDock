@@ -1999,6 +1999,204 @@
       }
     }
   },
+    "simsRumourInvalidOutput" : {
+      "comment": "Shown when model dialogue fails identity, length, or format validation after one revision.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das erzeugte Gespräch passte auch nach einer Überarbeitung nicht ins Dock. DDock versucht es in einem späteren ruhigen Moment erneut."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The generated conversation did not fit the dock, even after a revision. DDock will try again at a later quiet moment."
+          }
+        }
+      }
+    },
+    "simsRumourDiagnosticDetails" : {
+      "comment": "Disclosure title for selectable rumour diagnostics. Details contain only a request ID, time, failure reason, and error code.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fehlerdetails"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error details"
+          }
+        }
+      }
+    },
+    "simsRumoursEnable" : {
+      "comment": "Separate opt-in for on-device Foundation Models dialogue. Earlier canned-rumour consent does not enable this.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KI-Icon-Gerüchte"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI icon rumours"
+          }
+        }
+      }
+    },
+    "simsRumoursHelp" : {
+      "comment": "Explain data access, local generation, skipping, and quiet behavior before AI opt-in.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Intelligence erfindet auf diesem Mac kurze Gespräche aus sichtbaren App-Namen und Sims-Stimmungen. App-Inhalte werden nicht gelesen. Zum Überspringen den Zeiger ins Dock bewegen. Pausiert während Fokus-Sitzungen und bei reduzierter Bewegung."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Intelligence invents short conversations using visible app names and Sims moods, on this Mac. No app content is read. Move the pointer into the dock to skip. Paused during Focus Sessions and Reduce Motion."
+          }
+        }
+      }
+    },
+    "simsRumourSpeakers" : {
+      "comment": "Speaker and listener app names for a fictional Sims exchange. Preserve app names; first speaks to second.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ → %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ → %2$@"
+          }
+        }
+      }
+    },
+    "simsRumourDeviceUnavailable" : {
+      "comment": "AI rumour status when the device is not eligible.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Mac unterstützt Apple Intelligence nicht. KI-Gerüchte bleiben stumm."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Mac does not support Apple Intelligence. AI rumours stay quiet."
+          }
+        }
+      }
+    },
+    "simsRumourIntelligenceDisabled" : {
+      "comment": "AI rumour status when Apple Intelligence is disabled. DDock does not change system settings.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktiviere Apple Intelligence in den Systemeinstellungen, um KI-Gerüchte zu nutzen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Apple Intelligence in System Settings to use AI rumours."
+          }
+        }
+      }
+    },
+    "simsRumourModelNotReady" : {
+      "comment": "AI rumour status for a model not ready or lacking guided generation.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Sprachmodell auf diesem Mac ist noch nicht bereit. KI-Gerüchte warten."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The on-device language model is not ready. AI rumours will wait."
+          }
+        }
+      }
+    },
+    "simsRumourUnsupportedLanguage" : {
+      "comment": "AI rumour status for an unsupported locale.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Intelligence unterstützt die aktuelle App-Sprache für Gerüchte nicht."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Intelligence does not support the current app language for rumours."
+          }
+        }
+      }
+    },
+    "simsRumourGenerationFailed" : {
+      "comment": "Non-blocking Settings status after generation fails, refuses, or returns invalid output.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das letzte Gespräch konnte nicht erzeugt werden. DDock versucht es in einem späteren ruhigen Moment erneut."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The last conversation could not be generated. DDock will try at a later quiet moment."
+          }
+        }
+      }
+    },
+    "simsRumourPreviewLine" : {
+      "comment": "Preview-only layout fixture. Never used as a runtime rumour or fallback.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein wenig Platz für einen unerwarteten Gedanken."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little room for an unexpected thought."
+          }
+        }
+      }
+    },
   "discoveryDebugTitle": {
     "comment": "Debug-only Discovery settings card title.",
     "extractionState": "manual",

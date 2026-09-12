@@ -35,6 +35,26 @@ Existing `ApplicationCatalogTests` assertions were updated to distinguish succes
 - Exercise missing and stale folder bookmarks, the eight-cable limit, overlapping triggers, corrupt stored data and confirmed reset, cancellation, sleep, and screen lock. Confirm no delayed action replays on wake.
 - Check VoiceOver, keyboard-only operation, English and German, Light and Dark Mode, Reduce Motion, Reduce Transparency, Spaces, and multiple displays. Cables are static apart from direct pointer dragging.
 
+## DEE-43 icon rumours
+
+Implemented on `feature/dee-43` after DEE-33 was Done and its merged implementation was present. The user subsequently authorized replacing the canned slice with Apple Foundation Models. The on-device model chooses two visible pinned apps and generates their exchange after separate opt-in under **Settings → Features → Dock Sims → AI icon rumours**. See [Icon rumours](ICON-RUMOURS.md) for instructions, timing, cancellation, consent, and data boundaries.
+
+AI revision validation on 2026-09-12: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-43-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. This compiled the Foundation Models composer, guided-generation schema, generated localization symbols, and consent integration. The first sandboxed attempt could not access Xcode package caches; the permitted retry passed. Warnings were in existing Quarantine and Clipboard Museum code, plus App Intents metadata extraction. Automated tests, previews, native interaction, and live model generation were not run. Compilation does not establish model quality or native acceptance.
+
+Follow-up diagnosis on 2026-09-12: an isolated live Foundation Models call with synthetic Safari, Notizen, and Finder candidates in `de_DE` reproduced the generic failure. Generation returned 79- and 72-character lines; the app rejected them against its 65-character limit. Added one model revision for invalid drafts, distinct validation diagnostics, selectable Settings error details, and unified logging under `IconRumours`. A subsequent live call returned a valid German exchange. A focused follow-up exercised the revision path: an initial 70/70-character draft became a valid 53/43-character exchange after one revision. The corrected Debug app build passed with the same existing warnings. No unit suite, automated visual checks, or native dock acceptance was run. The diagnostic probe did not launch DDock or modify its preferences.
+
+
+### Required hands-on acceptance
+
+- Load preferences saved before DEE-43 or with only the earlier canned-rumour flag enabled. Confirm AI rumours start off and Sims moods and care history remain intact. Enable rumours, restart, and confirm the switch persists.
+- With Sims and AI rumours on and at least two visible pinned apps, leave the pointer outside a visible dock for 30 seconds plus generation time. Confirm a model-selected opening and reply appear beside their respective icons for five seconds each. Wait 90 more seconds plus generation time for a fresh exchange. Assess coherence, brevity, variation, English and German fluency, and response latency.
+- Enter the dock during either line. Confirm it disappears and the first click still activates the app. Exercise keyboard Focus Dock, dragging, menus, popovers, errors, Launcher, and timeline browsing during playback.
+- Disable AI rumours or Sims, enable Reduce Motion, or start or pause a Focus Session. Confirm playback stops. End the session or restore eligibility and confirm the quiet interval starts fresh.
+- Disable and re-enable AI rumours while generation is in flight. Confirm the older response never appears. Check that two display docks never generate concurrently.
+- Exercise model unavailable, Apple Intelligence disabled, unsupported locale, refusal, invalid response, and generation-error states. Confirm an invalid draft gets at most one revision, final failures leave selectable Error details, and Console shows IconRumours events without app names or dialogue. The dock stays quiet without a canned fallback.
+- Exercise auto-hide, all four edges, horizontal and vertical overflow, long app names, German text, Reduce Transparency, and VoiceOver. Confirm callouts fit without changing icon positions or taking focus.
+- Remove a participating pin or display, change Dock Mode, switch Spaces, sleep and wake, and switch user sessions. Confirm no stale line or queued exchange returns. Verify that hidden docks stay hidden.
+
 ## DEE-74 DDock Discovery
 
 Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.
@@ -60,7 +80,7 @@ This environment has no Xcode. Compilation, generated string symbols, and native
 
 ## DEE-33 Dock Sims / pet mini-game
 
-Implemented on `cursor/dee-33-dock-sims-af28`. Settings → Features → Dock Sims is off by default. When it is on, each favorite application pin shows a mood mark and a small idle motion (playful bounce, content breathe, hungry or lonely sway). Intensity is a 15–100% slider. Feed, Cheer, and Settle live on the pin’s context menu and VoiceOver actions. Settle and **Reset moods** undo care without unpinning. Turning Sims off hides overlays and keeps pets. Storage is `dock.sims.v1` in UserDefaults. Debug builds add a **Simulate time** card that advances a session-only care clock (+1 / +2 / +6 / +8 hours) so moods can be checked without waiting; the offset is not persisted. Corrupt bytes freeze edits until an explicit reset. There is no network path and no rumour feed (DEE-43).
+Implemented on `cursor/dee-33-dock-sims-af28`. Settings → Features → Dock Sims is off by default. When it is on, each favorite application pin shows a mood mark and a small idle motion (playful bounce, content breathe, hungry or lonely sway). Intensity is a 15–100% slider. Feed, Cheer, and Settle live on the pin’s context menu and VoiceOver actions. Settle and **Reset moods** undo care without unpinning. Turning Sims off hides overlays and keeps pets. Storage is `dock.sims.v1` in UserDefaults. Debug builds add a **Simulate time** card that advances a session-only care clock (+1 / +2 / +6 / +8 hours) so moods can be checked without waiting; the offset is not persisted. Corrupt bytes freeze edits until an explicit reset. There is no network path. AI rumours are a separate opt-in added by [DEE-43](ICON-RUMOURS.md).
 
 Folder pins, running-only unpinned tiles, and AI rumours are out of scope.
 

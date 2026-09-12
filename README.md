@@ -71,6 +71,8 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 **Patch bay** in **Settings → Features** connects app-pin opens to pinned-folder actions in Finder. Cable actions are off by default and scoped to a display and Dock Mode, with eight cables maximum. See [supported ports and limits](docs/PATCH-BAY.md).
 
+**AI icon rumours** uses on-device Apple Foundation Models to invent conversations between pinned apps after enabling both Sims moods and AI icon rumours in **Settings → Features → Dock Sims**. The model chooses speakers and dialogue from app names and Sims moods. Chatter is skippable and pauses during Focus Sessions and Reduce Motion. See [Icon rumours](docs/ICON-RUMOURS.md) for consent, model availability, and data boundaries.
+
 **DDock Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. Disable tips in **Settings → Features → DDock Discovery**. See [Discovery](docs/DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes

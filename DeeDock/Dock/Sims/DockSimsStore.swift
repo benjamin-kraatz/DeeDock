@@ -1,9 +1,10 @@
 import Foundation
 import Observation
+import OSLog
 
 /// App-wide opt-in Sims moods and the light care loop.
 ///
-/// All state stays on this Mac. There is no rumour feed, no account, and no network call.
+/// All state stays on this Mac. Rumours use the on-device Foundation Model after separate consent, with no account or network call.
 /// Moods are clocks: the store writes care timestamps and the overlay derives the face
 /// from elapsed time. Turning the feature off hides overlays without deleting pets.
 @MainActor @Observable
@@ -12,8 +13,16 @@ final class DockSimsStore {
     private(set) var requiresReset = false
     private(set) var storageFailed = false
     @ObservationIgnored private let repository: DockSimsRepository
+    @ObservationIgnored private let rumourComposer = FoundationModelsRumourComposer()
+    @ObservationIgnored private var rumourConsentGeneration = UUID()
+    @ObservationIgnored private var recentRumours: [String] = []
+    private(set) var rumourStatus: DockRumourStatus = .ready
+    private(set) var lastRumourDiagnostic: DockRumourDiagnostic?
+    private static let rumourLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.deedock",
+                                             category: "IconRumours")
 
     var isEnabled: Bool { document.isEnabled }
+    var aiRumoursEnabled: Bool { document.aiRumoursEnabled }
     var intensity: Double { document.intensity }
     var hasPets: Bool { !document.pets.isEmpty }
     /// Session-only care-clock shift. Zero in Release. Not written to `dock.sims.v1`.
@@ -46,6 +55,7 @@ final class DockSimsStore {
         guard !requiresReset, document.isEnabled != enabled else { return }
         let instant = date ?? currentTime
         document.isEnabled = enabled
+        invalidateRumours()
         if enabled, document.baselineAt == nil {
             document.baselineAt = instant
         }
@@ -58,6 +68,70 @@ final class DockSimsStore {
         guard document.intensity != clamped else { return }
         document.intensity = clamped
         persist()
+    }
+
+    /// Grants consent for on-device AI rumours. Playback also requires Sims and an idle, visible dock.
+    func setAIRumoursEnabled(_ enabled: Bool) {
+        guard !requiresReset, document.aiRumoursEnabled != enabled else { return }
+        document.aiRumoursEnabled = enabled
+        invalidateRumours()
+        persist()
+    }
+
+    /// Called when Settings appears or the app becomes active; generation checks availability again.
+    func refreshRumourAvailability(locale: Locale) {
+        let availability = FoundationModelsRumourComposer.availability(locale: locale)
+        // Opening Settings must not clear the error the person came here to investigate.
+        if availability != .ready || lastRumourDiagnostic == nil { rumourStatus = availability }
+    }
+
+    /// Model work stays in the composer actor. Consent and cancellation are checked on both sides
+    /// of the await so disabling then re-enabling cannot revive an older response.
+    func generateRumour(participants: [DockRumourParticipant], locale: Locale) async -> DockRumour? {
+        guard isEnabled, aiRumoursEnabled, !requiresReset, !Task.isCancelled else { return nil }
+        let consent = rumourConsentGeneration
+        let requestID = UUID()
+        let startedAt = Date.now
+        Self.rumourLogger.info("Generation started request=\(requestID.uuidString, privacy: .public) candidates=\(participants.count) locale=\(locale.identifier, privacy: .public)")
+        do {
+            let result = try await rumourComposer.compose(participants: participants, locale: locale, recent: recentRumours)
+            guard !Task.isCancelled, consent == rumourConsentGeneration, isEnabled, aiRumoursEnabled else { return nil }
+            rumourStatus = .ready
+            lastRumourDiagnostic = nil
+            Self.rumourLogger.info("Generation succeeded request=\(requestID.uuidString, privacy: .public) seconds=\(Date.now.timeIntervalSince(startedAt)) openingCharacters=\(result.opening.count) replyCharacters=\(result.reply.count)")
+            recentRumours.append(result.opening + " / " + result.reply)
+            recentRumours = Array(recentRumours.suffix(3))
+            return result
+        } catch {
+            guard !Task.isCancelled, consent == rumourConsentGeneration else {
+                Self.rumourLogger.debug("Generation cancelled request=\(requestID.uuidString, privacy: .public)")
+                return nil
+            }
+            if case FoundationModelsRumourComposer.Failure.busy = error {
+                Self.rumourLogger.debug("Generation skipped, composer busy request=\(requestID.uuidString, privacy: .public)")
+                return nil
+            }
+            let diagnostic = DockRumourDiagnostic(error: error, requestID: requestID)
+            lastRumourDiagnostic = diagnostic
+            Self.rumourLogger.error("\(diagnostic.report, privacy: .public)")
+            // Framework descriptions can contain source text. Keep those private in unified logging.
+            Self.rumourLogger.debug("Underlying generation failure: \(String(reflecting: error), privacy: .private)")
+            if case FoundationModelsRumourComposer.Failure.unavailable(let status) = error {
+                rumourStatus = status
+            } else if case FoundationModelsRumourComposer.Failure.invalidOutput = error {
+                rumourStatus = .invalidOutput
+            } else {
+                rumourStatus = .generationFailed
+            }
+            return nil
+        }
+    }
+
+    private func invalidateRumours() {
+        rumourConsentGeneration = UUID()
+        recentRumours = []
+        rumourStatus = .ready
+        lastRumourDiagnostic = nil
     }
 
     /// Feed, cheer, or settle one pinned app. Unpinned running tiles are ignored.
@@ -120,6 +194,7 @@ final class DockSimsStore {
 
     /// Replaces a corrupt document after an explicit reset. Sims starts disabled.
     func reset() {
+        invalidateRumours()
         document = .empty
         requiresReset = false
         storageFailed = false
@@ -149,7 +224,7 @@ final class DockSimsStore {
     }
 
     private func persistRemovingIfEmpty() {
-        if !document.isEnabled, document.pets.isEmpty, document.baselineAt == nil,
+        if !document.isEnabled, !document.aiRumoursEnabled, document.pets.isEmpty, document.baselineAt == nil,
            document.intensity == DockSimsLimits.defaultIntensity {
             repository.remove()
             storageFailed = false
