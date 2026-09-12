@@ -93,7 +93,17 @@ Do not put remote stylesheets, scripts, or Google Fonts in the markdown. The app
 
 ## Preview HTML
 
-Optional. Copy [comic-preview.template.html](comic-preview.template.html) to `*-comic.html` for review: art on top, German column, English column. That file may load Source Serif 4 from Google Fonts. The Update window never uses that `<link>`.
+Optional. Copy [comic-preview.template.html](comic-preview.template.html) to `*-comic.html` for review: art on top, German column, English column.
+
+That static file may load one Google Fonts family. Use Source Serif 4. Do not load a pile of families. Put this in the preview `<head>` only:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+```
+
+The Update window never uses that `<link>`. Do not add Google Fonts to Sparkle notes, `DDock-comic.md`, or any in-app HTML.
 
 ## GitHub Release names
 
@@ -102,8 +112,8 @@ At ship time, Esi uploads these next to `DDock.md`:
 - `DDock-comic.md` from `docs/releases/<MARKETING_VERSION>-comic.md`
 - `panel-0N.png` from `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png`
 
-The Release workflow does not copy those files yet. Leave them off a 0.4.x draft. A 0.5.0 Focus, Compost, and Gossip comic belongs only to 0.5.0.
+The Release workflow does not copy those files yet. The renderer PR does not add `0.4.1-comic.md` or `assets/0.4.1/`. A 0.5.0 Focus, Compost, and Gossip comic belongs only to 0.5.0.
 
 ## Process
 
-Author the comic in the same release-prep PR as the version bump and `docs/releases/<MARKETING_VERSION>.md`. Do not dispatch Release from that PR. Esi merges, then ships, then attaches the comic assets on the draft if this release has one.
+Land the native renderer first, with no version-specific comic content. Author the first real comic in the 0.5.0 release-prep PR, next to that version bump and `docs/releases/0.5.0.md`. Do not dispatch Release from the renderer PR. Esi merges, then ships, then attaches comic assets on the draft when that later cut has one.

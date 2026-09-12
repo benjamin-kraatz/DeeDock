@@ -30,7 +30,9 @@ The permission window offers automatic checks or manual checks. System-profile s
 
 Release notes use native text for plain text, Markdown, and HTML. HTML is parsed directly into native headings, paragraphs, lists, emphasis, and HTTPS links. Block spacing and hanging list indents are controlled by SwiftUI; HTML whitespace is collapsed before display. Remote styling, scripts, embedded media, and external entities are not loaded. Parsing is bounded to 512 KiB and runs off the main actor; dismissal or another offer cancels its result. An HTTPS release-note link remains available for the original document. Publishers should use text, headings, and lists for notes that read well in the app.
 
-When a release also publishes `DDock-comic.md` next to `DDock.md`, the Update window renders that comic first and keeps the full notes below. Panel PNGs load only over HTTPS from GitHub Releases or `raw.githubusercontent.com` for `benjamin-kraatz/DeeDock`, or from local files in previews and tests. A miss hides the art and keeps the copy. The app does not load Google Fonts, remote stylesheets, scripts, or other embedded media. Static `*-comic.html` review files may link Google Fonts. That link never enters the Update window. See [What’s New comics](releases/COMIC-README.md).
+When a later release also publishes `DDock-comic.md` next to `DDock.md`, the Update window renders that comic first and keeps the full notes below. Panel PNGs load only over HTTPS from GitHub Releases or `raw.githubusercontent.com` for `benjamin-kraatz/DeeDock`, or from local files in previews and tests. A miss hides the art and keeps the copy. The app does not load Google Fonts, remote stylesheets, scripts, or other embedded media. Static `*-comic.html` review files may link Google Fonts. That link never enters the Update window. See [What’s New comics](releases/COMIC-README.md).
+
+The 0.4.1 cut is this renderer only. It does not add `0.4.1-comic.md` or `assets/0.4.1/`. The first authored comic stays on 0.5.0.
 
 ## Prepare the release
 
@@ -146,7 +148,7 @@ DDock 0.2.1, Build 18, requires macOS 27 and an Apple Silicon Mac.
 
 `generate_appcast` embeds a `.md` file whose base name matches the archive. Copy the version file to the staging folder as `DDock.md` next to `DDock.zip`. Sparkle 2.9.6 accepts Markdown. The in-app window parses headings, lists, and HTTPS links and does not load remote styling.
 
-A What’s New comic is optional. Author it as `docs/releases/<MARKETING_VERSION>-comic.md` using [COMIC-TEMPLATE.md](releases/COMIC-TEMPLATE.md). Keep the 0.5.0 Focus, Compost, and Gossip comic on that version. Do not attach it to 0.4.x. At ship time, Esi uploads `DDock-comic.md` and the panel PNGs onto the GitHub Release next to `DDock.md`. The workflow still copies only `DDock.md` for Sparkle.
+A What’s New comic is optional and is not part of 0.4.1. Author it as `docs/releases/<MARKETING_VERSION>-comic.md` using [COMIC-TEMPLATE.md](releases/COMIC-TEMPLATE.md) on a later release-prep PR. Keep the 0.5.0 Focus, Compost, and Gossip comic on that version. Do not attach it to a 0.4.x draft. At ship time, Esi uploads `DDock-comic.md` and the panel PNGs onto the GitHub Release next to `DDock.md`. The workflow still copies only `DDock.md` for Sparkle.
 
 Existing `docs/releases/0.2.0.md` is German only. Add an `## English` section on the next version. Do not rewrite older published notes.
 

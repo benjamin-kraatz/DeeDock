@@ -1,6 +1,8 @@
 # What’s New comics
 
-Bilingual comic companions for DDock release notes. The native Update window renders a comic when the GitHub Release includes one. Releases without a comic keep the notes-only window.
+Bilingual comic companions for DDock release notes. The native Update window can render a comic when the GitHub Release includes one. Releases without a comic keep the notes-only window.
+
+The renderer is a platform capability. It does not ship a version-specific comic package. Do not add `0.4.1-comic.md` or `assets/0.4.1/` on the renderer branch. The first authored comic (Focus, Compost, Gossip) stays on the 0.5.0 release-prep PR.
 
 - Authoring spec: [COMIC-TEMPLATE.md](COMIC-TEMPLATE.md)
 - Sparkle notes: `<MARKETING_VERSION>.md` (German first, then `## English`)
