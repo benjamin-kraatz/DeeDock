@@ -2,7 +2,7 @@
 
 Bilingual comic companions for DDock release notes. The native Update window can render a comic when the GitHub Release includes one. Releases without a comic keep the notes-only window.
 
-The renderer is a platform capability. It does not ship a version-specific comic package. Do not add `0.4.1-comic.md` or `assets/0.4.1/` on the renderer branch. The first authored comic (Focus, Compost, Gossip) stays on the 0.5.0 release-prep PR.
+The renderer is a platform capability. It does not ship a version-specific comic package. Do not add `0.4.1-comic.md` or `assets/0.4.1/` on the renderer branch. The first authored comic is 0.5.0: Focus, Compost, and Gossip.
 
 - Authoring spec: [COMIC-TEMPLATE.md](COMIC-TEMPLATE.md)
 - Sparkle notes: `<MARKETING_VERSION>.md` (German first, then `## English`)
@@ -10,6 +10,8 @@ The renderer is a platform capability. It does not ship a version-specific comic
 - Optional review preview: `<MARKETING_VERSION>-comic.html`
 - Panel art: `assets/<MARKETING_VERSION>/panel-0N.png`
 - HTML starter with Google Fonts: [comic-preview.template.html](comic-preview.template.html)
+
+Current authored comic: [0.5.0-comic.md](0.5.0-comic.md) and [0.5.0-comic.html](0.5.0-comic.html), with notes in [0.5.0.md](0.5.0.md).
 
 ## GitHub Release assets
 
