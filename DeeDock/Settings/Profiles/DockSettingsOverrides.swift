@@ -119,6 +119,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.magneticEdges = defaults.magneticEdges
         result.confirmBeforeEmptyingTrash = defaults.confirmBeforeEmptyingTrash
         result.windowPeekEnabled = defaults.windowPeekEnabled
+        result.windowPeekSplitEnabled = defaults.windowPeekSplitEnabled
         result.windowPeekSize = defaults.windowPeekSize
         result.windowPeekLayout = defaults.windowPeekLayout
         result.windowPeekStyle = defaults.windowPeekStyle

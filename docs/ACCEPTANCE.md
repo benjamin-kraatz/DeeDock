@@ -1050,6 +1050,38 @@ The final focused Xcode app build succeeded with no reported diagnostics. The si
 - Exercise Focus Dock with Space, arrow navigation, Return, and Escape, plus VoiceOver, Reduce Motion, Reduce Transparency, and foreground-focus preservation.
 - Measure idle and visible-Peek CPU, GPU, and memory use. Confirm capture stops and images are released when Peek closes.
 
+## DEE-54: Split-peek
+
+**Settings → Features → Window Peek → Split-peek** contains the app-wide opt-in. It is off
+for new and existing settings. Display profiles inherit it, and presets leave it unchanged.
+
+The supported v0 case is two captured windows belonging to the app whose icon opened Peek.
+The selected window appears beside its next neighbor in discovery order, with the main window
+first initially. The final window appears beside its previous neighbor. Previous/Next window
+and keyboard arrows browse without activating windows. Clicking a pane or pressing Return uses
+the existing selection action. Both panes keep window actions, Watch, portals, and Fusion.
+Split panes always show window titles, including with the Minimal style.
+
+Both thumbnails must be available. A single window, missing capture, constrained display, or
+file handoff uses the existing Peek view. **Show all windows** restores the configured layout
+for the current presentation. Capture-only cards retain their app-level selection explanation.
+The implementation reuses the existing public ScreenCaptureKit service and its one-shot,
+memory-only images, along with Peek's hover, outside-click, Escape, and focus handling.
+It does not arrange source windows or change the system Dock.
+
+Validation: the Debug app target built using Xcode 27 with `CODE_SIGNING_ALLOWED=NO`.
+Focused regression cases were authored for settings migration and inheritance, selection,
+capture fallback, opt-out, file handoff, and placement. Tests were not run or compiled.
+SwiftUI samples cover split content, a missing thumbnail, German text, and an opaque background.
+Previews, native interaction, and automated visual checks were not run.
+
+Pending hands-on acceptance: enable Split-peek and hover an app with two capturable windows;
+compare the two thumbnails with their sources. Browse three or more windows, use Show all,
+activate either pane, and exercise card actions. Check one window, missing or denied capture,
+file handoff, pointer travel, outside clicks, Escape, and changing settings. Check all dock edges,
+negative display origins, Spaces, full-screen apps, display removal, VoiceOver, Reduce Motion,
+and Reduce Transparency. A passing build does not establish these behaviors.
+
 ## Dock Modes
 
 Implemented on 2026-09-04 as an app-wide named configuration layer over display pins and App Visibility. The first launch after this change creates **Default** from the existing shared visibility, display visibility overrides, and every remembered display's typed pins. Legacy keys remain untouched for rollback, while subsequent pin and visibility edits write to the active mode.

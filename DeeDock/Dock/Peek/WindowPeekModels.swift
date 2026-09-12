@@ -46,6 +46,24 @@ final class WindowPeekState {
     var phase: WindowPeekPhase = .loading
     var cards: [WindowPeekCard] = []
     var selectedID: ApplicationWindowToken?
+    /// The ordinary layout stays available for this presentation without changing preferences.
+    var showsAllWindows = false
+    var splitFitsDisplay = true
+
+    /// The selected window and its neighbor in discovery order, with the main window first initially.
+    var splitCandidates: [WindowPeekCard] {
+        guard settings.windowPeekSplitEnabled, !routingFiles, !showsAllWindows,
+              splitFitsDisplay, phase == .windows, cards.count >= 2 else { return [] }
+        let index = selectedID.flatMap { id in cards.firstIndex { $0.id == id } } ?? 0
+        let start = min(index, cards.count - 2)
+        return Array(cards[start...start + 1])
+    }
+
+    /// Never present a split with an icon placeholder in place of either window's content.
+    var splitCards: [WindowPeekCard] {
+        let candidates = splitCandidates
+        return candidates.count == 2 && candidates.allSatisfy { $0.thumbnail != nil } ? candidates : []
+    }
     /// ScreenCaptureKit-only cards can be previewed, but selecting one can only activate its app.
     var usesApplicationSelection = false
     var actionBusy = false
