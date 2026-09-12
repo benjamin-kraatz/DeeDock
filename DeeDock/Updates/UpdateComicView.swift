@@ -153,7 +153,7 @@ struct UpdateComicCopyView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .frame(maxWidth: .infinity, minWidth: 168, alignment: .leading)
+        .frame(minWidth: 168, maxWidth: .infinity, alignment: .leading)
         .textSelection(.enabled)
     }
 }
