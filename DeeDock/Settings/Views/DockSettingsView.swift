@@ -114,6 +114,7 @@ struct DockSettingsView: View {
             }
         case .modes:
             DockModesSettingsPane(store: profiles.modes,
+                                  focusBreathing: coordinator?.focusBreathing,
                                   activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
                                   deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
                                   startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true,

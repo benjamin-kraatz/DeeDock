@@ -415,6 +415,186 @@
       }
     }
   },
+  "focusBreathingTitle": {
+    "comment": "Settings card and public Focus filter title.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Focus breathing"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fokus-Atmen"
+        }
+      }
+    }
+  },
+  "focusBreathingEnable": {
+    "comment": "Master opt-in toggle and Focus filter parameter, both off by default.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Breathe dock background"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dock-Hintergrund atmen lassen"
+        }
+      }
+    }
+  },
+  "focusBreathingIntensity": {
+    "comment": "Amplitude slider for dock background highlight.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Breathing intensity"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Atemintensität"
+        }
+      }
+    }
+  },
+  "focusBreathingSessions": {
+    "comment": "Trigger breathing during running sessions, excluding paused or completed sessions.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "During running Focus Sessions"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Während laufender Fokus-Sitzungen"
+        }
+      }
+    }
+  },
+  "focusBreathingModes": {
+    "comment": "Explicit selection of Dock Modes that trigger breathing.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Also breathe in these Dock Modes"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Auch in diesen Dock-Modi atmen"
+        }
+      }
+    }
+  },
+  "focusBreathingSystemStatus": {
+    "comment": "Status of the app-specific public system Focus filter, not global Focus status.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock Focus filter"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "DDock-Fokusfilter"
+        }
+      }
+    }
+  },
+  "focusBreathingFilterOn": {
+    "comment": "DDock Focus filter requests breathing.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Active"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktiv"
+        }
+      }
+    }
+  },
+  "focusBreathingFilterOff": {
+    "comment": "DDock Focus filter is inactive, unavailable, or not configured.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Inactive"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Inaktiv"
+        }
+      }
+    }
+  },
+  "focusBreathingFilterDescription": {
+    "comment": "Description shown when adding the public system Focus filter.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gently animate DDock’s background during this Focus. Enable Focus breathing in DDock Settings first."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Den Hintergrund von DDock während dieses Fokus sanft animieren. Aktiviere zuerst Fokus-Atmen in den DDock-Einstellungen."
+        }
+      }
+    }
+  },
+  "focusBreathingHelp": {
+    "comment": "Explains opt-in, triggers, public Focus filter setup, and accessibility limits.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Off by default. A slow highlight breathes inside DDock’s background. Reduce Motion turns it off. For macOS Focus, add DDock under System Settings → Focus → your Focus → Focus Filters and turn on Breathe dock background. Only configured Focus filters, running Focus Sessions, or selected Dock Modes trigger the effect. A hidden background shows no effect."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Standardmäßig ausgeschaltet. Ein langsamer Lichtakzent atmet im Hintergrund von DDock. Bewegung reduzieren schaltet den Effekt aus. Füge für macOS-Fokus DDock unter Systemeinstellungen → Fokus → dein Fokus → Fokusfilter hinzu und aktiviere Dock-Hintergrund atmen lassen. Nur eingerichtete Fokusfilter, laufende Fokus-Sitzungen oder ausgewählte Dock-Modi lösen den Effekt aus. Bei ausgeblendetem Hintergrund erscheint kein Effekt."
+        }
+      }
+    }
+  },
   "focusDebtTitle": {
     "comment": "Title of the optional, gentle count of sessions ended early.",
     "extractionState": "manual",

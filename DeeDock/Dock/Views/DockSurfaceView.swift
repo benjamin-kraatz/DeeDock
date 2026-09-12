@@ -56,6 +56,21 @@ struct DockSurfaceView: View {
                     interaction.idleFade.animation,
                     value: opacity.background
                 )
+                .overlay {
+                    if let breathing = interaction.focusBreathing {
+                        FocusBreathingChrome(
+                            active: interaction.exposesContent && breathing.isActive(
+                                modeID: interaction.dockModes?.activeMode.id,
+                                sessionRunning: interaction.focusSession?.session?.phase == .running
+                            ),
+                            intensity: breathing.intensity,
+                            reduceMotion: reduceMotion,
+                            cornerRadius: min(interaction.idleFade.settings.cornerRadius,
+                                              min(surface.width, surface.height) / 2),
+                            backgroundOpacity: opacity.background
+                        )
+                    }
+                }
                 .frame(width: surface.width, height: surface.height)
                 .position(x: surface.midX, y: surface.midY)
             }
