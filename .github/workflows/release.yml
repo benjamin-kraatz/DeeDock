@@ -5,8 +5,9 @@
 # one, is her routine: she runs workflow_dispatch with intent=watch.
 #
 # Job graph:
-#   watch (ubuntu-latest) on every dispatch. Version, secret presence, notes.
-#     intent=watch stops here. No Xcode, no certs, no Mac.
+#   watch (ubuntu-latest) on every dispatch. Version, secret presence, notes,
+#     optional What’s New comic path. intent=watch stops here. No Xcode, no
+#     certs, no Mac.
 #   archive (xcode-27) only for intent=ship, after watch succeeds.
 #     Archive, Developer ID export, notarytool+staple, zip, generate_appcast.
 #   draft (ubuntu-latest) only for intent=ship, after archive.
@@ -92,6 +93,9 @@ jobs:
       release_tag: ${{ steps.versions.outputs.release_tag }}
       notes_path: ${{ steps.notes.outputs.notes_path }}
       has_english: ${{ steps.notes.outputs.has_english }}
+      comic_path: ${{ steps.comic.outputs.comic_path }}
+      has_comic: ${{ steps.comic.outputs.has_comic }}
+      comic_panel_count: ${{ steps.comic.outputs.comic_panel_count }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -167,6 +171,33 @@ jobs:
             echo "Warning: $notes is missing. Add it before a real ship."
             echo "notes_path=" >> "$GITHUB_OUTPUT"
             echo "has_english=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Locate What’s New comic
+        id: comic
+        env:
+          MARKETING_VERSION: ${{ steps.versions.outputs.marketing_version }}
+        run: |
+          set -eu
+          comic="docs/releases/${MARKETING_VERSION}-comic.md"
+          if [ -f "$comic" ]; then
+            echo "Found $comic"
+            echo "comic_path=$comic" >> "$GITHUB_OUTPUT"
+            echo "has_comic=true" >> "$GITHUB_OUTPUT"
+            count=0
+            for panel in "docs/releases/assets/${MARKETING_VERSION}"/panel-0[0-9].png; do
+              if [ -f "$panel" ]; then
+                echo "Found $panel"
+                count=$((count + 1))
+              fi
+            done
+            echo "comic_panel_count=$count" >> "$GITHUB_OUTPUT"
+            echo "What’s New comic is optional. Presence does not change preflight."
+          else
+            echo "No What’s New comic at $comic. Notes-only ship is OK."
+            echo "comic_path=" >> "$GITHUB_OUTPUT"
+            echo "has_comic=false" >> "$GITHUB_OUTPUT"
+            echo "comic_panel_count=0" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Fail ship before starting xcode-27
@@ -441,6 +472,51 @@ jobs:
             exit 1
           fi
 
+      - name: Stage What’s New comic
+        env:
+          COMIC_PATH: ${{ needs.watch.outputs.comic_path }}
+          MARKETING_VERSION: ${{ needs.watch.outputs.marketing_version }}
+        run: |
+          set -eu
+          comic_src="${COMIC_PATH:-}"
+          if [ -z "$comic_src" ]; then
+            comic_src="docs/releases/${MARKETING_VERSION}-comic.md"
+          fi
+          if [ ! -f "$comic_src" ]; then
+            echo "No What’s New comic at docs/releases/${MARKETING_VERSION}-comic.md. Notes-only ship continues."
+            echo "HAS_COMIC=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          UPDATE_DIR="$UPDATE_DIR" COMIC_SRC="$comic_src" MARKETING_VERSION="$MARKETING_VERSION" python3 - <<'PY'
+          import os
+          import pathlib
+          import re
+
+          source = pathlib.Path(os.environ["COMIC_SRC"])
+          dest = pathlib.Path(os.environ["UPDATE_DIR"]) / "DDock-comic.md"
+          version = os.environ["MARKETING_VERSION"]
+          text = source.read_text()
+          # Authored comics use assets/<ver>/panel-0N.png. The Update window
+          # loads DDock-comic.md next to flat release assets, so the staged
+          # copy rewrites those links to panel-0N.png.
+          pattern = re.compile(
+              r"(?:\./)?assets/" + re.escape(version) + r"/(panel-\d{2}\.png)",
+              re.IGNORECASE,
+          )
+          dest.write_text(pattern.sub(r"\1", text))
+          PY
+          echo "Copied $comic_src to $UPDATE_DIR/DDock-comic.md with flat panel image links."
+          copied=0
+          for panel in "docs/releases/assets/${MARKETING_VERSION}"/panel-0[0-9].png; do
+            if [ -f "$panel" ]; then
+              cp "$panel" "$UPDATE_DIR/$(basename "$panel")"
+              echo "Copied $panel to $UPDATE_DIR/$(basename "$panel")"
+              copied=$((copied + 1))
+            fi
+          done
+          echo "Staged $copied panel PNG file(s)."
+          echo "HAS_COMIC=true" >> "$GITHUB_ENV"
+
       - name: Generate appcast
         env:
           SPARKLE_PRIVATE_ED_KEY: ${{ secrets.SPARKLE_PRIVATE_ED_KEY }}
@@ -505,18 +581,52 @@ jobs:
             echo "build_number=$BUILD_NUMBER"
             echo "release_tag=$RELEASE_TAG"
             echo "has_english=$HAS_ENGLISH"
+            echo "has_comic=${HAS_COMIC:-false}"
             echo "git_sha=$GITHUB_SHA"
           } > "$UPDATE_DIR/version-metadata.txt"
+
+      - name: Collect Sparkle artifacts
+        run: |
+          set -eu
+          artifact_dir="$RUNNER_TEMP/sparkle-artifacts"
+          rm -rf "$artifact_dir"
+          mkdir -p "$artifact_dir"
+          cp "$UPDATE_DIR/DDock.zip" "$UPDATE_DIR/appcast.xml" \
+            "$UPDATE_DIR/DDock.md" "$UPDATE_DIR/version-metadata.txt" \
+            "$artifact_dir/"
+          if [ -f "$UPDATE_DIR/DDock-comic.md" ]; then
+            cp "$UPDATE_DIR/DDock-comic.md" "$artifact_dir/"
+          fi
+          for panel in "$UPDATE_DIR"/panel-0[0-9].png; do
+            if [ -f "$panel" ]; then
+              cp "$panel" "$artifact_dir/"
+            fi
+          done
+          echo "ARTIFACT_DIR=$artifact_dir" >> "$GITHUB_ENV"
+          ls -la "$artifact_dir"
 
       - name: Upload Sparkle artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ddock-sparkle
+          # Required files always exist in ARTIFACT_DIR. Optional comic
+          # paths are listed by name so a missing glob cannot empty the
+          # upload. upload-artifact ignores paths that are not present.
           path: |
-            ${{ env.UPDATE_DIR }}/DDock.zip
-            ${{ env.UPDATE_DIR }}/appcast.xml
-            ${{ env.UPDATE_DIR }}/DDock.md
-            ${{ env.UPDATE_DIR }}/version-metadata.txt
+            ${{ env.ARTIFACT_DIR }}/DDock.zip
+            ${{ env.ARTIFACT_DIR }}/appcast.xml
+            ${{ env.ARTIFACT_DIR }}/DDock.md
+            ${{ env.ARTIFACT_DIR }}/version-metadata.txt
+            ${{ env.ARTIFACT_DIR }}/DDock-comic.md
+            ${{ env.ARTIFACT_DIR }}/panel-01.png
+            ${{ env.ARTIFACT_DIR }}/panel-02.png
+            ${{ env.ARTIFACT_DIR }}/panel-03.png
+            ${{ env.ARTIFACT_DIR }}/panel-04.png
+            ${{ env.ARTIFACT_DIR }}/panel-05.png
+            ${{ env.ARTIFACT_DIR }}/panel-06.png
+            ${{ env.ARTIFACT_DIR }}/panel-07.png
+            ${{ env.ARTIFACT_DIR }}/panel-08.png
+            ${{ env.ARTIFACT_DIR }}/panel-09.png
           if-no-files-found: error
           retention-days: 1
 
@@ -595,6 +705,18 @@ jobs:
               echo "Missing artifact: $asset"
               ls -la "$ARTIFACT_DIR"
               exit 1
+            fi
+          done
+          if [ -f "$ARTIFACT_DIR/DDock-comic.md" ]; then
+            assets+=("$ARTIFACT_DIR/DDock-comic.md")
+            echo "Including DDock-comic.md on the draft."
+          else
+            echo "No DDock-comic.md in the artifact. Notes-only draft continues."
+          fi
+          for panel in "$ARTIFACT_DIR"/panel-0[0-9].png; do
+            if [ -f "$panel" ]; then
+              assets+=("$panel")
+              echo "Including $(basename "$panel") on the draft."
             fi
           done
           # This job downloads artifacts only. gh cannot discover the

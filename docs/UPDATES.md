@@ -90,7 +90,7 @@ xcrun stapler validate "$EXPORTED_APP"
 
 Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DDock.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
 
-Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. When `docs/releases/<MARKETING_VERSION>.md` exists, copy it beside the ZIP as `DDock.md` before `generate_appcast`, and upload that `DDock.md` with the draft. When a later cut authors `docs/releases/<MARKETING_VERSION>-comic.md`, upload it as `DDock-comic.md` on the same release, and upload each `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` as `panel-0N.png` next to it. The Update window looks for `DDock-comic.md` in the same directory as `releaseNotesURL` or the enclosure ZIP, then resolves `assets/<ver>/panel-0N.png` and a same-directory `panel-0N.png` fallback. Write the GitHub Release body in English only. Sparkle notes stay bilingual German and English. The Release workflow does not upload comic files yet. 0.4.1 has no comic package. Esi attaches comic assets on a later draft that has one.
+Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. When `docs/releases/<MARKETING_VERSION>.md` exists, copy it beside the ZIP as `DDock.md` before `generate_appcast`, and upload that `DDock.md` with the draft. When `docs/releases/<MARKETING_VERSION>-comic.md` is on the shipped commit, the Release workflow also stages it as `DDock-comic.md`, copies each `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` as a flat `panel-0N.png`, and uploads those files on the same draft. The staged comic rewrites `assets/<ver>/panel-0N.png` links to `panel-0N.png` so the Update window can load art next to `DDock-comic.md`. A missing comic file is skipped and the notes-only ship still succeeds. Write the GitHub Release body in English only. Sparkle notes stay bilingual German and English. 0.4.1 has no comic package.
 
 The Release workflow stops at that draft. Leave `publish_latest` off until Benn confirms a Latest cut. Verify both assets before anyone marks the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
 
@@ -148,7 +148,7 @@ DDock 0.2.1, Build 18, requires macOS 27 and an Apple Silicon Mac.
 
 `generate_appcast` embeds a `.md` file whose base name matches the archive. Copy the version file to the staging folder as `DDock.md` next to `DDock.zip`. Sparkle 2.9.6 accepts Markdown. The in-app window parses headings, lists, and HTTPS links and does not load remote styling.
 
-A What’s New comic is optional and is not part of 0.4.1. Author it as `docs/releases/<MARKETING_VERSION>-comic.md` using [COMIC-TEMPLATE.md](releases/COMIC-TEMPLATE.md) on a later release-prep PR. Keep the 0.5.0 Focus, Compost, and Gossip comic on that version. Do not attach it to a 0.4.x draft. At ship time, Esi uploads `DDock-comic.md` and the panel PNGs onto the GitHub Release next to `DDock.md`. The workflow still copies only `DDock.md` for Sparkle.
+A What’s New comic is optional and is not part of 0.4.1. Author it as `docs/releases/<MARKETING_VERSION>-comic.md` using [COMIC-TEMPLATE.md](releases/COMIC-TEMPLATE.md) on a later release-prep PR. Keep the 0.5.0 Focus, Compost, and Gossip comic on that version. Do not attach it to a 0.4.x draft. When that file is present, the Release workflow uploads `DDock-comic.md` and the matching `panel-0N.png` files onto the GitHub Release next to `DDock.md`. See [What’s New comics](releases/COMIC-README.md) for the asset names.
 
 Existing `docs/releases/0.2.0.md` is German only. Add an `## English` section on the next version. Do not rewrite older published notes.
 
@@ -160,7 +160,7 @@ Esi dispatches it. She chooses `intent=watch` for a dry-run, or `intent=ship` af
 
 Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` only in `Configuration/App.xcconfig` and adds bilingual notes at `docs/releases/<MARKETING_VERSION>.md`. Confirm `DeeDock.xcodeproj/project.pbxproj` target build settings inherit those keys instead of repeating them. Esi merges that PR before she dispatches. Feature work does not bump those versions.
 
-**watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the six secrets by name, and checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section. It does not archive, import a certificate, or start `xcode-27`.
+**watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the six secrets by name, checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section, and reports whether `docs/releases/<MARKETING_VERSION>-comic.md` and any `panel-0N.png` files exist. A missing comic does not fail watch or ship. It does not archive, import a certificate, or start `xcode-27`.
 
 **archive** (`xcode-27`). `intent=ship` only, after watch succeeds. Watch fails first if a secret or the bilingual notes file is missing, so the Mac job does not start. Then, in order:
 
@@ -170,12 +170,12 @@ Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETIN
 4. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime. This is not TestFlight.
 5. Export with a generated Developer ID options plist, then `xcrun notarytool submit ... --apple-id --password --team-id --wait`, then `stapler staple`. Nested Sparkle code stays signed. The job does not weaken hardened runtime.
 6. Verify `codesign --deep --strict` and `stapler validate`.
-7. Build `DDock.zip` with `ditto`, copy bilingual notes to `DDock.md`, and run `generate_appcast --ed-key-file - --maximum-deltas 0`.
-8. Upload `DDock.zip`, `appcast.xml`, `DDock.md`, and version metadata as a workflow artifact.
+7. Build `DDock.zip` with `ditto`, copy bilingual notes to `DDock.md`, copy a What’s New comic to `DDock-comic.md` plus flat `panel-0N.png` files when that comic exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`.
+8. Upload `DDock.zip`, `appcast.xml`, `DDock.md`, version metadata, and any staged comic files as a workflow artifact.
 
 Do not run those archive steps in parallel.
 
-**draft** (`ubuntu-latest`). After archive. Downloads the artifacts and opens a draft GitHub Release for `v<MARKETING_VERSION>` with an English-only body. Upload `DDock.zip`, `appcast.xml`, and `DDock.md`. The job refuses to overwrite a published or Latest release. `xcode-27` does not call `gh`.
+**draft** (`ubuntu-latest`). After archive. Downloads the artifacts and opens a draft GitHub Release for `v<MARKETING_VERSION>` with an English-only body. Upload `DDock.zip`, `appcast.xml`, and `DDock.md`. When `DDock-comic.md` and `panel-0N.png` are in the artifact, upload those too. The job refuses to overwrite a published or Latest release. `xcode-27` does not call `gh`.
 
 `publish_latest` defaults to false. Turn it on only after Benn confirms a Latest cut. The first smoke path must stay a draft.
 
