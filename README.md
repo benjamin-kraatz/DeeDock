@@ -69,9 +69,11 @@ Three project-local agent skills are installed under `.agents/skills`: SwiftUI E
 
 ## Using DDock
 
-These personality extras are deprecated and turn off on launch: Dock Sims and AI icon rumours, Focus breathing, Focus debt, Pin weather (icon rust), Quarantine stamp, and Patch bay. Their settings stay under **Settings → Features → Deprecated**, with a notice that they will be removed in version 1.0.0. Atmosphere and soap bubbles stay in the ordinary Features list.
+These personality extras are deprecated and turn off on launch: Dock Sims and AI icon rumours, Focus breathing, Focus debt, Pin weather (icon rust), Quarantine stamp, Patch bay, and Magnetic Edges. Their settings stay under **Settings → Features → Deprecated**, with a notice that they will be removed in version 1.0.0. Atmosphere and soap bubbles stay in the ordinary Features list.
 
 **Patch bay** is deprecated. Launch turns cable actions off. The editor stays under **Settings → Features → Deprecated**. See [supported ports and limits](docs/PATCH-BAY.md).
+
+**Magnetic Edges** is deprecated and will be removed in version 1.0.0. Launch turns snapping off. The toggle stays under **Settings → Features → Deprecated**.
 
 **AI icon rumours** and Dock Sims are deprecated. Launch turns Sims moods off, which also stops rumours. Settings stay under **Settings → Features → Deprecated → Dock Sims**. See [Icon rumours](docs/ICON-RUMOURS.md) for the old consent and data boundaries.
 

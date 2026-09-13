@@ -52,10 +52,10 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
 
     /// Personality features slated for removal in 1.0.0. Launch turns their enable flags off.
     static let deprecatedPages: [SettingsPage] = [
-        .sims, .focusBreathing, .focusDebt, .pinWeather, .quarantine, .patchBay
+        .sims, .focusBreathing, .focusDebt, .pinWeather, .quarantine, .patchBay, .magneticEdges
     ]
 
-    /// True for the Features overview's bottom group and the shared 1.0.0 removal notice.
+    /// True for the Deprecated sidebar section and the shared 1.0.0 removal notice.
     var isDeprecated: Bool { Self.deprecatedPages.contains(self) }
 
     /// Which family of content a page belongs to, so the detail view can hand it to the one view

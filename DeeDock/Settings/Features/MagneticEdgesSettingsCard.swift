@@ -2,9 +2,11 @@ import SwiftUI
 
 /// App-wide control for pin and stack magnetism while dragging and after release.
 ///
-/// Magnetism is deliberately not per-display: a drag can cross screens, so the setting is read
-/// from the shared store even when a display profile is being edited. `locked` dims the switch
-/// while another owner (an active mode) controls the value, leaving the explanatory copy readable.
+/// Deprecated. The page stays under Settings → Features → Deprecated. Launch turns
+/// `magneticEdges` off. Magnetism is deliberately not per-display: a drag can cross
+/// screens, so the setting is read from the shared store even when a display profile
+/// is being edited. `locked` dims the switch while another owner (an active mode)
+/// controls the value, leaving the explanatory copy readable.
 struct MagneticEdgesSettingsCard: View {
     /// Provides the shared settings binding for `magneticEdges`.
     let source: SettingsValueSource
@@ -33,6 +35,17 @@ private func previewSource() -> SettingsValueSource {
     MagneticEdgesSettingsCard(source: previewSource())
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
+}
+
+#Preview("Deprecated — German, dark") {
+    VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+        DeprecatedFeatureNotice()
+        MagneticEdgesSettingsCard(source: previewSource())
+    }
+    .padding(24)
+    .frame(width: SettingsMetrics.columnWidth)
+    .environment(\.locale, Locale(identifier: "de"))
+    .preferredColorScheme(.dark)
 }
 
 #Preview("Locked — dark") {
