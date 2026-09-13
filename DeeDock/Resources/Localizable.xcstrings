@@ -21676,6 +21676,42 @@
         }
       }
     },
+    "launcherRobiScope" : {
+      "comment" : "Search-field chip shown while Robi's suggestions replace app search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        }
+      }
+    },
+    "launcherRobiScopeHelp" : {
+      "comment" : "Tooltip for the Robi search-field chip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zur App-Suche (Esc)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to app search (Esc)"
+          }
+        }
+      }
+    },
     "launcherRobiSuggestions" : {
       "comment" : "Clarifies that AI results are suggestions requiring a click.",
       "extractionState" : "manual",
@@ -21744,6 +21780,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search apps"
+          }
+        }
+      }
+    },
+    "launcherSearchOverflow" : {
+      "comment" : "Accessible label for the search field overflow menu. Distinct from the footer Launcher options menu.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchoptionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search options"
+          }
+        }
+      }
+    },
+    "launcherSearchOverflowHelp" : {
+      "comment" : "Hover help for the search field overflow menu.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnistyp, Filter, Ansicht und Dateiaktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Result type, filters, layout, and file actions"
           }
         }
       }

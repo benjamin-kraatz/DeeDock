@@ -101,7 +101,10 @@ The existing **Find a Window** entry points and keyboard shortcut keep their exi
 | Sort | Name, last opened through DDock, or number of opens through DDock |
 | Group | None, application category, or first letter |
 
-Location lives in the same options menu as sort and group, immediately left of Grid or List.
+Those controls live in one overflow menu in the search field, with Choose Files and
+Capture & image search. The idle bar shows that menu and Close. A query also shows Clear
+and **Ask Robi**.
+
 **Applications folders** is the default. It keeps bundles whose path is under `/Applications`
 or `~/Applications` and hides build helpers, Homebrew wrappers, and other discovered junk.
 **Standard Mac locations** adds `/System/Applications`. It does not add
@@ -129,10 +132,16 @@ They are independent of dock pins and remain when you clear launch history.
 
 ## Robi
 
-**Ask Robi** matches a task description to installed apps using on-device Apple Intelligence.
+**Ask Robi** appears in the search field when the trimmed query is not empty. It matches a
+task description to installed apps using on-device Apple Intelligence. The button animates
+in and out with the other Launcher snappy motion. Reduce Motion shows and hides it at once.
 It receives the task and app names, categories, and bundle identifiers. It receives no file
 contents or window captures. Requests use bounded batches and can be cancelled. Editing the
 query or closing the launcher invalidates pending suggestions.
+
+While Robi's answer is shown, a **Robi** chip replaces the magnifier in the search field and
+Ask Robi hides. Clicking the chip or pressing Esc returns to app search and keeps the query.
+Esc closes the launcher only when Robi is not active.
 
 Suggestions are restricted to known app identities. Robi never opens an app itself. The user
 chooses a result to launch it. If Apple Intelligence is unavailable or a request fails, the

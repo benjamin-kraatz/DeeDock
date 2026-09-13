@@ -80,7 +80,8 @@ These personality extras are deprecated and turn off on launch: Dock Sims and AI
 The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes
 grid and list app browsing plus unified search for apps, windows, Capsules/Breadcrumbs, Shelf files,
 pinned Shortcuts, and Dock Modes. App browsing retains filters, a location/source filter, sorting, grouping, and launch history.
-**Ask Robi** uses on-device Apple Intelligence to suggest apps for a task you describe.
+Those browse controls live in one search-field overflow menu. **Ask Robi** appears there for a
+nonempty query and uses on-device Apple Intelligence to suggest apps for a task you describe.
 With files selected, Launcher can open them with a compatible app, pass them to a pinned
 Shortcut, or copy them into a chosen folder. See the [launcher reference](docs/LAUNCHER.md)
 for controls and discovery limits, and the [acceptance notes](docs/ACCEPTANCE.md#dee-8-app-launcher)

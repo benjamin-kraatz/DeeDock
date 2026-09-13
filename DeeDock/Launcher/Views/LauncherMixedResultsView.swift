@@ -124,7 +124,7 @@ private struct LauncherMixedResultRow: View {
     }
 }
 
-/// Used by both row context menus and the toolbar menu reachable with Tab from the search field.
+/// Used by both row context menus and the search-field overflow menu reachable with Tab.
 struct LauncherMixedResultMenu: View {
     let result: LauncherSearchResult
     let launcher: LauncherState
@@ -156,31 +156,6 @@ struct LauncherMixedResultMenu: View {
                     launcher.search.actionBusy || launcher.search.discovering
                 )
             }
-        }
-    }
-}
-
-/// Chooses whether the launcher searches apps alone or combines all supported result types.
-struct LauncherSearchKindPicker: View {
-    let launcher: LauncherState
-
-    var body: some View {
-        @Bindable var search = launcher.search
-        Picker(selection: $search.kind) {
-            ForEach(LauncherSearchKind.allCases) { kind in
-                Text(kind.title).tag(kind)
-            }
-        } label: {
-            Text(.unifiedTypeFilter)
-        }
-        .labelsHidden()
-        .pickerStyle(.menu)
-        .controlSize(.large)
-        .frame(maxWidth: 153)
-        .fixedSize()
-        .onChange(of: search.kind) {
-            launcher.cancelRobi()
-            launcher.keyboardNavigationActive = false
         }
     }
 }

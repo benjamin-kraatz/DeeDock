@@ -37,9 +37,6 @@ struct LauncherView: View {
                         state: state,
                         searchFocused: $searchFocused
                     )
-                    if !state.usesFileActions {
-                        LauncherToolbar(state: state)
-                    }
                     status
                     if state.usesFileActions {
                         LauncherFileInputSummaryView(state: state.fileActions)
@@ -73,7 +70,10 @@ struct LauncherView: View {
             }
         }
         .onChange(of: state.contentVisible) { _, visible in searchFocused = visible }
-        .onExitCommand { state.close?() }
+        .onExitCommand {
+            // Esc steps out of Robi first, so leaving its answer never closes the launcher.
+            if state.robiActive { state.cancelRobi() } else { state.close?() }
+        }
         .onKeyPress(.downArrow) {
             state.moveSelection(by: state.usesGridNavigation ? columns : 1); return .handled
         }
@@ -136,11 +136,8 @@ struct LauncherView: View {
             Text(error).font(.callout).foregroundStyle(.red).textSelection(.enabled)
         }
         if let message = state.robiMessage {
-            HStack {
-                Text(message).font(.callout).foregroundStyle(.secondary)
-                Spacer()
-                Button { state.cancelRobi() } label: { Text(.launcherTextSearch) }
-            }
+            Text(message).font(.callout).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         if state.history.unreadable {
             HStack {
