@@ -2612,3 +2612,17 @@ Pending native acceptance:
 
 Compilation does not establish OCR accuracy, visual quality, deletion behavior at runtime,
 or permission handling on a user's Mac.
+
+## DEE-77: Launcher favorites
+
+Favorites is an app filter in both browsing and unified app search. The shared app menu
+adds and removes favorites. The app-wide identity set persists in `launcher.favorites.v1`,
+independently of display pins and launch history. The existing location filter still applies.
+
+Validation on 2026-09-13:
+
+- Debug app build succeeded with `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-77-build CODE_SIGNING_ALLOWED=NO build`.
+- Diff whitespace check passed. No tests or automated visual checks were run.
+- Native acceptance remains pending: add and remove favorites in grid and list menus,
+  select Favorites with and without a query, check DE and EN labels, and relaunch to confirm
+  persistence. Also check that another display shares favorites while retaining its own pins.

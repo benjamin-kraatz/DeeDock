@@ -1,7 +1,7 @@
 import Foundation
 
 nonisolated enum LauncherFilter: String, CaseIterable, Identifiable, Sendable {
-    case all, running, pinned, recent
+    case all, running, pinned, recent, favorites
     var id: Self { self }
     var title: LocalizedStringResource {
         switch self {
@@ -9,13 +9,14 @@ nonisolated enum LauncherFilter: String, CaseIterable, Identifiable, Sendable {
         case .running: .launcherRunning
         case .pinned: .launcherPinned
         case .recent: .launcherRecent
+        case .favorites: .launcherFavorites
         }
     }
 }
 
 /// Restricts browsing and app search by where a bundle lives on disk.
 ///
-/// Independent of ``LauncherFilter``, which still selects All / Running / Pinned / Recent.
+/// Independent of ``LauncherFilter``, which still selects All / Running / Pinned / Recent / Favorites.
 /// Matching uses lexical path prefixes only and does not query the filesystem.
 nonisolated enum LauncherLocationFilter: String, CaseIterable, Identifiable, Sendable {
     /// Every application the library already discovered.

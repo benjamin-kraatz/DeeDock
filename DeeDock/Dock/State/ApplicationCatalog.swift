@@ -5,6 +5,7 @@ import Observation
 @MainActor @Observable
 final class ApplicationCatalog {
     let launcherLibrary: LauncherLibrary
+    let launcherFavorites: LauncherFavorites
     let launcherHistory: LauncherHistory
     let suggestions: LauncherSuggestionsStore
     @ObservationIgnored private lazy var suggestionObservation = LauncherSuggestionObservation(store: suggestions)
@@ -25,7 +26,8 @@ final class ApplicationCatalog {
     @ObservationIgnored private var generation = UUID()
 
     init(service: any ApplicationServicing, launcherHistory: LauncherHistory? = nil, launcherLibrary: LauncherLibrary? = nil,
-         suggestions: LauncherSuggestionsStore? = nil) {
+         suggestions: LauncherSuggestionsStore? = nil, launcherFavorites: LauncherFavorites? = nil) {
+        self.launcherFavorites = launcherFavorites ?? LauncherFavorites(defaults: nil)
         self.service = service
         self.launcherHistory = launcherHistory ?? LauncherHistory(defaults: nil)
         self.launcherLibrary = launcherLibrary ?? LauncherLibrary()

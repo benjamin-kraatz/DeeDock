@@ -95,11 +95,15 @@ struct LauncherResultButton: View {
     var isSuggestion = false
     @State private var icon: NSImage?
     @State private var hovered = false
+    @State private var hoveredBadge: Badge?
+
+    private enum Badge { case favorite, pinned }
 
     private var selected: Bool {
         state.usesMixedResults ? state.search.selectedID == .application(application.id)
             : state.selectedID == (isSuggestion ? .suggested(application.id) : .application(application.id))
     }
+    private var favorite: Bool { state.favorites.ids.contains(application.id) }
     private var pinned: Bool { state.pinnedIDs.contains(application.id) }
     private var running: Bool {
         state.catalog.runningIDs.contains(application.id)
@@ -168,24 +172,37 @@ struct LauncherResultButton: View {
                 LauncherSuggestionActions(application: application, state: state)
             }
         }
-        .onHover { hovered = $0 }
+        .onHover {
+            hovered = $0
+            if !$0 { hoveredBadge = nil }
+        }
         .task(id: application.reference.url) {
             icon = state.icon(for: application)
         }
         .accessibilityLabel(Text(application.reference.name))
-        .accessibilityValue(
-            pinned
-                ? Text(
-                    running ? .launcherPinnedRunning : .launcherPinnedNotRunning
-                )
-                : Text(running ? .launcherRunning : .launcherNotRunning)
-        )
+        .accessibilityValue(accessibilityStatus)
         .accessibilityHint(Text(.launcherOpenHint))
         .accessibilityActions {
             if isSuggestion { LauncherSuggestionActions(application: application, state: state) }
         }
         .accessibilityAddTraits(selected ? [.isSelected] : [])
-        .help(application.reference.url.path)
+        // The outer Button owns the native tooltip, so nested badge help cannot override it.
+        .help(hoverHelp)
+    }
+
+    private var hoverHelp: Text {
+        switch hoveredBadge {
+        case .favorite where favorite: Text(.launcherFavoriteBadgeHelp)
+        case .pinned where pinned: Text(.launcherPinnedBadgeHelp)
+        default: Text(verbatim: application.reference.url.path)
+        }
+    }
+
+    private var accessibilityStatus: Text {
+        let status = pinned
+            ? String(localized: running ? .launcherPinnedRunning : .launcherPinnedNotRunning)
+            : String(localized: running ? .launcherRunning : .launcherNotRunning)
+        return favorite ? Text(.launcherFavoriteStatus(status: status)) : Text(verbatim: status)
     }
 
     private func artwork(size: CGFloat) -> some View {
@@ -210,6 +227,25 @@ struct LauncherResultButton: View {
                 ).background(.regularMaterial, in: .circle)
             }
         }
+        .overlay(alignment: .topLeading) {
+            if favorite {
+                Image(systemName: "star.fill")
+                    .font(.system(size: size * 0.16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: size * 0.31, height: size * 0.31)
+                    .background(Color.orange.gradient, in: .circle)
+                    .overlay {
+                        Circle().strokeBorder(.white.opacity(0.45), lineWidth: 0.75)
+                    }
+                    .shadow(color: .black.opacity(0.22), radius: 1.5, y: 1)
+                    .contentShape(.circle)
+                    .onHover { inside in
+                        if inside { hoveredBadge = .favorite }
+                        else if hoveredBadge == .favorite { hoveredBadge = nil }
+                    }
+                    .offset(x: -size * 0.02, y: -size * 0.01)
+            }
+        }
         .overlay(alignment: .topTrailing) {
             if pinned {
                 Image(systemName: "pin.fill")
@@ -219,6 +255,11 @@ struct LauncherResultButton: View {
                     .background(Color.accentColor, in: .circle)
                     .overlay {
                         Circle().strokeBorder(.background, lineWidth: 1.5)
+                    }
+                    .contentShape(.circle)
+                    .onHover { inside in
+                        if inside { hoveredBadge = .pinned }
+                        else if hoveredBadge == .pinned { hoveredBadge = nil }
                     }
                     .offset(x: size * 0.04, y: -size * 0.02)
             }

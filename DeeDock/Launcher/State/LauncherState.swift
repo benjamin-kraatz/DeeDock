@@ -10,6 +10,7 @@ final class LauncherState {
     @ObservationIgnored var suggestionModeID: (() -> String?)?
     @ObservationIgnored var suggestionVisibility: (() -> DockAppVisibility)?
     var library: LauncherLibrary { catalog.launcherLibrary }
+    var favorites: LauncherFavorites { catalog.launcherFavorites }
     var history: LauncherHistory { catalog.launcherHistory }
     var isPresented = false
     var contentVisible = false
@@ -45,7 +46,7 @@ final class LauncherState {
     }
     var searchOptions: LauncherSearchOptions {
         LauncherSearchOptions(filter: filter, locationFilter: locationFilter, sort: sort, grouping: grouping,
-            running: Set(catalog.runningIDs), pinned: pinnedIDs,
+            running: Set(catalog.runningIDs), pinned: pinnedIDs, favorites: favorites.ids,
             visits: history.visits.mapValues { .init(count: $0.count, lastOpened: $0.lastOpened) })
     }
     var query = "" { didSet {
@@ -64,7 +65,7 @@ final class LauncherState {
     /// On-disk location constraint for browsing, unified app search, and Robi.
     ///
     /// Defaults to Applications folders. Sort, group, layout, and the All / Running / Pinned /
-    /// Recent filter are session-scoped on this panel, so this is too.
+    /// Recent / Favorites filter are session-scoped on this panel, so this is too.
     var locationFilter: LauncherLocationFilter = .applicationsFolders {
         didSet {
             guard oldValue != locationFilter else { return }
@@ -124,6 +125,7 @@ final class LauncherState {
             case .all: break
             case .running: guard running.contains(app.id) else { return nil }
             case .pinned: guard pinnedIDs.contains(app.id) else { return nil }
+            case .favorites: guard favorites.ids.contains(app.id) else { return nil }
             case .recent: guard history.visits[app.id] != nil else { return nil }
             }
             if let suggestions { return suggestions.contains(app.id) ? (app, 0) : nil }

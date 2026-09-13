@@ -23,6 +23,15 @@ struct LauncherApplicationMenu: View {
         }
         Divider()
         Button {
+            state.favorites.toggle(application.id)
+        } label: {
+            Label {
+                Text(state.favorites.ids.contains(application.id) ? .launcherRemoveFavorite : .launcherAddFavorite)
+            } icon: {
+                Image(systemName: state.favorites.ids.contains(application.id) ? "star.slash" : "star")
+            }
+        }
+        Button {
             state.togglePin(application)
         } label: {
             Label {

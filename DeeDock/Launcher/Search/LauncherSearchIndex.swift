@@ -15,6 +15,7 @@ nonisolated enum LauncherSearchIndex {
                 case .all: break
                 case .running: guard input.options.running.contains(app.id) else { continue }
                 case .pinned: guard input.options.pinned.contains(app.id) else { continue }
+                case .favorites: guard input.options.favorites.contains(app.id) else { continue }
                 case .recent: guard input.options.visits[app.id] != nil else { continue }
                 }
                 if let score = app.score(query) {
