@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDock 0.6.0 What’s New</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f1e6;
+    --ink: #2a2754;
+    --lilac: #c9b8e0;
+    --mint: #b7dcc8;
+    --coral: #f2b6a8;
+    --rule: #d8d0c4;
+  }
+  html { background: var(--paper); color: var(--ink); }
+  body {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding: 2rem 1.25rem 4rem;
+    font: 1.05rem/1.5 "Source Serif 4", "Iowan Old Style", Palatino, serif;
+  }
+  h1 { font-size: 1.6rem; font-weight: 600; margin: 0 0 0.35rem; }
+  h2 { font-size: 1.15rem; font-weight: 600; margin: 0 0 0.75rem; }
+  p { margin: 0.4rem 0; }
+  a { color: var(--ink); }
+  .lede { margin-bottom: 2rem; }
+  .panel {
+    border: 2px solid var(--ink);
+    border-radius: 1rem;
+    padding: 1rem 1rem 1.15rem;
+    margin: 0 0 1.5rem;
+    background: #fffdf8;
+  }
+  .art {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.6rem;
+    margin-bottom: 1rem;
+    background: var(--paper);
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.25rem;
+  }
+  @media (max-width: 640px) {
+    .cols { grid-template-columns: 1fr; }
+  }
+  .lang { min-width: 0; }
+  .lang h3 {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 0.4rem;
+    color: #5c5878;
+  }
+  .title { font-weight: 650; margin: 0 0 0.35rem; }
+  .speech {
+    margin: 0 0 0.45rem;
+    padding: 0.45rem 0.65rem;
+    background: var(--lilac);
+    border-radius: 0.7rem;
+  }
+  .caption { margin: 0; }
+  .mint { background: var(--mint); }
+  .coral { background: var(--coral); }
+</style>
+</head>
+<body>
+<h1>DDock 0.6.0 What’s New</h1>
+<p class="lede">Review preview for <a href="0.6.0.md">0.6.0.md</a>. Art is shared. Copy is selectable. German left, English right. Google Fonts (Source Serif 4) are for this static file only. The native Update window does not load this stylesheet.</p>
+
+<article class="panel">
+<h2>01 / Launcher-Filter und Suche</h2>
+<img class="art" src="assets/0.6.0/panel-01.png" alt="Lächelnde Kacheln hinter einem Trichter; Sterne an Favoriten; eine Overflow-Kapsel an der Suchleiste. / Smiling tiles behind a funnel; stars on favorites; one overflow capsule on the search bar.">
+<div class="cols">
+  <div class="lang">
+    <h3>Deutsch</h3>
+    <p class="title">Launcher räumt die Suche</p>
+    <p class="speech mint">Nur Favoriten. Eine Leiste.</p>
+    <p class="caption">Filter, Favoriten und Ort sitzen im Overflow. Robi kommt erst mit einer Query. Scroll bleibt, aktive Filter sind sichtbar und lassen sich zurücksetzen.</p>
+  </div>
+  <div class="lang">
+    <h3>English</h3>
+    <p class="title">Cleaner launcher search</p>
+    <p class="speech mint">Favorites only. One menu.</p>
+    <p class="caption">Type, favorites, and location live in one overflow. Robi appears only with a query. Scroll is restored; active filters show and reset.</p>
+  </div>
+</div>
+</article>
+
+<article class="panel">
+<h2>02 / Update-Hinweise</h2>
+<img class="art" src="assets/0.6.0/panel-02.png" alt="Lächelndes Dock mit Korall-Pip, Hinweiswölkchen und Badge; schlafendes Kissen neben einem Paket. / Smiling dock with a coral pip, a callout puff, and a badge; a sleepy pillow beside a small package.">
+<div class="cols">
+  <div class="lang">
+    <h3>Deutsch</h3>
+    <p class="title">Updates winken leise</p>
+    <p class="speech">Hier. Wenn du Zeit hast.</p>
+    <p class="caption">Ein Hinweis auf dem Hauptdisplay, Badges in Menü und Einstellungen, ein Pip am Dock. Installation im Leerlauf bleibt aus, bis du sie anschaltest.</p>
+  </div>
+  <div class="lang">
+    <h3>English</h3>
+    <p class="title">Updates tap quietly</p>
+    <p class="speech">Here. When you are idle.</p>
+    <p class="caption">A callout on the main display, badges in the menu and Settings, a pip on DDock glass. Idle install stays off until you turn it on.</p>
+  </div>
+</div>
+</article>
+
+<article class="panel">
+<h2>03 / Aufräumen vor 1.0</h2>
+<img class="art" src="assets/0.6.0/panel-03.png" alt="Ordentliche Settings-Karten auf einem Regal; ein lächelnder Magnet wandert in eine Archivkiste. / Neat settings cards on a shelf; a smiling magnet going into an archive box.">
+<div class="cols">
+  <div class="lang">
+    <h3>Deutsch</h3>
+    <p class="title">Aufräumen vor 1.0</p>
+    <p class="speech coral">Magnete kommen in die Kiste.</p>
+    <p class="caption">Einstellungen sind neu gegliedert, Atmosphere sitzt auf den gemeinsamen Karten. Magnetische Kanten und die Vor-1.0-Persönlichkeit sind abgeschaltet und landen unter Veraltet.</p>
+  </div>
+  <div class="lang">
+    <h3>English</h3>
+    <p class="title">Tidying up before 1.0</p>
+    <p class="speech coral">Magnets go in the box.</p>
+    <p class="caption">Settings are regrouped, Atmosphere sits on the shared cards. Magnetic Edges and the pre-1.0 personality features are forced off under Deprecated.</p>
+  </div>
+</div>
+</article>
+</body>
+</html>
