@@ -76,8 +76,8 @@ struct AtmosphereSettingsPane: View {
             concepts: [
                 .text(
                     store.settings.mood.isEmpty
-                        ? String(localized: store.settings.preset.title)
-                        : store.settings.mood
+                        ? String(localized: store.settings.preset.decorPrompt)
+                        : String(localized: .atmosphereDecorPromptMood(mood: store.settings.mood))
                 )
             ]
         ) { url in

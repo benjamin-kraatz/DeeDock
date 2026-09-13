@@ -99,6 +99,15 @@ enum AtmospherePreset: String, Codable, CaseIterable {
         }
     }
     var hasDecor: Bool { self == .sixtyNine || self == .party }
+    /// Image Playground prompt for a small corner ornament that matches the preset.
+    var decorPrompt: LocalizedStringResource {
+        switch self {
+        case .sixtyNine: .atmosphereDecorPromptSixtyNine
+        case .minimal: .atmosphereDecorPromptMinimal
+        case .focus: .atmosphereDecorPromptFocus
+        case .party: .atmosphereDecorPromptParty
+        }
+    }
 }
 
 enum AtmosphereColorSource: String, Codable, CaseIterable {

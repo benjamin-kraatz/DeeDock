@@ -2433,6 +2433,96 @@
         }
       }
     },
+    "atmosphereDecorPromptFocus" : {
+      "comment" : "Image Playground prompt for the Atmosphere corner decoration. Not shown in the UI; describe a single small ornament.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine ruhig leuchtende Schreibtischlampe neben einer dampfenden Tasse Tee, ein einzelnes kleines Ornament mittig auf schlichtem Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A calm, softly glowing desk lamp beside a steaming cup of tea, a single small ornament centered on a plain background"
+          }
+        }
+      }
+    },
+    "atmosphereDecorPromptMinimal" : {
+      "comment" : "Image Playground prompt for the Atmosphere corner decoration. Not shown in the UI; describe a single small ornament.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein einzelner glatter Kieselstein mit einem kleinen Keimling, sanfte gedeckte Farben, ein kleines minimalistisches Ornament mittig auf schlichtem Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A single smooth pebble with a tiny sprout, soft muted tones, a small minimalist ornament centered on a plain background"
+          }
+        }
+      }
+    },
+    "atmosphereDecorPromptMood" : {
+      "comment" : "Image Playground prompt for the Atmosphere corner decoration. Not shown in the UI; describe a single small ornament. mood is the user's own mood description.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein einzelnes kleines Deko-Ornament, das diese Stimmung einfängt: %1$(mood)@. Mittig auf schlichtem Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A single small decorative ornament that captures this mood: %1$(mood)@. Centered on a plain background"
+          }
+        }
+      }
+    },
+    "atmosphereDecorPromptParty" : {
+      "comment" : "Image Playground prompt for the Atmosphere corner decoration. Not shown in the UI; describe a single small ornament.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein fröhlicher Strauß bunter Luftballons mit Konfetti und Luftschlangen, ein einzelnes festliches Ornament mittig auf schlichtem Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cheerful bunch of colorful balloons with confetti and streamers, a single festive ornament centered on a plain background"
+          }
+        }
+      }
+    },
+    "atmosphereDecorPromptSixtyNine" : {
+      "comment" : "Image Playground prompt for the Atmosphere corner decoration. Not shown in the UI; describe a single small ornament.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drei warm leuchtende Kerzen unterschiedlicher Höhe mit sanften Flammen, ein einzelnes gemütliches Ornament mittig auf schlichtem Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three warm glowing candles of different heights with gentle flames, a single cozy ornament centered on a plain background"
+          }
+        }
+      }
+    },
     "atmosphereDensity" : {
       "comment" : "Atmosphere Settings or corner decoration. Particle density",
       "extractionState" : "manual",
