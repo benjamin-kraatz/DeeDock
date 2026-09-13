@@ -22,6 +22,7 @@ struct LauncherView: View {
             // which is what kept the hosted controls trailing behind the old window resize.
             let presenting = state.contentRect != .zero
             let landing = presenting ? state.contentRect : CGRect(origin: .zero, size: geometry.size)
+            let browseColumns = max(1, Int((landing.width - 56 + 12) / 148))
             let morphing = presenting && !state.expanded
             let rect = morphing ? state.dockRect : landing
             let radius: CGFloat = morphing
@@ -46,7 +47,10 @@ struct LauncherView: View {
                     } else if state.usesMixedResults {
                         LauncherMixedResultsView(launcher: state)
                     } else {
-                        LauncherResultsView(state: state, columns: columns, groups: groups)
+                        let context = LauncherBrowseScroll.Context(state: state, columns: browseColumns, groups: groups)
+                        LauncherResultsView(state: state, columns: browseColumns, groups: groups)
+                            .modifier(LauncherBrowseScrollRestoration(state: state, context: context))
+                            .id(context)
                     }
                     footer(count: resultCount(groups: groups))
                 }

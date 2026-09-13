@@ -1620,6 +1620,23 @@ Remaining native acceptance:
 
 The final settings window uses a singleton SwiftUI `Window` scene, native `NavigationStack` back navigation, and the standard sidebar toggle to keep the toolbar height consistent. All app Settings entry points open this window. Native menus, segmented controls, and numeric text fields replace custom capsule controls. Repeating overview headers and custom row hover fills are removed. The user accepted the final appearance and toolbar height on 2026-09-07. The final Debug app build and diff checks passed; no tests or automated visual checks ran during this polish pass. The broader accessibility and display-specific checks above remain unverified.
 
+## DEE-78: Launcher scroll restoration
+
+Ordinary app grid and list browsing retain a per-display offset in memory across dismissal.
+Changed browse controls, grid column counts, or ordered app sections start at the top.
+Query changes and file-action adoption clear the saved offset. Optional suggestions can
+shift the restored location slightly when their section height changes.
+
+Validation on 2026-09-13: the focused Debug build succeeded with
+`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -derivedDataPath /tmp/DeeDock-dee78-build build`.
+The log is `/tmp/DeeDock-dee78-build.log`. Warnings came from unchanged Clipboard Museum,
+Quarantine, and Dock Badges code. `git diff --check` passed.
+
+Hands-on acceptance is pending. No tests or automated visual checks were run.
+Check both layouts, category and letter grouping, Escape and outside-click dismissal,
+query and filter changes, changed app results, keyboard navigation after reopening,
+optional suggestions, Reduce Motion, and independent positions on two displays.
+
 ## DEE-8: App Launcher
 
 Implemented from DEE-8 and its September 7 clarification. A permanent utility tile expands

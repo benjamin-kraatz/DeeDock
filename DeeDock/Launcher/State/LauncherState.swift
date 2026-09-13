@@ -50,6 +50,7 @@ final class LauncherState {
     }
     var query = "" { didSet {
         guard oldValue != query else { return }
+        browseScroll = nil
         cancelRobi(); search.invalidateQuery(); selectedID = nil; keyboardNavigationActive = false
     } }
     var filter: LauncherFilter = .all {
@@ -74,6 +75,8 @@ final class LauncherState {
     var sort: LauncherSort = .name { didSet { if oldValue != sort { search.invalidateQuery() } } }
     var grouping: LauncherGrouping = .none { didSet { if oldValue != grouping { search.invalidateQuery() } } }
     var layout: LauncherLayout = .grid
+    // Geometry updates must not invalidate the Launcher or recompute its app results every frame.
+    @ObservationIgnored var browseScroll: LauncherBrowseScroll?
     var selectedID: LauncherBrowseID?
     var navigationColumns = 1
     var keyboardNavigationActive = false
@@ -195,6 +198,7 @@ final class LauncherState {
 
     /// Enters file-action mode with an already-owned batch. Drag leases are not copied.
     func adoptFiles(_ adoption: LauncherFileAdoption) {
+        browseScroll = nil
         cancelRobi()
         query = ""
         error = nil
