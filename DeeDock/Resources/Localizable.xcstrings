@@ -21640,6 +21640,42 @@
         }
       }
     },
+    "launcherSearchOverflow" : {
+      "comment" : "Accessible label for the search field overflow menu. Distinct from the footer Launcher options menu.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchoptionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search options"
+          }
+        }
+      }
+    },
+    "launcherSearchOverflowHelp" : {
+      "comment" : "Hover help for the search field overflow menu.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnistyp, Filter, Ansicht und Dateiaktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Result type, filters, layout, and file actions"
+          }
+        }
+      }
+    },
     "launcherSearchPrompt" : {
       "comment" : "Launcher search field placeholder.",
       "extractionState" : "manual",

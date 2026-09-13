@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The launcher's search field and the trailing file, browse, Robi, and close actions.
+/// The launcher's search field, overflow menu, and query-gated clear and Robi actions.
 struct LauncherSearchBar: View {
     @Bindable var state: LauncherState
     var searchFocused: FocusState<Bool>.Binding
@@ -29,25 +29,7 @@ struct LauncherSearchBar: View {
             .autocorrectionDisabled()
             .layoutPriority(1)
 
-            Button {
-                state.fileActions.chooseFiles()
-            } label: {
-                Image(systemName: "doc.badge.plus")
-            }
-            .buttonStyle(.borderless)
-            .help(.launcherFileChooseFiles)
-            .accessibilityLabel(Text(.launcherFileChooseFiles))
-
-            if !state.usesFileActions {
-                Button {
-                    state.search.explicitSearch?()
-                } label: {
-                    Image(systemName: "camera.viewfinder")
-                }
-                .buttonStyle(.borderless)
-                .help(.unifiedCaptureRoute)
-                .accessibilityLabel(Text(.unifiedCaptureRoute))
-            }
+            LauncherSearchBarOverflowMenu(state: state)
 
             if !state.query.isEmpty {
                 Button {
@@ -62,10 +44,7 @@ struct LauncherSearchBar: View {
             }
 
             if !state.usesFileActions {
-                ViewThatFits(in: .horizontal) {
-                    LauncherSearchBarBrowseControls(state: state, showsRobiTitle: true)
-                    LauncherSearchBarBrowseControls(state: state, showsRobiTitle: false)
-                }
+                LauncherRobiButton(state: state)
             }
 
             Button {

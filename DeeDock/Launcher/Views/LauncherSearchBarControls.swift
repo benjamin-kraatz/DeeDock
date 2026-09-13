@@ -1,173 +1,150 @@
 import SwiftUI
 
-/// Compact browse chrome for the search field. File-action mode never hosts this cluster.
-struct LauncherSearchBarBrowseControls: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+/// One search-field overflow for type, filters, layout, and file actions.
+///
+/// File-action mode keeps Choose Files and hides browse-only items. A discrete result type
+/// replaces the app filter and location, sort, group, and layout pickers with result actions.
+struct LauncherSearchBarOverflowMenu: View {
     @Bindable var state: LauncherState
-    /// When false, Ask Robi drops its title so the trailing cluster can shrink.
-    var showsRobiTitle: Bool
 
     var body: some View {
-        HStack(spacing: showsRobiTitle ? 8 : 4) {
-            LauncherSearchKindPicker(launcher: state)
-            kindActionsOrFilters
-            if !hasDiscreteKindSelected {
-                LauncherLocationSortGroupMenu(state: state)
-                LauncherLayoutPicker(state: state)
+        @Bindable var search = state.search
+        Menu {
+            if !state.usesFileActions {
+                Picker(selection: $search.kind) {
+                    ForEach(LauncherSearchKind.allCases) { kind in
+                        Label {
+                            Text(kind.title)
+                        } icon: {
+                            Image(systemName: kind.symbol)
+                        }
+                        .tag(kind)
+                    }
+                } label: {
+                    Text(.unifiedTypeFilter)
+                }
+                if hasDiscreteKindSelected {
+                    mixedResultActions
+                } else {
+                    appsFilter
+                    locationSortGroup
+                    layout
+                }
+                Divider()
             }
-            LauncherRobiButton(state: state, showsTitle: showsRobiTitle)
+            chooseFiles
+            if !state.usesFileActions {
+                capture
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
         }
-        .controlSize(showsRobiTitle ? .regular : .small)
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .accessibilityLabel(Text(.launcherSearchOverflow))
+        .help(Text(.launcherSearchOverflowHelp))
+        .onChange(of: search.kind) {
+            state.cancelRobi()
+            state.keyboardNavigationActive = false
+        }
     }
 
     private var hasDiscreteKindSelected: Bool {
         state.search.kind != .all && state.search.kind != .application
     }
 
-    private var kindActionsOrFilters: some View {
-        ZStack(alignment: .leading) {
-            if hasDiscreteKindSelected {
-                LauncherMixedResultActionsMenu(state: state)
-                    .transition(kindActionTransition)
-            } else {
-                LauncherAppsFilterPicker(state: state)
-                    .transition(kindActionTransition)
-            }
-        }
-        .animation(
-            reduceMotion ? nil : .snappy(duration: 0.24),
-            value: hasDiscreteKindSelected
-        )
-    }
-
-    private var kindActionTransition: some Transition {
-        .blurReplace
-    }
-}
-
-/// Icon-only result-type menu. Full titles stay inside the menu.
-struct LauncherSearchKindPicker: View {
-    let launcher: LauncherState
-
-    var body: some View {
-        @Bindable var search = launcher.search
-        Menu {
-            Picker(selection: $search.kind) {
-                ForEach(LauncherSearchKind.allCases) { kind in
-                    Label {
-                        Text(kind.title)
-                    } icon: {
-                        Image(systemName: kind.symbol)
-                    }
-                    .tag(kind)
+    private var appsFilter: some View {
+        Picker(selection: $state.filter) {
+            ForEach(LauncherFilter.allCases) { filter in
+                Label {
+                    Text(filter.title)
+                } icon: {
+                    Image(systemName: filter.symbol)
                 }
-            } label: {
-                Text(.unifiedTypeFilter)
+                .tag(filter)
             }
         } label: {
-            Image(systemName: search.kind.barSymbol)
-        }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .accessibilityLabel(Text(.unifiedTypeFilter))
-        .accessibilityValue(Text(search.kind.title))
-        .help(Text(.unifiedTypeFilter))
-        .onChange(of: search.kind) {
-            launcher.cancelRobi()
-            launcher.keyboardNavigationActive = false
+            Text(.launcherFilter)
         }
     }
-}
 
-/// Icon-only All / Running / Pinned / Recent menu. The icon follows the active filter.
-struct LauncherAppsFilterPicker: View {
-    @Bindable var state: LauncherState
-
-    var body: some View {
-        Menu {
-            Picker(selection: $state.filter) {
-                ForEach(LauncherFilter.allCases) { filter in
-                    Label {
-                        Text(filter.title)
-                    } icon: {
-                        Image(systemName: filter.symbol)
-                    }
-                    .tag(filter)
-                }
-            } label: {
-                Text(.launcherFilter)
+    @ViewBuilder private var locationSortGroup: some View {
+        Picker(selection: $state.locationFilter) {
+            ForEach(LauncherLocationFilter.allCases) { location in
+                Text(location.title).tag(location)
             }
         } label: {
-            Image(systemName: state.filter.symbol)
+            Text(.launcherLocation)
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .accessibilityLabel(Text(.launcherFilter))
-        .accessibilityValue(Text(state.filter.title))
-        .help(Text(.launcherFilter))
-    }
-}
-
-/// Location, sort, and group pickers behind the existing options symbol.
-struct LauncherLocationSortGroupMenu: View {
-    @Bindable var state: LauncherState
-
-    var body: some View {
-        Menu {
-            Picker(selection: $state.locationFilter) {
-                ForEach(LauncherLocationFilter.allCases) { location in
-                    Text(location.title).tag(location)
-                }
-            } label: {
-                Text(.launcherLocation)
-            }
-            Picker(selection: $state.sort) {
-                ForEach(LauncherSort.allCases) { sort in
-                    Text(sort.title).tag(sort)
-                }
-            } label: {
-                Text(.launcherSort)
-            }
-            Picker(selection: $state.grouping) {
-                ForEach(LauncherGrouping.allCases) { group in
-                    Text(group.title).tag(group)
-                }
-            } label: {
-                Text(.launcherGroup)
+        Picker(selection: $state.sort) {
+            ForEach(LauncherSort.allCases) { sort in
+                Text(sort.title).tag(sort)
             }
         } label: {
-            Image(systemName: "line.3.horizontal.decrease")
+            Text(.launcherSort)
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .accessibilityLabel(Text(.launcherSortAndGroup))
-        .help(Text(.launcherSortAndGroup))
+        Picker(selection: $state.grouping) {
+            ForEach(LauncherGrouping.allCases) { group in
+                Text(group.title).tag(group)
+            }
+        } label: {
+            Text(.launcherGroup)
+        }
     }
-}
 
-/// Grid or list, icons only. Titles remain the accessibility names.
-struct LauncherLayoutPicker: View {
-    @Bindable var state: LauncherState
-
-    var body: some View {
+    private var layout: some View {
         Picker(selection: $state.layout) {
             ForEach(LauncherLayout.allCases) { layout in
-                Image(systemName: layout.symbol)
-                    .accessibilityLabel(Text(layout.title))
-                    .tag(layout)
+                Label {
+                    Text(layout.title)
+                } icon: {
+                    Image(systemName: layout.symbol)
+                }
+                .tag(layout)
             }
         } label: {
             Text(.launcherView)
         }
-        .labelsHidden()
-        .pickerStyle(.tabs)
-        .fixedSize()
-        .accessibilityLabel(Text(.launcherView))
-        .accessibilityValue(Text(state.layout.title))
-        .help(Text(.launcherView))
+    }
+
+    @ViewBuilder private var mixedResultActions: some View {
+        if let result = mixedResultActionTarget {
+            Divider()
+            LauncherMixedResultMenu(result: result, launcher: state)
+        }
+    }
+
+    private var chooseFiles: some View {
+        Button {
+            state.fileActions.chooseFiles()
+        } label: {
+            Label {
+                Text(.launcherFileChooseFiles)
+            } icon: {
+                Image(systemName: "doc.badge.plus")
+            }
+        }
+    }
+
+    private var capture: some View {
+        Button {
+            state.search.explicitSearch?()
+        } label: {
+            Label {
+                Text(.unifiedCaptureRoute)
+            } icon: {
+                Image(systemName: "camera.viewfinder")
+            }
+        }
+    }
+
+    private var mixedResultActionTarget: LauncherSearchResult? {
+        guard let selectedID = state.search.selectedID else {
+            return state.search.visible.first
+        }
+
+        return state.search.visible.first { $0.id == selectedID }
     }
 }
 
@@ -175,7 +152,6 @@ struct LauncherLayoutPicker: View {
 struct LauncherRobiButton: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var state: LauncherState
-    var showsTitle: Bool
 
     var body: some View {
         Group {
@@ -201,9 +177,7 @@ struct LauncherRobiButton: View {
                 } else {
                     Image(systemName: "sparkles")
                 }
-                if showsTitle {
-                    Text(state.robiBusy ? .launcherRobiCancel : .launcherAskRobi)
-                }
+                Text(state.robiBusy ? .launcherRobiCancel : .launcherAskRobi)
             }
         }
         .buttonStyle(.borderedProminent)
@@ -212,37 +186,5 @@ struct LauncherRobiButton: View {
         )
         .disabled(!state.hasLocationMatchingApplications)
         .help(Text(.launcherRobiHelp))
-    }
-}
-
-/// Keyboard-reachable actions for the selected mixed result, icon-only in the search bar.
-struct LauncherMixedResultActionsMenu: View {
-    @Bindable var state: LauncherState
-
-    var body: some View {
-        Menu {
-            if let result = mixedResultActionTarget {
-                LauncherMixedResultMenu(
-                    result: result,
-                    launcher: state
-                )
-            }
-        } label: {
-            Image(systemName: "ellipsis.circle")
-        }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .disabled(mixedResultActionTarget == nil)
-        .accessibilityLabel(Text(.unifiedResultActions))
-        .help(Text(.unifiedResultActions))
-    }
-
-    private var mixedResultActionTarget: LauncherSearchResult? {
-        guard let selectedID = state.search.selectedID else {
-            return state.search.visible.first
-        }
-
-        return state.search.visible.first { $0.id == selectedID }
     }
 }

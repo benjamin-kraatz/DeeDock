@@ -101,9 +101,10 @@ The existing **Find a Window** entry points and keyboard shortcut keep their exi
 | Sort | Name, last opened through DDock, or number of opens through DDock |
 | Group | None, application category, or first letter |
 
-Those controls sit in the search field, trailing the query, as icon-only menus and a
-grid-or-list switch. Location, sort, and group share one options menu immediately left of
-Grid or List. **Ask Robi** appears there only when the query is not empty.
+Those controls live in one overflow menu in the search field, with Choose Files and
+Capture & image search. The idle bar shows that menu and Close. A query also shows Clear
+and **Ask Robi**.
+
 **Applications folders** is the default. It keeps bundles whose path is under `/Applications`
 or `~/Applications` and hides build helpers, Homebrew wrappers, and other discovered junk.
 **Standard Mac locations** adds `/System/Applications`. It does not add

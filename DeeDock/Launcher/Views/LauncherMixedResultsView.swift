@@ -124,7 +124,7 @@ private struct LauncherMixedResultRow: View {
     }
 }
 
-/// Used by both row context menus and the search-bar menu reachable with Tab from the search field.
+/// Used by both row context menus and the search-field overflow menu reachable with Tab.
 struct LauncherMixedResultMenu: View {
     let result: LauncherSearchResult
     let launcher: LauncherState
