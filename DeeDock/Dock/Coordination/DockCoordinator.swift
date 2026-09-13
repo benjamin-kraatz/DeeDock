@@ -216,7 +216,8 @@ final class DockCoordinator {
             focusSession: focusSession,
             pinWeather: pinWeather,
             quarantine: .shared,
-            patchBay: patchBay
+            patchBay: patchBay,
+            dockSettings: settings
         )
         badgeMemory.start(session: focusSession.session)
         focusSession.changed = { [weak self] in

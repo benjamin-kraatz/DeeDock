@@ -3,9 +3,9 @@
 ## Deprecated personality features
 
 Dock Sims (including AI icon rumours), Focus breathing, Focus debt, Pin weather / icon rust,
-Quarantine stamp, and Patch bay are deprecated. They will be removed in version 1.0.0.
-Launch coerces each enable flag to off and persists that. Settings keeps a **Deprecated**
-group at the bottom of Features so the removal notice stays reachable. Atmosphere and
+Quarantine stamp, Patch bay, and Magnetic Edges are deprecated. They will be removed in
+version 1.0.0. Launch coerces each enable flag to off and persists that. Settings keeps a
+**Deprecated** section under Features so the removal notice stays reachable. Atmosphere and
 soap bubbles stay first-class.
 
 The slices below remain the record of how those features were built. Hands-on checks that

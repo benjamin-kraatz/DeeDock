@@ -10,7 +10,7 @@ struct DeprecatedFeaturesTests {
         #expect(SettingsSection.fixed.last == .deprecated)
         let last = SettingsPage.deprecatedPages
         #expect(Set(last) == [
-            .sims, .focusBreathing, .focusDebt, .pinWeather, .quarantine, .patchBay
+            .sims, .focusBreathing, .focusDebt, .pinWeather, .quarantine, .patchBay, .magneticEdges
         ])
         let active = Set(SettingsSection.featureSections.flatMap(\.pageGroups).flatMap(\.self))
         #expect(active.contains(.soapBubbles))
@@ -19,11 +19,12 @@ struct DeprecatedFeaturesTests {
         #expect(active.contains(.discovery))
         #expect(active.contains(.clipboardMuseum))
         #expect(active.contains(.appSuggestions))
-        #expect(active.contains(.magneticEdges))
+        #expect(!active.contains(.magneticEdges))
         #expect(!active.contains(.sims))
         #expect(!active.contains(.patchBay))
         #expect(!SettingsPage.focusSessions.isDeprecated)
         #expect(!SettingsPage.soapBubbles.isDeprecated)
+        #expect(SettingsPage.magneticEdges.isDeprecated)
         #expect(SettingsPage.deprecatedPages.allSatisfy { $0.isDeprecated })
     }
 
@@ -42,12 +43,14 @@ struct DeprecatedFeaturesTests {
         let focusDefaults = try #require(UserDefaults(suiteName: "DeprecatedFocus.\(suffix)"))
         let weatherDefaults = try #require(UserDefaults(suiteName: "DeprecatedWeather.\(suffix)"))
         let patchDefaults = try #require(UserDefaults(suiteName: "DeprecatedPatch.\(suffix)"))
+        let magnetDefaults = try #require(UserDefaults(suiteName: "DeprecatedMagnet.\(suffix)"))
         defer {
             simsDefaults.removePersistentDomain(forName: "DeprecatedSims.\(suffix)")
             breathingDefaults.removePersistentDomain(forName: "DeprecatedBreathing.\(suffix)")
             focusDefaults.removePersistentDomain(forName: "DeprecatedFocus.\(suffix)")
             weatherDefaults.removePersistentDomain(forName: "DeprecatedWeather.\(suffix)")
             patchDefaults.removePersistentDomain(forName: "DeprecatedPatch.\(suffix)")
+            magnetDefaults.removePersistentDomain(forName: "DeprecatedMagnet.\(suffix)")
         }
 
         let sims = DockSimsStore(repository: DockSimsRepository(defaults: simsDefaults))
@@ -78,6 +81,13 @@ struct DeprecatedFeaturesTests {
         )
         #expect(patchBay.document.enabled)
 
+        let magnetRepository = DockSettingsRepository(defaults: magnetDefaults)
+        var magnetOn = DockSettings.defaults
+        magnetOn.magneticEdges = true
+        try magnetRepository.save(magnetOn)
+        let dockSettings = DockSettingsStore(repository: magnetRepository)
+        #expect(dockSettings.value.magneticEdges)
+
         let quarantineWasEnabled = QuarantineStampController.shared.enabled
         QuarantineStampController.shared.enabled = true
         defer { QuarantineStampController.shared.enabled = quarantineWasEnabled }
@@ -88,7 +98,8 @@ struct DeprecatedFeaturesTests {
             focusSession: focus,
             pinWeather: weather,
             quarantine: .shared,
-            patchBay: patchBay
+            patchBay: patchBay,
+            dockSettings: dockSettings
         )
 
         #expect(!sims.isEnabled)
@@ -97,6 +108,7 @@ struct DeprecatedFeaturesTests {
         #expect(!weather.enabled)
         #expect(!patchBay.document.enabled)
         #expect(!QuarantineStampController.shared.enabled)
+        #expect(!dockSettings.value.magneticEdges)
 
         let reloadedSims = DockSimsStore(repository: DockSimsRepository(defaults: simsDefaults))
         reloadedSims.start()
@@ -118,5 +130,8 @@ struct DeprecatedFeaturesTests {
             repository: PatchBayRepository(defaults: patchDefaults)
         )
         #expect(!reloadedPatch.document.enabled)
+
+        let reloadedMagnet = DockSettingsStore(repository: DockSettingsRepository(defaults: magnetDefaults))
+        #expect(!reloadedMagnet.value.magneticEdges)
     }
 }

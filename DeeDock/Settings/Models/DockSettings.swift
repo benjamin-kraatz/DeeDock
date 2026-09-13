@@ -66,6 +66,9 @@ struct DockSettings: Codable, Equatable {
     /// Whether each display dock includes the trailing system Trash tile.
     var showTrash: Bool = true
     /// Whether dragging a pin or folder stack snaps to screen edges and peer items.
+    ///
+    /// Deprecated. Launch coerces this off and persists the change. The Settings
+    /// page stays under Deprecated so the switch can be turned back on until 1.0.0.
     var magneticEdges: Bool = true
     /// Whether Empty Trash requires DeeDock's destructive confirmation alert.
     var confirmBeforeEmptyingTrash: Bool = true
