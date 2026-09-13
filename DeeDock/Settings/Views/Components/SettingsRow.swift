@@ -43,7 +43,11 @@ struct SettingsRow<Control: View>: View {
         }
         .padding(.horizontal, SettingsMetrics.rowInset)
         .padding(.vertical, SettingsMetrics.rowVerticalInset)
-        .frame(maxWidth: .infinity, minHeight: SettingsMetrics.rowMinimumHeight, alignment: .leading)
+        .frame(
+            maxWidth: .infinity,
+            minHeight: SettingsMetrics.rowMinimumHeight,
+            alignment: .leading
+        )
     }
 }
 
@@ -80,6 +84,7 @@ struct SettingsToggleRow: View {
     let title: LocalizedStringResource
     var subtitle: LocalizedStringResource?
     @Binding var isOn: Bool
+    var disabled: Bool?
 
     var body: some View {
         SettingsRow(title: title, subtitle: subtitle) {
@@ -87,7 +92,13 @@ struct SettingsToggleRow: View {
                 .labelsHidden()
                 .toggleStyle(.switch)
                 .controlSize(.small)
+                .disabled(isDisabled)
+                .opacity(isDisabled ? 0.5 : 1.0)
         }
+    }
+
+    var isDisabled: Bool {
+        disabled ?? false
     }
 }
 
@@ -96,15 +107,26 @@ struct SettingsMenuRow<Value: Hashable, Content: View>: View {
     let title: LocalizedStringResource
     var subtitle: LocalizedStringResource?
     @Binding var selection: Value
+    var disabled: Bool?
     @ViewBuilder var content: Content
 
     var body: some View {
         SettingsRow(title: title, subtitle: subtitle) {
-            Picker(selection: $selection) { content } label: { Text(title) }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .fixedSize()
+            Picker(selection: $selection) {
+                content
+            } label: {
+                Text(title)
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .fixedSize()
+            .controlSize(.large)
+            .disabled(isDisabled)
         }
+    }
+
+    var isDisabled: Bool {
+        disabled ?? false
     }
 }
 
@@ -114,7 +136,10 @@ struct SettingsActionRow<Content: View>: View {
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
-            HStack(spacing: 8) { Spacer(minLength: 0); content }
+            HStack(spacing: 8) {
+                Spacer(minLength: 0)
+                content
+            }
             VStack(alignment: .trailing, spacing: 8) { content }
         }
         .padding(.horizontal, SettingsMetrics.rowInset)
@@ -124,20 +149,48 @@ struct SettingsActionRow<Content: View>: View {
 }
 
 #if DEBUG
-#Preview("Row shapes") {
-    @Previewable @State var toggle = true
-    @Previewable @State var choice = DockAppVisibility.showAll
-    VStack(spacing: SettingsMetrics.cardSpacing) {
-        SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
-            SettingsToggleRow(title: .behaviorAutoHide, isOn: $toggle)
-            SettingsMenuRow(title: .settingsAppVisibility, selection: $choice) {
-                ForEach(DockAppVisibility.allCases, id: \.self) { value in
-                    Text(value.title).tag(value)
+    #Preview("Row shapes") {
+        @Previewable @State var toggle = true
+        @Previewable @State var choice = DockAppVisibility.showAll
+        VStack(spacing: SettingsMetrics.cardSpacing) {
+            SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
+                SettingsToggleRow(title: .behaviorAutoHide, isOn: $toggle)
+                SettingsMenuRow(
+                    title: .settingsAppVisibility,
+                    selection: $choice
+                ) {
+                    ForEach(DockAppVisibility.allCases, id: \.self) { value in
+                        Text(value.title).tag(value)
+                    }
                 }
             }
         }
+        .padding(24)
+        .frame(width: 560)
     }
-    .padding(24)
-    .frame(width: 560)
-}
+
+    #Preview("Row shapes - disabled") {
+        @Previewable @State var toggle = true
+        @Previewable @State var choice = DockAppVisibility.showAll
+        VStack(spacing: SettingsMetrics.cardSpacing) {
+            SettingsCard(title: .settingsBehavior, footnote: .behaviorHelp) {
+                SettingsToggleRow(
+                    title: .behaviorAutoHide,
+                    isOn: $toggle,
+                    disabled: true
+                )
+                SettingsMenuRow(
+                    title: .settingsAppVisibility,
+                    selection: $choice,
+                    disabled: true
+                ) {
+                    ForEach(DockAppVisibility.allCases, id: \.self) { value in
+                        Text(value.title).tag(value)
+                    }
+                }
+            }
+        }
+        .padding(24)
+        .frame(width: 560)
+    }
 #endif

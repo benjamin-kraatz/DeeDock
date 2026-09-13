@@ -1,6 +1,10 @@
-import SwiftUI
 import ImagePlayground
+import SwiftUI
 
+/// App-wide Atmosphere preferences, laid out on the shared settings column.
+///
+/// The master switch lives in the header; every card below it is disabled while Atmosphere is off
+/// so the pane reads as one feature rather than a list of unrelated controls.
 struct AtmosphereSettingsPane: View {
     @Bindable var store: AtmosphereStore
     @Environment(\.supportsImagePlayground) private var supportsImagePlayground
@@ -9,88 +13,97 @@ struct AtmosphereSettingsPane: View {
     @State private var mood = AtmosphereMood()
 
     var body: some View {
-        Form {
-            Section {
-                Toggle(.atmosphereEnabled, isOn: $store.settings.enabled)
-                Text(.atmosphereSummary).foregroundStyle(.secondary)
-                Picker(.atmospherePreset, selection: $store.settings.preset) {
-                    ForEach(AtmospherePreset.allCases, id: \.self) { Text($0.title).tag($0) }
+        SettingsPageScaffold {
+            AtmosphereHeaderCard(isOn: $store.settings.enabled)
+            Group {
+                SettingsCard(
+                    title: .atmospherePreset,
+                    footnote: store.settings.preset.hasDecor
+                        ? .atmosphereInteractionHelp : nil
+                ) {
+                    AtmospherePresetPicker(selection: $store.settings.preset)
+                    AtmosphereSliderRow(
+                        title: .atmosphereDensity,
+                        value: $store.settings.density,
+                        range: 0...1,
+                        minimumSymbol: "circle.dotted",
+                        maximumSymbol: "circle.hexagongrid.fill"
+                    )
+                    AtmosphereSliderRow(
+                        title: .atmosphereIntensity,
+                        value: $store.settings.intensity,
+                        range: AtmosphereLimits.intensityRange,
+                        minimumSymbol: "sun.min",
+                        maximumSymbol: "sun.max.fill"
+                    )
                 }
-                Slider(value: $store.settings.density, in: 0...1) { Text(.atmosphereDensity) }
-                Slider(value: $store.settings.intensity, in: AtmosphereLimits.intensityRange) { Text(.atmosphereIntensity) }
-                Toggle(.atmosphereIdle, isOn: $store.settings.idleOnly)
-                Text(.atmosphereGateHelp).font(.caption).foregroundStyle(.secondary)
-                Picker(.atmosphereLayout, selection: $store.settings.panorama) {
-                    Text(.atmospherePerDisplay).tag(false)
-                    Text(.atmospherePanorama).tag(true)
-                }.pickerStyle(.radioGroup)
-                Text(.atmosphereLayoutHelp).font(.caption).foregroundStyle(.secondary)
-            }
-            Section {
-                Picker(.atmosphereSource, selection: $store.settings.source) {
-                    ForEach(AtmosphereColorSource.allCases.filter { $0 != .mood || mood.available }, id: \.self) {
-                        Text($0.title).tag($0)
+                AtmosphereColorsCard(
+                    settings: $store.settings,
+                    mood: mood,
+                    apply: { mood.apply(to: store) }
+                )
+                SettingsCard(title: .settingsBehavior) {
+                    SettingsToggleRow(
+                        title: .atmosphereIdle,
+                        subtitle: .atmosphereGateHelp,
+                        isOn: $store.settings.idleOnly
+                    )
+                    SettingsMenuRow(
+                        title: .atmosphereLayout,
+                        subtitle: .atmosphereLayoutHelp,
+                        selection: $store.settings.panorama
+                    ) {
+                        Text(.atmospherePerDisplay).tag(false)
+                        Text(.atmospherePanorama).tag(true)
                     }
-                }.pickerStyle(.radioGroup)
-                switch store.settings.source {
-                case .manual:
-                    ColorPicker(.atmosphereFirstColor, selection: colorBinding(first: true), supportsOpacity: false)
-                    ColorPicker(.atmosphereSecondColor, selection: colorBinding(first: false), supportsOpacity: false)
-                case .wallpaper:
-                    Picker(.atmosphereWallpaperMode, selection: $store.settings.wallpaper) {
-                        ForEach(AtmosphereWallpaperMode.allCases, id: \.self) { Text($0.title).tag($0) }
-                    }
-                case .appIcon: Text(.atmosphereAppHelp).font(.caption)
-                case .mood:
-                    if mood.available {
-                        TextField(.atmosphereMoodPrompt, text: $store.settings.mood)
-                        HStack {
-                            Button(.atmosphereApply) { mood.apply(to: store) }
-                                .disabled(mood.generating || store.settings.mood.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                            if mood.generating { ProgressView().controlSize(.small) }
-                            Button(.atmosphereEditManual) {
-                                store.settings.manual = store.settings.moodPalette
-                                store.settings.source = .manual
-                            }
+                }
+                if supportsImagePlayground {
+                    AtmosphereDecorCard(
+                        image: store.decorImage,
+                        failed: decorFailed,
+                        generate: { playground = true },
+                        remove: {
+                            decorFailed = false
+                            store.removeDecor()
                         }
-                        HStack {
-                            Circle().fill(store.settings.moodPalette.first.color).frame(width: 24, height: 24)
-                            Circle().fill(store.settings.moodPalette.second.color).frame(width: 24, height: 24)
-                        }.accessibilityHidden(true)
-                        if mood.failed { Text(.atmosphereMoodError).foregroundStyle(.secondary) }
-                    }
+                    )
                 }
             }
-            if supportsImagePlayground {
-                Section {
-                    Button(.atmosphereGenerateDecor) { playground = true }
-                    if store.decorImage != nil {
-                        Button(.atmosphereRemoveDecor) { store.removeDecor() }
-                    }
-                    if decorFailed { Text(.atmosphereDecorError).foregroundStyle(.secondary) }
-                }
-            }
-            Text(.atmosphereInteractionHelp).font(.caption).foregroundStyle(.secondary)
+            .disabled(!store.settings.enabled)
         }
-        .imagePlaygroundSheet(isPresented: $playground, concepts: [.text(store.settings.mood.isEmpty ? String(localized: store.settings.preset.title) : store.settings.mood)]) { url in
+        .imagePlaygroundSheet(
+            isPresented: $playground,
+            concepts: [
+                .text(
+                    store.settings.mood.isEmpty
+                        ? String(localized: store.settings.preset.title)
+                        : store.settings.mood
+                )
+            ]
+        ) { url in
             decorFailed = !store.saveDecor(from: url)
         }
-        .formStyle(.grouped)
         .navigationTitle(Text(.atmosphereTitle))
         .onChange(of: store.settings.source) { _, _ in mood.cancel() }
         .onDisappear { mood.cancel() }
     }
-
-    private func colorBinding(first: Bool) -> Binding<Color> {
-        Binding(get: { first ? store.settings.manual.first.color : store.settings.manual.second.color }, set: {
-            if first { store.settings.manual.first = AtmosphereColor($0) }
-            else { store.settings.manual.second = AtmosphereColor($0) }
-        })
-    }
 }
 
 #if DEBUG
-#Preview("Atmosphere") {
-    AtmosphereSettingsPane(store: AtmosphereStore(defaults: nil)).frame(width: 650, height: 750)
-}
+    #Preview("Atmosphere") {
+        AtmosphereSettingsPane(store: AtmosphereStore(defaults: nil)).frame(
+            width: 650,
+            height: 750
+        )
+    }
+
+    #Preview("Atmosphere, enabled, dark") {
+        let store = AtmosphereStore(defaults: nil)
+        store.settings.enabled = true
+        store.settings.preset = .party
+        store.settings.source = .wallpaper
+        return AtmosphereSettingsPane(store: store)
+            .frame(width: 650, height: 750)
+            .preferredColorScheme(.dark)
+    }
 #endif
