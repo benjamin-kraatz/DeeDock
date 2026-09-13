@@ -20,6 +20,7 @@ nonisolated enum LauncherFilter: String, CaseIterable, Identifiable, Sendable {
         case .running: "play.circle"
         case .pinned: "pin.fill"
         case .recent: "clock"
+        case .favorites: "star"
         }
     }
 }
