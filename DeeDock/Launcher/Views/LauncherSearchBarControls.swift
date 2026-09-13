@@ -31,24 +31,59 @@ struct LauncherSearchBarOverflowMenu: View {
                     layout
                 }
                 Divider()
+                Button {
+                    state.resetBrowseOptions()
+                } label: {
+                    Label {
+                        Text(.launcherResetBrowseOptions)
+                    } icon: {
+                        Image(systemName: "arrow.counterclockwise")
+                    }
+                }
+                .disabled(!state.hasCustomBrowseOptions)
+                Divider()
             }
             chooseFiles
             if !state.usesFileActions {
                 capture
             }
         } label: {
-            Image(systemName: "ellipsis")
+            Image(systemName: labelSymbol)
+                .contentTransition(.symbolEffect(.replace))
         }
         .menuStyle(.button)
-        .buttonStyle(LauncherSearchAccessoryButtonStyle())
+        .buttonStyle(LauncherSearchAccessoryButtonStyle(active: customized))
         .menuIndicator(.hidden)
         .fixedSize()
         .accessibilityLabel(Text(.launcherSearchOverflow))
-        .help(Text(.launcherSearchOverflowHelp))
+        .accessibilityValue(activeSummary)
+        .help(customized ? Text(.launcherSearchOverflowCustomizedHelp) : Text(.launcherSearchOverflowHelp))
         .onChange(of: search.kind) {
             state.cancelRobi()
             state.keyboardNavigationActive = false
         }
+    }
+
+    private var customized: Bool { !state.usesFileActions && state.hasCustomBrowseOptions }
+
+    /// The narrowest active choice names the button: app filter, then result type, then a
+    /// generic filter glyph for location, sort, or grouping. Defaults keep the ellipsis.
+    private var labelSymbol: String {
+        guard customized else { return "ellipsis" }
+        if state.filter != .all, !hasDiscreteKindSelected { return state.filter.symbol }
+        if state.search.kind != .all { return state.search.kind.symbol }
+        return "line.3.horizontal.decrease"
+    }
+
+    private var activeSummary: Text {
+        guard customized else { return Text(verbatim: "") }
+        var parts: [Text] = []
+        if state.search.kind != .all { parts.append(Text(state.search.kind.title)) }
+        if state.filter != .all, !hasDiscreteKindSelected { parts.append(Text(state.filter.title)) }
+        if state.locationFilter != .applicationsFolders { parts.append(Text(state.locationFilter.title)) }
+        if state.sort != .name { parts.append(Text(state.sort.title)) }
+        if state.grouping != .none { parts.append(Text(state.grouping.title)) }
+        return parts.dropFirst().reduce(parts.first ?? Text(verbatim: "")) { Text("\($0), \($1)") }
     }
 
     private var hasDiscreteKindSelected: Bool {

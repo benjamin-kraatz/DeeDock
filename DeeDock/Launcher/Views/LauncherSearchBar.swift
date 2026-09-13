@@ -116,8 +116,11 @@ private struct LauncherRobiScopeChip: View {
 
 /// Round, hover-lit chrome for the search field's small trailing icons.
 struct LauncherSearchAccessoryButtonStyle: ButtonStyle {
+    /// Tints the icon and keeps a wash behind it, marking a non-default state.
+    var active = false
+
     func makeBody(configuration: Configuration) -> some View {
-        LauncherSearchAccessory(isPressed: configuration.isPressed) {
+        LauncherSearchAccessory(isPressed: configuration.isPressed, active: active) {
             configuration.label
         }
     }
@@ -125,19 +128,31 @@ struct LauncherSearchAccessoryButtonStyle: ButtonStyle {
 
 /// Shared hover and press treatment for accessory buttons and the overflow menu label.
 struct LauncherSearchAccessory<Label: View>: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var hovering = false
     var isPressed = false
+    var active = false
     @ViewBuilder var label: Label
 
     var body: some View {
         label
             .font(.body.weight(.medium))
             .imageScale(.medium)
-            .foregroundStyle(hovering ? .primary : .secondary)
+            .foregroundStyle(foreground)
             .frame(width: 28, height: 28)
-            .background(.primary.opacity(isPressed ? 0.12 : hovering ? 0.07 : 0), in: .circle)
+            .background(background, in: .circle)
             .contentShape(.circle)
             .onHover { hovering = $0 }
             .animation(.snappy(duration: 0.15), value: hovering)
+    }
+
+    private var foreground: AnyShapeStyle {
+        if active { return AnyShapeStyle(LauncherRobiTint.label(colorScheme)) }
+        return hovering ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary)
+    }
+
+    private var background: AnyShapeStyle {
+        if active { return AnyShapeStyle(LauncherRobiTint.fill(pressed: isPressed, hovering: hovering)) }
+        return AnyShapeStyle(.primary.opacity(isPressed ? 0.12 : hovering ? 0.07 : 0))
     }
 }

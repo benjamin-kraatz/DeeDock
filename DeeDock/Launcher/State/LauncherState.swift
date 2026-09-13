@@ -78,6 +78,20 @@ final class LauncherState {
     var sort: LauncherSort = .name { didSet { if oldValue != sort { search.invalidateQuery() } } }
     var grouping: LauncherGrouping = .none { didSet { if oldValue != grouping { search.invalidateQuery() } } }
     var layout: LauncherLayout = .grid
+    /// True when result type, app filter, location, sort, or grouping differs from its default.
+    /// Layout is a presentation choice and does not count.
+    var hasCustomBrowseOptions: Bool {
+        search.kind != .all || filter != .all || locationFilter != .applicationsFolders
+            || sort != .name || grouping != .none
+    }
+    /// Restores the defaults that ``hasCustomBrowseOptions`` checks. Layout stays as chosen.
+    func resetBrowseOptions() {
+        search.kind = .all
+        filter = .all
+        locationFilter = .applicationsFolders
+        sort = .name
+        grouping = .none
+    }
     // Geometry updates must not invalidate the Launcher or recompute its app results every frame.
     @ObservationIgnored var browseScroll: LauncherBrowseScroll?
     var selectedID: LauncherBrowseID?

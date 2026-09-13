@@ -105,6 +105,12 @@ Those controls live in one overflow menu in the search field, with Choose Files 
 Capture & image search. The idle bar shows that menu and Close. A query also shows Clear
 and **Ask Robi**.
 
+The overflow button shows when browsing differs from its defaults (All types, All apps,
+Applications folders, Name, no grouping). It turns accent-tinted and swaps the ellipsis for the
+active app filter's symbol, then the result type's, or a generic filter glyph when only
+location, sort, or grouping changed. VoiceOver reads the active choices as its value. **Reset to
+Defaults** in the menu restores those five and leaves the grid/list choice alone.
+
 **Applications folders** is the default. It keeps bundles whose path is under `/Applications`
 or `~/Applications` and hides build helpers, Homebrew wrappers, and other discovered junk.
 **Standard Mac locations** adds `/System/Applications`. It does not add
