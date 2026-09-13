@@ -21364,6 +21364,114 @@
         }
       }
     },
+    "launcherFavoriteBadgeHelp" : {
+      "comment": "Hover help for the star badge on a favorite app icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorit"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorite"
+          }
+        }
+      }
+    },
+    "launcherPinnedBadgeHelp" : {
+      "comment": "Hover help for the pin badge on a Launcher app icon.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf diesem Display angepinnt"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinned on this display"
+          }
+        }
+      }
+    },
+    "launcherFavoriteStatus" : {
+      "comment": "Accessibility status for a Launcher favorite. status describes its pinned and running state.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorit, %1$(status)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorite, %1$(status)@"
+          }
+        }
+      }
+    },
+    "launcherFavorites" : {
+      "comment": "Launcher filter for favorites shared across displays, independent of pins.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoriten"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorites"
+          }
+        }
+      }
+    },
+    "launcherAddFavorite" : {
+      "comment": "App context menu action to mark an app as a Launcher favorite.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu Favoriten hinzufügen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add to Favorites"
+          }
+        }
+      }
+    },
+    "launcherRemoveFavorite" : {
+      "comment": "App context menu action to remove an app from Launcher favorites.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus Favoriten entfernen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from Favorites"
+          }
+        }
+      }
+    },
     "launcherPinned" : {
       "comment" : "Launcher filter for application pins on the source display.",
       "extractionState" : "manual",

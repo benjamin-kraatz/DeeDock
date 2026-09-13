@@ -78,5 +78,6 @@ nonisolated struct LauncherSearchOptions: Equatable, Sendable {
     var grouping: LauncherGrouping = .none
     var running: Set<String> = []
     var pinned: Set<String> = []
+    var favorites: Set<String> = []
     var visits: [String: Visit] = [:]
 }

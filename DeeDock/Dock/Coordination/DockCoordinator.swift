@@ -116,7 +116,7 @@ final class DockCoordinator {
         patchBay = PatchBayController(profiles: profiles)
         let applicationService = ApplicationService()
         catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory(),
-                                     suggestions: LauncherSuggestionsStore())
+                                     suggestions: LauncherSuggestionsStore(), launcherFavorites: LauncherFavorites())
         recipes = WorkspaceRecipeCoordinator(applications: catalog.service, actions: actionTiles)
         let menus = ApplicationMenuController(
             access: windowAccess,

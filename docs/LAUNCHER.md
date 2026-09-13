@@ -40,8 +40,8 @@ identifies directory enumeration failures. Synthetic metadata-ranking measuremen
 Discovery completeness and end-to-end native latency remain unmeasured.
 
 Each app has a context menu in both views: **Open**, **Show in Finder**, **Pin** or
-**Unpin**, **Pin on Display**, and **Create capsule…**. Pinning applies to the source
-display; the submenu lists other enabled docks. Creating a capsule opens an editable draft
+**Unpin**, **Add to Favorites** or **Remove from Favorites**, **Pin on Display**, and **Create capsule…**.
+Pinning applies to the source display; the submenu lists other enabled docks. Creating a capsule opens an editable draft
 containing that app. Enter a summary and save to persist it.
 
 ## Mixed search
@@ -52,7 +52,7 @@ rows that identify their kind, source, and default action.
 or named Dock Modes. Selecting a non-app type also browses that source without a query.
 Clear the query and choose **All types** or **Apps** to return to app grid/list browsing.
 App filters, location, sorting, and grouping apply with or without a query, including when **Apps** is
-selected as the result type. Running, pinned, and recent filters show only matching apps in
+selected as the result type. Running, pinned, recent, and favorites filters show only matching apps in
 **All types** or **Apps**. The location filter further limits those apps to selected folders.
 Select the all-apps filter to include other kinds again. A specific
 non-app result type uses its own source and ignores the hidden app filter. App sections appear first and use the selected
@@ -96,7 +96,7 @@ The existing **Find a Window** entry points and keyboard shortcut keep their exi
 | Control | Choices |
 | --- | --- |
 | View | Grid or list |
-| Filter | All apps, running, pinned on the source display, or recent |
+| Filter | All apps, running, pinned on the source display, recent, or favorites |
 | Location | All discovered paths, Applications folders, or standard Mac locations |
 | Sort | Name, last opened through DDock, or number of opens through DDock |
 | Group | None, application category, or first letter |
@@ -106,7 +106,7 @@ Location lives in the same options menu as sort and group, immediately left of G
 or `~/Applications` and hides build helpers, Homebrew wrappers, and other discovered junk.
 **Standard Mac locations** adds `/System/Applications`. It does not add
 `/System/Library/CoreServices`. **All** restores every discovered app. Location composes with
-All apps, Running, Pinned, or Recent. Ask Robi and unified app search use the same location
+All apps, Running, Pinned, Recent, or Favorites. Ask Robi and unified app search use the same location
 constraint. Matching is a case-insensitive path prefix, including the `/System/Volumes/Data`
 firmlink prefix. It does not scan the disk again.
 
@@ -119,6 +119,13 @@ application catalog. Hiding an already foreground app, failed opens, and app act
 outside DDock do not create entries. History persists under `launcher.history.v1` and retains
 at most 500 app identities. The launcher options menu clears the history after confirmation.
 Unreadable history bytes remain untouched until that explicit clear action.
+
+To mark an app as a favorite, right-click it and choose **Add to Favorites**.
+Select **Favorites** in the app filter to show your favorites in either layout, including during search.
+A warm gold star badge marks favorite app icons in grid and list views, including search results.
+The blue pin badge remains separate. Hover over either badge to see its meaning. The location filter still applies. **Remove from Favorites** removes the app from this set.
+Favorites are shared across displays and persist under `launcher.favorites.v1`.
+They are independent of dock pins and remain when you clear launch history.
 
 ## Robi
 
