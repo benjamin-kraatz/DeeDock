@@ -27,6 +27,89 @@ struct LauncherTests {
         }
     }
 
+    @Test("Applications folders keep /Applications and ~/Applications", arguments: [
+        "/Applications/Safari.app",
+        "/Applications/Utilities/Terminal.app",
+        "/Users/example/Applications/Pixel.app",
+        "/APPLICATIONS/Notes.app",
+        "/System/Volumes/Data/Applications/Mail.app",
+        "/System/Volumes/Data/Users/example/Applications/Tools.app",
+    ])
+    func applicationsFolderIncludes(_ path: String) {
+        let home = URL(fileURLWithPath: "/Users/example")
+        #expect(LauncherLocationFilter.applicationsFolders.includes(URL(fileURLWithPath: path), home: home))
+    }
+
+    @Test("Applications folders hide system apps and project builds", arguments: [
+        "/System/Applications/Calculator.app",
+        "/System/Library/CoreServices/Finder.app",
+        "/System/Library/CoreServices/Applications/Feedback Assistant.app",
+        "/Users/example/Projects/Build/Editor.app",
+        "/opt/homebrew/Cellar/python/python.app",
+        "/ApplicationsExtra/Foo.app",
+        "/Users/example/Applications Extra/Foo.app",
+    ])
+    func applicationsFolderExcludes(_ path: String) {
+        let home = URL(fileURLWithPath: "/Users/example")
+        #expect(!LauncherLocationFilter.applicationsFolders.includes(URL(fileURLWithPath: path), home: home))
+    }
+
+    @Test("Standard Mac locations add /System/Applications only", arguments: [
+        "/Applications/Safari.app",
+        "/Users/example/Applications/Pixel.app",
+        "/System/Applications/Calculator.app",
+        "/System/Applications/Utilities/Terminal.app",
+        "/System/Volumes/Data/Applications/Mail.app",
+    ])
+    func standardMacLocationsInclude(_ path: String) {
+        let home = URL(fileURLWithPath: "/Users/example")
+        #expect(LauncherLocationFilter.standardMacLocations.includes(URL(fileURLWithPath: path), home: home))
+    }
+
+    @Test("Standard Mac locations still hide CoreServices and project builds", arguments: [
+        "/System/Library/CoreServices/Finder.app",
+        "/System/Library/CoreServices/Applications/Feedback Assistant.app",
+        "/Users/example/Projects/Build/Editor.app",
+        "/opt/homebrew/Cellar/python/python.app",
+    ])
+    func standardMacLocationsExclude(_ path: String) {
+        let home = URL(fileURLWithPath: "/Users/example")
+        #expect(!LauncherLocationFilter.standardMacLocations.includes(URL(fileURLWithPath: path), home: home))
+    }
+
+    @Test("All locations keep discovered junk")
+    func allLocationsIncludeProjectBuilds() {
+        let home = URL(fileURLWithPath: "/Users/example")
+        #expect(LauncherLocationFilter.all.includes(
+            URL(fileURLWithPath: "/Users/example/Projects/Build/DevenvCreator.app"), home: home))
+    }
+
+    @Test("Location filter composes with the All apps / Recent filter")
+    func locationFilterComposesWithAppFilter() {
+        func app(_ id: String, _ path: String) -> LauncherApplication {
+            LauncherApplication(reference: ApplicationReference(
+                bundleIdentifier: id, url: URL(fileURLWithPath: path), name: id))
+        }
+        let safari = app("safari", "/Applications/Safari.app")
+        let calculator = app("calculator", "/System/Applications/Calculator.app")
+        let python = app("python", "/opt/homebrew/Cellar/python/python.app")
+        let catalog = ApplicationCatalog(
+            service: ApplicationService(),
+            launcherLibrary: LauncherLibrary(applications: [safari, calculator, python])
+        )
+        let state = LauncherState(catalog: catalog)
+        #expect(state.results.map(\.id) == [safari.id])
+        state.locationFilter = .standardMacLocations
+        #expect(Set(state.results.map(\.id)) == [safari.id, calculator.id])
+        state.locationFilter = .all
+        #expect(Set(state.results.map(\.id)) == [safari.id, calculator.id, python.id])
+        catalog.launcherHistory.record(python.reference)
+        state.filter = .recent
+        #expect(state.results.map(\.id) == [python.id])
+        state.locationFilter = .applicationsFolders
+        #expect(state.results.isEmpty)
+    }
+
     @Test("An exact app name outranks a prefix; unrelated words do not become fuzzy hits")
     func relevance() throws {
         let app = LauncherApplication(reference: ApplicationReference(bundleIdentifier: "example.notes",

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Filters constrain both ordinary and Robi results; search relevance precedes the selected tie-break order.
+/// App, location, sort, and group controls. Search relevance precedes the selected tie-break order.
 struct LauncherToolbar: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var state: LauncherState
@@ -74,6 +74,13 @@ struct LauncherToolbar: View {
     private var options: some View {
         HStack(spacing: 12) {
             Menu {
+                Picker(selection: $state.locationFilter) {
+                    ForEach(LauncherLocationFilter.allCases) { location in
+                        Text(location.title).tag(location)
+                    }
+                } label: {
+                    Text(.launcherLocation)
+                }
                 Picker(selection: $state.sort) {
                     ForEach(LauncherSort.allCases) { sort in
                         Text(sort.title).tag(sort)
@@ -159,7 +166,7 @@ struct LauncherToolbar: View {
         )
         .disabled(
             state.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                || state.library.applications.isEmpty
+                || !state.hasLocationMatchingApplications
         )
         .controlSize(.large)
         .help(Text(.launcherRobiHelp))
