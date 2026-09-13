@@ -103,6 +103,7 @@ struct UpdateIdleInstallSwitch: View {
     }
 }
 
+#if DEBUG
 #Preview("Idle install switch") {
     UpdateIdleInstallSwitch(awareness: .previewStore())
         .padding()
@@ -115,6 +116,7 @@ struct UpdateIdleInstallSwitch: View {
         .padding()
         .frame(width: 480)
 }
+#endif
 
 private struct UpdateProgressView: View {
     let presentation: UpdatePresentation

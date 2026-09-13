@@ -128,6 +128,7 @@ private struct UpdateWindowActions: View {
         .frame(width: 580, height: 600)
 }
 
+#if DEBUG
 #Preview("Update ready") {
     let model = UpdatePresentation()
     model.phase = .ready
@@ -135,6 +136,7 @@ private struct UpdateWindowActions: View {
                               informational: false, informationURL: nil, releaseNotesURL: nil)
     return UpdateWindowView(presentation: model, awareness: .previewStore()).frame(width: 580, height: 600)
 }
+#endif
 
 #Preview("Release notes") {
     let model = UpdatePresentation()
