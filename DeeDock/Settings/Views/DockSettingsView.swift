@@ -114,7 +114,6 @@ struct DockSettingsView: View {
             }
         case .modes:
             DockModesSettingsPane(store: profiles.modes,
-                                  focusBreathing: coordinator?.focusBreathing,
                                   activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
                                   deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
                                   startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true,
@@ -145,9 +144,9 @@ struct DockSettingsView: View {
     /// A page the build or this machine cannot offer is left out of its overview entirely.
     private func isAvailable(_ page: SettingsPage) -> Bool {
         switch page {
-        case .focusSessions: coordinator?.focusSession != nil
+        case .focusSessions, .focusBreathing, .focusDebt: coordinator?.focusSession != nil
         case .actionTiles: coordinator?.actionTiles != nil
-        case .pinWeather: coordinator != nil
+        case .pinWeather, .sims, .patchBay: coordinator != nil
         default: true
         }
     }

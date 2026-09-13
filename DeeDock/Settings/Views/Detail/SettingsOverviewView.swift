@@ -19,7 +19,8 @@ struct SettingsOverviewView<Header: View>: View {
         SettingsPageScaffold {
             header
             ForEach(Array(groups.enumerated()), id: \.offset) { _, group in
-                SettingsLinkCard(pages: group, open: open)
+                SettingsLinkCard(title: group.allSatisfy(\.isDeprecated) ? .settingsDeprecated : nil,
+                                 pages: group, open: open)
             }
         }
         .navigationTitle(title)
@@ -48,5 +49,9 @@ extension SettingsOverviewView where Header == EmptyView {
                          open: { _ in })
         .preferredColorScheme(.dark)
         .frame(width: 720, height: 640)
+}
+#Preview("Features overview — deprecated group") {
+    SettingsOverviewView(section: .features, open: { _ in })
+        .frame(width: 720, height: 860)
 }
 #endif

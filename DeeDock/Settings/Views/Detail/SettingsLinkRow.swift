@@ -24,7 +24,12 @@ struct SettingsLinkRow: View {
                         #endif
                     }
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(page.title)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(page.title)
+                        if page.isDeprecated {
+                            DeprecatedFeatureBadge()
+                        }
+                    }
                     if let subtitle = page.subtitle {
                         Text(subtitle)
                             .font(.caption)
@@ -44,16 +49,19 @@ struct SettingsLinkRow: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .accessibilityValue(Text(page.isDeprecated ? String(localized: .settingsDeprecated) : ""))
     }
 }
 
 /// A group of overview rows drawn as one card, matching the spacing of a card of controls.
 struct SettingsLinkCard: View {
+    /// Optional group heading, used for the Deprecated Features card.
+    var title: LocalizedStringResource? = nil
     let pages: [SettingsPage]
     let open: (SettingsPage) -> Void
 
     var body: some View {
-        SettingsCard {
+        SettingsCard(title: title) {
             ForEach(pages) { page in
                 SettingsLinkRow(page: page, open: open)
             }
@@ -72,5 +80,19 @@ struct SettingsLinkCard: View {
         .padding(24)
     }
     .frame(width: 620, height: 420)
+}
+
+#Preview("Deprecated Features rows") {
+    SettingsLinkCard(title: .settingsDeprecated, pages: SettingsPage.deprecatedPages, open: { _ in })
+        .padding(24)
+        .frame(width: SettingsMetrics.columnWidth)
+}
+
+#Preview("Deprecated Features rows — German, dark") {
+    SettingsLinkCard(title: .settingsDeprecated, pages: SettingsPage.deprecatedPages, open: { _ in })
+        .padding(24)
+        .frame(width: SettingsMetrics.columnWidth)
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.dark)
 }
 #endif

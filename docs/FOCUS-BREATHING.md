@@ -1,7 +1,9 @@
 # Focus breathing
 
-Enable **Breathe dock background** in **Settings → Modes** or
-**Settings → Features → Focus Sessions**. The switch starts off and applies to all displays.
+This feature is deprecated and will be removed in version 1.0.0. Launch turns it off.
+Settings remain under **Settings → Features → Deprecated → Focus breathing**.
+
+Enable **Breathe dock background** on that Deprecated page. The switch starts off and applies to all displays.
 **Breathing intensity** controls the highlight amplitude from 0 to 100 percent.
 Reset restores 30 percent. Zero removes the effect.
 
@@ -13,7 +15,7 @@ selected Dock Mode or configured macOS Focus filter remains active.
 
 ## Connect a macOS Focus
 
-1. Enable Focus breathing in DDock Settings.
+1. Enable Focus breathing in **Settings → Features → Deprecated**.
 2. Open **System Settings → Focus** and choose a Focus.
 3. Add DDock under **Focus Filters**.
 4. Turn on **Breathe dock background** in that filter.

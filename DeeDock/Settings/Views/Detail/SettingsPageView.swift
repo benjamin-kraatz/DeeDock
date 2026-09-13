@@ -10,6 +10,9 @@ struct SettingsPageView: View {
 
     var body: some View {
         SettingsPageScaffold {
+            if page.isDeprecated {
+                DeprecatedFeatureNotice()
+            }
             switch page.group {
             case .dock:
                 DockPageContent(page: page, context: context, override: override, showZone: showZone)
