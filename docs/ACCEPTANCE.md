@@ -2595,3 +2595,9 @@ Pending native acceptance:
 
 Compilation does not establish OCR accuracy, visual quality, deletion behavior at runtime,
 or permission handling on a user's Mac.
+
+## App divorce court experiment (DEE-40)
+
+Branch-only implementation on `feature/dee-40`. See [App divorce court](APP-DIVORCE-COURT.md) for consent, rarity, fictional canon, witnesses, and local storage boundaries. The experiment is excluded from the intended production path toward 1.0.
+
+Debug compilation passed with Xcode 27. Tests and automated visual suites were not run. Native inspection confirmed the German settings entry, disabled initial opt-in, sample controls, and model availability. Full native and live-model acceptance is pending, including transparent hit testing, focus, display/Space transitions, witness consistency, cancellation, and safe explicit restoration.

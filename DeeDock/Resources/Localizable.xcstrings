@@ -1,6 +1,888 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "courtTitle": {
+    "comment": "App divorce court experiment: App divorce court",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App divorce court"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App-Scheidungsgericht"
+        }
+      }
+    }
+  },
+  "courtHelp": {
+    "comment": "App divorce court experiment: A local experiment with fictional app characters and occasional courtroom drama.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A local experiment with fictional app characters and occasional courtroom drama."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein lokales Experiment mit fiktiven App-Figuren und gelegentlichem Gerichtsdrama."
+        }
+      }
+    }
+  },
+  "courtExperiment": {
+    "comment": "App divorce court experiment: Branch-only experiment. Not intended for production toward 1.0.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Branch-only experiment. Not intended for production toward 1.0."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Experiment nur auf diesem Branch. Nicht für die Produktion bis 1.0 vorgesehen."
+        }
+      }
+    }
+  },
+  "courtEnable": {
+    "comment": "App divorce court experiment: Enable automatic hearings",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Enable automatic hearings"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Automatische Verhandlungen aktivieren"
+        }
+      }
+    }
+  },
+  "courtConsent": {
+    "comment": "App divorce court experiment: Unpin always happens immediately. Eligible apps may open a hearing once a week. Apple Intelligence writes fiction on this Mac. Pin age is recorded after opt-in; usage counts are used only with separate App suggestions consent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unpin always happens immediately. Eligible apps may open a hearing once a week. Apple Intelligence writes fiction on this Mac. Pin age is recorded after opt-in; usage counts are used only with separate App suggestions consent."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Unpin wird immer sofort ausgeführt. Geeignete Apps können einmal pro Woche eine Verhandlung öffnen. Apple Intelligence schreibt Fiktion auf diesem Mac. Die Pin-Dauer wird erst nach Aktivierung erfasst; Nutzungszahlen werden nur mit separater Zustimmung zu App-Vorschlägen verwendet."
+        }
+      }
+    }
+  },
+  "courtSkipForever": {
+    "comment": "App divorce court experiment: Skip forever",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Skip forever"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dauerhaft überspringen"
+        }
+      }
+    }
+  },
+  "courtClear": {
+    "comment": "App divorce court experiment: Clear court data",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Clear court data"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gerichtsdaten löschen"
+        }
+      }
+    }
+  },
+  "courtSample": {
+    "comment": "App divorce court experiment: Sample hearing",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sample hearing"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beispielverhandlung"
+        }
+      }
+    }
+  },
+  "courtSampleWitness": {
+    "comment": "App divorce court experiment: Sample with witness",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sample with witness"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beispiel mit Zeugen"
+        }
+      }
+    }
+  },
+  "courtLibrary": {
+    "comment": "App divorce court experiment: Character library",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Character library"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Figurenbibliothek"
+        }
+      }
+    }
+  },
+  "courtLibraryEmpty": {
+    "comment": "App divorce court experiment: Characters appear here after their first hearing.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Characters appear here after their first hearing."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Figuren erscheinen hier nach ihrer ersten Verhandlung."
+        }
+      }
+    }
+  },
+  "courtDeleteCharacter": {
+    "comment": "App divorce court experiment: Delete character and cases",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Delete character and cases"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Figur und Fälle löschen"
+        }
+      }
+    }
+  },
+  "courtFiction": {
+    "comment": "App divorce court experiment: Fictional canon. These stories are invented, not records of your activity.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fictional canon. These stories are invented, not records of your activity."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fiktiver Kanon. Diese Geschichten sind erfunden und keine Aufzeichnungen deiner Aktivitäten."
+        }
+      }
+    }
+  },
+  "courtUnavailable": {
+    "comment": "App divorce court experiment: Court needs an available on-device Apple Intelligence model with support for your language. Enable Apple Intelligence in System Settings or wait for the model download to finish.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Court needs an available on-device Apple Intelligence model with support for your language. Enable Apple Intelligence in System Settings or wait for the model download to finish."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das Gericht benötigt ein verfügbares Apple-Intelligence-Modell auf dem Gerät mit Unterstützung für deine Sprache. Aktiviere Apple Intelligence in den Systemeinstellungen oder warte auf den Abschluss des Modelldownloads."
+        }
+      }
+    }
+  },
+  "courtStorageFailed": {
+    "comment": "App divorce court experiment: Court data could not be read. Unpin is unaffected. Clear court data to reset this experiment.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Court data could not be read. Unpin is unaffected. Clear court data to reset this experiment."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gerichtsdaten konnten nicht gelesen werden. Unpin bleibt verfügbar. Lösche die Gerichtsdaten, um das Experiment zurückzusetzen."
+        }
+      }
+    }
+  },
+  "courtWritingLore": {
+    "comment": "App divorce court experiment: Writing character biographies…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Writing character biographies…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Figurenbiografien werden geschrieben …"
+        }
+      }
+    }
+  },
+  "courtPreparingWitness": {
+    "comment": "App divorce court experiment: Preparing the witness…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preparing the witness…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeuge wird vorbereitet …"
+        }
+      }
+    }
+  },
+  "courtPreparingCase": {
+    "comment": "App divorce court experiment: Preparing the case…",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preparing the case…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fall wird vorbereitet …"
+        }
+      }
+    }
+  },
+  "courtPreparingHelp": {
+    "comment": "App divorce court experiment: The characters are preparing their stories. You can close the court at any time.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The characters are preparing their stories. You can close the court at any time."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Figuren bereiten ihre Geschichten vor. Du kannst das Gericht jederzeit schließen."
+        }
+      }
+    }
+  },
+  "courtWaiting": {
+    "comment": "App divorce court experiment: Preparing the next statement",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Preparing the next statement"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nächste Aussage wird vorbereitet"
+        }
+      }
+    }
+  },
+  "courtGenerationFailed": {
+    "comment": "App divorce court experiment: The hearing paused because generation failed. Retry continues with the same cast.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The hearing paused because generation failed. Retry continues with the same cast."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Verhandlung wurde wegen eines Generierungsfehlers angehalten. Ein neuer Versuch setzt mit denselben Figuren fort."
+        }
+      }
+    }
+  },
+  "courtRetry": {
+    "comment": "App divorce court experiment: Retry",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Retry"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erneut versuchen"
+        }
+      }
+    }
+  },
+  "courtClose": {
+    "comment": "App divorce court experiment: Close",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Close"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schließen"
+        }
+      }
+    }
+  },
+  "courtPause": {
+    "comment": "App divorce court experiment: Pause",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pause"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pause"
+        }
+      }
+    }
+  },
+  "courtResume": {
+    "comment": "App divorce court experiment: Resume",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Resume"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fortsetzen"
+        }
+      }
+    }
+  },
+  "courtNext": {
+    "comment": "App divorce court experiment: Next",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Next"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Weiter"
+        }
+      }
+    }
+  },
+  "courtLore": {
+    "comment": "App divorce court experiment: Character stories",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Character stories"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Figurengeschichten"
+        }
+      }
+    }
+  },
+  "courtTranscript": {
+    "comment": "App divorce court experiment: Transcript",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Transcript"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Protokoll"
+        }
+      }
+    }
+  },
+  "courtAlreadyUnpinned": {
+    "comment": "App divorce court experiment: Already unpinned. Only you can Pin again.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Already unpinned. Only you can Pin again."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bereits entfernt. Nur du kannst erneut pinnen."
+        }
+      }
+    }
+  },
+  "courtPinAgain": {
+    "comment": "App divorce court experiment: Pin again",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Pin again"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erneut pinnen"
+        }
+      }
+    }
+  },
+  "courtSeparation": {
+    "comment": "App divorce court experiment: Separation counsel",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Separation counsel"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Trennungsanwalt"
+        }
+      }
+    }
+  },
+  "courtReconciliation": {
+    "comment": "App divorce court experiment: App counsel",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App counsel"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "App-Anwalt"
+        }
+      }
+    }
+  },
+  "courtJudge": {
+    "comment": "App divorce court experiment: Judge",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Judge"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Richter"
+        }
+      }
+    }
+  },
+  "courtJudgeName": {
+    "comment": "App divorce court experiment: Judge Dockwell",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Judge Dockwell"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Richter Dockwell"
+        }
+      }
+    }
+  },
+  "courtWitness": {
+    "comment": "App divorce court experiment: Witness",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Witness"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeuge"
+        }
+      }
+    }
+  },
+  "courtOpening": {
+    "comment": "App divorce court experiment: Opening statements",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Opening statements"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eröffnung"
+        }
+      }
+    }
+  },
+  "courtEvidence": {
+    "comment": "App divorce court experiment: Evidence",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Evidence"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Beweisaufnahme"
+        }
+      }
+    }
+  },
+  "courtWitnessCalled": {
+    "comment": "App divorce court experiment: Witness called",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Witness called"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeuge aufgerufen"
+        }
+      }
+    }
+  },
+  "courtQuestioning": {
+    "comment": "App divorce court experiment: Witness questioning",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Witness questioning"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zeugenbefragung"
+        }
+      }
+    }
+  },
+  "courtCrossExamination": {
+    "comment": "App divorce court experiment: Cross-examination",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cross-examination"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kreuzverhör"
+        }
+      }
+    }
+  },
+  "courtCredibility": {
+    "comment": "App divorce court experiment: Assessing credibility",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Assessing credibility"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Glaubwürdigkeit prüfen"
+        }
+      }
+    }
+  },
+  "courtClosing": {
+    "comment": "App divorce court experiment: Closing arguments",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Closing arguments"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Schlussplädoyers"
+        }
+      }
+    }
+  },
+  "courtJudgment": {
+    "comment": "App divorce court experiment: Judgment",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Judgment"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Urteil"
+        }
+      }
+    }
+  },
+  "courtAdjourned": {
+    "comment": "App divorce court experiment: Court adjourned",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Court adjourned"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Verhandlung geschlossen"
+        }
+      }
+    }
+  },
+  "courtMove": {
+    "comment": "App divorce court experiment: Drag to move. Option-arrow keys move the court when focused.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Drag to move. Option-arrow keys move the court when focused."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Zum Verschieben ziehen. Bei Fokus verschieben Wahltaste und Pfeiltasten das Gericht."
+        }
+      }
+    }
+  },
+  "courtMoveLeft": {
+    "comment": "App divorce court experiment: Move court left",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move court left"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gericht nach links verschieben"
+        }
+      }
+    }
+  },
+  "courtMoveRight": {
+    "comment": "App divorce court experiment: Move court right",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move court right"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gericht nach rechts verschieben"
+        }
+      }
+    }
+  },
+  "courtMoveUp": {
+    "comment": "App divorce court experiment: Move court up",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move court up"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gericht nach oben verschieben"
+        }
+      }
+    }
+  },
+  "courtMoveDown": {
+    "comment": "App divorce court experiment: Move court down",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Move court down"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gericht nach unten verschieben"
+        }
+      }
+    }
+  },
   "patchBayTitle": {
     "comment": "Settings page title for scoped cable automations.",
     "extractionState": "manual",

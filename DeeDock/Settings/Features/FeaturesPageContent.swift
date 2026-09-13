@@ -76,6 +76,8 @@ struct FeaturesPageContent: View {
                                   isOn: source.binding(\.secondaryDisplayAppsOnly))
             }
             .disabled(locked)
+        case .court:
+            if let court = context.coordinator?.court { CourtSettingsView(court: court) }
         case .appSuggestions:
             if let coordinator = context.coordinator {
                 LauncherSuggestionsSettingsView(store: coordinator.launcherSuggestions,

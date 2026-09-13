@@ -6,6 +6,8 @@ import UniformTypeIdentifiers
 @MainActor @Observable
 final class DockStore {
     @ObservationIgnored var openLauncher: (() -> Void)?
+    /// Captures court context before persistence; returned work runs only after successful removal.
+    @ObservationIgnored var courtPrepareRemoval: ((ApplicationReference, Int) -> (() -> Void)?)?
     var launcherCatalog: ApplicationCatalog { catalog }
     let focusSession: FocusSessionController?
     @ObservationIgnored var openFocusSession: (() -> Void)?
@@ -372,9 +374,20 @@ final class DockStore {
     }
 
     func removePin(_ id: String) -> Bool {
+        guard canEditPins, let index = persistedPins.firstIndex(where: { $0.id == id }) else { return false }
+        let afterRemoval = persistedPins[index].application.flatMap { courtPrepareRemoval?($0, index) }
         willMutateFavoriteIDs?([id])
         pinIDsHiddenFromDock.remove(id)
-        return savePins(pins.filter { $0.id != id })
+        let succeeded = savePins(pins.filter { $0.id != id })
+        if succeeded, let afterRemoval {
+            // Let the successful unpin render before constructing any optional court UI.
+            // The closure revalidates weak display/session ownership when it runs.
+            Task { @MainActor in
+                await Task.yield()
+                afterRemoval()
+            }
+        }
+        return succeeded
     }
 
     /// Maps a drop index among visible pinned tiles onto the persisted pin list,

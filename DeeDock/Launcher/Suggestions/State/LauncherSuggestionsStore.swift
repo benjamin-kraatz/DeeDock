@@ -31,6 +31,7 @@ final class LauncherSuggestionsStore {
     var isActive: Bool { enabled && !paused && ready && !storageUnavailable }
     var hasSession: Bool { sessionActive }
     @ObservationIgnored var modeProvider: (() -> String?)?
+    @ObservationIgnored var courtPrivacyDidChange: (() -> Void)?
     @ObservationIgnored var activityChanged: (() -> Void)?
     @ObservationIgnored private let defaults: UserDefaults?
     @ObservationIgnored private let repository: LauncherSuggestionsRepository
@@ -178,6 +179,7 @@ final class LauncherSuggestionsStore {
     func exclude(appID: String) {
         guard Self.validIdentity(appID) else { return }
         excludedIDs.insert(appID)
+        courtPrivacyDidChange?()
         revokedAt[appID] = Date()
         // Remove all effective learning involving the app, including contextual identifiers.
         // Re-enabling suggestions for it starts learning afresh, without restoring old examples.
@@ -402,8 +404,20 @@ final class LauncherSuggestionsStore {
             || context.secondsSinceUse[id] != nil || context.secondsSinceTermination[id] != nil
     }
 
+    /// Read-only real-history aggregate. Never reads the separate synthetic Debug document.
+    func courtUsage(appID: String, now: Date = Date()) -> CourtUsage? {
+        guard isActive, eligible(appID) != nil else { return nil }
+        let earliest = max(now.addingTimeInterval(-30 * 86400), revokedAt[appID] ?? .distantPast)
+        let events = document.events.filter {
+            $0.kind == .activation && $0.appID == appID && $0.date > earliest && $0.date <= now
+        }
+        return CourtUsage(activations: events.count,
+                          days: Set(events.map { Calendar.current.startOfDay(for: $0.date) }).count)
+    }
+
     private func invalidate() {
         revision = UUID()
+        courtPrivacyDidChange?()
         recorder.stop(); sessionActive = false
         cancelLearning()
         activityChanged?()

@@ -89,6 +89,7 @@ enum SettingsSection: Hashable, Identifiable {
              [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
              [.localHistory, .clipboardMuseum, .magneticEdges, .soapBubbles],
              [.discovery, .multipleDisplays, .permissions],
+             [.court],
              SettingsPage.deprecatedPages]
         case .modes, .atmosphere:
             []

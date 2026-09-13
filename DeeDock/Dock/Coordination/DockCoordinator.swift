@@ -84,6 +84,7 @@ final class DockCoordinator {
     var badgeMemory: BadgeMemoryStore { badges.memory }
     @ObservationIgnored private lazy var badgeMemoryWindow = BadgeMemoryWindowController(memory: badges.memory)
     @ObservationIgnored private let catalog: ApplicationCatalog
+    let court = CourtController()
     var launcherSuggestions: LauncherSuggestionsStore { catalog.suggestions }
     var launcherApplications: [LauncherApplication] { catalog.launcherLibrary.applications }
     var recipeApplications: any ApplicationServicing { catalog.service }
@@ -320,6 +321,8 @@ final class DockCoordinator {
             self?.windowPeeks.close(returnFocus: false)
             self?.endFocus(restore: false)
         }
+        launcherSuggestions.courtPrivacyDidChange = { [weak self] in self?.court.validateContext() }
+        court.synchronize = { [weak self] in self?.synchronizeCourt() }
         profiles.didChange = { [weak self] in
             guard let self else { return }
             if !dragging.committing { dragging.cancel() }
@@ -349,6 +352,7 @@ final class DockCoordinator {
             suspensionObservers.append(NSWorkspace.shared.notificationCenter.addObserver(
                 forName: name, object: nil, queue: .main
             ) { [weak self] _ in MainActor.assumeIsolated {
+                self?.court.close()
                 self?.occupancySuspended = true
                 self?.occupancy.stop()
                 self?.dragging.cancel()
@@ -387,7 +391,7 @@ final class DockCoordinator {
             modePicker.close(returnFocus: false)
         }
         reconciling = true
-        defer { reconciling = false }
+        defer { reconciling = false; synchronizeCourt() }
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
         patchBay.reconcile()
         atmosphere.update(displays: displays)
@@ -408,6 +412,7 @@ final class DockCoordinator {
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles,
                                   focusSession: focusSession, history: localHistory, pinWeather: pinWeather)
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
+            configureCourt(on: panel)
             configureLauncherSearch(on: panel)
             panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
             panel.launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
@@ -867,7 +872,50 @@ final class DockCoordinator {
 
     func showFusion() { fusion.show() }
 
+    private func synchronizeCourt() {
+        let mode = profiles.modes.activeMode.id.uuidString
+        for (id, pins) in profiles.pinLists { court.observePins(pins, display: id, mode: mode) }
+        court.validateContext()
+    }
+
+    private func configureCourt(on panel: DockPanelController) {
+        panel.store.courtPrepareRemoval = { [weak self, weak panel] app, index in
+            guard let self, let panel, court.enabled else { return nil }
+            let display = panel.store.displayID
+            let mode = profiles.modes.activeMode.id
+            let since = court.pinDate(appID: app.id, display: display, mode: mode.uuidString)
+            let candidates = panel.store.persistedPins.compactMap(\.application)
+            let usage = launcherSuggestions.courtUsage(appID: app.id)
+            let revision = launcherSuggestions.revision
+            let origin = CGPoint(x: panel.restingDragBounds.midX, y: panel.restingDragBounds.midY)
+            return { [weak self, weak panel] in
+                guard let self, let panel else { return }
+                court.removed(app: app, since: since, candidates: candidates.filter { candidate in
+                    panel.store.persistedPins.contains { $0.id == candidate.id }
+                }, usage: usage, origin: origin,
+                    valid: { [weak self, weak panel] in
+                        guard let self, let panel else { return false }
+                        return panels[display] === panel && profiles.modes.activeMode.id == mode
+                            && panel.store.canEditPins && !panel.store.persistedPins.contains { $0.id == app.id }
+                    }, usageValid: { [weak self] in
+                        guard let self else { return false }
+                        return usage == nil || (launcherSuggestions.isActive && launcherSuggestions.revision == revision
+                            && !launcherSuggestions.excludedIDs.contains(app.id))
+                    }, restore: { [weak self, weak panel] in
+                        guard let self, let panel, panels[display] === panel,
+                              profiles.modes.activeMode.id == mode, panel.store.canEditPins,
+                              !panel.store.persistedPins.contains(where: { $0.id == app.id }),
+                              FileManager.default.fileExists(atPath: app.url.path) else { return false }
+                        return panel.store.insertPins([.application(app)], at: min(index, panel.store.persistedPins.count))
+                    })
+            }
+        }
+    }
+
     func stop() {
+        court.close()
+        court.synchronize = nil
+        launcherSuggestions.courtPrivacyDidChange = nil
         discovery.stop()
         clipboardMuseum.didUse = nil
         atmosphere.stop()

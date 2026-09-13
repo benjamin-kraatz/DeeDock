@@ -36,6 +36,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case multipleDisplays
     case permissions
     case appSuggestions
+    case court
     case localHistory
     case pinWeather
     case clipboardMuseum
@@ -72,7 +73,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
-             .discovery, .quarantine: .features
+             .discovery, .quarantine, .court: .features
         }
     }
 
@@ -108,6 +109,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .patchBay: .patchBayTitle
         case .actionTiles: .actionsTitle
         case .multipleDisplays: .secondaryDockTitle
+        case .court: .courtTitle
         case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .localHistory: .timelineTitle
         case .pinWeather: .pinWeatherTitle
@@ -134,6 +136,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .patchBay: .patchBaySubtitle
         case .actionTiles: .settingsFeatureActionsSubtitle
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
+        case .court: .courtHelp
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .localHistory: .settingsFeatureTimelineSubtitle
         case .pinWeather: .settingsFeaturePinWeatherSubtitle
@@ -171,6 +174,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .patchBay: .symbol("point.3.connected.trianglepath.dotted")
         case .actionTiles: .symbol("bolt.fill")
         case .multipleDisplays: .symbol("display.2")
+        case .court: .symbol("building.columns.fill")
         case .appSuggestions: .symbol("sparkles")
         case .localHistory: .symbol("clock.arrow.circlepath")
         case .pinWeather: .symbol("leaf.fill")
@@ -206,6 +210,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .patchBay: .teal
         case .actionTiles: Color(red: 0.60, green: 0.34, blue: 0.90)
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
+        case .court: .purple
         case .appSuggestions: .indigo
         case .localHistory: Color(red: 0.22, green: 0.48, blue: 0.72)
         case .pinWeather: Color(red: 0.62, green: 0.40, blue: 0.24)
@@ -241,6 +246,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .patchBay: [.mint, .teal]
         case .actionTiles: [Color(red: 0.78, green: 0.54, blue: 1.0), Color(red: 0.48, green: 0.22, blue: 0.84)]
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
+        case .court: [.purple, .indigo]
         case .appSuggestions: [.indigo, .purple]
         case .localHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
         case .pinWeather: [Color(red: 0.86, green: 0.62, blue: 0.38), Color(red: 0.48, green: 0.28, blue: 0.16)]
@@ -259,6 +265,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     private var keywords: LocalizedStringResource {
         switch self {
         case .patchBay: .patchBayHelp
+        case .court: .courtHelp
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
         case .pinWeather: .pinWeatherSettingsKeywords
