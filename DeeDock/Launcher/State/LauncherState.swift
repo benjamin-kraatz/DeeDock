@@ -44,7 +44,7 @@ final class LauncherState {
         return search.visible.first(where: { $0.id == id })?.application != nil
     }
     var searchOptions: LauncherSearchOptions {
-        LauncherSearchOptions(filter: filter, sort: sort, grouping: grouping,
+        LauncherSearchOptions(filter: filter, locationFilter: locationFilter, sort: sort, grouping: grouping,
             running: Set(catalog.runningIDs), pinned: pinnedIDs,
             visits: history.visits.mapValues { .init(count: $0.count, lastOpened: $0.lastOpened) })
     }
@@ -58,6 +58,17 @@ final class LauncherState {
             selectedID = nil
             search.invalidateQuery()
             if filter == .recent { sort = .recent }
+        }
+    }
+    /// On-disk location constraint for browsing, unified app search, and Robi.
+    ///
+    /// Defaults to Applications folders. Sort, group, layout, and the All / Running / Pinned /
+    /// Recent filter are session-scoped on this panel, so this is too.
+    var locationFilter: LauncherLocationFilter = .applicationsFolders {
+        didSet {
+            guard oldValue != locationFilter else { return }
+            selectedID = nil
+            search.invalidateQuery()
         }
     }
     var sort: LauncherSort = .name { didSet { if oldValue != sort { search.invalidateQuery() } } }
@@ -91,11 +102,21 @@ final class LauncherState {
         fileActions.catalog = catalog
     }
 
+    /// True when at least one discovered app passes the current location filter.
+    ///
+    /// Ask Robi uses this set, not Running, Pinned, or Recent.
+    var hasLocationMatchingApplications: Bool {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        return library.applications.contains { locationFilter.includes($0.reference.url, home: home) }
+    }
+
     var results: [LauncherApplication] {
         let query = LauncherApplication.normalize(query)
         let running = Set(catalog.runningIDs)
         let suggestions = robiIDs.map(Set.init)
+        let home = FileManager.default.homeDirectoryForCurrentUser
         let matches: [(LauncherApplication, Int)] = library.applications.compactMap { app in
+            guard locationFilter.includes(app.reference.url, home: home) else { return nil }
             switch filter {
             case .all: break
             case .running: guard running.contains(app.id) else { return nil }
@@ -221,7 +242,10 @@ final class LauncherState {
         cancelRobi()
         guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let token = UUID(); robiGeneration = token
-        let task = query, apps = library.applications, robi = robi
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        let task = query
+        let apps = library.applications.filter { locationFilter.includes($0.reference.url, home: home) }
+        let robi = robi
         robiBusy = true
         robiTask = Task { [weak self] in
             do {

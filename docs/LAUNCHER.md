@@ -45,9 +45,10 @@ rows that identify their kind, source, and default action.
 **Result type** filters apps, windows, Capsules and Breadcrumbs, Shelf files, pinned Shortcuts,
 or named Dock Modes. Selecting a non-app type also browses that source without a query.
 Clear the query and choose **All types** or **Apps** to return to app grid/list browsing.
-App filters, sorting, and grouping apply with or without a query, including when **Apps** is
+App filters, location, sorting, and grouping apply with or without a query, including when **Apps** is
 selected as the result type. Running, pinned, and recent filters show only matching apps in
-**All types** or **Apps**. Select the all-apps filter to include other kinds again. A specific
+**All types** or **Apps**. The location filter further limits those apps to selected folders.
+Select the all-apps filter to include other kinds again. A specific
 non-app result type uses its own source and ignores the hidden app filter. App sections appear first and use the selected
 category or first-letter grouping. Other kinds remain compact rows below them.
 
@@ -90,8 +91,18 @@ The existing **Find a Window** entry points and keyboard shortcut keep their exi
 | --- | --- |
 | View | Grid or list |
 | Filter | All apps, running, pinned on the source display, or recent |
+| Location | All discovered paths, Applications folders, or standard Mac locations |
 | Sort | Name, last opened through DDock, or number of opens through DDock |
 | Group | None, application category, or first letter |
+
+Location lives in the same options menu as sort and group, immediately left of Grid or List.
+**Applications folders** is the default. It keeps bundles whose path is under `/Applications`
+or `~/Applications` and hides build helpers, Homebrew wrappers, and other discovered junk.
+**Standard Mac locations** adds `/System/Applications`. It does not add
+`/System/Library/CoreServices`. **All** restores every discovered app. Location composes with
+All apps, Running, Pinned, or Recent. Ask Robi and unified app search use the same location
+constraint. Matching is a case-insensitive path prefix, including the `/System/Volumes/Data`
+firmlink prefix. It does not scan the disk again.
 
 Search relevance precedes the selected sort order. Choosing **Recent** selects last-opened
 sorting; the sort menu can change that order. Missing category metadata goes into **Other

@@ -72,6 +72,8 @@ nonisolated struct LauncherSearchOptions: Equatable, Sendable {
         let lastOpened: Date
     }
     var filter: LauncherFilter = .all
+    /// Defaults to all so a ranking snapshot without a copied location includes every supplied app.
+    var locationFilter: LauncherLocationFilter = .all
     var sort: LauncherSort = .name
     var grouping: LauncherGrouping = .none
     var running: Set<String> = []

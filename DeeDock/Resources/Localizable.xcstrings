@@ -19564,6 +19564,24 @@
         }
       }
     },
+    "launcherApplicationsFolders" : {
+      "comment" : "Location filter limited to /Applications and ~/Applications.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programme-Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applications folders"
+          }
+        }
+      }
+    },
     "launcherAskRobi" : {
       "comment" : "Starts explicit local AI app suggestions.",
       "extractionState" : "manual",
@@ -21112,6 +21130,42 @@
         }
       }
     },
+    "launcherLocation" : {
+      "comment" : "Location filter picker label in the launcher options menu. Distinct from the All / Running / Pinned / Recent app filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "launcherLocationAll" : {
+      "comment" : "Location filter that includes every discovered application path. Distinct from the All apps running/pinned/recent filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        }
+      }
+    },
     "launcherMenuCreateCapsule" : {
       "comment" : "Opens an editable session capsule containing the selected application.",
       "extractionState" : "manual",
@@ -21629,13 +21683,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apps sortieren und gruppieren"
+            "value" : "Apps nach Ort filtern, sortieren und gruppieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort and group apps"
+            "value" : "Filter apps by location, sort, and group"
+          }
+        }
+      }
+    },
+    "launcherStandardMacLocations" : {
+      "comment" : "Location filter for /Applications, ~/Applications, and /System/Applications.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardorte auf dem Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard Mac locations"
           }
         }
       }

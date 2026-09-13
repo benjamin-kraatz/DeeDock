@@ -19,7 +19,7 @@ private enum LauncherPreviewData {
             LauncherApplication(
                 reference: ApplicationReference(
                     bundleIdentifier: "preview.\(index)",
-                    url: URL(fileURLWithPath: "/Preview/\(index).app"),
+                    url: URL(fileURLWithPath: "/Applications/\(name).app"),
                     name: name
                 ),
                 category: index.isMultiple(of: 2)
