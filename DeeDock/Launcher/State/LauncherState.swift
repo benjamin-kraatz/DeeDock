@@ -36,6 +36,8 @@ final class LauncherState {
     var usesMixedResults: Bool {
         !usesFileActions && robiIDs == nil && (!query.isEmpty || (search.kind != .all && search.kind != .application))
     }
+    /// Robi is running or its answer replaces app search; `cancelRobi()` returns to app search.
+    var robiActive: Bool { robiBusy || robiIDs != nil || robiMessage != nil }
     var usesGridNavigation: Bool {
         if usesFileActions { return false }
         guard layout == .grid else { return false }

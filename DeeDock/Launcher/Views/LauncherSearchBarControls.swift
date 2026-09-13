@@ -37,9 +37,10 @@ struct LauncherSearchBarOverflowMenu: View {
                 capture
             }
         } label: {
-            Image(systemName: "ellipsis.circle")
+            Image(systemName: "ellipsis")
         }
-        .menuStyle(.borderlessButton)
+        .menuStyle(.button)
+        .buttonStyle(LauncherSearchAccessoryButtonStyle())
         .menuIndicator(.hidden)
         .fixedSize()
         .accessibilityLabel(Text(.launcherSearchOverflow))
@@ -172,19 +173,73 @@ struct LauncherRobiButton: View {
             if state.robiBusy { state.cancelRobi() } else { state.askRobi() }
         } label: {
             HStack(spacing: 6) {
-                if state.robiBusy {
-                    ProgressView().controlSize(.mini).accessibilityHidden(true)
-                } else {
-                    Image(systemName: "sparkles")
+                Group {
+                    if state.robiBusy {
+                        ProgressView().controlSize(.mini)
+                    } else {
+                        Image(systemName: "sparkles")
+                    }
                 }
+                .frame(width: 14)
+                .accessibilityHidden(true)
                 Text(state.robiBusy ? .launcherRobiCancel : .launcherAskRobi)
+                    .lineLimit(1)
+                    .fixedSize()
+                if !state.robiBusy {
+                    Text(verbatim: "⌘↩")
+                        .font(.caption.weight(.medium))
+                        .opacity(0.55)
+                        .accessibilityHidden(true)
+                }
             }
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(LauncherRobiButtonStyle())
+        .keyboardShortcut(.return, modifiers: .command)
         .accessibilityLabel(
             Text(state.robiBusy ? .launcherRobiCancel : .launcherAskRobi)
         )
         .disabled(!state.hasLocationMatchingApplications)
         .help(Text(.launcherRobiHelp))
+    }
+}
+
+/// A tinted text capsule the same height as the field's icon buttons, so Robi sits in line with them.
+private struct LauncherRobiButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        RobiLabel(configuration: configuration)
+    }
+
+    private struct RobiLabel: View {
+        @Environment(\.isEnabled) private var isEnabled
+        @Environment(\.colorScheme) private var colorScheme
+        let configuration: Configuration
+        @State private var hovering = false
+
+        var body: some View {
+            configuration.label
+                .font(.body.weight(.medium))
+                .foregroundStyle(LauncherRobiTint.label(colorScheme))
+                .padding(.horizontal, 12)
+                .frame(height: 28)
+                .background(
+                    LauncherRobiTint.fill(pressed: configuration.isPressed, hovering: hovering),
+                    in: .capsule
+                )
+                .contentShape(.capsule)
+                .opacity(isEnabled ? 1 : 0.4)
+                .onHover { hovering = $0 }
+                .animation(.snappy(duration: 0.15), value: hovering)
+        }
+    }
+}
+
+/// Robi's tint: a solid accent wash, with the label lifted toward white on dark glass for contrast.
+enum LauncherRobiTint {
+    static func label(_ scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color.accentColor.mix(with: .white, by: 0.35) : .accentColor
+    }
+
+    static func fill(pressed: Bool = false, hovering: Bool) -> Color {
+        Color.accentColor.opacity(pressed ? 0.45 : hovering ? 0.36 : 0.28)
     }
 }

@@ -132,6 +132,10 @@ It receives the task and app names, categories, and bundle identifiers. It recei
 contents or window captures. Requests use bounded batches and can be cancelled. Editing the
 query or closing the launcher invalidates pending suggestions.
 
+While Robi's answer is shown, a **Robi** chip replaces the magnifier in the search field and
+Ask Robi hides. Clicking the chip or pressing Esc returns to app search and keeps the query.
+Esc closes the launcher only when Robi is not active.
+
 Suggestions are restricted to known app identities. Robi never opens an app itself. The user
 chooses a result to launch it. If Apple Intelligence is unavailable or a request fails, the
 launcher shows an explanation and keeps ordinary app search available. A final review limits the combined results to five suggestions. Suggestion quality depends on

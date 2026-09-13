@@ -21568,6 +21568,42 @@
         }
       }
     },
+    "launcherRobiScope" : {
+      "comment" : "Search-field chip shown while Robi's suggestions replace app search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        }
+      }
+    },
+    "launcherRobiScopeHelp" : {
+      "comment" : "Tooltip for the Robi search-field chip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zur App-Suche (Esc)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to app search (Esc)"
+          }
+        }
+      }
+    },
     "launcherRobiSuggestions" : {
       "comment" : "Clarifies that AI results are suggestions requiring a click.",
       "extractionState" : "manual",
