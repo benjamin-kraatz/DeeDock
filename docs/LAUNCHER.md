@@ -7,6 +7,12 @@ The permanent **App Launcher** tile expands its dock window into a panel on the 
 reactivating the previous app. Reduce Motion disables the window animation, and Reduce
 Transparency supplies an opaque background.
 
+Ordinary app browsing remembers its scroll position per display until DDock quits or that
+display's dock is recreated. Reopening restores the offset when the filters, sort, grouping,
+layout, grid column count, and ordered app results still match. Changing the query or entering
+file actions clears it. Mixed search has no scroll restoration. The position is approximate
+if the optional Suggested section changes height between openings.
+
 The launcher is also a selectable tile in **Focus Dock**. Return opens it. In the launcher,
 typing searches apps, windows, saved work, Shelf filenames, pinned Shortcuts, and Dock Modes.
 Arrows select results, and Return performs the selected result's labeled action. If no result
