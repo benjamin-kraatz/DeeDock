@@ -11,8 +11,14 @@ struct LauncherMixedResultsView: View {
             applications: launcher.library.applications,
             options: launcher.searchOptions
         )
+        let tools = LauncherTool.matching(launcher.query)
+        if !tools.isEmpty {
+            LauncherToolsSection(state: launcher, tools: tools, columns: 1, grid: false)
+        }
         ZStack {
-            if state.results.isEmpty {
+            if state.results.isEmpty, !tools.isEmpty {
+                Color.clear
+            } else if state.results.isEmpty {
                 if state.ranking {
                     ProgressView().controlSize(.small)
                 } else {

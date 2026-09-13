@@ -102,6 +102,10 @@ final class LauncherState {
     var pinDestinations: [DockPinDestination] { dockStore?.pinDestinations ?? [] }
     @ObservationIgnored weak var dockStore: DockStore?
     @ObservationIgnored var createCapsule: ((ApplicationReference) -> Void)?
+    /// Opens one of DDock's own windows. The owner closes the launcher first.
+    @ObservationIgnored var openTool: ((LauncherTool) -> Void)?
+    /// Tools are browsable only in the unfiltered app list, where they cannot be mistaken for results.
+    var showsToolsInBrowse: Bool { robiIDs == nil && filter == .all && query.isEmpty }
     var error: LocalizedStringResource?
     private(set) var robiIDs: [String]?
     private(set) var robiBusy = false

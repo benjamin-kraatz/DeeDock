@@ -62,6 +62,11 @@ struct LauncherResultsView: View {
                                 }
                             }
                         }
+                        if state.showsToolsInBrowse {
+                            Divider()
+                            LauncherToolsSection(state: state, tools: LauncherTool.allCases, columns: columns,
+                                                 grid: state.layout == .grid)
+                        }
                     }
                     .padding(2)
                 }

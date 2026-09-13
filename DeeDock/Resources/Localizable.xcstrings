@@ -19863,6 +19863,24 @@
         }
       }
     },
+    "launcherToolsSectionTitle" : {
+      "comment" : "Launcher section listing DDock's own tool windows (Clipboard Museum, App Fusion, ...).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DDock"
+          }
+        }
+      }
+    },
     "launcherUngrouped" : {
       "comment" : "Show one continuous app collection.",
       "extractionState" : "manual",
@@ -20291,6 +20309,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wordmark"
+          }
+        }
+      }
+    },
+    "menuSectionDock" : {
+      "comment" : "Menu bar menu section header for dock controls.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock"
+          }
+        }
+      }
+    },
+    "menuSectionFind" : {
+      "comment" : "Menu bar menu section header for window search, local history, and clipboard.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find"
+          }
+        }
+      }
+    },
+    "menuSectionTools" : {
+      "comment" : "Menu bar menu section header for DDock tools.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werkzeuge"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tools"
           }
         }
       }
@@ -28475,6 +28547,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usable desktop"
+          }
+        }
+      }
+    },
+    "settingsWindowsFocus" : {
+      "comment" : "Sidebar title for Window Peek, focus sessions, and their permissions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster & Fokus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows & Focus"
+          }
+        }
+      }
+    },
+    "settingsWindowsFocusSummary" : {
+      "comment" : "One-line description under the Windows & Focus heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window Peek, Fokussitzungen und die dafür nötigen Berechtigungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window Peek, focus sessions, and the permissions they need."
           }
         }
       }
@@ -41146,40 +41254,10 @@
       }
     },
     "windowSearchShortcutHelp" : {
-      "comment" : "Window search: Global shortcut: ⌘⇧Space",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Globales Tastenkürzel: ⌘⇧Leertaste"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global shortcut: ⌘⇧Space"
-          }
-        }
-      }
+
     },
     "windowSearchShortcutUnavailable" : {
-      "comment" : "Window search: Global shortcut unavailable. Use Find a Window here.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Globales Tastenkürzel nicht verfügbar. Nutze hier „Fenster suchen“."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global shortcut unavailable. Use Find a Window here."
-          }
-        }
-      }
+
     },
     "windowSearchStale" : {
       "comment" : "Window search: This source changed, closed, or cannot be reached. Refresh titles or capture it again. No other window was substituted.",
@@ -41321,42 +41399,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“Yesterday” searches only capsules saved yesterday. Choose Saved Capsules. Without a saved checkpoint, there is no history to search."
-          }
-        }
-      }
-    },
-    "settingsWindowsFocus" : {
-      "comment" : "Sidebar title for Window Peek, focus sessions, and their permissions.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster & Fokus"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Windows & Focus"
-          }
-        }
-      }
-    },
-    "settingsWindowsFocusSummary" : {
-      "comment" : "One-line description under the Windows & Focus heading on its overview page.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Window Peek, Fokussitzungen und die dafür nötigen Berechtigungen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Window Peek, focus sessions, and the permissions they need."
           }
         }
       }

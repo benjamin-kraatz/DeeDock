@@ -40,23 +40,30 @@ struct DeeDockApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            Button(.actionFocusDock) { delegate.coordinator.focusDock() }
-                .disabled(!delegate.coordinator.canFocus)
-            Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
-                .disabled(!delegate.coordinator.canBrowseLocalHistory)
-            Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
-            Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
-
-            Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
-                .keyboardShortcut("f", modifiers: [.command, .shift])
-            Text(delegate.coordinator.searchShortcutAvailable ? .windowSearchShortcutHelp : .windowSearchShortcutUnavailable)
-            Button(.fusionTitle) { delegate.coordinator.showFusion() }
-            QuarantineMenu()
-            DockModesMenu(coordinator: delegate.coordinator)
+            Section {
+                Button(.actionFocusDock) { delegate.coordinator.focusDock() }
+                    .disabled(!delegate.coordinator.canFocus)
+                DockModesMenu(coordinator: delegate.coordinator)
+            } header: { Text(.menuSectionDock) }
+            Section {
+                // The hint shows the shortcut that works from any app, when it could be registered.
+                Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
+                    .keyboardShortcut(delegate.coordinator.searchShortcutAvailable
+                        ? KeyboardShortcut(.space, modifiers: [.command, .shift])
+                        : KeyboardShortcut("f", modifiers: [.command, .shift]))
+                Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
+                    .disabled(!delegate.coordinator.canBrowseLocalHistory)
+                Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
+            } header: { Text(.menuSectionFind) }
+            Section {
+                Button(.fusionTitle) { delegate.coordinator.showFusion() }
+                Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
+                QuarantineMenu()
+                OpenSystemSettingsCloneButton()
+            } header: { Text(.menuSectionTools) }
             Divider()
             OpenDockSettingsButton()
                 .keyboardShortcut(",")
-            OpenSystemSettingsCloneButton()
             #if DIRECT_DISTRIBUTION
             CheckForUpdatesButton(updater: delegate.updater)
             #endif

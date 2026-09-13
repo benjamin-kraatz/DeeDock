@@ -589,6 +589,17 @@ final class DockCoordinator {
                 panel.closeLauncher()
                 sessionCapsules.beginFromApplication(application, on: panel)
             }
+            panel.launcher.openTool = { [weak self, weak panel] tool in
+                guard let self, let panel else { return }
+                panel.closeLauncher()
+                switch tool {
+                case .clipboardMuseum: showClipboardMuseum()
+                case .localHistory: browseLocalHistory()
+                case .fusion: showFusion()
+                // Needs a SwiftUI openWindow action, so the launcher view opens it directly.
+                case .systemSettingsClone: break
+                }
+            }
             store.copyPin = { [weak self] pin, targetID in
                 guard let self, let target = panels[targetID] else { return }
                 if !target.store.pins.contains(where: { $0.id == pin.id }) {
