@@ -12,10 +12,12 @@ struct LoginItemSettingsCard: View {
     var dismissError: () -> Void = {}
 
     private var isPending: Bool { pendingOperation != nil }
+    /// States macOS must resolve get a warning line of their own; routine states read as a subtitle.
+    private var needsAttention: Bool { status == .requiresApproval || status == .notFound || status == .unknown }
 
     var body: some View {
         SettingsCard {
-            SettingsRow(title: .loginLaunchAtLogin, subtitle: status.message) {
+            SettingsRow(title: .loginLaunchAtLogin, subtitle: needsAttention ? nil : status.message) {
                 Toggle(isOn: Binding(get: { status.isEnabled }, set: setEnabled)) {
                     Text(.loginLaunchAtLogin)
                 }
@@ -40,10 +42,18 @@ struct LoginItemSettingsCard: View {
                 .accessibilityAddTraits(.updatesFrequently)
             }
 
-            if status == .requiresApproval {
-                SettingsActionRow { approvalActions }
-            } else if status == .notFound || status == .unknown {
-                SettingsActionRow { recoveryActions }
+            if needsAttention {
+                SettingsStatusRow(symbol: "exclamationmark.triangle.fill", tint: .orange,
+                                  message: Text(status.message)) {
+                    Button(.loginOpenSystemSettings, action: openSettings)
+                    SettingsMoreMenu {
+                        if status == .requiresApproval {
+                            Button(.loginCancelRequest, action: cancelRequest).disabled(isPending)
+                        } else {
+                            Button(.loginRefresh, action: refresh).disabled(isPending)
+                        }
+                    }
+                }
             }
 
             if let errorMessage {
@@ -52,15 +62,6 @@ struct LoginItemSettingsCard: View {
         }
     }
 
-    @ViewBuilder private var approvalActions: some View {
-        Button(.loginCancelRequest, action: cancelRequest).disabled(isPending)
-        Button(.loginOpenSystemSettings, action: openSettings).buttonStyle(.borderedProminent)
-    }
-
-    @ViewBuilder private var recoveryActions: some View {
-        Button(.loginRefresh, action: refresh).disabled(isPending)
-        Button(.loginOpenSystemSettings, action: openSettings).buttonStyle(.borderedProminent)
-    }
 }
 
 private extension LoginItemStatus {

@@ -9,19 +9,32 @@ struct SettingsPageView: View {
     var showZone: (() -> Void)?
 
     var body: some View {
-        SettingsPageScaffold {
-            if page.isDeprecated {
-                DeprecatedFeatureNotice()
-            }
-            switch page.group {
-            case .dock:
-                DockPageContent(page: page, context: context, override: override, showZone: showZone)
-            case .general:
-                GeneralPageContent(page: page, context: context)
-            case .features:
-                FeaturesPageContent(page: page, context: context)
+        Group {
+            if DockPagePreviewStrip.offers(page) {
+                SettingsPageScaffold {
+                    DockPagePreviewStrip(page: page, settings: context.source(override).value)
+                } content: {
+                    content
+                }
+            } else {
+                SettingsPageScaffold { content }
             }
         }
+        .environment(\.settingsPageTitleKey, page.title.key)
         .navigationTitle(Text(page.title))
+    }
+
+    @ViewBuilder private var content: some View {
+        if page.isDeprecated {
+            DeprecatedFeatureNotice()
+        }
+        switch page.group {
+        case .dock:
+            DockPageContent(page: page, context: context, override: override, showZone: showZone)
+        case .general:
+            GeneralPageContent(page: page, context: context)
+        case .features:
+            FeaturesPageContent(page: page, context: context)
+        }
     }
 }

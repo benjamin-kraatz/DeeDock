@@ -7,49 +7,20 @@ struct PreviewPermissionsSettingsCard: View {
 
     var body: some View {
         SettingsCard(title: .windowPeekPermissionsTitle, footnote: .windowPeekPermissionsHelp) {
-            permissionRows(
-                title: .windowAccessTitle,
-                status: windowAccess.status.permissionMessage,
-                enabled: windowAccess.status == .enabled,
-                enableTitle: .windowAccessEnable,
-                request: windowAccess.requestAccess,
-                refresh: windowAccess.refresh,
-                openSettings: windowAccess.openSystemSettings
-            )
-            permissionRows(
-                title: .screenCaptureAccessTitle,
-                status: screenCapture.status.permissionMessage,
-                enabled: screenCapture.status == .enabled,
-                enableTitle: .screenCaptureAccessEnable,
-                request: screenCapture.requestAccess,
-                refresh: screenCapture.refresh,
-                openSettings: screenCapture.openSystemSettings
-            )
+            SettingsPermissionRow(symbol: "macwindow", colors: SettingsPage.windowPeek.tileColors,
+                                  title: .windowAccessTitle, status: windowAccess.status.permissionMessage,
+                                  state: windowAccess.status.permissionState, enableTitle: .windowAccessEnable,
+                                  request: windowAccess.requestAccess, refresh: windowAccess.refresh,
+                                  openSettings: windowAccess.openSystemSettings)
+            SettingsPermissionRow(symbol: "rectangle.dashed.badge.record", colors: SettingsPage.badges.tileColors,
+                                  title: .screenCaptureAccessTitle, status: screenCapture.status.permissionMessage,
+                                  state: screenCapture.status.permissionState, enableTitle: .screenCaptureAccessEnable,
+                                  request: screenCapture.requestAccess, refresh: screenCapture.refresh,
+                                  openSettings: screenCapture.openSystemSettings)
         }
         .onAppear {
             windowAccess.refresh()
             screenCapture.refresh()
-        }
-    }
-
-    @ViewBuilder
-    private func permissionRows(title: LocalizedStringResource, status: LocalizedStringResource,
-                                enabled: Bool, enableTitle: LocalizedStringResource,
-                                request: @escaping () -> Void, refresh: @escaping () -> Void,
-                                openSettings: @escaping () -> Void) -> some View {
-        SettingsStackedRow(title: title) {
-            Label {
-                Text(status)
-            } icon: {
-                Image(systemName: enabled ? "checkmark.circle.fill" : "circle.dashed")
-            }
-            .font(.callout)
-            .foregroundStyle(enabled ? AnyShapeStyle(Color.green) : AnyShapeStyle(.secondary))
-        }
-        SettingsActionRow {
-            Button(.windowAccessCheckAgain, action: refresh)
-            Button(.windowAccessOpenSettings, action: openSettings)
-            if !enabled { Button(enableTitle, action: request).buttonStyle(.borderedProminent) }
         }
     }
 }
@@ -62,6 +33,14 @@ private extension WindowAccessStatus {
         case .unavailable: .windowAccessStatusUnavailable
         }
     }
+
+    var permissionState: SettingsPermissionRow.State {
+        switch self {
+        case .enabled: .granted
+        case .notEnabled: .missing
+        case .unavailable: .unavailable
+        }
+    }
 }
 
 private extension ScreenCaptureAccessStatus {
@@ -70,6 +49,14 @@ private extension ScreenCaptureAccessStatus {
         case .enabled: .screenCaptureAccessStatusEnabled
         case .notEnabled: .screenCaptureAccessStatusNotEnabled
         case .unavailable: .screenCaptureAccessStatusUnavailable
+        }
+    }
+
+    var permissionState: SettingsPermissionRow.State {
+        switch self {
+        case .enabled: .granted
+        case .notEnabled: .missing
+        case .unavailable: .unavailable
         }
     }
 }

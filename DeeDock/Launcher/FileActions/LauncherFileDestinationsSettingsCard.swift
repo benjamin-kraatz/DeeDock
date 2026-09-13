@@ -12,59 +12,58 @@ struct LauncherFileDestinationsSettingsCard: View {
 
     var body: some View {
         SettingsCard(title: .launcherFileDestinationsTitle, footnote: .launcherFileDestinationsHelp) {
-            SettingsStackedRow {
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(store.destinations) { destination in
-                        HStack {
-                            Image(systemName: "folder.fill").foregroundStyle(.tint)
-                            VStack(alignment: .leading) {
-                                if renaming == destination.id {
-                                    TextField(text: $draftName) {
-                                        Text(.launcherFileDestinationName)
-                                    }
-                                    .textFieldStyle(.roundedBorder)
-                                    .onSubmit { commitRename(destination.id) }
-                                } else {
-                                    Text(verbatim: destination.name)
-                                    Text(verbatim: destination.url.path)
-                                        .font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                                    if !store.isAvailable(destination) {
-                                        Text(.launcherFileDestinationUnavailable)
-                                            .font(.caption).foregroundStyle(.red)
-                                    }
-                                }
+            ForEach(store.destinations) { destination in
+                HStack(spacing: 11) {
+                    SettingsIconTile(glyph: .symbol("folder.fill"), colors: SettingsPage.windowPeek.tileColors, size: 24)
+                    if renaming == destination.id {
+                        TextField(text: $draftName) { Text(.launcherFileDestinationName) }
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit { commitRename(destination.id) }
+                        Button(.launcherFileDestinationSaveName) { commitRename(destination.id) }
+                    } else {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(verbatim: destination.name).lineLimit(1)
+                            Text(verbatim: destination.url.path)
+                                .font(.caption).foregroundStyle(.secondary)
+                                .lineLimit(1).truncationMode(.middle)
+                                .help(Text(verbatim: destination.url.path))
+                            if !store.isAvailable(destination) {
+                                Text(.launcherFileDestinationUnavailable)
+                                    .font(.caption).foregroundStyle(.red)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
-                            Spacer()
-                            if renaming == destination.id {
-                                Button(.launcherFileDestinationSaveName) { commitRename(destination.id) }
-                            } else {
-                                Button(.launcherFileDestinationRename) {
-                                    renaming = destination.id
-                                    draftName = destination.name
-                                }
-                                .disabled(store.requiresReset)
+                        }
+                        .layoutPriority(1)
+                        Spacer(minLength: SettingsMetrics.controlSpacing)
+                        SettingsMoreMenu {
+                            Button(.launcherFileDestinationRename) {
+                                renaming = destination.id
+                                draftName = destination.name
                             }
                             Button(.launcherFileDestinationRepair) { repairing = destination.id }
-                                .disabled(store.requiresReset)
-                            Button(.launcherFileDestinationRemove, role: .destructive) {
-                                store.remove(destination.id)
-                            }
-                            .disabled(store.requiresReset)
+                            Divider()
+                            Button(.launcherFileDestinationRemove, role: .destructive) { store.remove(destination.id) }
                         }
+                        .disabled(store.requiresReset)
                     }
-                    if let error = store.error {
-                        Text(verbatim: error).foregroundStyle(.red).textSelection(.enabled)
-                    }
-                    HStack {
-                        Button(.launcherFileDestinationAdd, systemImage: "folder.badge.plus") {
-                            adding = true
-                        }
-                        .disabled(store.requiresReset
-                                  || store.destinations.count >= LauncherFileDestinationsDocument.capacity)
-                        if store.requiresReset {
-                            Button(.launcherFileDestinationsReset, role: .destructive) { confirmsReset = true }
-                        }
-                    }
+                }
+                .padding(.horizontal, SettingsMetrics.rowInset)
+                .padding(.vertical, SettingsMetrics.rowVerticalInset)
+                .frame(maxWidth: .infinity, minHeight: SettingsMetrics.rowMinimumHeight, alignment: .leading)
+            }
+            if let error = store.error {
+                SettingsStatusRow(symbol: "exclamationmark.triangle.fill", tint: .orange,
+                                  message: Text(verbatim: error))
+                    .textSelection(.enabled)
+            }
+            SettingsListFooter {
+                Button(.launcherFileDestinationAdd, systemImage: "folder.badge.plus") { adding = true }
+                    .disabled(store.requiresReset
+                              || store.destinations.count >= LauncherFileDestinationsDocument.capacity)
+            }
+            if store.requiresReset {
+                SettingsActionRow {
+                    Button(.launcherFileDestinationsReset, role: .destructive) { confirmsReset = true }
                 }
             }
         }

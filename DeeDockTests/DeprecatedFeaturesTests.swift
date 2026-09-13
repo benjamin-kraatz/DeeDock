@@ -4,15 +4,15 @@ import Testing
 
 @MainActor
 struct DeprecatedFeaturesTests {
-    @Test("Deprecated Features pages sit in the last group; soap bubbles stays active")
+    @Test("Deprecated pages sit in their own section; soap bubbles stays active")
     func featuresOverviewGroups() throws {
-        let groups = SettingsSection.features.pageGroups
-        let last = try #require(groups.last)
-        #expect(last == SettingsPage.deprecatedPages)
+        #expect(SettingsSection.deprecated.pageGroups == [SettingsPage.deprecatedPages])
+        #expect(SettingsSection.fixed.last == .deprecated)
+        let last = SettingsPage.deprecatedPages
         #expect(Set(last) == [
             .sims, .focusBreathing, .focusDebt, .pinWeather, .quarantine, .patchBay
         ])
-        let active = Set(groups.dropLast().flatMap(\.self))
+        let active = Set(SettingsSection.featureSections.flatMap(\.pageGroups).flatMap(\.self))
         #expect(active.contains(.soapBubbles))
         #expect(active.contains(.focusSessions))
         #expect(active.contains(.shelfAndTrash))
@@ -24,7 +24,7 @@ struct DeprecatedFeaturesTests {
         #expect(!active.contains(.patchBay))
         #expect(!SettingsPage.focusSessions.isDeprecated)
         #expect(!SettingsPage.soapBubbles.isDeprecated)
-        #expect(SettingsPage.deprecatedPages.allSatisfy(\.isDeprecated))
+        #expect(SettingsPage.deprecatedPages.allSatisfy { $0.isDeprecated })
     }
 
     @Test("Pin weather starts off for new documents and missing keys")

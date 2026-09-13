@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Physical edge placement, previewed on a stand-in display.
+/// Physical edge placement. The page pins its stand-in display preview above this pane.
 /// Physical left and right are independent of interface reading direction.
 struct PositionSettingsPane: View {
     @Binding var edge: DockEdge
@@ -21,12 +21,6 @@ struct PositionSettingsPane: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
-            SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
-                SettingsStackedRow {
-                    DockPlacementPreview(edge: edge, reference: reference, alignment: alignment,
-                                         alongEdgeOffset: alongEdgeOffset, edgeDistance: edgeDistance)
-                }
-            }
             SettingsCard(title: .settingsCardAnchor, footnote: edge == .top ? nil : .settingsDockOverlapHelp) {
                 SettingsPickerRow(title: .settingsEdge, options: DockEdge.settingsOptions, selection: $edge)
                     .settingsOverride(overrideContext, field: .edge)

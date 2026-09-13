@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Searchable sections and devices, in the order System Settings uses: what the app is, then what
-/// the dock is, then the screens it appears on.
+/// Searchable sections and devices, in the order System Settings uses: what the app is, what it
+/// can do, the screens it appears on, and finally what is on its way out.
 struct SettingsSidebar: View {
     @Binding var selection: SettingsSection?
     @Binding var searchText: String
@@ -9,7 +9,12 @@ struct SettingsSidebar: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// A section survives the filter when it, or any page it leads to, matches the query.
-    private var sections: [SettingsSection] { SettingsSection.fixed.filter { $0.matches(searchText) } }
+    private func filtered(_ sections: [SettingsSection]) -> [SettingsSection] {
+        sections.filter { $0.matches(searchText) }
+    }
+    private var primary: [SettingsSection] { filtered(SettingsSection.primary) }
+    private var features: [SettingsSection] { filtered(SettingsSection.featureSections) }
+    private var showsDeprecated: Bool { SettingsSection.deprecated.matches(searchText) }
 
     /// A display stays listed when its own name matches, or when the query matches a dock page,
     /// since every dock page can be set for that display.
@@ -24,13 +29,17 @@ struct SettingsSidebar: View {
     }
     private var remembered: [DisplayProfile] { profiles.remembered.filter(matches) }
 
+    private var isEmpty: Bool {
+        primary.isEmpty && features.isEmpty && !showsDeprecated && connected.isEmpty && remembered.isEmpty
+    }
+
     var body: some View {
         List(selection: $selection) {
-            Section {
-                ForEach(sections) { section in
-                    SettingsSectionRow(section: section, isSelected: selection == section)
-                        .tag(section)
-                }
+            if !primary.isEmpty {
+                Section { rows(primary) }
+            }
+            if !features.isEmpty {
+                Section { rows(features) } header: { Text(.settingsFeatures) }
             }
             if !connected.isEmpty {
                 Section {
@@ -40,7 +49,7 @@ struct SettingsSidebar: View {
                                 .tag(SettingsSection.display(display.id))
                         }
                     }
-                } header: { Text(.displayConnectedGroup).font(.caption.weight(.semibold)) }
+                } header: { Text(.displayConnectedGroup) }
             }
             if !remembered.isEmpty {
                 Section {
@@ -48,9 +57,13 @@ struct SettingsSidebar: View {
                         DisplayProfileRow(profile: profile, snapshot: nil)
                             .tag(SettingsSection.display(profile.id))
                     }
-                } header: { Text(.displayRememberedGroup).font(.caption.weight(.semibold)) }
+                } header: { Text(.displayRememberedGroup) }
             }
-            if sections.isEmpty && connected.isEmpty && remembered.isEmpty {
+            // Deprecated sits last and alone so it never reads as one of the current features.
+            if showsDeprecated {
+                Section { rows([.deprecated]) }
+            }
+            if isEmpty {
                 Text(.settingsNoMatches)
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -59,6 +72,13 @@ struct SettingsSidebar: View {
             }
         }
         .searchable(text: $searchText, placement: .sidebar, prompt: Text(.settingsSearchPrompt))
-        .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: sections)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: primary + features)
+    }
+
+    private func rows(_ sections: [SettingsSection]) -> some View {
+        ForEach(sections) { section in
+            SettingsSectionRow(section: section, isSelected: selection == section)
+                .tag(section)
+        }
     }
 }

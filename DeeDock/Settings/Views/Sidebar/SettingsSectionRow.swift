@@ -12,7 +12,7 @@ struct SettingsSectionRow: View {
         Label {
             Text(section.title ?? .settingsGeneral)
         } icon: {
-            SettingsIconTile(glyph: section.glyph, colors: section.tileColors)
+            SettingsIconTile(glyph: section.glyph, colors: section.tileColors, size: 20)
                 .overlay(alignment: .topTrailing) {
                     #if DIRECT_DISTRIBUTION
                     if section == .general, updater?.awareness.showsIndicators == true {

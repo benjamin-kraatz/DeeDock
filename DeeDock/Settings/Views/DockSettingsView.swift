@@ -32,7 +32,7 @@ struct DockSettingsView: View {
                 path = []
                 selection = $0
             }), searchText: $searchText, profiles: profiles)
-                .navigationSplitViewColumnWidth(min: 200, ideal: 235, max: 300)
+                .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 300)
         } detail: {
             detail
                 .safeAreaInset(edge: .bottom, spacing: 0) { footer }
@@ -76,7 +76,7 @@ struct DockSettingsView: View {
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false
             // Window Peek and its permissions are app-wide, so there is no display to select.
-            select(.features, page: .windowPeek)
+            select(.windowsFocus, page: .windowPeek)
         }
         .onDisappear {
             settingsActive = false
@@ -84,7 +84,7 @@ struct DockSettingsView: View {
             coordinator?.displayIndicator.stop()
         }
         .navigationSplitViewStyle(.balanced)
-        .frame(minWidth: 740, idealWidth: 820, minHeight: 540, idealHeight: 650)
+        .frame(minWidth: 760, idealWidth: 880, minHeight: 560, idealHeight: 680)
         .onChange(of: profiles.document.profiles.keys.sorted()) { _, ids in
             if case .display(let id) = selection, !ids.contains(id) { select(.dock) }
         }
@@ -104,10 +104,13 @@ struct DockSettingsView: View {
         switch selection {
         case .general:
             SettingsOverviewView(section: .general, open: open)
-        case .features:
-            SettingsOverviewView(section: .features, isAvailable: isAvailable, open: open)
         case .dock:
             SettingsOverviewView(section: .dock, open: open)
+        case .extras, .windowsFocus, .suggestionsHistory, .deprecated:
+            if let selection {
+                SettingsOverviewView(section: selection, isAvailable: isAvailable, status: status, open: open)
+                    .id(selection)
+            }
         case .atmosphere:
             if let atmosphere = coordinator?.atmosphere {
                 AtmosphereSettingsPane(store: atmosphere.store)
@@ -151,10 +154,27 @@ struct DockSettingsView: View {
         }
     }
 
-    /// General and Modes own no dock preferences, so they carry no reset action.
+    /// On or Off for feature pages governed by one switch; pages with richer state show nothing.
+    private func status(_ page: SettingsPage) -> LocalizedStringResource? {
+        let value = context.source().value
+        let isOn: Bool
+        switch page {
+        case .shelfAndTrash: isOn = value.showShelf || value.showTrash
+        case .capsules: isOn = value.showSessionCapsules
+        case .badges: isOn = value.showAppBadges
+        case .windowPeek: isOn = value.windowPeekEnabled
+        case .magneticEdges: isOn = value.magneticEdges
+        case .soapBubbles: isOn = value.soapBubbleEffects
+        case .multipleDisplays: isOn = value.secondaryDisplayAppsOnly
+        default: return nil
+        }
+        return isOn ? .settingsStatusOn : .settingsStatusOff
+    }
+
+    /// Sections that own no dock preferences carry no reset action.
     @ViewBuilder private var footer: some View {
         switch selection {
-        case .dock, .features, .display:
+        case .some(let section) where section.offersRestoreDefaults:
             SettingsFooterBar(errorMessage: context.errorMessage(override),
                               resetTitle: override == nil ? .settingsRestoreDefaults : .displayUseDefaults,
                               resetDisabled: override != nil && profiles.requiresReset,

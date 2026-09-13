@@ -41,48 +41,28 @@ struct UpdateSettingsCard: View {
     }
 
     var body: some View {
-        SettingsCard(title: .updatesSectionTitle) {
-            SettingsRow(title: .updatesCurrentVersion) {
-                Text(currentVersion).monospacedDigit().textSelection(.enabled)
-            }
-            SettingsRow(title: .updatesAutomatic, subtitle: .updatesAutomaticDescription) {
-                Toggle(isOn: Binding(get: { automaticallyChecks }, set: setAutomaticallyChecks)) {
-                    Text(.updatesAutomatic)
-                }
-                .labelsHidden()
-                .toggleStyle(.switch)
-                .controlSize(.small)
-                .disabled(startupFailed)
-            }
-            SettingsRow(title: .updatesAutomaticInstallation,
-                        subtitle: automaticInstallationDescription) {
-                Toggle(isOn: Binding(get: { automaticallyInstalls }, set: setAutomaticallyInstalls)) {
-                    Text(.updatesAutomaticInstallation)
-                }
-                .labelsHidden()
-                .toggleStyle(.switch)
-                .controlSize(.small)
-                .disabled(startupFailed || !allowsAutomaticInstalls)
-            }
-            SettingsRow(title: .updatesIdleInstall, subtitle: .updatesIdleInstallDescription) {
-                Toggle(isOn: Binding(get: { installWhenIdle }, set: setInstallWhenIdle)) {
-                    Text(.updatesIdleInstall)
-                }
-                .labelsHidden()
-                .toggleStyle(.switch)
-                .controlSize(.small)
-                .disabled(startupFailed)
-            }
-            SettingsActionRow {
+        VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+            AppAboutCard(version: currentVersion) {
                 Button(action: check) {
                     Text(updateAvailable ? .updatesAvailable : updateInProgress ? .updatesShowProgress : .updatesCheck)
                 }
+                .buttonStyle(.borderedProminent)
                 .disabled(!canCheck)
             }
-            if startupFailed {
-                Text(.updatesStartupFailed)
-                    .foregroundStyle(.secondary)
-                    .padding(SettingsMetrics.rowInset)
+            SettingsCard(title: .updatesSectionTitle) {
+                SettingsToggleRow(title: .updatesAutomatic, subtitle: .updatesAutomaticDescription,
+                                  isOn: Binding(get: { automaticallyChecks }, set: setAutomaticallyChecks),
+                                  disabled: startupFailed)
+                SettingsToggleRow(title: .updatesAutomaticInstallation, subtitle: automaticInstallationDescription,
+                                  isOn: Binding(get: { automaticallyInstalls }, set: setAutomaticallyInstalls),
+                                  disabled: startupFailed || !allowsAutomaticInstalls)
+                SettingsToggleRow(title: .updatesIdleInstall, subtitle: .updatesIdleInstallDescription,
+                                  isOn: Binding(get: { installWhenIdle }, set: setInstallWhenIdle),
+                                  disabled: startupFailed)
+                if startupFailed {
+                    SettingsStatusRow(symbol: "exclamationmark.triangle.fill", tint: .orange,
+                                      message: Text(.updatesStartupFailed))
+                }
             }
         }
     }
@@ -93,7 +73,7 @@ struct UpdateSettingsCard: View {
                        automaticallyInstalls: true, allowsAutomaticInstalls: true,
                        canCheck: true, updateAvailable: true, startupFailed: false,
                        installWhenIdle: true)
-        .padding().frame(width: 560)
+        .padding().frame(width: 640)
 }
 
 #Preview("Updater unavailable, German") {
@@ -101,6 +81,6 @@ struct UpdateSettingsCard: View {
                        automaticallyInstalls: false, allowsAutomaticInstalls: false,
                        canCheck: false, updateAvailable: false, startupFailed: true)
         .environment(\.locale, Locale(identifier: "de"))
-        .padding().frame(width: 560)
+        .padding().frame(width: 640)
 }
 #endif

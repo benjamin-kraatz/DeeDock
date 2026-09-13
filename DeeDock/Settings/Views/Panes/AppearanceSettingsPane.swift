@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Requested size and hover scale, previewed above the controls that change them.
+/// Requested size, hover scale, and indicators. The page pins its preview above this pane
+/// (`DockPagePreviewStrip`) so the sample stays visible while the controls scroll.
 struct AppearanceSettingsPane: View {
     var edge: DockEdge = .bottom
     @Binding var iconSize: Double
@@ -11,24 +12,10 @@ struct AppearanceSettingsPane: View {
     @Binding var animateIndicators: Bool
     @Binding var launchAnimation: DockLaunchAnimation
 
-    var appearanceSettings = DockSettings.defaults
     var overrideContext: SettingsOverrideContext? = nil
-
-    private var previewSettings: DockSettings {
-        var settings = appearanceSettings
-        settings.cornerRadius = cornerRadius
-        return settings
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
-            SettingsCard(title: .settingsPreview, footnote: .settingsPreviewDisclaimer) {
-                SettingsStackedRow {
-                    DockAppearancePreview(edge: edge, iconSize: iconSize, magnification: magnification,
-                                          itemSpacing: itemSpacing, runningIndicatorStyle: runningIndicatorStyle,
-                                          appearanceSettings: previewSettings)
-                }
-            }
             SettingsCard(title: .settingsCornerRadius, footnote: .settingsCornerRadiusHelp) {
                 SettingsSliderRow(title: .settingsCornerRadius, unit: .settingsPoints,
                                   value: $cornerRadius, range: 0...100, step: 1,

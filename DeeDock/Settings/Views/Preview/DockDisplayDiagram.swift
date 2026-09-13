@@ -4,7 +4,8 @@ import SwiftUI
 struct DockDisplayDiagram: View {
     let settings: DockSettings
     let showsActivation: Bool
-    private let scale: CGFloat = 0.22
+    /// Points drawn per desktop point; the pinned page strip uses a smaller scale than inline diagrams.
+    var scale: CGFloat = 0.22
     private let screen = CGRect(x: 0, y: 0, width: 1440, height: 900)
 
     var body: some View {

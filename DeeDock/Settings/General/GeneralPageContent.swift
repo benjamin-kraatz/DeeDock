@@ -11,14 +11,8 @@ struct GeneralPageContent: View {
 
     var body: some View {
         switch page {
-        case .about:
-            SettingsCard(title: .updatesSectionTitle) {
-                SettingsRow(title: .updatesCurrentVersion) {
-                    Text(AppVersionInfo.current.settingsValue).monospacedDigit().textSelection(.enabled)
-                }
-            }
-        case .softwareUpdate:
-            updates
+        case .about, .softwareUpdate:
+            about
         case .menuBar:
             MenuBarIconSettingsCard(controller: context.menuBarIcon)
         case .startup:
@@ -35,8 +29,9 @@ struct GeneralPageContent: View {
         }
     }
 
-    /// Only a directly distributed build updates itself; elsewhere the page is not offered at all.
-    @ViewBuilder private var updates: some View {
+    /// Version and updates share one page. Only a directly distributed build updates itself, so
+    /// elsewhere the page is just the version.
+    @ViewBuilder private var about: some View {
         #if DIRECT_DISTRIBUTION
         if let updater {
             UpdateSettingsCard(currentVersion: AppVersionInfo.current.settingsValue,
@@ -50,7 +45,11 @@ struct GeneralPageContent: View {
                                setAutomaticallyInstalls: updater.setAutomaticallyInstallsUpdates,
                                setInstallWhenIdle: updater.setInstallWhenIdle,
                                check: updater.checkForUpdates)
+        } else {
+            AppAboutCard(version: AppVersionInfo.current.settingsValue)
         }
+        #else
+        AppAboutCard(version: AppVersionInfo.current.settingsValue)
         #endif
     }
 }

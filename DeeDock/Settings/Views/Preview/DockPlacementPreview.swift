@@ -7,10 +7,11 @@ struct DockPlacementPreview: View {
     let alignment: DockSettings.Alignment
     let alongEdgeOffset: Double
     let edgeDistance: Double
+    var scale: CGFloat = 0.22
 
     var body: some View {
         DockDisplayDiagram(settings: DockSettings(edge: edge, alignment: alignment,
-            alongEdgeOffset: alongEdgeOffset, edgeDistance: edgeDistance, positionReference: reference), showsActivation: false)
+            alongEdgeOffset: alongEdgeOffset, edgeDistance: edgeDistance, positionReference: reference), showsActivation: false, scale: scale)
     }
 }
 

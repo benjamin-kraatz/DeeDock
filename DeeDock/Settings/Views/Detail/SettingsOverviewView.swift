@@ -8,7 +8,10 @@ struct SettingsOverviewView<Header: View>: View {
     let section: SettingsSection
     let title: Text
     var isAvailable: (SettingsPage) -> Bool = { _ in true }
+    /// Short trailing state for a row, such as On or Off, so a person can scan without opening pages.
+    var status: (SettingsPage) -> LocalizedStringResource? = { _ in nil }
     let open: (SettingsPage) -> Void
+    /// Section-specific controls shown between the heading and the page list.
     @ViewBuilder var header: Header
 
     private var groups: [[SettingsPage]] {
@@ -19,8 +22,7 @@ struct SettingsOverviewView<Header: View>: View {
         SettingsPageScaffold {
             header
             ForEach(Array(groups.enumerated()), id: \.offset) { _, group in
-                SettingsLinkCard(title: group.allSatisfy(\.isDeprecated) ? .settingsDeprecated : nil,
-                                 pages: group, open: open)
+                SettingsLinkCard(pages: group, status: status, open: open)
             }
         }
         .navigationTitle(title)
@@ -28,11 +30,12 @@ struct SettingsOverviewView<Header: View>: View {
 }
 
 extension SettingsOverviewView where Header == EmptyView {
-    /// Fixed sections use the navigation title without a duplicate content heading.
+    /// Fixed sections take their title from the section itself.
     init(section: SettingsSection, isAvailable: @escaping (SettingsPage) -> Bool = { _ in true },
+         status: @escaping (SettingsPage) -> LocalizedStringResource? = { _ in nil },
          open: @escaping (SettingsPage) -> Void) {
         let title = Text(section.title ?? .settingsGeneral)
-        self.init(section: section, title: title, isAvailable: isAvailable, open: open) {
+        self.init(section: section, title: title, isAvailable: isAvailable, status: status, open: open) {
             EmptyView()
         }
     }
@@ -43,15 +46,16 @@ extension SettingsOverviewView where Header == EmptyView {
     SettingsOverviewView(section: .dock, open: { _ in })
         .frame(width: 720, height: 640)
 }
-#Preview("Features overview — dark") {
-    SettingsOverviewView(section: .features,
-                         isAvailable: { $0 != .focusSessions && $0 != .actionTiles },
+#Preview("Dock Extras overview — dark") {
+    SettingsOverviewView(section: .extras,
+                         isAvailable: { $0 != .actionTiles },
+                         status: { [.capsules, .badges].contains($0) ? .settingsStatusOn : .settingsStatusOff },
                          open: { _ in })
         .preferredColorScheme(.dark)
         .frame(width: 720, height: 640)
 }
-#Preview("Features overview — deprecated group") {
-    SettingsOverviewView(section: .features, open: { _ in })
-        .frame(width: 720, height: 860)
+#Preview("Deprecated overview") {
+    SettingsOverviewView(section: .deprecated, open: { _ in })
+        .frame(width: 720, height: 640)
 }
 #endif

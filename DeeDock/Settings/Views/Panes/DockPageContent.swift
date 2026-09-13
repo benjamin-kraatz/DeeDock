@@ -28,7 +28,6 @@ struct DockPageContent: View {
                                        runningIndicatorStyle: binding(\.runningIndicatorStyle),
                                        animateIndicators: binding(\.animateIndicators),
                                        launchAnimation: binding(\.launchAnimation),
-                                       appearanceSettings: source.value,
                                        overrideContext: override)
             case .appNames:
                 DockTooltipSettingsPane(source: source)

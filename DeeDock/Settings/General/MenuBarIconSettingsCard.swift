@@ -6,12 +6,13 @@ struct MenuBarIconSettingsCard: View {
 
     var body: some View {
         SettingsCard(title: .menuBarIconTitle, footnote: .menuBarIconHelp) {
-            SettingsStackedRow {
+            SettingsRow(title: .menuBarIconStyle) {
                 SettingsOptionPicker(
-                    title: .menuBarIconTitle,
+                    title: .menuBarIconStyle,
                     options: MenuBarIconStyle.settingsOptions,
                     selection: Binding(get: { controller.style }, set: { controller.setStyle($0) })
                 )
+                .fixedSize()
             }
         }
     }

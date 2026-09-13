@@ -11751,6 +11751,42 @@
         }
       }
     },
+    "focusDurationTitle" : {
+      "comment" : "Label of the focus-session length row in Settings; the value and a stepper follow it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dauer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duration"
+          }
+        }
+      }
+    },
+    "focusDurationValue" : {
+      "comment" : "Focus-session length shown beside its stepper. The argument is a number of minutes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Min."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld min"
+          }
+        }
+      }
+    },
     "focusExtend" : {
       "comment" : "Extend the current focus session by five minutes.",
       "extractionState" : "manual",
@@ -20115,6 +20151,24 @@
         }
       }
     },
+    "menuBarIconStyle" : {
+      "comment" : "Row label for choosing whether the menu-bar item shows the icon or the wordmark.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darstellung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
+          }
+        }
+      }
+    },
     "menuBarIconTitle" : {
       "comment" : "General setting for the artwork shown in the macOS menu bar extra.",
       "extractionState" : "manual",
@@ -25761,6 +25815,24 @@
         }
       }
     },
+    "settingsAboutUpdates" : {
+      "comment" : "Settings page title combining the app version and the software update options.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info & Updates"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About & Updates"
+          }
+        }
+      }
+    },
     "settingsAlignBottom" : {
       "comment" : "Align a vertical dock near the bottom of the display.",
       "extractionState" : "manual",
@@ -26319,6 +26391,24 @@
         }
       }
     },
+    "settingsDeprecatedSummary" : {
+      "comment" : "One-line description under the Deprecated heading on its overview page. These features are removed in version 1.0.0.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktionen, die in Version 1.0.0 entfernt werden. Ihre Einstellungen bleiben bis dahin verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Features that will be removed in version 1.0.0. Their settings stay available until then."
+          }
+        }
+      }
+    },
     "settingsDisplaySummary" : {
       "comment" : "One-line description under a display's name on its overview page.",
       "extractionState" : "manual",
@@ -26477,6 +26567,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Top"
+          }
+        }
+      }
+    },
+    "settingsExtras" : {
+      "comment" : "Sidebar title for optional parts of the dock itself, such as the Shelf, Trash, and badges.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock-Extras"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dock Extras"
+          }
+        }
+      }
+    },
+    "settingsExtrasSummary" : {
+      "comment" : "One-line description under the Dock Extras heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionale Teile des Docks: Ablage, Papierkorb, Kapseln, Kennzeichen, Action Tiles und Randeffekte."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional parts of the dock: the Shelf, Trash, capsules, badges, Action Tiles, and edge effects."
           }
         }
       }
@@ -27561,6 +27687,24 @@
         }
       }
     },
+    "settingsMoreActions" : {
+      "comment" : "Accessibility label and tooltip for the ellipsis menu holding secondary actions of a settings row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
     "settingsMultiplier" : {
       "comment" : "Unit symbol for magnification scale.",
       "extractionState" : "manual",
@@ -27611,6 +27755,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%"
+          }
+        }
+      }
+    },
+    "settingsPermissionGranted" : {
+      "comment" : "Trailing status on a permission row when macOS has granted DDock that permission.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaubt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allowed"
           }
         }
       }
@@ -28061,6 +28223,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Login & Startup"
+          }
+        }
+      }
+    },
+    "settingsStatusOff" : {
+      "comment" : "Trailing status on a settings overview row whose feature is switched off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "settingsStatusOn" : {
+      "comment" : "Trailing status on a settings overview row whose feature is switched on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On"
+          }
+        }
+      }
+    },
+    "settingsSuggestionsHistory" : {
+      "comment" : "Sidebar title for app suggestions, Discovery tips, local history, and the clipboard museum.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge & Verlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestions & History"
+          }
+        }
+      }
+    },
+    "settingsSuggestionsHistorySummary" : {
+      "comment" : "One-line description under the Suggestions & History heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Vorschläge, gelegentliche Tipps und der Verlauf, den DDock auf diesem Mac speichert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App suggestions, occasional tips, and the history DDock keeps on this Mac."
           }
         }
       }
@@ -40997,6 +41231,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“Yesterday” searches only capsules saved yesterday. Choose Saved Capsules. Without a saved checkpoint, there is no history to search."
+          }
+        }
+      }
+    },
+    "settingsWindowsFocus" : {
+      "comment" : "Sidebar title for Window Peek, focus sessions, and their permissions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster & Fokus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows & Focus"
+          }
+        }
+      }
+    },
+    "settingsWindowsFocusSummary" : {
+      "comment" : "One-line description under the Windows & Focus heading on its overview page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window Peek, Fokussitzungen und die dafür nötigen Berechtigungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window Peek, focus sessions, and the permissions they need."
           }
         }
       }

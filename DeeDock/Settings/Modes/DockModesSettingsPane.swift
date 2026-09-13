@@ -26,40 +26,34 @@ struct DockModesSettingsPane: View {
 
     var body: some View {
         SettingsPageScaffold {
-            SettingsCard(title: .dockModesActiveTitle, footnote: .dockModesHelp) {
-                SettingsRow(title: .dockModesActiveMode) {
-                    Text(verbatim: store.activeMode.name).foregroundStyle(.secondary)
+            if let error = store.errorMessage { SettingsErrorBanner(message: error) }
+            SettingsCard(title: .dockModesConfigurationsTitle, footnote: .dockModesHelp) {
+                ForEach(Array(store.modes.enumerated()), id: \.element.id) { index, mode in
+                    VStack(alignment: .leading, spacing: 2) {
+                        modeRow(mode, index: index)
+                        DisclosureGroup {
+                            WorkspaceRecipeEditor(mode: mode, store: store, applications: applications,
+                                                  actions: actions,
+                                                  prepare: prepareWorkspace.map { prepare in { prepare(mode) } },
+                                                  canPrepare: canPrepareWorkspace)
+                        } label: {
+                            Text(mode.hasRecipe ? .recipeTitle : .recipeEmpty)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        // Lines the recipe up under the mode name rather than its status glyph.
+                        .padding(.leading, 28)
+                    }
+                    .padding(.horizontal, SettingsMetrics.rowInset)
+                    .padding(.vertical, 8)
                 }
-                SettingsActionRow {
+                SettingsListFooter {
                     Button(.dockModesNew, systemImage: "plus", action: beginCreate)
                         .disabled(!store.canEdit)
                     Button(.recipeSnapshotTitle, systemImage: "camera", action: beginSnapshot)
                         .disabled(!store.canEdit || applications == nil)
                 }
             }
-            SettingsCard(title: .dockModesConfigurationsTitle) {
-                SettingsStackedRow {
-                    VStack(spacing: 0) {
-                        ForEach(Array(store.modes.enumerated()), id: \.element.id) { index, mode in
-                            if index > 0 { Divider().padding(.leading, 38) }
-                            VStack(alignment: .leading, spacing: 8) {
-                                modeRow(mode, index: index)
-                                DisclosureGroup {
-                                    WorkspaceRecipeEditor(mode: mode, store: store, applications: applications,
-                                                          actions: actions,
-                                                          prepare: prepareWorkspace.map { prepare in { prepare(mode) } },
-                                                          canPrepare: canPrepareWorkspace)
-                                } label: {
-                                    Text(mode.hasRecipe ? .recipeTitle : .recipeEmpty)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if let error = store.errorMessage { SettingsErrorBanner(message: error) }
             if store.requiresReset {
                 SettingsCard(title: .dockModesRecoveryTitle, footnote: .dockModesRecoveryHelp) {
                     SettingsActionRow {
@@ -99,17 +93,23 @@ struct DockModesSettingsPane: View {
             Spacer(minLength: 10)
             if let prepareWorkspace, mode.hasRecipe {
                 Button(.recipeTitle, systemImage: "briefcase") { prepareWorkspace(mode) }
-                    .labelStyle(.iconOnly).disabled(!canPrepareWorkspace)
+                    .labelStyle(.iconOnly).buttonStyle(.borderless).disabled(!canPrepareWorkspace)
                     .help(Text(.recipePrepareHelp))
             }
             if let startFocus {
                 Button(.focusStart, systemImage: "timer") { startFocus(mode) }
-                    .labelStyle(.iconOnly).disabled(!canStartFocus)
+                    .labelStyle(.iconOnly).buttonStyle(.borderless).disabled(!canStartFocus)
                     .help(Text(.focusStartHelp))
             }
-            Button(.dockModesActivate) { _ = activate(mode.id) }
-                .disabled(!store.canEdit || mode.id == store.document.activeModeID)
-            Menu {
+            if mode.id == store.document.activeModeID {
+                Text(.dockModesCurrent)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            } else {
+                Button(.dockModesActivate) { _ = activate(mode.id) }
+                    .disabled(!store.canEdit)
+            }
+            SettingsMoreMenu(label: Text(.dockModesActions(modeName: mode.name))) {
                 Button(.dockModesRename) { beginRename(mode) }
                 Button(.dockModesDuplicate) {
                     _ = store.duplicate(mode.id)
@@ -119,13 +119,9 @@ struct DockModesSettingsPane: View {
                 Button(.dockModesMoveDown) { _ = store.move(mode.id, by: 1) }.disabled(index == store.modes.count - 1)
                 Divider()
                 Button(.dockModesDelete, role: .destructive) { deletingMode = mode }.disabled(store.modes.count == 1)
-            } label: { Image(systemName: "ellipsis.circle") }
-            .menuStyle(.borderlessButton)
-            .fixedSize()
+            }
             .disabled(!store.canEdit)
-            .accessibilityLabel(Text(.dockModesActions(modeName: mode.name)))
         }
-        .padding(.vertical, 8)
         .accessibilityElement(children: .contain)
     }
 

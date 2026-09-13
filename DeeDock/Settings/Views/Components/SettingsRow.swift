@@ -5,13 +5,17 @@ import SwiftUI
 /// One place to tune the rhythm of the window: rows, cards, and separators all read from here
 /// instead of repeating literals, which is what let the panes drift apart as they grew.
 enum SettingsMetrics {
-    static let cardRadius: CGFloat = 10
-    static let cardSpacing: CGFloat = 20
+    static let cardRadius: CGFloat = 12
+    static let cardSpacing: CGFloat = 22
     /// Widest a column of cards grows before it centers in the window.
-    static let columnWidth: CGFloat = 620
+    static let columnWidth: CGFloat = 640
+    /// Side margin between the window edge and the column when the window is narrow.
+    static let pageInset: CGFloat = 28
+    /// Lines card headings and footnotes up with the rounded corner rather than the card edge.
+    static let captionInset: CGFloat = 4
     static let rowInset: CGFloat = 14
-    static let rowVerticalInset: CGFloat = 9
-    static let rowMinimumHeight: CGFloat = 44
+    static let rowVerticalInset: CGFloat = 8
+    static let rowMinimumHeight: CGFloat = 42
     static let controlSpacing: CGFloat = 8
 }
 

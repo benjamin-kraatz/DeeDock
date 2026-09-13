@@ -5,7 +5,8 @@ import SwiftUI
 /// This mirrors how System Settings works: the sidebar picks a section, the section's overview
 /// lists its pages, and a page holds the controls. Adding a page means adding a case here, its
 /// copy to the string catalog, listing it in a section's `pageGroups`, and giving it content in
-/// `SettingsPageView`. Deprecated personality pages also belong in `deprecatedPages`.
+/// `SettingsPageView`. Deprecated personality pages also belong in `deprecatedPages`, which the
+/// sidebar's Deprecated section lists.
 ///
 /// The `dock` cases are the display-scopable ones: every control they show writes through a
 /// `SettingsOverrideContext` when a display profile is being edited, so the same page serves both
@@ -94,7 +95,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .position: .settingsPosition
         case .behavior: .settingsBehavior
         case .shownApps: .settingsAppVisibility
-        case .about: .settingsAbout
+        case .about: Self.aboutTitle
         case .softwareUpdate: .updatesSectionTitle
         case .menuBar: .menuBarIconTitle
         case .startup: .settingsStartup
@@ -119,6 +120,24 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .quarantine: .quarantineTitle
         case .permissions: .windowPeekPermissionsTitle
         }
+    }
+
+    /// A directly distributed build folds Software Update into About, so the page says both.
+    private static var aboutTitle: LocalizedStringResource {
+        #if DIRECT_DISTRIBUTION
+        .settingsAboutUpdates
+        #else
+        .settingsAbout
+        #endif
+    }
+
+    /// Update wording that should find the About page, since that is where updates now live.
+    private static var aboutKeywords: [LocalizedStringResource] {
+        #if DIRECT_DISTRIBUTION
+        [.updatesSectionTitle, .updatesCheck, .updatesAutomatic, .updatesIdleInstall]
+        #else
+        []
+        #endif
     }
 
     /// Brief descriptions on the Features overview, before opening a page.
@@ -285,7 +304,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         guard !query.isEmpty else { return true }
         let copy: [LocalizedStringResource] = [title, keywords]
             + (isDeprecated ? [.settingsDeprecated, .settingsDeprecatedFeatureNotice] : [])
-            + (self == .softwareUpdate ? [.updatesIdleInstall] : [])
+            + (self == .about || self == .softwareUpdate ? Self.aboutKeywords : [])
         return copy.contains { String(localized: $0).localizedStandardContains(query) }
     }
 }

@@ -22,7 +22,7 @@ struct DisplayProfileRow: View {
     var body: some View {
         HStack(spacing: 8) {
             // Matched to the section tiles above so both groups share one leading edge.
-            SettingsIconTile(glyph: .symbol("display"), colors: tileColors)
+            SettingsIconTile(glyph: .symbol("display"), colors: tileColors, size: 20)
             VStack(alignment: .leading, spacing: 1) {
                 Text(verbatim: profile.name).lineLimit(1)
                 Text(status).font(.caption).foregroundStyle(.secondary).lineLimit(1)

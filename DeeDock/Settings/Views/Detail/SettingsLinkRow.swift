@@ -1,11 +1,13 @@
 import SwiftUI
 
-/// An overview row that opens one page: glyph tile, name, disclosure chevron.
+/// An overview row that opens one page: glyph tile, name, optional state, disclosure chevron.
 ///
 /// The plain button style strips the button chrome so the row reads as a line in the card rather
 /// than as a control inside it, while keeping keyboard focus and Return activation.
 struct SettingsLinkRow: View {
     let page: SettingsPage
+    /// Trailing state such as On or Off, drawn beside the chevron the way System Settings does.
+    var status: LocalizedStringResource?
     let open: (SettingsPage) -> Void
     #if DIRECT_DISTRIBUTION
     @Environment(\.appUpdater) private var updater
@@ -14,16 +16,16 @@ struct SettingsLinkRow: View {
     var body: some View {
         Button { open(page) } label: {
             HStack(spacing: 11) {
-                SettingsIconTile(glyph: page.glyph, colors: page.tileColors, size: 22)
+                SettingsIconTile(glyph: page.glyph, colors: page.tileColors, size: 24)
                     .overlay(alignment: .topTrailing) {
                         #if DIRECT_DISTRIBUTION
-                        if page == .softwareUpdate, updater?.awareness.showsIndicators == true {
+                        if page == .about, updater?.awareness.showsIndicators == true {
                             UpdateAwarenessBadge(diameter: 8)
                                 .offset(x: 2, y: -2)
                         }
                         #endif
                     }
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 2) {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
                         Text(page.title)
                         if page.isDeprecated {
@@ -37,7 +39,13 @@ struct SettingsLinkRow: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
+                .layoutPriority(1)
                 Spacer(minLength: SettingsMetrics.controlSpacing)
+                if let status {
+                    Text(status)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
                 Image(systemName: "chevron.forward")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.tertiary)
@@ -49,21 +57,27 @@ struct SettingsLinkRow: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityValue(Text(page.isDeprecated ? String(localized: .settingsDeprecated) : ""))
+        .accessibilityValue(accessibilityValue)
+    }
+
+    private var accessibilityValue: Text {
+        if page.isDeprecated { return Text(.settingsDeprecated) }
+        return status.map { Text($0) } ?? Text(verbatim: "")
     }
 }
 
 /// A group of overview rows drawn as one card, matching the spacing of a card of controls.
 struct SettingsLinkCard: View {
-    /// Optional group heading, used for the Deprecated Features card.
+    /// Optional group heading.
     var title: LocalizedStringResource? = nil
     let pages: [SettingsPage]
+    var status: (SettingsPage) -> LocalizedStringResource? = { _ in nil }
     let open: (SettingsPage) -> Void
 
     var body: some View {
         SettingsCard(title: title) {
             ForEach(pages) { page in
-                SettingsLinkRow(page: page, open: open)
+                SettingsLinkRow(page: page, status: status(page), open: open)
             }
         }
     }
@@ -73,23 +87,18 @@ struct SettingsLinkCard: View {
 #Preview("Overview rows") {
     ScrollView {
         VStack(spacing: SettingsMetrics.cardSpacing) {
-            ForEach(Array(SettingsPage.dockGroups.enumerated()), id: \.offset) { _, group in
-                SettingsLinkCard(pages: group, open: { _ in })
+            ForEach(Array(SettingsSection.extras.pageGroups.enumerated()), id: \.offset) { _, group in
+                SettingsLinkCard(pages: group, status: { $0 == .badges ? .settingsStatusOff : .settingsStatusOn },
+                                 open: { _ in })
             }
         }
         .padding(24)
     }
-    .frame(width: 620, height: 420)
+    .frame(width: 640, height: 480)
 }
 
-#Preview("Deprecated Features rows") {
-    SettingsLinkCard(title: .settingsDeprecated, pages: SettingsPage.deprecatedPages, open: { _ in })
-        .padding(24)
-        .frame(width: SettingsMetrics.columnWidth)
-}
-
-#Preview("Deprecated Features rows — German, dark") {
-    SettingsLinkCard(title: .settingsDeprecated, pages: SettingsPage.deprecatedPages, open: { _ in })
+#Preview("Deprecated rows — German, dark") {
+    SettingsLinkCard(pages: SettingsPage.deprecatedPages, open: { _ in })
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
         .environment(\.locale, Locale(identifier: "de"))

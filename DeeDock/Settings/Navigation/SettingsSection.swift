@@ -2,27 +2,38 @@ import SwiftUI
 
 /// A top-level sidebar entry. Selecting one shows its overview; the overview pushes `SettingsPage`s.
 ///
-/// The five fixed sections are app-scoped groupings. A `display` section edits one profile's
+/// The fixed sections are app-scoped groupings. A `display` section edits one profile's
 /// overrides and offers the same pages as `dock`, so a person moves between "for everything" and
 /// "for this screen" without learning a second layout.
 enum SettingsSection: Hashable, Identifiable {
     case general
     case dock
-    case features
-    case modes
     case atmosphere
+    case modes
+    case extras
+    case windowsFocus
+    case suggestionsHistory
+    /// Personality features slated for removal in 1.0.0, kept reachable but out of the way.
+    case deprecated
     case display(String)
 
-    /// Sections that always exist, in sidebar order. Displays are appended from the profile store.
-    static let fixed: [SettingsSection] = [.general, .dock, .features, .atmosphere, .modes]
+    /// What the app and the dock are; the sidebar's untitled first group.
+    static let primary: [SettingsSection] = [.general, .dock, .atmosphere, .modes]
+    /// Opt-in capabilities, listed under the sidebar's Features heading.
+    static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory]
+    /// Sections that always exist, in sidebar order. Displays are inserted from the profile store.
+    static let fixed: [SettingsSection] = primary + featureSections + [.deprecated]
 
     var id: String {
         switch self {
         case .general: "general"
         case .dock: "dock"
-        case .features: "features"
-        case .modes: "modes"
         case .atmosphere: "atmosphere"
+        case .modes: "modes"
+        case .extras: "extras"
+        case .windowsFocus: "windowsFocus"
+        case .suggestionsHistory: "suggestionsHistory"
+        case .deprecated: "deprecated"
         case .display(let id): "display.\(id)"
         }
     }
@@ -32,9 +43,12 @@ enum SettingsSection: Hashable, Identifiable {
         switch self {
         case .general: .settingsGeneral
         case .dock: .settingsGroupDock
-        case .features: .settingsFeatures
-        case .modes: .dockModesTitle
         case .atmosphere: .atmosphereTitle
+        case .modes: .dockModesTitle
+        case .extras: .settingsExtras
+        case .windowsFocus: .settingsWindowsFocus
+        case .suggestionsHistory: .settingsSuggestionsHistory
+        case .deprecated: .settingsDeprecated
         case .display: nil
         }
     }
@@ -43,9 +57,12 @@ enum SettingsSection: Hashable, Identifiable {
         switch self {
         case .general: .settingsGeneralSummary
         case .dock: .settingsDockSummary
-        case .features: .settingsFeaturesSummary
-        case .modes: .settingsModesSummary
         case .atmosphere: .atmosphereSummary
+        case .modes: .settingsModesSummary
+        case .extras: .settingsExtrasSummary
+        case .windowsFocus: .settingsWindowsFocusSummary
+        case .suggestionsHistory: .settingsSuggestionsHistorySummary
+        case .deprecated: .settingsDeprecatedSummary
         case .display: .settingsDisplaySummary
         }
     }
@@ -54,44 +71,57 @@ enum SettingsSection: Hashable, Identifiable {
         switch self {
         case .general: .symbol("gearshape.fill")
         case .dock: .dock
-        case .features: .symbol("puzzlepiece.extension.fill")
-        case .modes: .symbol("square.stack.3d.up.fill")
         case .atmosphere: .symbol("sparkles")
+        case .modes: .symbol("square.stack.3d.up.fill")
+        case .extras: .symbol("puzzlepiece.extension.fill")
+        case .windowsFocus: .symbol("macwindow.on.rectangle")
+        case .suggestionsHistory: .symbol("clock.arrow.circlepath")
+        case .deprecated: .symbol("archivebox.fill")
         case .display: .symbol("display")
         }
     }
-
 
     var tileColors: [Color] {
         switch self {
         case .general: [Color(red: 0.62, green: 0.65, blue: 0.70), Color(red: 0.36, green: 0.39, blue: 0.44)]
         case .dock, .display: [Color(red: 0.32, green: 0.78, blue: 1.0), Color(red: 0.06, green: 0.42, blue: 0.94)]
-        case .features: [Color(red: 1.0, green: 0.47, blue: 0.72), Color(red: 0.83, green: 0.15, blue: 0.52)]
-        case .modes: [.indigo, .purple]
         case .atmosphere: [.pink, .orange]
+        case .modes: [.indigo, .purple]
+        case .extras: [Color(red: 1.0, green: 0.47, blue: 0.72), Color(red: 0.83, green: 0.15, blue: 0.52)]
+        case .windowsFocus: [Color(red: 1.0, green: 0.58, blue: 0.34), Color(red: 0.84, green: 0.24, blue: 0.16)]
+        case .suggestionsHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
+        case .deprecated: [Color(red: 0.74, green: 0.72, blue: 0.68), Color(red: 0.50, green: 0.47, blue: 0.42)]
         }
     }
 
-    /// Overview rows, grouped into the cards they are drawn in. Modes has no sub-pages: its
-    /// section is the page.
+    /// Overview rows, grouped into the cards they are drawn in. Modes and Atmosphere have no
+    /// sub-pages: the section is the page.
     var pageGroups: [[SettingsPage]] {
         switch self {
         case .general:
-            #if DIRECT_DISTRIBUTION
-            [[.about, .softwareUpdate], [.menuBar, .startup]]
-            #else
             [[.about], [.menuBar, .startup]]
-            #endif
         case .dock, .display:
             SettingsPage.dockGroups
-        case .features:
+        case .extras:
             [[.shelfAndTrash, .capsules, .badges],
-             [.windowPeek, .focusSessions, .actionTiles, .appSuggestions],
-             [.localHistory, .clipboardMuseum, .magneticEdges, .soapBubbles],
-             [.discovery, .multipleDisplays, .permissions],
-             SettingsPage.deprecatedPages]
+             [.actionTiles, .magneticEdges, .soapBubbles],
+             [.multipleDisplays]]
+        case .windowsFocus:
+            [[.windowPeek, .focusSessions], [.permissions]]
+        case .suggestionsHistory:
+            [[.appSuggestions, .discovery], [.localHistory, .clipboardMuseum]]
+        case .deprecated:
+            [SettingsPage.deprecatedPages]
         case .modes, .atmosphere:
             []
+        }
+    }
+
+    /// Sections whose pages write dock preferences, so the window offers to restore them.
+    var offersRestoreDefaults: Bool {
+        switch self {
+        case .general, .atmosphere, .modes: false
+        case .dock, .display, .extras, .windowsFocus, .suggestionsHistory, .deprecated: true
         }
     }
 
@@ -105,7 +135,8 @@ enum SettingsSection: Hashable, Identifiable {
             [.settingsGeneralKeywords]
             #endif
         case .dock: [.settingsAppearanceKeywords, .settingsPositionKeywords, .settingsBehaviorKeywords]
-        case .features: [.settingsFeaturesKeywords, .settingsDeprecated]
+        case .extras, .windowsFocus, .suggestionsHistory: [.settingsFeatures, .settingsFeaturesKeywords]
+        case .deprecated: [.settingsDeprecatedFeatureNotice]
         case .modes: [.dockModesKeywords]
         case .atmosphere: [.atmosphereSummary]
         case .display: []

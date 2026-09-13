@@ -10,13 +10,14 @@ struct AppBadgesSettingsCard: View {
         SettingsCard(title: .appBadgesTitle, footnote: .appBadgesHelp) {
             SettingsToggleRow(title: .appBadgesToggle, isOn: $isOn).disabled(locked)
             if isOn && windowAccess.status != .enabled {
-                SettingsStackedRow {
-                    Text(.appBadgesPermission).foregroundStyle(.secondary)
-                }
-                SettingsActionRow {
+                SettingsStatusRow(symbol: "exclamationmark.triangle.fill", tint: .orange,
+                                  message: Text(.appBadgesPermission)) {
                     Button(.windowAccessEnable, action: windowAccess.requestAccess)
-                    Button(.windowAccessOpenSettings, action: windowAccess.openSystemSettings)
-                    Button(.windowAccessCheckAgain, action: windowAccess.refresh)
+                        .buttonStyle(.borderedProminent)
+                    SettingsMoreMenu {
+                        Button(.windowAccessCheckAgain, action: windowAccess.refresh)
+                        Button(.windowAccessOpenSettings, action: windowAccess.openSystemSettings)
+                    }
                 }
             }
         }
@@ -30,6 +31,6 @@ struct AppBadgesSettingsCard: View {
 #if DEBUG
 #Preview("Badges need access") {
     AppBadgesSettingsCard(isOn: .constant(true), windowAccess: WindowAccessPreview.controller(), locked: false)
-        .padding().frame(width: 620)
+        .padding().frame(width: 640)
 }
 #endif
