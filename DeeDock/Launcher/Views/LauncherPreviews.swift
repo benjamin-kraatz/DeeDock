@@ -155,6 +155,26 @@ private struct LauncherTransitionPreview: View {
     )
 }
 
+#Preview("Launcher search query") {
+    let state = LauncherPreviewData.state()
+    state.query = "invoice"
+    return LauncherView(state: state).frame(width: 900, height: 640)
+}
+
+#Preview("Launcher search query, German, dark") {
+    let state = LauncherPreviewData.state()
+    state.query = "Rechnung"
+    return LauncherView(state: state).frame(width: 720, height: 540)
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Launcher windows type") {
+    let state = LauncherPreviewData.state()
+    state.search.kind = .window
+    return LauncherView(state: state).frame(width: 720, height: 540)
+}
+
 #Preview("Launcher file actions") {
     let state = LauncherPreviewData.state()
     state.adoptFiles(.owned(

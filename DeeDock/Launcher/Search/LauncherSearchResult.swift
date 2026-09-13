@@ -30,6 +30,11 @@ nonisolated enum LauncherSearchKind: String, CaseIterable, Identifiable, Sendabl
         case .mode: "rectangle.3.group"
         }
     }
+
+    /// Search-bar type menu icon. All types uses a stack so it is not a second magnifying glass.
+    var barSymbol: String {
+        self == .all ? "square.stack" : symbol
+    }
 }
 
 /// A value-only result. Native handles and file leases stay with their existing owners.

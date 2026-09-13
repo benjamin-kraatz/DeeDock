@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// The launcher's search field and its adjacent search, capture, clear, and close actions.
+/// The launcher's search field and the trailing file, browse, Robi, and close actions.
 struct LauncherSearchBar: View {
     @Bindable var state: LauncherState
     var searchFocused: FocusState<Bool>.Binding
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 10) {
             Button {
                 searchFocused.wrappedValue = true
                 state.keyboardNavigationActive = false
@@ -27,6 +27,7 @@ struct LauncherSearchBar: View {
             .focused(searchFocused)
             .onSubmit { state.openSelection() }
             .autocorrectionDisabled()
+            .layoutPriority(1)
 
             Button {
                 state.fileActions.chooseFiles()
@@ -58,6 +59,13 @@ struct LauncherSearchBar: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
                 .accessibilityLabel(Text(.launcherClearSearch))
+            }
+
+            if !state.usesFileActions {
+                ViewThatFits(in: .horizontal) {
+                    LauncherSearchBarBrowseControls(state: state, showsRobiTitle: true)
+                    LauncherSearchBarBrowseControls(state: state, showsRobiTitle: false)
+                }
             }
 
             Button {

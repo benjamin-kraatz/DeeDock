@@ -37,9 +37,6 @@ struct LauncherView: View {
                         state: state,
                         searchFocused: $searchFocused
                     )
-                    if !state.usesFileActions {
-                        LauncherToolbar(state: state)
-                    }
                     status
                     if state.usesFileActions {
                         LauncherFileInputSummaryView(state: state.fileActions)

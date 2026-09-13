@@ -101,7 +101,9 @@ The existing **Find a Window** entry points and keyboard shortcut keep their exi
 | Sort | Name, last opened through DDock, or number of opens through DDock |
 | Group | None, application category, or first letter |
 
-Location lives in the same options menu as sort and group, immediately left of Grid or List.
+Those controls sit in the search field, trailing the query, as icon-only menus and a
+grid-or-list switch. Location, sort, and group share one options menu immediately left of
+Grid or List. **Ask Robi** appears there only when the query is not empty.
 **Applications folders** is the default. It keeps bundles whose path is under `/Applications`
 or `~/Applications` and hides build helpers, Homebrew wrappers, and other discovered junk.
 **Standard Mac locations** adds `/System/Applications`. It does not add
@@ -122,7 +124,9 @@ Unreadable history bytes remain untouched until that explicit clear action.
 
 ## Robi
 
-**Ask Robi** matches a task description to installed apps using on-device Apple Intelligence.
+**Ask Robi** appears in the search field when the trimmed query is not empty. It matches a
+task description to installed apps using on-device Apple Intelligence. The button animates
+in and out with the other Launcher snappy motion. Reduce Motion shows and hides it at once.
 It receives the task and app names, categories, and bundle identifiers. It receives no file
 contents or window captures. Requests use bounded batches and can be cancelled. Editing the
 query or closing the launcher invalidates pending suggestions.

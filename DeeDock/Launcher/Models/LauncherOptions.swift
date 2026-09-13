@@ -11,6 +11,16 @@ nonisolated enum LauncherFilter: String, CaseIterable, Identifiable, Sendable {
         case .recent: .launcherRecent
         }
     }
+
+    /// Compact search-bar icon. Menu rows keep the full localized titles.
+    var symbol: String {
+        switch self {
+        case .all: "square.stack.3d.up"
+        case .running: "play.circle"
+        case .pinned: "pin.fill"
+        case .recent: "clock"
+        }
+    }
 }
 
 /// Restricts browsing and app search by where a bundle lives on disk.
