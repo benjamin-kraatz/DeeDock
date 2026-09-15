@@ -6,6 +6,7 @@ struct LauncherBrowseScroll {
     struct Context: Hashable {
         let query: String
         let filter: LauncherFilter
+        let locationFilter: LauncherLocationFilter
         let sort: LauncherSort
         let grouping: LauncherGrouping
         let layout: LauncherLayout
@@ -16,6 +17,7 @@ struct LauncherBrowseScroll {
         init(state: LauncherState, columns: Int, groups: [LauncherState.Group]) {
             query = state.query
             filter = state.filter
+            locationFilter = state.locationFilter
             sort = state.sort
             grouping = state.grouping
             layout = state.layout
