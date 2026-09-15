@@ -133,7 +133,12 @@ final class LauncherPresentationController {
                let editor = panel.firstResponder as? NSTextView, editor.hasMarkedText() {
                 return event // Input-method candidates own arrows, Return, and Escape until composition ends.
             }
-            if event.type == .keyDown, event.window === panel, event.keyCode == 53 { close(); return nil }
+            if event.type == .keyDown, event.window === panel, event.keyCode == 53 {
+                // The field editor never delivers Escape to SwiftUI's onExitCommand.
+                // Robi owns the first press so the chip and docs stay true.
+                if state.robiActive { state.cancelRobi() } else { close() }
+                return nil
+            }
             // The window is larger than the glass while the launcher is open, so a click on the
             // transparent margin has to dismiss the way a click outside the window would.
             if mouse.contains(NSEvent.EventTypeMask(rawValue: 1 << event.type.rawValue)), event.window === panel,
