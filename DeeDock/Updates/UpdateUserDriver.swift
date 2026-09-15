@@ -194,7 +194,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showUpdateInFocus() {
         guard presentation.isActive else { return }
-        if presentation.updateAvailable { awareness.noteWindowOpened() }
+        awareness.noteWindowOpened()
         window.present(activate: true)
     }
 
