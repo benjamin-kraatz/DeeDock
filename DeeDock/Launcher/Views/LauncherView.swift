@@ -3,12 +3,7 @@ import SwiftUI
 /// Native launcher content. The containing dock window owns focus, frame morphing, and dismissal.
 struct LauncherView: View {
     @Bindable var state: LauncherState
-    /// The resting dock's own radius, so the surface starts the morph as exactly the shape the
-    /// dock was drawing and the growth is the only thing that changes.
-    var dockCornerRadius: CGFloat = 22
     @FocusState private var searchFocused: Bool
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.openWindow) private var openWindow
     @State private var columns = 1
     @State private var confirmClear = false
@@ -16,55 +11,31 @@ struct LauncherView: View {
     var body: some View {
         let groups = state.usesFileActions || state.usesMixedResults ? [] : state.groups
         GeometryReader { geometry in
-            // Presented, the panel's window is fixed at a frame that covers both ends of the morph
-            // and the content lays out once at the rect it lands on. The morph is the glass rect
-            // growing from the dock's rect to that one: nothing inside it ever changes position,
-            // which is what kept the hosted controls trailing behind the old window resize.
-            let presenting = state.contentRect != .zero
-            let landing = presenting ? state.contentRect : CGRect(origin: .zero, size: geometry.size)
-            let browseColumns = max(1, Int((landing.width - 56 + 12) / 148))
-            let morphing = presenting && !state.expanded
-            let rect = morphing ? state.dockRect : landing
-            let radius: CGFloat = morphing
-                ? min(dockCornerRadius, min(state.dockRect.width, state.dockRect.height) / 2)
-                : 28
-            ZStack(alignment: .topLeading) {
-                panel(radius: radius)
-                    .frame(width: rect.width, height: rect.height)
-                    .offset(x: rect.minX, y: rect.minY)
-                VStack(spacing: 16) {
-                    LauncherSearchBar(
-                        state: state,
-                        searchFocused: $searchFocused
-                    )
-                    status
-                    if state.usesFileActions {
-                        LauncherFileInputSummaryView(state: state.fileActions)
-                        LauncherFileActionsView(launcher: state)
-                    } else if state.usesMixedResults {
-                        LauncherMixedResultsView(launcher: state)
-                    } else {
-                        let context = LauncherBrowseScroll.Context(state: state, columns: browseColumns, groups: groups)
-                        LauncherResultsView(state: state, columns: browseColumns, groups: groups)
-                            .modifier(LauncherBrowseScrollRestoration(state: state, context: context))
-                            .id(context)
-                    }
-                    footer(count: resultCount(groups: groups))
+            let browseColumns = max(1, Int((geometry.size.width - 56 + 12) / 148))
+            VStack(spacing: 16) {
+                LauncherSearchBar(
+                    state: state,
+                    searchFocused: $searchFocused
+                )
+                status
+                if state.usesFileActions {
+                    LauncherFileInputSummaryView(state: state.fileActions)
+                    LauncherFileActionsView(launcher: state)
+                } else if state.usesMixedResults {
+                    LauncherMixedResultsView(launcher: state)
+                } else {
+                    let context = LauncherBrowseScroll.Context(state: state, columns: browseColumns, groups: groups)
+                    LauncherResultsView(state: state, columns: browseColumns, groups: groups)
+                        .modifier(LauncherBrowseScrollRestoration(state: state, context: context))
+                        .id(context)
                 }
-                .padding(20)
-                .frame(width: landing.width, height: landing.height)
-                .offset(x: landing.minX, y: landing.minY)
-                .modifier(LauncherMorphFade(phase: presenting && !reduceMotion ? state.morph : 1))
-                .allowsHitTesting(state.contentVisible)
-                .accessibilityHidden(!state.contentVisible)
+                footer(count: resultCount(groups: groups))
             }
-            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
-            .mask(alignment: .topLeading) {
-                RoundedRectangle(cornerRadius: radius)
-                    .frame(width: rect.width, height: rect.height)
-                    .offset(x: rect.minX, y: rect.minY)
-            }
-            .onChange(of: landing.width, initial: true) { _, width in
+            .padding(20)
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .allowsHitTesting(state.contentVisible)
+            .accessibilityHidden(!state.contentVisible)
+            .onChange(of: geometry.size.width, initial: true) { _, width in
                 columns = max(1, Int((width - 56 + 12) / 148))
                 state.navigationColumns = columns
             }
@@ -97,16 +68,6 @@ struct LauncherView: View {
         if state.usesFileActions { return state.fileActions.actions.count }
         if state.usesMixedResults { return state.search.results.count }
         return groups.reduce(0) { $0 + $1.applications.count }
-    }
-
-    /// The launcher's own material, drawn at whatever rect the morph currently holds.
-    @ViewBuilder private func panel(radius: CGFloat) -> some View {
-        if reduceTransparency {
-            RoundedRectangle(cornerRadius: radius).fill(Color(nsColor: .windowBackgroundColor))
-        } else {
-            RoundedRectangle(cornerRadius: radius).fill(.clear)
-                .glassEffect(.regular, in: .rect(cornerRadius: radius))
-        }
     }
 
     @ViewBuilder private var status: some View {

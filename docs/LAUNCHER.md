@@ -7,6 +7,14 @@ The permanent **App Launcher** tile expands its dock window into a panel on the 
 reactivating the previous app. Reduce Motion disables the window animation, and Reduce
 Transparency supplies an opaque background.
 
+The whole dock expands into the launcher. Native AppKit glass shapes merge inside one glass
+container, with launcher content embedded in the growing shape. The controls keep their final
+layout size while a parent layer moves and scales them. The dock's icons stay outside the glass
+views, clipped to the dock shape, so they look identical to the resting dock throughout. Closing
+uses a critically damped spring and completes as soon as the resting dock is fully restored,
+rather than waiting out the sub-pixel tail. Search receives focus after expansion;
+Reduce Motion presents it immediately.
+
 Ordinary app browsing remembers its scroll position per display until DDock quits or that
 display's dock is recreated. Reopening restores the offset when the filters, sort, grouping,
 layout, grid column count, and ordered app results still match. Changing the query or entering

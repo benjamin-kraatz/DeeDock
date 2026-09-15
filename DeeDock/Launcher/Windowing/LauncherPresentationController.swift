@@ -1,5 +1,4 @@
 import AppKit
-import SwiftUI
 
 /// Expands the existing dock panel, preserving its native material and screen ownership.
 /// Scoped monitors exist only while open. Generation checks prevent stale morph completions restoring a closed panel.
@@ -15,34 +14,35 @@ final class LauncherPresentationController {
     private var generation = UUID()
     private var closing = false
     private var reduceMotion: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
-    /// Expanding passes the expanded rect by a few percent and settles back onto it.
-    private let openSpring = Animation.spring(response: 0.42, dampingFraction: 0.72)
-    /// Collapsing is quicker and lands on the dock's rect with only a trace of a bounce.
-    private let closeSpring = Animation.spring(response: 0.28, dampingFraction: 0.86)
-
     init(panel: DockPanel, state: LauncherState) { self.panel = panel; self.state = state }
 
     func open(origin: CGRect, target: CGRect, dockWindow: CGRect, pins: [ApplicationReference],
               previousApplication: NSRunningApplication?) {
         guard !state.isPresented else { close(); return }
         generation = UUID(); closing = false
+        state.transitionCompleted = nil
         self.origin = origin
         self.previousApplication = previousApplication
         if self.previousApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier { self.previousApplication = nil }
         state.begin(pins: pins, foregroundID: self.previousApplication?.bundleIdentifier)
         state.close = { [weak self] in self?.close() }
         state.didOpen = { [weak self] in self?.close(restoreFocus: false) }
-        state.isPresented = true; state.contentVisible = false; state.expanded = false
+        state.contentVisible = false; state.expanded = true
         // The panel takes its final frame up front and never resizes again while it is open. The
         // window is transparent outside the glass, so its size is not what the morph shows: the
-        // glass rect grows inside it instead, which leaves every control laid out where it lands.
-        let window = LauncherPanelFrame.presentation(origin: origin, target: target,
+        // native glass shapes merge inside it while controls keep their destination layout.
+        let window = LauncherPanelFrame.presentation(origin: origin.union(dockWindow), target: target,
                                                      screen: panel.screen?.visibleFrame ?? origin.union(target))
         state.dockRect = Self.local(origin, in: window)
         state.contentRect = Self.local(target, in: window)
         let dock = Self.local(dockWindow, in: window)
         state.dockContentOffset = CGSize(width: dock.minX, height: dock.minY)
-        state.morph = 0
+        let token = generation
+        state.transitionCompleted = { [weak self] expanded in
+            guard let self, expanded, self.generation == token, !self.closing else { return }
+            self.state.contentVisible = true
+        }
+        state.isPresented = true
         LauncherPanelFrame.set(window, on: panel)
         panel.acceptsKeyboardFocus = true
         // The passive dock only becomes key for views that request it. A searchable panel
@@ -52,26 +52,20 @@ final class LauncherPresentationController {
         ExplicitWindowPresenter.shared.present(panel)
         focusGeneration = ExplicitWindowPresenter.shared.generation
         installMonitors()
-        if reduceMotion {
-            state.expanded = true; state.morph = 1
-            state.contentVisible = true
-            return
-        }
-        // Shape and contents share one animation. The dock's contents dissolve over its first
-        // third and the launcher's resolve over its second half, so neither is a fade running
-        // beside the morph - both are the morph.
-        state.contentVisible = true
-        withAnimation(openSpring) { state.expanded = true; state.morph = 1 }
     }
 
     func close(animated: Bool = true, restoreFocus: Bool = true) {
         guard state.isPresented, !closing || !animated else { return }
         ExplicitWindowPresenter.shared.cancel(panel)
         closing = true; generation = UUID()
+        state.transitionCompleted = nil
         let token = generation
         removeMonitors()
         state.cancelRobi()
         state.contentVisible = false
+        // End native field editing before its host starts moving. The window's field editor
+        // is a separate view and otherwise can linger above the shrinking glass for a frame.
+        panel.makeFirstResponder(nil)
         let finish = { [weak self] in
             guard let self, generation == token else { return }
             state.isPresented = false
@@ -89,8 +83,11 @@ final class LauncherPresentationController {
             }
             previousApplication = nil
         }
-        if !animated || reduceMotion { state.expanded = false; state.morph = 0; finish(); return }
-        withAnimation(closeSpring) { state.expanded = false; state.morph = 0 } completion: { finish() }
+        if !animated || reduceMotion { state.expanded = false; finish(); return }
+        state.transitionCompleted = { expanded in
+            if !expanded { finish() }
+        }
+        state.expanded = false
     }
 
     /// Converts a screen rect into the presentation window's top-left origin, y-down coordinates.
@@ -182,8 +179,9 @@ final class LauncherPresentationController {
     func stop() {
         ExplicitWindowPresenter.shared.cancel(panel)
         generation = UUID(); removeMonitors()
+        state.transitionCompleted = nil
         state.isPresented = false; state.contentVisible = false; state.expanded = false
-        state.morph = 0; state.end()
+        state.end()
         state.didOpen = nil; didClose = nil; previousApplication = nil
     }
 }

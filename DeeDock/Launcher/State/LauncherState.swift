@@ -14,16 +14,15 @@ final class LauncherState {
     var history: LauncherHistory { catalog.launcherHistory }
     var isPresented = false
     var contentVisible = false
-    /// Drives the morph: false draws the panel at the dock's rect, true at the expanded rect.
+    /// The native glass animation's destination. Reversing it preserves the current velocity.
     var expanded = false
+    /// Native animation completion, scoped by the presentation controller to this opening.
+    @ObservationIgnored var transitionCompleted: ((Bool) -> Void)?
     /// The expanded panel, in the presentation window's coordinates. The content lays out here for
-    /// the whole morph and never moves, so nothing has to chase a changing layout.
+    /// the whole morph. Rendering transforms it without reflowing hosted controls.
     var contentRect = CGRect.zero
-    /// The dock's own rect, in the same coordinates. The morph starts from this shape.
+    /// The resting dock glass, in the same coordinates.
     var dockRect = CGRect.zero
-    /// The morph's progress, 0 at the dock's rect and 1 at the expanded one. Both sets of contents
-    /// fade against this rather than on timers of their own, so they move with the glass.
-    var morph = 0.0
     /// Shifts the dock's contents from its own window's origin to the presentation window's, so
     /// they keep the position they had while they fade.
     var dockContentOffset = CGSize.zero
