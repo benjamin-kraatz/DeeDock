@@ -100,8 +100,8 @@ final class UpdateAwarenessStore {
 /// Snapshot of whether DDock is free to install and relaunch.
 ///
 /// Input idle is measured by the caller. The busy flags are the strict gates from DEE-76
-/// plus file-picker, dock popover, and menu-tracking states that are equally "in the middle
-/// of something."
+/// plus file-picker, dock popover, Window Peek, and menu-tracking states that are equally
+/// "in the middle of something."
 struct UpdateIdleGate: Equatable, Sendable {
     var isDragging = false
     var isFocusSessionPanelOpen = false
@@ -109,6 +109,7 @@ struct UpdateIdleGate: Equatable, Sendable {
     var isFilePickerActive = false
     var isPopoverOpen = false
     var isMenuTracking = false
+    var isWindowPeekOpen = false
     var secondsSinceInput: TimeInterval = 0
 
     /// Quiet period after the last HID event before DDock counts as idle.
@@ -116,7 +117,7 @@ struct UpdateIdleGate: Equatable, Sendable {
 
     var isBusy: Bool {
         isDragging || isFocusSessionPanelOpen || isUpdateWindowOpen
-            || isFilePickerActive || isPopoverOpen || isMenuTracking
+            || isFilePickerActive || isPopoverOpen || isMenuTracking || isWindowPeekOpen
     }
 
     var isIdle: Bool {

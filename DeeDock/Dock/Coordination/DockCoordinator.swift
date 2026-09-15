@@ -54,7 +54,7 @@ final class DockCoordinator {
         } ?? NSScreen.main
     }
 
-    /// Strict idle-install gates plus picker, popover, and menu tracking.
+    /// Strict idle-install gates plus picker, popover, Window Peek, and menu tracking.
     var updateIdleGate: UpdateIdleGate {
         UpdateIdleGate(
             isDragging: dragging.isDragging,
@@ -62,6 +62,7 @@ final class DockCoordinator {
             isFilePickerActive: filePicker.isActive,
             isPopoverOpen: popovers.isOpen,
             isMenuTracking: panels.values.contains(where: \.isMenuTracking),
+            isWindowPeekOpen: windowPeeks.isOpen,
             secondsSinceInput: UpdateIdleGate.secondsSinceLastInput()
         )
     }
@@ -69,7 +70,7 @@ final class DockCoordinator {
     /// Hides the main-display callout while the pointer is in a dock interaction.
     var isUpdateAwarenessBlocked: Bool {
         dragging.isDragging || focusPopover.isOpen || filePicker.isActive || popovers.isOpen
-            || panels.values.contains(where: \.isMenuTracking)
+            || panels.values.contains(where: \.isMenuTracking) || windowPeeks.isOpen
     }
     #endif
     @ObservationIgnored private let dragging = DockDragCoordinator()
