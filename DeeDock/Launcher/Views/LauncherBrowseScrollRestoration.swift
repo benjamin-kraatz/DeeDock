@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Seeds each new results view from the retained offset. Context identity recreates it at the top
-/// when filtering, sorting, grouping, grid width, or the ordered app results change.
+/// when filtering, location, sorting, grouping, grid width, or the ordered app results change.
 struct LauncherBrowseScrollRestoration: ViewModifier {
     let state: LauncherState
     let context: LauncherBrowseScroll.Context

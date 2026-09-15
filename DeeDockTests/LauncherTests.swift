@@ -84,6 +84,21 @@ struct LauncherTests {
             URL(fileURLWithPath: "/Users/example/Projects/Build/DevenvCreator.app"), home: home))
     }
 
+    @Test("Browse scroll identity includes the location filter even when sections match")
+    func browseScrollContextIncludesLocation() {
+        let catalog = ApplicationCatalog(
+            service: ApplicationService(),
+            launcherLibrary: LauncherLibrary(applications: [])
+        )
+        let state = LauncherState(catalog: catalog)
+        let applications = LauncherBrowseScroll.Context(state: state, columns: 4, groups: [])
+        state.locationFilter = .all
+        let allLocations = LauncherBrowseScroll.Context(state: state, columns: 4, groups: [])
+        #expect(applications != allLocations)
+        #expect(applications.locationFilter == .applicationsFolders)
+        #expect(allLocations.locationFilter == .all)
+    }
+
     @Test("Location filter composes with the All apps / Recent filter")
     func locationFilterComposesWithAppFilter() {
         func app(_ id: String, _ path: String) -> LauncherApplication {

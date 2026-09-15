@@ -153,7 +153,7 @@ struct LauncherSearchBarOverflowMenu: View {
 
     private var chooseFiles: some View {
         Button {
-            state.fileActions.chooseFiles()
+            state.chooseFiles()
         } label: {
             Label {
                 Text(.launcherFileChooseFiles)

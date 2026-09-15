@@ -45,7 +45,7 @@ final class UpdateWindowController: NSObject, NSWindowDelegate {
             if let window { AppDockPresence.shared.windowWillOpen(window) }
             window?.orderFront(nil)
         }
-        if activate, presentation.updateAvailable { awareness.noteWindowOpened() }
+        awareness.noteWindowOpened()
     }
 
     /// Hiding progress retains the same session; dismissal never implies permission to install.

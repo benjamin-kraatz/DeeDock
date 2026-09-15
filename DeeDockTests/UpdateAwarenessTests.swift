@@ -137,11 +137,12 @@ struct UpdateIdleGateTests {
         #expect(gate.isIdle)
     }
 
-    @Test("File picker, popover, and menu tracking are busy")
+    @Test("File picker, popover, menu tracking, and Window Peek are busy")
     func extraBusyGates() {
         #expect(UpdateIdleGate(isFilePickerActive: true, secondsSinceInput: 120).isBusy)
         #expect(UpdateIdleGate(isPopoverOpen: true, secondsSinceInput: 120).isBusy)
         #expect(UpdateIdleGate(isMenuTracking: true, secondsSinceInput: 120).isBusy)
+        #expect(UpdateIdleGate(isWindowPeekOpen: true, secondsSinceInput: 120).isBusy)
     }
 }
 
