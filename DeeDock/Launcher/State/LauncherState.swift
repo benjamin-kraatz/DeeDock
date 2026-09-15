@@ -227,6 +227,12 @@ final class LauncherState {
         fileActions.adopt(adoption)
     }
 
+    /// Opens the file chooser. Cancels Robi first so the chip cannot outlive file-action mode.
+    func chooseFiles() {
+        cancelRobi()
+        fileActions.chooseFiles()
+    }
+
     func togglePin(_ application: LauncherApplication) {
         guard let dockStore else { return }
         let succeeded = pinnedIDs.contains(application.id)
