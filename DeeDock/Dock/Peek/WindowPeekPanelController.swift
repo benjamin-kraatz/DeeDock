@@ -111,6 +111,9 @@ final class WindowPeekPanelController {
         state.fileDragEnded = nil
         state.watch = nil
         state.pinPortal = nil
+        state.pinFrozen = nil
+        state.dropPortal = nil
+        state.portalTracking = nil
         state.addToFusion = nil
         state.choose = nil
         state.showApp = nil
@@ -149,9 +152,10 @@ final class WindowPeekPanelController {
             if let id = state.selectedID { state.manage?(id) }
         case 8 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: state.chooseFiles?()
         case 13 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: if let id = state.selectedID { state.watch?(id) }
-        case 35 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
+        case 35 where event.modifierFlags.intersection([.command, .control]).isEmpty:
             if let card = state.cards.first(where: { $0.id == state.selectedID }) {
-                state.pinPortal?(card.window)
+                if event.modifierFlags.contains(.option) { state.pinFrozen?(card.window) }
+                else { state.pinPortal?(card.window) }
             }
         case 3 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
             if let card = state.cards.first(where: { $0.id == state.selectedID }) {

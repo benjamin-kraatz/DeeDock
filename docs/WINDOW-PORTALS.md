@@ -2,8 +2,19 @@
 
 DEE-14 adds persistent, session-only window previews. In Window Peek, choose **Pin window portal**
 from a card's context menu or VoiceOver actions. In Focus Dock, open Peek with Space, select a card,
-and press P. Pinning closes Peek and opens an independent portal. The accessible menu action is
-this issue's detach mechanism; card dragging is not implemented.
+and press P. Pinning closes Peek and opens an independent portal. The menu and VoiceOver actions
+remain available without dragging.
+
+Drag a preview card outside Peek and release to pin a live portal at the pointer. This works in
+ordinary and split previews. Hold Option when releasing to pin a frozen reference instead.
+The first successful capture after the drop becomes the frozen frame, with its capture time shown
+in the portal. Resume returns it to live updates. The floating drag thumbnail labels the current
+action; pressing or releasing Option changes it. Escape or a drop inside Peek cancels the drag.
+A click still selects the window, and the card's action buttons remain clickable.
+
+**Pin frozen reference** is also available in the card menu and VoiceOver actions. In keyboard Peek,
+Option-P pins a frozen reference. Both kinds of portal share the four-portal limit and the existing
+permission, privacy, and session-only storage rules. No frame is exported by dragging.
 
 Drag the native title bar to move a portal and its edges to resize it. The image always fits its
 source aspect ratio, with unused space when the panel has a different shape. **Show source** tries
@@ -223,3 +234,16 @@ DEE-23 delivery: [PR #41](https://github.com/benjamin-kraatz/DeeDock/pull/41) ta
 `/tmp/DeeDock-dee23-final-build.log`, with only the App Intents metadata-extraction notice.
 All 14 new strings match the packaged English and German resources. GPT 5.6 Sol at Low reasoning
 reported no actionable defects in its static PR review; its trailing-blank-line finding was removed.
+
+
+## Preview drag validation
+
+The drag implementation requires native acceptance for click versus drag, Escape, changing Option
+before release, dropping back into Peek, context menus, action buttons, and the four-portal limit.
+Check ordinary and split layouts, all dock edges, negative display origins, mixed display scales,
+and display removal during a drag. Confirm hover and mouse pinning do not steal focus. Verify that
+Option-drop freezes the first successful capture and Resume starts live updates again.
+The DeeDock Debug build for My Mac passed using Xcode 27 and `/tmp/deedock-portal-drag-build`
+as Derived Data. All four new strings are present in the compiled English and German resources.
+The diff passed whitespace inspection. No tests or automated visual checks were run for this change.
+Native acceptance remains pending.

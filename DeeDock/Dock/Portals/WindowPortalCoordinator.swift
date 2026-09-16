@@ -10,13 +10,15 @@ final class WindowPortalCoordinator {
     private var observers: [(NotificationCenter, NSObjectProtocol)] = []
 
     /// Returns false at the bound. The caller keeps Peek open and presents the localized limit message.
-    func pin(_ source: ApplicationWindowSummary, appName: String, keyboard: Bool) -> Bool {
+    func pin(_ source: ApplicationWindowSummary, appName: String, keyboard: Bool,
+             dropPoint: CGPoint? = nil, frozen: Bool = false) -> Bool {
         guard portals.count < Self.maximumPortals else { return false }
         if portals.isEmpty { installObservers() }
         let id = UUID()
-        let point = NSEvent.mouseLocation
+        let point = dropPoint ?? NSEvent.mouseLocation
         let portal = WindowPortalPanelController(source: source, appName: appName,
-            origin: CGPoint(x: point.x + 20, y: point.y - 280))
+            origin: CGPoint(x: point.x + (dropPoint == nil ? 20 : -180), y: point.y - 260),
+            freezeFirstFrame: frozen)
         portals[id] = portal
         order.append(id)
         portal.onClose = { [weak self] in

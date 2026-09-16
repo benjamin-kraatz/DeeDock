@@ -78,6 +78,10 @@ final class WindowPeekState {
     @ObservationIgnored var fileDragExited: (() -> Void)?
     @ObservationIgnored var fileDragEnded: (() -> Void)?
     @ObservationIgnored var watch: ((ApplicationWindowToken) -> Void)?
+    var portalDragging = false
+    @ObservationIgnored var portalTracking: ((Bool) -> Void)?
+    @ObservationIgnored var dropPortal: ((ApplicationWindowSummary, CGPoint, Bool) -> Void)?
+    @ObservationIgnored var pinFrozen: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var pinPortal: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var addToFusion: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var choose: ((ApplicationWindowToken) -> Void)?

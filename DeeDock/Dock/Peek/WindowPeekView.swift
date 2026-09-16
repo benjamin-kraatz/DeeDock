@@ -164,7 +164,10 @@ struct WindowPeekView: View {
                                    choose: { state.choose?(card.id) },
                                    watch: { state.watch?(card.id) },
                                    addToFusion: { state.addToFusion?(card.window) },
-                                   pinPortal: { state.pinPortal?(card.window) })
+                                   pinPortal: { state.pinPortal?(card.window) },
+                                   pinFrozen: { state.pinFrozen?(card.window) },
+                                   portalTracking: { state.portalTracking?($0) },
+                                   dropPortal: { state.dropPortal?(card.window, $0, $1) })
                     .onAppear { state.thumbnailNeeded?(card.id) }
             }
         }

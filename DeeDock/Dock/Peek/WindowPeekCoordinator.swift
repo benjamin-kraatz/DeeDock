@@ -53,6 +53,7 @@ final class WindowPeekCoordinator {
     }
 
     func hover(_ item: DockItem?, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {
+        guard controller?.state.portalDragging != true else { return }
         guard let item else {
             if sourcePanel === panel { leaveSource(); scheduleClose() }
             return
@@ -250,6 +251,27 @@ final class WindowPeekCoordinator {
             }
             close(returnFocus: false)
         }
+        next.state.portalTracking = { [weak self, weak next] tracking in
+            next?.state.portalDragging = tracking
+            if tracking { self?.closeTask?.cancel() } else { self?.updatePointer() }
+        }
+        next.state.dropPortal = { [weak self, weak panel] window, point, frozen in
+            guard let self else { return }
+            guard portals.pin(window, appName: item.reference.name, keyboard: false,
+                              dropPoint: point, frozen: frozen) else {
+                panel?.store.errorMessage = .portalLimit
+                return
+            }
+            close(returnFocus: false)
+        }
+        next.state.pinFrozen = { [weak self, weak panel] window in
+            guard let self else { return }
+            guard portals.pin(window, appName: item.reference.name, keyboard: keyboard, frozen: true) else {
+                panel?.store.errorMessage = .portalLimit
+                return
+            }
+            close(returnFocus: false)
+        }
         next.state.manage = { [weak self] token in self?.manage(token) }
         next.state.choose = { [weak self] token in self?.choose(token) }
         next.state.showApp = { [weak self] in self?.showApp() }
@@ -266,6 +288,9 @@ final class WindowPeekCoordinator {
         if fileDocuments != nil {
             next.state.watch = nil
             next.state.pinPortal = nil
+            next.state.pinFrozen = nil
+            next.state.dropPortal = nil
+            next.state.portalTracking = nil
             next.state.addToFusion = nil
         }
         next.show()
@@ -549,7 +574,7 @@ final class WindowPeekCoordinator {
     }
 
     private func scheduleClose() {
-        if controller?.state.actionBusy == true { return }
+        if controller?.state.actionBusy == true || controller?.state.portalDragging == true { return }
         if fileDocuments != nil, !fileDrag { return }
         closeTask?.cancel()
         let delay = fileDrag ? 650 : 180

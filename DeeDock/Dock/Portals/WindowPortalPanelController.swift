@@ -35,6 +35,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
     private var requestTask: Task<WindowPortalCaptureResult, Never>?
     private var freshnessTask: Task<Void, Never>?
     private var jumpTask: Task<Void, Never>?
+    private var freezeFirstFrame: Bool
     private var suspended = false
     private var closed = false
     private var epoch = UUID()
@@ -42,7 +43,8 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
     private let started = ContinuousClock.now
     var onClose: (() -> Void)?
 
-    init(source: ApplicationWindowSummary, appName: String, origin: CGPoint) {
+    init(source: ApplicationWindowSummary, appName: String, origin: CGPoint, freezeFirstFrame: Bool = false) {
+        self.freezeFirstFrame = freezeFirstFrame
         let application = NSRunningApplication(processIdentifier: source.processIdentifier)
         state = WindowPortalState(appName: appName, source: source, icon: application?.icon)
         capture = WindowPortalCapture(source: source)
@@ -119,6 +121,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         requestTask?.cancel()
         epoch = UUID()
         if value {
+            freezeFirstFrame = false
             clearPixels()
             state.userPaused = true
             state.phase = .userPaused
@@ -238,6 +241,10 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
                 state.phase = .live
             }
             state.lastFrameAt = Date()
+            if freezeFirstFrame {
+                freezeFirstFrame = false
+                freeze()
+            }
             lastSuccess = .now
             state.captures += 1
             let duration = start.duration(to: .now).components
@@ -253,6 +260,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
 
     private func togglePause() {
         guard !state.editingCrop else { return }
+        freezeFirstFrame = false
         if state.frozen { state.frozen = false; state.userPaused = false }
         else { state.userPaused.toggle() }
         requestTask?.cancel()

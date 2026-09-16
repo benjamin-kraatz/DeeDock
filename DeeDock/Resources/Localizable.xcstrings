@@ -23205,6 +23205,60 @@
         }
       }
     },
+    "portalDragCancel" : {
+      "comment" : "Window Peek portal tear-off action and drag guidance. Option chooses a frozen first capture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Anpinnen aus der Vorschau ziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag outside Peek to pin"
+          }
+        }
+      }
+    },
+    "portalDragHelp" : {
+      "comment" : "Window Peek portal tear-off action and drag guidance. Option chooses a frozen first capture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herausziehen, um ein Live-Portal anzupinnen. Beim Loslassen die Wahltaste für ein Standbild halten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag out to pin a live portal. Hold Option at drop for a frozen reference."
+          }
+        }
+      }
+    },
+    "portalDragModifier" : {
+      "comment" : "Window Peek portal tear-off action and drag guidance. Option chooses a frozen first capture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥ Standbild beim Ablegen · Esc Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥ Freeze at drop · Esc Cancel"
+          }
+        }
+      }
+    },
     "portalFocusNext" : {
       "comment" : "Window portal: menu command to focus each existing portal in turn",
       "extractionState" : "manual",
@@ -23471,6 +23525,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pin window portal"
+          }
+        }
+      }
+    },
+    "portalPinFrozen" : {
+      "comment" : "Window Peek portal tear-off action and drag guidance. Option chooses a frozen first capture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standbild anpinnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin frozen reference"
           }
         }
       }

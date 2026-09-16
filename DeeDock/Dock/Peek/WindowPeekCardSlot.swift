@@ -15,6 +15,9 @@ struct WindowPeekCardSlot: View {
     let watch: () -> Void
     let addToFusion: () -> Void
     let pinPortal: () -> Void
+    let pinFrozen: () -> Void
+    let portalTracking: (Bool) -> Void
+    let dropPortal: (CGPoint, Bool) -> Void
     @State private var hovering = false
 
     var body: some View {
@@ -25,12 +28,18 @@ struct WindowPeekCardSlot: View {
                 Divider()
                 Button(.watchTitle, systemImage: "eye", action: watch)
                 Button(.portalPin, systemImage: "pin", action: pinPortal)
+                Button(.portalPinFrozen, systemImage: "snowflake", action: pinFrozen)
                 Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
             }
             .accessibilityAction(named: Text(.peekActionTitle), manage)
             .accessibilityAction(named: Text(.watchTitle), watch)
             .accessibilityAction(named: Text(.fusionAdd), addToFusion)
             .accessibilityAction(named: Text(.portalPin), pinPortal)
+            .accessibilityAction(named: Text(.portalPinFrozen), pinFrozen)
+            .help(Text(.portalDragHelp))
+            .overlay {
+                WindowPeekPortalDragSource(card: card, click: choose, tracking: portalTracking, drop: dropPortal)
+            }
             .overlay(alignment: .topTrailing) {
                 HStack(spacing: 4) {
                     WindowPeekActionButton(revealed: hovering || selected, label: .peekActionTitle,
