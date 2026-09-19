@@ -8,6 +8,8 @@ Familiar by default. Precise when you want control.
 
 The native dock and the first three customization slices are implemented for macOS 27: native Liquid Glass, pointer magnification, pinned and running applications, folder stacks, Session Capsules, a Shelf tile, a Trash tile, Window Peek, Dock Modes, window-aware application menus, position/appearance settings, and one dock per connected desktop display. Each dock can sit on the bottom, top, left, or right edge. Apps and folders can be arranged by drag-and-drop, imported from Finder, and copied between display docks. Named Dock Modes switch every display's pins and app visibility together. An optional recipe can prepare apps, files, links, and Shortcuts as a separate action. Display-independent appearance and behavior settings still use shared defaults with optional per-display overrides. A first-launch tour introduces the dock and guides hiding the macOS Dock. See [acceptance notes](docs/ACCEPTANCE.md) for what has been checked and what still needs hands-on validation.
 
+Source is public; the license is proprietary — see [LICENSE](LICENSE).
+
 ## What we are building
 
 The macOS Dock is the reference for visual quality, interaction, and responsiveness. DDock should earn its place through everyday use: recognizable app icons, predictable activation, clear running state, natural hover and motion, and reliable drag interactions.
