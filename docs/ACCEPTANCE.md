@@ -1534,12 +1534,12 @@ GPT-5.6 Luna reviewed the PR with Extra High reasoning. Follow-up fixes also app
 A second review pass identified cancellation overlap and all-or-nothing expiry for slow but valid scans. Replacement readers now wait for the previous task to release its observer. Complete scans use batches of 16 items with a cancellable 25 ms pause between batches, retaining per-handle timeouts without an overall data-scan cutoff. The fallback timer starts after completion, so slow scans do not queue periodic work. Observer registration retains its separate one-second budget and can fall back without discarding valid badge data.
 
 
-## App Fusion (DEE-16)
+## App Compare (DEE-16)
 
 Implementation on `feature/dee-16` adds an app-wide Fusion tray, Window Peek card and keyboard
 actions, an accessible picker, explicit capture and text review, typed on-device generation,
 and editable drafts saved as text files through Shelf's existing reference contract.
-See [App Fusion](APP_FUSION.md) for API boundaries, retention rules, and model/state cases worth testing.
+See [App Compare](APP_FUSION.md) for API boundaries, retention rules, and model/state cases worth testing.
 
 The user resumed implementation on 2026-09-07. Compilation does not establish native acceptance
 and this issue must not be marked Done from the build result alone.
@@ -1769,7 +1769,7 @@ xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
 ### DEE-11 review follow-up
 
 Merged current `main` into `feature/dee-11` without checking out `main`. Peek now preserves both
-Watch and App Fusion actions and their W/F shortcuts. The merged String Catalog preserves both
+Watch and App Compare actions and their W/F shortcuts. The merged String Catalog preserves both
 features' entries.
 
 Review fixes cover offscreen setup retry, process identity around capture, clamped region controls,
@@ -1781,7 +1781,7 @@ slow capture, hidden-window closure, setup restore, display placement, and keybo
 
 The final focused build passed after resolving the Peek anchor at click time, rather than retaining
 an earlier display frame. Log: `/tmp/DeeDock-dee11-review-final-build.log`. All 38 compiled English
-and German watch strings matched the catalog after merging App Fusion. `git diff --check` passed.
+and German watch strings matched the catalog after merging App Compare. `git diff --check` passed.
 
 GPT-5.6 Luna reviewed the implementation at Extra High reasoning. Its reported setup, identity,
 region, control-visibility, placement, and cancellation findings were addressed. Follow-up fixes
@@ -2626,3 +2626,77 @@ Validation on 2026-09-13:
 - Native acceptance remains pending: add and remove favorites in grid and list menus,
   select Favorites with and without a query, check DE and EN labels, and relaunch to confirm
   persistence. Also check that another display shares favorites while retaining its own pins.
+
+## Atmosphere ambient light
+
+Settings → Features → Atmosphere now includes an opt-in halo around the focused window.
+It has five color modes: average window color, dominant window color, random, daylight,
+and DZWEI. DZWEI cycles through `#198FC5`, `#E29830`, and `#D35691`.
+Glow pulsing defaults to off. Gradient rotation defaults to on and takes 24 seconds per turn.
+Existing Atmosphere preferences decode with window lighting disabled. The existing intensity
+slider also adjusts the halo. Desktop lighting and decorations retain their existing controls.
+
+Window Access tracks the focused window through public Accessibility notifications.
+The existing two-second Atmosphere gate reconciles permission changes and missed notifications.
+Public AX geometry and optional titles are matched against on-screen Quartz window metadata.
+An ambiguous match hides the halo instead of choosing an arbitrary window. AppKit conversion
+uses the primary display's top edge and preserves negative display origins.
+The nonactivating panel ignores pointer events and orders below the focused window.
+A hollow mask excludes the window's content rectangle.
+
+Average and dominant modes need Screen Recording. They capture only the matched window,
+with a maximum dimension of 64 pixels, at most once every two seconds. Sampling uses the
+existing sRGB thumbnail sampler. Dominance means the most populated quantized color bin.
+Only one capture can be in flight. Focus, mode, lifecycle, and permission changes invalidate
+pending results. Images remain in memory and are not saved or transmitted.
+Missing capture permission or failed capture uses DZWEI. Other color modes do not capture.
+Permission prompts require the explicit Settings buttons.
+
+Near-black sampled colors blend continuously toward DZWEI below a maximum RGB component
+of 0.16. Near-white colors blend toward muted grey as the lowest component rises from 0.72
+to 1. Random chooses a new hue on focus change and every 30 seconds. Daylight follows the
+local clock, peaking at 13:00 and reaching its darkest value at 01:00. It does not use location
+or claim to track sunrise. Reduce Motion stops rotation, pulsing, and color transitions.
+Reduce Transparency replaces the blurred halo with a static narrow rim.
+
+Disabling Atmosphere or ambient light, sleep, session resignation, and controller shutdown
+cancel sampling and release the panel and AX observer. Idle-only behavior also applies to the
+halo. Display-filling focused windows hide it, including conservatively detected borderless
+fullscreen windows. The rendering timeline stops while the halo is hidden.
+
+Validation: the DeeDock Debug target compiled for My Mac with code signing disabled.
+Tests, automated visual checks, previews, and native interaction acceptance were not run.
+Native acceptance remains open for halo strength and stacking, same-app focus changes,
+move/resize, minimized and destroyed windows, permission denial and revocation, all color modes,
+black/white transitions, DE/EN layouts, persistence, Reduce Motion/Transparency, multiple
+displays, Spaces, fullscreen, sleep/wake, and idle-only behavior. No reference image was
+attached to the request; DZWEI uses the supplied hex colors.
+
+## App Fusion coordinated window pairs
+
+App Fusion adds explicit two-app launch and exact window selection, shared glass controls,
+proportion and size adjustment, and a combined dock item. Pairs are session-only and use
+Window Access. App Compare remains unchanged. See [App Fusion](APP-MELT.md) for the workflow,
+platform boundaries, recovery actions, and native acceptance checklist.
+
+Compilation is checked with the DeeDock Debug macOS target. Tests and automated visual
+checks were not requested and were not run. Live Xcode/My Mac checks with App Store and
+Stocks verified creation of the shared header and combined dock item after honoring app
+minimum sizes. Shared minimize retained the combined icon with minimized status. A later
+restore timeout fix compiled and passed the shared minimize → combined-icon restore
+check after unlocking: the pair returned to its connected state without an error. Native
+source-app minimize/restore, dragging, glass alignment, focus, accessibility,
+multi-display, Spaces, fullscreen, and sleep/wake acceptance remain open.
+
+### App Fusion Finder-style toolbar follow-up
+
+Added a rounded outer frame and Finder-style toolbar with folder tools, AI Compare, side swap,
+five tile presets and a custom split, fit/restore, display selection, one-step layout undo,
+and Unpair. The separate folder-navigation toolbar shortcut remains deferred.
+
+Static review covers retained window identity on swaps, invalidation of Finder previews,
+layout/file-work exclusion, fresh Compare metadata, cancellation, comparison-tray teardown,
+and coalesced drag updates. String Catalog JSON and whitespace checks are recorded with
+this change. No build, app launch, tests, or automated visual checks were run at the user's
+request. Compilation, actual Finder-like appearance, frame seams/corners, accessibility,
+minimum sizes, rapid actions, multi-display behavior, and runtime performance remain unverified.

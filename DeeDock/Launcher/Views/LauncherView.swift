@@ -73,10 +73,11 @@ struct LauncherView: View {
     @ViewBuilder private var status: some View {
         if state.query.isEmpty, !state.usesMixedResults, state.catalog.suggestions.isActive {
             if state.catalog.suggestions.engineBusy {
-                HStack(spacing: 8) {
-                    ProgressView().controlSize(.small)
-                    Text(.launcherSuggestionsEnginePreparing).font(.caption).foregroundStyle(.secondary)
-                }
+//                HStack(spacing: 8) {
+//                    ProgressView().controlSize(.small)
+//                    Text(.launcherSuggestionsEnginePreparing).font(.caption).foregroundStyle(.secondary)
+//                    
+//                }
             } else if state.catalog.suggestions.engineUnavailable {
                 Text(.launcherSuggestionsEngineUnavailable).font(.caption).foregroundStyle(.secondary)
             }

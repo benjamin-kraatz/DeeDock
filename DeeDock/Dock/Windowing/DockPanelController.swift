@@ -399,6 +399,14 @@ final class DockPanelController {
                                       mask: sample.mask, exposed: visibility.exposesContent)
     }
 
+    /// Melt reserves only the central half of an app icon, leaving pin insertion at its edges.
+    func meltTarget(at point: CGPoint) -> DockItem? {
+        guard let item = documentTarget(at: point),
+              let rect = interaction.iconRects[DockEntryID.app(item.id).hitID],
+              rect.insetBy(dx: rect.width * 0.25, dy: rect.height * 0.25).contains(contentPoint(point)) else { return nil }
+        return item
+    }
+
     /// Hit test for a trailing utility tile, using the same clipped content space as clicks.
     func utilityTarget(_ entry: DockEntryID, at point: CGPoint) -> Bool {
         guard !stopped, !launcher.isPresented, panel.frame.contains(point), visibility.exposesContent else { return false }

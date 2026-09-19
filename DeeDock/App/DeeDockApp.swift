@@ -56,6 +56,7 @@ struct DeeDockApp: App {
                 Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
             } header: { Text(.menuSectionFind) }
             Section {
+                AppMeltMenu(controller: delegate.coordinator.appMelt)
                 Button(.fusionTitle) { delegate.coordinator.showFusion() }
                 Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
                 QuarantineMenu()
@@ -82,6 +83,7 @@ struct DeeDockApp: App {
                 OpenDockSettingsButton().keyboardShortcut(",")
             }
             CommandGroup(after: .appInfo) {
+                AppMeltMenu(controller: delegate.coordinator.appMelt)
                 #if DIRECT_DISTRIBUTION
                 CheckForUpdatesButton(updater: delegate.updater)
                 #endif

@@ -27,6 +27,7 @@ struct WindowPeekSplitView: View {
                             manage: { state.manage?(card.id) }, choose: { state.choose?(card.id) },
                             watch: { state.watch?(card.id) },
                             addToFusion: { state.addToFusion?(card.window) },
+                                   startMelt: { state.startMelt?(card.window) },
                             pinPortal: { state.pinPortal?(card.window) },
                                    pinFrozen: { state.pinFrozen?(card.window) },
                                    portalTracking: { state.portalTracking?($0) },

@@ -20,6 +20,9 @@ struct DockEntryView: View {
 
     @ViewBuilder private var content: some View {
         switch slot {
+        case .melt(let pair, let index):
+            AppMeltDockButton(pair: pair, memberIndex: index, size: size, selected: selected, interaction: interaction,
+                accessibilityFocus: { accessibilityFocus(DockEntryID.app(pair.applicationIDs[index]).hitID, $0) })
         case .launcher:
             DockLauncherButton(
                 size: size,

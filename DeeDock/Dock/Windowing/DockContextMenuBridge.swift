@@ -31,6 +31,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         var togglePin: (() -> Void)?
         var openSettings: (() -> Void)?
         var tracking: ((Bool) -> Void)?
+        private var meltChooser: AppMeltWindowPickerMenu?
         private var trackedMenu: NSMenu?
         private var snapshot: ApplicationMenuSnapshot?
         private var discoveryID: UUID?
@@ -49,6 +50,10 @@ struct DockContextMenuBridge: NSViewRepresentable {
 
         private func show(_ event: NSEvent) {
             guard let item else { return }
+            meltChooser?.cancel()
+            if let controller = interaction?.appMelt {
+                meltChooser = AppMeltWindowPickerMenu(controller: controller)
+            } else { meltChooser = nil }
             selectedWindowToken = nil
             snapshot = interaction?.applicationMenuSnapshot?(item)
                 ?? ApplicationMenuSnapshot(processes: [], windowState: .hidden)
@@ -63,12 +68,27 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 discoveryID = interaction?.beginApplicationWindowDiscovery?(item, snapshot) { [weak self, weak menu] state in
                     guard let self, let menu, trackedMenu === menu, let previous = self.snapshot else { return }
                     self.snapshot = ApplicationMenuSnapshot(processes: previous.processes, windowState: state)
-                    self.rebuild(menu)
+                    if self.meltChooser?.isTracking != true { self.rebuild(menu) }
                 }
             }
 
             NSMenu.popUpContextMenu(menu, with: event, for: self)
             finishTracking()
+            let chooser = meltChooser
+            meltChooser = nil
+            if let chooser, !chooser.cancelled, let partner = chooser.selection, let controller = interaction?.appMelt {
+                let source = item.resolvedURL ?? item.reference.url
+                Task {
+                    await controller.showSetup(first: source, partner: partner)
+                    chooser.cancel()
+                }
+            } else {
+                if chooser?.setupRequested == true, let controller = interaction?.appMelt {
+                    let source = item.resolvedURL ?? item.reference.url
+                    DispatchQueue.main.async { controller.showSetup(first: source) }
+                }
+                chooser?.cancel()
+            }
         }
 
         private func rebuild(_ menu: NSMenu) {
@@ -77,7 +97,13 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 isAvailable: item.isAvailable,
                 snapshot: snapshot
             )
+            for entry in menu.items where entry.submenu === meltChooser?.menu { entry.submenu = nil }
             menu.removeAllItems()
+            if item.isAvailable, interaction?.appMelt != nil {
+                let fusionItem = addItem(.meltStartWithApp, symbol: "rectangle.split.2x1", action: #selector(startMelt), to: menu)
+                if let meltChooser { fusionItem.submenu = meltChooser.menu }
+                menu.addItem(.separator())
+            }
             if interaction?.openBadgeMemory != nil {
                 addItem(.badgeMemoryDetails, symbol: "app.badge", action: #selector(showBadgeMemory), to: menu)
                 menu.addItem(.separator())
@@ -207,6 +233,12 @@ struct DockContextMenuBridge: NSViewRepresentable {
             DispatchQueue.main.async { action?(item) }
         }
 
+        @objc private func startMelt() {
+            guard let item, let controller = interaction?.appMelt else { return }
+            let url = item.resolvedURL ?? item.reference.url
+            DispatchQueue.main.async { controller.showSetup(first: url) }
+        }
+
         @objc private func openApplication() { open?() }
 
         @objc private func openFiles() {
@@ -263,6 +295,8 @@ struct DockContextMenuBridge: NSViewRepresentable {
         }
 
         func stop() {
+            meltChooser?.cancel()
+            meltChooser = nil
             trackedMenu?.cancelTracking()
             trackedMenu?.delegate = nil
             finishTracking()

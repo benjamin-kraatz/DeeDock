@@ -2,7 +2,7 @@ import SwiftUI
 
 /// One card plus the affordances that belong to it, so the card owns its own hover state.
 ///
-/// The Add to Fusion control is revealed by the pointer being anywhere on the card, not only on the
+/// The Add to Compare control is revealed by the pointer being anywhere on the card, not only on the
 /// control itself, which is what makes hiding it at rest acceptable.
 struct WindowPeekCardSlot: View {
     let card: WindowPeekCard
@@ -14,6 +14,7 @@ struct WindowPeekCardSlot: View {
     let choose: () -> Void
     let watch: () -> Void
     let addToFusion: () -> Void
+    let startMelt: () -> Void
     let pinPortal: () -> Void
     let pinFrozen: () -> Void
     let portalTracking: (Bool) -> Void
@@ -30,10 +31,12 @@ struct WindowPeekCardSlot: View {
                 Button(.portalPin, systemImage: "pin", action: pinPortal)
                 Button(.portalPinFrozen, systemImage: "snowflake", action: pinFrozen)
                 Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
+                Button(.meltStartWithApp, systemImage: "rectangle.split.2x1", action: startMelt)
             }
             .accessibilityAction(named: Text(.peekActionTitle), manage)
             .accessibilityAction(named: Text(.watchTitle), watch)
             .accessibilityAction(named: Text(.fusionAdd), addToFusion)
+            .accessibilityAction(named: Text(.meltStartWithApp), startMelt)
             .accessibilityAction(named: Text(.portalPin), pinPortal)
             .accessibilityAction(named: Text(.portalPinFrozen), pinFrozen)
             .help(Text(.portalDragHelp))

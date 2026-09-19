@@ -48,6 +48,13 @@ final class FusionCoordinator: NSObject, NSWindowDelegate {
         else if state.sources.isEmpty && !state.isBusy && state.draft == nil { state.pick() }
     }
 
+    /// Each pair owns its comparison tray, preserving any reviewed input or draft on reopen.
+    func show(pair windows: [ApplicationWindowSummary]) {
+        let needsSelection = state.sources.isEmpty && !state.isBusy && state.draft == nil
+        if needsSelection { state.pickPair(windows) }
+        show()
+    }
+
     /// Clamp in AppKit screen points, including negative display origins and removed displays.
     private func fitToVisibleScreen(preferred: NSScreen? = nil) {
         guard let panel, let screen = preferred ?? panel.screen ?? NSScreen.main else { return }

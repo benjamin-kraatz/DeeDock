@@ -128,7 +128,8 @@ struct LauncherSuggestionInspectorView: View {
                         Text(store.engine == .baseline ? .launcherSuggestionsEngineBaseline : .launcherSuggestionsEngineCoreML)
                         Spacer()
                         if store.engineBusy {
-                            Text(.launcherSuggestionsEnginePreparing)
+                            //Text(.launcherSuggestionsEnginePreparing)
+                            EmptyView()
                         } else if store.engineUnavailable {
                             Text(.launcherSuggestionsEngineUnavailable)
                         } else {

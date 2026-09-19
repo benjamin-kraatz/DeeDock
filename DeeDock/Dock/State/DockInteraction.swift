@@ -5,6 +5,7 @@ import Observation
 /// Per-panel geometry shared between SwiftUI presentation and AppKit pointer handling.
 @MainActor @Observable
 final class DockInteraction {
+    var appMelt: AppMeltController?
     /// Owns this panel's idle deadline and artwork opacity.
     @ObservationIgnored var openLauncher: (() -> Void)?
     @ObservationIgnored var openFocusSession: (() -> Void)?

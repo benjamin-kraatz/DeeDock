@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The App Fusion tray: choose two windows, review what was actually captured, then keep the result.
+/// The App Compare tray: choose two windows, review what was actually captured, then keep the result.
 ///
 /// Every step shares one skeleton — a header carrying the step indicator, a scrolling body of
 /// labelled cards, and a footer bar holding that step's single primary action — so moving through
@@ -130,17 +130,17 @@ struct FusionPanelView: View {
 }
 
 #if DEBUG
-#Preview("Fusion input review") {
+#Preview("Compare input review") {
     FusionPanelView(state: .preview(), close: {}).frame(width: 620, height: 720)
 }
-#Preview("Fusion selection") {
+#Preview("Compare selection") {
     FusionPanelView(state: .preview(captured: false), close: {}).frame(width: 620, height: 720)
 }
-#Preview("Fusion retained draft after save failure") {
+#Preview("Compare retained draft after save failure") {
     FusionPanelView(state: .preview(failedSave: true), close: {}).frame(width: 620, height: 720)
         .environment(\.locale, Locale(identifier: "de"))
 }
-#Preview("Fusion — Reduce Transparency") {
+#Preview("Compare — Reduce Transparency") {
     FusionPanelView(state: .preview(), close: {}, forceOpaqueBackground: true)
         .frame(width: 620, height: 720)
 }

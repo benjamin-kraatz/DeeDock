@@ -20,7 +20,7 @@ enum AtmospherePaletteSampler {
         return sample(cg, mode: .gradient)
     }
 
-    nonisolated private static func sample(_ image: CGImage, mode: AtmosphereWallpaperMode) -> AtmospherePalette? {
+    nonisolated static func sample(_ image: CGImage, mode: AtmosphereWallpaperMode) -> AtmospherePalette? {
         let side = 32
         var bytes = [UInt8](repeating: 0, count: side * side * 4)
         let drawn = bytes.withUnsafeMutableBytes { buffer -> Bool in

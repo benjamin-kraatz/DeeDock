@@ -9,6 +9,7 @@ final class DockStore {
     var launcherCatalog: ApplicationCatalog { catalog }
     let focusSession: FocusSessionController?
     @ObservationIgnored var openFocusSession: (() -> Void)?
+    var appMelt: AppMeltController?
     let actions: ActionTilesController?
     let displayID: String
     /// Filters running-only apps and Finder, including its pin. Other pins and section visibility remain independent.
@@ -177,7 +178,10 @@ final class DockStore {
     private func refreshEntries() {
         let hidden = pinIDsHiddenFromDock
         let visiblePins = pins.filter { !hidden.contains($0.id) }
-        let visibleItems = items.filter { !$0.isFavorite || !hidden.contains($0.reference.id) }
+        let pairs = appMelt?.pairs ?? []
+        let pairedIDs = Set(pairs.flatMap(\.applicationIDs))
+        // Only the projection moves. Saved pins and running order remain the return destination.
+        let visibleItems = items.filter { !pairedIDs.contains($0.id) && (!$0.isFavorite || !hidden.contains($0.reference.id)) }
         let visibleFolders = folders.filter { !hidden.contains($0.id) }
         var content = DockSectionProjection.entries(items: visibleItems, folders: visibleFolders, pins: visiblePins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
@@ -186,6 +190,8 @@ final class DockStore {
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
                                                   trash: showsTrash ? trash?.item : nil)
+        content.insert(contentsOf: pairs.flatMap { pair in pair.applicationIDs.indices.map { DockRenderSlot.melt(pair, $0) } },
+                       at: content.firstIndex(where: \.isUtility) ?? content.count)
         let downloads = DockRenderSlot.folder(DownloadsDockItem.item(displayID: displayID))
         let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.trash != nil } ?? content.count
         content.insert(downloads, at: insertion)
@@ -497,6 +503,7 @@ final class DockStore {
     func openSelection() {
         guard let entry = entries.first(where: { $0.target == selectedTarget }) else { return }
         switch entry {
+        case .melt(let pair, _): appMelt?.restore(pair)
         case .launcher: openLauncher?()
         case .focus: openFocusSession?()
         case .action(let item): actions?.run(item.tile.id)

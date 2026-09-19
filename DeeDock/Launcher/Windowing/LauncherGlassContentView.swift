@@ -62,11 +62,16 @@ final class LauncherGlassContentView: NSView {
         let base = contentOffset ?? .zero
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        transport.layer?.setAffineTransform(CGAffineTransform(
+        let transform = CGAffineTransform(
             a: presentationScale, b: 0, c: 0, d: presentationScale,
             tx: origin.x - base.x, ty: origin.y - base.y
-        ))
-        transport.layer?.opacity = presentationOpacity
+        )
+        if transport.layer?.affineTransform() != transform {
+            transport.layer?.setAffineTransform(transform)
+        }
+        if transport.layer?.opacity != presentationOpacity {
+            transport.layer?.opacity = presentationOpacity
+        }
         CATransaction.commit()
     }
 }

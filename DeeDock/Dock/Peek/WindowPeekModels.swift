@@ -83,6 +83,7 @@ final class WindowPeekState {
     @ObservationIgnored var dropPortal: ((ApplicationWindowSummary, CGPoint, Bool) -> Void)?
     @ObservationIgnored var pinFrozen: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var pinPortal: ((ApplicationWindowSummary) -> Void)?
+    @ObservationIgnored var startMelt: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var addToFusion: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var choose: ((ApplicationWindowToken) -> Void)?
     @ObservationIgnored var showApp: (() -> Void)?

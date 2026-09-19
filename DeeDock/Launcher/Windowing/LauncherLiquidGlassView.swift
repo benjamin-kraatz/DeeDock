@@ -25,6 +25,7 @@ final class LauncherLiquidGlassView: NSView {
     private var target = 1.0
     private var settledTarget: Double?
     private var reduceMotion = false
+    private var renderedSample: LauncherLiquidGeometry.Sample?
     var onSettled: ((Bool) -> Void)?
     override var isFlipped: Bool { true }
 
@@ -165,22 +166,33 @@ final class LauncherLiquidGlassView: NSView {
     private func render() {
         let visual = max(0, (progress - Self.restZone) / (1 - Self.restZone))
         let sample = geometry.sample(at: visual)
+        // AppKit layout and SwiftUI updates can revisit the same spring sample. Reapplying
+        // glass frames here schedules more layout without producing a different image.
+        guard sample != renderedSample else { return }
+        renderedSample = sample
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        dockGlass.frame = sample.dock
-        dockGlass.cornerRadius = sample.dockRadius
         dockGlass.isHidden = sample.dockHidden
+        if !sample.dockHidden {
+            if dockGlass.frame != sample.dock { dockGlass.frame = sample.dock }
+            if dockGlass.cornerRadius != sample.dockRadius { dockGlass.cornerRadius = sample.dockRadius }
+        }
         bubbleGlass.frame = sample.bubble
         bubbleGlass.cornerRadius = sample.bubbleRadius
         bubbleGlass.isHidden = sample.bubbleHidden
         // Only the clip resizes; the hosted dock just shifts so its icons hold their screen position.
         dockClip.isHidden = sample.dockHidden || sample.dockContentOpacity <= 0
-        dockClip.frame = sample.dock
-        dockClip.layer?.cornerRadius = sample.dockRadius
-        dockContent.setFrameOrigin(CGPoint(x: -sample.dock.minX, y: -sample.dock.minY))
+        // The icons disappear early in expansion. Leave their hidden hierarchy alone until
+        // they return on collapse, instead of moving and clipping it throughout the spring.
+        if !dockClip.isHidden {
+            if dockClip.frame != sample.dock { dockClip.frame = sample.dock }
+            dockClip.layer?.cornerRadius = sample.dockRadius
+            let origin = CGPoint(x: -sample.dock.minX, y: -sample.dock.minY)
+            if dockContent.frame.origin != origin { dockContent.setFrameOrigin(origin) }
+            dockContent.present(viewport: sample.dock.size, scale: 1, opacity: sample.dockContentOpacity)
+        }
         // NSGlassEffectView owns its contentView frame through Auto Layout. Do not also
         // resize that view, or resize/rebound NSHostingView, from this display-link callback.
-        dockContent.present(viewport: sample.dock.size, scale: 1, opacity: sample.dockContentOpacity)
         launcherContent.present(viewport: sample.bubble.size, scale: sample.launcherContentScale,
                                 opacity: sample.launcherContentOpacity)
         CATransaction.commit()

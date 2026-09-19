@@ -414,7 +414,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = DDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -468,7 +468,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = DDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -521,7 +521,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = DDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -572,7 +572,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = DDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -745,7 +745,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = DDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -798,7 +798,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = DDock;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Open and empty Trash through Finder when you choose a Trash command.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

@@ -7,7 +7,7 @@ struct LauncherLiquidGeometry {
     let destination: CGRect
     let dockRadius: CGFloat
 
-    struct Sample {
+    struct Sample: Equatable {
         let dock: CGRect
         let bubble: CGRect
         let dockRadius: CGFloat

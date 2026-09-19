@@ -30,6 +30,9 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         let launchDate: Date?
     }
 
+    // App Fusion owns these exact handles only for an active pointer gesture.
+    var meltMoveHandles: [UUID: [Handle]] = [:]
+
     var undoFrames: [ApplicationWindowToken: CGRect] = [:]
     var handles: [ApplicationWindowToken: Handle] = [:]
     let messagingTimeout: Float
@@ -58,7 +61,8 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         handles = handles.filter { $0.key.sessionID != sessionID }
         var result: [ApplicationWindowSummary] = []
 
-        for process in processes {
+        var seenProcesses = Set<pid_t>()
+        for process in processes where seenProcesses.insert(process.processIdentifier).inserted {
             try Task.checkCancellation()
             let application = AXUIElementCreateApplication(process.processIdentifier)
             _ = AXUIElementSetMessagingTimeout(application, messagingTimeout)
@@ -73,7 +77,7 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
 
                 let token = ApplicationWindowToken(sessionID: sessionID, id: UUID())
                 handles[token] = Handle(element: window, processIdentifier: process.processIdentifier,
-                                        launchDate: NSRunningApplication(processIdentifier: process.processIdentifier)?.launchDate)
+                                        launchDate: NSRunningApplication(processIdentifier: process.processIdentifier)?.windowControlLaunchDate)
                 let rawTitle = string(window, attribute: kAXTitleAttribute as CFString)
                 result.append(ApplicationWindowSummary(
                     token: token,
@@ -126,11 +130,12 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
     }
 
     func discard(sessionID: UUID) {
+        meltMoveHandles[sessionID] = nil
         undoFrames = undoFrames.filter { $0.key.sessionID != sessionID }
         handles = handles.filter { $0.key.sessionID != sessionID }
     }
 
-    func stop() { handles.removeAll(); undoFrames.removeAll() }
+    func stop() { handles.removeAll(); undoFrames.removeAll(); meltMoveHandles.removeAll() }
 
     func copy(_ element: AXUIElement, attribute: CFString) throws -> CFTypeRef? {
         try prepareElement(element)

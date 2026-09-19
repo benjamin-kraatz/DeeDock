@@ -6,6 +6,7 @@ import SwiftUI
 @MainActor
 final class AtmosphereController {
     let store = AtmosphereStore()
+    private let windowLight = AtmosphereWindowLightController()
     private struct Desktop {
         let scene: AtmosphereScene
         let ambient: NSPanel
@@ -46,9 +47,11 @@ final class AtmosphereController {
         }
         observers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
-                guard let self, self.store.settings.enabled, self.store.settings.source == .appIcon else { return }
-                self.readAppPalette()
-                self.applyPalettes()
+                guard let self else { return }
+                if self.store.settings.enabled, self.store.settings.source == .appIcon {
+                    self.readAppPalette()
+                    self.applyPalettes()
+                }
                 self.updateGates()
             }
         })
@@ -196,6 +199,8 @@ final class AtmosphereController {
     }
 
     private func updateGates() {
+        guard store.settings.enabled, !suspended else { windowLight.stop(); return }
+        windowLight.update(settings: store.settings, displays: displays)
         let idle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: CGEventType(rawValue: UInt32.max)!)
         let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
         let primaryTop = displays.first(where: \.isPrimary)?.frame.maxY ?? NSScreen.screens.first?.frame.maxY ?? 0
@@ -236,6 +241,7 @@ final class AtmosphereController {
     }
 
     private func closePanels() {
+        windowLight.stop()
         for desktop in desktops.values {
             desktop.ambient.contentView = nil; desktop.ambient.close()
             desktop.decor.forEach { $0.contentView = nil; $0.close() }

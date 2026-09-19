@@ -77,6 +77,7 @@ final class DockCoordinator {
     @ObservationIgnored private let popovers = DockPopoverPresenter()
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
     @ObservationIgnored private let shelves: ShelfCoordinator
+    let appMelt = AppMeltController()
     @ObservationIgnored private let fusion: FusionCoordinator
     @ObservationIgnored private let sessionCapsules: SessionCapsuleCoordinator
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
@@ -227,6 +228,16 @@ final class DockCoordinator {
             badgeMemory.synchronize(session: focusSession.session)
             refreshPanels()
         }
+        appMelt.compareWindows = { [weak self] pair, windows in
+            guard let self else { return }
+            if pair.comparison == nil { pair.comparison = FusionCoordinator(shelf: self.shelf) }
+            pair.comparison?.show(pair: windows)
+        }
+        appMelt.readDockApplication = { [weak self] in self?.dragging.meltApplication(from: $0) }
+        appMelt.finishDockApplicationDrop = { [weak self] in self?.dragging.finishMeltDrop() }
+        dragging.meltApplications = { [weak self] first, second in
+            self?.appMelt.showSetup(first: first.url, second: second.url)
+        }
         rememberExternal(NSWorkspace.shared.frontmostApplication)
         dragging.openSpringFolder = { [weak self] folder, panel in
             self?.folderStacks.show(folder, on: panel, keyboard: false, spring: true)
@@ -287,6 +298,9 @@ final class DockCoordinator {
                 self?.modePicker.close(returnFocus: false)
             }
             self?.panels.values.forEach { $0.holdPopover(open) }
+        }
+        windowPeeks.startMelt = { [weak self] window in
+            self?.appMelt.showSetup(window: window)
         }
         windowPeeks.addToFusion = { [weak self] window, panel, keyboard in
             self?.fusion.show(from: panel, keyboard: keyboard, matching: window)
@@ -369,7 +383,12 @@ final class DockCoordinator {
         let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
                                          .scrollWheel, .leftMouseDown, .rightMouseDown, .otherMouseDown,
                                          .leftMouseUp, .rightMouseUp, .otherMouseUp]
-        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] event in self?.updatePointers(eventType: event.type); self?.dragging.observe(event) }) {
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] event in
+            guard let self else { return }
+            updatePointers(eventType: event.type)
+            dragging.observe(event)
+            appMelt.observePointer(event, dockDragging: dragging.isDragging)
+        }) {
             monitors.append(monitor)
         }
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: mask.union(.keyDown), handler: { [weak self] event in
@@ -377,6 +396,8 @@ final class DockCoordinator {
             if event.type == .keyDown, !dragging.isDragging, let id = focusedID, let panel = panels[id], panel.owns(event.window), panel.handleKey(event) { return nil }
             updatePointers(eventType: event.type)
             dragging.observe(event)
+            // Local events only dismiss offers; DDock windows are never proximity sources.
+            appMelt.observePointer(event, dockDragging: dragging.isDragging)
             return event
         }) { monitors.append(monitor) }
     }
@@ -409,6 +430,11 @@ final class DockCoordinator {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles,
                                   focusSession: focusSession, history: localHistory, pinWeather: pinWeather)
+            store.appMelt = appMelt
+            store.refresh()
+            appMelt.changed = { [weak self] in
+                self?.panels.values.forEach { $0.store.refresh(); $0.store.presentationDidChange?() }
+            }
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
             configureLauncherSearch(on: panel)
             panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
@@ -416,6 +442,7 @@ final class DockCoordinator {
             panel.launcher.suggestionVisibility = { [weak self] in
                 self?.profiles.modes.effectiveVisibility(for: display.id) ?? .showAll
             }
+            panel.interaction.appMelt = appMelt
             panel.interaction.actionTiles = actionTiles
             panel.interaction.timeline = timeline
             panel.interaction.pinWeather = pinWeather
@@ -910,6 +937,7 @@ final class DockCoordinator {
         recipes.stop()
         recipeProgress.stop()
         watchPresets.stop()
+        appMelt.stop()
         fusion.stop()
         sessionCapsules.stop()
         shelfSemanticWarmup.stop()

@@ -24,6 +24,10 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var actionDestination: (String, UUID)?
     private var folderDestination: (String, FolderDockItem)?
     private var launcherDestinationID: String?
+    private var meltDestination: (String, ApplicationReference, ApplicationReference)?
+    private var meltHoverID: String?
+    private var meltHoverStarted = Date.distantPast
+    var meltApplications: ((ApplicationReference, ApplicationReference) -> Void)?
     var openSpringFolder: ((FolderDockItem, DockPanelController) -> Void)?
     var dropInFolder: ((NSDraggingInfo, FolderDockItem, DockPanelController) -> Bool)?
     var springDragEnded: (() -> Void)?
@@ -54,6 +58,20 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var active = false
     private var preparingSource = false
     var isDragging: Bool { active || preparingSource }
+
+    /// Resolve only this coordinator's currently active native app drag.
+    func meltApplication(from pasteboard: NSPasteboard) -> ApplicationReference? {
+        guard active, !completion.cancelled, !completion.committed,
+              let token, pasteboard.string(forType: Self.pasteboardType) == token else { return nil }
+        return sourcePin?.application
+    }
+
+    /// Setup consumed the icon without moving or removing its persisted pin.
+    func finishMeltDrop() {
+        completion.committed = true
+        nativeSession?.animatesToStartingPositionsOnCancelOrFail = false
+        clearFeedback()
+    }
 
     func trackSource(_ tracking: Bool) { preparingSource = tracking }
     private var updating = false
@@ -142,6 +160,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if sourceUtilityID != nil {
             return destinationID == displayID && destinationIndex != nil ? .move : []
         }
+        if meltDestination?.0 == displayID { return .copy }
         if unpinDestinationID == displayID { return .move }
         if actionDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if launcherDestinationID == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
@@ -163,6 +182,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
+        if let (destination, first, second) = meltDestination, destination == displayID,
+           let meltApplications {
+            finishMeltDrop()
+            DispatchQueue.main.async { meltApplications(first, second) }
+            return true
+        }
         if let utilityID = sourceUtilityID {
             guard sourceID == displayID, destinationID == displayID, let index = destinationIndex,
                   let panel = panels[displayID] else { return false }
@@ -423,6 +448,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         let point = magnetizedPoint(rawPoint)
         destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; launcherDestinationID = nil
         unpinDestinationID = nil
+        meltDestination = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
         trackingID = candidate?.store.displayID
         if let utilityID = sourceUtilityID {
@@ -440,6 +466,25 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             updateScrollTimer()
             return
         }
+        // Holding in an icon's center offers Melt. Its edges remain ordinary reorder targets.
+        if let first = sourcePin?.application, let sourceID,
+           panels[sourceID]?.store.items.contains(where: { $0.id == first.id && $0.isRunning }) == true,
+           let candidate, let second = candidate.meltTarget(at: point), second.isRunning,
+           first.id != second.id, meltApplications != nil {
+            let hoverID = candidate.store.displayID + ":" + second.id
+            if meltHoverID != hoverID { meltHoverID = hoverID; meltHoverStarted = Date() }
+            let ready = Date().timeIntervalSince(meltHoverStarted) >= 0.65
+            if ready { meltDestination = (candidate.store.displayID, first, second.reference) }
+            for panel in panels.values {
+                let targeted = panel === candidate
+                panel.updateSectionDragHover(at: point, valid: false)
+                panel.setDragPresentation(proposal: nil, source: panel.store.displayID == sourceID ? sourcePin?.id : nil,
+                    targeted: targeted, message: targeted ? (ready ? .meltDropReady : .meltDropHold) : nil)
+            }
+            updateScrollTimer()
+            return
+        }
+        meltHoverID = nil
         // Moving a saved pin into this dock's running section removes only the pin.
         // Other displays continue to copy pins, and utility tiles never remove them.
         if let candidate, candidate.store.displayID == sourceID,
@@ -659,6 +704,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if active { springDragEnded?() }
         completion.cancelled = true
         active = false; preparingSource = false; importSession.stop()
+        meltDestination = nil; meltHoverID = nil
         importTask?.cancel(); importTask = nil
         cleanupTask?.cancel(); cleanupTask = nil
         clearFeedback()

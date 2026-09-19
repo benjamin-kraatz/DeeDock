@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Shared furniture for the App Fusion tray.
+/// Shared furniture for the App Compare tray.
 ///
 /// The tray is a three-step flow — choose, review, result — and every step is built from the same
 /// three pieces so a step change never re-flows the window: a header carrying the step indicator, a
@@ -228,7 +228,7 @@ struct FusionFlowSteps: View {
 }
 
 #if DEBUG
-#Preview("Fusion chrome") {
+#Preview("Compare chrome") {
     VStack(alignment: .leading, spacing: FusionMetrics.section) {
         FusionFlowSteps(current: 1)
         FusionSection(.fusionSelectionTitle, symbol: "macwindow.on.rectangle") {

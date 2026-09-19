@@ -115,6 +115,7 @@ final class WindowPeekPanelController {
         state.dropPortal = nil
         state.portalTracking = nil
         state.addToFusion = nil
+        state.startMelt = nil
         state.choose = nil
         state.showApp = nil
         state.settingsSelected = nil

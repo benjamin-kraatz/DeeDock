@@ -128,6 +128,14 @@ Drag Downloads, Capsules, or Shelf within their section to change their order. A
 
 Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
 
+## App Fusion
+
+Choose **App Fusion → Fuse windows** from the menu-bar menu to launch two apps and pair
+one window from each. Shared glass controls move, resize, minimize, restore, and request
+closure of both windows. A combined DDock icon keeps the pair reachable when minimized.
+Native title bars remain, and pairs last for the current DDock session. Window Access is
+required. See [App Fusion](docs/APP-MELT.md) for setup, recovery, and validation limits.
+
 ## Dock Modes
 
 **Focus breathing** is deprecated and will be removed in version 1.0.0. Launch turns it off.
@@ -270,13 +278,13 @@ Each source can retain at most 2,000 characters of captured text. Screenshots ar
 
 The underlying window-context service is feature-neutral: its public values contain current window identity, application identity, bounds, one-time imagery, and OCR. The planned Window Scout can reuse that capture boundary without depending on the Capsules repository or UI.
 
-## App Fusion
+## App Compare
 
-Choose **Add to Fusion** on a Window Peek card, then select a second window from the same or another app. In keyboard Peek, **F** adds the selected card. **App Fusion** in the menu-bar item opens an accessible picker. The app-wide tray keeps the selection while you navigate other previews and displays.
+Choose **Add to Compare** on a Window Peek card, then select a second window from the same or another app. In keyboard Peek, **F** adds the selected card. **App Compare** in the menu-bar item opens an accessible picker. The app-wide tray keeps the selection while you navigate other previews and displays.
 
 Capture the selected windows, review or correct their visible text, and choose Compare, Summarize differences, or Create checklist. Apple Intelligence generates an editable draft from the reviewed text only. Save explicitly to create a native text artifact in Shelf with source attribution, capture times, and limitations. Errors retain reviewed input or the draft where practical; unavailable AI never produces a substitute result. This is a partial visible-context analysis, not a complete document comparison.
 
-See [App Fusion](docs/APP_FUSION.md) for input lifetime, save recovery, and storage behavior. Compilation is separate from [pending native acceptance](docs/ACCEPTANCE.md#app-fusion-dee-16).
+See [App Compare](docs/APP_FUSION.md) for input lifetime, save recovery, and storage behavior. Compilation is separate from [pending native acceptance](docs/ACCEPTANCE.md#app-compare-dee-16).
 
 ## Shelf
 

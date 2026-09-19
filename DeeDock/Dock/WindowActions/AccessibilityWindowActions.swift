@@ -3,13 +3,19 @@ import ApplicationServices
 
 extension AccessibilityApplicationWindowService {
     /// Retained AX equality plus process birth time avoids title/frame guessing and PID reuse.
-    /// Re-enumeration must contain exactly one equal element; no replacement target is selected.
-    func validatedHandle(_ token: ApplicationWindowToken) throws -> Handle {
+    /// Normally re-enumeration must contain exactly one equal element. App Fusion may retain
+    /// the live object through minimize transitions; neither path selects a replacement.
+    func validatedHandle(_ token: ApplicationWindowToken, allowRetainedWindow: Bool = false) throws -> Handle {
         try Task.checkCancellation()
         guard AXIsProcessTrusted() else { throw WindowActionError.permission }
         guard let handle = handles[token], let birth = handle.launchDate,
               let app = NSRunningApplication(processIdentifier: handle.processIdentifier),
-              !app.isTerminated, app.launchDate == birth else { throw WindowActionError.stale }
+              !app.isTerminated, app.windowControlLaunchDate == birth else { throw WindowActionError.stale }
+        // App Fusion transitions retain the exact AX object. Apps can omit it from AXWindows
+        // during miniaturization; process birth and the live role still validate its identity.
+        if allowRetainedWindow, string(handle.element, attribute: kAXRoleAttribute as CFString) == kAXWindowRole {
+            return handle
+        }
         let application = AXUIElementCreateApplication(handle.processIdentifier)
         _ = AXUIElementSetMessagingTimeout(application, messagingTimeout)
         guard let live = try copy(application, attribute: kAXWindowsAttribute as CFString) as? [AXUIElement],
@@ -33,7 +39,9 @@ extension AccessibilityApplicationWindowService {
         try actionCapabilities(token)
     }
 
-    private func actionCapabilities(_ token: ApplicationWindowToken) throws -> WindowActionCapabilities {
+    /// Revalidates the exact window and excludes fullscreen, modal, and unknown states.
+    /// Shared with App Fusion so grouped commands use the same eligibility policy as Window Peek.
+    func actionCapabilities(_ token: ApplicationWindowToken) throws -> WindowActionCapabilities {
         let handle = try validatedHandle(token)
         let window = handle.element
         let children = (try? copy(window, attribute: kAXChildrenAttribute as CFString)) as? [AXUIElement]
@@ -73,7 +81,8 @@ extension AccessibilityApplicationWindowService {
             frame: frame, restricted: restricted)
     }
 
-    private func closeButton(_ window: AXUIElement) -> AXUIElement? {
+    /// Returns only an enabled native Close button that advertises the public Press action.
+    func closeButton(_ window: AXUIElement) -> AXUIElement? {
         guard let value = try? copy(window, attribute: kAXCloseButtonAttribute as CFString),
               CFGetTypeID(value) == AXUIElementGetTypeID() else { return nil }
         let button = value as! AXUIElement
@@ -106,7 +115,7 @@ extension AccessibilityApplicationWindowService {
             let birth = handle.launchDate
             let activated = await MainActor.run {
                 guard !Task.isCancelled, AXIsProcessTrusted(),
-                      let app = NSRunningApplication(processIdentifier: pid), app.launchDate == birth,
+                      let app = NSRunningApplication(processIdentifier: pid), app.windowControlLaunchDate == birth,
                       !app.isTerminated else { return false }
                 return app.activate(options: [])
             }
@@ -146,7 +155,9 @@ extension AccessibilityApplicationWindowService {
             isMain: boolean(handle.element, attribute: kAXMainAttribute as CFString) ?? false)
     }
 
-    private func geometry(_ token: ApplicationWindowToken, requested: CGRect, usable: CGRect, resize: Bool, displays: [WindowActionDisplay]) throws {
+    /// Applies and verifies an AX frame against a still-connected display snapshot. A rejected
+    /// size or position throws after the accepted partial write; callers must expose recovery.
+    func geometry(_ token: ApplicationWindowToken, requested: CGRect, usable: CGRect, resize: Bool, displays: [WindowActionDisplay]) throws {
         guard WindowPlacementPolicy.valid(requested), WindowPlacementPolicy.valid(usable) else { throw WindowActionError.unsupported }
         try validateDisplays(displays)
         if resize {

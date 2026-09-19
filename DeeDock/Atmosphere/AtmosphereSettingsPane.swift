@@ -16,6 +16,7 @@ struct AtmosphereSettingsPane: View {
         SettingsPageScaffold {
             AtmosphereHeaderCard(isOn: $store.settings.enabled)
             Group {
+                AtmosphereWindowLightSettingsCard(settings: $store.settings.ambientLight)
                 SettingsCard(
                     title: .atmospherePreset,
                     footnote: store.settings.preset.hasDecor

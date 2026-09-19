@@ -99,6 +99,31 @@ final class FusionState {
         }
     }
 
+    /// Resolve both exact sources together; never substitute a nearby or similarly named window.
+    func pickPair(_ windows: [ApplicationWindowSummary]) {
+        guard windows.count == 2, !isBusy, draft == nil, sources.isEmpty else { return }
+        showingPicker = true
+        run(.discovering) { [weak self] in
+            guard let self else { return }
+            let found = try await contexts.discover()
+            try Task.checkCancellation()
+            candidates = found
+            let matches = WindowThumbnailMatcher.matches(summaries: windows, candidates: found.map {
+                WindowCaptureCandidate(id: $0.id, processIdentifier: $0.processIdentifier,
+                    title: $0.title, frame: $0.frame, isOnScreen: true)
+            })
+            let selected = windows.compactMap { summary in
+                matches[summary.token].flatMap { id in found.first { $0.id == id } }
+            }
+            guard selected.count == 2, selected[0].id != selected[1].id else {
+                error = String(localized: .fusionChooseExactWindow)
+                return
+            }
+            sources = selected.map { FusionSource(candidate: $0) }
+            showingPicker = false
+        }
+    }
+
     func closePicker() {
         showingPicker = false
         replacingID = nil

@@ -26,9 +26,10 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case launcher, focus, action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, trash
+    case launcher, focus, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, trash
     var hitID: String {
         switch self {
+        case .melt(let id): "melt:\(id.uuidString)"
         case .launcher: "launcher"
         case .focus: "focus"
         case .action(let id): "action:\(id.uuidString)"

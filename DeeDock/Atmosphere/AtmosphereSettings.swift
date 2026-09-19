@@ -3,6 +3,7 @@ import SwiftUI
 
 /// Independent, app-wide preferences. No Dock Mode participates in this document.
 struct AtmosphereSettings: Codable, Equatable {
+    var ambientLight = AtmosphereWindowLightSettings()
     var enabled = false
     var preset: AtmospherePreset = .sixtyNine
     var source: AtmosphereColorSource = .manual
@@ -17,14 +18,16 @@ struct AtmosphereSettings: Codable, Equatable {
     var mood = ""
 
     enum CodingKeys: String, CodingKey {
+        case ambientLight
         case enabled, preset, source, wallpaper, panorama, density, intensity, idleOnly, manual, moodPalette, mood
     }
 
     init() {}
 
-    /// Documents saved before intensity keep every other field and receive the midpoint default.
+    /// Older documents keep their existing fields and default new lighting controls to off.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        ambientLight = try container.decodeIfPresent(AtmosphereWindowLightSettings.self, forKey: .ambientLight) ?? .init()
         enabled = try container.decode(Bool.self, forKey: .enabled)
         preset = try container.decode(AtmospherePreset.self, forKey: .preset)
         source = try container.decode(AtmosphereColorSource.self, forKey: .source)
@@ -40,6 +43,7 @@ struct AtmosphereSettings: Codable, Equatable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(ambientLight, forKey: .ambientLight)
         try container.encode(enabled, forKey: .enabled)
         try container.encode(preset, forKey: .preset)
         try container.encode(source, forKey: .source)

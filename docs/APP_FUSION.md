@@ -1,13 +1,13 @@
-# App Fusion
+# App Compare
 
-App Fusion turns two deliberately selected window contexts into an editable comparison,
+App Compare turns two deliberately selected window contexts into an editable comparison,
 difference summary, or checklist. It uses the on-device Apple Intelligence model. It does
 not modify source applications, send messages, or read complete documents.
 
 ## Create an artifact
 
-1. Choose **Add to Fusion** on a Window Peek card: the round button appears on the card under the pointer, and the card's context menu holds the same action. In keyboard Peek, press **F** for the selected card.
-2. Add another window from Peek, or use **Choose or refresh windows** in the tray. You can also open **App Fusion** from the DDock menu-bar item to start with the picker.
+1. Choose **Add to Compare** on a Window Peek card: the round button appears on the card under the pointer, and the card's context menu holds the same action. In keyboard Peek, press **F** for the selected card.
+2. Add another window from Peek, or use **Choose or refresh windows** in the tray. You can also open **App Compare** from the DDock menu-bar item to start with the picker.
 3. Check the two source slots. Each filled slot's **Source options** menu holds **Replace** and **Remove**.
 4. Choose **Capture selected windows**. Screen Recording permission must already be enabled through Settings.
 5. Review the recognized text. Correct OCR errors or supply your own notes, then choose an action and optionally add an instruction.

@@ -129,6 +129,8 @@ struct DockSurfaceView: View {
                         .accessibilityHidden(true)
                 }
             }
+            AppMeltDockBackgrounds(slots: slots, layout: layout, sizes: sizes,
+                                   opacity: opacity.background, reduceTransparency: reduceTransparency)
             ForEach(Array(slots.enumerated()), id: \.element.id) {
                 index,
                 slot in
@@ -212,6 +214,10 @@ struct DockSurfaceView: View {
         .animation(
             reduceMotion ? nil : .easeOut(duration: 0.18),
             value: slots.map(\.id)
+        )
+        .animation(
+            reduceMotion ? nil : .spring(response: 0.38, dampingFraction: 0.86),
+            value: slots.compactMap { $0.melt?.id }
         )
         .animation(
             reduceMotion

@@ -34,6 +34,7 @@ final class WindowPeekCoordinator {
     private var generation = UUID()
     private var sourceHovered = false
     private var panelHovered = false
+    var startMelt: ((ApplicationWindowSummary) -> Void)?
     var addToFusion: ((ApplicationWindowSummary, DockPanelController, Bool) -> Void)?
     var prepareSettings: ((String) -> Void)?
     var isOpen: Bool { controller != nil }
@@ -192,6 +193,7 @@ final class WindowPeekCoordinator {
         watches.stop()
         prepareSettings = nil
         addToFusion = nil
+        startMelt = nil
     }
 
     private func present(_ item: DockItem, on panel: DockPanelController, keyboard: Bool) {
@@ -236,6 +238,12 @@ final class WindowPeekCoordinator {
                   let currentContext = panel.windowPeekContext(for: item.id) else { return }
             close(returnFocus: false)
             watches.show(summary, visibleFrame: currentContext.anchor.visibleFrame)
+        }
+        next.state.startMelt = { [weak self] window in
+            guard let self else { return }
+            let action = startMelt
+            close(returnFocus: false)
+            action?(window)
         }
         next.state.addToFusion = { [weak self, weak panel] window in
             guard let self, let panel else { return }
@@ -292,6 +300,7 @@ final class WindowPeekCoordinator {
             next.state.dropPortal = nil
             next.state.portalTracking = nil
             next.state.addToFusion = nil
+            next.state.startMelt = nil
         }
         next.show()
         discover(item)

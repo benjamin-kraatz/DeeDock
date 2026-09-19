@@ -13,6 +13,7 @@ enum DockRenderSlot: Identifiable {
     case launcher
     case focus(FocusDockItem)
     case action(ActionDockItem)
+    case melt(AppMeltPair, Int)
     case app(DockItem)
     case folder(FolderDockItem)
     case group(DockGroupControl)
@@ -24,6 +25,7 @@ enum DockRenderSlot: Identifiable {
 
     var id: String {
         switch self {
+        case .melt(let pair, let index): return pair.dockIdentity(at: index).hitID
         case .launcher: return DockEntryID.launcher.hitID
         case .focus: return DockEntryID.focus.hitID
         case .action(let item): return DockEntryID.action(item.tile.id).hitID
@@ -43,7 +45,7 @@ enum DockRenderSlot: Identifiable {
         case .folder(let item): return !item.isDownloads
         case .gap(let id): return !id.hasPrefix("utility:")
         case .group(let control): return control.group == .pinned
-        case .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash: return false
+        case .melt, .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash: return false
         }
     }
     var item: DockItem? { if case .app(let item) = self { return item }; return nil }
@@ -53,18 +55,19 @@ enum DockRenderSlot: Identifiable {
     var capsules: CapsuleDockItem? { if case .sessionCapsules(let item) = self { return item }; return nil }
     var capsule: SessionCapsuleDockItem? { if case .sessionCapsule(let item) = self { return item }; return nil }
     /// Trailing tiles that are neither pins nor running applications, and share one divider.
+    var melt: AppMeltPair? { if case .melt(let pair, _) = self { return pair }; return nil }
     var action: ActionDockItem? { if case .action(let item) = self { return item }; return nil }
     var focus: FocusDockItem? { if case .focus(let item) = self { return item }; return nil }
     var isUtility: Bool {
         if case .gap(let id) = self { return id.hasPrefix("utility:") }
-        return folder?.isDownloads == true || target == .launcher || focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil
+        return melt != nil || folder?.isDownloads == true || target == .launcher || focus != nil || action != nil || trash != nil || shelf != nil || capsules != nil || capsule != nil
     }
     var appGroup: DockAppGroup? {
         switch self {
         case .app(let item): item.isFavorite ? .pinned : .running
         case .folder(let item): item.isDownloads ? nil : .pinned
         case .group(let control): control.group
-        case .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash, .gap: nil
+        case .melt, .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .trash, .gap: nil
         }
     }
     var pin: DockPin? {
@@ -83,6 +86,7 @@ enum DockRenderSlot: Identifiable {
     var icon: NSImage? { item?.icon ?? folder?.icon ?? capsule?.icon ?? capsules?.icon ?? shelf?.icon ?? trash?.icon }
     var name: String {
         switch self {
+        case .melt(let pair, let index): pair.names[index]
         case .launcher: String(localized: .launcherTitle)
         case .focus(let item): String(localized: .focusTileName(item.session.modeName))
         case .action(let item): item.tile.name
@@ -99,6 +103,7 @@ enum DockRenderSlot: Identifiable {
 
     var target: DockEntryID? {
         switch self {
+        case .melt(let pair, let index): pair.dockIdentity(at: index)
         case .launcher: .launcher
         case .focus: .focus
         case .action(let item): .action(item.tile.id)
