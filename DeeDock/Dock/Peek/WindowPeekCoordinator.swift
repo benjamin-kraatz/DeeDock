@@ -54,11 +54,16 @@ final class WindowPeekCoordinator {
     }
 
     func hover(_ item: DockItem?, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {
-        guard controller?.state.portalDragging != true else { return }
         guard let item else {
-            if sourcePanel === panel { leaveSource(); scheduleClose() }
+            if sourcePanel === panel {
+                leaveSource()
+                // A portal card press still has to record that the pointer left the tile.
+                // Blocking that exit kept Peek open after mouse-up off the icon and panel.
+                if controller?.state.portalDragging != true { scheduleClose() }
+            }
             return
         }
+        guard controller?.state.portalDragging != true else { return }
         guard item.isRunning, item.isAvailable,
               let context = panel.windowPeekContext(for: item.id), context.settings.windowPeekEnabled else {
             close(returnFocus: false)

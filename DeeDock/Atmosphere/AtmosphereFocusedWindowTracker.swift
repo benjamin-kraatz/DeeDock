@@ -24,7 +24,6 @@ final class AtmosphereFocusedWindowTracker {
         }
         if pid != app.processIdentifier {
             stop()
-            pid = app.processIdentifier
             var created: AXObserver?
             if AXObserverCreate(app.processIdentifier, { _, _, _, context in
                 guard let context else { return }
@@ -32,6 +31,9 @@ final class AtmosphereFocusedWindowTracker {
                     Unmanaged<AtmosphereFocusedWindowTracker>.fromOpaque(context).takeUnretainedValue().scheduleChange()
                 }
             }, &created) == .success, let created {
+                // Assign pid only after a successful create so a failed attempt can retry
+                // while this app is still frontmost. Setting it first skipped that retry.
+                pid = app.processIdentifier
                 observer = created
                 let element = AXUIElementCreateApplication(app.processIdentifier)
                 AXObserverAddNotification(created, element, kAXFocusedWindowChangedNotification as CFString,

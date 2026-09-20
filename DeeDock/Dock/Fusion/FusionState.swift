@@ -124,7 +124,10 @@ final class FusionState {
         }
     }
 
+    /// Dismisses the picker and cancels in-flight discovery so a late match cannot fill a slot
+    /// and `isBusy` does not keep Choose Windows disabled after the tray is hidden.
     func closePicker() {
+        cancelWork()
         showingPicker = false
         replacingID = nil
     }
