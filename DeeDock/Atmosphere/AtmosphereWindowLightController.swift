@@ -103,7 +103,10 @@ final class AtmosphereWindowLightController {
                 self.task = nil
                 guard self.target?.id == target.id, self.target?.pid == target.pid,
                       NSWorkspace.shared.frontmostApplication?.processIdentifier == target.pid else { return }
-                self.blend(colors ?? AtmosphereWindowLightPalette.dzwei)
+                // A nil sample is busy, cancelled, or a transient ScreenCapture miss — not a
+                // new palette. Applying the default here flashes DZWEI over a good halo.
+                guard let colors else { return }
+                self.blend(colors)
             }
         }
     }
@@ -122,7 +125,7 @@ final class AtmosphereWindowLightController {
     private func hide() {
         scene.visible = false
         panel?.orderOut(nil)
-        target = nil
+        // Keep the last target so the same window does not reset to DZWEI on the next show.
         cancelSample()
     }
 

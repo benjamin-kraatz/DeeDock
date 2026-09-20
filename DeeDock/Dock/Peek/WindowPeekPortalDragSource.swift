@@ -34,7 +34,6 @@ struct WindowPeekPortalDragSource: NSViewRepresentable {
             guard let window, let configuration else { return }
             let origin = window.convertPoint(toScreen: event.locationInWindow)
             var dragging = false
-            configuration.tracking(true)
             defer {
                 ghost?.orderOut(nil)
                 ghost = nil
@@ -54,6 +53,9 @@ struct WindowPeekPortalDragSource: NSViewRepresentable {
                 let point = NSEvent.mouseLocation
                 if !dragging, hypot(point.x - origin.x, point.y - origin.y) >= DockDragGeometry.startDistance {
                     dragging = true
+                    // Hold Peek only after the tear-off starts. Tracking from mouseDown
+                    // dropped hover-exit and left the panel open after a click-and-leave.
+                    configuration.tracking(true)
                 }
                 let frozen = next.modifierFlags.contains(.option)
                 if next.type == .leftMouseUp {
