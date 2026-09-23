@@ -33,7 +33,7 @@ nonisolated struct AppMeltSettleWait: Sendable {
     private var processes: Set<pid_t> = []
     private var epoch: UInt64 = 0
     private var settleGenerationValue: UInt64 = 0
-    private var settleWaiters: [UUID: Waiter] = []
+    private var settleWaiters: [UUID: Waiter] = [:]
     private var signalQueued = false
     private var settleQueued = false
     var changed: (() -> Void)?
