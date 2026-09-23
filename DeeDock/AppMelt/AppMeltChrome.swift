@@ -99,7 +99,8 @@ import SwiftUI
     }
 
     func update(show: Bool) {
-        guard show, let primary = NSScreen.screens.first else { hide(); return }
+        guard show, AppMeltGeometry.mainScreen() != nil else { hide(); return }
+        let top = AppMeltGeometry.mainDisplayTop()
         let outer = pair.frame
         // Accepted native sizes can exceed the requested ratio when an app enforces a minimum.
         let members = pair.acceptedFrames.count == 2 ? pair.acceptedFrames
@@ -115,7 +116,7 @@ import SwiftUI
         ]
         for (panel, frame) in zip(panels, frames) {
             if panel.title != pair.title { panel.title = pair.title }
-            panel.setFrame(AppMeltGeometry.appKit(frame, primaryTop: primary.frame.maxY), display: false)
+            panel.setFrame(AppMeltGeometry.appKit(frame, primaryTop: top), display: false)
             if !panel.isVisible { panel.orderFrontRegardless() }
         }
     }

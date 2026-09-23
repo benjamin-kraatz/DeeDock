@@ -7,6 +7,8 @@ extension AccessibilityApplicationWindowService {
     /// The controller coalesces pending positions and reconciles actual geometry on release.
     func meltMove(_ tokens: [ApplicationWindowToken], sessionID: UUID, frames: [CGRect]) throws -> [CGRect] {
         guard tokens.count == 2, frames.count == 2 else { throw WindowActionError.unsupported }
+        for token in tokens { try ensureSessionOpen(token.sessionID) }
+        try ensureSessionOpen(sessionID)
         if meltMoveHandles[sessionID] == nil {
             for token in tokens {
                 guard try actionCapabilities(token).canMove else { throw WindowActionError.unsupported }
@@ -16,6 +18,7 @@ extension AccessibilityApplicationWindowService {
         guard let members = meltMoveHandles[sessionID] else { throw WindowActionError.stale }
         for (handle, frame) in zip(members, frames) {
             try Task.checkCancellation()
+            try ensureSessionOpen(sessionID)
             guard AXIsProcessTrusted() else { throw WindowActionError.permission }
             guard let app = NSRunningApplication(processIdentifier: handle.processIdentifier),
                   !app.isTerminated, app.windowControlLaunchDate == handle.launchDate,

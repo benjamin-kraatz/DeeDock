@@ -86,6 +86,12 @@ operations. A partial move or minimize can occur when an app refuses a request. 
 pauses the pair, adds an error badge, and exposes Restore and Unpair. It does not retry
 failed mutations automatically. The original apps' system Dock minimize targets remain.
 
+Observation registers move, resize, minimize, and destroy on the retained pair members only.
+Handle lookup runs off the main actor. Minimize and layout wait for those notifications
+with a bounded readback, then use the same Restore/Unpair suspend path if the app does not
+settle. Refresh does not raise windows and does not start minimize or restore while another
+pair operation is still finishing.
+
 The glass controls hide when another app or another document has focus. Native title-bar
 moves and resizes reconcile after a short notification debounce; the shared title area
 is the coordinated drag control. Fullscreen, modal sheets, missing metadata, permission

@@ -1,7 +1,10 @@
 import AppKit
 
-/// Shared-frame geometry in global AX points. AppKit conversion always uses the primary display,
-/// not the screen containing the pair, so negative and vertically arranged displays work.
+/// Shared-frame geometry in global AX points. Quartz and AX share a top-left origin on the
+/// main display (`CGMainDisplayID`, the menu-bar display). AppKit's origin is that display's
+/// bottom-left. The flip axis is the main display's AppKit `maxY`, including when that
+/// display is not `NSScreen.screens.first` and when other displays are taller or stacked.
+/// Flipping by the display under the pointer uses the wrong axis in those arrangements.
 nonisolated enum AppMeltGeometry {
     static let rim: CGFloat = 16
     static let cornerRadius: CGFloat = 16
@@ -35,16 +38,41 @@ nonisolated enum AppMeltGeometry {
     static func appKit(_ frame: CGRect, primaryTop: CGFloat) -> CGRect {
         CGRect(x: frame.minX, y: primaryTop - frame.maxY, width: frame.width, height: frame.height)
     }
+
+    static func screenID(_ screen: NSScreen) -> UInt32? {
+        let value = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]
+        if let number = value as? NSNumber { return number.uint32Value }
+        return value as? UInt32
+    }
+
+    /// The menu-bar display. Quartz window bounds and AX positions are measured from its top-left.
+    static func mainScreen(among screens: [NSScreen] = NSScreen.screens) -> NSScreen? {
+        let main = CGMainDisplayID()
+        return screens.first { screenID($0) == main } ?? screens.first
+    }
+
+    static func mainDisplayTop(among screens: [NSScreen] = NSScreen.screens) -> CGFloat {
+        mainScreen(among: screens)?.frame.maxY ?? 0
+    }
+
+    /// Converts a global AppKit point to the Quartz space used by `CGWindow` bounds.
+    /// X is shared. Y is the distance below the main display's top, so a point on a
+    /// secondary display keeps that display's global X and its signed Quartz Y.
+    static func quartz(fromAppKit point: CGPoint, screens: [NSScreen] = NSScreen.screens) -> CGPoint {
+        CGPoint(x: point.x, y: mainDisplayTop(among: screens) - point.y)
+    }
 }
 
 extension AppMeltGeometry {
     static var displays: [WindowActionDisplay] {
-        guard let primary = NSScreen.screens.first else { return [] }
-        return NSScreen.screens.compactMap { screen in
-            guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? UInt32 else { return nil }
+        let screens = NSScreen.screens
+        guard mainScreen(among: screens) != nil else { return [] }
+        let top = mainDisplayTop(among: screens)
+        return screens.compactMap { screen in
+            guard let id = screenID(screen) else { return nil }
             return WindowActionDisplay(id: String(id), runtimeID: id, name: screen.localizedName,
-                frame: appKit(screen.frame, primaryTop: primary.frame.maxY),
-                usable: appKit(screen.visibleFrame, primaryTop: primary.frame.maxY))
+                frame: appKit(screen.frame, primaryTop: top),
+                usable: appKit(screen.visibleFrame, primaryTop: top))
         }
     }
 }

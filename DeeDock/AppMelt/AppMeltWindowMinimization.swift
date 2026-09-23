@@ -15,7 +15,10 @@ extension AccessibilityApplicationWindowService {
     /// Writes once, then waits for the native minimize animation to settle. App Store reports
     /// AXDialog while minimized, so restoration of an exact retained minimized handle must not
     /// depend on the normal-window geometry policy. Geometry stays gated after restoration.
-    func meltSetMinimized(_ minimized: Bool, token: ApplicationWindowToken) async throws {
+    /// Readback is notification-driven and capped: a slow app fails into Restore/Unpair
+    /// instead of holding the pair busy through a long poll. The write is never repeated.
+    func meltSetMinimized(_ minimized: Bool, token: ApplicationWindowToken, settle: AppMeltSettleWait? = nil) async throws {
+        try ensureSessionOpen(token.sessionID)
         let handle = try validatedHandle(token, allowRetainedWindow: true)
         guard let current = try meltBoolean(handle.element, attribute: kAXMinimizedAttribute as CFString) else {
             throw WindowActionError.unsupported
@@ -30,6 +33,7 @@ extension AccessibilityApplicationWindowService {
                     throw WindowActionError.unsupported
                 }
             }
+            try ensureSessionOpen(token.sessionID)
             do {
                 try set(handle.element, attribute: kAXMinimizedAttribute as CFString,
                         value: minimized ? kCFBooleanTrue : kCFBooleanFalse)
@@ -38,17 +42,15 @@ extension AccessibilityApplicationWindowService {
                 // never send a second mutation while an app may still be animating the first one.
             }
         }
-        for attempt in 0..<24 {
-            try Task.checkCancellation()
-            let window = try validatedHandle(token, allowRetainedWindow: true).element
-            if try meltBoolean(window, attribute: kAXMinimizedAttribute as CFString) == minimized {
-                // Restoring may update AXMinimized before the app restores its normal subrole.
-                if minimized { return }
-                if try meltRestoredWindowCanMove(window) { return }
-            }
-            if attempt < 23 { try await Task.sleep(for: .milliseconds(75)) }
+        let ready = try await meltWaitUntil(budget: .milliseconds(800), maximumReads: 3, settle: settle) {
+            try self.ensureSessionOpen(token.sessionID)
+            let window = try self.validatedHandle(token, allowRetainedWindow: true).element
+            guard try self.meltBoolean(window, attribute: kAXMinimizedAttribute as CFString) == minimized else { return false }
+            // Restoring may update AXMinimized before the app restores its normal subrole.
+            if minimized { return true }
+            return try self.meltRestoredWindowCanMove(window)
         }
-        throw WindowActionError.unsupported
+        guard ready else { throw WindowActionError.unsupported }
     }
 
     /// Restore polling stays on the retained window. Re-enumerating every application window on
