@@ -34,7 +34,7 @@ import ApplicationServices
                   controller?.pairs.contains(where: { $0.windows.contains { $0.processIdentifier == pid } }) != true else { return }
             held = true
             let stamp = generation
-            let point = axPointer
+            let point = quartzPointer(event)
             scan = Task { [weak self] in
                 guard let self else { return }
                 let windows = await scanner.snapshot()
@@ -71,8 +71,12 @@ import ApplicationServices
         } else if event.type == .rightMouseDown { cancel() }
     }
 
-    private var axPointer: CGPoint {
-        CGPoint(x: NSEvent.mouseLocation.x, y: (NSScreen.screens.first?.frame.maxY ?? 0) - NSEvent.mouseLocation.y)
+    /// `mouseLocation` is the global AppKit cursor. Quartz Y is measured down from the main
+    /// display's top (`CGMainDisplayID`), including when the pointer is on another display.
+    /// A nil-window global event has no local window to convert; local events use that window's screen point.
+    private func quartzPointer(_ event: NSEvent) -> CGPoint {
+        let appKit = event.window?.convertPoint(toScreen: event.locationInWindow) ?? NSEvent.mouseLocation
+        return AppMeltGeometry.quartz(fromAppKit: appKit)
     }
 
     private func update(_ windows: [AppMeltVisibleWindow]) {

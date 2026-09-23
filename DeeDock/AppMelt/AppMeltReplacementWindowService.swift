@@ -11,6 +11,7 @@ extension AccessibilityApplicationWindowService {
 
     /// Copy a validated handle into the pair's lifetime before the chooser discards its session.
     func meltAdopt(_ token: ApplicationWindowToken, sessionID: UUID) throws -> ApplicationWindowSummary {
+        try ensureSessionOpen(sessionID)
         let handle = try validatedHandle(token, allowRetainedWindow: true)
         let adopted = ApplicationWindowToken(sessionID: sessionID, id: UUID())
         handles[adopted] = handle
@@ -20,6 +21,7 @@ extension AccessibilityApplicationWindowService {
 
     /// Activation follows an explicit replacement only, never a passive focus notification.
     func meltActivateReplacement(_ token: ApplicationWindowToken) async throws {
+        try ensureSessionOpen(token.sessionID)
         let handle = try validatedHandle(token)
         let pid = handle.processIdentifier
         let birth = handle.launchDate

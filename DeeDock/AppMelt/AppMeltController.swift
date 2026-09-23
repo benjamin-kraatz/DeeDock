@@ -108,10 +108,14 @@ import Observation
         // Creation is complete only after native placement and chrome presentation finish.
         // Keep failed groups reachable, but keep their failure visible in the composer too.
         let placementTask = pair.task
+        let sealedService = service
         await withTaskCancellationHandler {
             await placementTask?.value
         } onCancel: {
             placementTask?.cancel()
+            // Seal before the placement task resumes so its next AX call cannot commit
+            // or reinstall observation after setup cancellation.
+            sealedService.seal(sessionID: sessionID)
         }
         if Task.isCancelled { unpair(pair); throw CancellationError() }
         guard pairs.contains(where: { $0.id == pair.id }) else { throw WindowActionError.stale }
@@ -120,35 +124,41 @@ import Observation
     }
 
     func restore(_ pair: AppMeltPair) {
-        guard pairs.contains(where: { $0.id == pair.id }), !pair.busy else { return }
+        guard pairs.contains(where: { $0.id == pair.id }), !pair.busy, !pair.invalidated else { return }
         guard let display = WindowPlacementPolicy.current(pair.frame, displays: AppMeltGeometry.displays),
               display.usable.width >= 640, display.usable.height >= 360 else {
             suspend(pair, message: .meltSizeConstraint)
             return
         }
-        guard pair.observation.start(processes: pair.windows.map(\.processIdentifier)) else {
-            suspend(pair, message: .meltObservationFailed)
-            return
-        }
         pair.frame.size.width = min(pair.frame.width, display.usable.width)
         pair.frame.size.height = min(pair.frame.height, display.usable.height)
         pair.frame = WindowPlacementPolicy.fit(pair.frame, into: display.usable)
-        pair.suspended = false
         run(pair) { [self] in
+            let settle = pair.observation.settleWait
+            guard try await pair.observation.start(tokens: pair.layoutTokens, service: service) else {
+                suspend(pair, message: .meltObservationFailed)
+                return
+            }
+            try ensureActive(pair)
+            pair.suspended = false
             for token in pair.layoutTokens {
-                try await service.meltSetMinimized(false, token: token)
+                try await service.meltSetMinimized(false, token: token, settle: settle)
+                try ensureActive(pair)
             }
             pair.minimized = false
             let accepted = try await service.meltLayout(pair.layoutTokens,
-                frames: AppMeltGeometry.windows(in: pair.frame, ratio: pair.ratio), displays: AppMeltGeometry.displays)
+                frames: AppMeltGeometry.windows(in: pair.frame, ratio: pair.ratio), displays: AppMeltGeometry.displays,
+                settle: settle)
+            try ensureActive(pair)
             pair.accept(accepted)
             try await service.meltRaise(pair.layoutTokens)
-            try Task.checkCancellation()
+            try ensureActive(pair)
             if let pid = pair.windows.first?.processIdentifier {
                 NSRunningApplication(processIdentifier: pid)?.activate(options: [])
             }
             if pair.needsReveal {
                 try await pair.chrome?.reveal()
+                try ensureActive(pair)
                 pair.needsReveal = false
             }
             else { pair.chrome?.update(show: true) }
@@ -156,18 +166,21 @@ import Observation
     }
 
     func minimize(_ pair: AppMeltPair) {
-        guard !pair.busy else { return }
+        guard !pair.busy, !pair.invalidated else { return }
         pair.finderTools?.dismiss()
         run(pair) { [self] in
             // Preflight both members. If an app rejects the second write, retain the pair and its
             // error so Restore can repair the partial minimize without losing either source.
+            let settle = pair.observation.settleWait
             for token in pair.layoutTokens {
                 if !(try await service.meltSummary(token).isMinimized) {
                     guard try await service.capabilities(token).canMinimize else { throw WindowActionError.unsupported }
                 }
+                try ensureActive(pair)
             }
             for token in pair.layoutTokens {
-                try await service.meltSetMinimized(true, token: token)
+                try await service.meltSetMinimized(true, token: token, settle: settle)
+                try ensureActive(pair)
             }
             pair.minimized = true
             pair.chrome?.hide()
@@ -186,12 +199,16 @@ import Observation
     }
 
     /// Unpair leaves current positions and native minimized state intact, with no extra AX writes.
+    /// The session is sealed before cancellation so a resumed create or replace cannot register
+    /// observers or adopt handles after this returns.
     func unpair(_ pair: AppMeltPair) {
         guard pairs.contains(where: { $0.id == pair.id }) else { return }
+        pair.invalidated = true
+        service.seal(sessionID: pair.sessionID)
+        pair.operationEpoch &+= 1
         pair.task?.cancel()
-        pair.task = nil
+        pair.refreshPending = false
         pair.refreshTask?.cancel()
-        pair.refreshTask = nil
         pair.replacement?.isPresented = false
         pair.observation.stop()
         pair.observation.changed = nil
@@ -199,8 +216,10 @@ import Observation
         pair.comparison = nil
         pair.chrome?.stop()
         pair.chrome = nil
+        pair.pendingFrame = nil
         pairs.removeAll { $0.id == pair.id }
-        Task { await service.meltEndMove(pair.sessionID); await service.discard(sessionID: pair.sessionID) }
+        let session = pair.sessionID
+        Task { await service.meltEndMove(session); await service.discard(sessionID: session) }
         changed?()
     }
 
@@ -210,6 +229,7 @@ import Observation
         pair.finderTools?.invalidateLayout()
         pair.gestureStart = AppMeltLayoutSnapshot(pair)
         pair.isDragging = true
+        pair.refreshPending = false
         pair.refreshTask?.cancel()
     }
 
@@ -233,18 +253,23 @@ import Observation
         requested.size.height = min(requested.height, display.usable.height)
         requested = WindowPlacementPolicy.fit(requested, into: display.usable)
         pair.pendingFrame = requested
-        guard !pair.busy else { return }
+        guard !pair.busy, !pair.invalidated else { return }
+        pair.operationEpoch &+= 1
         pair.busy = true
+        pair.refreshPending = false
         pair.refreshTask?.cancel()
         pair.task = Task { [weak self, weak pair] in
             guard let self, let pair else { return }
-            while let next = pair.pendingFrame, !Task.isCancelled {
+            while let next = pair.pendingFrame, !Task.isCancelled, !pair.invalidated {
                 pair.pendingFrame = nil
                 pair.frame = next
                 await performLayout(pair)
-                if pair.suspended { pair.pendingFrame = nil }
+                if pair.suspended || pair.invalidated { pair.pendingFrame = nil }
             }
+            pair.operationEpoch &+= 1
             pair.busy = false
+            pair.task = nil
+            guard !pair.invalidated, pairs.contains(where: { $0.id == pair.id }) else { return }
             finishGestureHistory(pair)
             if !pair.isDragging { await service.meltEndMove(pair.sessionID) }
             // Geometry does not change dock membership. Refreshing every dock here used to
@@ -256,6 +281,7 @@ import Observation
 
     private func performLayout(_ pair: AppMeltPair) async {
         do {
+            try ensureActive(pair)
             let frames = AppMeltGeometry.windows(in: pair.frame, ratio: pair.ratio)
             let translationOnly = pair.acceptedFrames.count == frames.count
                 && zip(pair.acceptedFrames, frames).allSatisfy { old, new in old.size == new.size }
@@ -264,34 +290,55 @@ import Observation
                 accepted = try await service.meltMove(pair.layoutTokens, sessionID: pair.sessionID, frames: frames)
             } else {
                 await service.meltEndMove(pair.sessionID)
-                accepted = try await service.meltLayout(pair.layoutTokens, frames: frames, displays: AppMeltGeometry.displays)
+                try ensureActive(pair)
+                accepted = try await service.meltLayout(pair.layoutTokens, frames: frames, displays: AppMeltGeometry.displays,
+                    settle: pair.observation.settleWait)
             }
             try Task.checkCancellation()
+            try ensureActive(pair)
             pair.accept(accepted)
             pair.message = nil
             pair.chrome?.update(show: true)
-        } catch { fail(pair, error: error) }
+        } catch is CancellationError { return }
+        catch { fail(pair, error: error) }
     }
 
     /// Owns one explicit operation until completion. Callers must gate entry on pair availability.
     func run(_ pair: AppMeltPair, operation: @escaping @MainActor () async throws -> Void) {
-        guard pairs.contains(where: { $0.id == pair.id }), !pair.busy else { return }
+        guard pairs.contains(where: { $0.id == pair.id }), !pair.busy, !pair.invalidated else { return }
+        pair.operationEpoch &+= 1
         pair.busy = true
         pair.message = nil
         pair.task = Task { [weak self, weak pair] in
             guard let self, let pair else { return }
             pair.showsOperationProgress = true
-            defer { pair.showsOperationProgress = false }
-            do { try await operation(); try Task.checkCancellation() }
-            catch { fail(pair, error: error) }
+            var cancelled = false
+            do {
+                try await operation()
+                try Task.checkCancellation()
+                if pair.invalidated { throw CancellationError() }
+            } catch is CancellationError {
+                cancelled = true
+                // Create-cancel seals the session before this task resumes. Drop observers and
+                // chrome before busy clears so a queued notification cannot refresh the pair.
+                pair.observation.stop()
+                pair.chrome?.hide()
+            } catch { fail(pair, error: error) }
+            pair.showsOperationProgress = false
+            pair.operationEpoch &+= 1
             pair.busy = false
             pair.task = nil
-            if !pair.suspended, pair.message == nil, composerState?.createdPair?.id == pair.id {
+            guard !pair.invalidated, pairs.contains(where: { $0.id == pair.id }) else { return }
+            if !cancelled, !pair.suspended, pair.message == nil, composerState?.createdPair?.id == pair.id {
                 composer?.orderOut(nil)
             }
             changed?()
-            scheduleRefresh(pair)
+            if !cancelled { scheduleRefresh(pair) }
         }
+    }
+
+    func ensureActive(_ pair: AppMeltPair) throws {
+        guard !pair.invalidated, pairs.contains(where: { $0.id == pair.id }) else { throw CancellationError() }
     }
 
     private func fail(_ pair: AppMeltPair, error: Error) {
@@ -309,30 +356,61 @@ import Observation
     }
 
     private func scheduleRefresh(_ pair: AppMeltPair) {
-        guard pairs.contains(where: { $0.id == pair.id }), !pair.suspended,
-              !pair.isDragging, !pair.busy else { return }
-        pair.refreshTask?.cancel()
+        guard pairs.contains(where: { $0.id == pair.id }), !pair.invalidated, !pair.suspended,
+              !pair.isDragging, !pair.busy, pair.task == nil else { return }
+        pair.refreshPending = true
+        guard pair.refreshTask == nil else { return }
         pair.refreshTask = Task { [weak self, weak pair] in
-            try? await Task.sleep(for: .milliseconds(140))
-            guard !Task.isCancelled, let self, let pair, !pair.busy else { return }
-            await refresh(pair)
+            guard let self, let pair else { return }
+            await drainRefresh(pair)
         }
     }
 
-    private func refresh(_ pair: AppMeltPair) async {
+    /// One trailing refresh per pair. Further hints set `refreshPending` instead of cancelling
+    /// the in-flight read, so a burst of AX notifications cannot restart capability work forever.
+    private func drainRefresh(_ pair: AppMeltPair) async {
+        while pair.refreshPending, !Task.isCancelled, !pair.invalidated {
+            pair.refreshPending = false
+            do { try await Task.sleep(for: .milliseconds(180)) } catch { break }
+            guard !Task.isCancelled, !pair.invalidated, pairs.contains(where: { $0.id == pair.id }) else { break }
+            guard !pair.busy, pair.task == nil, !pair.isDragging, !pair.suspended else { continue }
+            await refresh(pair, epoch: pair.operationEpoch)
+        }
+        pair.refreshTask = nil
+        if pair.refreshPending, !Task.isCancelled, !pair.invalidated { scheduleRefresh(pair) }
+    }
+
+    private func refresh(_ pair: AppMeltPair, epoch: UInt64) async {
         do {
             var values: [ApplicationWindowSummary] = []
             for token in pair.layoutTokens { values.append(try await service.meltSummary(token)) }
             try Task.checkCancellation()
-            guard !pair.busy, !pair.suspended else { return }
-            let minimized = values.contains(where: \.isMinimized)
-            if pair.minimized && values.contains(where: { !$0.isMinimized }) { restore(pair); return }
-            if !pair.minimized && minimized && !pair.suspended { minimize(pair); return }
-            guard !pair.suspended, !minimized else { return }
+            guard refreshCanMutate(pair, epoch: epoch) else { return }
+            let anyMinimized = values.contains(where: \.isMinimized)
+            let anyRestored = values.contains(where: { !$0.isMinimized })
+            if pair.minimized && anyRestored { restore(pair); return }
+            if !pair.minimized && anyMinimized { minimize(pair); return }
+            guard !anyMinimized else { return }
+            let framesMatch = values.count == pair.acceptedFrames.count && values.count == 2
+                && zip(values, pair.acceptedFrames).allSatisfy { value, accepted in
+                    value.frame.map { AppMeltGeometry.nearlyEqual($0, accepted) } == true
+                }
+            if framesMatch {
+                let focused = try await service.meltContainsFocusedWindow(pair.layoutTokens)
+                try Task.checkCancellation()
+                guard refreshCanMutate(pair, epoch: epoch) else { return }
+                // Notification-driven refresh must never raise windows: AXRaise emits another
+                // focus notification, which can cancel this task before its state is recorded
+                // and start an endless raise/cancel cycle between members of the same app.
+                // Only deliberate creation/Restore changes stacking; refresh follows user focus.
+                pair.foreground = focused
+                pair.chrome?.update(show: focused || ownsChromeInteraction(pair))
+                return
+            }
             for token in pair.layoutTokens {
                 let capabilities = try await service.capabilities(token)
                 try Task.checkCancellation()
-                guard pairs.contains(where: { $0.id == pair.id }), !pair.busy, !pair.suspended else { return }
+                guard refreshCanMutate(pair, epoch: epoch) else { return }
                 guard capabilities.canMove else {
                     suspend(pair, message: .meltSuspended)
                     return
@@ -347,6 +425,7 @@ import Observation
                }),
                let actual = values[index].frame {
                 try Task.checkCancellation()
+                guard refreshCanMutate(pair, epoch: epoch) else { return }
                 let previous = pair.acceptedFrames[index]
                 var frame = pair.frame
                 frame.origin.x += actual.minX - previous.minX
@@ -357,19 +436,23 @@ import Observation
                               index == 1 ? actual.width : pair.acceptedFrames[1].width]
                 pair.ratio = min(0.75, max(0.25, widths[0] / (widths[0] + widths[1])))
                 layout(pair, frame: frame)
+                return
             }
             let focused = try await service.meltContainsFocusedWindow(pair.layoutTokens)
             try Task.checkCancellation()
-            guard !pair.busy, !pair.suspended else { return }
-            // Notification-driven refresh must never raise windows: AXRaise emits another
-            // focus notification, which can cancel this task before its state is recorded
-            // and start an endless raise/cancel cycle between members of the same app.
-            // Only deliberate creation/Restore changes stacking; refresh follows user focus.
+            guard refreshCanMutate(pair, epoch: epoch) else { return }
             pair.foreground = focused
             pair.chrome?.update(show: focused || ownsChromeInteraction(pair))
         } catch is CancellationError { return }
         catch WindowActionError.stale { fail(pair, error: WindowActionError.stale) }
         catch { fail(pair, error: error) }
+    }
+
+    /// Refresh may follow focus and geometry. It must not start minimize, restore, or layout
+    /// while another pair operation is still finishing or the pointer is dragging.
+    private func refreshCanMutate(_ pair: AppMeltPair, epoch: UInt64) -> Bool {
+        epoch == pair.operationEpoch && !pair.invalidated && !pair.busy && pair.task == nil
+            && !pair.isDragging && !pair.suspended && pairs.contains(where: { $0.id == pair.id })
     }
 
     /// Header controls and their popovers can own key focus while the source app has no
@@ -413,6 +496,7 @@ import Observation
     private func suspend(_ pair: AppMeltPair, message: LocalizedStringResource) {
         pair.comparison?.suspend()
         pair.finderTools?.dismiss()
+        pair.refreshPending = false
         pair.refreshTask?.cancel()
         pair.observation.stop()
         pair.pendingFrame = nil
@@ -467,6 +551,6 @@ import Observation
 
 private extension NSEvent {
     static var mouseLocationAX: CGPoint {
-        CGPoint(x: mouseLocation.x, y: (NSScreen.screens.first?.frame.maxY ?? 0) - mouseLocation.y)
+        AppMeltGeometry.quartz(fromAppKit: mouseLocation)
     }
 }

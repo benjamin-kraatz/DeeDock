@@ -34,16 +34,35 @@ checks were run. The changes below have source-level evidence, not native accept
 - Canceled Finder work does not publish a completed preview or success animation after its
   asynchronous operation returns.
 
-## Remaining observation concern
+## Observation, settle, refresh, unpair, and proximity (source, 2026-09-23)
 
-`AppMeltObservation.start` still enumerates and registers all windows for each source process
-on the main thread. It also combines supported notification names across those windows,
-so registration success does not establish support for each exact pair member.
-Repeated startup work is reduced, but the initial cost and exact-member coverage remain
-unresolved. A follow-up should move preparation off the main thread and use the retained AX
-identities. It must not substitute title or frame matching for those identities.
+`AppMeltObservation.start` resolves the pair's retained AX elements on the window-service actor.
+It does not copy `AXWindows`. Notification registration stays on the main run loop, which is
+the thread that delivers the callbacks, and it names only those retained elements. Moved,
+resized, and destroyed must succeed on each member. A sibling window's success does not count.
+The same elements and processes are reused until `forceRestart`, including a same-app
+replacement. Title and frame are not used as identity.
 
-No measured latency, CPU, or frame-rate improvement is claimed.
+Minimize and layout readback wait on those notifications. Minimize allows about 800 ms and
+three reads. Layout's sleeps share a 1.6 s budget; each resize and position uses a handful of
+reads. A timeout throws the existing failure and does not send the mutation again. The pair
+then suspends with Restore and Unpair. No measured latency change is claimed.
+
+Refresh keeps one trailing task per pair. It skips the full capability scan when the retained
+frames still match the accepted frames. It does not minimize, restore, layout, or raise while
+that pair's operation epoch, drag, or busy flag says another operation is in progress.
+
+Unpair sets `invalidated` and seals the session before cancelling work or releasing handles.
+Later App Fusion mutations on that session throw `CancellationError`. Setup cancellation seals
+the same way. A cancelled operation stops observation and hides chrome before it clears `busy`.
+
+Proximity converts the global AppKit cursor with the main display's top (`CGMainDisplayID`),
+not `NSScreen.screens.first` and not the height of the display under the pointer. The offer
+panel prefers the display under the pointer when it clamps. The 120 ms drag throttle and the
+absence of idle window polling are unchanged.
+
+No app launch, tests, or live multi-display checks were run for this pass. The editing
+environment has no Swift toolchain or macOS SDK, so the DeeDock target was not compiled here.
 
 ## Manual checks
 

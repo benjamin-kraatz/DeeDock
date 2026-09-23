@@ -30,9 +30,13 @@ import Observation
         panel.collectionBehavior = [.transient, .fullScreenNone]
         panel.contentView = NSHostingView(rootView: AppMeltProximityOfferView(state: state,
             connect: { [weak self] in self?.connect?() }, dismiss: { [weak self] in self?.dismiss?() }))
-        let top = NSScreen.screens.first?.frame.maxY ?? 0
+        let top = AppMeltGeometry.mainDisplayTop()
         var rect = AppMeltGeometry.appKit(CGRect(x: frame.midX - 150, y: frame.minY + 56, width: 300, height: 116), primaryTop: top)
-        if let screen = NSScreen.screens.first(where: { $0.frame.contains(CGPoint(x: rect.midX, y: rect.midY)) }) {
+        let anchor = CGPoint(x: rect.midX, y: rect.midY)
+        // Prefer the display under the pointer, then the display that contains the converted offer.
+        let screen = NSScreen.screens.first { $0.frame.contains(NSEvent.mouseLocation) }
+            ?? NSScreen.screens.first { $0.frame.contains(anchor) }
+        if let screen {
             rect.origin.x = min(max(rect.minX, screen.visibleFrame.minX), screen.visibleFrame.maxX - rect.width)
             rect.origin.y = min(max(rect.minY, screen.visibleFrame.minY), screen.visibleFrame.maxY - rect.height)
         }

@@ -45,6 +45,12 @@ import Observation
     @ObservationIgnored var refreshTask: Task<Void, Never>?
     @ObservationIgnored var acceptedFrames: [CGRect] = []
     @ObservationIgnored var suspended = false
+    /// Set synchronously by Unpair so in-flight create or replace cannot reinstall observers or chrome.
+    @ObservationIgnored var invalidated = false
+    /// Bumped when an explicit operation or drag layout starts and when it finishes.
+    /// Refresh will not minimize or restore across a mismatched value.
+    @ObservationIgnored var operationEpoch: UInt64 = 0
+    @ObservationIgnored var refreshPending = false
     @ObservationIgnored var foreground = false
     /// Chrome follows the accepted native frames, including app-enforced minimum sizes.
     func accept(_ frames: [CGRect]) {

@@ -1,6 +1,7 @@
 import ApplicationServices
 import AppKit
 import Security
+import Synchronization
 
 /// Failures from public Accessibility window discovery and control.
 nonisolated enum ApplicationWindowServiceError: Error, Equatable, Sendable {
@@ -37,6 +38,9 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
     var handles: [ApplicationWindowToken: Handle] = [:]
     let messagingTimeout: Float
     private let maximumWindows: Int
+    /// Sessions Unpair has closed. Checked without hopping to this actor so a cancelled
+    /// pair cannot start another mutation while `discard` is still queued behind it.
+    let sealedSessions = Mutex(Set<UUID>())
 
     init(messagingTimeout: Float = 0.25, maximumWindows: Int = .max) {
         self.messagingTimeout = messagingTimeout
@@ -127,6 +131,17 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         }
         try Task.checkCancellation()
         try performNativeAction(handle.element, action: kAXRaiseAction as CFString)
+    }
+
+    /// Closes a pair session immediately. Later App Fusion mutations on its tokens throw
+    /// `CancellationError` even if this actor has not yet removed their AX handles.
+    /// Discovery and menu sessions are not sealed unless App Fusion unpaired that same id.
+    nonisolated func seal(sessionID: UUID) {
+        sealedSessions.withLock { $0.insert(sessionID) }
+    }
+
+    nonisolated func ensureSessionOpen(_ sessionID: UUID) throws {
+        if sealedSessions.withLock({ $0.contains(sessionID) }) { throw CancellationError() }
     }
 
     func discard(sessionID: UUID) {

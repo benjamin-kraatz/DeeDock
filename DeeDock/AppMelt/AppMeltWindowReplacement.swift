@@ -15,6 +15,7 @@ extension AppMeltController {
         guard !pairs.contains(where: { $0.id != pair.id && $0.windows.contains {
             $0.processIdentifier == candidate.processIdentifier
         } }) else { pair.replacement?.message = .meltReplacementInUse; return }
+        pair.refreshPending = false
         pair.refreshTask?.cancel()
         run(pair) { [self] in
             let adopted: ApplicationWindowSummary
@@ -45,6 +46,7 @@ extension AppMeltController {
                 return
             }
             try Task.checkCancellation()
+            try ensureActive(pair)
             let previous = pair.windows[index].token
             pair.chrome?.stop()
             pair.finderTools = nil
@@ -59,19 +61,23 @@ extension AppMeltController {
             await service.meltEndMove(pair.sessionID)
             await service.meltRelease(previous)
             try Task.checkCancellation()
-            guard pairs.contains(where: { $0.id == pair.id }) else { throw CancellationError() }
-            guard pair.observation.start(processes: pair.windows.map(\.processIdentifier), forceRestart: true) else {
+            try ensureActive(pair)
+            let settle = pair.observation.settleWait
+            guard try await pair.observation.start(tokens: pair.layoutTokens, service: service, forceRestart: true) else {
                 throw WindowActionError.unsupported
             }
-            try await service.meltSetMinimized(false, token: adopted.token)
+            try ensureActive(pair)
+            try await service.meltSetMinimized(false, token: adopted.token, settle: settle)
+            try ensureActive(pair)
             let accepted = try await service.meltLayout(pair.layoutTokens,
-                frames: AppMeltGeometry.windows(in: pair.frame, ratio: pair.ratio), displays: AppMeltGeometry.displays)
-            try Task.checkCancellation()
+                frames: AppMeltGeometry.windows(in: pair.frame, ratio: pair.ratio), displays: AppMeltGeometry.displays,
+                settle: settle)
+            try ensureActive(pair)
             pair.accept(accepted)
             try await service.meltRaise(pair.layoutTokens)
-            try Task.checkCancellation()
+            try ensureActive(pair)
             try await service.meltActivateReplacement(adopted.token)
-            try Task.checkCancellation()
+            try ensureActive(pair)
             pair.chrome?.update(show: true)
         }
     }

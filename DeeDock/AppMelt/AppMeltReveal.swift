@@ -7,8 +7,8 @@ import QuartzCore
 
     func show(frame: CGRect) {
         stop()
-        guard let primary = NSScreen.screens.first else { return }
-        let rect = AppMeltGeometry.appKit(frame, primaryTop: primary.frame.maxY).insetBy(dx: -12, dy: -12)
+        guard AppMeltGeometry.mainScreen() != nil else { return }
+        let rect = AppMeltGeometry.appKit(frame, primaryTop: AppMeltGeometry.mainDisplayTop()).insetBy(dx: -12, dy: -12)
         let panel = NSPanel(contentRect: rect, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.isReleasedWhenClosed = false
         panel.backgroundColor = .clear

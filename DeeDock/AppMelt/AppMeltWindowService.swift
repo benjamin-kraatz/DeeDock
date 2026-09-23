@@ -28,6 +28,7 @@ extension AccessibilityApplicationWindowService {
 
     /// Raising preserves the token and changes no app-wide hidden state or unrelated windows.
     func meltRaise(_ tokens: [ApplicationWindowToken]) async throws {
+        for token in tokens { try ensureSessionOpen(token.sessionID) }
         let front = await MainActor.run { NSWorkspace.shared.frontmostApplication?.processIdentifier }
         // PID ordering cannot distinguish two windows of one app. Capture the exact focused
         // member before raising anything and raise it last to preserve the user's selection.
@@ -48,6 +49,7 @@ extension AccessibilityApplicationWindowService {
         }.map(\.element)
         if let focusedIndex { ordered.append(tokens[focusedIndex]) }
         for token in ordered {
+            try ensureSessionOpen(token.sessionID)
             let handle = try validatedHandle(token)
             try performNativeAction(handle.element, action: kAXRaiseAction as CFString)
         }
@@ -56,6 +58,7 @@ extension AccessibilityApplicationWindowService {
     /// Close remains cooperative. Keep the exact handle while the application presents a save
     /// sheet, so cancelling that sheet does not lose the pair or select a replacement window.
     func meltClose(_ tokens: [ApplicationWindowToken]) async throws {
+        for token in tokens { try ensureSessionOpen(token.sessionID) }
         for token in tokens {
             guard try actionCapabilities(token).canClose else { throw WindowActionError.unsupported }
         }
