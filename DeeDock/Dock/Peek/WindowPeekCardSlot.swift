@@ -19,11 +19,16 @@ struct WindowPeekCardSlot: View {
     let pinFrozen: () -> Void
     let portalTracking: (Bool) -> Void
     let dropPortal: (CGPoint, Bool) -> Void
+    /// Enlarged-preview hooks; `nil` while that option is off, so disabled Peek does no extra work.
+    var lifted = false
+    var enlargeHover: ((Bool) -> Void)? = nil
+    var artworkFrameChanged: ((CGRect) -> Void)? = nil
     @State private var hovering = false
 
     var body: some View {
         WindowPeekCardView(card: card, appIcon: appIcon, settings: settings,
-                           selected: selected, action: choose)
+                           selected: selected, lifted: lifted, artworkFrameChanged: artworkFrameChanged,
+                           action: choose)
             .contextMenu {
                 Button(.peekActionTitle, systemImage: "ellipsis", action: manage)
                 Divider()
@@ -55,7 +60,10 @@ struct WindowPeekCardSlot: View {
                 .padding(7)
             }
             .frame(width: size.width, height: size.height)
-            .onHover { hovering = $0 }
+            .onHover { inside in
+                hovering = inside
+                enlargeHover?(inside)
+            }
     }
 }
 

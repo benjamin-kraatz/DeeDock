@@ -1192,6 +1192,68 @@ file handoff, pointer travel, outside clicks, Escape, and changing settings. Che
 negative display origins, Spaces, full-screen apps, display removal, VoiceOver, Reduce Motion,
 and Reduce Transparency. A passing build does not establish these behaviors.
 
+## DEE-80: Enlarged preview
+
+**Settings → Features → Window Peek → Enlarged preview** holds the app-wide opt-in. It is off for
+new and existing settings. Presets leave it unchanged, and display profiles inherit it.
+
+When it is on, resting the pointer on a card for 0.45 s stages a larger copy of that card's
+captured image in the middle of the display. The whole display dims slightly, including the menu
+bar and the dock, except for the Peek panel. A title placard sits under the image. The hero keeps
+the window's aspect ratio, stays at least 48 pt from the usable display edges, uses at most 72% of
+either dimension, and is never larger than the window itself. The image is centered exactly on the
+full display frame and shrinks as needed to clear the Peek panel. If staying centered would cost
+more than 30% of its size, it moves off center, away from the dock edge. If there is no room for an
+image at least 240 pt on its longer side, nothing is staged.
+
+The stage's hosting view has `sizingOptions` cleared and a fixed root frame. The first build let
+the hosting view shrink the stage panel to its content, which hid the dim and shifted the hero.
+
+This is an image, not Aero Peek. DeeDock never raises, restores, or focuses the real window on
+hover. Leaving the card dismisses the stage after a 120 ms grace period, so the pointer can cross
+the gap between cards. While a hero is staged, moving to another card replaces it after 140 ms, and
+sweeping across cards stages nothing until the pointer stops. A key press, scroll, or secondary
+click dismisses the stage at once. The same card stays quiet until the pointer moves to another card.
+
+Clicking the staged card uses Peek's existing selection and close. The picture then flies from the
+hero onto the window's frame from discovery. It resizes to that frame, takes window-sized corners,
+and the dim fades, so the preview appears to become the window. Once the flight has ended and
+selection has closed Peek, the whole stage window fades out over 0.22 s, revealing the real window.
+A 1.1 s deadline ends the landing if activation is slow or fails. `WindowPeekLanding` owns the stage
+panel from the click on and keeps itself alive through its animation completion and deadline. The
+first version finished the landing through weak references to the enlarge controller. Closing Peek
+released that controller, so the picture stayed on screen over the app. A landing does not run under Reduce Motion, for capture-only cards (app
+activation may front a different window), for windows without a frame, or when less than half the
+window lies on the Peek display, because the stage covers one display. Those cases dismiss as
+before. A mouse-up that selects nothing clears the stage. The frame may be stale if the window was
+moved after Peek opened.
+
+The strip image flies from its card to the hero while the card slot shows an empty placeholder.
+Reduce Motion, or a card whose frame is unknown, uses a short fade and scale instead. At the same
+time, one on-demand ScreenCaptureKit capture is requested at the hero's size in backing pixels. It
+crossfades in when it arrives. Only one hi-res capture is outstanding: scrubbing or leaving cancels
+it, and late results are discarded unless they belong to the staged card. Minimized windows and
+cards without a thumbnail do not enlarge.
+
+The stage is a click-through panel one level above Peek. It never takes focus and is hidden from
+VoiceOver, which keeps using the labeled cards. It is suspended during file handoff, portal drags,
+window actions and their menu, an armed Quarantine stamp, dock drags, and App Fusion drags or
+busy pairs. Closing Peek stops its tasks, removes its event monitor, and fades the panel out.
+
+Validation: the Debug app target and the test bundle built with Xcode 27 and
+`CODE_SIGNING_ALLOWED=NO`. `WindowPeekEnlargeTests` covers settings migration and inheritance,
+hero placement on all four edges, exact centering and the off-center fallback, size cap, cramped displays, negative display
+origins, capture budget, flight and landing poses, Quartz-to-AppKit conversion, and scrub timing. Those tests were compiled but not run.
+Previews, native interaction, and automated visual checks were not run.
+
+Pending hands-on acceptance: with the option off, confirm Peek is unchanged. With it on, rest on
+a card and check the flight, dim, and placard. Confirm the hi-res swap on a Retina display and on
+a 1× display. Scrub quickly across grid, list, filmstrip, and Split-peek cards. Leave the card and
+the panel, click a staged card and watch it land on its window (including a window on another
+display or Space), click an unstaged card, and open the context menu. Start a portal drag, use a window action, and
+exercise file handoff. Check all dock edges, negative origins, a secondary display, Spaces,
+full-screen apps, Reduce Motion, Reduce Transparency, and GPU and memory use during scrubbing.
+
 ## Dock Modes
 
 Implemented on 2026-09-04 as an app-wide named configuration layer over display pins and App Visibility. The first launch after this change creates **Default** from the existing shared visibility, display visibility overrides, and every remembered display's typed pins. Legacy keys remain untouched for rollback, while subsequent pin and visibility edits write to the active mode.

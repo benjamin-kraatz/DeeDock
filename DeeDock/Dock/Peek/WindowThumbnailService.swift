@@ -88,6 +88,16 @@ protocol WindowThumbnailServicing: Actor {
     func stop()
 }
 
+extension WindowThumbnailServicing {
+    /// Captures one window to fit an exact pixel budget, for the enlarged preview.
+    ///
+    /// `capture(_:size:)` takes logical points and doubles them for backing pixels, so the budget is
+    /// halved on the way in. Returns `nil` for a minimized, unmatched, or failed window, or on cancellation.
+    func capture(_ window: ApplicationWindowSummary, fittingPixels pixels: CGSize) async -> CGImage? {
+        await capture([window], size: CGSize(width: pixels.width / 2, height: pixels.height / 2))[window.token]
+    }
+}
+
 /// One-shot, memory-only ScreenCaptureKit capture. Native window handles never leave this actor.
 actor ScreenCaptureWindowThumbnailService: WindowThumbnailServicing {
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "DeeDock",

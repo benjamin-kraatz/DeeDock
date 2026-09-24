@@ -31,7 +31,10 @@ struct WindowPeekSplitView: View {
                             pinPortal: { state.pinPortal?(card.window) },
                                    pinFrozen: { state.pinFrozen?(card.window) },
                                    portalTracking: { state.portalTracking?($0) },
-                                   dropPortal: { state.dropPortal?(card.window, $0, $1) }
+                                   dropPortal: { state.dropPortal?(card.window, $0, $1) },
+                            lifted: state.liftedID == card.id,
+                            enlargeHover: state.enlargesCards ? { state.cardHovered?(card.id, $0) } : nil,
+                            artworkFrameChanged: state.enlargesCards ? { state.artworkFrames[card.id] = $0 } : nil
                         )
                         .overlay(alignment: .leading) {
                             if card.id != state.splitCards.first?.id { Divider().offset(x: -7) }

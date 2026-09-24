@@ -120,6 +120,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.confirmBeforeEmptyingTrash = defaults.confirmBeforeEmptyingTrash
         result.windowPeekEnabled = defaults.windowPeekEnabled
         result.windowPeekSplitEnabled = defaults.windowPeekSplitEnabled
+        result.windowPeekEnlargeEnabled = defaults.windowPeekEnlargeEnabled
         result.windowPeekSize = defaults.windowPeekSize
         result.windowPeekLayout = defaults.windowPeekLayout
         result.windowPeekStyle = defaults.windowPeekStyle
