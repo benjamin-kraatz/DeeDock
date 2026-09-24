@@ -27,6 +27,8 @@ final class DockInteraction {
     #endif
     /// Optional soap-bubble bursts for pin click and drop. Owned per panel.
     let soapBubbles = DockSoapBubbleController()
+    /// Number hints for Quick Launch keys. Owned per panel; the coordinator owns the hot keys.
+    let quickLaunch = QuickLaunchHints()
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?
     let tooltips = DockTooltipController()
     var tooltipPreset: DockTooltipPreset = .classic

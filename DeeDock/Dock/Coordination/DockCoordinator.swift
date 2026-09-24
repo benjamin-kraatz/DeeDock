@@ -94,6 +94,9 @@ final class DockCoordinator {
     @ObservationIgnored private let capsules = SessionCapsuleController()
     @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
     private(set) var searchShortcutAvailable = false
+    @ObservationIgnored private let quickLaunch = QuickLaunchShortcuts()
+    /// One-based Quick Launch slots another app already owns; shown on the Quick Launch settings page.
+    private(set) var quickLaunchUnavailableSlots: [Int] = []
     @ObservationIgnored private lazy var windowSearch = WindowSearchController(capsules: capsules)
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     let peekHistory = PeekHistoryStore.live()
@@ -658,6 +661,7 @@ final class DockCoordinator {
         let satelliteMode = settings.value.secondaryDisplayAppsOnly
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
         badges.configure(enabled: settings.value.showAppBadges && !enabledDisplays.isEmpty)
+        configureQuickLaunch()
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)
         dragging.applyMagneticPinHiding()
         for display in enabledDisplays {
@@ -745,6 +749,38 @@ final class DockCoordinator {
     }
 
     func focusNextPortal() { windowPeeks.focusNextPortal() }
+
+    /// Registers the hot keys only while the preference is on and some dock can receive them.
+    private func configureQuickLaunch() {
+        let wanted = started && settings.value.quickLaunchKeys && !enabledDisplays.isEmpty
+        if wanted, !quickLaunch.isActive {
+            if !quickLaunch.start(action: { [weak self] slot in self?.performQuickLaunch(slot: slot) }) {
+                quickLaunch.stop()
+                quickLaunchUnavailableSlots = Array(1...QuickLaunchSlots.count)
+                return
+            }
+        } else if !wanted, quickLaunch.isActive {
+            quickLaunch.stop()
+        }
+        if quickLaunchUnavailableSlots != quickLaunch.unavailableSlots {
+            quickLaunchUnavailableSlots = quickLaunch.unavailableSlots
+        }
+    }
+
+    /// Registers again after the user closes a conflicting app. Called only from Settings.
+    func retryQuickLaunch() {
+        quickLaunch.stop()
+        configureQuickLaunch()
+    }
+
+    /// Targets the dock under the pointer, like Focus Dock. Drags, menus, and the file picker own
+    /// the pointer and keyboard while active, so a shortcut then does nothing rather than interrupt them.
+    private func performQuickLaunch(slot: Int) {
+        guard !dragging.isDragging, !filePicker.isActive, !panels.values.contains(where: \.isMenuTracking),
+              let id = DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation),
+              let panel = panels[id] else { return }
+        panel.performQuickLaunch(slot: slot)
+    }
 
     /// Opens metadata search only after a menu or keyboard action.
     func searchWindows() {
@@ -948,6 +984,8 @@ final class DockCoordinator {
         popovers.stop()
         shelf.stop()
         searchShortcut.stop()
+        quickLaunch.stop()
+        quickLaunchUnavailableSlots = []
         windowSearch.stop()
         capsules.stop()
         windowPeeks.stop()

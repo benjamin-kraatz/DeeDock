@@ -44,6 +44,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case sims
     case discovery
     case soapBubbles
+    case quickLaunch
     case focusBreathing
     case focusDebt
     case quarantine
@@ -73,7 +74,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
-             .discovery, .quarantine: .features
+             .quickLaunch, .discovery, .quarantine: .features
         }
     }
 
@@ -117,6 +118,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .simsTitle
         case .discovery: .discoveryTitle
         case .soapBubbles: .soapBubblesTitle
+        case .quickLaunch: .quickLaunchTitle
         case .quarantine: .quarantineTitle
         case .permissions: .windowPeekPermissionsTitle
         }
@@ -161,6 +163,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .settingsFeatureSimsSubtitle
         case .discovery: .discoverySettingsHelp
         case .soapBubbles: .settingsFeatureSoapBubblesSubtitle
+        case .quickLaunch: .settingsFeatureQuickLaunchSubtitle
         case .quarantine: .settingsFeatureQuarantineSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
@@ -198,6 +201,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .symbol("heart.fill")
         case .discovery: .symbol("lightbulb.fill")
         case .soapBubbles: .symbol("circle.dotted")
+        case .quickLaunch: .symbol("keyboard.fill")
         case .quarantine: .symbol("seal.fill")
         case .permissions: .symbol("lock.fill")
         }
@@ -233,6 +237,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: Color(red: 0.92, green: 0.42, blue: 0.58)
         case .discovery: .teal
         case .soapBubbles: Color(red: 0.38, green: 0.72, blue: 0.88)
+        case .quickLaunch: Color(red: 0.26, green: 0.40, blue: 0.86)
         case .quarantine: Color(red: 0.78, green: 0.27, blue: 0.16)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
@@ -268,6 +273,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: [Color(red: 1.0, green: 0.62, blue: 0.72), Color(red: 0.86, green: 0.22, blue: 0.46)]
         case .discovery: [.mint, .teal]
         case .soapBubbles: [Color(red: 0.72, green: 0.94, blue: 1.0), Color(red: 0.78, green: 0.52, blue: 0.96)]
+        case .quickLaunch: [Color(red: 0.52, green: 0.66, blue: 1.0), Color(red: 0.20, green: 0.30, blue: 0.80)]
         case .quarantine: [Color(red: 0.92, green: 0.46, blue: 0.34), Color(red: 0.62, green: 0.18, blue: 0.12)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
@@ -286,6 +292,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .simsSettingsKeywords
         case .discovery: .discoverySettingsHelp
         case .soapBubbles: .soapBubblesSettingsKeywords
+        case .quickLaunch: .quickLaunchSettingsKeywords
         case .focusBreathing: .focusBreathingHelp
         case .focusDebt: .focusDebtHelp
         case .quarantine: .quarantineSettingsHelp

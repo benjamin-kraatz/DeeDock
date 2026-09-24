@@ -43664,6 +43664,168 @@
           }
         }
       }
+    },
+    "quickLaunchTitle" : {
+      "comment" : "Feature name for the Control-Option-number shortcuts that open numbered dock apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnellstart-Tasten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Launch keys"
+          }
+        }
+      }
+    },
+    "quickLaunchToggle" : {
+      "comment" : "Toggle that registers the Quick Launch keyboard shortcuts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps mit Control-Wahltaste-Zahl öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open apps with Control-Option-number"
+          }
+        }
+      }
+    },
+    "quickLaunchToggleSubtitle" : {
+      "comment" : "Subtitle under the Quick Launch toggle describing the shortcut range.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control-Wahltaste-1 bis Control-Wahltaste-0 öffnen die ersten zehn Apps im Dock unter dem Zeiger."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control-Option-1 through Control-Option-0 open the first ten apps on the dock under the pointer."
+          }
+        }
+      }
+    },
+    "quickLaunchHelp" : {
+      "comment" : "Footnote under the Quick Launch settings card explaining numbering and behavior.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlen zählen App-Symbole vom Anfang des Docks: zuerst angepinnte, dann laufende Apps. Ordner und Kacheln werden übersprungen. Ein Kurzbefehl wirkt wie ein Klick, bei der App im Vordergrund blendet er sie also aus. Die Zahlen erscheinen nach einem Kurzbefehl und während „Dock fokussieren“ auf den Symbolen; dort funktionieren auch einfache Ziffern. Es ist keine Berechtigung nötig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numbers count app icons from the start of the dock: pinned apps first, then running apps. Folders and tiles are skipped. A shortcut does what a click does, so using it on the frontmost app hides that app. Numbers appear on the icons after a shortcut and throughout Focus Dock, where plain digits work too. No permission is needed."
+          }
+        }
+      }
+    },
+    "settingsFeatureQuickLaunchSubtitle" : {
+      "comment" : "Description of Quick Launch keys on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ersten zehn Dock-Apps per Tastatur öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the first ten dock apps from the keyboard."
+          }
+        }
+      }
+    },
+    "quickLaunchSettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the Quick Launch settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastatur Kurzbefehl Tastenkürzel Zahl Ziffer Control Wahltaste starten öffnen App wechseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keyboard shortcut hotkey number digit control option launch open app switch"
+          }
+        }
+      }
+    },
+    "quickLaunchConflict" : {
+      "comment" : "Warning when other apps already own some Quick Launch shortcuts. keys is a list of shortcuts such as ⌃⌥3, ⌃⌥0.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine andere App verwendet bereits %(keys)@. Diese Zahlen bleiben wirkungslos, bis sie sie freigibt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another app already uses %(keys)@. Those numbers do nothing until it releases them."
+          }
+        }
+      }
+    },
+    "quickLaunchRetry" : {
+      "comment" : "Button that registers Quick Launch shortcuts again after a conflict.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        }
+      }
+    },
+    "quickLaunchShortcutSpoken" : {
+      "comment" : "VoiceOver value naming an app icon's Quick Launch shortcut. number is a single digit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control-Wahltaste-%(number)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control-Option-%(number)@"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

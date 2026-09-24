@@ -2762,3 +2762,26 @@ and coalesced drag updates. String Catalog JSON and whitespace checks are record
 this change. No build, app launch, tests, or automated visual checks were run at the user's
 request. Compilation, actual Finder-like appearance, frame seams/corners, accessibility,
 minimum sizes, rapid actions, multi-display behavior, and runtime performance remain unverified.
+
+## Quick Launch keys
+
+Opt-in Control-Option-1…0 shortcuts open the Nth app icon on the dock under the pointer through the
+same primary action as a click. Number chips appear after a shortcut and during Focus Dock. Plain
+digits work in Focus Dock. See [Quick Launch keys](QUICK-LAUNCH.md).
+
+**What was run:** nothing. The feature was written in a Linux container without Xcode or macOS.
+It has not been compiled. `DeeDockTests/QuickLaunchTests.swift` was added but not run.
+
+**Needs native acceptance:**
+
+- A build of the `DeeDock` target, including the Carbon constants (`kEventHotKeyExclusive`,
+  `kVK_ANSI_*`) and `accessibilityCustomContent(_:_:)` with an optional value.
+- Shortcuts while another app is frontmost: DDock must not become active or take key focus.
+- Launch, activate, and the frontmost hide toggle, compared against clicking the same icon.
+- Two displays: the pointer's display wins, and each dock has its own numbering.
+- An empty slot beeps and flashes numbers. A hidden auto-hide dock stays hidden.
+- Conflict reporting: register Control-Option-3 in another app first, then turn the feature on and use **Try Again** after quitting that app.
+- Focus Dock: chips stay visible for the session, digits open and select, Escape clears chips.
+- Chip placement on all four edges with magnification, next to app badges and running indicators.
+- VoiceOver custom content, Reduce Transparency's opaque chip, and Reduce Motion's fade.
+- Sleep/wake and display reconfiguration with the feature on.
