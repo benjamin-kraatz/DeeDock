@@ -91,6 +91,16 @@ final class WindowPeekState {
     @ObservationIgnored var showAll: (() -> Void)?
     @ObservationIgnored var hovered: ((Bool) -> Void)?
     @ObservationIgnored var thumbnailNeeded: ((ApplicationWindowToken) -> Void)?
+    /// The card whose image is lifted onto the enlarged-preview stage; its slot shows a placeholder.
+    var liftedID: ApplicationWindowToken?
+    /// Latest artwork frame per card in the Peek panel's top-left-origin SwiftUI space. Unobserved:
+    /// it feeds the enlarged preview's flight geometry and must not re-render the cards.
+    @ObservationIgnored var artworkFrames: [ApplicationWindowToken: CGRect] = [:]
+    /// Pointer entered (`true`) or left a card. Set only while the enlarged preview is enabled.
+    @ObservationIgnored var cardHovered: ((ApplicationWindowToken, Bool) -> Void)?
+
+    /// Whether cards report hover and artwork frames for the enlarged preview.
+    var enlargesCards: Bool { settings.windowPeekEnlargeEnabled && !routingFiles }
 
     init(item: DockItem, settings: DockSettings) {
         appName = item.reference.name

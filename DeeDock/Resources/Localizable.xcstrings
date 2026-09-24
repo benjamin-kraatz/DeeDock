@@ -41829,6 +41829,60 @@
         }
       }
     },
+    "windowPeekEnlargeEnabled" : {
+      "comment" : "Opt-in switch that shows an enlarged window preview after the pointer rests on a Window Peek card. Off by default and shared by all displays.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergrößerte Vorschau beim Verweilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enlarge preview on hover"
+          }
+        }
+      }
+    },
+    "windowPeekEnlargeHelp" : {
+      "comment" : "Explains Enlarged preview: it shows a bigger captured image and never focuses or moves the real window until a click. Window Peek is a feature name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn der Zeiger kurz auf einer Karte ruht, erscheint eine vergrößerte Aufnahme des Fensters in der Bildschirmmitte. Das echte Fenster wird dabei weder aktiviert noch bewegt. Ein Klick wählt es wie gewohnt aus. Benötigt Zugriff auf die Bildschirmaufnahme. Die Dateiübergabe zeigt keine vergrößerte Vorschau."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When the pointer rests on a card, an enlarged capture of that window appears in the middle of the screen. The real window is not focused or moved. Click to select it as usual. Requires Screen Recording access. File handoff never shows an enlarged preview."
+          }
+        }
+      }
+    },
+    "windowPeekEnlargeTitle" : {
+      "comment" : "Title for the Window Peek settings card that controls the enlarged hover preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergrößerte Vorschau"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enlarged preview"
+          }
+        }
+      }
+    },
     "windowPeekExample" : {
       "comment" : "Label above the deterministic Window Peek settings sample.",
       "extractionState" : "manual",

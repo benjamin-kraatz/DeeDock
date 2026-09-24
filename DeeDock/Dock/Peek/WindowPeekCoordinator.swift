@@ -21,6 +21,9 @@ final class WindowPeekCoordinator {
     private let screenCapture: ScreenCaptureAccessController
     private let thumbnails: any WindowThumbnailServicing
     private var controller: WindowPeekPanelController?
+    private var enlarge: WindowPeekEnlargeController?
+    /// Collisions outside Peek (dock drags, App Fusion gestures) that suspend the enlarged preview.
+    var enlargeBlocked: (() -> Bool)?
     private weak var sourcePanel: DockPanelController?
     private var sourceItem: DockItem?
     private var allWindows: [ApplicationWindowSummary] = []
@@ -169,6 +172,8 @@ final class WindowPeekCoordinator {
         captureTask = nil
         if let discoveryID { menus.cancelDiscovery(discoveryID) }
         discoveryID = nil
+        enlarge?.stop()
+        enlarge = nil
         Task { await thumbnails.stop() }
         let panel = sourcePanel
         let activeController = controller
@@ -197,6 +202,7 @@ final class WindowPeekCoordinator {
         close(returnFocus: false)
         watches.stop()
         prepareSettings = nil
+        enlargeBlocked = nil
         addToFusion = nil
         startMelt = nil
     }
@@ -266,6 +272,7 @@ final class WindowPeekCoordinator {
         }
         next.state.portalTracking = { [weak self, weak next] tracking in
             next?.state.portalDragging = tracking
+            if tracking { self?.enlarge?.dismiss() }
             if tracking { self?.closeTask?.cancel() } else { self?.updatePointer() }
         }
         next.state.dropPortal = { [weak self, weak panel] window, point, frozen in
@@ -298,6 +305,13 @@ final class WindowPeekCoordinator {
         }
         next.state.showAll = { [weak self] in self?.displayWindows(applyFilters: false) }
         next.state.thumbnailNeeded = { [weak self] token in self?.requestThumbnail(token) }
+        if fileDocuments == nil, context.settings.windowPeekEnlargeEnabled {
+            let enlarge = WindowPeekEnlargeController(peek: next, thumbnails: thumbnails) { [weak self] in
+                self?.enlargeBlocked?() ?? false
+            }
+            self.enlarge = enlarge
+            next.state.cardHovered = { [weak enlarge] token, inside in enlarge?.hover(token, inside: inside) }
+        }
         if fileDocuments != nil {
             next.state.watch = nil
             next.state.pinPortal = nil
@@ -487,6 +501,7 @@ final class WindowPeekCoordinator {
 
     private func manage(_ token: ApplicationWindowToken) {
         guard let controller, !controller.state.actionBusy, !controller.state.routingFiles else { return }
+        enlarge?.dismiss()
         guard !controller.state.usesApplicationSelection else {
             controller.state.actionMessage = .peekActionCaptureOnly
             return
@@ -570,9 +585,13 @@ final class WindowPeekCoordinator {
         if fileDocuments != nil { routeFiles(to: token); return }
         guard let item = sourceItem, let panel = sourcePanel else { return }
         guard controller?.state.usesApplicationSelection != true else {
+            // App activation may front a different window, so the image must not claim this one.
+            enlarge?.dismiss()
             showApp()
             return
         }
+        // The staged image flies onto the window this selection brings forward, then fades to reveal it.
+        enlarge?.land(token, windowFrame: allWindows.first { $0.token == token }?.frame)
         menus.perform(.selectWindow(token), for: item) { [weak self, weak panel] error in
             if let error { panel?.store.errorMessage = error }
             else { panel?.store.applicationOpened?() }

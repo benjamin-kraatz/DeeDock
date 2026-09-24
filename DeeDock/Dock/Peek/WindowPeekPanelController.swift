@@ -94,6 +94,21 @@ final class WindowPeekPanelController {
 
     var actionMenuPoint: CGPoint { CGPoint(x: panel.frame.midX, y: panel.frame.midY) }
 
+    /// The panel's frame in AppKit screen coordinates.
+    var frame: CGRect { panel.frame }
+    var edge: DockEdge { anchor.edge }
+    var visibleFrame: CGRect { anchor.visibleFrame }
+    /// The display showing this Peek, preferring the one whose usable frame the anchor came from.
+    var screen: NSScreen? {
+        NSScreen.screens.first { $0.visibleFrame == anchor.visibleFrame } ?? panel.screen
+    }
+
+    /// Converts a rectangle from the hosting view's top-left-origin SwiftUI space to screen coordinates.
+    /// The hosting view fills the borderless panel, so its origin is the panel's top-left corner.
+    func screenRect(fromContent rect: CGRect) -> CGRect {
+        CGRect(x: panel.frame.minX + rect.minX, y: panel.frame.maxY - rect.maxY, width: rect.width, height: rect.height)
+    }
+
     func contains(_ screenPoint: CGPoint) -> Bool { panel.frame.contains(screenPoint) }
 
     func close(returnFocus: Bool) {
@@ -122,6 +137,7 @@ final class WindowPeekPanelController {
         state.showAll = nil
         state.hovered = nil
         state.thumbnailNeeded = nil
+        state.cardHovered = nil
         panel.keyboardHandler = nil
         let callback = closed
         closed = nil

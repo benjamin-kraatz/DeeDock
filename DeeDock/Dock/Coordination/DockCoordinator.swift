@@ -302,6 +302,10 @@ final class DockCoordinator {
         windowPeeks.startMelt = { [weak self] window in
             self?.appMelt.showSetup(window: window)
         }
+        windowPeeks.enlargeBlocked = { [weak self] in
+            guard let self else { return true }
+            return dragging.isDragging || appMelt.pairs.contains { $0.isDragging || $0.busy }
+        }
         windowPeeks.addToFusion = { [weak self] window, panel, keyboard in
             self?.fusion.show(from: panel, keyboard: keyboard, matching: window)
         }

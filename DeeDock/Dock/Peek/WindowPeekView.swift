@@ -168,10 +168,21 @@ struct WindowPeekView: View {
                                    pinPortal: { state.pinPortal?(card.window) },
                                    pinFrozen: { state.pinFrozen?(card.window) },
                                    portalTracking: { state.portalTracking?($0) },
-                                   dropPortal: { state.dropPortal?(card.window, $0, $1) })
+                                   dropPortal: { state.dropPortal?(card.window, $0, $1) },
+                                   lifted: state.liftedID == card.id,
+                                   enlargeHover: enlargeHover(card.id),
+                                   artworkFrameChanged: artworkFrameChanged(card.id))
                     .onAppear { state.thumbnailNeeded?(card.id) }
             }
         }
+    }
+
+    private func enlargeHover(_ token: ApplicationWindowToken) -> ((Bool) -> Void)? {
+        state.enlargesCards ? { state.cardHovered?(token, $0) } : nil
+    }
+
+    private func artworkFrameChanged(_ token: ApplicationWindowToken) -> ((CGRect) -> Void)? {
+        state.enlargesCards ? { state.artworkFrames[token] = $0 } : nil
     }
 
     private func dropTarget(_ token: ApplicationWindowToken?) -> some View {
@@ -213,7 +224,12 @@ struct WindowPeekCardView: View {
     let appIcon: NSImage
     let settings: DockSettings
     let selected: Bool
+    /// The image is on the enlarged-preview stage, so the slot shows an empty placeholder.
+    var lifted = false
+    /// Reports the artwork's frame in the hosting view's space, the start of the enlarge flight.
+    var artworkFrameChanged: ((CGRect) -> Void)? = nil
     let action: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var title: String {
         ApplicationContextMenuProjection.windowTitle(card.window, untitled: String(localized: .applicationMenuUntitledWindow))
@@ -243,6 +259,11 @@ struct WindowPeekCardView: View {
         Group {
             if let thumbnail = card.thumbnail {
                 Image(decorative: thumbnail, scale: 2).resizable().interpolation(.high).scaledToFit()
+                    .opacity(lifted ? 0 : 1)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: lifted)
+                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                        artworkFrameChanged?(frame)
+                    }
             } else {
                 ZStack {
                     Rectangle().fill(.quaternary.opacity(0.55))
