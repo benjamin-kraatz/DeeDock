@@ -93,6 +93,9 @@ struct DockSettings: Codable, Equatable {
     /// Optional soap-bubble bursts on pin click and drop. Off by default, and Reduce Motion
     /// suppresses playback without rewriting this preference.
     var soapBubbleEffects: Bool = false
+    /// Registers Control-Option-1 through Control-Option-0 to open the first ten apps on the
+    /// dock under the pointer. Off by default because it claims system-wide shortcuts.
+    var quickLaunchKeys: Bool = false
     var edge: DockEdge = .bottom
     var alignment: Alignment = .center
     /// Signed displacement from the alignment anchor, in points; positive moves right on horizontal docks and down on side docks.
@@ -160,7 +163,7 @@ extension DockSettings {
         case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, quickLaunchKeys, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -207,6 +210,7 @@ extension DockSettings {
         launchAnimation = values.contains(.launchAnimation)
             ? try values.decode(DockLaunchAnimation.self, forKey: .launchAnimation) : Self.defaults.launchAnimation
         soapBubbleEffects = try values.decodeIfPresent(Bool.self, forKey: .soapBubbleEffects) ?? false
+        quickLaunchKeys = try values.decodeIfPresent(Bool.self, forKey: .quickLaunchKeys) ?? false
         edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : .bottom
         alignment = try values.decode(Alignment.self, forKey: .alignment)
         alongEdgeOffset = try values.decode(Double.self, forKey: .alongEdgeOffset)

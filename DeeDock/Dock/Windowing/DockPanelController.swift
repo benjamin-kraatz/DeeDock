@@ -136,6 +136,8 @@ final class DockPanelController {
         interaction.animateIndicators = settings.animateIndicators
         interaction.launchAnimation = settings.launchAnimation
         interaction.soapBubbles.isEnabled = settings.soapBubbleEffects
+        interaction.quickLaunch.configure(enabled: settings.quickLaunchKeys,
+                                          assignments: QuickLaunchSlots.assignments(for: store.entries))
         if !settings.soapBubbleEffects || NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
             interaction.soapBubbles.removeAll()
         }
@@ -586,6 +588,8 @@ final class DockPanelController {
         visibility.showImmediately()
         panel.acceptsKeyboardFocus = true
         store.selectedTarget = store.selectedTarget ?? store.entries.first?.target
+        // History browsing reuses keyboard focus but treats digits as scrub input, so it shows no numbers.
+        interaction.quickLaunch.setPersistent(interaction.timeline?.isActive(on: store.displayID) != true)
         ExplicitWindowPresenter.shared.present(panel)
         panel.makeFirstResponder(panel)
         updatePointer()
@@ -628,6 +632,18 @@ final class DockPanelController {
             if event.keyCode == 53 { escape?(); return true }
             return true
         }
+        // Plain number-row digits open the numbered app, mirroring Control-Option-digit outside Focus Dock.
+        if interaction.quickLaunch.isEnabled,
+           event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
+           let slot = QuickLaunchSlots.slot(forKeyCode: event.keyCode) {
+            if let item = quickLaunchItem(slot: slot) {
+                store.selectedTarget = .app(item.id)
+                store.open(item)
+            } else {
+                NSSound.beep()
+            }
+            return true
+        }
         if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
             if event.modifierFlags.contains(.option),
                let pin = store.entries.first(where: { $0.target == store.selectedTarget })?.pin {
@@ -648,8 +664,33 @@ final class DockPanelController {
         }
         return true
     }
+    /// Performs a Quick Launch shortcut on this dock: the numbered app gets exactly the action a
+    /// click would give it, including hiding the frontmost app. An empty slot beeps.
+    ///
+    /// Numbers flash on the icons either way, so a miss shows where the apps actually are. A hidden
+    /// dock stays hidden; the shortcut works without revealing it.
+    func performQuickLaunch(slot: Int) {
+        guard !stopped, !launcher.isPresented else { return }
+        // Entries may have changed since the last layout pass; renumber before resolving the slot.
+        interaction.quickLaunch.configure(enabled: interaction.quickLaunch.isEnabled,
+                                          assignments: QuickLaunchSlots.assignments(for: store.entries))
+        guard let item = quickLaunchItem(slot: slot) else {
+            interaction.quickLaunch.flash(triggered: nil)
+            NSSound.beep()
+            return
+        }
+        interaction.quickLaunch.flash(triggered: item.id)
+        store.performPrimaryAction(item)
+    }
+
+    private func quickLaunchItem(slot: Int) -> DockItem? {
+        guard let id = QuickLaunchSlots.itemID(forSlot: slot, in: store.entries) else { return nil }
+        return store.entries.lazy.compactMap(\.item).first { $0.id == id }
+    }
+
     /// The coordinator clears its focus owner before this potentially reentrant resign operation.
     func endFocus() {
+        interaction.quickLaunch.setPersistent(false)
         ExplicitWindowPresenter.shared.cancel(panel)
         store.keyboardFocus = false; store.selectedID = nil; panel.acceptsKeyboardFocus = false
         panel.resignKey(); updatePointer()
@@ -665,6 +706,7 @@ final class DockPanelController {
     func stop() {
         launcherPresentation.stop(); launcherWillOpen = nil; interaction.openLauncher = nil
         invalidateDrag?(); invalidateDrag = nil
+        interaction.quickLaunch.stop()
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.openBadgeMemory = nil

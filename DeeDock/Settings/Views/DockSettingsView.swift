@@ -165,6 +165,7 @@ struct DockSettingsView: View {
         case .windowPeek: isOn = value.windowPeekEnabled
         case .magneticEdges: isOn = value.magneticEdges
         case .soapBubbles: isOn = value.soapBubbleEffects
+        case .quickLaunch: isOn = value.quickLaunchKeys
         case .multipleDisplays: isOn = value.secondaryDisplayAppsOnly
         default: return nil
         }

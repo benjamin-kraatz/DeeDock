@@ -114,6 +114,11 @@ struct FeaturesPageContent: View {
                                   isOn: source.binding(\.soapBubbleEffects))
             }
             .disabled(locked)
+        case .quickLaunch:
+            QuickLaunchSettingsCard(isOn: source.binding(\.quickLaunchKeys),
+                                    unavailableSlots: context.coordinator?.quickLaunchUnavailableSlots ?? [],
+                                    locked: locked,
+                                    retry: { context.coordinator?.retryQuickLaunch() })
         default:
             EmptyView()
         }

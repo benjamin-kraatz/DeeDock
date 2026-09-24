@@ -43,6 +43,15 @@ struct DockAppButton: View {
         return weather.sample(for: item.id)
     }
 
+    /// Digit for this icon's Quick Launch shortcut while hints are showing.
+    private var quickLaunchLabel: String? { interaction?.quickLaunch.label(for: item.id) }
+
+    /// Spoken shortcut whenever Quick Launch keys are on, whether or not the chips are visible.
+    private var quickLaunchSpoken: Text? {
+        guard let slot = interaction?.quickLaunch.numbers[item.id] else { return nil }
+        return Text(.quickLaunchShortcutSpoken(number: QuickLaunchSlots.label(for: slot)))
+    }
+
     private var badgeLabel: String? {
         guard item.isAvailable else { return nil }
         return interaction?.badges?.labels[(item.resolvedURL ?? item.reference.url).standardizedFileURL.path]
@@ -125,6 +134,21 @@ struct DockAppButton: View {
                 .accessibilityLabel(Text(.badgeMemoryDetails))
             }
         }
+        .overlay(alignment: .topLeading) {
+            if let quickLaunchLabel {
+                QuickLaunchNumberChip(label: quickLaunchLabel, iconSize: size,
+                                      highlighted: interaction?.quickLaunch.lastTriggeredID == item.id,
+                                      opaque: reduceTransparency)
+                    // Match the upright icon origin, accounting for the edge's indicator strip.
+                    .padding(.top, interaction?.layout.edge == .top ? DockGeometry.indicatorAreaDepth : 0)
+                    .padding(.leading, interaction?.layout.edge == .left ? DockGeometry.indicatorAreaDepth : 0)
+                    .offset(x: -3, y: -3)
+                    .transition(reduceMotion ? .opacity : .scale(scale: 0.6).combined(with: .opacity))
+            }
+        }
+        .animation(reduceMotion ? nil : .spring(duration: 0.22), value: quickLaunchLabel)
+        .accessibilityCustomContent(AccessibilityCustomContentKey(Text(.quickLaunchTitle), id: "quickLaunch"),
+                                    quickLaunchSpoken)
         .accessibilityFocused($accessibilityFocused)
         .onChange(of: accessibilityFocused) { _, focused in
             accessibilityFocus(focused)

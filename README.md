@@ -584,6 +584,10 @@ DDock mirrors badge text exposed by application items in the system Dock, matche
 
 AX reads run outside the main actor and do not depend on pointer movement or animation frames. Disabling badges, disabling all docks, sleep, and shutdown clear badge state and stop the reader. Permission loss clears badges on the next refresh. Compilation is verified; live badge coverage and performance still need native acceptance. See [the acceptance record](docs/ACCEPTANCE.md#app-badges-dee-10).
 
+## Quick Launch keys
+
+Turn on **Settings → Features → Quick Launch keys** to open dock apps by position. Control-Option-1 through Control-Option-0 do what clicking the first ten app icons on the dock under the pointer does. Numbers count app icons only: pinned apps first, then running apps. Folders and tiles are skipped. Numbers appear on the icons briefly after a shortcut and throughout Focus Dock, where plain digits also work. No permission is required. Shortcuts another app already owns are listed in Settings, not taken over. See [Quick Launch keys](docs/QUICK-LAUNCH.md) for numbering rules, conflicts, and validation status.
+
 ## Find a window
 
 Choose **Find a Window** from the DDock menu, press Command-Shift-Space globally, or press `/` in Focus Dock. Search live window titles and app names without AI. Use **Choose Windows…** and **Capture Selected** to search visible text from up to four selected windows. **Search Images with AI** separately checks those screenshots and labels matches as model suggestions. Captures stay in memory for at most ten minutes and are cleared when search closes.
