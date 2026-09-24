@@ -11,7 +11,7 @@ The renderer is a platform capability. It does not ship a version-specific comic
 - Panel art: `assets/<MARKETING_VERSION>/panel-0N.png`
 - HTML starter with Google Fonts: [comic-preview.template.html](comic-preview.template.html)
 
-Current authored comic: [0.8.0-comic.md](0.8.0-comic.md) and [0.8.0-comic.html](0.8.0-comic.html), with notes in [0.8.0.md](0.8.0.md). The 0.5.0 Focus, Compost, and Gossip comic stays on that version.
+Current authored comic: [0.9.0-comic.md](0.9.0-comic.md) and [0.9.0-comic.html](0.9.0-comic.html), with notes in [0.9.0.md](0.9.0.md). The 0.5.0 Focus, Compost, and Gossip comic stays on that version.
 
 ## GitHub Release assets
 
