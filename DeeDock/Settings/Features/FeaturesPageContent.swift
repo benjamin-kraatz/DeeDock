@@ -32,6 +32,7 @@ struct FeaturesPageContent: View {
             .disabled(locked)
         case .badges:
             AppBadgesSettingsCard(isOn: source.binding(\.showAppBadges),
+                                  showCounts: source.binding(\.showAppBadgeCounts),
                                   windowAccess: context.windowAccess, locked: locked)
             if let coordinator = context.coordinator {
                 BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })

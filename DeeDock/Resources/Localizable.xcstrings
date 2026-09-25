@@ -3315,6 +3315,42 @@
         }
       }
     },
+    "appBadgeCountsHelp" : {
+      "comment" : "Subtitle under the badge-count switch. VoiceOver still speaks the count when this is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt die Anzahl auf dem Mitteilungskennzeichen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the notification count on badges."
+          }
+        }
+      }
+    },
+    "appBadgeCountsToggle" : {
+      "comment" : "Opt-in switch that draws the notification count on app badges. Off shows a red dot.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlen anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show numbers"
+          }
+        }
+      }
+    },
     "appBadgesHelp" : {
       "comment" : "Explains badge coverage, refresh delay, and permission scope.",
       "extractionState" : "manual",
