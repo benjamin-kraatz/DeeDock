@@ -24,6 +24,7 @@ struct DockIconPresentation<Artwork: View>: View {
     var artworkOpacity: Double = 1
     var artworkAnimation: Animation? = nil
     var badgeLabel: String? = nil
+    var badgeStyle: DockAppBadge.Style = .dot
     var launchAnimation = DockSettings.defaults.launchAnimation
     var launchRequest: Date? = nil
     var launchMotionEnabled = true
@@ -32,6 +33,7 @@ struct DockIconPresentation<Artwork: View>: View {
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
+         badgeStyle: DockAppBadge.Style = .dot,
          launchAnimation: DockLaunchAnimation = DockSettings.defaults.launchAnimation,
          launchRequest: Date? = nil, launchMotionEnabled: Bool = true,
          @ViewBuilder artwork: () -> Artwork) {
@@ -48,6 +50,7 @@ struct DockIconPresentation<Artwork: View>: View {
         self.artworkOpacity = artworkOpacity
         self.artworkAnimation = artworkAnimation
         self.badgeLabel = badgeLabel
+        self.badgeStyle = badgeStyle
         self.launchAnimation = launchAnimation
         self.launchRequest = launchRequest
         self.launchMotionEnabled = launchMotionEnabled
@@ -85,7 +88,7 @@ struct DockIconPresentation<Artwork: View>: View {
                 }
                 .overlay(alignment: .topTrailing) {
                     if let badgeLabel {
-                        DockAppBadge(label: badgeLabel, iconSize: size)
+                        DockAppBadge(label: badgeLabel, iconSize: size, style: badgeStyle)
                             .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                     }
                 }
@@ -105,12 +108,14 @@ extension DockIconPresentation where Artwork == Image {
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
+         badgeStyle: DockAppBadge.Style = .dot,
          launchAnimation: DockLaunchAnimation = DockSettings.defaults.launchAnimation,
          launchRequest: Date? = nil, launchMotionEnabled: Bool = true) {
         self.init(size: size, edge: edge, available: available, running: running, launching: launching,
                   keyboardSelected: keyboardSelected, runningIndicatorStyle: runningIndicatorStyle,
                   indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
                   artworkOpacity: artworkOpacity, artworkAnimation: artworkAnimation, badgeLabel: badgeLabel,
+                  badgeStyle: badgeStyle,
                   launchAnimation: launchAnimation, launchRequest: launchRequest, launchMotionEnabled: launchMotionEnabled) {
             Image(nsImage: icon).resizable().interpolation(.high)
         }

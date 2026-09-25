@@ -19,6 +19,9 @@ final class DockInteraction {
     var dockModes: DockModesStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
+    /// When true, notification badges draw their count. Off draws a red dot.
+    /// VoiceOver still reads the count from the badge label.
+    var showAppBadgeCounts = false
     /// Shared opt-in Sims moods. Nil in previews that do not play the care loop.
     var sims: DockSimsStore?
     #if DIRECT_DISTRIBUTION
