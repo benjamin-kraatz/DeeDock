@@ -230,7 +230,8 @@ final class WindowPeekEnlargeController {
         }
     }
 
-    /// The strip thumbnail is at most twice a card's size, which is soft at hero size on Retina.
+    /// The strip image is only as sharp as the card. `pixels` is already the hero in backing pixels
+    /// and must reach `fittingPixels` unchanged.
     private func requestDetail(for window: ApplicationWindowSummary, exhibit: WindowPeekExhibit, pixels: CGSize) {
         guard !window.isMinimized else { return }
         captureTask = Task { @MainActor [weak self, thumbnails] in

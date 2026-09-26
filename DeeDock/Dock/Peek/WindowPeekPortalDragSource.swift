@@ -104,7 +104,7 @@ private struct WindowPeekPortalDragPreview: View {
     var body: some View {
         VStack(spacing: 8) {
             if let image {
-                Image(decorative: image, scale: 2).resizable().scaledToFit()
+                Image(decorative: image, scale: 1).resizable().scaledToFit()
             } else {
                 Image(systemName: "macwindow").font(.largeTitle).frame(maxHeight: .infinity)
             }

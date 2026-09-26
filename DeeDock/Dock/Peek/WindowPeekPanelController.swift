@@ -45,6 +45,9 @@ final class WindowPeekPanelController {
         panel.acceptsKeyboardFocus = keyboard
         let hosting = WindowPeekHostingView(rootView: WindowPeekView(state: state, keyboard: keyboard,
                                                                      edge: anchor.edge))
+        // Default options include the content's ideal size, which follows the bitmap and ignores
+        // the point size from Settings. The panel frame stays the one `WindowPeekGeometry` computed.
+        hosting.sizingOptions = []
         panel.contentView = hosting
         hosting.rootView.contentHeightChanged = { [weak self] height in self?.fit(contentHeight: height) }
         hosting.rootView.splitPresentationChanged = { [weak self] in
