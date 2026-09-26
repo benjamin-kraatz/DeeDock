@@ -65,8 +65,12 @@ final class ApplicationCatalog {
     }
 
     func refresh() {
-        running = DockOrdering.unique(service.runningApplications())
-        runningIDs = DockOrdering.runningOrder(previous: runningIDs, current: running)
+        let nextRunning = DockOrdering.unique(service.runningApplications())
+        let nextIDs = DockOrdering.runningOrder(previous: runningIDs, current: nextRunning)
+        // Unchanged arrays are not reassigned, so observers of the running set do not re-render.
+        // `didChange` still fires: unhide and wake can change window occupancy without changing apps.
+        if nextRunning != running { running = nextRunning }
+        if nextIDs != runningIDs { runningIDs = nextIDs }
         didChange?()
     }
 
@@ -137,7 +141,8 @@ final class ApplicationCatalog {
     }
 
     func pruneIcons(items: [DockItem], folders: [FolderDockItem] = []) {
-        let applicationURLs = items.compactMap { service.resolvedURL(for: $0.reference) }
+        // `DockStore.refresh` just resolved these; resolving again would re-read every bookmark.
+        let applicationURLs = items.compactMap(\.resolvedURL)
         let folderURLs = folders.compactMap { item -> URL? in
             let access = FolderResourceAccess(item.reference)
             defer { withExtendedLifetime(access) {} }

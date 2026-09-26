@@ -208,7 +208,7 @@ struct ShelfPanelView: View {
         .coordinateSpace(.named(Self.listSpace))
         .overlay {
             ShelfSelectionOverlayView(
-                rowFrames: state.rowFrames,
+                rowFrames: { state.rowFrames },
                 began: { additive in sweepBase = additive ? state.selection : [] },
                 sweep: { rect, additive in
                     state.sweep(rect, additive: additive, base: sweepBase)

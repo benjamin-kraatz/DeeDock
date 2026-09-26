@@ -35,7 +35,10 @@ final class ShelfPanelState {
     /// The rubber band being swept, in the list's coordinate space.
     var band: CGRect?
     /// Item rectangles in that same space, republished as the list scrolls or resizes.
-    var rowFrames: [UUID: CGRect] = [:]
+    ///
+    /// Not observed: every visible row writes here on each scroll frame, and only event-time hit
+    /// testing and sweeps read it. Observing it would re-render the whole list per row per frame.
+    @ObservationIgnored var rowFrames: [UUID: CGRect] = [:]
     var preview: DockFilePreviewItem?
     var error: String?
     var showingCompost = false

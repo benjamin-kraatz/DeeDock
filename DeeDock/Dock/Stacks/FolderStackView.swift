@@ -177,12 +177,14 @@ struct FolderStackView: View {
     }
 
     private var smartContent: some View {
-        ScrollView {
+        // One index per pass; a linear search per row made large folders quadratic.
+        let entriesByID = Dictionary(state.entries.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return ScrollView {
             LazyVStack(alignment: .leading, spacing: 2, pinnedViews: [.sectionHeaders]) {
                 ForEach(state.sortedSemanticSections) { section in
                     Section {
                         ForEach(section.itemIDs, id: \.self) { id in
-                            if let entry = state.entries.first(where: { $0.id == id }) {
+                            if let entry = entriesByID[id] {
                                 item(entry, grid: false)
                                     .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
                             }

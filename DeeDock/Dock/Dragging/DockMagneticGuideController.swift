@@ -5,6 +5,9 @@ import SwiftUI
 @MainActor
 final class DockMagneticGuideController {
     private var panel: NSPanel?
+    /// What the panel currently shows. Drag events repeat identical guides while a pin stays
+    /// snapped; rebuilding a screen-sized hosting view for each one is wasted work.
+    private var shown: (guides: [DockMagneticGuide], canvas: CGRect)?
 
     /// Shows `guides` in screen space, or hides the overlay when the drag is free.
     ///
@@ -20,17 +23,23 @@ final class DockMagneticGuideController {
             hide()
             return
         }
+        if let shown, shown.guides == guides, shown.canvas == canvas { return }
         let panel = preparedPanel()
-        panel.setFrame(canvas, display: true)
+        if panel.frame != canvas { panel.setFrame(canvas, display: false) }
         let local = guides.map { $0.convertedToTopLeft(in: canvas) }
-        panel.contentView = NSHostingView(
-            rootView: DockMagneticGuidesView(guides: local, canvasSize: canvas.size)
-                .frame(width: canvas.width, height: canvas.height)
-        )
+        let rootView = AnyView(DockMagneticGuidesView(guides: local, canvasSize: canvas.size)
+            .frame(width: canvas.width, height: canvas.height))
+        if let host = panel.contentView as? NSHostingView<AnyView> {
+            host.rootView = rootView
+        } else {
+            panel.contentView = NSHostingView(rootView: rootView)
+        }
+        shown = (guides, canvas)
         panel.orderFrontRegardless()
     }
 
     func hide() {
+        shown = nil
         panel?.orderOut(nil)
         panel?.contentView = nil
     }

@@ -30,6 +30,7 @@ final class WindowPeekCoordinator {
     private var discoveryID: UUID?
     private var dwellTask: Task<Void, Never>?
     private var closeTask: Task<Void, Never>?
+    private var closeDelay = 0
     private var fallbackDiscoveryTask: Task<Void, Never>?
     private var captureTask: Task<Void, Never>?
     private var pendingThumbnailIDs: Set<ApplicationWindowToken> = []
@@ -73,7 +74,7 @@ final class WindowPeekCoordinator {
             return
         }
         sourceHovered = true
-        closeTask?.cancel()
+        cancelClose()
         if sourcePanel === panel, sourceItem?.id == item.id, fileDrag == (documents != nil),
            controller != nil || dwellTask != nil { return }
         close(returnFocus: false)
@@ -134,7 +135,7 @@ final class WindowPeekCoordinator {
 
         panelHovered = controller?.contains(NSEvent.mouseLocation) == true
         if WindowPeekLifecycle.retainsPresentation(sourceHovered: sourceHovered, panelHovered: panelHovered) {
-            closeTask?.cancel()
+            cancelClose()
         } else if controller != nil { scheduleClose() }
     }
 
@@ -163,7 +164,7 @@ final class WindowPeekCoordinator {
         actionMenu.cancel()
         generation = UUID()
         dwellTask?.cancel()
-        closeTask?.cancel()
+        cancelClose()
         fallbackDiscoveryTask?.cancel()
         captureTask?.cancel()
         dwellTask = nil
@@ -226,7 +227,7 @@ final class WindowPeekCoordinator {
         next.state.fileDragUpdated = { [weak self, weak next] info, token in
             guard let self, fileDrag, validatedFileDrop?(info) != nil else { return false }
             panelHovered = true
-            closeTask?.cancel()
+            cancelClose()
             next?.state.selectedID = token
             return true
         }
@@ -241,7 +242,7 @@ final class WindowPeekCoordinator {
         next.state.fileDragEnded = { [weak self] in self?.fileDragEnded?() }
         next.state.hovered = { [weak self] hovered in
             self?.panelHovered = hovered
-            if hovered { self?.closeTask?.cancel() } else { self?.scheduleClose() }
+            if hovered { self?.cancelClose() } else { self?.scheduleClose() }
         }
         next.state.watch = { [weak self, weak panel] token in
             guard let self, let panel,
@@ -273,7 +274,7 @@ final class WindowPeekCoordinator {
         next.state.portalTracking = { [weak self, weak next] tracking in
             next?.state.portalDragging = tracking
             if tracking { self?.enlarge?.dismiss() }
-            if tracking { self?.closeTask?.cancel() } else { self?.updatePointer() }
+            if tracking { self?.cancelClose() } else { self?.updatePointer() }
         }
         next.state.dropPortal = { [weak self, weak panel] window, point, frozen in
             guard let self else { return }
@@ -509,7 +510,7 @@ final class WindowPeekCoordinator {
         actionLayout = actionDisplaySnapshot()
         controller.state.actionBusy = true
         controller.state.actionMessage = nil
-        closeTask?.cancel()
+        cancelClose()
         let currentGeneration = generation
         let point = isKeyboardActive ? controller.actionMenuPoint : NSEvent.mouseLocation
         windowActionTask = Task { [weak self, weak controller] in
@@ -609,14 +610,24 @@ final class WindowPeekCoordinator {
     private func scheduleClose() {
         if controller?.state.actionBusy == true || controller?.state.portalDragging == true { return }
         if fileDocuments != nil, !fileDrag { return }
-        closeTask?.cancel()
         let delay = fileDrag ? 650 : 180
+        // Pointer updates call this on every move outside the peek. Keep the pending deadline so
+        // continuous movement neither churns tasks nor postpones the close indefinitely.
+        if closeTask != nil, closeDelay == delay { return }
+        cancelClose()
+        closeDelay = delay
         closeTask = Task { @MainActor [weak self] in
             try? await Task.sleep(for: .milliseconds(delay))
-            guard let self, !Task.isCancelled,
-                  !WindowPeekLifecycle.retainsPresentation(sourceHovered: sourceHovered, panelHovered: panelHovered)
+            guard let self, !Task.isCancelled else { return }
+            closeTask = nil
+            guard !WindowPeekLifecycle.retainsPresentation(sourceHovered: sourceHovered, panelHovered: panelHovered)
             else { return }
             close(returnFocus: false)
         }
+    }
+
+    private func cancelClose() {
+        closeTask?.cancel()
+        closeTask = nil
     }
 }

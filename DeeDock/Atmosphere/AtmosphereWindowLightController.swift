@@ -68,7 +68,9 @@ final class AtmosphereWindowLightController {
             created.contentView = NSHostingView(rootView: AtmosphereWindowLightView(scene: scene))
             panel = created
         }
-        panel?.setFrame(frame.insetBy(dx: -AtmosphereWindowLightView.margin, dy: -AtmosphereWindowLightView.margin), display: true)
+        // Move and resize notifications arrive every frame of a window drag; skip identical frames.
+        let haloFrame = frame.insetBy(dx: -AtmosphereWindowLightView.margin, dy: -AtmosphereWindowLightView.margin)
+        if panel?.frame != haloFrame { panel?.setFrame(haloFrame, display: true) }
         // Keep the halo behind its source, so it cannot tint that window or cover menus above it.
         panel?.order(.below, relativeTo: Int(next.id))
         scene.visible = true

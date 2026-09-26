@@ -39,8 +39,6 @@ struct DockSurfaceView: View {
         )
     }
 
-    private var centers: [CGFloat] { layout.centers(sizes: sizes) }
-
     /// Inward-trailing corner of DDock glass, not an app pin.
     private var pipAlignment: Alignment {
         switch layout.edge {
@@ -52,6 +50,9 @@ struct DockSurfaceView: View {
     }
 
     var body: some View {
+        // Computed once per pass. Each slot and separator reads it, and this body runs on every
+        // pointer move over the dock and every auto-hide frame.
+        let centers = layout.centers(sizes: sizes)
         ZStack(alignment: .topLeading) {
             if drawsBackground {
                 DockBackgroundView(

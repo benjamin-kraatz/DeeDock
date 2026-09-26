@@ -37,6 +37,9 @@ struct DockAppButton: View {
     @AccessibilityFocusState private var accessibilityFocused: Bool
     @State private var accessibilityWindows: [ApplicationWindowSummary] = []
     @State private var accessibilityDiscoveryID: UUID?
+    /// Captured when VoiceOver focuses the button. `.accessibilityActions` builds its content during
+    /// every `body` pass, and a live process snapshot there would scan running apps on each pointer move.
+    @State private var accessibilityAllHidden = false
 
     private var pinWeatherSample: PinWeatherSample? {
         guard item.isFavorite, let weather = interaction?.pinWeather else { return nil }
@@ -49,6 +52,8 @@ struct DockAppButton: View {
     }
 
     var body: some View {
+        // Standardizes the app URL for the lookup; read once per pass, not once per use.
+        let badgeLabel = self.badgeLabel
         Button(action: primaryAction) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
                                  available: item.isAvailable, running: item.isRunning,
@@ -137,7 +142,7 @@ struct DockAppButton: View {
             cancelAccessibilityWindowDiscovery()
         }
         .accessibilityLabel(Text(verbatim: item.reference.name))
-        .accessibilityValue(accessibilityStatus)
+        .accessibilityValue(accessibilityStatus(badgeLabel: badgeLabel))
         .accessibilityHint(Text(.appOpenHint))
         .accessibilityAction(
             named: Text(item.isFavorite ? .actionUnpin : .actionPin),
@@ -152,9 +157,10 @@ struct DockAppButton: View {
                 Button(.applicationMenuShowInFinder) { interaction?.performApplicationMenuAction?(.showInFinder, item) }
             }
             if item.isRunning {
-                let allHidden = interaction?.applicationMenuSnapshot?(item).allProcessesHidden == true
+                let allHidden = accessibilityAllHidden
                 Button(allHidden ? .applicationMenuShow : .applicationMenuHide) {
                     interaction?.performApplicationMenuAction?(.setHidden(!allHidden), item)
+                    accessibilityAllHidden = !allHidden
                 }
                 Button(.applicationMenuBringAllToFront) { interaction?.performApplicationMenuAction?(.bringAllToFront, item) }
                 Button(.applicationMenuQuit) { interaction?.performApplicationMenuAction?(.quit, item) }
@@ -201,7 +207,7 @@ struct DockAppButton: View {
                                          name: item.reference.name, eligible: item.isFavorite))
     }
 
-    private var accessibilityStatus: Text {
+    private func accessibilityStatus(badgeLabel: String?) -> Text {
         let status = String(localized: item.isAvailable
             ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusNotRunning)
             : .appStatusUnavailable)
@@ -222,9 +228,9 @@ struct DockAppButton: View {
     }
 
     private func discoverAccessibilityWindows() {
-        guard accessibilityDiscoveryID == nil,
-              let snapshot = interaction?.applicationMenuSnapshot?(item),
-              snapshot.windowState == .loading else {
+        let snapshot = interaction?.applicationMenuSnapshot?(item)
+        accessibilityAllHidden = snapshot?.allProcessesHidden == true
+        guard accessibilityDiscoveryID == nil, let snapshot, snapshot.windowState == .loading else {
             accessibilityWindows = []
             return
         }

@@ -30,6 +30,9 @@ final class DockTimelineController {
     @ObservationIgnored private var layouts: [UUID: [String]] = [:]
     @ObservationIgnored private var pinLookup: [String: DockPin] = [:]
     @ObservationIgnored private var currentPins: [DockPin] = []
+    /// Markers depend only on the event list, while `presentation` is rebuilt on every pointer
+    /// move along the timeline. Array equality short-circuits on unchanged storage.
+    @ObservationIgnored private var markersCache: (events: [DockLocalHistoryEvent], markers: [DockTimelineMarker])?
 
     init(history: DockLocalHistoryStore) {
         self.history = history
@@ -51,14 +54,21 @@ final class DockTimelineController {
             isReplayingPins: isReplayingPins,
             progress: progress,
             selectedEvent: selectedEvent,
-            markers: events.map { event in
-                DockTimelineMarker(
-                    id: event.id,
-                    progress: DockTimelineMapping.progress(for: event, in: events),
-                    kind: event.kind
-                )
-            }
+            markers: markers(for: events)
         )
+    }
+
+    private func markers(for events: [DockLocalHistoryEvent]) -> [DockTimelineMarker] {
+        if let markersCache, markersCache.events == events { return markersCache.markers }
+        let markers = events.map { event in
+            DockTimelineMarker(
+                id: event.id,
+                progress: DockTimelineMapping.progress(for: event, in: events),
+                kind: event.kind
+            )
+        }
+        markersCache = (events, markers)
+        return markers
     }
 
     /// Starts browsing on one display's dock. Progress begins at the newest event.

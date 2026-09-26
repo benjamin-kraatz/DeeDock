@@ -101,11 +101,17 @@ nonisolated struct LauncherSuggestionDocument: Codable, Sendable {
         let oldCounts = [events.count, examples.count, feedback.count, impressions.count, promptAnswers.count]
         let cutoff = now.addingTimeInterval(-Self.retention)
         func eligible(_ date: Date) -> Bool { date > cutoff && date <= now }
-        events = Array(events.filter { eligible($0.date) && eligible($0.context.date) }.suffix(20_000))
-        examples = Array(examples.filter { eligible($0.date) && eligible($0.context.date) }.suffix(10_000))
-        feedback = Array(feedback.filter { eligible($0.date) && eligible($0.context.date) }.suffix(2_000))
-        impressions = Array(impressions.filter { eligible($0.date) && eligible($0.context.date) }.suffix(2_000))
-        promptAnswers = Array(promptAnswers.filter { eligible($0.date) }.suffix(100))
+        // Runs on every app switch. Rebuild an array only when something actually ages out or
+        // exceeds its cap; the common case is a scan with no allocation.
+        func retain<Item>(_ items: inout [Item], cap: Int, where keep: (Item) -> Bool) {
+            guard items.count > cap || items.contains(where: { !keep($0) }) else { return }
+            items = Array(items.filter(keep).suffix(cap))
+        }
+        retain(&events, cap: 20_000) { eligible($0.date) && eligible($0.context.date) }
+        retain(&examples, cap: 10_000) { eligible($0.date) && eligible($0.context.date) }
+        retain(&feedback, cap: 2_000) { eligible($0.date) && eligible($0.context.date) }
+        retain(&impressions, cap: 2_000) { eligible($0.date) && eligible($0.context.date) }
+        retain(&promptAnswers, cap: 100) { eligible($0.date) }
         return oldCounts != [events.count, examples.count, feedback.count, impressions.count, promptAnswers.count]
     }
 }

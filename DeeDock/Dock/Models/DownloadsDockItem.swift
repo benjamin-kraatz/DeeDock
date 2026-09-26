@@ -11,8 +11,19 @@ enum DownloadsDockItem {
             .flatMap(FolderStackPresentation.init(rawValue:)) ?? .grid
         let reference = FolderReference(id: id, url: url, name: String(localized: .downloadsName),
             bookmarkData: Data(), presentation: presentation)
-        return FolderDockItem(reference: reference, icon: NSWorkspace.shared.icon(forFile: url.path),
+        return FolderDockItem(reference: reference, icon: icon(for: url),
             isAvailable: FolderResourceAccess(reference).isAvailable)
+    }
+
+    /// Every entries rebuild creates this item. Reusing one image keeps SwiftUI from treating the
+    /// icon as new artwork and avoids a Launch Services lookup per rebuild.
+    private static var cachedIcon: (path: String, image: NSImage)?
+
+    private static func icon(for url: URL) -> NSImage {
+        if let cachedIcon, cachedIcon.path == url.path { return cachedIcon.image }
+        let image = NSWorkspace.shared.icon(forFile: url.path)
+        cachedIcon = (url.path, image)
+        return image
     }
 }
 

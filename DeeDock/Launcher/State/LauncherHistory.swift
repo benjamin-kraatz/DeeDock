@@ -4,7 +4,7 @@ import Observation
 /// App-wide successful DDock opens. No system-wide usage monitoring is involved.
 @MainActor @Observable
 final class LauncherHistory {
-    struct Visit: Codable {
+    struct Visit: Codable, Equatable {
         let reference: ApplicationReference
         var lastOpened: Date
         var count: Int
