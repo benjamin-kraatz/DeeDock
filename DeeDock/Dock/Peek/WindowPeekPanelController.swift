@@ -88,9 +88,18 @@ final class WindowPeekPanelController {
     }
 
     /// Content shorter than the panel would otherwise leave a gap between the card and its icon.
+    ///
+    /// A card list fills any height it is offered, so its report is only a mirror of the current
+    /// panel size. With the compatibility switch on, the windows phase ignores reports and restores
+    /// the computed placement, so a short report from an earlier phase cannot pin the panel.
     private func fit(contentHeight: CGFloat) {
         guard !stopped, contentHeight > 0 else { return }
-        let frame = WindowPeekGeometry.fitted(placement, contentHeight: contentHeight)
+        let frame: CGRect
+        if state.settings.windowPeekKeepsPanelSize, state.phase == .windows {
+            frame = placement.frame
+        } else {
+            frame = WindowPeekGeometry.fitted(placement, contentHeight: contentHeight)
+        }
         guard abs(frame.height - panel.frame.height) > 0.5 || abs(frame.minY - panel.frame.minY) > 0.5 else { return }
         panel.setFrame(frame, display: true)
     }

@@ -10,6 +10,11 @@ struct WindowPeekCompatibilityTests {
         try assertOptInMigration(\.windowPeekNeverShowsScrollBars, key: "windowPeekNeverShowsScrollBars")
     }
 
+    @Test("Fixed panel size stays off for existing settings and round-trips when enabled")
+    func keepsPanelSize() throws {
+        try assertOptInMigration(\.windowPeekKeepsPanelSize, key: "windowPeekKeepsPanelSize")
+    }
+
     private func assertOptInMigration(_ keyPath: WritableKeyPath<DockSettings, Bool>, key: String) throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()

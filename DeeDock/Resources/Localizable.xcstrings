@@ -43754,6 +43754,24 @@
           }
         }
       }
+    },
+    "windowPeekKeepsPanelSize" : {
+      "comment" : "Compatibility switch: the Window Peek panel keeps its computed size while windows are shown instead of shrinking to the height its content reports.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feld in berechneter Größe belassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the panel at its computed size"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

@@ -58,6 +58,8 @@ struct WindowPeekSettingsPane: View {
             SettingsCard(title: .windowPeekCompatibilityTitle, footnote: .windowPeekCompatibilityHelp) {
                 SettingsToggleRow(title: .windowPeekNeverShowsScrollBars,
                                   isOn: source.binding(\.windowPeekNeverShowsScrollBars))
+                SettingsToggleRow(title: .windowPeekKeepsPanelSize,
+                                  isOn: source.binding(\.windowPeekKeepsPanelSize))
             }
         }
         .disabled(persistentSettingsDisabled)

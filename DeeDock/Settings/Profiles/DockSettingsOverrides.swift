@@ -128,6 +128,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.windowPeekIncludeUntitled = defaults.windowPeekIncludeUntitled
         result.windowPeekHoverDelay = defaults.windowPeekHoverDelay
         result.windowPeekNeverShowsScrollBars = defaults.windowPeekNeverShowsScrollBars
+        result.windowPeekKeepsPanelSize = defaults.windowPeekKeepsPanelSize
         result.soapBubbleEffects = defaults.soapBubbleEffects
         result.showAppBadgeCounts = defaults.showAppBadgeCounts
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
