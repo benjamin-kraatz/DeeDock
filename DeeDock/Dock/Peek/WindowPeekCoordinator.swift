@@ -470,6 +470,15 @@ final class WindowPeekCoordinator {
                 images[card.id] != nil && windows.contains { $0 == card.window }
             }
             history.record(historyCards, appName: controller.state.appName, epoch: historyEpoch)
+            WindowPeekDiagnostics.shared.record(
+                settings: settings, placement: controller.placementFrame, panel: controller.frame,
+                screen: controller.screen,
+                captures: windows.map { window in
+                    let image = images[window.token]
+                    return WindowPeekDiagnostics.Capture(
+                        frame: window.frame ?? .zero,
+                        pixels: image.map { CGSize(width: $0.width, height: $0.height) })
+                })
             captureTask = nil
             scheduleCapture()
         }

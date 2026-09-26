@@ -8,6 +8,7 @@ import SwiftUI
 struct WindowPeekSettingsPane: View {
     let source: SettingsValueSource
     let persistentSettingsDisabled: Bool
+    private let diagnostics = WindowPeekDiagnostics.shared
 
     private var settings: DockSettings { source.value }
 
@@ -62,6 +63,14 @@ struct WindowPeekSettingsPane: View {
                                   isOn: source.binding(\.windowPeekKeepsPanelSize))
                 SettingsToggleRow(title: .windowPeekCapturesAtAutomaticResolution,
                                   isOn: source.binding(\.windowPeekCapturesAtAutomaticResolution))
+                SettingsStackedRow(title: .windowPeekDiagnosticsTitle, subtitle: .windowPeekDiagnosticsHelp) {
+                    Button(.windowPeekCopyDiagnostics, systemImage: "doc.on.doc") {
+                        guard let report = diagnostics.report else { return }
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(report, forType: .string)
+                    }
+                    .disabled(diagnostics.report == nil)
+                }
             }
         }
         .disabled(persistentSettingsDisabled)

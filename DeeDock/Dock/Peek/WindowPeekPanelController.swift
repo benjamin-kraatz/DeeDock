@@ -108,6 +108,8 @@ final class WindowPeekPanelController {
 
     /// The panel's frame in AppKit screen coordinates.
     var frame: CGRect { panel.frame }
+    /// The frame `WindowPeekGeometry` computed for the current layout, before any content fitting.
+    var placementFrame: CGRect { placement.frame }
     var edge: DockEdge { anchor.edge }
     var visibleFrame: CGRect { anchor.visibleFrame }
     /// The display showing this Peek, preferring the one whose usable frame the anchor came from.

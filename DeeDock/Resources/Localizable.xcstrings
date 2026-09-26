@@ -43790,6 +43790,60 @@
           }
         }
       }
+    },
+    "windowPeekDiagnosticsTitle" : {
+      "comment" : "Row title above the button that copies a Window Peek diagnostics report.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnose"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostics"
+          }
+        }
+      }
+    },
+    "windowPeekDiagnosticsHelp" : {
+      "comment" : "Explains the diagnostics report: it holds sizes, display scale, scroll bar style, and capture dimensions from the last Window Peek, with no window titles, app names, or images.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert Größen, Bildschirmskalierung, Rollbalkenstil und Aufnahmemaße der letzten Vorschau. Fenstertitel, App-Namen und Bilder sind nicht enthalten. Füge den Text in einen Fehlerbericht ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copies sizes, display scale, scroll bar style, and capture dimensions from the last preview. No window titles, app names, or images are included. Paste it into a bug report."
+          }
+        }
+      }
+    },
+    "windowPeekCopyDiagnostics" : {
+      "comment" : "Button that copies the Window Peek diagnostics report to the clipboard. Disabled until a preview has been shown.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnose kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Diagnostics"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"
