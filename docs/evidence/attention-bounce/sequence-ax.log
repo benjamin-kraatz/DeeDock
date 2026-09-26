@@ -1,0 +1,1039 @@
+0.039 MATCHES 2
+0.039 ITEM 0 ATTRIBUTES ["AXRole", "AXRoleDescription", "AXSubrole", "AXTitle", "AXParent", "AXChildren", "AXPosition", "AXSize", "AXFrame", "AXTopLevelUIElement", "AXSelected", "AXShownMenuUIElement", "AXStatusLabel", "AXProgressValue", "AXURL", "AXIsApplicationRunning"]
+0.039 PARAMETERIZED Optional(<__NSArray0 0x1ebf3cb18>(
+
+)
+)
+0.039 SUBSCRIBE 0 AXMoved -25207
+0.039 SUBSCRIBE 0 AXResized -25207
+0.039 SUBSCRIBE 0 AXValueChanged -25207
+0.039 SUBSCRIBE 0 AXTitleChanged -25207
+0.039 SUBSCRIBE 0 AXLayoutChanged -25207
+0.039 SUBSCRIBE 0 AXSelectedChildrenChanged -25207
+0.039 SUBSCRIBE 0 AXUIElementDestroyed 0
+0.039 SUBSCRIBE 0 AXCreated 0
+0.039 SUBSCRIBE 0 AXAnnouncementRequested -25207
+0.040 ITEM 1 ATTRIBUTES ["AXRole", "AXRoleDescription", "AXSubrole", "AXTitle", "AXParent", "AXChildren", "AXPosition", "AXSize", "AXFrame", "AXTopLevelUIElement", "AXSelected", "AXShownMenuUIElement", "AXStatusLabel", "AXProgressValue", "AXURL", "AXIsApplicationRunning"]
+0.040 PARAMETERIZED Optional(<__NSArray0 0x1ebf3cb18>(
+
+)
+)
+0.040 SUBSCRIBE 1 AXMoved -25207
+0.040 SUBSCRIBE 1 AXResized -25207
+0.040 SUBSCRIBE 1 AXValueChanged -25207
+0.040 SUBSCRIBE 1 AXTitleChanged -25207
+0.040 SUBSCRIBE 1 AXLayoutChanged -25207
+0.040 SUBSCRIBE 1 AXSelectedChildrenChanged -25207
+0.040 SUBSCRIBE 1 AXUIElementDestroyed 0
+0.040 SUBSCRIBE 1 AXCreated 0
+0.040 SUBSCRIBE 1 AXAnnouncementRequested -25207
+0.041 CHANGE 0.AXRole AXDockItem
+0.041 CHANGE 0.AXRoleDescription Dockobjekt ist Programm
+0.041 CHANGE 0.AXSubrole AXApplicationDockItem
+0.041 CHANGE 0.AXTitle Rattention
+0.041 CHANGE 0.AXParent <AXUIElement PTR> {pid=677}
+0.041 CHANGE 0.AXChildren (
+)
+0.041 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1445.000000 type = kAXValueCGPointType}
+0.041 CHANGE 0.AXSize <AXValue PTR> {value = w:47.000000 h:59.000000 type = kAXValueCGSizeType}
+0.041 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+0.041 CHANGE 0.AXTopLevelUIElement <AXUIElement PTR> {pid=677}
+0.041 CHANGE 0.AXSelected 0
+0.041 CHANGE 0.AXShownMenuUIElement <nil>
+0.041 CHANGE 0.AXStatusLabel <nil>
+0.041 CHANGE 0.AXProgressValue <nil>
+0.042 CHANGE 0.AXURL file:///Users/USER/Library/Developer/Xcode/DerivedData/DeeDock-fzdwxvqpdeduqvbqmbiemjvnbqau/Build/Products/Debug/Rattention.app/
+0.042 CHANGE 0.AXIsApplicationRunning 1
+0.042 CHANGE 1.AXRole AXDockItem
+0.042 CHANGE 1.AXRoleDescription Dockobjekt ist Programm
+0.042 CHANGE 1.AXSubrole AXApplicationDockItem
+0.042 CHANGE 1.AXTitle Rattention
+0.042 CHANGE 1.AXParent <AXUIElement PTR> {pid=677}
+0.042 CHANGE 1.AXChildren (
+)
+0.042 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+0.042 CHANGE 1.AXSize <AXValue PTR> {value = w:47.000000 h:59.000000 type = kAXValueCGSizeType}
+0.042 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+0.042 CHANGE 1.AXTopLevelUIElement <AXUIElement PTR> {pid=677}
+0.042 CHANGE 1.AXSelected 0
+0.042 CHANGE 1.AXShownMenuUIElement <nil>
+0.042 CHANGE 1.AXStatusLabel <nil>
+0.042 CHANGE 1.AXProgressValue <nil>
+0.042 CHANGE 1.AXURL file:///private/tmp/rattention-probe/build/Rattention.app/
+0.042 CHANGE 1.AXIsApplicationRunning 1
+1.505 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.421753 type = kAXValueCGPointType}
+1.505 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.421753 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.534 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.032349 type = kAXValueCGPointType}
+1.535 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.032349 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.568 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.373291 type = kAXValueCGPointType}
+1.568 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.373291 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.600 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1398.892578 type = kAXValueCGPointType}
+1.600 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1398.892578 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.633 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1389.116577 type = kAXValueCGPointType}
+1.634 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1389.116577 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.667 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1382.045532 type = kAXValueCGPointType}
+1.667 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1382.045532 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.709 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.766357 type = kAXValueCGPointType}
+1.709 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.766357 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.742 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.017700 type = kAXValueCGPointType}
+1.742 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.017700 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.773 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.060913 type = kAXValueCGPointType}
+1.774 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.060913 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.805 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1380.809082 type = kAXValueCGPointType}
+1.805 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1380.809082 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.835 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1387.485962 type = kAXValueCGPointType}
+1.835 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1387.485962 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.869 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1391.633789 type = kAXValueCGPointType}
+1.869 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1391.633789 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.902 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1402.523560 type = kAXValueCGPointType}
+1.902 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1402.523560 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.936 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1415.854370 type = kAXValueCGPointType}
+1.936 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.854370 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+1.969 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1431.890015 type = kAXValueCGPointType}
+1.969 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1431.890015 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.002 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1440.500732 type = kAXValueCGPointType}
+2.002 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1440.500732 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.036 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1428.275269 type = kAXValueCGPointType}
+2.036 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1428.275269 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.069 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1419.019531 type = kAXValueCGPointType}
+2.070 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1419.019531 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.101 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1413.247681 type = kAXValueCGPointType}
+2.101 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1413.247681 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.130 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.592041 type = kAXValueCGPointType}
+2.131 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.592041 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.163 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.563599 type = kAXValueCGPointType}
+2.169 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.563599 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.202 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1412.790527 type = kAXValueCGPointType}
+2.202 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1412.790527 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.234 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1418.198853 type = kAXValueCGPointType}
+2.234 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1418.198853 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.265 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.080566 type = kAXValueCGPointType}
+2.265 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.080566 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.297 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1438.942505 type = kAXValueCGPointType}
+2.297 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1438.942505 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.329 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1439.104614 type = kAXValueCGPointType}
+2.330 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1439.104614 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.362 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1434.848999 type = kAXValueCGPointType}
+2.362 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1434.848999 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.394 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1429.421875 type = kAXValueCGPointType}
+2.394 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1429.421875 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.427 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.756104 type = kAXValueCGPointType}
+2.427 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.756104 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.458 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1429.966919 type = kAXValueCGPointType}
+2.458 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1429.966919 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.489 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.931274 type = kAXValueCGPointType}
+2.490 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.931274 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.523 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1440.463379 type = kAXValueCGPointType}
+2.523 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+2.556 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+2.628 FRONT Xcode pid=14193
+13.048 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.032349 type = kAXValueCGPointType}
+13.048 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.032349 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.080 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.769653 type = kAXValueCGPointType}
+13.080 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.769653 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.108 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1404.973389 type = kAXValueCGPointType}
+13.108 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1404.973389 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.141 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1393.806396 type = kAXValueCGPointType}
+13.141 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1393.806396 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.173 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1385.142212 type = kAXValueCGPointType}
+13.173 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1385.142212 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.206 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1379.462158 type = kAXValueCGPointType}
+13.206 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1379.462158 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.238 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.486816 type = kAXValueCGPointType}
+13.238 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.486816 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.267 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.017700 type = kAXValueCGPointType}
+13.267 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.017700 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.298 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.130493 type = kAXValueCGPointType}
+13.299 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.130493 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.331 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1380.955811 type = kAXValueCGPointType}
+13.332 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1380.955811 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.363 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1387.712280 type = kAXValueCGPointType}
+13.363 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1387.712280 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.391 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1391.897583 type = kAXValueCGPointType}
+13.391 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1391.897583 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.422 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1402.523560 type = kAXValueCGPointType}
+13.422 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1402.523560 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.455 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1415.854370 type = kAXValueCGPointType}
+13.455 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.854370 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.488 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1432.387939 type = kAXValueCGPointType}
+13.489 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1432.387939 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.521 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1440.500732 type = kAXValueCGPointType}
+13.521 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1440.500732 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.552 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1433.815918 type = kAXValueCGPointType}
+13.553 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1433.815918 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.585 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1423.226685 type = kAXValueCGPointType}
+13.585 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1423.226685 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.617 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1415.818726 type = kAXValueCGPointType}
+13.618 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.818726 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.651 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.668701 type = kAXValueCGPointType}
+13.651 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.668701 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.685 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.532471 type = kAXValueCGPointType}
+13.685 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.532471 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.717 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1412.577637 type = kAXValueCGPointType}
+13.718 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1412.577637 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.750 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1417.610596 type = kAXValueCGPointType}
+13.751 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1417.610596 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.784 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1426.211914 type = kAXValueCGPointType}
+13.784 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1426.211914 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.818 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1437.801025 type = kAXValueCGPointType}
+13.818 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1437.801025 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.851 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+13.851 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.883 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.489136 type = kAXValueCGPointType}
+13.884 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.489136 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.915 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1429.630615 type = kAXValueCGPointType}
+13.916 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1429.630615 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.946 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.751587 type = kAXValueCGPointType}
+13.946 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.751587 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+13.978 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1429.630615 type = kAXValueCGPointType}
+13.978 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1429.630615 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+14.011 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.272705 type = kAXValueCGPointType}
+14.011 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.272705 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+14.043 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1439.638916 type = kAXValueCGPointType}
+14.043 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1439.638916 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+14.076 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+14.077 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.017 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1440.654663 type = kAXValueCGPointType}
+15.017 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1440.654663 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.047 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1431.394287 type = kAXValueCGPointType}
+15.048 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1431.394287 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.080 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1415.436035 type = kAXValueCGPointType}
+15.081 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.436035 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.113 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1402.182495 type = kAXValueCGPointType}
+15.114 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1402.182495 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.146 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1391.633789 type = kAXValueCGPointType}
+15.146 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1391.633789 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.177 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1383.789795 type = kAXValueCGPointType}
+15.178 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1383.789795 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.208 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1380.809082 type = kAXValueCGPointType}
+15.208 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1380.809082 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.240 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.060913 type = kAXValueCGPointType}
+15.240 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.060913 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.271 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.027588 type = kAXValueCGPointType}
+15.271 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.027588 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.304 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.766357 type = kAXValueCGPointType}
+15.304 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.766357 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.337 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1382.376709 type = kAXValueCGPointType}
+15.337 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1382.376709 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.370 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1389.602417 type = kAXValueCGPointType}
+15.370 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1389.602417 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.401 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1394.087891 type = kAXValueCGPointType}
+15.401 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1394.087891 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.432 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1405.332153 type = kAXValueCGPointType}
+15.432 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1405.332153 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.464 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1419.719482 type = kAXValueCGPointType}
+15.464 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1419.719482 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.496 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1436.450684 type = kAXValueCGPointType}
+15.496 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1436.450684 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.525 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1444.158569 type = kAXValueCGPointType}
+15.526 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1444.158569 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.559 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1431.115112 type = kAXValueCGPointType}
+15.559 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1431.115112 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.592 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1421.017944 type = kAXValueCGPointType}
+15.592 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1421.017944 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.624 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1414.427979 type = kAXValueCGPointType}
+15.624 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1414.427979 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.656 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.019409 type = kAXValueCGPointType}
+15.656 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.019409 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.688 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.792114 type = kAXValueCGPointType}
+15.689 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.792114 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.723 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1413.877441 type = kAXValueCGPointType}
+15.723 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1413.877441 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.757 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1416.504272 type = kAXValueCGPointType}
+15.757 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1416.504272 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.790 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1424.544678 type = kAXValueCGPointType}
+15.790 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1424.544678 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.822 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.588379 type = kAXValueCGPointType}
+15.822 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.588379 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.855 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1441.898804 type = kAXValueCGPointType}
+15.856 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1441.898804 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.889 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1433.462646 type = kAXValueCGPointType}
+15.889 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1433.462646 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.923 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1428.787842 type = kAXValueCGPointType}
+15.923 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1428.787842 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.956 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.874390 type = kAXValueCGPointType}
+15.956 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.874390 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+15.990 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1430.858887 type = kAXValueCGPointType}
+15.990 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1430.858887 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+16.023 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1437.575562 type = kAXValueCGPointType}
+16.023 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1437.575562 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+16.056 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+16.056 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.055 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.986206 type = kAXValueCGPointType}
+17.055 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.986206 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.089 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1412.168091 type = kAXValueCGPointType}
+17.089 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1412.168091 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.123 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1399.532837 type = kAXValueCGPointType}
+17.123 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1399.532837 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.155 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1389.602417 type = kAXValueCGPointType}
+17.156 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1389.602417 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.190 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1382.376709 type = kAXValueCGPointType}
+17.190 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1382.376709 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.222 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.855835 type = kAXValueCGPointType}
+17.222 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.855835 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.254 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.027588 type = kAXValueCGPointType}
+17.255 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.027588 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.285 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.158936 type = kAXValueCGPointType}
+17.286 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.158936 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.317 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1378.438721 type = kAXValueCGPointType}
+17.317 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1378.438721 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.350 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1383.605469 type = kAXValueCGPointType}
+17.350 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1383.605469 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.384 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1391.372070 type = kAXValueCGPointType}
+17.384 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1391.372070 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.417 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1401.843506 type = kAXValueCGPointType}
+17.417 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1401.843506 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.449 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1415.436035 type = kAXValueCGPointType}
+17.449 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.436035 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.482 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1422.849365 type = kAXValueCGPointType}
+17.482 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1422.849365 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.516 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1440.654663 type = kAXValueCGPointType}
+17.516 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1440.654663 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.548 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1434.517212 type = kAXValueCGPointType}
+17.548 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1434.517212 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.581 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1423.746094 type = kAXValueCGPointType}
+17.581 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1423.746094 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.614 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1416.328979 type = kAXValueCGPointType}
+17.614 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1416.328979 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.646 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.829712 type = kAXValueCGPointType}
+17.646 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.829712 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.676 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.520752 type = kAXValueCGPointType}
+17.677 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.520752 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.709 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.072632 type = kAXValueCGPointType}
+17.710 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.072632 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.738 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1414.572144 type = kAXValueCGPointType}
+17.738 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1414.572144 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.766 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1421.490601 type = kAXValueCGPointType}
+17.766 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1421.490601 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.798 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1425.927490 type = kAXValueCGPointType}
+17.798 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1425.927490 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.829 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1437.801025 type = kAXValueCGPointType}
+17.829 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1437.801025 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.858 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1439.910645 type = kAXValueCGPointType}
+17.858 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1439.910645 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.890 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1432.394165 type = kAXValueCGPointType}
+17.891 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1432.394165 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.922 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1428.304199 type = kAXValueCGPointType}
+17.922 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1428.304199 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.955 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.756104 type = kAXValueCGPointType}
+17.955 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.756104 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+17.985 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1429.421875 type = kAXValueCGPointType}
+17.985 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1429.421875 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+18.017 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.059326 type = kAXValueCGPointType}
+18.017 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.059326 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+18.046 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1444.355225 type = kAXValueCGPointType}
+18.046 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1444.355225 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+18.075 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+18.075 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.030 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1434.401611 type = kAXValueCGPointType}
+19.030 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1434.401611 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.059 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1425.618164 type = kAXValueCGPointType}
+19.059 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1425.618164 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.089 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.979126 type = kAXValueCGPointType}
+19.090 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.979126 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.121 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1398.261108 type = kAXValueCGPointType}
+19.121 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1398.261108 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.154 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1388.877075 type = kAXValueCGPointType}
+19.155 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1388.877075 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.184 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1385.142212 type = kAXValueCGPointType}
+19.184 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1385.142212 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.216 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1379.339600 type = kAXValueCGPointType}
+19.216 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1379.339600 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.246 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.441650 type = kAXValueCGPointType}
+19.246 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.441650 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.278 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.248413 type = kAXValueCGPointType}
+19.278 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.248413 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.308 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.202271 type = kAXValueCGPointType}
+19.308 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.202271 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.341 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1381.104858 type = kAXValueCGPointType}
+19.341 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1381.104858 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.373 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1387.940918 type = kAXValueCGPointType}
+19.373 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1387.940918 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.406 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1397.024536 type = kAXValueCGPointType}
+19.406 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1397.024536 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.438 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1409.424683 type = kAXValueCGPointType}
+19.438 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1409.424683 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.469 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1424.223877 type = kAXValueCGPointType}
+19.469 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1424.223877 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.503 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1441.727783 type = kAXValueCGPointType}
+19.503 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1441.727783 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.535 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1440.107178 type = kAXValueCGPointType}
+19.535 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1440.107178 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.567 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.972656 type = kAXValueCGPointType}
+19.568 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.972656 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.599 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1419.019531 type = kAXValueCGPointType}
+19.599 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1419.019531 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.632 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1413.247681 type = kAXValueCGPointType}
+19.632 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1413.247681 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.664 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.657104 type = kAXValueCGPointType}
+19.665 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.657104 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.698 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.247925 type = kAXValueCGPointType}
+19.698 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.247925 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.731 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1412.790527 type = kAXValueCGPointType}
+19.731 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.020142 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.765 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1418.198853 type = kAXValueCGPointType}
+19.765 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1418.198853 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.796 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1426.788452 type = kAXValueCGPointType}
+19.797 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1426.788452 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.831 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1438.559448 type = kAXValueCGPointType}
+19.831 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1438.559448 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.865 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1439.370239 type = kAXValueCGPointType}
+19.865 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1439.370239 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.898 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1431.743164 type = kAXValueCGPointType}
+19.898 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1431.743164 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.931 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1428.143066 type = kAXValueCGPointType}
+19.931 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1428.143066 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.963 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1428.304199 type = kAXValueCGPointType}
+19.963 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1428.304199 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+19.993 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1429.851807 type = kAXValueCGPointType}
+19.994 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1429.851807 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+20.027 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.708740 type = kAXValueCGPointType}
+20.027 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.708740 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+20.060 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+20.061 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.037 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1433.390381 type = kAXValueCGPointType}
+21.037 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1433.390381 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.069 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1416.697876 type = kAXValueCGPointType}
+21.069 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1416.697876 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.104 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1403.212524 type = kAXValueCGPointType}
+21.104 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1403.212524 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.137 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1392.431885 type = kAXValueCGPointType}
+21.137 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1392.431885 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.170 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1387.940918 type = kAXValueCGPointType}
+21.170 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1387.940918 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.202 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1381.104858 type = kAXValueCGPointType}
+21.202 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1381.104858 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.234 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.276245 type = kAXValueCGPointType}
+21.235 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.276245 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.265 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.001099 type = kAXValueCGPointType}
+21.266 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.001099 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.298 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.511353 type = kAXValueCGPointType}
+21.299 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.511353 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.332 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1381.723145 type = kAXValueCGPointType}
+21.332 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1381.723145 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.363 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1384.942383 type = kAXValueCGPointType}
+21.363 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1384.942383 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.391 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1393.250000 type = kAXValueCGPointType}
+21.391 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1393.250000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.423 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1404.616821 type = kAXValueCGPointType}
+21.423 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1404.616821 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.454 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1417.979614 type = kAXValueCGPointType}
+21.455 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1417.979614 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.485 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1426.087402 type = kAXValueCGPointType}
+21.485 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1426.087402 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.518 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1443.900391 type = kAXValueCGPointType}
+21.518 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1443.900391 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.551 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1432.444702 type = kAXValueCGPointType}
+21.551 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1432.444702 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.584 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1421.973633 type = kAXValueCGPointType}
+21.584 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1421.973633 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.617 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1415.020142 type = kAXValueCGPointType}
+21.618 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.020142 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.651 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.247925 type = kAXValueCGPointType}
+21.651 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.247925 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.684 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.687012 type = kAXValueCGPointType}
+21.684 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.687012 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.718 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1413.247681 type = kAXValueCGPointType}
+21.718 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1413.247681 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.752 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1415.818726 type = kAXValueCGPointType}
+21.752 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1415.818726 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.785 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1423.226685 type = kAXValueCGPointType}
+21.785 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1423.226685 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.818 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1433.815918 type = kAXValueCGPointType}
+21.818 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1433.815918 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.851 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1442.796875 type = kAXValueCGPointType}
+21.851 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1442.796875 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.885 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1434.038330 type = kAXValueCGPointType}
+21.886 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1434.038330 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.918 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1429.041138 type = kAXValueCGPointType}
+21.918 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1429.041138 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.952 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.805298 type = kAXValueCGPointType}
+21.952 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.805298 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+21.986 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1430.330688 type = kAXValueCGPointType}
+21.986 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1430.330688 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+22.020 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1436.617554 type = kAXValueCGPointType}
+22.020 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1436.617554 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+22.053 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+22.053 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.019 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1439.590454 type = kAXValueCGPointType}
+23.019 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1439.590454 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.051 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1430.900757 type = kAXValueCGPointType}
+23.052 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1430.900757 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.084 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1414.605835 type = kAXValueCGPointType}
+23.085 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1414.605835 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.119 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1401.506836 type = kAXValueCGPointType}
+23.119 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1401.506836 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.151 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1390.855469 type = kAXValueCGPointType}
+23.151 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1390.855469 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.185 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1383.243286 type = kAXValueCGPointType}
+23.185 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1383.243286 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.217 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1378.336060 type = kAXValueCGPointType}
+23.217 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1378.336060 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.248 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.133545 type = kAXValueCGPointType}
+23.248 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.133545 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.279 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.054077 type = kAXValueCGPointType}
+23.279 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.054077 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.311 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.947510 type = kAXValueCGPointType}
+23.311 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.947510 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.342 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1382.545654 type = kAXValueCGPointType}
+23.342 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1382.545654 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.373 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1390.096924 type = kAXValueCGPointType}
+23.373 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1390.096924 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.406 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1394.657593 type = kAXValueCGPointType}
+23.406 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1399.856323 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.439 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1406.056396 type = kAXValueCGPointType}
+23.439 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1406.056396 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.471 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1420.160034 type = kAXValueCGPointType}
+23.471 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1420.160034 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.502 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1436.968384 type = kAXValueCGPointType}
+23.503 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1436.968384 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.534 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1437.053101 type = kAXValueCGPointType}
+23.535 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1437.053101 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.565 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1425.366577 type = kAXValueCGPointType}
+23.566 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1425.366577 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.597 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1421.017944 type = kAXValueCGPointType}
+23.598 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1421.017944 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.630 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1414.286499 type = kAXValueCGPointType}
+23.630 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1414.286499 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.664 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.968750 type = kAXValueCGPointType}
+23.664 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.968750 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.696 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1410.832397 type = kAXValueCGPointType}
+23.696 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1410.832397 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.727 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1414.011108 type = kAXValueCGPointType}
+23.727 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1414.011108 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.757 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1416.682129 type = kAXValueCGPointType}
+23.757 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1416.682129 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.787 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1424.816040 type = kAXValueCGPointType}
+23.787 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1424.816040 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.818 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1435.588379 type = kAXValueCGPointType}
+23.818 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1435.588379 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.849 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1441.605591 type = kAXValueCGPointType}
+23.849 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1441.605591 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.878 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1436.852417 type = kAXValueCGPointType}
+23.878 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1436.852417 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.909 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1430.458130 type = kAXValueCGPointType}
+23.909 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1430.458130 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.939 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1427.825195 type = kAXValueCGPointType}
+23.939 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1427.825195 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+23.971 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1428.953613 type = kAXValueCGPointType}
+23.971 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1428.953613 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.003 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1430.998535 type = kAXValueCGPointType}
+24.003 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1430.998535 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.036 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1438.072998 type = kAXValueCGPointType}
+24.036 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1438.072998 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.068 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+24.068 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.131 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1443.991211 type = kAXValueCGPointType}
+24.131 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1443.991211 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.133 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1443.991211 type = kAXValueCGPointType}
+24.133 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1443.991211 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.164 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1438.967529 type = kAXValueCGPointType}
+24.164 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1438.967529 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.166 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1436.378662 type = kAXValueCGPointType}
+24.166 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1436.378662 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.197 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1426.612061 type = kAXValueCGPointType}
+24.197 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1426.612061 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.198 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1426.612061 type = kAXValueCGPointType}
+24.198 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1426.612061 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.228 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1414.999268 type = kAXValueCGPointType}
+24.228 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1414.999268 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.229 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1414.999268 type = kAXValueCGPointType}
+24.229 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1414.999268 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.259 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1398.408447 type = kAXValueCGPointType}
+24.259 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1398.408447 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.260 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1398.408447 type = kAXValueCGPointType}
+24.260 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1398.408447 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.290 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1387.954590 type = kAXValueCGPointType}
+24.290 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1387.954590 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.291 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1387.954590 type = kAXValueCGPointType}
+24.291 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1387.954590 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.322 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1378.453369 type = kAXValueCGPointType}
+24.322 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1378.453369 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.323 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1378.453369 type = kAXValueCGPointType}
+24.323 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1378.453369 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.353 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1376.002686 type = kAXValueCGPointType}
+24.353 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1376.002686 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.353 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.002686 type = kAXValueCGPointType}
+24.354 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.002686 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.383 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1376.000000 type = kAXValueCGPointType}
+24.383 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1376.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.384 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.000000 type = kAXValueCGPointType}
+24.384 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+24.604 CHANGE 1.AXSelected 1
+25.034 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1369.336792 type = kAXValueCGPointType}
+25.034 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1369.336792 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.066 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1357.203247 type = kAXValueCGPointType}
+25.067 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1357.203247 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.101 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1347.172363 type = kAXValueCGPointType}
+25.101 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1347.172363 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.134 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1341.179688 type = kAXValueCGPointType}
+25.134 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1341.179688 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.167 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1334.786011 type = kAXValueCGPointType}
+25.167 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1334.786011 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.201 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1330.583496 type = kAXValueCGPointType}
+25.201 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1330.583496 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.233 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1328.691162 type = kAXValueCGPointType}
+25.234 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1328.691162 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.265 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1328.006958 type = kAXValueCGPointType}
+25.265 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1328.006958 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.296 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1328.836304 type = kAXValueCGPointType}
+25.296 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1328.836304 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.326 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1329.920044 type = kAXValueCGPointType}
+25.326 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1329.920044 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.359 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1333.680176 type = kAXValueCGPointType}
+25.359 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1333.680176 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.392 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1339.244263 type = kAXValueCGPointType}
+25.393 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1339.244263 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.426 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1346.690063 type = kAXValueCGPointType}
+25.426 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1346.690063 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.459 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1356.311523 type = kAXValueCGPointType}
+25.459 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1356.311523 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.493 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1367.226318 type = kAXValueCGPointType}
+25.493 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1367.226318 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.527 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1372.596313 type = kAXValueCGPointType}
+25.527 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1372.596313 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.559 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1364.154907 type = kAXValueCGPointType}
+25.559 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1364.154907 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.592 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1358.073853 type = kAXValueCGPointType}
+25.592 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1358.073853 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.626 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1353.911377 type = kAXValueCGPointType}
+25.626 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1353.911377 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.659 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1352.759644 type = kAXValueCGPointType}
+25.659 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1352.759644 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.688 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1352.044312 type = kAXValueCGPointType}
+25.688 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1352.044312 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.717 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1353.518433 type = kAXValueCGPointType}
+25.717 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1353.518433 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.746 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1355.038696 type = kAXValueCGPointType}
+25.746 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1355.038696 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.776 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1361.583252 type = kAXValueCGPointType}
+25.776 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1361.583252 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.808 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1367.501709 type = kAXValueCGPointType}
+25.809 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1367.501709 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.837 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1374.836548 type = kAXValueCGPointType}
+25.837 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1374.836548 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.868 CHANGE 0.AXSelected 1
+25.868 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1369.848389 type = kAXValueCGPointType}
+25.868 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1369.848389 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.868 CHANGE 1.AXSelected 0
+25.899 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1366.259888 type = kAXValueCGPointType}
+25.899 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1366.259888 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.930 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1364.346069 type = kAXValueCGPointType}
+25.930 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1364.346069 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.961 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1364.385498 type = kAXValueCGPointType}
+25.961 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1364.385498 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+25.991 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1366.359253 type = kAXValueCGPointType}
+25.992 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1366.359253 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+26.021 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1370.007446 type = kAXValueCGPointType}
+26.022 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1370.007446 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+26.053 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1376.000000 type = kAXValueCGPointType}
+26.054 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1376.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+26.964 CHANGE 0.AXChildren (
+    "<AXUIElement PTR> {pid=41201}"
+)
+26.964 CHANGE 0.AXSelected 0
+26.964 CHANGE 0.AXShownMenuUIElement <AXUIElement PTR> {pid=41201}
+26.965 CHANGE 1.AXShownMenuUIElement <AXUIElement PTR> {pid=41201}
+28.462 CHANGE 0.AXShownMenuUIElement <nil>
+28.463 CHANGE 1.AXShownMenuUIElement <nil>
+28.494 CHANGE 0.AXChildren (
+)
+28.494 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1377.028931 type = kAXValueCGPointType}
+28.494 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1377.028931 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.495 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1377.028931 type = kAXValueCGPointType}
+28.495 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1377.028931 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.525 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1378.045776 type = kAXValueCGPointType}
+28.525 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1378.045776 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.527 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1379.297485 type = kAXValueCGPointType}
+28.527 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1379.297485 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.557 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1385.781860 type = kAXValueCGPointType}
+28.557 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1385.781860 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.558 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1385.781860 type = kAXValueCGPointType}
+28.558 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1385.781860 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.587 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1395.292725 type = kAXValueCGPointType}
+28.588 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1395.292725 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.589 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1395.292725 type = kAXValueCGPointType}
+28.589 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1395.292725 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.620 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1411.301025 type = kAXValueCGPointType}
+28.620 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1411.301025 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.621 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1411.301025 type = kAXValueCGPointType}
+28.621 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1411.301025 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.652 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1423.471680 type = kAXValueCGPointType}
+28.652 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1423.471680 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.653 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1423.471680 type = kAXValueCGPointType}
+28.653 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1423.471680 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.684 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1436.646606 type = kAXValueCGPointType}
+28.684 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1436.646606 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.685 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1436.646606 type = kAXValueCGPointType}
+28.686 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1436.646606 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.717 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1442.803223 type = kAXValueCGPointType}
+28.717 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1442.803223 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.718 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1442.803223 type = kAXValueCGPointType}
+28.718 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1442.803223 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.749 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.425049 y:1445.000000 type = kAXValueCGPointType}
+28.749 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+28.750 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.425049 y:1445.000000 type = kAXValueCGPointType}
+28.750 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.425049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.667 CHANGE 0.AXPosition <AXValue PTR> {value = x:1551.496094 y:1445.071045 type = kAXValueCGPointType}
+30.667 CHANGE 0.AXSize <AXValue PTR> {value = w:46.857910 h:58.857910 type = kAXValueCGSizeType}
+30.667 CHANGE 0.AXFrame <AXValue PTR> {value = x:1551.496094 y:1445.071045 w:46.857910 h:58.857910 type = kAXValueCGRectType}
+30.670 CHANGE 1.AXPosition <AXValue PTR> {value = x:1598.154541 y:1445.000000 type = kAXValueCGPointType}
+30.670 CHANGE 1.AXFrame <AXValue PTR> {value = x:1598.154541 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.700 CHANGE 0.AXPosition <AXValue PTR> {value = x:1552.035400 y:1445.610352 type = kAXValueCGPointType}
+30.700 CHANGE 0.AXSize <AXValue PTR> {value = w:45.779297 h:57.779297 type = kAXValueCGSizeType}
+30.700 CHANGE 0.AXFrame <AXValue PTR> {value = x:1552.035400 y:1445.610352 w:45.779297 h:57.779297 type = kAXValueCGRectType}
+30.701 CHANGE 1.AXPosition <AXValue PTR> {value = x:1597.814697 y:1445.000000 type = kAXValueCGPointType}
+30.701 CHANGE 1.AXFrame <AXValue PTR> {value = x:1597.814697 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.728 CHANGE 0.AXPosition <AXValue PTR> {value = x:1553.132690 y:1446.707764 type = kAXValueCGPointType}
+30.729 CHANGE 0.AXSize <AXValue PTR> {value = w:43.584595 h:55.584473 type = kAXValueCGSizeType}
+30.729 CHANGE 0.AXFrame <AXValue PTR> {value = x:1553.132690 y:1446.707764 w:43.584595 h:55.584473 type = kAXValueCGRectType}
+30.730 CHANGE 1.AXPosition <AXValue PTR> {value = x:1596.717163 y:1445.000000 type = kAXValueCGPointType}
+30.730 CHANGE 1.AXFrame <AXValue PTR> {value = x:1596.717163 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.761 CHANGE 0.AXPosition <AXValue PTR> {value = x:1554.720459 y:1448.295410 type = kAXValueCGPointType}
+30.761 CHANGE 0.AXSize <AXValue PTR> {value = w:40.409180 h:52.409180 type = kAXValueCGSizeType}
+30.761 CHANGE 0.AXFrame <AXValue PTR> {value = x:1554.720459 y:1448.295410 w:40.409180 h:52.409180 type = kAXValueCGRectType}
+30.762 CHANGE 1.AXPosition <AXValue PTR> {value = x:1595.129639 y:1445.000000 type = kAXValueCGPointType}
+30.762 CHANGE 1.AXFrame <AXValue PTR> {value = x:1595.129639 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.793 CHANGE 0.AXPosition <AXValue PTR> {value = x:1556.726929 y:1450.302002 type = kAXValueCGPointType}
+30.794 CHANGE 0.AXSize <AXValue PTR> {value = w:36.395996 h:48.395996 type = kAXValueCGSizeType}
+30.794 CHANGE 0.AXFrame <AXValue PTR> {value = x:1556.726929 y:1450.302002 w:36.395996 h:48.395996 type = kAXValueCGRectType}
+30.795 CHANGE 1.AXPosition <AXValue PTR> {value = x:1593.122925 y:1445.000000 type = kAXValueCGPointType}
+30.795 CHANGE 1.AXFrame <AXValue PTR> {value = x:1593.122925 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.825 CHANGE 0.AXPosition <AXValue PTR> {value = x:1557.856201 y:1451.431274 type = kAXValueCGPointType}
+30.825 CHANGE 0.AXSize <AXValue PTR> {value = w:34.137451 h:46.137451 type = kAXValueCGSizeType}
+30.825 CHANGE 0.AXFrame <AXValue PTR> {value = x:1557.856201 y:1451.431274 w:34.137451 h:46.137451 type = kAXValueCGRectType}
+30.827 CHANGE 1.AXPosition <AXValue PTR> {value = x:1591.993652 y:1445.000000 type = kAXValueCGPointType}
+30.828 CHANGE 1.AXFrame <AXValue PTR> {value = x:1590.799316 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.859 CHANGE 0.AXPosition <AXValue PTR> {value = x:1560.296631 y:1453.871704 type = kAXValueCGPointType}
+30.859 CHANGE 0.AXSize <AXValue PTR> {value = w:29.256714 h:41.256592 type = kAXValueCGSizeType}
+30.859 CHANGE 0.AXFrame <AXValue PTR> {value = x:1560.296631 y:1453.871704 w:29.256714 h:41.256592 type = kAXValueCGRectType}
+30.860 CHANGE 1.AXPosition <AXValue PTR> {value = x:1589.553345 y:1445.000000 type = kAXValueCGPointType}
+30.860 CHANGE 1.AXFrame <AXValue PTR> {value = x:1589.553345 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.892 CHANGE 0.AXPosition <AXValue PTR> {value = x:1562.879517 y:1456.454590 type = kAXValueCGPointType}
+30.892 CHANGE 0.AXSize <AXValue PTR> {value = w:24.090820 h:36.090820 type = kAXValueCGSizeType}
+30.892 CHANGE 0.AXFrame <AXValue PTR> {value = x:1562.879517 y:1456.454590 w:24.090820 h:36.090820 type = kAXValueCGRectType}
+30.894 CHANGE 1.AXPosition <AXValue PTR> {value = x:1586.970337 y:1445.000000 type = kAXValueCGPointType}
+30.894 CHANGE 1.AXFrame <AXValue PTR> {value = x:1586.970337 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.925 CHANGE 0.AXPosition <AXValue PTR> {value = x:1565.476562 y:1459.051514 type = kAXValueCGPointType}
+30.925 CHANGE 0.AXSize <AXValue PTR> {value = w:18.896973 h:30.896973 type = kAXValueCGSizeType}
+30.925 CHANGE 0.AXFrame <AXValue PTR> {value = x:1565.476562 y:1459.051514 w:18.896973 h:30.896973 type = kAXValueCGRectType}
+30.927 CHANGE 1.AXPosition <AXValue PTR> {value = x:1584.373413 y:1445.000000 type = kAXValueCGPointType}
+30.927 CHANGE 1.AXFrame <AXValue PTR> {value = x:1584.373413 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.957 CHANGE 0.AXPosition <AXValue PTR> {value = x:1567.924683 y:1461.499634 type = kAXValueCGPointType}
+30.958 CHANGE 0.AXSize <AXValue PTR> {value = w:14.000610 h:26.000732 type = kAXValueCGSizeType}
+30.958 CHANGE 0.AXFrame <AXValue PTR> {value = x:1567.924683 y:1461.499634 w:14.000610 h:26.000732 type = kAXValueCGRectType}
+30.958 CHANGE 1.AXPosition <AXValue PTR> {value = x:1581.925293 y:1445.000000 type = kAXValueCGPointType}
+30.959 CHANGE 1.AXFrame <AXValue PTR> {value = x:1581.925293 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+30.988 CHANGE 0.AXPosition <AXValue PTR> {value = x:1570.177490 y:1463.752441 type = kAXValueCGPointType}
+30.988 CHANGE 0.AXSize <AXValue PTR> {value = w:9.494995 h:21.495117 type = kAXValueCGSizeType}
+30.988 CHANGE 0.AXFrame <AXValue PTR> {value = x:1570.177490 y:1463.752441 w:9.494995 h:21.495117 type = kAXValueCGRectType}
+30.989 CHANGE 1.AXPosition <AXValue PTR> {value = x:1579.672607 y:1445.000000 type = kAXValueCGPointType}
+30.989 CHANGE 1.AXFrame <AXValue PTR> {value = x:1579.672607 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.021 CHANGE 0.AXPosition <AXValue PTR> {value = x:1571.181274 y:1464.756226 type = kAXValueCGPointType}
+31.023 CHANGE 0.AXSize <AXValue PTR> {value = w:5.672363 h:17.672363 type = kAXValueCGSizeType}
+31.023 CHANGE 0.AXFrame <AXValue PTR> {value = x:1572.088867 y:1465.663818 w:5.672363 h:17.672363 type = kAXValueCGRectType}
+31.024 CHANGE 1.AXPosition <AXValue PTR> {value = x:1577.761230 y:1435.421753 type = kAXValueCGPointType}
+31.024 CHANGE 1.AXFrame <AXValue PTR> {value = x:1577.761230 y:1435.421753 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.054 CHANGE 0.AXPosition <AXValue PTR> {value = x:1572.885254 y:1466.460327 type = kAXValueCGPointType}
+31.054 CHANGE 0.AXSize <AXValue PTR> {value = w:4.079346 h:16.079346 type = kAXValueCGSizeType}
+31.054 CHANGE 0.AXFrame <AXValue PTR> {value = x:1572.885254 y:1466.460327 w:4.079346 h:16.079346 type = kAXValueCGRectType}
+31.055 CHANGE 1.AXPosition <AXValue PTR> {value = x:1576.964600 y:1427.032349 type = kAXValueCGPointType}
+31.055 CHANGE 1.AXFrame <AXValue PTR> {value = x:1576.964600 y:1427.032349 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.084 CHANGE 0.AXPosition <AXValue PTR> {value = x:1574.101562 y:1467.676514 type = kAXValueCGPointType}
+31.084 CHANGE 0.AXSize <AXValue PTR> {value = w:1.646973 h:13.646973 type = kAXValueCGSizeType}
+31.084 CHANGE 0.AXFrame <AXValue PTR> {value = x:1574.101562 y:1467.676514 w:1.646973 h:13.646973 type = kAXValueCGRectType}
+31.084 CHANGE 1.AXPosition <AXValue PTR> {value = x:1575.748413 y:1411.373291 type = kAXValueCGPointType}
+31.084 CHANGE 1.AXFrame <AXValue PTR> {value = x:1575.748413 y:1411.373291 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.114 CHANGE 0.AXPosition <AXValue PTR> {value = x:1574.775391 y:1468.350464 type = kAXValueCGPointType}
+31.114 CHANGE 0.AXSize <AXValue PTR> {value = w:0.299072 h:12.299072 type = kAXValueCGSizeType}
+31.114 CHANGE 0.AXFrame <AXValue PTR> {value = x:1574.775391 y:1468.350464 w:0.299072 h:12.299072 type = kAXValueCGRectType}
+31.116 CHANGE 1.AXPosition <AXValue PTR> {value = x:1575.074463 y:1399.211548 type = kAXValueCGPointType}
+31.116 CHANGE 1.AXFrame <AXValue PTR> {value = x:1575.074463 y:1399.211548 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.148 CHANGE 0.AXPosition <AXValue PTR> {value = x:1574.925049 y:1468.500000 type = kAXValueCGPointType}
+31.148 CHANGE 0.AXSize <AXValue PTR> {value = w:0.000000 h:12.000000 type = kAXValueCGSizeType}
+31.148 CHANGE 0.AXFrame <AXValue PTR> {value = x:1574.925049 y:1468.500000 w:0.000000 h:12.000000 type = kAXValueCGRectType}
+31.150 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1389.116577 type = kAXValueCGPointType}
+31.150 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1389.116577 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.180 EVENT AXUIElementDestroyed title=nil
+31.181 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1382.045532 type = kAXValueCGPointType}
+31.182 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1382.045532 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.212 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1379.462158 type = kAXValueCGPointType}
+31.213 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1379.462158 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.241 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1376.486816 type = kAXValueCGPointType}
+31.241 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1376.486816 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.271 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1376.248413 type = kAXValueCGPointType}
+31.271 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1376.248413 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.300 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1377.130493 type = kAXValueCGPointType}
+31.300 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1377.130493 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.332 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1380.955811 type = kAXValueCGPointType}
+31.332 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1380.955811 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.364 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1387.485962 type = kAXValueCGPointType}
+31.365 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1387.485962 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.396 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1397.024536 type = kAXValueCGPointType}
+31.396 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1397.024536 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.428 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1408.660767 type = kAXValueCGPointType}
+31.428 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1408.660767 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.459 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1415.854370 type = kAXValueCGPointType}
+31.459 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1415.854370 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.490 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1431.890015 type = kAXValueCGPointType}
+31.490 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1431.890015 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.521 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1440.896729 type = kAXValueCGPointType}
+31.522 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1440.896729 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.554 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.888184 type = kAXValueCGPointType}
+31.554 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.888184 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.584 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1419.662231 type = kAXValueCGPointType}
+31.584 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1419.662231 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.612 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1416.328979 type = kAXValueCGPointType}
+31.612 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1416.328979 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.642 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1411.829712 type = kAXValueCGPointType}
+31.643 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1411.829712 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.674 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1410.520752 type = kAXValueCGPointType}
+31.675 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1410.520752 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.706 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1412.474976 type = kAXValueCGPointType}
+31.706 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1412.474976 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.737 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1414.718872 type = kAXValueCGPointType}
+31.738 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1414.718872 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.766 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1421.252930 type = kAXValueCGPointType}
+31.767 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1421.252930 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.798 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1431.443604 type = kAXValueCGPointType}
+31.798 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1431.443604 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.831 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1444.578003 type = kAXValueCGPointType}
+31.832 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1444.578003 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.862 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1439.910645 type = kAXValueCGPointType}
+31.863 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1439.910645 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.893 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1432.226807 type = kAXValueCGPointType}
+31.894 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1432.226807 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.926 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.247437 type = kAXValueCGPointType}
+31.926 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.247437 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.957 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.193726 type = kAXValueCGPointType}
+31.957 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.193726 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+31.988 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1431.901245 type = kAXValueCGPointType}
+31.988 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1431.901245 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.018 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1435.272705 type = kAXValueCGPointType}
+32.019 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1435.272705 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.051 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1442.783936 type = kAXValueCGPointType}
+32.051 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1442.783936 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.083 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1436.282593 type = kAXValueCGPointType}
+32.083 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1436.282593 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.114 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1426.353516 type = kAXValueCGPointType}
+32.115 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1426.353516 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.145 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1410.405273 type = kAXValueCGPointType}
+32.145 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1410.405273 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.176 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1398.513672 type = kAXValueCGPointType}
+32.176 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1398.513672 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.207 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1387.702759 type = kAXValueCGPointType}
+32.207 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1387.702759 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.240 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1378.251099 type = kAXValueCGPointType}
+32.240 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1378.251099 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+32.271 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1376.000000 type = kAXValueCGPointType}
+32.271 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1376.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.040 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1365.282104 type = kAXValueCGPointType}
+33.040 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1365.282104 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.071 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1362.252319 type = kAXValueCGPointType}
+33.072 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1362.252319 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.104 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1363.285522 type = kAXValueCGPointType}
+33.104 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1363.285522 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.135 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1366.048096 type = kAXValueCGPointType}
+33.135 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1366.048096 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.165 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1369.441528 type = kAXValueCGPointType}
+33.166 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1369.441528 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.197 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1373.329834 type = kAXValueCGPointType}
+33.198 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1373.329834 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.229 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1375.356079 type = kAXValueCGPointType}
+33.229 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1375.356079 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.260 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1376.039795 type = kAXValueCGPointType}
+33.260 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1376.039795 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.290 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1377.276245 type = kAXValueCGPointType}
+33.290 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1377.276245 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.321 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1380.243774 type = kAXValueCGPointType}
+33.321 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1380.243774 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.352 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1384.942383 type = kAXValueCGPointType}
+33.352 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1384.942383 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.383 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1393.527100 type = kAXValueCGPointType}
+33.384 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1393.527100 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.416 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1402.182495 type = kAXValueCGPointType}
+33.416 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1402.182495 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.448 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1416.697876 type = kAXValueCGPointType}
+33.448 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1416.697876 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.480 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1429.433594 type = kAXValueCGPointType}
+33.480 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1429.433594 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.511 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1442.100464 type = kAXValueCGPointType}
+33.512 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1442.100464 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.541 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1432.108398 type = kAXValueCGPointType}
+33.542 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1432.108398 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.572 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1426.788452 type = kAXValueCGPointType}
+33.572 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1426.788452 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.603 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1418.000122 type = kAXValueCGPointType}
+33.604 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1418.000122 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.635 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1412.682739 type = kAXValueCGPointType}
+33.635 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1412.682739 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.667 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1410.546753 type = kAXValueCGPointType}
+33.668 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1410.546753 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.698 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1411.668701 type = kAXValueCGPointType}
+33.698 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1411.668701 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.729 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1413.368408 type = kAXValueCGPointType}
+33.729 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1413.368408 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.762 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1419.445435 type = kAXValueCGPointType}
+33.762 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1419.445435 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.794 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.275269 type = kAXValueCGPointType}
+33.794 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.275269 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.825 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1440.500732 type = kAXValueCGPointType}
+33.825 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1440.500732 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.858 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1438.072998 type = kAXValueCGPointType}
+33.858 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1438.072998 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.889 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1431.141357 type = kAXValueCGPointType}
+33.889 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1431.141357 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.921 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1429.131714 type = kAXValueCGPointType}
+33.922 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1429.131714 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.954 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1427.788330 type = kAXValueCGPointType}
+33.954 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1427.788330 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+33.986 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1430.206421 type = kAXValueCGPointType}
+33.986 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1430.206421 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+34.018 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1436.156982 type = kAXValueCGPointType}
+34.019 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1436.156982 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+34.050 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1445.000000 type = kAXValueCGPointType}
+34.051 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.018 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1441.190063 type = kAXValueCGPointType}
+35.019 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1441.190063 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.049 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1423.305298 type = kAXValueCGPointType}
+35.050 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1423.305298 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.078 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1415.436035 type = kAXValueCGPointType}
+35.079 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1415.436035 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.107 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1402.523560 type = kAXValueCGPointType}
+35.107 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1402.523560 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.138 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1391.897583 type = kAXValueCGPointType}
+35.138 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1391.897583 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.171 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1383.789795 type = kAXValueCGPointType}
+35.171 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1383.789795 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.204 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1380.955811 type = kAXValueCGPointType}
+35.204 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1380.955811 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.237 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1377.060913 type = kAXValueCGPointType}
+35.237 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1377.060913 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.266 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1376.017700 type = kAXValueCGPointType}
+35.266 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1376.017700 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.295 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1377.679199 type = kAXValueCGPointType}
+35.295 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1377.679199 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.325 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1379.586914 type = kAXValueCGPointType}
+35.325 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1379.586914 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.354 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1385.344238 type = kAXValueCGPointType}
+35.354 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1385.344238 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.385 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1394.087891 type = kAXValueCGPointType}
+35.385 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1394.087891 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.415 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1399.532837 type = kAXValueCGPointType}
+35.416 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1399.532837 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.446 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1412.168091 type = kAXValueCGPointType}
+35.446 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1412.168091 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.478 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1427.508179 type = kAXValueCGPointType}
+35.479 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1427.508179 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.479 FRONT T3 Code (Nightly) pid=92723
+35.514 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1444.158569 type = kAXValueCGPointType}
+35.515 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1444.158569 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.549 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1431.115112 type = kAXValueCGPointType}
+35.549 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1431.115112 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.578 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1421.252930 type = kAXValueCGPointType}
+35.578 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1421.252930 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.608 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1417.419678 type = kAXValueCGPointType}
+35.608 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1417.419678 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.640 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1412.375000 type = kAXValueCGPointType}
+35.640 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1412.375000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.671 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1410.505249 type = kAXValueCGPointType}
+35.671 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1410.505249 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.701 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1411.829712 type = kAXValueCGPointType}
+35.701 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1411.829712 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.731 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1413.746216 type = kAXValueCGPointType}
+35.731 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1413.746216 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.762 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1419.881714 type = kAXValueCGPointType}
+35.763 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1419.881714 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.793 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1429.198486 type = kAXValueCGPointType}
+35.793 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1429.198486 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.823 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1442.100464 type = kAXValueCGPointType}
+35.823 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1442.100464 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.854 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1441.898804 type = kAXValueCGPointType}
+35.854 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1441.898804 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.884 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1433.276855 type = kAXValueCGPointType}
+35.884 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1433.276855 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.915 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.709473 type = kAXValueCGPointType}
+35.915 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.709473 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.945 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1427.825195 type = kAXValueCGPointType}
+35.945 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1427.825195 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+35.975 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.953613 type = kAXValueCGPointType}
+35.975 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.953613 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+36.004 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1433.843384 type = kAXValueCGPointType}
+36.004 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1433.843384 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+36.031 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1437.822754 type = kAXValueCGPointType}
+36.031 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1437.822754 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+36.062 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1445.000000 type = kAXValueCGPointType}
+36.063 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.029 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1436.968384 type = kAXValueCGPointType}
+37.030 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1436.968384 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.062 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1420.160034 type = kAXValueCGPointType}
+37.062 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1420.160034 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.092 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1406.056396 type = kAXValueCGPointType}
+37.092 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1406.056396 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.123 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1399.856323 type = kAXValueCGPointType}
+37.124 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1399.856323 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.155 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1389.848633 type = kAXValueCGPointType}
+37.155 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1389.848633 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.183 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1382.376709 type = kAXValueCGPointType}
+37.184 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1382.376709 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.213 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1377.855835 type = kAXValueCGPointType}
+37.214 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1377.855835 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.245 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1376.583984 type = kAXValueCGPointType}
+37.245 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1376.583984 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.275 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1376.158936 type = kAXValueCGPointType}
+37.276 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1376.158936 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.307 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1378.543579 type = kAXValueCGPointType}
+37.307 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1378.543579 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.338 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1383.605469 type = kAXValueCGPointType}
+37.338 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1383.605469 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.365 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1387.261963 type = kAXValueCGPointType}
+37.365 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1387.261963 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.395 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1396.419556 type = kAXValueCGPointType}
+37.395 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1396.419556 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.425 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1408.282104 type = kAXValueCGPointType}
+37.426 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1408.282104 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.457 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1415.019775 type = kAXValueCGPointType}
+37.457 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1415.019775 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.488 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1431.394287 type = kAXValueCGPointType}
+37.489 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1431.394287 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.520 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1441.295410 type = kAXValueCGPointType}
+37.520 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1441.295410 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.551 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.888184 type = kAXValueCGPointType}
+37.551 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.888184 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.581 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1424.009644 type = kAXValueCGPointType}
+37.581 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1424.009644 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.612 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1416.328979 type = kAXValueCGPointType}
+37.612 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1416.328979 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.643 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1411.747803 type = kAXValueCGPointType}
+37.643 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1411.747803 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.674 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1410.520752 type = kAXValueCGPointType}
+37.674 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1410.520752 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.704 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1411.072632 type = kAXValueCGPointType}
+37.704 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1411.072632 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.733 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1414.718872 type = kAXValueCGPointType}
+37.734 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1414.718872 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.765 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1421.490601 type = kAXValueCGPointType}
+37.765 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1421.490601 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.796 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1431.774658 type = kAXValueCGPointType}
+37.796 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1431.774658 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.826 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1437.801025 type = kAXValueCGPointType}
+37.826 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1437.801025 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.857 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1439.910645 type = kAXValueCGPointType}
+37.857 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1439.910645 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.888 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1432.226807 type = kAXValueCGPointType}
+37.889 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1432.226807 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.920 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1428.304199 type = kAXValueCGPointType}
+37.920 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1428.304199 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.951 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1427.751587 type = kAXValueCGPointType}
+37.951 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1427.751587 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+37.982 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1429.524780 type = kAXValueCGPointType}
+37.982 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1429.524780 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+38.012 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1435.272705 type = kAXValueCGPointType}
+38.014 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1435.272705 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+38.045 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1444.676025 type = kAXValueCGPointType}
+38.045 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1444.676025 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+38.076 CHANGE 1.AXPosition <AXValue PTR> {value = x:1574.925049 y:1445.000000 type = kAXValueCGPointType}
+38.076 CHANGE 1.AXFrame <AXValue PTR> {value = x:1574.925049 y:1445.000000 w:47.000000 h:59.000000 type = kAXValueCGRectType}
+38.292 FRONT Rattention pid=94531
+38.715 FRONT Xcode pid=14193
+52.020 DONE samples=1642

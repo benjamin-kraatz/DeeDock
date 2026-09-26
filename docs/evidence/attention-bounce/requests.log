@@ -1,0 +1,9 @@
+sandbox_extension_issue_file_to_process failed for /tmp/rattention-probe/build/Rattention.app: 1 (Operation not permitted)
+0.000 baseline active=false
+7.149 informational id=0 active=false
+15.656 cancel informational active=false
+18.674 critical id=0 active=false
+31.380 cancel critical active=false
+36.656 critical activation test id=0 active=false
+43.932 activate active=false
+49.152 done active=false

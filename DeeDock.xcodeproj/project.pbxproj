@@ -24,6 +24,7 @@
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
+		33714B843067ADC40044A43D /* Rattention.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rattention.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		525BD98535225C6EE024849D /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -34,6 +35,11 @@
 		000000000000000000000010 /* DeeDock */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DeeDock;
+			sourceTree = "<group>";
+		};
+		33714B853067ADC50044A43D /* Rattention */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Rattention;
 			sourceTree = "<group>";
 		};
 		DD0000000000000000000004 /* DeeDockTests */ = {
@@ -55,6 +61,11 @@
 			files = (
 			);
 		};
+		33714B813067ADC40044A43D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		DD0000000000000000000005 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -68,6 +79,7 @@
 			children = (
 				000000000000000000000010 /* DeeDock */,
 				DD0000000000000000000004 /* DeeDockTests */,
+				33714B853067ADC50044A43D /* Rattention */,
 				000000000000000000000020 /* Products */,
 				33DE04A8304AA89B007D87CE /* Frameworks */,
 				0EE3B5E31B6358B0F2F32162 /* App.xcconfig */,
@@ -81,6 +93,7 @@
 				000000000000000000000120 /* DDock.app */,
 				DD0000000000000000000003 /* DeeDockTests.xctest */,
 				525BD98535225C6EE024849D /* DDock.app */,
+				33714B843067ADC40044A43D /* Rattention.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,6 +129,24 @@
 			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* DDock.app */;
+			productType = "com.apple.product-type.application";
+		};
+		33714B833067ADC40044A43D /* Rattention */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33714B8F3067ADC50044A43D /* Build configuration list for PBXNativeTarget "Rattention" */;
+			buildPhases = (
+				33714B803067ADC40044A43D /* Sources */,
+				33714B813067ADC40044A43D /* Frameworks */,
+				33714B823067ADC40044A43D /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				33714B853067ADC50044A43D /* Rattention */,
+			);
+			name = Rattention;
+			productName = Rattention;
+			productReference = 33714B843067ADC40044A43D /* Rattention.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7C2885433F43592EF492D80F /* DeeDock-TestFlight */ = {
@@ -164,11 +195,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2630;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					000000000000000100000000 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					33714B833067ADC40044A43D = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -193,6 +227,7 @@
 				000000000000000100000000 /* DeeDock */,
 				DD0000000000000000000006 /* DeeDockTests */,
 				7C2885433F43592EF492D80F /* DeeDock-TestFlight */,
+				33714B833067ADC40044A43D /* Rattention */,
 			);
 		};
 /* End PBXProject section */
@@ -205,6 +240,11 @@
 			);
 		};
 		0DAD087831ADC2A21667D035 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		33714B823067ADC40044A43D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -238,6 +278,11 @@
 			);
 		};
 		09C4672B70E9497ED199B2DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		33714B803067ADC40044A43D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
@@ -496,6 +541,105 @@
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		33714B8C3067ADC50044A43D /* Debug configuration for PBXNativeTarget "Rattention" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TM38354MMP;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.dzwei.apps.DeeDock.Rattention;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		33714B8D3067ADC50044A43D /* Preview configuration for PBXNativeTarget "Rattention" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TM38354MMP;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.dzwei.apps.DeeDock.Rattention;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Preview;
+		};
+		33714B8E3067ADC50044A43D /* Release configuration for PBXNativeTarget "Rattention" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TM38354MMP;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.dzwei.apps.DeeDock.Rattention;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -874,6 +1018,15 @@
 				000000000000000111000000 /* Debug configuration for PBXNativeTarget "DeeDock" */,
 				DDCA00000000000000000001 /* Preview configuration for PBXNativeTarget "DeeDock" */,
 				000000000000000112000000 /* Release configuration for PBXNativeTarget "DeeDock" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		33714B8F3067ADC50044A43D /* Build configuration list for PBXNativeTarget "Rattention" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33714B8C3067ADC50044A43D /* Debug configuration for PBXNativeTarget "Rattention" */,
+				33714B8D3067ADC50044A43D /* Preview configuration for PBXNativeTarget "Rattention" */,
+				33714B8E3067ADC50044A43D /* Release configuration for PBXNativeTarget "Rattention" */,
 			);
 			defaultConfigurationName = Release;
 		};
