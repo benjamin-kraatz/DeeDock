@@ -27,6 +27,8 @@ final class WindowPeekCoordinator {
     private weak var sourcePanel: DockPanelController?
     private var sourceItem: DockItem?
     private var allWindows: [ApplicationWindowSummary] = []
+    /// Which discovery path produced `allWindows`, for the diagnostics report only.
+    private var discoverySource = "none"
     private var discoveryID: UUID?
     private var dwellTask: Task<Void, Never>?
     private var closeTask: Task<Void, Never>?
@@ -346,6 +348,7 @@ final class WindowPeekCoordinator {
             case .loaded(let windows):
                 controller?.state.usesApplicationSelection = false
                 allWindows = windows
+                discoverySource = "accessibility"
                 displayWindows(applyFilters: true)
             case .unavailable(let failure):
                 discoverWithScreenCapture(processes: snapshot.processes, originalFailure: failure)
@@ -382,6 +385,7 @@ final class WindowPeekCoordinator {
                 fallbackDiscoveryTask = nil
                 controller?.state.usesApplicationSelection = true
                 allWindows = windows
+                discoverySource = "screencapture fallback after \(originalFailure)"
                 displayWindows(applyFilters: true)
             } catch is CancellationError {
                 return
@@ -404,14 +408,20 @@ final class WindowPeekCoordinator {
     private func displayWindows(applyFilters: Bool) {
         guard let controller, let sourcePanel,
               let sourceItem, let context = sourcePanel.windowPeekContext(for: sourceItem.id) else { return }
+        // The minimized filter also governs off-screen fallback cards: both are windows the user
+        // cannot currently see, and public metadata cannot split hidden from minimized there.
         let filtered = applyFilters ? allWindows.filter { window in
-            (context.settings.windowPeekIncludeMinimized || !window.isMinimized)
+            (context.settings.windowPeekIncludeMinimized || !(window.isMinimized || window.isOffScreen))
                 && (context.settings.windowPeekIncludeUntitled || window.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
         } : allWindows
         guard !filtered.isEmpty else {
             controller.state.cards = []
             controller.state.phase = allWindows.isEmpty ? .noWindows : .noMatch
             controller.update(anchor: context.anchor, settings: context.settings, count: 1)
+            // An empty Peek is the case support reports most often, so it gets a report too.
+            WindowPeekDiagnostics.shared.record(
+                settings: context.settings, placement: controller.placementFrame, panel: controller.frame,
+                screen: controller.screen, discovery: discoverySource, discovered: allWindows.count, captures: [])
             return
         }
         let ordered = filtered.enumerated().sorted { lhs, rhs in
@@ -458,23 +468,26 @@ final class WindowPeekCoordinator {
                   let controller else { return }
             controller.state.cards = controller.state.cards.map { card in
                 guard let captured = windows.first(where: { $0.token == card.id }),
-                      captured == card.window else { return card }
+                      captured == card.window, let image = images[card.id]?.image else { return card }
                 var updated = card
-                updated.thumbnail = images[card.id]
+                updated.thumbnail = image
                 return updated
             }
+            // Only fresh pixels enter OCR history; a cached picture was already recorded when captured.
             let historyCards = controller.state.cards.filter { card in
-                images[card.id] != nil && windows.contains { $0 == card.window }
+                images[card.id]?.isCached == false && windows.contains { $0 == card.window }
             }
             history.record(historyCards, appName: controller.state.appName, epoch: historyEpoch)
             WindowPeekDiagnostics.shared.record(
                 settings: settings, placement: controller.placementFrame, panel: controller.frame,
-                screen: controller.screen,
+                screen: controller.screen, discovery: discoverySource, discovered: allWindows.count,
                 captures: windows.map { window in
-                    let image = images[window.token]
+                    let thumbnail = images[window.token]
                     return WindowPeekDiagnostics.Capture(
                         frame: window.frame ?? .zero,
-                        pixels: image.map { CGSize(width: $0.width, height: $0.height) })
+                        pixels: thumbnail.map { CGSize(width: $0.image.width, height: $0.image.height) },
+                        cached: thumbnail?.isCached == true,
+                        hidden: window.isMinimized || window.isOffScreen)
                 })
             captureTask = nil
             scheduleCapture()

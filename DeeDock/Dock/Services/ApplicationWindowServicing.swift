@@ -69,8 +69,7 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
         for process in processes where seenProcesses.insert(process.processIdentifier).inserted {
             try Task.checkCancellation()
             let application = AXUIElementCreateApplication(process.processIdentifier)
-            _ = AXUIElementSetMessagingTimeout(application, messagingTimeout)
-            guard let windows = try copy(application, attribute: kAXWindowsAttribute as CFString) as? [AXUIElement] else { continue }
+            guard let windows = try windowElements(of: application) else { continue }
 
             for window in windows {
                 guard handles.count < maximumWindows else { break }
@@ -94,6 +93,26 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
             }
         }
         return result
+    }
+
+    /// Reads `AXWindows` with the ordinary timeout, then once more with a longer one if the app
+    /// merely failed to answer in time. Electron apps and apps busy on their main thread routinely
+    /// miss the short deadline, and without this retry Peek would drop their exact AX handles and
+    /// fall back to ScreenCaptureKit metadata. Any other AX error propagates unchanged. The longer
+    /// timeout is set on this application element only, so later per-window reads keep the short one.
+    private func windowElements(of application: AXUIElement) throws -> [AXUIElement]? {
+        _ = AXUIElementSetMessagingTimeout(application, messagingTimeout)
+        do {
+            return try copy(application, attribute: kAXWindowsAttribute as CFString) as? [AXUIElement]
+        } catch ApplicationWindowServiceError.accessibility(let code) where code == AXError.cannotComplete.rawValue {
+            try Task.checkCancellation()
+            try check(AXUIElementSetMessagingTimeout(application, messagingTimeout * 4))
+            var value: CFTypeRef?
+            let error = AXUIElementCopyAttributeValue(application, kAXWindowsAttribute as CFString, &value)
+            if error == .attributeUnsupported || error == .noValue { return nil }
+            try check(error)
+            return value as? [AXUIElement]
+        }
     }
 
     func selectWindow(_ token: ApplicationWindowToken) async throws {

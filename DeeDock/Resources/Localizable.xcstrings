@@ -42189,6 +42189,24 @@
         }
       }
     },
+    "windowPeekOffScreen" : {
+      "comment" : "Status under a Window Peek card whose window is hidden, minimized, or on another Space. Shown only when ScreenCaptureKit metadata cannot tell which.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht sichtbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not visible"
+          }
+        }
+      }
+    },
     "windowPeekOpenSettings" : {
       "comment" : "Window Peek fallback action that opens its permission settings.",
       "extractionState" : "manual",

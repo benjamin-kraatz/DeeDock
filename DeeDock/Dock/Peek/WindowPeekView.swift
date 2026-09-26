@@ -255,11 +255,21 @@ struct WindowPeekCardView: View {
                     in: .rect(cornerRadius: 11))
         .overlay(RoundedRectangle(cornerRadius: 11).strokeBorder(selected ? Color.accentColor : .clear, lineWidth: 2))
         .accessibilityLabel(Text(.applicationMenuOpenWindow(title: title)))
-        .accessibilityValue(card.window.isMinimized ? Text(.windowPeekMinimized) : Text(verbatim: ""))
+        .accessibilityValue(accessibilityStatus)
     }
 
+    private var accessibilityStatus: Text {
+        if card.window.isMinimized { return Text(.windowPeekMinimized) }
+        if card.window.isOffScreen { return Text(.windowPeekOffScreen) }
+        return Text(verbatim: "")
+    }
+
+    /// Identity of the current bitmap. A cached picture replaced by a fresh capture changes this
+    /// identity, and the container crossfades the swap instead of cutting between two bitmaps.
+    private var thumbnailIdentity: ObjectIdentifier? { card.thumbnail.map(ObjectIdentifier.init) }
+
     private var artwork: some View {
-        Group {
+        ZStack {
             if let thumbnail = card.thumbnail {
                 // The card frame is the logical point size. One pixel per point fills that frame.
                 Image(decorative: thumbnail, scale: 1).resizable().interpolation(.high).scaledToFit()
@@ -268,13 +278,17 @@ struct WindowPeekCardView: View {
                     .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
                         artworkFrameChanged?(frame)
                     }
+                    .id(thumbnailIdentity)
+                    .transition(.opacity)
             } else {
                 ZStack {
                     Rectangle().fill(.quaternary.opacity(0.55))
                     Image(nsImage: appIcon).resizable().interpolation(.high).scaledToFit().padding(22)
                 }
+                .transition(.opacity)
             }
         }
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.16), value: thumbnailIdentity)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.black.opacity(0.06))
         .compositingGroup()
@@ -286,6 +300,9 @@ struct WindowPeekCardView: View {
             Text(verbatim: title).font(.callout.weight(.medium)).lineLimit(2)
             if card.window.isMinimized {
                 Label { Text(.windowPeekMinimized) } icon: { Image(systemName: "minus.square") }
+                    .font(.caption).foregroundStyle(.secondary)
+            } else if card.window.isOffScreen {
+                Label { Text(.windowPeekOffScreen) } icon: { Image(systemName: "eye.slash") }
                     .font(.caption).foregroundStyle(.secondary)
             } else if card.window.isMain {
                 Label { Text(.windowPeekMainWindow) } icon: { Image(systemName: "checkmark.circle") }

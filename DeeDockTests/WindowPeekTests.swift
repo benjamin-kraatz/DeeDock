@@ -68,7 +68,7 @@ struct WindowPeekTests {
         #expect(WindowThumbnailMatcher.matches(summaries: [first], candidates: ambiguous)[first.token] == nil)
     }
 
-    @Test("Screen capture discovery keeps only visible-sized windows for the requested processes")
+    @Test("Screen capture discovery keeps sized windows for the requested processes and flags off-screen ones")
     func screenCaptureDiscovery() {
         let session = UUID()
         let candidates = [
@@ -83,9 +83,60 @@ struct WindowPeekTests {
         ]
         let summaries = WindowCaptureDiscovery.summaries(
             candidates: candidates, processIdentifiers: [40], sessionID: session)
-        #expect(summaries.count == 1)
-        #expect(summaries[0].processIdentifier == 40)
-        #expect(summaries[0].token.sessionID == session)
+        #expect(summaries.count == 2)
+        #expect(summaries.allSatisfy { $0.processIdentifier == 40 && $0.token.sessionID == session })
+        #expect(summaries[0].isOffScreen == false)
+        // A hidden, minimized, or other-Space window keeps a card rather than emptying the Peek.
+        #expect(summaries[1].title == "Off-screen helper")
+        #expect(summaries[1].isOffScreen)
+        #expect(summaries[1].isMinimized == false)
+    }
+
+    @Test("Thumbnail cache reuses a picture only for the same process launch, window size, and pixel budget")
+    func thumbnailCacheValidity() throws {
+        var cache = WindowThumbnailCache(capacity: 4)
+        let key = WindowThumbnailCache.Key(processIdentifier: 40, windowID: 7)
+        let launch = Date(timeIntervalSince1970: 1_000)
+        let size = CGSize(width: 800, height: 600)
+        let budget = CGSize(width: 400, height: 250)
+        let image = try #require(Self.bitmap())
+        cache.store(image, for: key, sourceSize: size, budget: budget, launchDate: launch)
+
+        #expect(cache.image(for: key, sourceSize: size, budget: budget, launchDate: launch) === image)
+        // The matcher's two-point tolerance applies to the window size.
+        #expect(cache.image(for: key, sourceSize: CGSize(width: 802, height: 598), budget: budget, launchDate: launch) != nil)
+        #expect(cache.image(for: key, sourceSize: CGSize(width: 803, height: 600), budget: budget, launchDate: launch) == nil)
+        #expect(cache.image(for: key, sourceSize: size, budget: CGSize(width: 800, height: 500), launchDate: launch) == nil)
+        #expect(cache.image(for: key, sourceSize: size, budget: budget, launchDate: launch + 1) == nil)
+        #expect(cache.image(for: WindowThumbnailCache.Key(processIdentifier: 41, windowID: 7),
+                            sourceSize: size, budget: budget, launchDate: launch) == nil)
+
+        cache.removeAll(for: 40)
+        #expect(cache.image(for: key, sourceSize: size, budget: budget, launchDate: launch) == nil)
+    }
+
+    @Test("Thumbnail cache evicts the least recently used picture past its capacity")
+    func thumbnailCacheEviction() throws {
+        var cache = WindowThumbnailCache(capacity: 2)
+        let image = try #require(Self.bitmap())
+        let size = CGSize(width: 800, height: 600)
+        let budget = CGSize(width: 400, height: 250)
+        func key(_ id: CGWindowID) -> WindowThumbnailCache.Key { .init(processIdentifier: 40, windowID: id) }
+        cache.store(image, for: key(1), sourceSize: size, budget: budget, launchDate: nil)
+        cache.store(image, for: key(2), sourceSize: size, budget: budget, launchDate: nil)
+        // Touching window 1 makes window 2 the eviction candidate.
+        #expect(cache.image(for: key(1), sourceSize: size, budget: budget, launchDate: nil) != nil)
+        cache.store(image, for: key(3), sourceSize: size, budget: budget, launchDate: nil)
+        #expect(cache.count == 2)
+        #expect(cache.image(for: key(1), sourceSize: size, budget: budget, launchDate: nil) != nil)
+        #expect(cache.image(for: key(2), sourceSize: size, budget: budget, launchDate: nil) == nil)
+        #expect(cache.image(for: key(3), sourceSize: size, budget: budget, launchDate: nil) != nil)
+    }
+
+    private static func bitmap() -> CGImage? {
+        CGContext(data: nil, width: 4, height: 4, bitsPerComponent: 8, bytesPerRow: 0,
+                  space: CGColorSpaceCreateDeviceRGB(),
+                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage()
     }
 
     @Test("Panel geometry points inward and clamps on negative-origin displays",

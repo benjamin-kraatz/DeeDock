@@ -1151,6 +1151,14 @@ Authored tests cover absent-key defaults, preset projection, display inheritance
 
 The final focused Xcode app build succeeded with no reported diagnostics. The signed Debug app launched, and its console showed one XProtect rule-read diagnostic at startup but no two-second recurrence after the Trash monitor stopped recompiling its read-only script. The currently launched Debug identity reported both privacy grants as disabled, so thumbnail rendering and window-card interaction could not be accepted in that process. No test suite, SwiftUI preview, or automated visual check was run. Compilation and the bounded console observation do not establish permission behavior, capture correctness, window selection, native input, or visual quality.
 
+### Hidden and minimized windows (2026-09-26)
+
+Peek attempts a live ScreenCaptureKit capture for minimized windows instead of skipping them, and the ScreenCaptureKit fallback keeps off-screen windows (minimized, hidden app, other Space) as cards captioned "Not visible" rather than reporting no windows. Whether the public screenshot API returns a minimized or hidden window's backing store is not established; it is expected to vary by macOS release and is the reason the diagnostics report now names the discovery path, marks hidden windows, and marks cached pictures. The AX window read retries once with a four-times-longer timeout when an app merely failed to answer in time, which keeps Electron apps on the exact-handle path.
+
+The thumbnail service keeps a memory-only, least-recently-used cache of the last good picture per window server window, at most 32 entries. It survives Peek closing, is used only when a fresh capture fails for a window whose process launch date, size (two-point tolerance), and pixel budget still match, and is dropped per process on termination and entirely when Screen Recording access is found missing. Cached pictures never enter OCR history. Cards crossfade between a cached and a fresh picture; Reduce Motion swaps without animation. An app with no windows at all, such as an Electron app whose last window was closed, still reports no windows because there is nothing to cache.
+
+Not yet exercised hands-on: minimized capture outcome, hidden-app capture outcome, the crossfade, and the AX retry against a busy Electron app. A build succeeded; no tests were run.
+
 ### Required hands-on acceptance
 
 - Grant, deny, revoke, and regrant each permission independently in one consistently signed build. Confirm no prompt appears from startup, hover, context menus, or Focus Dock.

@@ -29,6 +29,10 @@ nonisolated struct ApplicationWindowSummary: Equatable, Identifiable, Sendable {
     let frame: CGRect?
     let isMinimized: Bool
     let isMain: Bool
+    /// ScreenCaptureKit reported the window off screen: minimized, owned by a hidden app, or on
+    /// another Space. Public metadata cannot tell these apart. Accessibility discovery leaves it
+    /// `false` because `isMinimized` is exact there.
+    var isOffScreen = false
 
     var id: ApplicationWindowToken { token }
 }

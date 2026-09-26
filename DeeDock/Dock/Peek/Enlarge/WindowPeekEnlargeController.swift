@@ -233,7 +233,7 @@ final class WindowPeekEnlargeController {
     /// The strip image is only as sharp as the card. `pixels` is already the hero in backing pixels
     /// and must reach `fittingPixels` unchanged.
     private func requestDetail(for window: ApplicationWindowSummary, exhibit: WindowPeekExhibit, pixels: CGSize) {
-        guard !window.isMinimized else { return }
+        // Minimized windows are attempted too; a failed capture simply keeps the strip image.
         captureTask = Task { @MainActor [weak self, thumbnails] in
             let image = await thumbnails.capture(window, fittingPixels: pixels)
             guard let self, !Task.isCancelled, staged === exhibit else { return }

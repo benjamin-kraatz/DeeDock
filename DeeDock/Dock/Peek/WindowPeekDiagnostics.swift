@@ -13,17 +13,22 @@ final class WindowPeekDiagnostics {
                                        category: "WindowPeekDiagnostics")
 
     /// One captured window: its frame in points and the bitmap ScreenCaptureKit returned, if any.
+    /// `cached` marks a picture reused from an earlier capture; `hidden` marks a minimized or
+    /// off-screen window, the cases where a live capture is expected to be unreliable.
     nonisolated struct Capture: Sendable {
         let frame: CGRect
         let pixels: CGSize?
+        var cached = false
+        var hidden = false
     }
 
     /// The latest report, or `nil` until a Peek has shown windows since launch.
     private(set) var report: String?
 
     /// Replaces the report and mirrors it to the unified log at info level.
+    /// `discovery` names the path that produced the window list and `discovered` counts windows before filters.
     func record(settings: DockSettings, placement: CGRect, panel: CGRect, screen: NSScreen?,
-                captures: [Capture]) {
+                discovery: String, discovered: Int, captures: [Capture]) {
         let card = WindowPeekGeometry.cardSize(settings)
         let thumbnail = settings.windowPeekSize.thumbnailSize
         var lines: [String] = []
@@ -40,11 +45,14 @@ final class WindowPeekDiagnostics {
         }
         lines.append("Card: \(Self.text(card)) thumbnail \(Self.text(thumbnail))")
         lines.append("Panel: computed \(Self.text(placement)) actual \(Self.text(panel))")
+        lines.append("Discovery: \(discovery) · \(discovered) discovered")
         lines.append("Windows: \(captures.count)")
         for (index, capture) in captures.enumerated() {
-            let pixels = capture.pixels.map { "\(Self.text($0)) px" } ?? "no capture"
+            var pixels = capture.pixels.map { "\(Self.text($0)) px" } ?? "no capture"
+            if capture.cached { pixels += " (cached)" }
             let aspect = capture.frame.height > 0 ? Self.text(capture.frame.width / capture.frame.height) : "—"
-            lines.append("  #\(index + 1) window \(Self.text(capture.frame)) aspect \(aspect) → \(pixels)")
+            let state = capture.hidden ? " hidden" : ""
+            lines.append("  #\(index + 1) window\(state) \(Self.text(capture.frame)) aspect \(aspect) → \(pixels)")
         }
         let text = lines.joined(separator: "\n")
         report = text
