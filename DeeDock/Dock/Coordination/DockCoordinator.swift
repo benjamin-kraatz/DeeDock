@@ -319,6 +319,10 @@ final class DockCoordinator {
         windowPeeks.prepareSettings = { [weak self] _ in
             self?.settingsFeaturesRequest = true
         }
+        windowPeeks.stageOnShelf = { [weak self] url in
+            guard let self else { return 0 }
+            return try shelf.add([url])
+        }
         catalog.didChange = { [weak self] in self?.occupancy.invalidate(); self?.refreshPanels() }
         trash.didChange = { [weak self] in self?.refreshPanels() }
         // One shared Shelf: an edit on any display re-renders every dock and the open panel.

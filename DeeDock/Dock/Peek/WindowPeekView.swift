@@ -166,6 +166,7 @@ struct WindowPeekView: View {
                                    manage: { state.manage?(card.id) },
                                    choose: { state.choose?(card.id) },
                                    watch: { state.watch?(card.id) },
+                                   markup: { state.markup?(card.id) },
                                    addToFusion: { state.addToFusion?(card.window) },
                                    startMelt: { state.startMelt?(card.window) },
                                    pinPortal: { state.pinPortal?(card.window) },

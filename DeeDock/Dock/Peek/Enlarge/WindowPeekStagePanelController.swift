@@ -43,6 +43,9 @@ final class WindowPeekStagePanelController {
     /// Converts a screen rectangle into the stage view's coordinate space.
     func local(_ rect: CGRect) -> CGRect { WindowPeekEnlargeGeometry.local(rect, in: screenFrame) }
 
+    /// The panel's window level, so companions such as the hero toolbar can sit just above it.
+    var level: NSWindow.Level { panel.level }
+
     func show() {
         panel.alphaValue = 1
         if !panel.isVisible { panel.orderFrontRegardless() }

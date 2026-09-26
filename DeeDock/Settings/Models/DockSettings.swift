@@ -88,6 +88,12 @@ struct DockSettings: Codable, Equatable {
     var windowPeekIncludeUntitled: Bool = true
     /// Seconds a pointer must remain over an app before Peek opens.
     var windowPeekHoverDelay: Double = 0.4
+    /// File format for saved Window Peek markups. Copy always uses PNG.
+    var windowMarkupFormat: WindowMarkupFormat = .png
+    /// Where **Search Web** in a markup sends recognised text.
+    var windowMarkupSearchEngine: WindowMarkupSearchEngine = .google
+    /// Folder for Send to Shelf and the save panel's starting place; `nil` is `~/Pictures/DeeDock Markups`.
+    var windowMarkupFolder: String? = nil
     var tooltipPreset: DockTooltipPreset = .classic
     var runningIndicatorStyle: RunningIndicatorStyle = .dot
     /// Whether Stardust twinkles. Drawn styles are always still, and Reduce Motion
@@ -165,6 +171,7 @@ extension DockSettings {
         case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
+        case windowMarkupFormat, windowMarkupSearchEngine, windowMarkupFolder
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
@@ -202,6 +209,10 @@ extension DockSettings {
         windowPeekIncludeMinimized = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeMinimized) ?? true
         windowPeekIncludeUntitled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeUntitled) ?? true
         windowPeekHoverDelay = try values.decodeIfPresent(Double.self, forKey: .windowPeekHoverDelay) ?? 0.4
+        windowMarkupFormat = try values.decodeIfPresent(WindowMarkupFormat.self, forKey: .windowMarkupFormat) ?? .png
+        windowMarkupSearchEngine = try values.decodeIfPresent(WindowMarkupSearchEngine.self,
+                                                              forKey: .windowMarkupSearchEngine) ?? .google
+        windowMarkupFolder = try values.decodeIfPresent(String.self, forKey: .windowMarkupFolder)
         tooltipPreset = values.contains(.tooltipPreset) ? try values.decode(DockTooltipPreset.self, forKey: .tooltipPreset) : .classic
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)

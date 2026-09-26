@@ -27,6 +27,9 @@ final class WindowPeekPanelController {
     private var globalMonitor: Any?
     private var stopped = false
     var closed: ((Bool) -> Void)?
+    /// Windows that belong to this Peek without being the panel, such as the enlarged preview's
+    /// hero toolbar. A click in one must not count as an outside click that closes Peek.
+    var ownsAuxiliaryWindow: ((NSWindow?) -> Bool)?
 
     init(item: DockItem, anchor: WindowPeekAnchor, settings: DockSettings, keyboard: Bool) {
         state = WindowPeekState(item: item, settings: settings)
@@ -138,6 +141,7 @@ final class WindowPeekPanelController {
         state.fileDragExited = nil
         state.fileDragEnded = nil
         state.watch = nil
+        state.markup = nil
         state.pinPortal = nil
         state.pinFrozen = nil
         state.dropPortal = nil
@@ -151,6 +155,7 @@ final class WindowPeekPanelController {
         state.hovered = nil
         state.thumbnailNeeded = nil
         state.cardHovered = nil
+        ownsAuxiliaryWindow = nil
         panel.keyboardHandler = nil
         let callback = closed
         closed = nil
@@ -162,7 +167,8 @@ final class WindowPeekPanelController {
     private func installMonitors() {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
-            guard let self, !self.state.actionMenuTracking, event.window !== self.panel else { return event }
+            guard let self, !self.state.actionMenuTracking, event.window !== self.panel,
+                  self.ownsAuxiliaryWindow?(event.window) != true else { return event }
             self.close(returnFocus: false)
             return event
         }
@@ -182,6 +188,8 @@ final class WindowPeekPanelController {
             if let id = state.selectedID { state.manage?(id) }
         case 8 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: state.chooseFiles?()
         case 13 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: if let id = state.selectedID { state.watch?(id) }
+        case 46 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
+            if let id = state.selectedID { state.markup?(id) }
         case 35 where event.modifierFlags.intersection([.command, .control]).isEmpty:
             if let card = state.cards.first(where: { $0.id == state.selectedID }) {
                 if event.modifierFlags.contains(.option) { state.pinFrozen?(card.window) }

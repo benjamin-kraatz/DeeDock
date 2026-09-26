@@ -83,6 +83,11 @@ nonisolated enum WindowPeekEnlargeGeometry {
         CGRect(x: rect.minX - container.minX, y: container.maxY - rect.maxY, width: rect.width, height: rect.height)
     }
 
+    /// The inverse of `local(_:in:)`: a panel-space rectangle back in screen coordinates.
+    static func screen(_ rect: CGRect, in container: CGRect) -> CGRect {
+        CGRect(x: container.minX + rect.minX, y: container.maxY - rect.maxY, width: rect.width, height: rect.height)
+    }
+
     /// Converts a Quartz global rectangle (Accessibility and ScreenCaptureKit window frames: y down from
     /// the primary display's top) to AppKit screen coordinates (y up from the primary display's bottom).
     static func appKit(fromQuartz rect: CGRect, primaryMaxY: CGFloat) -> CGRect {

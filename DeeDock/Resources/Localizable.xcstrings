@@ -43754,6 +43754,1428 @@
           }
         }
       }
+    },
+    "markupToolSelect" : {
+      "comment": "Markup tool: move and edit existing marks.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswählen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select"
+          }
+        }
+      }
+    },
+    "markupToolPen" : {
+      "comment": "Markup tool: freehand pen.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stift"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pen"
+          }
+        }
+      }
+    },
+    "markupToolHighlighter" : {
+      "comment": "Markup tool: translucent wide highlighter.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Textmarker"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Highlighter"
+          }
+        }
+      }
+    },
+    "markupToolArrow" : {
+      "comment": "Markup tool: arrow from drag start to end.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pfeil"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrow"
+          }
+        }
+      }
+    },
+    "markupToolRectangle" : {
+      "comment": "Markup tool: outlined box.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechteck"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rectangle"
+          }
+        }
+      }
+    },
+    "markupToolText" : {
+      "comment": "Markup tool: typed label.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text"
+          }
+        }
+      }
+    },
+    "markupToolBadge" : {
+      "comment": "Markup tool: numbered callout circle.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nummernmarke"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Number badge"
+          }
+        }
+      }
+    },
+    "markupToolRedact" : {
+      "comment": "Markup tool: hides pixels by pixelating or blacking out.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwärzen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redact"
+          }
+        }
+      }
+    },
+    "markupToolCrop" : {
+      "comment": "Markup tool: choose the area to export.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuschneiden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crop"
+          }
+        }
+      }
+    },
+    "markupToolHelp" : {
+      "comment": "Tooltip for a markup tool button. tool is the tool name, key its keyboard shortcut letter.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%(tool)@ (%(key)@)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%(tool)@ (%(key)@)"
+          }
+        }
+      }
+    },
+    "markupToolsAccessibility" : {
+      "comment": "VoiceOver label for the markup tool palette.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierungswerkzeuge"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markup tools"
+          }
+        }
+      }
+    },
+    "markupRedactPixelate" : {
+      "comment": "Redaction style: pixelate.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verpixeln"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pixelate"
+          }
+        }
+      }
+    },
+    "markupRedactSolid" : {
+      "comment": "Redaction style: solid black block.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwarz abdecken"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Black out"
+          }
+        }
+      }
+    },
+    "markupColorRed" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rot"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Red"
+          }
+        }
+      }
+    },
+    "markupColorOrange" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orange"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orange"
+          }
+        }
+      }
+    },
+    "markupColorYellow" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gelb"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yellow"
+          }
+        }
+      }
+    },
+    "markupColorGreen" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grün"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Green"
+          }
+        }
+      }
+    },
+    "markupColorBlue" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blau"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blue"
+          }
+        }
+      }
+    },
+    "markupColorPurple" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lila"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purple"
+          }
+        }
+      }
+    },
+    "markupColorWhite" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiß"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "White"
+          }
+        }
+      }
+    },
+    "markupColorBlack" : {
+      "comment": "Markup palette colour.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwarz"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Black"
+          }
+        }
+      }
+    },
+    "markupWeightThin" : {
+      "comment": "Markup stroke weight.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dünn"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thin"
+          }
+        }
+      }
+    },
+    "markupWeightRegular" : {
+      "comment": "Markup stroke weight.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normal"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regular"
+          }
+        }
+      }
+    },
+    "markupWeightBold" : {
+      "comment": "Markup stroke weight.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kräftig"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bold"
+          }
+        }
+      }
+    },
+    "markupFormatPNG" : {
+      "comment": "Saved markup file format.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PNG"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PNG"
+          }
+        }
+      }
+    },
+    "markupFormatJPEG" : {
+      "comment": "Saved markup file format.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JPEG"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JPEG"
+          }
+        }
+      }
+    },
+    "markupSearchEngineGoogle" : {
+      "comment": "Search engine choice for Search Web. Brand name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google"
+          }
+        }
+      }
+    },
+    "markupSearchEngineDuckDuckGo" : {
+      "comment": "Search engine choice for Search Web. Brand name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DuckDuckGo"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DuckDuckGo"
+          }
+        }
+      }
+    },
+    "markupSearchEngineBing" : {
+      "comment": "Search engine choice for Search Web. Brand name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bing"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bing"
+          }
+        }
+      }
+    },
+    "markupSearchEngineEcosia" : {
+      "comment": "Search engine choice for Search Web. Brand name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ecosia"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ecosia"
+          }
+        }
+      }
+    },
+    "markupNoticeCopied" : {
+      "comment": "Markup notice after the picture reached the clipboard.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopiert"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied"
+          }
+        }
+      }
+    },
+    "markupNoticeCopyFailed" : {
+      "comment": "Markup notice when the picture could not be copied.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bild konnte nicht kopiert werden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t copy the picture"
+          }
+        }
+      }
+    },
+    "markupNoticeSaved" : {
+      "comment": "Markup notice after the file was written.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesichert"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved"
+          }
+        }
+      }
+    },
+    "markupNoticeSaveFailed" : {
+      "comment": "Markup notice when the file could not be written.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bild konnte nicht gesichert werden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t save the picture"
+          }
+        }
+      }
+    },
+    "markupNoticeShelved" : {
+      "comment": "Markup notice after the file was staged on the Shelf.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zur Ablage hinzugefügt"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added to the Shelf"
+          }
+        }
+      }
+    },
+    "markupNoticeShelfFull" : {
+      "comment": "Markup notice when the Shelf has no room for another item.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Ablage ist voll"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Shelf is full"
+          }
+        }
+      }
+    },
+    "markupNoticeShelfFailed" : {
+      "comment": "Markup notice when writing or staging for the Shelf failed.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konnte nicht zur Ablage hinzugefügt werden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t add to the Shelf"
+          }
+        }
+      }
+    },
+    "markupNoticeTextCopied" : {
+      "comment": "Markup notice after recognised or selected text reached the clipboard.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text kopiert"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text copied"
+          }
+        }
+      }
+    },
+    "markupNoticeNoText" : {
+      "comment": "Markup notice when Vision found no text in the picture or selection.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Text gefunden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No text found"
+          }
+        }
+      }
+    },
+    "markupNoticeEscapeAgain" : {
+      "comment": "Markup notice after Escape with unsaved marks.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drücke erneut Escape, um die Markierungen zu verwerfen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press Escape again to discard your marks"
+          }
+        }
+      }
+    },
+    "markupNoticeBusy" : {
+      "comment": "Markup notice when another markup with marks is already open.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beende oder schließe zuerst diese Markierung"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finish or close this markup first"
+          }
+        }
+      }
+    },
+    "markupCropAccessibility" : {
+      "comment": "VoiceOver label for the crop selection on the markup picture.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuschnittauswahl"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crop selection"
+          }
+        }
+      }
+    },
+    "markupCanvasAccessibility" : {
+      "comment": "VoiceOver label for the markup drawing area. title is the window title supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierung von %(title)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markup of %(title)@"
+          }
+        }
+      }
+    },
+    "markupCanvasAccessibilityHint" : {
+      "comment": "VoiceOver hint for the markup drawing area.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Zeichnen wird ein Zeiger benötigt. Kopieren, Sichern, Zuschneiden und Textaktionen sind in der Werkzeugleiste verfügbar."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drawing needs a pointer. Copy, save, crop, and text actions are available from the toolbar."
+          }
+        }
+      }
+    },
+    "markupTextPlaceholder" : {
+      "comment": "Placeholder inside a new text mark.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippen…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type…"
+          }
+        }
+      }
+    },
+    "markupUndo" : {
+      "comment": "Markup header button.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widerrufen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Undo"
+          }
+        }
+      }
+    },
+    "markupRedo" : {
+      "comment": "Markup header button.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederholen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redo"
+          }
+        }
+      }
+    },
+    "markupStatusCapturing" : {
+      "comment": "Markup header status while the full-resolution capture is on its way.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufnahme in voller Auflösung…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capturing at full resolution…"
+          }
+        }
+      }
+    },
+    "markupStatusFresh" : {
+      "comment": "Markup header status once the sharp capture arrived; width and height are pixels.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%(width)lld × %(height)lld · frische Aufnahme"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%(width)lld × %(height)lld · fresh capture"
+          }
+        }
+      }
+    },
+    "markupStatusPreview" : {
+      "comment": "Markup header status when only the Peek preview image is available.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschaubild · keine frische Aufnahme"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preview image · no fresh capture"
+          }
+        }
+      }
+    },
+    "markupCopy" : {
+      "comment": "Markup action: copy the picture.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopieren"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy"
+          }
+        }
+      }
+    },
+    "markupCopyHelp" : {
+      "comment": "Tooltip for the markup Copy button.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bild oder ausgewählten Live-Text kopieren (⌘C)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy the picture, or the selected Live Text (⌘C)"
+          }
+        }
+      }
+    },
+    "markupSave" : {
+      "comment": "Markup action: save the picture through the save panel.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichern…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save…"
+          }
+        }
+      }
+    },
+    "markupShare" : {
+      "comment": "Markup action: system share picker.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teilen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        }
+      }
+    },
+    "markupSendToShelf" : {
+      "comment": "Markup action: write the picture to the markup folder and stage it on the Shelf.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In die Ablage"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send to Shelf"
+          }
+        }
+      }
+    },
+    "markupLiveText" : {
+      "comment": "Markup action: toggle Live Text and Visual Look Up on the picture.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Text"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Text"
+          }
+        }
+      }
+    },
+    "markupLiveTextHelp" : {
+      "comment": "Tooltip for the Live Text toggle.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text auswählen, nachschlagen und Links im Bild öffnen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select text, look things up, and open links in the picture"
+          }
+        }
+      }
+    },
+    "markupCopyText" : {
+      "comment": "Markup action: copy recognised text.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text kopieren"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Text"
+          }
+        }
+      }
+    },
+    "markupSearchWeb" : {
+      "comment": "Markup action: open the search engine with recognised or selected text.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Web suchen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Web"
+          }
+        }
+      }
+    },
+    "markupFrame" : {
+      "comment": "Markup action: toggle the coloured presentation frame around the export.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rahmen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frame"
+          }
+        }
+      }
+    },
+    "markupFrameHelp" : {
+      "comment": "Tooltip for the presentation frame toggle.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bild mit farbigem Passepartout und runden Ecken umrahmen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wrap the picture in a coloured mat with rounded corners"
+          }
+        }
+      }
+    },
+    "markupResetCrop" : {
+      "comment": "Markup action: remove the crop selection.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganzes Bild"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Whole picture"
+          }
+        }
+      }
+    },
+    "markupRecapture" : {
+      "comment": "Markup action: take a new capture of the window.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neu aufnehmen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recapture"
+          }
+        }
+      }
+    },
+    "markupClearAll" : {
+      "comment": "Markup action: remove every mark.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        }
+      }
+    },
+    "markupActionsAccessibility" : {
+      "comment": "VoiceOver label for the markup action bar.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierungsaktionen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markup actions"
+          }
+        }
+      }
+    },
+    "markupDrag" : {
+      "comment": "Markup drag handle label.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag"
+          }
+        }
+      }
+    },
+    "markupDragHelp" : {
+      "comment": "Tooltip for the markup drag handle.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fertiges Bild in eine andere App oder den Finder ziehen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag the finished picture into another app or Finder"
+          }
+        }
+      }
+    },
+    "markupWindowTitle" : {
+      "comment": "Accessibility title of the markup window. title is the window title supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierung: %(title)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markup: %(title)@"
+          }
+        }
+      }
+    },
+    "markupOpen" : {
+      "comment": "Window Peek card action and menu item that opens the markup editor.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenster markieren…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark up window…"
+          }
+        }
+      }
+    },
+    "markupOpenShort" : {
+      "comment": "Short label on the enlarged preview's toolbar that opens the markup editor.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markieren"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark up"
+          }
+        }
+      }
+    },
+    "markupHeroToolbarAccessibility" : {
+      "comment": "VoiceOver label for the toolbar on the enlarged preview.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktionen der vergrößerten Vorschau"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlarged preview actions"
+          }
+        }
+      }
+    },
+    "markupSettingsTitle" : {
+      "comment": "Settings card title for Window Peek markup.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierung"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markup"
+          }
+        }
+      }
+    },
+    "markupSettingsHelp" : {
+      "comment": "Settings card footnote for Window Peek markup.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle Fenster markieren auf einer Window-Peek-Karte oder drücke M im Tastatur-Peek, um auf eine frische Aufnahme zu zeichnen und sie zu kopieren, zu sichern, zu teilen oder zu durchsuchen. In die Ablage schreibt in den Ordner unten; Sichern… fragt immer nach dem Ort."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Mark up window on a Window Peek card, or press M in keyboard Peek, to draw on a fresh capture and copy, save, share, or search it. Send to Shelf writes into the folder below; Save… always asks where."
+          }
+        }
+      }
+    },
+    "markupSettingsFormat" : {
+      "comment": "Settings row: saved markup file format.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateiformat beim Sichern"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved file format"
+          }
+        }
+      }
+    },
+    "markupSettingsSearchEngine" : {
+      "comment": "Settings row: search engine for Search Web.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Web suchen mit"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Web uses"
+          }
+        }
+      }
+    },
+    "markupSettingsFolder" : {
+      "comment": "Settings row: markup folder.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierungsordner"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markup folder"
+          }
+        }
+      }
+    },
+    "markupSettingsFolderHelp" : {
+      "comment": "Settings row subtitle for the markup folder.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In die Ablage schreibt hierhin, Sichern… beginnt hier."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send to Shelf writes here, and Save… starts here."
+          }
+        }
+      }
+    },
+    "markupSettingsChooseFolder" : {
+      "comment": "Settings button: choose the markup folder.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswählen…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose…"
+          }
+        }
+      }
+    },
+    "markupSettingsResetFolder" : {
+      "comment": "Settings button: return to the default markup folder.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard verwenden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use Default"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"
