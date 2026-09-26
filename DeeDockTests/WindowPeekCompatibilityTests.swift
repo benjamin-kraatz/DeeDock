@@ -15,6 +15,12 @@ struct WindowPeekCompatibilityTests {
         try assertOptInMigration(\.windowPeekKeepsPanelSize, key: "windowPeekKeepsPanelSize")
     }
 
+    @Test("Automatic capture resolution stays off for existing settings and round-trips when enabled")
+    func capturesAtAutomaticResolution() throws {
+        try assertOptInMigration(\.windowPeekCapturesAtAutomaticResolution,
+                                 key: "windowPeekCapturesAtAutomaticResolution")
+    }
+
     private func assertOptInMigration(_ keyPath: WritableKeyPath<DockSettings, Bool>, key: String) throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()

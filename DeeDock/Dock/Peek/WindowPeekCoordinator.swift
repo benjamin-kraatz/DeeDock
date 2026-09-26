@@ -1,4 +1,5 @@
 import AppKit
+import ScreenCaptureKit
 
 /// App-wide owner for the single transient window preview.
 @MainActor
@@ -446,12 +447,15 @@ final class WindowPeekCoordinator {
             pendingThumbnailIDs.subtract(ids)
             requestedThumbnailIDs.formUnion(ids)
             let windows = allWindows.filter { ids.contains($0.token) }
-            guard let size = controller?.state.settings.windowPeekSize.thumbnailSize else { return }
+            guard let settings = controller?.state.settings else { return }
+            let size = settings.windowPeekSize.thumbnailSize
             let historyEpoch = history.collectionEpoch
             // OCR reuses this capture at a larger logical size. Capture multiplies by the window's
             // display scale, so a 2× screen stores at most 1600 × 1000 pixels.
             let captureSize = historyEpoch == nil ? size : CGSize(width: 800, height: 500)
-            let images = await thumbnails.capture(windows, size: captureSize)
+            let images = await thumbnails.capture(
+                windows, size: captureSize,
+                resolution: settings.windowPeekCapturesAtAutomaticResolution ? .automatic : .best)
             guard !Task.isCancelled,
                   WindowPeekLifecycle.acceptsResult(expected: currentGeneration, current: generation),
                   let controller else { return }

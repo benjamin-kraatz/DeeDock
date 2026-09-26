@@ -29,12 +29,14 @@ nonisolated enum WindowScreenshot {
 
     /// Captures `source` (the window frame, in points) fitted into `size` pixels.
     ///
-    /// `.best` asks for the display's full resolution. The default automatic resolution returns a
-    /// Retina window at its point size, so a 2× card would be stored with half the pixels.
-    static func capture(filter: SCContentFilter, source: CGSize, fittingPixels size: CGSize) async throws -> CGImage {
+    /// `.best` asks for the display's full resolution. The automatic resolution returns a Retina
+    /// window at its point size, so a 2× card would be stored with half the pixels. Callers pass
+    /// `.automatic` only as a compatibility choice for displays where `.best` misbehaves.
+    static func capture(filter: SCContentFilter, source: CGSize, fittingPixels size: CGSize,
+                        resolution: SCCaptureResolutionType = .best) async throws -> CGImage {
         let pixels = outputPixels(source: source, fittingPixels: size)
         let configuration = SCStreamConfiguration()
-        configuration.captureResolution = .best
+        configuration.captureResolution = resolution
         configuration.width = max(1, Int(pixels.width))
         configuration.height = max(1, Int(pixels.height))
         configuration.showsCursor = false

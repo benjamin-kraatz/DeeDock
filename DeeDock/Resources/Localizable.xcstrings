@@ -43772,6 +43772,24 @@
           }
         }
       }
+    },
+    "windowPeekCapturesAtAutomaticResolution" : {
+      "comment" : "Compatibility switch: Window Peek captures thumbnails at ScreenCaptureKit's automatic resolution instead of the display's best resolution. Previews may be less sharp.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschauen mit automatischer Auflösung aufnehmen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture previews at automatic resolution"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

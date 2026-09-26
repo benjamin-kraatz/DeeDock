@@ -85,10 +85,19 @@ protocol WindowThumbnailServicing: Actor {
     func discover(processes: [ApplicationProcessSnapshot], sessionID: UUID) async throws
         -> [ApplicationWindowSummary]
     /// `size` is logical points. Each window is captured at that size times its own display scale.
-    func capture(_ windows: [ApplicationWindowSummary], size: CGSize) async -> [ApplicationWindowToken: CGImage]
+    /// `resolution` is `.best` for ordinary use; `.automatic` is a compatibility choice.
+    func capture(_ windows: [ApplicationWindowSummary], size: CGSize,
+                 resolution: SCCaptureResolutionType) async -> [ApplicationWindowToken: CGImage]
     /// `pixels` is an exact pixel budget. It is not divided or multiplied by a display scale.
     func capture(_ window: ApplicationWindowSummary, fittingPixels pixels: CGSize) async -> CGImage?
     func stop()
+}
+
+extension WindowThumbnailServicing {
+    /// Point-sized capture at the display's best resolution.
+    func capture(_ windows: [ApplicationWindowSummary], size: CGSize) async -> [ApplicationWindowToken: CGImage] {
+        await capture(windows, size: size, resolution: .best)
+    }
 }
 
 /// One-shot, memory-only ScreenCaptureKit capture. Native window handles never leave this actor.
@@ -115,18 +124,19 @@ actor ScreenCaptureWindowThumbnailService: WindowThumbnailServicing {
         }
     }
 
-    func capture(_ windows: [ApplicationWindowSummary], size: CGSize) async -> [ApplicationWindowToken: CGImage] {
-        await capture(windows) { filter in
+    func capture(_ windows: [ApplicationWindowSummary], size: CGSize,
+                 resolution: SCCaptureResolutionType) async -> [ApplicationWindowToken: CGImage] {
+        await capture(windows, resolution: resolution) { filter in
             WindowScreenshot.backingPixels(for: size, pointPixelScale: CGFloat(filter.pointPixelScale))
         }
     }
 
     func capture(_ window: ApplicationWindowSummary, fittingPixels pixels: CGSize) async -> CGImage? {
-        await capture([window]) { _ in pixels }[window.token]
+        await capture([window], resolution: .best) { _ in pixels }[window.token]
     }
 
     /// One enumeration and one match pass. `budget` receives the filter so a point size can use that window's scale.
-    private func capture(_ windows: [ApplicationWindowSummary],
+    private func capture(_ windows: [ApplicationWindowSummary], resolution: SCCaptureResolutionType,
                          budget: (SCContentFilter) -> CGSize) async -> [ApplicationWindowToken: CGImage] {
         guard CGPreflightScreenCaptureAccess(), !windows.isEmpty else { return [:] }
         do {
@@ -142,7 +152,8 @@ actor ScreenCaptureWindowThumbnailService: WindowThumbnailServicing {
                 do {
                     let filter = SCContentFilter(desktopIndependentWindow: window)
                     let image = try await WindowScreenshot.capture(
-                        filter: filter, source: window.frame.size, fittingPixels: budget(filter))
+                        filter: filter, source: window.frame.size, fittingPixels: budget(filter),
+                        resolution: resolution)
                     result[summary.token] = image
                 } catch is CancellationError {
                     return [:]

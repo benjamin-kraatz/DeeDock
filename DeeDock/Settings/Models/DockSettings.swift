@@ -98,6 +98,12 @@ struct DockSettings: Codable, Equatable {
     /// whatever height it is given, so a stale short report (from the loading state) can lock the
     /// panel at that height and clip the cards. Off by default; shared by all displays.
     var windowPeekKeepsPanelSize: Bool = false
+    /// Compatibility: captures Peek thumbnails at ScreenCaptureKit's automatic resolution.
+    ///
+    /// Ordinary captures ask for `.best`, the display's full backing resolution. On scaled display
+    /// modes the result can differ from the requested size; automatic returns a window at its
+    /// point size and never disagrees with the layout. Off by default; shared by all displays.
+    var windowPeekCapturesAtAutomaticResolution: Bool = false
     /// Seconds a pointer must remain over an app before Peek opens.
     var windowPeekHoverDelay: Double = 0.4
     var tooltipPreset: DockTooltipPreset = .classic
@@ -177,7 +183,7 @@ extension DockSettings {
         case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
-        case windowPeekNeverShowsScrollBars, windowPeekKeepsPanelSize
+        case windowPeekNeverShowsScrollBars, windowPeekKeepsPanelSize, windowPeekCapturesAtAutomaticResolution
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
@@ -217,6 +223,8 @@ extension DockSettings {
         windowPeekHoverDelay = try values.decodeIfPresent(Double.self, forKey: .windowPeekHoverDelay) ?? 0.4
         windowPeekNeverShowsScrollBars = try values.decodeIfPresent(Bool.self, forKey: .windowPeekNeverShowsScrollBars) ?? false
         windowPeekKeepsPanelSize = try values.decodeIfPresent(Bool.self, forKey: .windowPeekKeepsPanelSize) ?? false
+        windowPeekCapturesAtAutomaticResolution = try values.decodeIfPresent(
+            Bool.self, forKey: .windowPeekCapturesAtAutomaticResolution) ?? false
         tooltipPreset = values.contains(.tooltipPreset) ? try values.decode(DockTooltipPreset.self, forKey: .tooltipPreset) : .classic
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)
