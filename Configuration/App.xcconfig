@@ -3,6 +3,16 @@
 CURRENT_PROJECT_VERSION = 34
 MARKETING_VERSION = 0.9.3
 PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock
+INFOPLIST_KEY_CFBundleDisplayName = DDock
+
+// Development builds get their own identity so macOS privacy grants
+// (Accessibility, Screen Recording, Automation) for the Apple Development
+// signed build never replace the Developer ID signed release's grants.
+// This also separates preferences, Application Support, and keychain items.
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug] = de.benjaminkraatz.DeeDock.dev
+PRODUCT_BUNDLE_IDENTIFIER[config=Preview] = de.benjaminkraatz.DeeDock.dev
+INFOPLIST_KEY_CFBundleDisplayName[config=Debug] = DDock Dev
+INFOPLIST_KEY_CFBundleDisplayName[config=Preview] = DDock Dev
 PRODUCT_NAME = DDock
 PRODUCT_MODULE_NAME = DeeDock
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
