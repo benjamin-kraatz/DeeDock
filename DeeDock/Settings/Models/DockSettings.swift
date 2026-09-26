@@ -86,6 +86,12 @@ struct DockSettings: Codable, Equatable {
     var windowPeekStyle: WindowPeekStyle = .glass
     var windowPeekIncludeMinimized: Bool = true
     var windowPeekIncludeUntitled: Bool = true
+    /// Compatibility: hides Peek's scroll bars even when macOS is set to always show them.
+    ///
+    /// Peek asks for hidden indicators, but "Show scroll bars: Always" overrides that and draws
+    /// legacy scrollers inside the panel, taking layout space from the cards. Off by default;
+    /// shared by all displays.
+    var windowPeekNeverShowsScrollBars: Bool = false
     /// Seconds a pointer must remain over an app before Peek opens.
     var windowPeekHoverDelay: Double = 0.4
     var tooltipPreset: DockTooltipPreset = .classic
@@ -165,6 +171,7 @@ extension DockSettings {
         case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
+        case windowPeekNeverShowsScrollBars
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
@@ -202,6 +209,7 @@ extension DockSettings {
         windowPeekIncludeMinimized = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeMinimized) ?? true
         windowPeekIncludeUntitled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeUntitled) ?? true
         windowPeekHoverDelay = try values.decodeIfPresent(Double.self, forKey: .windowPeekHoverDelay) ?? 0.4
+        windowPeekNeverShowsScrollBars = try values.decodeIfPresent(Bool.self, forKey: .windowPeekNeverShowsScrollBars) ?? false
         tooltipPreset = values.contains(.tooltipPreset) ? try values.decode(DockTooltipPreset.self, forKey: .tooltipPreset) : .classic
         iconSize = try values.decode(Double.self, forKey: .iconSize)
         magnification = try values.decode(Double.self, forKey: .magnification)

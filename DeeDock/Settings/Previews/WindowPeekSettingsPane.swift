@@ -55,6 +55,10 @@ struct WindowPeekSettingsPane: View {
                                   minimumSymbol: "hare.fill", maximumSymbol: "tortoise.fill",
                                   defaultValue: DockSettings.defaults.windowPeekHoverDelay)
             }
+            SettingsCard(title: .windowPeekCompatibilityTitle, footnote: .windowPeekCompatibilityHelp) {
+                SettingsToggleRow(title: .windowPeekNeverShowsScrollBars,
+                                  isOn: source.binding(\.windowPeekNeverShowsScrollBars))
+            }
         }
         .disabled(persistentSettingsDisabled)
     }
