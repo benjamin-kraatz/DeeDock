@@ -258,7 +258,8 @@ struct WindowPeekCardView: View {
     private var artwork: some View {
         Group {
             if let thumbnail = card.thumbnail {
-                Image(decorative: thumbnail, scale: 2).resizable().interpolation(.high).scaledToFit()
+                // The card frame is the logical point size. One pixel per point fills that frame.
+                Image(decorative: thumbnail, scale: 1).resizable().interpolation(.high).scaledToFit()
                     .opacity(lifted ? 0 : 1)
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: lifted)
                     .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in

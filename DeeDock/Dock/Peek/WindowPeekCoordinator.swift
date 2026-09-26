@@ -448,8 +448,8 @@ final class WindowPeekCoordinator {
             let windows = allWindows.filter { ids.contains($0.token) }
             guard let size = controller?.state.settings.windowPeekSize.thumbnailSize else { return }
             let historyEpoch = history.collectionEpoch
-            // The same displayed capture carries more detail after OCR opt-in. The service doubles
-            // logical dimensions, so this bounds the raster to 1600 × 1000 without a second screenshot.
+            // OCR reuses this capture at a larger logical size. Capture multiplies by the window's
+            // display scale, so a 2× screen stores at most 1600 × 1000 pixels.
             let captureSize = historyEpoch == nil ? size : CGSize(width: 800, height: 500)
             let images = await thumbnails.capture(windows, size: captureSize)
             guard !Task.isCancelled,

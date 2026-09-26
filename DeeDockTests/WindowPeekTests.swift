@@ -102,6 +102,19 @@ struct WindowPeekTests {
         #expect(placement.frame.maxY <= safe.maxY)
     }
 
+    @Test("A 2× display captures the logical thumbnail in backing pixels, without halving it",
+          arguments: WindowPeekSize.allCases)
+    func retinaCaptureBudget(_ peekSize: WindowPeekSize) {
+        let logical = peekSize.thumbnailSize
+        let budget = WindowScreenshot.backingPixels(for: logical, pointPixelScale: 2)
+        #expect(budget == CGSize(width: logical.width * 2, height: logical.height * 2))
+        // 2048×1280 is the same 8:5 shape as the thumbnails, so the fitted bitmap is the budget.
+        let fitted = WindowScreenshot.outputPixels(source: CGSize(width: 2048, height: 1280), fittingPixels: budget)
+        #expect(fitted == budget)
+        #expect(WindowScreenshot.backingPixels(for: logical, pointPixelScale: 1) == logical)
+        #expect(WindowScreenshot.backingPixels(for: logical, pointPixelScale: 0) == logical)
+    }
+
     @Test("Short content keeps the panel edge that faces the dock icon", arguments: DockEdge.allCases)
     func fittedHeightHugsTheIcon(_ edge: DockEdge) {
         let placement = WindowPeekPlacement(frame: CGRect(x: 100, y: 200, width: 400, height: 300), edge: edge)
