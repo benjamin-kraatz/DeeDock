@@ -78,6 +78,8 @@ final class WindowPeekState {
     @ObservationIgnored var fileDragExited: (() -> Void)?
     @ObservationIgnored var fileDragEnded: (() -> Void)?
     @ObservationIgnored var watch: ((ApplicationWindowToken) -> Void)?
+    /// Opens the markup editor for a card's window. Closes Peek.
+    @ObservationIgnored var markup: ((ApplicationWindowToken) -> Void)?
     var portalDragging = false
     @ObservationIgnored var portalTracking: ((Bool) -> Void)?
     @ObservationIgnored var dropPortal: ((ApplicationWindowSummary, CGPoint, Bool) -> Void)?

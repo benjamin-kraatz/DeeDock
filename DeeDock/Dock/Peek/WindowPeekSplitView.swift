@@ -26,6 +26,7 @@ struct WindowPeekSplitView: View {
                             size: CGSize(width: max(1, (geometry.size.width - 13) / 2), height: paneHeight),
                             manage: { state.manage?(card.id) }, choose: { state.choose?(card.id) },
                             watch: { state.watch?(card.id) },
+                            markup: { state.markup?(card.id) },
                             addToFusion: { state.addToFusion?(card.window) },
                                    startMelt: { state.startMelt?(card.window) },
                             pinPortal: { state.pinPortal?(card.window) },

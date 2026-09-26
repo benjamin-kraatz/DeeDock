@@ -2762,3 +2762,36 @@ and coalesced drag updates. String Catalog JSON and whitespace checks are record
 this change. No build, app launch, tests, or automated visual checks were run at the user's
 request. Compilation, actual Finder-like appearance, frame seams/corners, accessibility,
 minimum sizes, rapid actions, multi-display behavior, and runtime performance remain unverified.
+
+## Window Peek markup
+
+Adds a markup editor for a Peek card's window: **Mark up window…** in the card menu, the revealed
+pencil button, VoiceOver actions, and M in keyboard Peek. Opening it closes Peek and opens one
+floating, non-activating, key-capable panel with a transparent title bar. The editor starts with
+the card's thumbnail (or the enlarged preview's capture) and requests one full-resolution
+ScreenCaptureKit capture; marks live in that fixed pixel space, so they stay put when the sharp
+picture arrives. Tools: select, pen, highlighter, arrow, rectangle, text, numbered badge, redact
+(pixelate or solid), and crop, with eight colours, three weights, snapshot undo/redo, and an
+optional coloured mat. Exports: Copy (PNG + TIFF), Save… through the save panel in the configured
+format, Share, Send to Shelf (writes into the markup folder, then stages the file), and a drag
+handle offering PNG data and a file. Text: VisionKit Live Text and Visual Look Up overlay, Copy
+Text, and Search Web with a configurable engine; recognition runs locally and pixels are never
+uploaded. Export renders the same SwiftUI picture the editor shows through `ImageRenderer` at
+scale 1. Settings gain the format, engine, and folder under Window Peek; they are app-wide and
+absent keys decode to defaults.
+
+The enlarged preview can now be held: leaving a card no longer dismisses the stage outright.
+`WindowPeekEnlargeHold` classifies the pointer as on the hero, in the corridor between Peek and
+the hero, or elsewhere; the hero shows a small toolbar (Mark up, Copy, Save) in its own
+mouse-accepting panel, the corridor waits 650 ms, and elsewhere dismisses as before. While held or
+waiting, the coordinator treats the pointer as being on the Peek panel. Peek's outside-click
+monitor exempts the toolbar panel, and the enlarge controller ignores its clicks.
+
+Compilation is checked with the DeeDock Debug macOS target in an isolated derived-data folder.
+Tests were written for settings migration, the document's undo model, geometry and hit testing,
+layout, file naming, and the hold rule, and compiled but not run, as the project asks. Nothing was
+launched. Pending hands-on acceptance: the flight from a staged hero into the editor, drawing feel,
+the Live Text overlay and Visual Look Up on a capture, Finder drops from the drag handle, the
+share picker anchor, the save sheet on the non-activating panel, Send to Shelf, the hero toolbar's
+clicks against Peek's monitors, multi-display placement, Spaces and full-screen behaviour, and
+Reduce Motion and Reduce Transparency.

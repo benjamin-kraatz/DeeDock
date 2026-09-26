@@ -22,8 +22,14 @@ final class WindowPeekCoordinator {
     private let thumbnails: any WindowThumbnailServicing
     private var controller: WindowPeekPanelController?
     private var enlarge: WindowPeekEnlargeController?
+    private let markups: WindowMarkupController
     /// Collisions outside Peek (dock drags, App Fusion gestures) that suspend the enlarged preview.
     var enlargeBlocked: (() -> Bool)?
+    /// Stages a file a markup wrote on the Shelf, returning how many did not fit. Set by the dock coordinator.
+    var stageOnShelf: ((URL) throws -> Int)? {
+        get { markups.stageOnShelf }
+        set { markups.stageOnShelf = newValue }
+    }
     private weak var sourcePanel: DockPanelController?
     private var sourceItem: DockItem?
     private var allWindows: [ApplicationWindowSummary] = []
@@ -54,6 +60,7 @@ final class WindowPeekCoordinator {
         self.menus = menus
         self.screenCapture = screenCapture
         self.thumbnails = thumbnails
+        markups = WindowMarkupController(thumbnails: thumbnails)
         watches = WindowWatchController(presets: watchPresets, actions: actions)
     }
 
@@ -133,7 +140,10 @@ final class WindowPeekCoordinator {
     func updatePointer() {
         if fileDocuments != nil, !fileDrag { return }
 
-        panelHovered = controller?.contains(NSEvent.mouseLocation) == true
+        let pointer = NSEvent.mouseLocation
+        enlarge?.pointerMoved(pointer)
+        // A pointer resting on the enlarged picture counts as being on the panel.
+        panelHovered = controller?.contains(pointer) == true || enlarge?.retainsPeek == true
         if WindowPeekLifecycle.retainsPresentation(sourceHovered: sourceHovered, panelHovered: panelHovered) {
             cancelClose()
         } else if controller != nil { scheduleClose() }
@@ -200,6 +210,7 @@ final class WindowPeekCoordinator {
         history.stop()
         fileHandoff.stop()
         portals.stop()
+        markups.stop()
         close(returnFocus: false)
         watches.stop()
         prepareSettings = nil
@@ -251,6 +262,7 @@ final class WindowPeekCoordinator {
             close(returnFocus: false)
             watches.show(summary, visibleFrame: currentContext.anchor.visibleFrame)
         }
+        next.state.markup = { [weak self] token in self?.openMarkup(token) }
         next.state.startMelt = { [weak self] window in
             guard let self else { return }
             let action = startMelt
@@ -311,10 +323,15 @@ final class WindowPeekCoordinator {
                 self?.enlargeBlocked?() ?? false
             }
             self.enlarge = enlarge
+            enlarge.markup = { [weak self] token in self?.openMarkup(token) }
+            // Deferred: the hold changes inside a pointer update, and the re-evaluation must see
+            // the stage's final state rather than re-enter it.
+            enlarge.heldChanged = { [weak self] in Task { @MainActor [weak self] in self?.updatePointer() } }
             next.state.cardHovered = { [weak enlarge] token, inside in enlarge?.hover(token, inside: inside) }
         }
         if fileDocuments != nil {
             next.state.watch = nil
+            next.state.markup = nil
             next.state.pinPortal = nil
             next.state.pinFrozen = nil
             next.state.dropPortal = nil
@@ -608,6 +625,26 @@ final class WindowPeekCoordinator {
             else { panel?.store.applicationOpened?() }
             self?.close(returnFocus: false)
         }
+    }
+
+    /// Closes Peek and opens the markup editor for `token`'s window.
+    ///
+    /// The Peek thumbnail, or the enlarged preview's sharper capture, is the editor's first picture;
+    /// the editor requests its own full-resolution capture. When the card is staged on the enlarge
+    /// stage, its on-screen frame travels along so the picture appears to move into the editor.
+    private func openMarkup(_ token: ApplicationWindowToken) {
+        guard fileDocuments == nil, let item = sourceItem, let panel = sourcePanel, let controller,
+              let card = controller.state.cards.first(where: { $0.id == token }),
+              let context = panel.windowPeekContext(for: item.id) else { return }
+        let staged = enlarge?.stagedExhibit(for: token)
+        let request = WindowMarkupRequest(
+            window: card.window, appName: item.reference.name, appIcon: item.icon,
+            preview: staged?.image ?? card.thumbnail, origin: staged?.frame,
+            visibleFrame: context.anchor.visibleFrame,
+            backingScale: controller.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2,
+            settings: context.settings, shelfAvailable: context.settings.showShelf)
+        close(returnFocus: false)
+        markups.show(request)
     }
 
     private func showApp() {
