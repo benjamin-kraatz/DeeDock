@@ -86,18 +86,19 @@ struct DockSettings: Codable, Equatable {
     var windowPeekStyle: WindowPeekStyle = .glass
     var windowPeekIncludeMinimized: Bool = true
     var windowPeekIncludeUntitled: Bool = true
-    /// Compatibility: hides Peek's scroll bars even when macOS is set to always show them.
+    /// Hides Peek's scroll bars even when macOS is set to always show them.
     ///
     /// Peek asks for hidden indicators, but "Show scroll bars: Always" overrides that and draws
-    /// legacy scrollers inside the panel, taking layout space from the cards. Off by default;
+    /// legacy scrollers inside the panel, taking layout space from the cards. On by default;
     /// shared by all displays.
-    var windowPeekNeverShowsScrollBars: Bool = false
-    /// Compatibility: while cards are shown, the panel keeps the size `WindowPeekGeometry` computed.
+    var windowPeekNeverShowsScrollBars: Bool = true
+    /// While cards are shown, the panel keeps the size `WindowPeekGeometry` computed.
     ///
-    /// The panel normally trims itself to the height its content reports. A vertical card list fills
-    /// whatever height it is given, so a stale short report (from the loading state) can lock the
-    /// panel at that height and clip the cards. Off by default; shared by all displays.
-    var windowPeekKeepsPanelSize: Bool = false
+    /// Trimming the panel to reported content height is wrong here: a card list fills whatever
+    /// height it is given, so a stale short report from the loading state locked the panel at
+    /// 143 points and clipped the cards (seen on a Mac with legacy scroll bars). On by default;
+    /// shared by all displays.
+    var windowPeekKeepsPanelSize: Bool = true
     /// Compatibility: captures Peek thumbnails at ScreenCaptureKit's automatic resolution.
     ///
     /// Ordinary captures ask for `.best`, the display's full backing resolution. On scaled display
@@ -221,8 +222,8 @@ extension DockSettings {
         windowPeekIncludeMinimized = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeMinimized) ?? true
         windowPeekIncludeUntitled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekIncludeUntitled) ?? true
         windowPeekHoverDelay = try values.decodeIfPresent(Double.self, forKey: .windowPeekHoverDelay) ?? 0.4
-        windowPeekNeverShowsScrollBars = try values.decodeIfPresent(Bool.self, forKey: .windowPeekNeverShowsScrollBars) ?? false
-        windowPeekKeepsPanelSize = try values.decodeIfPresent(Bool.self, forKey: .windowPeekKeepsPanelSize) ?? false
+        windowPeekNeverShowsScrollBars = try values.decodeIfPresent(Bool.self, forKey: .windowPeekNeverShowsScrollBars) ?? true
+        windowPeekKeepsPanelSize = try values.decodeIfPresent(Bool.self, forKey: .windowPeekKeepsPanelSize) ?? true
         windowPeekCapturesAtAutomaticResolution = try values.decodeIfPresent(
             Bool.self, forKey: .windowPeekCapturesAtAutomaticResolution) ?? false
         tooltipPreset = values.contains(.tooltipPreset) ? try values.decode(DockTooltipPreset.self, forKey: .tooltipPreset) : .classic
