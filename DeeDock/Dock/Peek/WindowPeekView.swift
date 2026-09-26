@@ -62,9 +62,15 @@ struct WindowPeekView: View {
             }
         }
         .padding(12)
-        .background(usesOpaqueBackground ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor))
-                                         : AnyShapeStyle(.regularMaterial),
-                    in: .rect(cornerRadius: 16))
+        .background {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16).fill(usesOpaqueBackground
+                    ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor))
+                    : AnyShapeStyle(.regularMaterial))
+                StudioMarkUnderlay()
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
         .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(.separator.opacity(0.7), lineWidth: 0.5))
         .shadow(color: .black.opacity(0.2), radius: 18, y: 7)
         .padding(6)
@@ -248,8 +254,15 @@ struct WindowPeekCardView: View {
         }
         .buttonStyle(.plain)
         .padding(settings.windowPeekStyle == .glass ? 7 : 3)
-        .background(settings.windowPeekStyle == .glass ? AnyShapeStyle(.thinMaterial) : AnyShapeStyle(.clear),
-                    in: .rect(cornerRadius: 11))
+        .background {
+            ZStack {
+                if settings.windowPeekStyle == .glass {
+                    RoundedRectangle(cornerRadius: 11).fill(.thinMaterial)
+                }
+                StudioMarkUnderlay()
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 11))
+        }
         .overlay(RoundedRectangle(cornerRadius: 11).strokeBorder(selected ? Color.accentColor : .clear, lineWidth: 2))
         .accessibilityLabel(Text(.applicationMenuOpenWindow(title: title)))
         .accessibilityValue(card.window.isMinimized ? Text(.windowPeekMinimized) : Text(verbatim: ""))

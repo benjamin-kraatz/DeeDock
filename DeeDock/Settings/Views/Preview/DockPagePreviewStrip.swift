@@ -21,7 +21,15 @@ struct DockPagePreviewStrip: View {
             sample
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
-                .background(.background.secondary, in: shape)
+                .background {
+                    ZStack {
+                        shape.fill(.background.secondary)
+                        if page == .appearance {
+                            StudioMarkUnderlay()
+                        }
+                    }
+                }
+                .clipShape(shape)
                 .overlay(shape.strokeBorder(.separator.opacity(0.4), lineWidth: 0.5))
             Text(.settingsPreviewDisclaimer)
                 .font(.caption)

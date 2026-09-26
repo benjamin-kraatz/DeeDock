@@ -72,6 +72,7 @@ struct SettingsSidebar: View {
             }
         }
         .searchable(text: $searchText, placement: .sidebar, prompt: Text(.settingsSearchPrompt))
+        .background { StudioMarkUnderlay() }
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: primary + features)
     }
 

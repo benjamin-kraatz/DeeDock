@@ -30,7 +30,12 @@ struct SettingsFooterBar: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 11)
-        .background(.bar)
+        .background {
+            ZStack {
+                Rectangle().fill(.bar)
+                StudioMarkUnderlay()
+            }
+        }
         .overlay(alignment: .top) { Divider() }
         .animation(reduceMotion ? nil : .snappy(duration: 0.3), value: errorMessage)
     }

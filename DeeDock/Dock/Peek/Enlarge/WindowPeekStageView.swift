@@ -94,8 +94,14 @@ private struct WindowPeekPlacard: View {
             .truncationMode(.middle)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(opaque ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor)) : AnyShapeStyle(.regularMaterial),
-                        in: .capsule)
+            .background {
+                ZStack {
+                    Capsule().fill(opaque ? AnyShapeStyle(Color(nsColor: .windowBackgroundColor))
+                                          : AnyShapeStyle(.regularMaterial))
+                    StudioMarkUnderlay()
+                }
+                .clipShape(Capsule())
+            }
             .frame(maxWidth: .infinity)
     }
 }

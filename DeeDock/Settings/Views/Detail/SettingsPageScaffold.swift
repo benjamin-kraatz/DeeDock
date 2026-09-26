@@ -3,6 +3,9 @@ import SwiftUI
 /// The scrolling body every overview and page shares: one measured column of cards, optionally
 /// under a pinned strip that stays put while the column scrolls.
 ///
+/// The studio mark sits in this backdrop, so it shows in the page margins and between cards.
+/// Each card paints the same mark on its own fill.
+///
 /// Keeping the column width and insets here is what makes a pushed page look like the overview it
 /// came from instead of a differently padded screen. The content area stays neutral — identity
 /// color lives in the sidebar and row tiles, and controls keep the system accent, the way macOS
@@ -42,6 +45,7 @@ struct SettingsPageScaffold<Pinned: View, Content: View>: View {
             }
             .scrollBounceBehavior(.basedOnSize)
         }
+        .background { StudioMarkUnderlay() }
     }
 }
 

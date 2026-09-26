@@ -49,7 +49,12 @@ struct SettingsCard<Content: View>: View {
                     }
                 }
             }
-            .background(.background.secondary, in: shape)
+            .background {
+                ZStack {
+                    shape.fill(.background.secondary)
+                    StudioMarkUnderlay()
+                }
+            }
             .clipShape(shape)
             .overlay(shape.strokeBorder(.separator.opacity(isDark ? 0.6 : 0.4), lineWidth: 0.5))
             if let footnote {
