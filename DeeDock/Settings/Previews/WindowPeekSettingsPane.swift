@@ -8,6 +8,7 @@ import SwiftUI
 struct WindowPeekSettingsPane: View {
     let source: SettingsValueSource
     let persistentSettingsDisabled: Bool
+    private let diagnostics = WindowPeekDiagnostics.shared
 
     private var settings: DockSettings { source.value }
 
@@ -54,6 +55,16 @@ struct WindowPeekSettingsPane: View {
                                   value: source.binding(\.windowPeekHoverDelay), range: 0.2...1, step: 0.1,
                                   minimumSymbol: "hare.fill", maximumSymbol: "tortoise.fill",
                                   defaultValue: DockSettings.defaults.windowPeekHoverDelay)
+            }
+            SettingsCard(title: .windowPeekDiagnosticsTitle, footnote: .windowPeekDiagnosticsHelp) {
+                SettingsActionRow {
+                    Button(.windowPeekCopyDiagnostics, systemImage: "doc.on.doc") {
+                        guard let report = diagnostics.report else { return }
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(report, forType: .string)
+                    }
+                    .disabled(diagnostics.report == nil)
+                }
             }
         }
         .disabled(persistentSettingsDisabled)

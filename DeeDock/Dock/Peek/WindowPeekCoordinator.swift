@@ -446,7 +446,8 @@ final class WindowPeekCoordinator {
             pendingThumbnailIDs.subtract(ids)
             requestedThumbnailIDs.formUnion(ids)
             let windows = allWindows.filter { ids.contains($0.token) }
-            guard let size = controller?.state.settings.windowPeekSize.thumbnailSize else { return }
+            guard let settings = controller?.state.settings else { return }
+            let size = settings.windowPeekSize.thumbnailSize
             let historyEpoch = history.collectionEpoch
             // OCR reuses this capture at a larger logical size. Capture multiplies by the window's
             // display scale, so a 2× screen stores at most 1600 × 1000 pixels.
@@ -466,6 +467,15 @@ final class WindowPeekCoordinator {
                 images[card.id] != nil && windows.contains { $0 == card.window }
             }
             history.record(historyCards, appName: controller.state.appName, epoch: historyEpoch)
+            WindowPeekDiagnostics.shared.record(
+                settings: settings, placement: controller.placementFrame, panel: controller.frame,
+                screen: controller.screen,
+                captures: windows.map { window in
+                    let image = images[window.token]
+                    return WindowPeekDiagnostics.Capture(
+                        frame: window.frame ?? .zero,
+                        pixels: image.map { CGSize(width: $0.width, height: $0.height) })
+                })
             captureTask = nil
             scheduleCapture()
         }

@@ -103,6 +103,7 @@
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
 				000000000000000140000000 /* Resources */,
+				B7A1C0FFEE0000000000C001 /* Stamp git commit */,
 				A5A968D9636D387DCD7B9F33 /* Validate direct updater configuration */,
 			);
 			buildRules = (
@@ -125,6 +126,7 @@
 				09C4672B70E9497ED199B2DF /* Sources */,
 				14FA4413957E93FAAFDD77B6 /* Frameworks */,
 				0DAD087831ADC2A21667D035 /* Resources */,
+				B7A1C0FFEE0000000000C001 /* Stamp git commit */,
 			);
 			buildRules = (
 			);
@@ -227,6 +229,23 @@
 			shellPath = /bin/sh;
 			shellScript = (
 				"/bin/sh \"${SRCROOT}/scripts/validate-updater-configuration.sh\"",
+			);
+		};
+		B7A1C0FFEE0000000000C001 /* Stamp git commit */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			inputPaths = (
+				"$(SRCROOT)/scripts/stamp-git-commit.sh",
+				"$(SRCROOT)/.git/HEAD",
+				"$(SRCROOT)/.git/logs/HEAD",
+			);
+			name = "Stamp git commit";
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GitCommit.txt",
+			);
+			shellPath = /bin/sh;
+			shellScript = (
+				"/bin/sh \"${SRCROOT}/scripts/stamp-git-commit.sh\"",
 			);
 		};
 /* End PBXShellScriptBuildPhase section */

@@ -87,10 +87,18 @@ final class WindowPeekPanelController {
         panel.setFrame(placement.frame, display: true)
     }
 
-    /// Content shorter than the panel would otherwise leave a gap between the card and its icon.
+    /// Content shorter than the panel (loading, a fallback message) would otherwise leave a gap
+    /// between the card and its icon.
+    ///
+    /// The windows phase never trims: a card list fills any height it is offered, so its report only
+    /// mirrors the current panel size, and a stale short report from the loading phase once pinned
+    /// the panel at 143 points and clipped every card. `placement` already accounts for the window
+    /// count and split layout, so it is restored as is.
     private func fit(contentHeight: CGFloat) {
         guard !stopped, contentHeight > 0 else { return }
-        let frame = WindowPeekGeometry.fitted(placement, contentHeight: contentHeight)
+        let frame = state.phase == .windows
+            ? placement.frame
+            : WindowPeekGeometry.fitted(placement, contentHeight: contentHeight)
         guard abs(frame.height - panel.frame.height) > 0.5 || abs(frame.minY - panel.frame.minY) > 0.5 else { return }
         panel.setFrame(frame, display: true)
     }
@@ -99,6 +107,8 @@ final class WindowPeekPanelController {
 
     /// The panel's frame in AppKit screen coordinates.
     var frame: CGRect { panel.frame }
+    /// The frame `WindowPeekGeometry` computed for the current layout, before any content fitting.
+    var placementFrame: CGRect { placement.frame }
     var edge: DockEdge { anchor.edge }
     var visibleFrame: CGRect { anchor.visibleFrame }
     /// The display showing this Peek, preferring the one whose usable frame the anchor came from.
