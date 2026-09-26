@@ -1,7 +1,7 @@
 // Shared by direct and TestFlight app targets. These two keys are the
 // only version source. Target build settings must inherit them.
-CURRENT_PROJECT_VERSION = 34
-MARKETING_VERSION = 0.9.3
+CURRENT_PROJECT_VERSION = 35
+MARKETING_VERSION = 0.10.0
 PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock
 INFOPLIST_KEY_CFBundleDisplayName = DDock
 
