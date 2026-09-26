@@ -56,14 +56,8 @@ struct WindowPeekSettingsPane: View {
                                   minimumSymbol: "hare.fill", maximumSymbol: "tortoise.fill",
                                   defaultValue: DockSettings.defaults.windowPeekHoverDelay)
             }
-            SettingsCard(title: .windowPeekCompatibilityTitle, footnote: .windowPeekCompatibilityHelp) {
-                SettingsToggleRow(title: .windowPeekNeverShowsScrollBars,
-                                  isOn: source.binding(\.windowPeekNeverShowsScrollBars))
-                SettingsToggleRow(title: .windowPeekKeepsPanelSize,
-                                  isOn: source.binding(\.windowPeekKeepsPanelSize))
-                SettingsToggleRow(title: .windowPeekCapturesAtAutomaticResolution,
-                                  isOn: source.binding(\.windowPeekCapturesAtAutomaticResolution))
-                SettingsStackedRow(title: .windowPeekDiagnosticsTitle, subtitle: .windowPeekDiagnosticsHelp) {
+            SettingsCard(title: .windowPeekDiagnosticsTitle, footnote: .windowPeekDiagnosticsHelp) {
+                SettingsActionRow {
                     Button(.windowPeekCopyDiagnostics, systemImage: "doc.on.doc") {
                         guard let report = diagnostics.report else { return }
                         NSPasteboard.general.clearContents()

@@ -4,7 +4,7 @@ import OSLog
 /// Geometry and capture facts from the most recent Peek presentation, for support reports.
 ///
 /// `WindowPeekCoordinator` records a snapshot after each thumbnail batch; Settings › Window Peek ›
-/// Compatibility copies the latest report to the clipboard. The report holds numbers and settings
+/// Diagnostics copies the latest report to the clipboard. The report holds numbers and settings
 /// only. Window titles, app names, and pixels never appear in it.
 @MainActor @Observable
 final class WindowPeekDiagnostics {
@@ -32,9 +32,6 @@ final class WindowPeekDiagnostics {
         lines.append("Peek: size=\(settings.windowPeekSize.rawValue) layout=\(settings.windowPeekLayout.rawValue) "
                      + "style=\(settings.windowPeekStyle.rawValue) split=\(settings.windowPeekSplitEnabled) "
                      + "enlarge=\(settings.windowPeekEnlargeEnabled)")
-        lines.append("Compatibility: noScrollBars=\(settings.windowPeekNeverShowsScrollBars) "
-                     + "keepPanelSize=\(settings.windowPeekKeepsPanelSize) "
-                     + "automaticResolution=\(settings.windowPeekCapturesAtAutomaticResolution)")
         if let screen {
             lines.append("Screen: frame \(Self.text(screen.frame)) visible \(Self.text(screen.visibleFrame)) "
                          + "scale \(Self.text(screen.backingScaleFactor))")

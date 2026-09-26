@@ -14,12 +14,6 @@ struct WindowPeekView: View {
         reduceTransparencyOverride ?? reduceTransparency
     }
 
-    /// `.hidden` still yields to "Show scroll bars: Always", which draws legacy scrollers inside the
-    /// panel and takes their width or height from the cards. `.never` is the only value that wins.
-    private var scrollIndicators: ScrollIndicatorVisibility {
-        state.settings.windowPeekNeverShowsScrollBars ? .never : .hidden
-    }
-
     /// The panel keeps the side nearest the dock icon, so a body shorter than the panel hugs the tile.
     private var alignment: Alignment {
         switch edge {
@@ -98,7 +92,7 @@ struct WindowPeekView: View {
                         applicationSelectionHelp
                     }
                 }
-                .scrollIndicators(scrollIndicators)
+                .scrollIndicators(.never)
             }
         case .appFallback:
             fallback(message: .windowPeekWindowAccessFallback, settings: true)
@@ -126,6 +120,9 @@ struct WindowPeekView: View {
         }
     }
 
+    // Every scroll view here uses `.never`: `.hidden` still yields to the macOS setting
+    // "Show scroll bars: Always", which draws legacy scrollers inside the panel and takes their
+    // width or height from the cards.
     @ViewBuilder private var cards: some View {
         let cardSize = WindowPeekGeometry.cardSize(state.settings)
         ScrollViewReader { proxy in
@@ -134,17 +131,17 @@ struct WindowPeekView: View {
                 case .list:
                     ScrollView(.vertical) {
                         LazyVStack(spacing: 8) { cardRows(size: cardSize) }
-                    }.scrollIndicators(scrollIndicators)
+                    }.scrollIndicators(.never)
                 case .grid:
                     ScrollView(.vertical) {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: cardSize.width), spacing: 10)], spacing: 10) {
                             cardRows(size: cardSize)
                         }
-                    }.scrollIndicators(scrollIndicators)
+                    }.scrollIndicators(.never)
                 case .filmstrip:
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 10) { cardRows(size: cardSize) }
-                    }.scrollIndicators(scrollIndicators)
+                    }.scrollIndicators(.never)
                 }
             }
             .onChange(of: state.selectedID, initial: true) { _, id in
