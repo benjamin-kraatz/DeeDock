@@ -48,10 +48,6 @@ struct DockContentView: View {
             dy: layout.edge.isVertical ? offset : 0
         )
     }
-    private var viewportSurface: CGRect {
-        shifted(layout.surfaceFrame(sizes: sizes), by: scrollOffset)
-            .intersection(viewport)
-    }
 
     private var ambientOpacity: Double {
         DockAppearanceOpacity(settings: interaction.idleFade.settings,
@@ -61,6 +57,12 @@ struct DockContentView: View {
 
     var body: some View {
         let edge = layout.edge
+        // This body runs on every pointer move over the dock. Derive slots and magnified sizes
+        // once per pass instead of once per use.
+        let slots = self.slots
+        let sizes = self.sizes
+        let surface = layout.surfaceFrame(sizes: sizes)
+        let viewportSurface = shifted(surface, by: scrollOffset).intersection(viewport)
         ZStack(alignment: .topLeading) {
             ScrollViewReader { proxy in
                 ScrollView(edge.isVertical ? .vertical : .horizontal) {
@@ -73,7 +75,7 @@ struct DockContentView: View {
                             && !interaction.dragActive,
                         layout: layout,
                         sizes: sizes,
-                        surface: layout.surfaceFrame(sizes: sizes),
+                        surface: surface,
                         viewport: shifted(viewport, by: -scrollOffset),
                         hoveredID: $hoveredID,
                         reduceMotion: reduceMotion,

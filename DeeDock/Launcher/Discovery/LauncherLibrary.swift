@@ -54,7 +54,9 @@ final class LauncherLibrary {
             do {
                 let snapshot = try await LauncherDiscovery.scan(extraURLs: urls)
                 guard !Task.isCancelled, let self, generation == token else { return }
-                applications = snapshot.applications
+                // Each open scans twice (directories, then Spotlight). Skipping an identical
+                // assignment keeps observers from recomputing results and restarting tasks.
+                if applications != snapshot.applications { applications = snapshot.applications }
                 skippedDirectories = snapshot.skippedDirectories
                 isLoading = false
                 task = nil

@@ -20,8 +20,10 @@ final class DockMagneticAttachmentController {
                 continue
             }
             let panel = preparedPanel(id: attachment.id)
-            panel.setFrame(attachment.frame, display: true)
-            panel.contentView = NSHostingView(rootView: DockMagneticAttachmentView(
+            if panel.frame != attachment.frame { panel.setFrame(attachment.frame, display: true) }
+            // Every dock refresh syncs here. Updating the existing host keeps SwiftUI's view tree
+            // instead of rebuilding it for each parked pin.
+            let view = DockMagneticAttachmentView(
                 icon: attachment.icon,
                 size: min(attachment.frame.width, attachment.frame.height),
                 name: attachment.name,
@@ -30,7 +32,12 @@ final class DockMagneticAttachmentController {
                 open: attachment.open,
                 begin: attachment.begin,
                 tracking: attachment.tracking
-            ))
+            )
+            if let host = panel.contentView as? NSHostingView<DockMagneticAttachmentView> {
+                host.rootView = view
+            } else {
+                panel.contentView = NSHostingView(rootView: view)
+            }
             panel.orderFrontRegardless()
         }
     }

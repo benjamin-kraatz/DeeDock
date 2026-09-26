@@ -170,7 +170,8 @@ struct ShelfItemDragSourceView: NSViewRepresentable {
 /// only empty space starts a sweep. Its coordinates are flipped to match the SwiftUI space the row
 /// rectangles were measured in.
 struct ShelfSelectionOverlayView: NSViewRepresentable {
-    let rowFrames: [UUID: CGRect]
+    /// Read at event time; the frames change on every scroll frame and are not observed.
+    let rowFrames: () -> [UUID: CGRect]
     let began: (Bool) -> Void
     let sweep: (CGRect, Bool) -> Void
     let ended: () -> Void
@@ -187,7 +188,7 @@ struct ShelfSelectionOverlayView: NSViewRepresentable {
     static func dismantleNSView(_ view: SweepView, coordinator: ()) { view.stop() }
 
     final class SweepView: NSView {
-        var rowFrames: [UUID: CGRect] = [:]
+        var rowFrames: () -> [UUID: CGRect] = { [:] }
         var began: ((Bool) -> Void)?
         var sweep: ((CGRect, Bool) -> Void)?
         var ended: (() -> Void)?
@@ -209,7 +210,7 @@ struct ShelfSelectionOverlayView: NSViewRepresentable {
             let local = convert(point, from: superview)
             guard local.x <= bounds.maxX - scrollerInset else { return nil }
             // Rows own their own presses; only the space between and around them sweeps.
-            guard !rowFrames.values.contains(where: { $0.contains(local) }) else { return nil }
+            guard !rowFrames().values.contains(where: { $0.contains(local) }) else { return nil }
             return super.hitTest(point)
         }
 

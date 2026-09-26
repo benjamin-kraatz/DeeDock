@@ -65,11 +65,10 @@ struct ClipboardMuseumGallery: View {
         selection.flatMap { id in exhibits.first { $0.id == id } }
     }
 
-    private var slideshowIDs: [UUID] {
-        visible.filter { !$0.isRedacted }.map(\.id)
-    }
-
     var body: some View {
+        // Full-text matching over every exhibit; derive it once per pass, not once per use.
+        let visible = self.visible
+        let slideshowIDs = visible.filter { !$0.isRedacted }.map(\.id)
         NavigationSplitView {
             ClipboardMuseumSidebar(halls: ClipboardMuseumHall.group(visible), count: exhibits.count,
                                    captureEnabled: captureEnabled, selection: $selection, renaming: $renaming,

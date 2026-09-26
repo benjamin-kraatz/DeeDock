@@ -133,26 +133,58 @@ final class LauncherState {
         return library.applications.contains { locationFilter.includes($0.reference.url, home: home) }
     }
 
+    /// Inputs that determine ``results``. Reading them here keeps observation tracking intact.
+    /// Array, set, and dictionary equality short-circuit on shared storage, so an unchanged key is cheap.
+    private struct ResultsKey: Equatable {
+        let query: String
+        let filter: LauncherFilter
+        let locationFilter: LauncherLocationFilter
+        let sort: LauncherSort
+        let robiIDs: [String]?
+        let applications: [LauncherApplication]
+        let running: [String]
+        let pinned: Set<String>
+        let favorites: Set<String>
+        let visits: [String: LauncherHistory.Visit]
+    }
+
+    // Several views and every arrow key read `results`, `groups`, and `browseRows` in one pass.
+    // Memoizing avoids re-filtering and re-sorting the whole library each time.
+    @ObservationIgnored private var resultsCache: (key: ResultsKey, value: [LauncherApplication])?
+    @ObservationIgnored private var groupsCache: (grouping: LauncherGrouping, results: [LauncherApplication], value: [Group])?
+
     var results: [LauncherApplication] {
-        let query = LauncherApplication.normalize(query)
-        let running = Set(catalog.runningIDs)
-        let suggestions = robiIDs.map(Set.init)
+        let key = ResultsKey(query: query, filter: filter, locationFilter: locationFilter, sort: sort, robiIDs: robiIDs,
+            applications: library.applications, running: catalog.runningIDs, pinned: pinnedIDs,
+            favorites: favorites.ids, visits: history.visits)
+        if let resultsCache, resultsCache.key == key { return resultsCache.value }
+        let value = computeResults(key)
+        resultsCache = (key, value)
+        return value
+    }
+
+    private func computeResults(_ key: ResultsKey) -> [LauncherApplication] {
+        let query = LauncherApplication.normalize(key.query)
+        let running = Set(key.running)
+        let suggestions = key.robiIDs.map(Set.init)
         let home = FileManager.default.homeDirectoryForCurrentUser
-        let matches: [(LauncherApplication, Int)] = library.applications.compactMap { app in
-            guard locationFilter.includes(app.reference.url, home: home) else { return nil }
-            switch filter {
+        let visits = key.visits
+        let matches: [(LauncherApplication, Int)] = key.applications.compactMap { app in
+            guard key.locationFilter.includes(app.reference.url, home: home) else { return nil }
+            switch key.filter {
             case .all: break
             case .running: guard running.contains(app.id) else { return nil }
-            case .pinned: guard pinnedIDs.contains(app.id) else { return nil }
-            case .favorites: guard favorites.ids.contains(app.id) else { return nil }
-            case .recent: guard history.visits[app.id] != nil else { return nil }
+            case .pinned: guard key.pinned.contains(app.id) else { return nil }
+            case .favorites: guard key.favorites.contains(app.id) else { return nil }
+            case .recent: guard visits[app.id] != nil else { return nil }
             }
             if let suggestions { return suggestions.contains(app.id) ? (app, 0) : nil }
             return app.score(query).map { (app, $0) }
         }
+        let sort = key.sort
         return matches.sorted { lhs, rhs in
             if lhs.1 != rhs.1 { return lhs.1 < rhs.1 }
-            let a = history.visits[lhs.0.id], b = history.visits[rhs.0.id]
+            let a = visits[lhs.0.id], b = visits[rhs.0.id]
             if sort == .frequent, (a?.count ?? 0) != (b?.count ?? 0) { return (a?.count ?? 0) > (b?.count ?? 0) }
             if sort == .recent {
                 let ad = a?.lastOpened ?? .distantPast, bd = b?.lastOpened ?? .distantPast
@@ -170,13 +202,20 @@ final class LauncherState {
 
     var groups: [Group] {
         let results = results
-        if grouping == .none { return [Group(id: "", applications: results)] }
-        let groups = Dictionary(grouping: results) { app in
-            grouping == .category ? String(localized: LauncherCategory.title(app.category))
-                : String(app.reference.name.prefix(1)).uppercased()
+        if let groupsCache, groupsCache.grouping == grouping, groupsCache.results == results { return groupsCache.value }
+        let value: [Group]
+        if grouping == .none {
+            value = [Group(id: "", applications: results)]
+        } else {
+            let groups = Dictionary(grouping: results) { app in
+                grouping == .category ? String(localized: LauncherCategory.title(app.category))
+                    : String(app.reference.name.prefix(1)).uppercased()
+            }
+            value = groups.keys.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+                .map { Group(id: $0, applications: groups[$0] ?? []) }
         }
-        return groups.keys.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
-            .map { Group(id: $0, applications: groups[$0] ?? []) }
+        groupsCache = (grouping, results, value)
+        return value
     }
 
     func begin(pins: [ApplicationReference], foregroundID: String? = nil) {
@@ -195,15 +234,17 @@ final class LauncherState {
         presentationGeneration = UUID()
         search.stop()
         fileActions.end()
-        cancelRobi(); library.release(owner); icons = [:]
+        cancelRobi(); library.release(owner)
         close = nil; didOpen = nil; error = nil
     }
 
+    /// Icons stay cached across presentations, keyed by bundle path so a moved or replaced app reloads.
     func icon(for application: LauncherApplication) -> NSImage {
-        if let icon = icons[application.id] { return icon }
-        let icon = iconProvider?(application) ?? NSWorkspace.shared.icon(forFile: application.reference.url.path)
+        let key = application.reference.url.path
+        if let icon = icons[key] { return icon }
+        let icon = iconProvider?(application) ?? NSWorkspace.shared.icon(forFile: key)
         icon.size = NSSize(width: 96, height: 96)
-        icons[application.id] = icon
+        icons[key] = icon
         return icon
     }
 

@@ -15,7 +15,12 @@ final class QuarantineStore {
         let stampedAt: Date
     }
 
-    private(set) var records: [Record] = []
+    private(set) var records: [Record] = [] {
+        didSet { indexRecords() }
+    }
+    // Every dock button checks membership during each render; lookups must not standardize every record.
+    @ObservationIgnored private var recordIDs: Set<String> = []
+    @ObservationIgnored private var recordURLs: Set<URL> = []
     private(set) var error: String?
     private(set) var unreadable = false
     private let defaults: UserDefaults?
@@ -24,7 +29,7 @@ final class QuarantineStore {
     init(defaults: UserDefaults? = .standard) {
         self.defaults = defaults
         guard let data = defaults?.data(forKey: key) else { return }
-        do { records = try JSONDecoder().decode([Record].self, from: data) }
+        do { records = try JSONDecoder().decode([Record].self, from: data); indexRecords() }
         catch {
             unreadable = true
             self.error = String(localized: .quarantineStorageError)
@@ -33,12 +38,16 @@ final class QuarantineStore {
 
     /// Identity follows saved app/Shelf IDs; URL matching also blocks alternate DDock routes.
     func contains(_ id: String, url: URL) -> Bool {
-        records.contains { $0.id == id || $0.url.standardizedFileURL == url.standardizedFileURL }
+        // Reading `records` keeps SwiftUI observation on the store's persisted state.
+        guard !records.isEmpty else { return false }
+        return recordIDs.contains(id) || recordURLs.contains(url.standardizedFileURL)
     }
 
     func blocks(_ url: URL) -> Bool {
         // Fail closed if flags cannot be decoded. Never overwrite the unreadable document.
-        unreadable || records.contains { $0.url.standardizedFileURL == url.standardizedFileURL }
+        if unreadable { return true }
+        guard !records.isEmpty else { return false }
+        return recordURLs.contains(url.standardizedFileURL)
     }
 
     func requireAllowed(_ url: URL, id: String? = nil) throws {
@@ -64,6 +73,11 @@ final class QuarantineStore {
     @discardableResult
     func release(_ record: Record) -> Bool {
         save(records.filter { $0.id != record.id })
+    }
+
+    private func indexRecords() {
+        recordIDs = Set(records.map(\.id))
+        recordURLs = Set(records.map(\.url.standardizedFileURL))
     }
 
     private func save(_ next: [Record]) -> Bool {

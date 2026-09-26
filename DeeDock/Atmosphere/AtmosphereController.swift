@@ -216,14 +216,12 @@ final class AtmosphereController {
                 return frame.insetBy(dx: -1, dy: -1).contains(quartz)
             }
             let paused = covered || (store.settings.idleOnly && idle < 30)
-            desktop.scene.paused = paused
+            if desktop.scene.paused != paused { desktop.scene.paused = paused }
             // Full-display windows are conservatively treated as fullscreen, even borderless apps.
-            // Order out releases pointer interception as well as visual coverage.
-            if covered {
-                desktop.ambient.orderOut(nil); desktop.decor.forEach { $0.orderOut(nil) }
-            } else {
-                desktop.ambient.orderFrontRegardless()
-                desktop.decor.forEach { $0.orderFrontRegardless() }
+            // Order out releases pointer interception as well as visual coverage. This runs every
+            // two seconds, so only panels whose visibility actually changes are reordered.
+            for panel in [desktop.ambient] + desktop.decor where panel.isVisible == covered {
+                if covered { panel.orderOut(nil) } else { panel.orderFrontRegardless() }
             }
         }
     }

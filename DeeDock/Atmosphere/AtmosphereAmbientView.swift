@@ -52,6 +52,8 @@ struct AtmosphereAmbientView: View {
     private func particles(time: Double, size: CGSize) -> some View {
         Canvas { context, _ in
             let count = Int(scene.settings.density * (scene.settings.preset == .party ? 64 : 22))
+            // Resolve the symbol once per frame instead of once per particle.
+            let symbol = context.resolve(Image(systemName: scene.settings.preset == .party ? "sparkle" : "heart.fill"))
             for index in 0..<count {
                 let seed = Double(index)
                 let progress = (seed * 0.618 + time / (scene.settings.preset == .party ? 18 : 40)).truncatingRemainder(dividingBy: 1)
@@ -59,8 +61,7 @@ struct AtmosphereAmbientView: View {
                 guard left ? scene.leftEdge : scene.rightEdge else { continue }
                 let x = left ? 8 + seed.truncatingRemainder(dividingBy: 5) * 10 : size.width - 8 - seed.truncatingRemainder(dividingBy: 5) * 10
                 let point = CGPoint(x: x, y: size.height * (1 - progress))
-                let symbol = scene.settings.preset == .party ? "sparkle" : "heart.fill"
-                context.draw(Image(systemName: symbol), at: point)
+                context.draw(symbol, at: point)
             }
         }
         .foregroundStyle(scene.palette.second.color.opacity(0.5))

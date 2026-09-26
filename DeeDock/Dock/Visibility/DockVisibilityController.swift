@@ -47,6 +47,10 @@ import Observation
     @ObservationIgnored private var activation = false
     @ObservationIgnored private var retained = false
     @ObservationIgnored private var held = false
+    /// True while the model already reflects the stored input. Identical pointer input is then a
+    /// no-op: the policy is a pure function of input and time, and time-based changes arrive through
+    /// the scheduled callback, which clears this flag before resampling.
+    @ObservationIgnored private var inputApplied = false
 
     init(settings: DockBehaviorSettings? = nil, reduceMotion: Bool = false,
          scheduler: (any DockVisibilityScheduling)? = nil) {
@@ -59,15 +63,21 @@ import Observation
         phase = model.phase
     }
     func update(activation: Bool, retained: Bool, held: Bool) {
+        // The global mouse monitor calls this on every move anywhere on screen. Skipping repeats
+        // avoids cancelling and recreating the pending deadline and re-presenting the panel.
+        if inputApplied, activation == self.activation, retained == self.retained, held == self.held { return }
         self.activation = activation; self.retained = retained; self.held = held
+        // A reentrant call from `didChange` is dropped by `process`; the next call must still apply it.
+        inputApplied = active && !processing
         process { $0.update(activation: activation, retained: retained, held: held, now: scheduler.now) }
     }
     func configure(_ settings: DockBehaviorSettings, reduceMotion: Bool, geometryChanged: Bool = false) {
         guard self.settings != settings || self.reduceMotion != reduceMotion || geometryChanged else { return }
         self.settings = settings; self.reduceMotion = reduceMotion
+        inputApplied = false
         process { $0.configure(settings, reduceMotion: reduceMotion) }
     }
-    func showImmediately() { process { $0.showImmediately() } }
+    func showImmediately() { inputApplied = false; process { $0.showImmediately() } }
 
     private func process(_ change: (inout DockVisibilityState) -> Void) {
         guard active, !processing else { return }
@@ -83,6 +93,7 @@ import Observation
             let token = generation
             scheduled = scheduler.schedule(after: max(0, time - scheduler.now)) { [weak self] in
                 guard let self, active, generation == token else { return }
+                inputApplied = false
                 if let refreshInput { refreshInput() }
                 else {
                     process { state in
@@ -95,7 +106,7 @@ import Observation
     }
     /// Invalidates even a callback already delivered by an uncooperative scheduler.
     func stop() {
-        active = false; generation = UUID(); scheduled?.cancel(); scheduled = nil
+        active = false; inputApplied = false; generation = UUID(); scheduled?.cancel(); scheduled = nil
         model.stop(); progress = 1; phase = .hidden; didChange = nil; refreshInput = nil
     }
 }

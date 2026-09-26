@@ -34,7 +34,9 @@ struct SystemSettingsCloneView: View {
 
     private var query: String { searchText.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var isSearching: Bool { !query.isEmpty }
-    private var results: [SystemSettingsCloneSearchResult] { searchIndex.search(query) }
+    /// Recomputed when the query changes. Hovering a result re-renders the view, and a computed
+    /// property would rescore every pane several times per pass.
+    @State private var results: [SystemSettingsCloneSearchResult] = []
     private var motion: Animation? { .systemSettingsClone(reduceMotion: reduceMotion) }
 
     var body: some View {
@@ -62,6 +64,7 @@ struct SystemSettingsCloneView: View {
         // Content runs under the hidden titlebar; the sidebar reserves room for the traffic lights.
         .ignoresSafeArea(.container, edges: .top)
         .background { SystemSettingsCloneAmbience(tint: isSearching ? results.first?.pane.tint : highlightedSection.ambientTint) }
+        .onChange(of: query, initial: true) { _, query in results = searchIndex.search(query) }
         .overlay(alignment: .bottom) { toastOverlay }
         .background { keyboardShortcuts }
         .frame(minWidth: 820, minHeight: 560)
