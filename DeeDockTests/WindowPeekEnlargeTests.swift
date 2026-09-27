@@ -163,6 +163,60 @@ struct WindowPeekEnlargeTests {
         #expect(abs(pose.cornerRadius * pose.scale.width - WindowPeekExhibitPose.windowCornerRadius) < 0.001)
     }
 
+    @Test("A saved picture leaves from the hero, arcs away from the dock, and lands inside its tile",
+          arguments: DockEdge.allCases)
+    func stowPath(_ edge: DockEdge) {
+        let hero = CGRect(x: 300, y: 120, width: 800, height: 500)
+        // Top-left stage space: a bottom dock sits at large y, a right dock at large x.
+        let tile: CGRect = switch edge {
+        case .bottom: CGRect(x: 1100, y: 900, width: 56, height: 56)
+        case .top: CGRect(x: 1100, y: 20, width: 56, height: 56)
+        case .left: CGRect(x: 20, y: 700, width: 56, height: 56)
+        case .right: CGRect(x: 1430, y: 700, width: 56, height: 56)
+        }
+        let path = WindowPeekStowPath(hero: hero, tile: tile, edge: edge)
+
+        let start = path.frame(at: 0)
+        for (actual, expected) in [(start.minX, hero.minX), (start.minY, hero.minY),
+                                   (start.width, hero.width), (start.height, hero.height)] {
+            #expect(abs(actual - expected) < 0.001)
+        }
+        #expect(path.opacity(at: 0) == 1)
+        #expect(path.opacity(at: 1) == 0)
+
+        let end = path.frame(at: 1)
+        #expect(tile.contains(end))
+        #expect(abs(end.width / end.height - hero.width / hero.height) < 0.001)
+        #expect(abs(end.midX - tile.midX) < 0.001 && abs(end.midY - tile.midY) < 0.001)
+
+        // The control point lies further from the dock than the hero, so the picture rises first.
+        let control = path.control
+        switch edge {
+        case .bottom: #expect(control.y < hero.midY)
+        case .top: #expect(control.y > hero.midY)
+        case .left: #expect(control.x > hero.midX)
+        case .right: #expect(control.x < hero.midX)
+        }
+
+        // The picture only ever shrinks on its way down.
+        var previous = hero.width
+        for step in 1...20 {
+            let width = path.frame(at: CGFloat(step) / 20).width
+            #expect(width <= previous + 0.001)
+            previous = width
+        }
+    }
+
+    @Test("Save goes to the Shelf only when its tile is on and staging is wired")
+    func saveTarget() {
+        var settings = DockSettings.defaults
+        settings.showShelf = true
+        #expect(WindowPeekHeroSave.target(settings: settings, shelfStaging: true) == .shelf)
+        #expect(WindowPeekHeroSave.target(settings: settings, shelfStaging: false) == .downloads)
+        settings.showShelf = false
+        #expect(WindowPeekHeroSave.target(settings: settings, shelfStaging: true) == .downloads)
+    }
+
     @Test("Scrubbing to a neighbor while staged waits less than the first dwell")
     func timing() {
         #expect(WindowPeekEnlargeTiming.dwell(staged: true) < WindowPeekEnlargeTiming.dwell(staged: false))

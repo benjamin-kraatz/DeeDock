@@ -1,12 +1,53 @@
 import AppKit
 import SwiftUI
 
+/// Where the hero toolbar's Save puts the picture.
+///
+/// The Shelf when its tile is on, since that is where the picture can be picked up again; otherwise
+/// the Downloads folder, the place people look for a file they did not name.
+enum WindowPeekHeroSaveTarget {
+    case shelf, downloads
+
+    var title: LocalizedStringResource {
+        switch self {
+        case .shelf: .markupHeroSaveToShelf
+        case .downloads: .markupHeroSaveToDownloads
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .shelf: "tray.and.arrow.down"
+        case .downloads: "arrow.down.circle"
+        }
+    }
+}
+
+/// What Save did, so the toolbar knows whether to confirm in place.
+enum WindowPeekHeroSaveOutcome {
+    /// The picture is flying into its dock tile; the toolbar is already going away.
+    case flew
+    /// Saved, with no flight to show it; the button confirms with a check.
+    case saved
+    case failed
+}
+
+/// A picture the coordinator saved for the hero toolbar.
+struct WindowPeekSavedPicture {
+    /// The Shelf or Downloads tile on the Peek's dock, in AppKit screen coordinates; `nil` without one.
+    let tile: CGRect?
+    /// Called once the picture reaches the tile, or at once when there is no flight.
+    let arrived: () -> Void
+}
+
 /// What the hero toolbar can do with the staged picture.
 struct WindowPeekHeroToolbarActions {
     let markup: () -> Void
     /// Copies the staged picture; returns whether it reached the pasteboard.
     let copy: () -> Bool
-    let save: () -> Void
+    let saveTarget: WindowPeekHeroSaveTarget
+    /// Saves the staged picture to `saveTarget` without a panel.
+    let save: () -> WindowPeekHeroSaveOutcome
 }
 
 /// Buttons must act on the first click; the panel never becomes key, so there is no second one.
@@ -86,11 +127,14 @@ final class WindowPeekHeroToolbarPanel {
     }
 }
 
-/// Mark up, copy, save. Copy confirms in place by swapping its icon for a check.
+/// Mark up, copy, save. Copy, and Save when it has no flight to show, confirm in place by swapping
+/// the icon for a check; a failed save shows a warning instead.
 struct WindowPeekHeroToolbarView: View {
     let actions: WindowPeekHeroToolbarActions
     @State private var copied = false
     @State private var resetTask: Task<Void, Never>?
+    @State private var saveOutcome: WindowPeekHeroSaveOutcome?
+    @State private var saveResetTask: Task<Void, Never>?
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
@@ -122,15 +166,17 @@ struct WindowPeekHeroToolbarView: View {
             .buttonStyle(.borderless)
             .help(Text(.markupCopyHelp))
             .accessibilityLabel(Text(.markupCopy))
-            Button(action: actions.save) {
-                Image(systemName: "square.and.arrow.down")
+            Button(action: save) {
+                Image(systemName: saveSymbol)
+                    .contentTransition(.symbolEffect(.replace))
+                    .foregroundStyle(saveOutcome == .failed ? AnyShapeStyle(.orange) : AnyShapeStyle(.primary))
                     .font(.system(size: 13, weight: .medium))
                     .frame(width: 30, height: 28)
                     .contentShape(.rect)
             }
             .buttonStyle(.borderless)
-            .help(Text(.markupSave))
-            .accessibilityLabel(Text(.markupSave))
+            .help(Text(actions.saveTarget.title))
+            .accessibilityLabel(Text(actions.saveTarget.title))
         }
         .padding(.horizontal, 5)
         .padding(.vertical, 4)
@@ -139,11 +185,39 @@ struct WindowPeekHeroToolbarView: View {
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(.markupHeroToolbarAccessibility))
     }
+
+    private var saveSymbol: String {
+        switch saveOutcome {
+        case .saved: "checkmark"
+        case .failed: "exclamationmark.triangle"
+        case .flew, nil: actions.saveTarget.symbol
+        }
+    }
+
+    private func save() {
+        let outcome = actions.save()
+        // A flight is its own confirmation, and the toolbar fades out as it starts.
+        guard outcome != .flew else { return }
+        saveOutcome = outcome
+        saveResetTask?.cancel()
+        saveResetTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(outcome == .failed ? 2_200 : 1_400))
+            guard !Task.isCancelled else { return }
+            saveOutcome = nil
+        }
+    }
 }
 
 #if DEBUG
-#Preview("Hero toolbar") {
-    WindowPeekHeroToolbarView(actions: .init(markup: {}, copy: { true }, save: {}))
+#Preview("Hero toolbar, Shelf") {
+    WindowPeekHeroToolbarView(actions: .init(markup: {}, copy: { true }, saveTarget: .shelf, save: { .saved }))
+        .padding(30)
+        .background(.gray)
+}
+#Preview("Hero toolbar, Downloads, failing save, German") {
+    WindowPeekHeroToolbarView(actions: .init(markup: {}, copy: { false }, saveTarget: .downloads, save: { .failed }))
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.dark)
         .padding(30)
         .background(.gray)
 }

@@ -45033,6 +45033,60 @@
         }
       }
     },
+    "markupHeroSaveToShelf" : {
+      "comment" : "Enlarged preview toolbar: Save button label and tooltip when it saves the picture to the Shelf without a panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In der Ablage sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Shelf"
+          }
+        }
+      }
+    },
+    "markupHeroSaveToDownloads" : {
+      "comment" : "Enlarged preview toolbar: Save button label and tooltip when the Shelf tile is off and the picture goes to the Downloads folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „Downloads“ sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Downloads"
+          }
+        }
+      }
+    },
+    "markupHeroSavedToDownloads" : {
+      "comment" : "VoiceOver announcement after the enlarged preview saved its picture to the Downloads folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „Downloads“ gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to Downloads"
+          }
+        }
+      }
+    },
     "markupSettingsTitle" : {
       "comment": "Settings card title for Window Peek markup.",
       "extractionState": "manual",

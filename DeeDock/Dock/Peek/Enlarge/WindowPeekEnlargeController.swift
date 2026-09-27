@@ -1,6 +1,5 @@
 import AppKit
 import SwiftUI
-import UniformTypeIdentifiers
 
 /// Runs the enlarged preview for one Peek presentation: card dwell, the staged hero, and its capture.
 ///
@@ -13,7 +12,8 @@ import UniformTypeIdentifiers
 /// one click-settle task exist at a time. Each is cancelled when superseded, and every result
 /// re-checks the exhibit it was started for, so a late capture can never land on a different card. A
 /// landing deliberately outlives Peek: `stop()` hands the stage panel to the landing, whose own
-/// deadline closes it.
+/// deadline closes it. Stow flights after Save are animations, not tasks; `stowsInFlight` counts
+/// them until their completions run.
 ///
 /// Holding: the pointer may leave the cards for the picture. `pointerMoved(_:)` decides, through
 /// `WindowPeekEnlargeHold`, whether the stage is held (pointer on the hero, toolbar shown), waiting
@@ -27,6 +27,14 @@ final class WindowPeekEnlargeController {
     var markup: ((ApplicationWindowToken) -> Void)?
     /// The hold state changed; the coordinator re-evaluates whether Peek stays open.
     var heldChanged: (() -> Void)?
+    /// Where the toolbar's Save puts the picture; set by the coordinator before the first hold.
+    var saveTarget: WindowPeekHeroSaveTarget = .shelf
+    /// Writes the staged picture (image, window title) to `saveTarget`; set by the coordinator.
+    /// Returns `nil` when nothing was saved, after the coordinator has reported why.
+    var savePicture: ((CGImage, String) -> WindowPeekSavedPicture?)?
+    /// Saved pictures still flying into their tile. Peek stays open meanwhile, so the dock keeps
+    /// the tile on screen until the picture lands.
+    private var stowsInFlight = 0
     private var heroToolbar: WindowPeekHeroToolbarPanel?
     private var held = false
     private var corridorTask: Task<Void, Never>?
@@ -62,7 +70,9 @@ final class WindowPeekEnlargeController {
     }
 
     /// Whether the pointer is on or heading for the staged picture, which keeps Peek open.
-    var retainsPeek: Bool { staged != nil && landing == nil && (held || corridorTask != nil) }
+    var retainsPeek: Bool {
+        stowsInFlight > 0 || (staged != nil && landing == nil && (held || corridorTask != nil))
+    }
 
     /// The staged card's picture and where it is on screen, for a hand-off to the markup editor.
     func stagedExhibit(for token: ApplicationWindowToken) -> (frame: CGRect, image: CGImage)? {
@@ -111,7 +121,8 @@ final class WindowPeekEnlargeController {
                     markup?(current.token)
                 },
                 copy: { [weak self] in self?.copyStaged() ?? false },
-                save: { [weak self] in self?.saveStaged() }))
+                saveTarget: saveTarget,
+                save: { [weak self] in self?.saveStaged() ?? .failed }))
         }
         heroToolbar?.show(forHero: hero)
         heldChanged?()
@@ -141,18 +152,56 @@ final class WindowPeekEnlargeController {
         return WindowMarkupExport.copy(staged.detail ?? staged.preview)
     }
 
-    /// Saves the staged picture as PNG through the save panel. The picture is at most hero-sized;
-    /// the markup editor is the way to a full-resolution file.
-    private func saveStaged() {
-        guard let staged, let data = WindowMarkupExport.data(staged.detail ?? staged.preview, format: .png) else { return }
-        let panel = NSSavePanel()
-        panel.allowedContentTypes = [.png]
-        panel.canCreateDirectories = true
-        panel.nameFieldStringValue = WindowMarkupExport.suggestedFilename(title: staged.title, appName: "", at: .now, format: .png)
-        NSApp.activate(ignoringOtherApps: true)
-        panel.begin { response in
-            guard response == .OK, let url = panel.url else { return }
-            try? data.write(to: url, options: .atomic)
+    /// Saves the staged picture to the Shelf (or Downloads) without a panel, then flies it into that
+    /// tile so the user sees where it went. The picture is at most hero-sized; the markup editor is
+    /// the way to a full-resolution file.
+    ///
+    /// A save panel would open behind the stage and the hero, which sit above every ordinary window,
+    /// so this writes directly. Without a tile to aim at, or with Reduce Motion, the stage stays and
+    /// the toolbar confirms in place.
+    private func saveStaged() -> WindowPeekHeroSaveOutcome {
+        guard let staged, let savePicture,
+              let saved = savePicture(staged.detail ?? staged.preview, staged.title) else { return .failed }
+        guard let tile = saved.tile, !staged.reduceMotion, let stagePanel, let peek,
+              stagePanel.screenFrame.intersects(tile) else {
+            saved.arrived()
+            return .saved
+        }
+        stow(staged, into: stagePanel.local(tile), edge: peek.edge, on: stagePanel, arrived: saved.arrived)
+        return .flew
+    }
+
+    /// Hands the staged exhibit to a stow flight and returns the stage to empty.
+    ///
+    /// The exhibit leaves `staged` at once, so pointer tracking, a new hover, or a dismissal no longer
+    /// touch it; the completion removes it from whichever stage it is still on. The dim lifts while it
+    /// flies, and Peek stays retained until it lands.
+    private func stow(_ exhibit: WindowPeekExhibit, into tile: CGRect, edge: DockEdge,
+                      on stagePanel: WindowPeekStagePanelController, arrived: @escaping () -> Void) {
+        corridorTask?.cancel()
+        corridorTask = nil
+        leaveTask?.cancel()
+        leaveTask = nil
+        captureTask?.cancel()
+        captureTask = nil
+        held = false
+        heroToolbar?.hide()
+        staged = nil
+        stowsInFlight += 1
+        exhibit.stow = WindowPeekStowPath(hero: exhibit.hero, tile: tile, edge: edge)
+        withAnimation(.easeOut(duration: 0.3)) {
+            stagePanel.stage.dimmed = false
+            peek?.state.liftedID = nil
+        }
+        withAnimation(WindowPeekStowPath.animation) {
+            exhibit.stowProgress = 1
+        } completion: { [weak self, weak stagePanel] in
+            stagePanel?.stage.exhibits.removeAll { $0 === exhibit }
+            stagePanel?.hideIfIdle()
+            arrived()
+            guard let self else { return }
+            stowsInFlight -= 1
+            heldChanged?()
         }
     }
 
@@ -243,6 +292,7 @@ final class WindowPeekEnlargeController {
         heroToolbar?.close()
         heroToolbar = nil
         markup = nil
+        savePicture = nil
         heldChanged = nil
         if let eventMonitor { NSEvent.removeMonitor(eventMonitor) }
         eventMonitor = nil
