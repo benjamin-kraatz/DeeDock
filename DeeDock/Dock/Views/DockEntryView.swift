@@ -86,6 +86,7 @@ struct DockEntryView: View {
                 }
             )
             .opacity(interaction.dragSourceID == item.id ? 0.3 : 1)
+            .modifier(DockTileArrivalBounce(hitID: DockEntryID.folder(item.reference.id).hitID, interaction: interaction))
         case .group(let control):
             DockGroupButton(
                 control: control,
@@ -129,6 +130,7 @@ struct DockEntryView: View {
                     accessibilityFocus(DockEntryID.shelf.hitID, $0)
                 }
             )
+            .modifier(DockTileArrivalBounce(hitID: DockEntryID.shelf.hitID, interaction: interaction))
         case .trash(let item):
             DockTrashButton(
                 item: item,

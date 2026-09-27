@@ -4,7 +4,8 @@ Markup turns a Window Peek card into an annotated screenshot without leaving the
 **Mark up window…** from a card's context menu, its revealed pencil button, or VoiceOver actions.
 In keyboard Peek, select a card and press **M**. With the enlarged preview on, resting the pointer
 on the staged picture shows a small toolbar with **Mark up**, Copy, and Save; see
-[holding the enlarged preview](#holding-the-enlarged-preview).
+[holding the enlarged preview](#holding-the-enlarged-preview) and
+[saving from the enlarged preview](#saving-from-the-enlarged-preview).
 
 Opening a markup closes Peek and opens one floating editor window. If a markup with marks on it is
 already open, it comes forward and says so rather than being replaced.
@@ -61,7 +62,8 @@ discards them.
 
 **Settings → Features → Window Peek → Markup** holds the saved file format (PNG or JPEG), the search
 engine for Search Web (Google, DuckDuckGo, Bing, Ecosia), and the markup folder. The folder defaults
-to `~/Pictures/DeeDock Markups`. It is created on first use by Send to Shelf.
+to `~/Pictures/DeeDock Markups`. It is created on first use by Send to Shelf or the enlarged
+preview's Save.
 
 ## Holding the enlarged preview
 
@@ -73,9 +75,27 @@ away still closes Peek. While held or waiting, the pointer counts as being on th
 toolbar is its own small mouse-accepting panel, since the stage stays click-through for the cards;
 Peek's outside-click monitor treats it as Peek's own window.
 
+## Saving from the enlarged preview
+
+The toolbar's Save opens no panel. A save panel would open behind the stage and the hero, which sit
+above ordinary windows. With the Shelf tile on, Save writes the picture into the markup folder and
+stages it on the Shelf, like **Send to Shelf**. With the Shelf tile off, it writes into Downloads.
+The button's label and tooltip name the destination.
+
+So the user sees where the file went, the picture flies from the hero into the Shelf tile, or the
+built-in Downloads stack, on the Peek's dock. `WindowPeekStowPath` defines the path: a quadratic
+arc that first rises away from the dock edge, shrinks the picture early, and fades it out inside
+the tile. The tile then bounces. Peek stays open until the picture lands, so the dock keeps the
+tile on screen. When the tile is not on this dock, or Reduce Motion is on, the stage stays and the
+button shows a check. VoiceOver announces the destination either way.
+
+The file is hero-sized and uses the markup format setting. If the Shelf is full or staging fails,
+the dock shows the error and the written file is removed.
+
 ## Privacy
 
-Markup writes to disk only on Save…, Send to Shelf, or a Finder drop that asks for a file. Copy and
+Markup writes to disk only on Save…, Send to Shelf, the enlarged preview's Save, or a Finder drop
+that asks for a file. Copy and
 Share stay in memory and the pasteboard. Vision text recognition and pixelation run on the device.
 Live Text's Visual Look Up is Apple's feature and follows Apple's own policy when the user invokes
 it.
@@ -93,4 +113,5 @@ Compilation is checked. Not yet exercised by hand: the flight from a staged hero
 drawing feel at high pointer rates, the Live Text overlay's selection and Visual Look Up on a
 captured window, Finder drops from the drag handle, the share picker's anchor, the save sheet on a
 non-activating panel, Send to Shelf with the Shelf open, the hero toolbar's clicks with Peek's
-monitors, and Reduce Motion and Reduce Transparency.
+monitors, the enlarged preview's Save flight into the Shelf and Downloads tiles on every dock edge
+and the tile bounce, and Reduce Motion and Reduce Transparency.

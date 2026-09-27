@@ -27,6 +27,9 @@ final class WindowPeekExhibit: Identifiable {
     /// The real window's frame after a click selected it; the exhibit flies there to become the window.
     /// The stage window itself then fades out, so the exhibit needs no vanishing pose of its own.
     var landing: CGRect?
+    /// The arc into a dock tile after Save; the view follows it as `stowProgress` goes from 0 to 1.
+    var stow: WindowPeekStowPath?
+    var stowProgress: CGFloat = 0
 
     init(token: ApplicationWindowToken, title: String, preview: CGImage, detail: CGImage? = nil,
          source: CGRect?, hero: CGRect, reduceMotion: Bool) {
@@ -47,6 +50,7 @@ final class WindowPeekExhibit: Identifiable {
     var morphs: Bool { source != nil && !reduceMotion }
 
     /// The transform that places the hero-sized layout at its current pose, anchored top-leading.
+    /// A stowing exhibit takes its pose from `stow` instead, which the view evaluates per frame.
     var pose: WindowPeekExhibitPose {
         if let landing {
             return .placing(hero: hero, at: landing, cornerRadius: WindowPeekExhibitPose.windowCornerRadius)
