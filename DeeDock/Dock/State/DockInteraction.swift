@@ -53,6 +53,8 @@ final class DockInteraction {
     var documentTargetID: String?
     var trashTargeted = false
     var shelfTargeted = false
+    /// Per tile hit ID, how many things have landed in it; each increment plays the arrival bounce.
+    var arrivals: [String: Int] = [:]
     var springEmphasized = false
     @ObservationIgnored var openFiles: ((DockItem) -> Void)?
     @ObservationIgnored var applicationMenuSnapshot: ((DockItem) -> ApplicationMenuSnapshot)?

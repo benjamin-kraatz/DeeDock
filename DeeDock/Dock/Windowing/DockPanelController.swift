@@ -514,6 +514,19 @@ final class DockPanelController {
         return DockPopoverAnchor(icon: screenRect, edge: settings.edge, visibleFrame: display.visibleFrame)
     }
 
+    /// A tile's frame in AppKit screen coordinates, or `nil` when this dock does not show it or it is
+    /// scrolled out of view.
+    func tileFrame(for target: DockEntryID) -> CGRect? {
+        guard let rect = popoverAnchor(for: target)?.icon, !rect.isNull, !rect.isEmpty else { return nil }
+        return rect
+    }
+
+    /// Something landed in `target`, such as a picture saved to the Shelf; the tile acknowledges it.
+    func tileReceived(_ target: DockEntryID) {
+        guard !stopped else { return }
+        interaction.arrivals[target.hitID, default: 0] += 1
+    }
+
     func endSectionDrag() { store.sections.endDrag() }
 
     func setDragPresentation(proposal: DockDragProposal?, source: String?, targeted: Bool, message: LocalizedStringResource?) {

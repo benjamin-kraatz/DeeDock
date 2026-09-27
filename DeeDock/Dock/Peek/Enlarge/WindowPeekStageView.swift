@@ -41,13 +41,12 @@ private struct WindowPeekExhibitView: View {
     let opaque: Bool
 
     var body: some View {
-        let pose = exhibit.pose
         ZStack(alignment: .topLeading) {
-            artwork(pose: pose)
+            artwork
             WindowPeekPlacard(title: exhibit.title, opaque: opaque)
                 .frame(width: exhibit.hero.width)
                 .offset(y: exhibit.hero.height + 14)
-                .opacity(exhibit.lifted && !exhibit.leaving && exhibit.landing == nil ? 1 : 0)
+                .opacity(exhibit.lifted && !exhibit.leaving && exhibit.landing == nil && exhibit.stow == nil ? 1 : 0)
         }
         .offset(x: exhibit.hero.minX, y: exhibit.hero.minY)
         .onAppear {
@@ -56,7 +55,7 @@ private struct WindowPeekExhibitView: View {
         }
     }
 
-    private func artwork(pose: WindowPeekExhibitPose) -> some View {
+    private var artwork: some View {
         ZStack {
             image(exhibit.preview)
             if let detail = exhibit.detail {
@@ -65,11 +64,7 @@ private struct WindowPeekExhibitView: View {
         }
         .animation(.easeOut(duration: 0.22), value: exhibit.detail != nil)
         .frame(width: exhibit.hero.width, height: exhibit.hero.height)
-        .clipShape(.rect(cornerRadius: pose.cornerRadius))
-        .shadow(color: .black.opacity(0.35 * pose.opacity), radius: 28, y: 12)
-        .scaleEffect(x: pose.scale.width, y: pose.scale.height, anchor: .topLeading)
-        .offset(pose.offset)
-        .opacity(pose.opacity)
+        .modifier(WindowPeekExhibitMotion(pose: exhibit.pose, stow: exhibit.stow, progress: exhibit.stowProgress))
     }
 
     private func image(_ image: CGImage) -> some View {
@@ -79,6 +74,33 @@ private struct WindowPeekExhibitView: View {
             .aspectRatio(contentMode: .fill)
             .frame(width: exhibit.hero.width, height: exhibit.hero.height)
             .clipped()
+    }
+}
+
+/// Applies an exhibit pose to the hero-sized artwork.
+///
+/// One modifier serves both motions so starting a stow does not change the view's identity. Poses
+/// between card, hero, and window animate as plain scale and offset. A stow animates `progress`
+/// instead, and SwiftUI evaluates the arc for every frame, which a straight scale-and-offset
+/// interpolation could not follow.
+private struct WindowPeekExhibitMotion: ViewModifier, Animatable {
+    let pose: WindowPeekExhibitPose
+    let stow: WindowPeekStowPath?
+    var progress: CGFloat
+
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func body(content: Content) -> some View {
+        let pose = stow?.pose(at: progress) ?? pose
+        content
+            .clipShape(.rect(cornerRadius: pose.cornerRadius))
+            .shadow(color: .black.opacity(0.35 * pose.opacity), radius: 28, y: 12)
+            .scaleEffect(x: pose.scale.width, y: pose.scale.height, anchor: .topLeading)
+            .offset(pose.offset)
+            .opacity(pose.opacity)
     }
 }
 
@@ -144,6 +166,21 @@ private func windowPeekStagePreviewImage(width: Int, height: Int) -> CGImage? {
     WindowPeekStageView(stage: windowPeekPreviewStage(lifted: false))
         .frame(width: 1020, height: 720)
         .background(.indigo.gradient)
+}
+#Preview("Stow into the Shelf tile (plays on appear)") {
+    @Previewable @State var stage = windowPeekPreviewStage(lifted: true)
+    WindowPeekStageView(stage: stage)
+        .frame(width: 1020, height: 720)
+        .background(.teal.gradient)
+        .onAppear {
+            guard let exhibit = stage.exhibits.first else { return }
+            exhibit.stow = WindowPeekStowPath(hero: exhibit.hero, tile: CGRect(x: 780, y: 650, width: 56, height: 56),
+                                              edge: .bottom)
+            withAnimation(WindowPeekStowPath.animation.delay(0.6)) {
+                stage.dimmed = false
+                exhibit.stowProgress = 1
+            }
+        }
 }
 #Preview("Reduce Motion fade, German, opaque placard") {
     WindowPeekStageView(stage: windowPeekPreviewStage(lifted: false, reduceMotion: true,

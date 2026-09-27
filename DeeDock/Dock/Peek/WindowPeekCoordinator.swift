@@ -324,6 +324,12 @@ final class WindowPeekCoordinator {
             }
             self.enlarge = enlarge
             enlarge.markup = { [weak self] token in self?.openMarkup(token) }
+            let saveTarget = WindowPeekHeroSave.target(settings: context.settings, shelfStaging: stageOnShelf != nil)
+            enlarge.saveTarget = saveTarget
+            enlarge.savePicture = { [weak self, weak panel] image, title in
+                WindowPeekHeroSave.save(image, title: title, appName: item.reference.name, to: saveTarget,
+                                        settings: context.settings, stageOnShelf: self?.stageOnShelf, panel: panel)
+            }
             // Deferred: the hold changes inside a pointer update, and the re-evaluation must see
             // the stage's final state rather than re-enter it.
             enlarge.heldChanged = { [weak self] in Task { @MainActor [weak self] in self?.updatePointer() } }

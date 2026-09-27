@@ -4,9 +4,14 @@ import AppKit
 enum DownloadsDockItem {
     static let id = UUID(uuidString: "5927AC59-94EE-4EE9-92B1-3D6C35F77BE8")!
 
-    static func item(displayID: String) -> FolderDockItem {
-        let url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+    /// The user's Downloads folder.
+    static var folderURL: URL {
+        FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
             ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Downloads", isDirectory: true)
+    }
+
+    static func item(displayID: String) -> FolderDockItem {
+        let url = folderURL
         let presentation = UserDefaults.standard.string(forKey: "downloadsPresentation.\(displayID)")
             .flatMap(FolderStackPresentation.init(rawValue:)) ?? .grid
         let reference = FolderReference(id: id, url: url, name: String(localized: .downloadsName),

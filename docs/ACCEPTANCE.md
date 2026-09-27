@@ -2795,3 +2795,19 @@ the Live Text overlay and Visual Look Up on a capture, Finder drops from the dra
 share picker anchor, the save sheet on the non-activating panel, Send to Shelf, the hero toolbar's
 clicks against Peek's monitors, multi-display placement, Spaces and full-screen behaviour, and
 Reduce Motion and Reduce Transparency.
+
+## Enlarged preview: Save to Shelf
+
+The hero toolbar's Save no longer opens a save panel, which appeared behind the stage. With the
+Shelf tile on, it writes the hero-sized picture into the markup folder and stages it on the Shelf.
+Otherwise it writes into Downloads. The picture then flies along an arc (`WindowPeekStowPath`) into
+the Shelf tile or the built-in Downloads stack, and the tile bounces. Without a tile on the Peek's
+dock, or with Reduce Motion, the button confirms with a check instead. VoiceOver announces the
+destination. If the Shelf is full or staging fails, the dock shows the error and the written file
+is removed.
+
+Compilation is checked with the DeeDock Debug macOS target and `build-for-testing` in an isolated
+derived-data folder. Tests for the arc geometry and the destination choice were written and compiled
+but not run. Nothing was launched. Pending hands-on acceptance: the flight on every dock edge and on
+a secondary display, the tile bounce, Peek staying open until landing with auto-hide on, the first
+write to Downloads (macOS may ask for folder access), Shelf-full handling, and Reduce Motion.
