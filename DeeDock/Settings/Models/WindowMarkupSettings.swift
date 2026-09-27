@@ -51,9 +51,9 @@ nonisolated enum WindowMarkupSearchEngine: String, Codable, CaseIterable, Sendab
 
 /// Resolves the folder markups are written to when the user does not name one in a panel.
 nonisolated enum WindowMarkupFolder {
-    static let defaultName = "DeeDock Markups"
+    static let defaultName = "DOKK Markups"
 
-    /// `~/Pictures/DeeDock Markups` unless Settings names another folder.
+    /// `~/Pictures/DOKK Markups` unless Settings names another folder.
     static func url(configured path: String?, fileManager: FileManager = .default) -> URL {
         if let path, !path.isEmpty { return URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true) }
         let pictures = fileManager.urls(for: .picturesDirectory, in: .userDomainMask).first

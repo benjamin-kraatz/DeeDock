@@ -134,13 +134,13 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Choose a side, then a window. The previous window stays open. Apps used recently in this DDock session appear first."
+          "value": "Choose a side, then a window. The previous window stays open. Apps used recently in this DOKK session appear first."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Wähle eine Seite und dann ein Fenster. Das bisherige Fenster bleibt geöffnet. Zuletzt in dieser DDock-Sitzung verwendete Apps stehen oben."
+          "value": "Wähle eine Seite und dann ein Fenster. Das bisherige Fenster bleibt geöffnet. Zuletzt in dieser DOKK-Sitzung verwendete Apps stehen oben."
         }
       }
     }
@@ -1250,13 +1250,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Window Access is not enabled for this running copy of DDock. Enable it, then refresh."
+            "value": "Window Access is not enabled for this running copy of DOKK. Enable it, then refresh."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Für diese laufende Kopie von DDock ist der Fensterzugriff nicht aktiviert. Aktiviere ihn und aktualisiere anschließend."
+            "value": "Für diese laufende Kopie von DOKK ist der Fensterzugriff nicht aktiviert. Aktiviere ihn und aktualisiere anschließend."
           }
         }
       }
@@ -1484,13 +1484,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Requires Window Access. Native title bars remain. Pairs last until DDock quits. Source apps keep their own save dialogs. Full screen and Space changes pause the pair."
+            "value": "Requires Window Access. Native title bars remain. Pairs last until DOKK quits. Source apps keep their own save dialogs. Full screen and Space changes pause the pair."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Benötigt Fensterzugriff. Native Titelleisten bleiben erhalten. Paare bestehen bis zum Beenden von DDock. Apps behalten ihre eigenen Speichern-Dialoge. Vollbild und Space-Wechsel pausieren das Paar."
+            "value": "Benötigt Fensterzugriff. Native Titelleisten bleiben erhalten. Paare bestehen bis zum Beenden von DOKK. Apps behalten ihre eigenen Speichern-Dialoge. Vollbild und Space-Wechsel pausieren das Paar."
           }
         }
       }
@@ -1930,7 +1930,7 @@
       }
     },
     "actionBrowseLocalHistory" : {
-      "comment" : "Menu command that treats the dock chrome as a time axis of DDock-local pin and session history.",
+      "comment" : "Menu command that treats the dock chrome as a time axis of DOKK-local pin and session history.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -2182,19 +2182,19 @@
       }
     },
     "actionQuit" : {
-      "comment" : "Menu command that exits DDock.",
+      "comment" : "Menu command that exits DOKK.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock beenden"
+            "value" : "DOKK beenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quit DDock"
+            "value" : "Quit DOKK"
           }
         }
       }
@@ -2380,7 +2380,7 @@
       }
     },
     "actionsResetHelp" : {
-      "comment" : "Reset confirmation affects DDock pins only.",
+      "comment" : "Reset confirmation affects DOKK pins only.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -4096,13 +4096,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock"
+            "value" : "DOKK"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock"
+            "value" : "DOKK"
           }
         }
       }
@@ -8584,13 +8584,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock erstellt einmalig temporäre Bilder von Fenstern. Diese Bilder sind lediglich im Arbeitsspeicher vorhanden und werden anschließend verworfen."
+            "value" : "DOKK erstellt einmalig temporäre Bilder von Fenstern. Diese Bilder sind lediglich im Arbeitsspeicher vorhanden und werden anschließend verworfen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock uses one-time window images to create the draft. Captures are not saved."
+            "value" : "DOKK uses one-time window images to create the draft. Captures are not saved."
           }
         }
       }
@@ -8902,19 +8902,19 @@
       }
     },
     "clipboardMuseumAccessDenied" : {
-      "comment" : "Warning when macOS denies DDock clipboard access.",
+      "comment" : "Warning when macOS denies DOKK clipboard access.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS verweigert DDock den Zugriff auf die Zwischenablage, daher wird nichts gesammelt. Erlaube es in den Systemeinstellungen, um mit dem Sammeln zu beginnen."
+            "value" : "macOS verweigert DOKK den Zugriff auf die Zwischenablage, daher wird nichts gesammelt. Erlaube es in den Systemeinstellungen, um mit dem Sammeln zu beginnen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS is set to deny DDock clipboard access, so nothing is collected. Allow it in System Settings to start collecting."
+            "value" : "macOS is set to deny DOKK clipboard access, so nothing is collected. Allow it in System Settings to start collecting."
           }
         }
       }
@@ -8980,13 +8980,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standardmäßig aus. Solange es aktiv ist, prüft DDock etwa einmal pro Sekunde auf Neues. macOS fragt eventuell, ob DDock die Zwischenablage lesen darf."
+            "value" : "Standardmäßig aus. Solange es aktiv ist, prüft DOKK etwa einmal pro Sekunde auf Neues. macOS fragt eventuell, ob DOKK die Zwischenablage lesen darf."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Off by default. While on, DDock checks for a new copy about once a second. macOS may ask whether DDock can read the clipboard."
+            "value" : "Off by default. While on, DOKK checks for a new copy about once a second. macOS may ask whether DOKK can read the clipboard."
           }
         }
       }
@@ -9730,7 +9730,7 @@
       }
     },
     "clipboardMuseumNotSecretReason" : {
-      "comment" : "Completes macOS's authentication sentence “DDock is trying to …”.",
+      "comment" : "Completes macOS's authentication sentence “DOKK is trying to …”.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -10162,7 +10162,7 @@
       }
     },
     "clipboardMuseumRevealReason" : {
-      "comment" : "Completes macOS's authentication sentence “DDock is trying to …”.",
+      "comment" : "Completes macOS's authentication sentence “DOKK is trying to …”.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -10456,13 +10456,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exponate bleiben im Programmsupport-Ordner von DDock auf diesem Mac. Sie werden nie synchronisiert und sind von Backups ausgenommen."
+            "value" : "Exponate bleiben im Programmsupport-Ordner von DOKK auf diesem Mac. Sie werden nie synchronisiert und sind von Backups ausgenommen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exhibits stay in DDock’s Application Support folder on this Mac. They are never synced and are excluded from backups."
+            "value" : "Exhibits stay in DOKK’s Application Support folder on this Mac. They are never synced and are excluded from backups."
           }
         }
       }
@@ -10696,7 +10696,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The collection could not be saved. Recent changes may be lost when DDock quits."
+            "value" : "The collection could not be saved. Recent changes may be lost when DOKK quits."
           }
         }
       }
@@ -11554,13 +11554,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock Discovery"
+            "value" : "DOKK Discovery"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock Discovery"
+            "value" : "DOKK Discovery"
           }
         }
       }
@@ -11950,13 +11950,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffne eine app, um sie in DDock anzuzeigen. Pinne sie an, um sie dauerhaft in Reichweite zu behalten."
+            "value" : "Öffne eine app, um sie in DOKK anzuzeigen. Pinne sie an, um sie dauerhaft in Reichweite zu behalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open an app to see it in DDock. Pin it to keep it here."
+            "value" : "Open an app to see it in DOKK. Pin it to keep it here."
           }
         }
       }
@@ -12808,7 +12808,7 @@
       }
     },
     "errorHideApp" : {
-      "comment" : "Error banner shown when the foreground application rejects DDock's request to hide it. appName is the application name.",
+      "comment" : "Error banner shown when the foreground application rejects DOKK's request to hide it. appName is the application name.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -13648,19 +13648,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Den Hintergrund von DDock während dieses Fokus sanft animieren. Aktiviere zuerst Fokus-Atmen in den DDock-Einstellungen."
+            "value" : "Den Hintergrund von DOKK während dieses Fokus sanft animieren. Aktiviere zuerst Fokus-Atmen in den DOKK-Einstellungen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gently animate DDock’s background during this Focus. Enable Focus breathing in DDock Settings first."
+            "value" : "Gently animate DOKK’s background during this Focus. Enable Focus breathing in DOKK Settings first."
           }
         }
       }
     },
     "focusBreathingFilterOff" : {
-      "comment" : "DDock Focus filter is inactive, unavailable, or not configured.",
+      "comment" : "DOKK Focus filter is inactive, unavailable, or not configured.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -13678,7 +13678,7 @@
       }
     },
     "focusBreathingFilterOn" : {
-      "comment" : "DDock Focus filter requests breathing.",
+      "comment" : "DOKK Focus filter requests breathing.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -13702,13 +13702,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standardmäßig ausgeschaltet. Ein langsamer Lichtakzent atmet im Hintergrund von DDock. Bewegung reduzieren schaltet den Effekt aus. Füge für macOS-Fokus DDock unter Systemeinstellungen → Fokus → dein Fokus → Fokusfilter hinzu und aktiviere Dock-Hintergrund atmen lassen. Nur eingerichtete Fokusfilter, laufende Fokus-Sitzungen oder ausgewählte Dock-Modi lösen den Effekt aus. Bei ausgeblendetem Hintergrund erscheint kein Effekt."
+            "value" : "Standardmäßig ausgeschaltet. Ein langsamer Lichtakzent atmet im Hintergrund von DOKK. Bewegung reduzieren schaltet den Effekt aus. Füge für macOS-Fokus DOKK unter Systemeinstellungen → Fokus → dein Fokus → Fokusfilter hinzu und aktiviere Dock-Hintergrund atmen lassen. Nur eingerichtete Fokusfilter, laufende Fokus-Sitzungen oder ausgewählte Dock-Modi lösen den Effekt aus. Bei ausgeblendetem Hintergrund erscheint kein Effekt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Off by default. A slow highlight breathes inside DDock’s background. Reduce Motion turns it off. For macOS Focus, add DDock under System Settings → Focus → your Focus → Focus Filters and turn on Breathe dock background. Only configured Focus filters, running Focus Sessions, or selected Dock Modes trigger the effect. A hidden background shows no effect."
+            "value" : "Off by default. A slow highlight breathes inside DOKK’s background. Reduce Motion turns it off. For macOS Focus, add DOKK under System Settings → Focus → your Focus → Focus Filters and turn on Breathe dock background. Only configured Focus filters, running Focus Sessions, or selected Dock Modes trigger the effect. A hidden background shows no effect."
           }
         }
       }
@@ -13774,13 +13774,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock-Fokusfilter"
+            "value" : "DOKK-Fokusfilter"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock Focus filter"
+            "value" : "DOKK Focus filter"
           }
         }
       }
@@ -15448,19 +15448,19 @@
       }
     },
     "fusionCaptureDenied" : {
-      "comment" : "App Compare: Screen Recording access is required. Enable it in DDock Settings → Features → Permissions, then choose the windows again.",
+      "comment" : "App Compare: Screen Recording access is required. Enable it in DOKK Settings → Features → Permissions, then choose the windows again.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Zugriff auf die Bildschirmaufnahme ist erforderlich. Aktiviere ihn in den DDock-Einstellungen unter Funktionen → Berechtigungen und wähle die Fenster erneut aus."
+            "value" : "Der Zugriff auf die Bildschirmaufnahme ist erforderlich. Aktiviere ihn in den DOKK-Einstellungen unter Funktionen → Berechtigungen und wähle die Fenster erneut aus."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Screen Recording access is required. Enable it in DDock Settings → Features → Permissions, then choose the windows again."
+            "value" : "Screen Recording access is required. Enable it in DOKK Settings → Features → Permissions, then choose the windows again."
           }
         }
       }
@@ -18532,13 +18532,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock speichert bis zu 90 Tage lang nur Metadaten zur App-Nutzung auf diesem Mac, darunter App-Kennungen, Zeiten, laufende Apps, Dock-Modus und Feedback zu Vorschlägen. Fenstertitel, Dokumente, URLs, Screenshots, Tastatureingaben und Inhalte werden nicht gespeichert. Lerndaten bleiben privat auf deinem Mac."
+            "value" : "DOKK speichert bis zu 90 Tage lang nur Metadaten zur App-Nutzung auf diesem Mac, darunter App-Kennungen, Zeiten, laufende Apps, Dock-Modus und Feedback zu Vorschlägen. Fenstertitel, Dokumente, URLs, Screenshots, Tastatureingaben und Inhalte werden nicht gespeichert. Lerndaten bleiben privat auf deinem Mac."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock stores only app-use metadata on this Mac for up to 90 days, including app identities, times, running apps, Dock Mode, and suggestion feedback. It does not store window titles, documents, URLs, screenshots, keystrokes, or content, and sends no learning data to the cloud. Learning starts when you enable it; existing Launcher history is not imported."
+            "value" : "DOKK stores only app-use metadata on this Mac for up to 90 days, including app identities, times, running apps, Dock Mode, and suggestion feedback. It does not store window titles, documents, URLs, screenshots, keystrokes, or content, and sends no learning data to the cloud. Learning starts when you enable it; existing Launcher history is not imported."
           }
         }
       }
@@ -19858,7 +19858,7 @@
       }
     },
     "launcherClearHistory" : {
-      "comment" : "Action requiring confirmation before clearing DDock launch history.",
+      "comment" : "Action requiring confirmation before clearing DOKK launch history.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -19882,13 +19882,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Liste der über DDock geöffneten Apps und ihre Öffnungszähler löschen?"
+            "value" : "Liste der über DOKK geöffneten Apps und ihre Öffnungszähler löschen?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove the list of apps opened through DDock and their open counts?"
+            "value" : "Remove the list of apps opened through DOKK and their open counts?"
           }
         }
       }
@@ -20356,13 +20356,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock konnte den Zugriff auf diesen Ordner nicht speichern."
+            "value" : "DOKK konnte den Zugriff auf diesen Ordner nicht speichern."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock could not save access to that folder."
+            "value" : "DOKK could not save access to that folder."
           }
         }
       }
@@ -20518,13 +20518,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dadurch werden gespeicherte Ziele aus DDock entfernt. Ordner auf der Festplatte bleiben erhalten."
+            "value" : "Dadurch werden gespeicherte Ziele aus DOKK entfernt. Ordner auf der Festplatte bleiben erhalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This removes saved destinations from DDock. Folders on disk are not deleted."
+            "value" : "This removes saved destinations from DOKK. Folders on disk are not deleted."
           }
         }
       }
@@ -20866,13 +20866,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausgewählte Dateien an diesen Kurzbefehl übergeben. DDock kann nicht prüfen, was er akzeptiert."
+            "value" : "Ausgewählte Dateien an diesen Kurzbefehl übergeben. DOKK kann nicht prüfen, was er akzeptiert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pass selected files to this Shortcut. DDock cannot verify what it accepts."
+            "value" : "Pass selected files to this Shortcut. DOKK cannot verify what it accepts."
           }
         }
       }
@@ -21058,7 +21058,7 @@
       }
     },
     "launcherFile.unavailableInputs" : {
-      "comment" : "The batch has no files DDock can currently open.",
+      "comment" : "The batch has no files DOKK can currently open.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -21226,7 +21226,7 @@
       }
     },
     "launcherLastOpened" : {
-      "comment" : "Sort by the last successful open through DDock.",
+      "comment" : "Sort by the last successful open through DOKK.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -21352,7 +21352,7 @@
       }
     },
     "launcherMostOpened" : {
-      "comment" : "Sort by successful opens through DDock.",
+      "comment" : "Sort by successful opens through DOKK.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -21460,7 +21460,7 @@
       }
     },
     "launcherOpenSettings" : {
-      "comment" : "Launcher options menu item that opens the DDock Settings window.",
+      "comment" : "Launcher options menu item that opens the DOKK Settings window.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -21568,7 +21568,7 @@
       }
     },
     "launcherRecent" : {
-      "comment" : "Launcher filter showing apps opened through DDock.",
+      "comment" : "Launcher filter showing apps opened through DOKK.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -22042,19 +22042,19 @@
       }
     },
     "launcherToolsSectionTitle" : {
-      "comment" : "Launcher section listing DDock's own tool windows (Clipboard Museum, App Compare, ...).",
+      "comment" : "Launcher section listing DOKK's own tool windows (Clipboard Museum, App Compare, ...).",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock"
+            "value" : "DOKK"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock"
+            "value" : "DOKK"
           }
         }
       }
@@ -22150,7 +22150,7 @@
       }
     },
     "loginLaunchAtLogin" : {
-      "comment" : "Toggle for starting DDock automatically when the current user signs in. On only when macOS approval is granted.",
+      "comment" : "Toggle for starting DOKK automatically when the current user signs in. On only when macOS approval is granted.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -22264,13 +22264,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock startet automatisch bei der Anmeldung und stellt deine Docks und das Menüleistensymbol wieder her."
+            "value" : "DOKK startet automatisch bei der Anmeldung und stellt deine Docks und das Menüleistensymbol wieder her."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock launches automatically when you sign in, restoring your docks and menu-bar item."
+            "value" : "DOKK launches automatically when you sign in, restoring your docks and menu-bar item."
           }
         }
       }
@@ -22282,13 +22282,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS konnte das Anmeldeobjekt von DDock nicht finden. Der automatische Start ist nicht verfügbar. Aktualisiere den Status oder prüfe die Anmeldeobjekte in den Systemeinstellungen."
+            "value" : "macOS konnte das Anmeldeobjekt von DOKK nicht finden. Der automatische Start ist nicht verfügbar. Aktualisiere den Status oder prüfe die Anmeldeobjekte in den Systemeinstellungen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS couldn’t find DDock’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
+            "value" : "macOS couldn’t find DOKK’s login item. Launch at Login is unavailable. Refresh the status or check Login Items in System Settings."
           }
         }
       }
@@ -22300,13 +22300,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock startet nicht automatisch beim Anmelden."
+            "value" : "DOKK startet nicht automatisch beim Anmelden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock won’t launch automatically when you sign in."
+            "value" : "DOKK won’t launch automatically when you sign in."
           }
         }
       }
@@ -22318,13 +22318,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der automatische Start ist inaktiv. Erlaube DDock unter „Anmeldeobjekte“ in den Systemeinstellungen oder brich die Anfrage ab."
+            "value" : "Der automatische Start ist inaktiv. Erlaube DOKK unter „Anmeldeobjekte“ in den Systemeinstellungen oder brich die Anfrage ab."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatic launch is inactive. Allow DDock in Login Items in System Settings, or cancel the request."
+            "value" : "Automatic launch is inactive. Allow DOKK in Login Items in System Settings, or cancel the request."
           }
         }
       }
@@ -22354,13 +22354,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock bei der Anmeldung automatisch starten. Beim Ausschalten bleibt DDock jetzt geöffnet."
+            "value" : "DOKK bei der Anmeldung automatisch starten. Beim Ausschalten bleibt DOKK jetzt geöffnet."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start DDock automatically when you sign in. Turning this off keeps DDock running now."
+            "value" : "Start DOKK automatically when you sign in. Turning this off keeps DOKK running now."
           }
         }
       }
@@ -22528,7 +22528,7 @@
       }
     },
     "menuSectionTools" : {
-      "comment" : "Menu bar menu section header for DDock tools.",
+      "comment" : "Menu bar menu section header for DOKK tools.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -22660,13 +22660,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock verwenden"
+            "value" : "DOKK verwenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start Using DDock"
+            "value" : "Start Using DOKK"
           }
         }
       }
@@ -22726,7 +22726,7 @@
       }
     },
     "onboardingOpenSettings" : {
-      "comment" : "Button on the last page of the tour that opens DDock's Settings window.",
+      "comment" : "Button on the last page of the tour that opens DOKK's Settings window.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -22906,7 +22906,7 @@
       }
     },
     "onboardingReadyKeyboard" : {
-      "comment" : "Hint on tour page 7. 'Focus Dock' is a DDock menu command; keep it consistent with the command's own translation.",
+      "comment" : "Hint on tour page 7. 'Focus Dock' is a DOKK menu command; keep it consistent with the command's own translation.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -22930,19 +22930,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock lebt in der Menüleiste. Dort findest du Einstellungen und mehr."
+            "value" : "DOKK lebt in der Menüleiste. Dort findest du Einstellungen und mehr."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock lives in the menu bar. Its icon is where you find Settings and Quit."
+            "value" : "DOKK lives in the menu bar. Its icon is where you find Settings and Quit."
           }
         }
       }
     },
     "onboardingReadyPinning" : {
-      "comment" : "Hint on tour page 7. Keep the Pin/Unpin terminology used throughout DDock.",
+      "comment" : "Hint on tour page 7. Keep the Pin/Unpin terminology used throughout DOKK.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -23002,13 +23002,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Willkommen bei DDock"
+            "value" : "Willkommen bei DOKK"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to DDock"
+            "value" : "Welcome to DOKK"
           }
         }
       }
@@ -23110,13 +23110,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zwei Docks am selben Rand kommen sich in die Quere. Blende das macOS-Dock aus, um Platz für DDock zu schaffen."
+            "value" : "Zwei Docks am selben Rand kommen sich in die Quere. Blende das macOS-Dock aus, um Platz für DOKK zu schaffen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DDock the space."
+            "value" : "Two docks competing for the same edge helps nobody. Hiding the macOS Dock gives DOKK the space."
           }
         }
       }
@@ -23146,13 +23146,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock ist ein nativer Ersatz für das macOS-Dock. Es läuft in der Menüleiste und lässt sich über die Einstellungen anpassen."
+            "value" : "DOKK ist ein nativer Ersatz für das macOS-Dock. Es läuft in der Menüleiste und lässt sich über die Einstellungen anpassen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
+            "value" : "DOKK is a native replacement for the macOS Dock. It runs from the menu bar, and everything it does is a setting you can change."
           }
         }
       }
@@ -23182,13 +23182,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Willkommen bei DDock"
+            "value" : "Willkommen bei DOKK"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to DDock"
+            "value" : "Welcome to DOKK"
           }
         }
       }
@@ -23362,13 +23362,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn du einen App-Pin über DDock öffnest, öffnet sein Kabel einen angepinnten Ordner im Finder, ohne den Fokus zu übernehmen. Kabel gelten nur für ihren Bildschirm und Dock Mode. Erst nach dem Aktivieren werden Aktionen ausgeführt."
+            "value" : "Wenn du einen App-Pin über DOKK öffnest, öffnet sein Kabel einen angepinnten Ordner im Finder, ohne den Fokus zu übernehmen. Kabel gelten nur für ihren Bildschirm und Dock Mode. Erst nach dem Aktivieren werden Aktionen ausgeführt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "After an app pin opens from DDock, its cable opens a pinned folder in Finder without taking focus. Cables apply only to their display and Dock Mode. Nothing runs until enabled."
+            "value" : "After an app pin opens from DOKK, its cable opens a pinned folder in Finder without taking focus. Cables apply only to their display and Dock Mode. Nothing runs until enabled."
           }
         }
       }
@@ -24316,13 +24316,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock speichert erkannten Text, App-Namen, Fenstertitel und Aufnahmezeiten auf diesem Mac, damit du vergangene Peeks durchsuchen kannst. Bilder werden nicht gespeichert. Nichts wird hochgeladen. Der Text kann private Nachrichten oder Passwörter enthalten; es gibt keine automatische Schwärzung. Wenn du die Sammlung ausschaltest, bleibt der bisherige Verlauf erhalten. Die Suche umfasst die letzten sieben Tage mit bis zu 500 Einträgen. Abgelaufene Einträge werden beim nächsten App-Start oder bei der nächsten Aufnahme entfernt. Mit „Verlauf löschen“ entfernst du alle gespeicherten Texte."
+            "value" : "DOKK speichert erkannten Text, App-Namen, Fenstertitel und Aufnahmezeiten auf diesem Mac, damit du vergangene Peeks durchsuchen kannst. Bilder werden nicht gespeichert. Nichts wird hochgeladen. Der Text kann private Nachrichten oder Passwörter enthalten; es gibt keine automatische Schwärzung. Wenn du die Sammlung ausschaltest, bleibt der bisherige Verlauf erhalten. Die Suche umfasst die letzten sieben Tage mit bis zu 500 Einträgen. Abgelaufene Einträge werden beim nächsten App-Start oder bei der nächsten Aufnahme entfernt. Mit „Verlauf löschen“ entfernst du alle gespeicherten Texte."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock saves recognized text, app names, window titles, and capture times on this Mac so you can search past peeks. Images are not saved. Nothing is uploaded. Text may include private messages or passwords; there is no automatic redaction. Turning collection off keeps existing history. Search covers the last seven days, with up to 500 entries. Expired entries are removed at the next app launch or capture. Clear history to remove all saved text."
+            "value" : "DOKK saves recognized text, app names, window titles, and capture times on this Mac so you can search past peeks. Images are not saved. Nothing is uploaded. Text may include private messages or passwords; there is no automatic redaction. Turning collection off keeps existing history. Search covers the last seven days, with up to 500 entries. Expired entries are removed at the next app launch or capture. Clear history to remove all saved text."
           }
         }
       }
@@ -24772,13 +24772,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock merkt sich nur Klicks im eigenen Dock. Bildschirmzeit und andere Apps bleiben unberührt."
+            "value" : "DOKK merkt sich nur Klicks im eigenen Dock. Bildschirmzeit und andere Apps bleiben unberührt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock only notes clicks in its own dock. It never reads Screen Time or other apps."
+            "value" : "DOKK only notes clicks in its own dock. It never reads Screen Time or other apps."
           }
         }
       }
@@ -25816,19 +25816,19 @@
       }
     },
     "quarantineBlocked" : {
-      "comment" : "Quarantine stamp control, item state, or help. Release this item from DDock quarantine before opening it.",
+      "comment" : "Quarantine stamp control, item state, or help. Release this item from DOKK quarantine before opening it.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib dieses Objekt zuerst aus der DDock-Quarantäne frei, um es zu öffnen."
+            "value" : "Gib dieses Objekt zuerst aus der DOKK-Quarantäne frei, um es zu öffnen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Release this item from DDock quarantine before opening it."
+            "value" : "Release this item from DOKK quarantine before opening it."
           }
         }
       }
@@ -25978,19 +25978,19 @@
       }
     },
     "quarantineMarked" : {
-      "comment" : "Quarantine stamp control, item state, or help. Set aside in DDock quarantine",
+      "comment" : "Quarantine stamp control, item state, or help. Set aside in DOKK quarantine",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In DDock-Quarantäne zurückgestellt"
+            "value" : "In DOKK-Quarantäne zurückgestellt"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set aside in DDock quarantine"
+            "value" : "Set aside in DOKK quarantine"
           }
         }
       }
@@ -26068,37 +26068,37 @@
       }
     },
     "quarantineReleaseHelp" : {
-      "comment" : "Quarantine stamp control, item state, or help. Click to release this item from DDock quarantine.",
+      "comment" : "Quarantine stamp control, item state, or help. Click to release this item from DOKK quarantine.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klicke, um dieses Objekt aus der DDock-Quarantäne freizugeben."
+            "value" : "Klicke, um dieses Objekt aus der DOKK-Quarantäne freizugeben."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Click to release this item from DDock quarantine."
+            "value" : "Click to release this item from DOKK quarantine."
           }
         }
       }
     },
     "quarantineSettingsHelp" : {
-      "comment" : "Quarantine stamp control, item state, or help. Enable this feature to show the stamp action in the DDock menu bar. It is off by default. While armed, the dock shows only stampable icons. Marked items stay in place and cannot open until released. Files and macOS quarantine attributes stay untouched.",
+      "comment" : "Quarantine stamp control, item state, or help. Enable this feature to show the stamp action in the DOKK menu bar. It is off by default. While armed, the dock shows only stampable icons. Marked items stay in place and cannot open until released. Files and macOS quarantine attributes stay untouched.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Quarantäne ist eine reine DDock-Markierung. Gestempelte Objekte bleiben an ihrem Platz und öffnen sich erst nach der Freigabe. Dateien und macOS-Quarantäneattribute bleiben unverändert."
+            "value" : "Die Quarantäne ist eine reine DOKK-Markierung. Gestempelte Objekte bleiben an ihrem Platz und öffnen sich erst nach der Freigabe. Dateien und macOS-Quarantäneattribute bleiben unverändert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quarantine is a DDock-only flag. Stamped items stay where they are and won’t open until released. Files and macOS quarantine attributes are never touched."
+            "value" : "Quarantine is a DOKK-only flag. Stamped items stay where they are and won’t open until released. Files and macOS quarantine attributes are never touched."
           }
         }
       }
@@ -26218,13 +26218,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Über das DDock-Menü oder direkt hier."
+            "value" : "Über das DOKK-Menü oder direkt hier."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "From the DDock menu or right here."
+            "value" : "From the DOKK menu or right here."
           }
         }
       }
@@ -26302,19 +26302,19 @@
       }
     },
     "quarantineStorageError" : {
-      "comment" : "Quarantine stamp control, item state, or help. DDock could not read or save quarantine flags. Existing data has been preserved.",
+      "comment" : "Quarantine stamp control, item state, or help. DOKK could not read or save quarantine flags. Existing data has been preserved.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock konnte die Quarantäne-Markierungen nicht lesen oder speichern. Vorhandene Daten bleiben erhalten."
+            "value" : "DOKK konnte die Quarantäne-Markierungen nicht lesen oder speichern. Vorhandene Daten bleiben erhalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock could not read or save quarantine flags. Existing data has been preserved."
+            "value" : "DOKK could not read or save quarantine flags. Existing data has been preserved."
           }
         }
       }
@@ -27190,13 +27190,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es wurden keine geeigneten sichtbaren Fenster gefunden. Apps und DDock-Anheftungen stehen für diesen Entwurf weiterhin bereit."
+            "value" : "Es wurden keine geeigneten sichtbaren Fenster gefunden. Apps und DOKK-Anheftungen stehen für diesen Entwurf weiterhin bereit."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No eligible visible windows were found. Apps and DDock pins are still available for this draft."
+            "value" : "No eligible visible windows were found. Apps and DOKK pins are still available for this draft."
           }
         }
       }
@@ -27226,31 +27226,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ohne Bildschirmaufnahme-Zugriff ist kein Fensterkontext verfügbar. Apps und DDock-Anheftungen sind enthalten. Erlaube den Zugriff unter Einstellungen → Funktionen und erstelle eine neue Aufnahme, um sichtbare Fenstertitel einzubeziehen."
+            "value" : "Ohne Bildschirmaufnahme-Zugriff ist kein Fensterkontext verfügbar. Apps und DOKK-Anheftungen sind enthalten. Erlaube den Zugriff unter Einstellungen → Funktionen und erstelle eine neue Aufnahme, um sichtbare Fenstertitel einzubeziehen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window context is unavailable without Screen Recording access. Apps and DDock pins are included. To include visible window titles, enable access in Settings → Features, then take a new snapshot."
+            "value" : "Window context is unavailable without Screen Recording access. Apps and DOKK pins are included. To include visible window titles, enable access in Settings → Features, then take a new snapshot."
           }
         }
       }
     },
     "recipeSnapshotPinned" : {
-      "comment" : "Candidate provenance from DDock mode pins, never system Dock preferences.",
+      "comment" : "Candidate provenance from DOKK mode pins, never system Dock preferences.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock-Anheftung"
+            "value" : "DOKK-Anheftung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock pin"
+            "value" : "DOKK pin"
           }
         }
       }
@@ -27370,13 +27370,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Fensterkontext konnte nicht gelesen werden. Apps und DDock-Anheftungen stehen für diesen Entwurf weiterhin bereit."
+            "value" : "Der Fensterkontext konnte nicht gelesen werden. Apps und DOKK-Anheftungen stehen für diesen Entwurf weiterhin bereit."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window context could not be read. Apps and DDock pins are still available for this draft."
+            "value" : "Window context could not be read. Apps and DOKK pins are still available for this draft."
           }
         }
       }
@@ -28714,7 +28714,7 @@
       }
     },
     "settingsConfirmBeforeEmptyingTrash" : {
-      "comment" : "Toggle that requires DDock's warning before it asks Finder to empty Trash.",
+      "comment" : "Toggle that requires DOKK's warning before it asks Finder to empty Trash.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -28846,7 +28846,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bei der Positionierung am Bildschirmrand kann sich das Dock mit dem System-Dock überlappen. Ein automatisch ausgeblendetes System-Dock kann sich bei beiden Positionierungsarten mit DDock überlappen."
+            "value" : "Bei der Positionierung am Bildschirmrand kann sich das Dock mit dem System-Dock überlappen. Ein automatisch ausgeblendetes System-Dock kann sich bei beiden Positionierungsarten mit DOKK überlappen."
           }
         },
         "en" : {
@@ -29836,13 +29836,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wähle eine Animation für Apps, die du über DDock startest. Klicke auf eine Variante, um sie anzusehen. Bei reduzierter Bewegung bleibt die Ladeanzeige."
+            "value" : "Wähle eine Animation für Apps, die du über DOKK startest. Klicke auf eine Variante, um sie anzusehen. Bei reduzierter Bewegung bleibt die Ladeanzeige."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose an animation for apps opened through DDock. Select a preset to preview it. Reduce Motion keeps the loading indicator."
+            "value" : "Choose an animation for apps opened through DOKK. Select a preset to preview it. Reduce Motion keeps the loading indicator."
           }
         }
       }
@@ -30172,7 +30172,7 @@
       }
     },
     "settingsPermissionGranted" : {
-      "comment" : "Trailing status on a permission row when macOS has granted DDock that permission.",
+      "comment" : "Trailing status on a permission row when macOS has granted DOKK that permission.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -30412,13 +30412,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Markiert laufende Apps, auch im Hintergrund. Wähle eine Randmarkierung, einen Rahmen oder ein Kennzeichen. Stardust lässt sich animieren. Hidden lässt die Symbolabstände unverändert. Wähle „Dock fokussieren“ im DDock-Menü, um den separaten Auswahlrahmen für die Tastaturbedienung zu sehen."
+            "value" : "Markiert laufende Apps, auch im Hintergrund. Wähle eine Randmarkierung, einen Rahmen oder ein Kennzeichen. Stardust lässt sich animieren. Hidden lässt die Symbolabstände unverändert. Wähle „Dock fokussieren“ im DOKK-Menü, um den separaten Auswahlrahmen für die Tastaturbedienung zu sehen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, or badge. Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DDock menu to see the independent keyboard selection outline."
+            "value" : "Marks running apps, including those in the background. Choose an edge marker, frame, or badge. Stardust can move. Hidden keeps icon spacing unchanged. Choose Focus Dock from the DOKK menu to see the independent keyboard selection outline."
           }
         }
       }
@@ -30700,13 +30700,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App-Vorschläge, gelegentliche Tipps und der Verlauf, den DDock auf diesem Mac speichert."
+            "value" : "App-Vorschläge, gelegentliche Tipps und der Verlauf, den DOKK auf diesem Mac speichert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App suggestions, occasional tips, and the history DDock keeps on this Mac."
+            "value" : "App suggestions, occasional tips, and the history DOKK keeps on this Mac."
           }
         }
       }
@@ -30754,13 +30754,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fügt den Papierkorb hinter einer Trennlinie hinzu. Du kannst außerdem festlegen, ob DDock vor dem Leeren nachfragt."
+            "value" : "Fügt den Papierkorb hinter einer Trennlinie hinzu. Du kannst außerdem festlegen, ob DOKK vor dem Leeren nachfragt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adds Trash after a divider. You can also choose whether DDock asks before emptying it."
+            "value" : "Adds Trash after a divider. You can also choose whether DOKK asks before emptying it."
           }
         }
       }
@@ -32176,13 +32176,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zuwendung bleibt auf diesem Mac. DDock nutzt dafür kein Netzwerk."
+            "value" : "Zuwendung bleibt auf diesem Mac. DOKK nutzt dafür kein Netzwerk."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Care stays on this Mac. DDock does not use a network for Sims."
+            "value" : "Care stays on this Mac. DOKK does not use a network for Sims."
           }
         }
       }
@@ -32320,19 +32320,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das letzte Gespräch konnte nicht erzeugt werden. DDock versucht es in einem späteren ruhigen Moment erneut."
+            "value" : "Das letzte Gespräch konnte nicht erzeugt werden. DOKK versucht es in einem späteren ruhigen Moment erneut."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The last conversation could not be generated. DDock will try at a later quiet moment."
+            "value" : "The last conversation could not be generated. DOKK will try at a later quiet moment."
           }
         }
       }
     },
     "simsRumourIntelligenceDisabled" : {
-      "comment" : "AI rumour status when Apple Intelligence is disabled. DDock does not change system settings.",
+      "comment" : "AI rumour status when Apple Intelligence is disabled. DOKK does not change system settings.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -32356,13 +32356,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das erzeugte Gespräch passte auch nach einer Überarbeitung nicht ins Dock. DDock versucht es in einem späteren ruhigen Moment erneut."
+            "value" : "Das erzeugte Gespräch passte auch nach einer Überarbeitung nicht ins Dock. DOKK versucht es in einem späteren ruhigen Moment erneut."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The generated conversation did not fit the dock, even after a revision. DDock will try again at a later quiet moment."
+            "value" : "The generated conversation did not fit the dock, even after a revision. DOKK will try again at a later quiet moment."
           }
         }
       }
@@ -33040,13 +33040,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffnet nur die Systemeinstellungen. DDock ändert diese Werte nie."
+            "value" : "Öffnet nur die Systemeinstellungen. DOKK ändert diese Werte nie."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only opens System Settings. DDock never changes these values."
+            "value" : "Only opens System Settings. DOKK never changes these values."
           }
         }
       }
@@ -35914,7 +35914,7 @@
       }
     },
     "timelineClear" : {
-      "comment" : "Deletes every stored DDock-local history event.",
+      "comment" : "Deletes every stored DOKK-local history event.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -35986,19 +35986,19 @@
       }
     },
     "timelineEmptyMessage" : {
-      "comment" : "Privacy-first empty state when DDock has not recorded local pin or session events yet.",
+      "comment" : "Privacy-first empty state when DOKK has not recorded local pin or session events yet.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock speichert nur eigene Anhefte- und Fokus-Sitzungsaktionen. Es gibt keine Bildschirmzeit und keine Daten anderer Apps."
+            "value" : "DOKK speichert nur eigene Anhefte- und Fokus-Sitzungsaktionen. Es gibt keine Bildschirmzeit und keine Daten anderer Apps."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock stores only its own pin and Focus Session actions. There is no Screen Time and no data from other apps."
+            "value" : "DOKK stores only its own pin and Focus Session actions. There is no Screen Time and no data from other apps."
           }
         }
       }
@@ -36244,19 +36244,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nur DDock-Aktionen. Nichts aus der macOS-Bildschirmzeit."
+            "value" : "Nur DOKK-Aktionen. Nichts aus der macOS-Bildschirmzeit."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only DDock actions. Nothing from macOS Screen Time."
+            "value" : "Only DOKK actions. Nothing from macOS Screen Time."
           }
         }
       }
     },
     "timelineRecord" : {
-      "comment" : "Toggle that pauses or resumes recording of DDock-local pin and session events.",
+      "comment" : "Toggle that pauses or resumes recording of DOKK-local pin and session events.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -36274,19 +36274,19 @@
       }
     },
     "timelineRecordHelp" : {
-      "comment" : "Explains that recording covers only DDock pin and Focus Session actions.",
+      "comment" : "Explains that recording covers only DOKK pin and Focus Session actions.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nur Anhefte- und Fokus-Sitzungsaktionen in DDock. Nichts aus der Bildschirmzeit oder anderen Apps."
+            "value" : "Nur Anhefte- und Fokus-Sitzungsaktionen in DOKK. Nichts aus der Bildschirmzeit oder anderen Apps."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only pin and Focus Session actions in DDock. Nothing from Screen Time or other apps."
+            "value" : "Only pin and Focus Session actions in DOKK. Nothing from Screen Time or other apps."
           }
         }
       }
@@ -36454,7 +36454,7 @@
       }
     },
     "timelineTitle" : {
-      "comment" : "Feature name for DDock-local pin and session history on the dock.",
+      "comment" : "Feature name for DOKK-local pin and session history on the dock.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -37336,7 +37336,7 @@
       }
     },
     "trashEmptyFailed" : {
-      "comment" : "Dock error when DDock cannot permanently delete one or more Trash items. details is supplied by macOS.",
+      "comment" : "Dock error when DOKK cannot permanently delete one or more Trash items. details is supplied by macOS.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38098,7 +38098,7 @@
       }
     },
     "updatesAllowChecks" : {
-      "comment" : "Custom DDock update window: Check Automatically",
+      "comment" : "Custom DOKK update window: Check Automatically",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38140,13 +38140,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatisch nach neuen Versionen von DDock suchen."
+            "value" : "Automatisch nach neuen Versionen von DOKK suchen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Check for new versions of DDock automatically."
+            "value" : "Check for new versions of DOKK automatically."
           }
         }
       }
@@ -38176,13 +38176,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Updates im Hintergrund laden und beim Beenden von DDock installieren. macOS kann weiterhin eine Administratorfreigabe verlangen."
+            "value" : "Updates im Hintergrund laden und beim Beenden von DOKK installieren. macOS kann weiterhin eine Administratorfreigabe verlangen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Download updates in the background and install them when DDock quits. macOS may still ask for administrator approval."
+            "value" : "Download updates in the background and install them when DOKK quits. macOS may still ask for administrator approval."
           }
         }
       }
@@ -38248,13 +38248,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock %1$(version)@ ist verfügbar."
+            "value" : "DOKK %1$(version)@ ist verfügbar."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock %1$(version)@ is available."
+            "value" : "DOKK %1$(version)@ is available."
           }
         }
       }
@@ -38296,7 +38296,7 @@
       }
     },
     "updatesAwarenessPip" : {
-      "comment" : "Accessibility label for the dock-adjacent update pip on DDock chrome.",
+      "comment" : "Accessibility label for the dock-adjacent update pip on DOKK chrome.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38332,7 +38332,7 @@
       }
     },
     "updatesCancel" : {
-      "comment" : "Custom DDock update window: Cancel",
+      "comment" : "Custom DOKK update window: Cancel",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38368,25 +38368,25 @@
       }
     },
     "updatesCheckingBody" : {
-      "comment" : "Custom DDock update window: Checking whether a newer version of DDock is available.",
+      "comment" : "Custom DOKK update window: Checking whether a newer version of DOKK is available.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es wird geprüft, ob eine neuere Version von DDock verfügbar ist."
+            "value" : "Es wird geprüft, ob eine neuere Version von DOKK verfügbar ist."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Checking whether a newer version of DDock is available."
+            "value" : "Checking whether a newer version of DOKK is available."
           }
         }
       }
     },
     "updatesCheckingTitle" : {
-      "comment" : "Custom DDock update window: Looking for an update",
+      "comment" : "Custom DOKK update window: Looking for an update",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38404,7 +38404,7 @@
       }
     },
     "updatesComicEnglish" : {
-      "comment" : "Custom DDock update window: English column label on a What’s New comic panel.",
+      "comment" : "Custom DOKK update window: English column label on a What’s New comic panel.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38422,7 +38422,7 @@
       }
     },
     "updatesComicGerman" : {
-      "comment" : "Custom DDock update window: German column label on a What’s New comic panel.",
+      "comment" : "Custom DOKK update window: German column label on a What’s New comic panel.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38458,7 +38458,7 @@
       }
     },
     "updatesCritical" : {
-      "comment" : "Custom DDock update window: This release contains a critical update.",
+      "comment" : "Custom DOKK update window: This release contains a critical update.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38494,7 +38494,7 @@
       }
     },
     "updatesDone" : {
-      "comment" : "Custom DDock update window: Done",
+      "comment" : "Custom DOKK update window: Done",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38512,7 +38512,7 @@
       }
     },
     "updatesDownload" : {
-      "comment" : "Custom DDock update window: Download Update",
+      "comment" : "Custom DOKK update window: Download Update",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38530,7 +38530,7 @@
       }
     },
     "updatesDownloadedAmount" : {
-      "comment" : "Custom DDock update window: Downloaded",
+      "comment" : "Custom DOKK update window: Downloaded",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38566,25 +38566,25 @@
       }
     },
     "updatesDownloadingBody" : {
-      "comment" : "Custom DDock update window: You can keep using DDock. Hiding this window keeps the download running; Cancel stops it.",
+      "comment" : "Custom DOKK update window: You can keep using DOKK. Hiding this window keeps the download running; Cancel stops it.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du kannst DDock weiter verwenden. Wenn du dieses Fenster ausblendest, läuft der Download weiter. Mit Abbrechen stoppst du ihn."
+            "value" : "Du kannst DOKK weiter verwenden. Wenn du dieses Fenster ausblendest, läuft der Download weiter. Mit Abbrechen stoppst du ihn."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can keep using DDock. Hiding this window keeps the download running; Cancel stops it."
+            "value" : "You can keep using DOKK. Hiding this window keeps the download running; Cancel stops it."
           }
         }
       }
     },
     "updatesDownloadingTitle" : {
-      "comment" : "Custom DDock update window: Downloading your update",
+      "comment" : "Custom DOKK update window: Downloading your update",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38602,7 +38602,7 @@
       }
     },
     "updatesErrorDetails" : {
-      "comment" : "Custom DDock update window: Error details",
+      "comment" : "Custom DOKK update window: Error details",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38620,7 +38620,7 @@
       }
     },
     "updatesFailedTitle" : {
-      "comment" : "Custom DDock update window: The update could not continue",
+      "comment" : "Custom DOKK update window: The update could not continue",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38638,25 +38638,25 @@
       }
     },
     "updatesFailureBody" : {
-      "comment" : "Custom DDock update window: Review the details below, then close this window. You can check for updates again from the DDock menu.",
+      "comment" : "Custom DOKK update window: Review the details below, then close this window. You can check for updates again from the DOKK menu.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sieh dir die Details unten an und schließe dann dieses Fenster. Du kannst im DDock-Menü erneut nach Updates suchen."
+            "value" : "Sieh dir die Details unten an und schließe dann dieses Fenster. Du kannst im DOKK-Menü erneut nach Updates suchen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Review the details below, then close this window. You can check for updates again from the DDock menu."
+            "value" : "Review the details below, then close this window. You can check for updates again from the DOKK menu."
           }
         }
       }
     },
     "updatesFoundBody" : {
-      "comment" : "Custom DDock update window: See what has changed, then download the update when you are ready. macOS may ask for administrator approval during installation.",
+      "comment" : "Custom DOKK update window: See what has changed, then download the update when you are ready. macOS may ask for administrator approval during installation.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38674,25 +38674,25 @@
       }
     },
     "updatesFoundTitle" : {
-      "comment" : "Custom DDock update window: A new DDock is here",
+      "comment" : "Custom DOKK update window: A new DOKK is here",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eine neue Version von DDock ist da"
+            "value" : "Eine neue Version von DOKK ist da"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A new DDock is here"
+            "value" : "A new DOKK is here"
           }
         }
       }
     },
     "updatesHardwareIncompatible" : {
-      "comment" : "Custom DDock update window: The available update requires a Mac with Apple silicon.",
+      "comment" : "Custom DOKK update window: The available update requires a Mac with Apple silicon.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38710,7 +38710,7 @@
       }
     },
     "updatesHide" : {
-      "comment" : "Custom DDock update window: Hide",
+      "comment" : "Custom DOKK update window: Hide",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38728,7 +38728,7 @@
       }
     },
     "updatesIdleInstall" : {
-      "comment" : "Settings toggle for installing a downloaded update when DDock is idle. Default is off.",
+      "comment" : "Settings toggle for installing a downloaded update when DOKK is idle. Default is off.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38752,13 +38752,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auch installieren und neu starten, wenn DDock im Leerlauf ist"
+            "value" : "Auch installieren und neu starten, wenn DOKK im Leerlauf ist"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Also install and relaunch when DDock is idle"
+            "value" : "Also install and relaunch when DOKK is idle"
           }
         }
       }
@@ -38770,13 +38770,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein heruntergeladenes Update wird installiert, sobald DDock im Leerlauf ist. Bleibt DDock beschäftigt, wird beim Beenden installiert."
+            "value" : "Ein heruntergeladenes Update wird installiert, sobald DOKK im Leerlauf ist. Bleibt DOKK beschäftigt, wird beim Beenden installiert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When an update is downloaded, install and restart DDock after it has been idle. If DDock stays busy, the update still installs when you quit."
+            "value" : "When an update is downloaded, install and restart DOKK after it has been idle. If DOKK stays busy, the update still installs when you quit."
           }
         }
       }
@@ -38800,7 +38800,7 @@
       }
     },
     "updatesInformationBody" : {
-      "comment" : "Custom DDock update window: This version cannot be installed here. Open the release information to see how to update.",
+      "comment" : "Custom DOKK update window: This version cannot be installed here. Open the release information to see how to update.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38818,7 +38818,7 @@
       }
     },
     "updatesInformationTitle" : {
-      "comment" : "Custom DDock update window: An update needs your attention",
+      "comment" : "Custom DOKK update window: An update needs your attention",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38836,7 +38836,7 @@
       }
     },
     "updatesInstall" : {
-      "comment" : "Custom DDock update window: Install Update",
+      "comment" : "Custom DOKK update window: Install Update",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38854,25 +38854,25 @@
       }
     },
     "updatesInstalledBody" : {
-      "comment" : "Custom DDock update window: The new version of DDock has been installed.",
+      "comment" : "Custom DOKK update window: The new version of DOKK has been installed.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die neue Version von DDock wurde installiert."
+            "value" : "Die neue Version von DOKK wurde installiert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The new version of DDock has been installed."
+            "value" : "The new version of DOKK has been installed."
           }
         }
       }
     },
     "updatesInstalledTitle" : {
-      "comment" : "Custom DDock update window: Update installed",
+      "comment" : "Custom DOKK update window: Update installed",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38890,25 +38890,25 @@
       }
     },
     "updatesInstallingBody" : {
-      "comment" : "Custom DDock update window: DDock is being updated. Please wait for the installation to finish.",
+      "comment" : "Custom DOKK update window: DOKK is being updated. Please wait for the installation to finish.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock wird aktualisiert. Bitte warte, bis die Installation abgeschlossen ist."
+            "value" : "DOKK wird aktualisiert. Bitte warte, bis die Installation abgeschlossen ist."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock is being updated. Please wait for the installation to finish."
+            "value" : "DOKK is being updated. Please wait for the installation to finish."
           }
         }
       }
     },
     "updatesInstallingTitle" : {
-      "comment" : "Custom DDock update window: Finishing the update",
+      "comment" : "Custom DOKK update window: Finishing the update",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38926,7 +38926,7 @@
       }
     },
     "updatesInstallOnQuit" : {
-      "comment" : "Custom DDock update window: Install on Quit",
+      "comment" : "Custom DOKK update window: Install on Quit",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38944,7 +38944,7 @@
       }
     },
     "updatesInstallRestart" : {
-      "comment" : "Custom DDock update window: Install and Restart",
+      "comment" : "Custom DOKK update window: Install and Restart",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38962,7 +38962,7 @@
       }
     },
     "updatesLater" : {
-      "comment" : "Custom DDock update window: Later",
+      "comment" : "Custom DOKK update window: Later",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38980,7 +38980,7 @@
       }
     },
     "updatesLearnMore" : {
-      "comment" : "Custom DDock update window: Learn More…",
+      "comment" : "Custom DOKK update window: Learn More…",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -38998,7 +38998,7 @@
       }
     },
     "updatesLoadingNotes" : {
-      "comment" : "Custom DDock update window: Loading release notes…",
+      "comment" : "Custom DOKK update window: Loading release notes…",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39016,7 +39016,7 @@
       }
     },
     "updatesMajorUpgrade" : {
-      "comment" : "Custom DDock update window: This is a major upgrade. Skipping it also skips its future minor releases.",
+      "comment" : "Custom DOKK update window: This is a major upgrade. Skipping it also skips its future minor releases.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39034,7 +39034,7 @@
       }
     },
     "updatesManualChecks" : {
-      "comment" : "Custom DDock update window: Check Manually",
+      "comment" : "Custom DOKK update window: Check Manually",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39052,7 +39052,7 @@
       }
     },
     "updatesNoCompatibleUpdate" : {
-      "comment" : "Custom DDock update window: No compatible update is currently available for this Mac.",
+      "comment" : "Custom DOKK update window: No compatible update is currently available for this Mac.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39070,7 +39070,7 @@
       }
     },
     "updatesNoNotes" : {
-      "comment" : "Custom DDock update window: No release notes were provided for this update.",
+      "comment" : "Custom DOKK update window: No release notes were provided for this update.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39088,7 +39088,7 @@
       }
     },
     "updatesNotesFailed" : {
-      "comment" : "Custom DDock update window: Release notes could not be displayed.",
+      "comment" : "Custom DOKK update window: Release notes could not be displayed.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39106,7 +39106,7 @@
       }
     },
     "updatesNoUpdateTitle" : {
-      "comment" : "Custom DDock update window: Update check complete",
+      "comment" : "Custom DOKK update window: Update check complete",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39124,43 +39124,43 @@
       }
     },
     "updatesOnLatest" : {
-      "comment" : "Custom DDock update window. The placeholder is the currently installed marketing version.",
+      "comment" : "Custom DOKK update window. The placeholder is the currently installed marketing version.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock %1$(currentVersion)@ ist auf dem neuesten Stand."
+            "value" : "DOKK %1$(currentVersion)@ ist auf dem neuesten Stand."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock %1$(currentVersion)@ is up to date."
+            "value" : "DOKK %1$(currentVersion)@ is up to date."
           }
         }
       }
     },
     "updatesOnNewer" : {
-      "comment" : "Custom DDock update window. The placeholder is the currently installed marketing version.",
+      "comment" : "Custom DOKK update window. The placeholder is the currently installed marketing version.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du verwendest DDock %1$(currentVersion)@. Diese Version ist neuer als die zuletzt veröffentlichte Version."
+            "value" : "Du verwendest DOKK %1$(currentVersion)@. Diese Version ist neuer als die zuletzt veröffentlichte Version."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You are using DDock %1$(currentVersion)@, which is newer than the latest published version."
+            "value" : "You are using DOKK %1$(currentVersion)@, which is newer than the latest published version."
           }
         }
       }
     },
     "updatesOSIncompatible" : {
-      "comment" : "Custom DDock update window: The available update does not support this version of macOS.",
+      "comment" : "Custom DOKK update window: The available update does not support this version of macOS.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39178,25 +39178,25 @@
       }
     },
     "updatesPermissionBody" : {
-      "comment" : "Custom DDock update window: May DDock check automatically? Automatic installation defaults to on and remains configurable in General Settings.",
+      "comment" : "Custom DOKK update window: May DOKK check automatically? Automatic installation defaults to on and remains configurable in General Settings.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Darf DDock automatisch nach neuen Versionen suchen? Die automatische Installation ist standardmäßig aktiviert. Du kannst beide Optionen in den allgemeinen Einstellungen ändern."
+            "value" : "Darf DOKK automatisch nach neuen Versionen suchen? Die automatische Installation ist standardmäßig aktiviert. Du kannst beide Optionen in den allgemeinen Einstellungen ändern."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "May DDock check for new versions automatically? Automatic installation is on by default. You can change both options in General Settings."
+            "value" : "May DOKK check for new versions automatically? Automatic installation is on by default. You can change both options in General Settings."
           }
         }
       }
     },
     "updatesPermissionPrivacy" : {
-      "comment" : "Custom DDock update window: No system profile is sent with update checks.",
+      "comment" : "Custom DOKK update window: No system profile is sent with update checks.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39214,25 +39214,25 @@
       }
     },
     "updatesPermissionTitle" : {
-      "comment" : "Custom DDock update window: Keep DDock up to date",
+      "comment" : "Custom DOKK update window: Keep DOKK up to date",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DDock aktuell halten"
+            "value" : "DOKK aktuell halten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keep DDock up to date"
+            "value" : "Keep DOKK up to date"
           }
         }
       }
     },
     "updatesPreparingBody" : {
-      "comment" : "Custom DDock update window: The download is being unpacked and verified. This step cannot be cancelled. macOS may request administrator approval.",
+      "comment" : "Custom DOKK update window: The download is being unpacked and verified. This step cannot be cancelled. macOS may request administrator approval.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39250,7 +39250,7 @@
       }
     },
     "updatesPreparingTitle" : {
-      "comment" : "Custom DDock update window: Preparing the update",
+      "comment" : "Custom DOKK update window: Preparing the update",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39268,7 +39268,7 @@
       }
     },
     "updatesReadReleaseNotes" : {
-      "comment" : "Custom DDock update window: Read Release Notes…",
+      "comment" : "Custom DOKK update window: Read Release Notes…",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39286,25 +39286,25 @@
       }
     },
     "updatesReadyBody" : {
-      "comment" : "Custom DDock update window: Restart DDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DDock quits. Cancel stops this installation.",
+      "comment" : "Custom DOKK update window: Restart DOKK to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DOKK quits. Cancel stops this installation.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Starte DDock neu, um das Update abzuschließen. Bei Installation beim Beenden oder beim Schließen dieses Fensters bleibt das Update bis zum nächsten Beenden bereit. Abbrechen stoppt diese Installation."
+            "value" : "Starte DOKK neu, um das Update abzuschließen. Bei Installation beim Beenden oder beim Schließen dieses Fensters bleibt das Update bis zum nächsten Beenden bereit. Abbrechen stoppt diese Installation."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restart DDock to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DDock quits. Cancel stops this installation."
+            "value" : "Restart DOKK to finish updating. Install on Quit, or closing this window, keeps the update ready for the next time DOKK quits. Cancel stops this installation."
           }
         }
       }
     },
     "updatesReadyTitle" : {
-      "comment" : "Custom DDock update window: Ready when you are",
+      "comment" : "Custom DOKK update window: Ready when you are",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39322,7 +39322,7 @@
       }
     },
     "updatesReleaseNotes" : {
-      "comment" : "Custom DDock update window: What has changed",
+      "comment" : "Custom DOKK update window: What has changed",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39346,19 +39346,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dieses Update ist bereits vorbereitet. Starte DDock jetzt neu oder wähle Beim Beenden installieren, um es später abzuschließen. Auch beim Schließen dieses Fensters bleibt die Installation beim Beenden aktiviert."
+            "value" : "Dieses Update ist bereits vorbereitet. Starte DOKK jetzt neu oder wähle Beim Beenden installieren, um es später abzuschließen. Auch beim Schließen dieses Fensters bleibt die Installation beim Beenden aktiviert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This update is already prepared. Restart DDock now, or choose Install on Quit to finish later. Closing this window also keeps installation on quit enabled."
+            "value" : "This update is already prepared. Restart DOKK now, or choose Install on Quit to finish later. Closing this window also keeps installation on quit enabled."
           }
         }
       }
     },
     "updatesRetryQuit" : {
-      "comment" : "Custom DDock update window: Try Quitting Again",
+      "comment" : "Custom DOKK update window: Try Quitting Again",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39394,7 +39394,7 @@
       }
     },
     "updatesShowProgress" : {
-      "comment" : "Custom DDock update window: Show App Update…",
+      "comment" : "Custom DOKK update window: Show App Update…",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39412,7 +39412,7 @@
       }
     },
     "updatesSkipUpgrade" : {
-      "comment" : "Custom DDock update window: Skip This Upgrade",
+      "comment" : "Custom DOKK update window: Skip This Upgrade",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39430,7 +39430,7 @@
       }
     },
     "updatesSkipVersion" : {
-      "comment" : "Custom DDock update window: Skip This Version",
+      "comment" : "Custom DOKK update window: Skip This Version",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39454,19 +39454,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Updater konnte nicht gestartet werden. Beende DDock und öffne es erneut. Falls das Problem weiterhin auftritt, lade die neueste Version von GitHub herunter."
+            "value" : "Der Updater konnte nicht gestartet werden. Beende DOKK und öffne es erneut. Falls das Problem weiterhin auftritt, lade die neueste Version von GitHub herunter."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The updater could not start. Quit and reopen DDock. If this continues, download the latest version from GitHub."
+            "value" : "The updater could not start. Quit and reopen DOKK. If this continues, download the latest version from GitHub."
           }
         }
       }
     },
     "updatesVersion" : {
-      "comment" : "Custom DDock update window: New version",
+      "comment" : "Custom DOKK update window: New version",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39484,25 +39484,25 @@
       }
     },
     "updatesWaitingToQuit" : {
-      "comment" : "Custom DDock update window: Waiting for DDock to quit. If it remains open, you can ask it to quit again.",
+      "comment" : "Custom DOKK update window: Waiting for DOKK to quit. If it remains open, you can ask it to quit again.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es wird darauf gewartet, dass DDock beendet wird. Falls es geöffnet bleibt, kannst du das Beenden erneut anfordern."
+            "value" : "Es wird darauf gewartet, dass DOKK beendet wird. Falls es geöffnet bleibt, kannst du das Beenden erneut anfordern."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Waiting for DDock to quit. If it remains open, you can ask it to quit again."
+            "value" : "Waiting for DOKK to quit. If it remains open, you can ask it to quit again."
           }
         }
       }
     },
     "updatesWhatsNew" : {
-      "comment" : "Custom DDock update window: What’s New heading above an authored release comic.",
+      "comment" : "Custom DOKK update window: What’s New heading above an authored release comic.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39520,7 +39520,7 @@
       }
     },
     "updatesWindowTitle" : {
-      "comment" : "Custom DDock update window: App Updates",
+      "comment" : "Custom DOKK update window: App Updates",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -39760,13 +39760,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn die Erkennung fertig ist, zeigt DDock eine Taste. Es wird nichts automatisch ausgeführt."
+            "value" : "Wenn die Erkennung fertig ist, zeigt DOKK eine Taste. Es wird nichts automatisch ausgeführt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "After the detector finishes, DDock shows a button. Nothing runs automatically."
+            "value" : "After the detector finishes, DOKK shows a button. Nothing runs automatically."
           }
         }
       }
@@ -39814,13 +39814,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Kurzbefehle gefunden. DDock übergibt weder aufgenommenes Bild noch Text."
+            "value" : "Keine Kurzbefehle gefunden. DOKK übergibt weder aufgenommenes Bild noch Text."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No Shortcuts found. DDock does not pass captured pixels or text to it."
+            "value" : "No Shortcuts found. DOKK does not pass captured pixels or text to it."
           }
         }
       }
@@ -40900,13 +40900,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein Name, den du später wiedererkennst. DDock übernimmt ihn nicht aus dem Fenstertitel."
+            "value" : "Ein Name, den du später wiedererkennst. DOKK übernimmt ihn nicht aus dem Fenstertitel."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A name you will recognize later. DDock does not take it from the window title."
+            "value" : "A name you will recognize later. DOKK does not take it from the window title."
           }
         }
       }
@@ -41098,13 +41098,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gespeicherte Beobachtungen konnten nicht gelesen werden. DDock hat die gespeicherten Daten unverändert gelassen."
+            "value" : "Gespeicherte Beobachtungen konnten nicht gelesen werden. DOKK hat die gespeicherten Daten unverändert gelassen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved watches could not be read. DDock left the stored data unchanged."
+            "value" : "Saved watches could not be read. DOKK left the stored data unchanged."
           }
         }
       }
@@ -41674,13 +41674,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erlaube DDock, Fenster anderer Apps aufzulisten und auszuwählen. Die Bildschirmaufnahme wird separat verwaltet und liefert nur Vorschaubilder."
+            "value" : "Erlaube DOKK, Fenster anderer Apps aufzulisten und auszuwählen. Die Bildschirmaufnahme wird separat verwaltet und liefert nur Vorschaubilder."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow DDock to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images."
+            "value" : "Allow DOKK to list and select another app’s windows. Screen Recording is managed separately and only supplies preview images."
           }
         }
       }
@@ -41836,13 +41836,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Fensterzugriff ist aktiviert, aber DDock konnte die Fenster dieser App nicht lesen. Du kannst die App weiterhin anzeigen."
+            "value" : "Der Fensterzugriff ist aktiviert, aber DOKK konnte die Fenster dieser App nicht lesen. Du kannst die App weiterhin anzeigen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but DDock could not read this app's windows. You can still show the app."
+            "value" : "Window Access is enabled, but DOKK could not read this app's windows. You can still show the app."
           }
         }
       }
@@ -41962,13 +41962,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bewege den Zeiger über eine laufende App oder drücke bei fokussiertem Dock die Leertaste. DDock fragt nie direkt im Dock nach Berechtigungen."
+            "value" : "Bewege den Zeiger über eine laufende App oder drücke bei fokussiertem Dock die Leertaste. DOKK fragt nie direkt im Dock nach Berechtigungen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hover over a running app, or press Space while using Focus Dock. DDock never asks for permission from the dock itself."
+            "value" : "Hover over a running app, or press Space while using Focus Dock. DOKK never asks for permission from the dock itself."
           }
         }
       }
@@ -42214,13 +42214,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese macOS-Berechtigungen gelten für alle Bildschirme mit DDock. Der Fensterzugriff ermöglicht das Auflisten und Auswählen von Fenstern. Die Bildschirmaufnahme ergänzt Vorschaubilder. Zuvor verweigerter Zugriff muss in den Systemeinstellungen geändert werden."
+            "value" : "Diese macOS-Berechtigungen gelten für alle Bildschirme mit DOKK. Der Fensterzugriff ermöglicht das Auflisten und Auswählen von Fenstern. Die Bildschirmaufnahme ergänzt Vorschaubilder. Zuvor verweigerter Zugriff muss in den Systemeinstellungen geändert werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "These macOS permissions apply to every DDock display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings."
+            "value" : "These macOS permissions apply to every DOKK display. Window Access lists and selects windows. Screen Recording adds thumbnail images. Previously denied access must be changed in System Settings."
           }
         }
       }
@@ -42340,13 +42340,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Fensterzugriff ist aktiviert, aber diese DDock-Version mit App-Sandbox kann die Fenster anderer Apps nicht lesen. Du kannst die App weiterhin anzeigen."
+            "value" : "Der Fensterzugriff ist aktiviert, aber diese DOKK-Version mit App-Sandbox kann die Fenster anderer Apps nicht lesen. Du kannst die App weiterhin anzeigen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Access is enabled, but this sandboxed DDock build cannot read other apps' windows. You can still show the app."
+            "value" : "Window Access is enabled, but this sandboxed DOKK build cannot read other apps' windows. You can still show the app."
           }
         }
       }

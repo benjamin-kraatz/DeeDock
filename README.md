@@ -1,4 +1,4 @@
-# DDock
+# DOKK
 
 A native macOS Dock alternative. It should look like the Dock, behave like the Dock, and feel like the Dock—with the flexibility macOS should have shipped.
 
@@ -12,7 +12,7 @@ Source is public; the license is proprietary — see [LICENSE](LICENSE).
 
 ## What we are building
 
-The macOS Dock is the reference for visual quality, interaction, and responsiveness. DDock should earn its place through everyday use: recognizable app icons, predictable activation, clear running state, natural hover and motion, and reliable drag interactions.
+The macOS Dock is the reference for visual quality, interaction, and responsiveness. DOKK should earn its place through everyday use: recognizable app icons, predictable activation, clear running state, natural hover and motion, and reliable drag interactions.
 
 The product roadmap includes:
 
@@ -61,7 +61,7 @@ Current configuration:
 | App Sandbox | Disabled in the current targets |
 | External package dependencies | Sparkle 2.9.6 for direct distribution |
 
-Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For direct updates and the separate TestFlight build, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DDock requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DDock does not change the system Dock’s preferences.
+Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For direct updates and the separate TestFlight build, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DOKK requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DOKK does not change the system Dock’s preferences.
 
 ## Working in this repository
 
@@ -69,7 +69,7 @@ Read [AGENTS.md](AGENTS.md) for implementation guidance, scope boundaries, and v
 
 Three project-local agent skills are installed under `.agents/skills`: SwiftUI Expert, Swift Concurrency, and Swift Testing. See [docs/SKILLS.md](docs/SKILLS.md) for their purpose, pinned sources, and update instructions. They add development guidance, not app dependencies.
 
-## Using DDock
+## Using DOKK
 
 These personality extras are deprecated and turn off on launch: Dock Sims and AI icon rumours, Focus breathing, Focus debt, Pin weather (icon rust), Quarantine stamp, Patch bay, and Magnetic Edges. Their settings stay under **Settings → Features → Deprecated**, with a notice that they will be removed in version 1.0.0. Atmosphere and soap bubbles stay in the ordinary Features list.
 
@@ -79,7 +79,7 @@ These personality extras are deprecated and turn off on launch: Dock Sims and AI
 
 **AI icon rumours** and Dock Sims are deprecated. Launch turns Sims moods off, which also stops rumours. Settings stay under **Settings → Features → Deprecated → Dock Sims**. See [Icon rumours](docs/ICON-RUMOURS.md) for the old consent and data boundaries.
 
-**DDock Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. Disable tips in **Settings → Features → DDock Discovery**. See [Discovery](docs/DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+**DOKK Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](docs/DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes
 grid and list app browsing plus unified search for apps, windows, Capsules/Breadcrumbs, Shelf files,
@@ -95,7 +95,7 @@ Optional **App suggestions** learn from local app activity after opt-in under **
 An empty Launcher query can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.
 See [app suggestions](docs/LAUNCHER-SUGGESTIONS.md) for the 90-day retention policy and observation limits.
 
-DDock starts as a menu-bar app without an icon in the macOS system Dock. DDock appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DDock's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DDock; dedicated coexistence controls are future work.
+DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK; dedicated coexistence controls are future work.
 
 - Choose **Appearance → App launch animation** for Classic Bounce, Spring, Pulse, Wobble, Flip, or Indicator only. Classic Bounce is the default. Select a preset to preview it; shared defaults and per-display overrides are supported. Reduce Motion keeps the loading indicator.
 - Click an icon to open or activate its application. Click the foreground application's icon to hide all of its windows; click again to show and activate it.
@@ -111,9 +111,9 @@ DDock starts as a menu-bar app without an icon in the macOS system Dock. DDock a
 - Neon, Aura, and the withdrawn Metal styles (Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, Glitch) load as Dot, rather than failing to load.
 - Right-click an app for opening and Finder commands, running-app commands, and **Pin** or **Unpin**. Running-app commands include Hide or Show, Bring All to Front, and cooperative Quit. One icon represents every matching regular process, so those commands apply to all matching instances. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
-- Choose **Focus Dock** from the DDock menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, Space opens Window Peek for a running app, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
+- Choose **Focus Dock** from the DOKK menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, Space opens Window Peek for a running app, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
 - Choose a named configuration from **Dock Mode** in the menu-bar item, or press M in Focus Dock to open the keyboard mode picker. A mode changes every display's pins and App Visibility together; it does not launch, quit, hide, or reorder running-only apps. **Prepare Workspace** is a separate command that runs that mode's optional recipe.
-- Choose **Quit DDock** from the menu-bar item or app menu to close it.
+- Choose **Quit DOKK** from the menu-bar item or app menu to close it.
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
@@ -135,8 +135,8 @@ Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to 
 
 Choose **App Fusion → Fuse windows** from the menu-bar menu to launch two apps and pair
 one window from each. Shared glass controls move, resize, minimize, restore, and request
-closure of both windows. A combined DDock icon keeps the pair reachable when minimized.
-Native title bars remain, and pairs last for the current DDock session. Window Access is
+closure of both windows. A combined DOKK icon keeps the pair reachable when minimized.
+Native title bars remain, and pairs last for the current DOKK session. Window Access is
 required. See [App Fusion](docs/APP-MELT.md) for setup, recovery, and validation limits.
 
 ## Dock Modes
@@ -184,29 +184,29 @@ this also treats borderless screen-filling apps conservatively as fullscreen. Re
 keeps particles still. Sleep and inactive sessions release all Atmosphere panels.
 See [Atmosphere acceptance](docs/ACCEPTANCE.md#dee-73-atmosphere) for runtime limitations.
 
-Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DDock keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
+Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DOKK keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
 
-**Snapshot workspace…** creates an editable recipe draft from open apps, visible window context, and DDock pins. Review the choices, name the draft, and save it as a new mode. Saving leaves the active mode unchanged. Window titles require existing Screen Recording access and help with review only. **Prepare Workspace** reopens the chosen apps and resources. See [recipe photography](docs/RECIPE-PHOTOGRAPHY.md) for capture and playback limits.
+**Snapshot workspace…** creates an editable recipe draft from open apps, visible window context, and DOKK pins. Review the choices, name the draft, and save it as a new mode. Saving leaves the active mode unchanged. Window titles require existing Screen Recording access and help with review only. **Prepare Workspace** reopens the chosen apps and resources. See [recipe photography](docs/RECIPE-PHOTOGRAPHY.md) for capture and playback limits.
 
 Each mode owns the ordered app and folder pins for every remembered display, plus the shared App Visibility choice and any display-specific App Visibility overrides. Pinning, unpinning, reordering, folder presentation changes, and App Visibility edits apply directly to the active mode. Appearance, placement, auto-hide, Trash, Window Peek, and other controls remain independent.
 
 The menu-bar **Dock Mode** submenu switches configurations across all connected docks after the new choice has saved successfully. Ordinary switching updates pins and app visibility only. **Prepare Workspace** is a separate command: it activates the chosen mode, then runs that mode's optional recipe in order. **Previous Mode** toggles between the last two configurations. During Focus Dock, press M, use Up or Down, then Return to switch. P prepares the selected mode's workspace. Escape closes the picker without switching. Switching is unavailable while a native menu, file picker, or drag operation is active, and closes open Window Peek and folder panels before changing the docks. Prepare reports that blocked state and does not open apps, files, links, or Shortcuts. A recipe does not start a Focus Session, replay after launch, or arrange windows.
 
-Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DDock continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
+Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DOKK continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
 
 ## Launch at login
 
-Open **Settings → General → Launch at Login** to start DDock automatically when you sign in. General sits above Shared Defaults and applies to the whole app. Appearance remains the initial Settings pane. Search for login, startup, or automatic launch to find General.
+Open **Settings → General → Launch at Login** to start DOKK automatically when you sign in. General sits above Shared Defaults and applies to the whole app. Appearance remains the initial Settings pane. Search for login, startup, or automatic launch to find General.
 
-The toggle reflects macOS’s registration status. It stays off until approval is granted. If approval is required, use **Open System Settings…** to open Login Items, or **Cancel Request** to withdraw the registration. Returning to the Settings window refreshes the status, including changes made outside DDock. An unavailable status provides Refresh and the System Settings link. Errors appear in General without automatic retries.
+The toggle reflects macOS’s registration status. It stays off until approval is granted. If approval is required, use **Open System Settings…** to open Login Items, or **Cancel Request** to withdraw the registration. Returning to the Settings window refreshes the status, including changes made outside DOKK. An unavailable status provides Refresh and the System Settings link. Errors appear in General without automatic retries.
 
-Turning off Launch at Login prevents future automatic launches and leaves DDock running. Login startup follows normal startup: configured docks and the menu-bar item appear without opening Settings or deliberately taking foreground focus. General remains usable if display settings have a storage error, and Restore Defaults does not change login registration.
+Turning off Launch at Login prevents future automatic launches and leaves DOKK running. Login startup follows normal startup: configured docks and the menu-bar item appear without opening Settings or deliberately taking foreground focus. General remains usable if display settings have a storage error, and Restore Defaults does not change login registration.
 
 The implementation uses `SMAppService.mainApp`; it stores no duplicate preference and installs no helper or launch-agent plist. Registration is opt-in. Real registration and logout/login acceptance require a consistently signed installed copy; see [acceptance notes](docs/ACCEPTANCE.md#launch-at-login).
 
 ## Window-aware application menus
 
-Open **Settings → Features → Permissions** to manage Window Access and Screen Recording. Each row reports Enabled, Not Enabled, or Unavailable. The Enable buttons are the only actions that ask macOS for consent; **Open System Settings…** and **Check Again** manage and refresh the external grants. Permissions and the Window Peek controls below them apply to the app as a whole. DDock stores no copy of permission state.
+Open **Settings → Features → Permissions** to manage Window Access and Screen Recording. Each row reports Enabled, Not Enabled, or Unavailable. The Enable buttons are the only actions that ask macOS for consent; **Open System Settings…** and **Check Again** manage and refresh the external grants. Permissions and the Window Peek controls below them apply to the app as a whole. DOKK stores no copy of permission state.
 
 Application-level actions do not need Accessibility access. For a running app, its context menu can Hide or Show every matching instance, Bring All to Front, or request a cooperative Quit. Available app bundles also offer Open, Open Files, and Show in Finder. These commands remain available when window access is off.
 
@@ -218,32 +218,32 @@ Window Peek uses one-shot ScreenCaptureKit screenshots only while a Peek is visi
 
 ## First launch
 
-The first time DDock runs, a tour opens over the desktop. The docks are already live behind it, so every page describes something you can see. Seven pages: what DDock is, a guide to hiding the macOS Dock, placement, running indicators, auto-hide, one dock per display, and a closing page with the launch-at-login toggle.
+The first time DOKK runs, a tour opens over the desktop. The docks are already live behind it, so every page describes something you can see. Seven pages: what DOKK is, a guide to hiding the macOS Dock, placement, running indicators, auto-hide, one dock per display, and a closing page with the launch-at-login toggle.
 
-Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DDock** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
+Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DOKK** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
 
 One page changes a setting; the rest only demonstrate. **Put it where you want it** lets you click a screen edge, which sets **Edge** in shared defaults and moves the docks immediately. It writes shared defaults only and leaves per-display overrides alone, so a display already overriding that control keeps its own value, and the change is reversible in Settings.
 
 That page carries a prompt line under its illustration and its handles respond to the pointer. The prompt is the only signal that a page is interactive; pages without one do nothing when clicked.
 
-The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DDock never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames, because an App Sandbox cannot read another application's preferences: turning on *Automatically hide and show the Dock* releases the space and clears the status, while moving the Dock to another edge does not. The page can be skipped.
+The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DOKK never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames, because an App Sandbox cannot read another application's preferences: turning on *Automatically hide and show the Dock* releases the space and clears the status, while moving the Dock to another edge does not. The page can be skipped.
 
 The illustrations use production code, not artwork. Placement runs the same `DockPlacement` calculation as a real dock, the running indicators are drawn by `DockIconIndicator` and `DockRunningIndicator`, and the auto-hide page is driven by the real `DockVisibilityController`. Reduce Motion holds a single frame on every page and cross-fades between them instead of sliding; Reduce Transparency uses opaque backgrounds. Only the visible page animates.
 
 ## Arrange pins with drag-and-drop
 
 - Drag a pinned app along the dock to reorder it. Drag a running app into the pinned section to pin it at that position. Running-only order remains automatic.
-- Drop one or more application bundles or ordinary folders from Finder into the pinned section. Mixed app-and-folder batches are accepted in Finder order. The whole batch must be pinnable: plain files, packages, aliases, unreadable items, and DDock itself reject the pin operation. Existing pins move into the dropped block; duplicate app identities and resolved folder locations appear only once.
-- Drag an app onto another display’s DDock to pin it there without removing the source pin. An existing destination pin moves to the chosen position.
-- Drag a pin at least 64 points outside its dock to see **Unpin**, then release to unpin it. Returning closer or pressing Escape cancels removal. Releasing over another DDock that rejects the drop keeps the source pin. Running apps remain in the running section after unpinning; applications are never quit or deleted.
+- Drop one or more application bundles or ordinary folders from Finder into the pinned section. Mixed app-and-folder batches are accepted in Finder order. The whole batch must be pinnable: plain files, packages, aliases, unreadable items, and DOKK itself reject the pin operation. Existing pins move into the dropped block; duplicate app identities and resolved folder locations appear only once.
+- Drag an app onto another display’s DOKK to pin it there without removing the source pin. An existing destination pin moves to the chosen position.
+- Drag a pin at least 64 points outside its dock to see **Unpin**, then release to unpin it. Returning closer or pressing Escape cancels removal. Releasing over another DOKK that rejects the drop keeps the source pin. Running apps remain in the running section after unpinning; applications are never quit or deleted.
 - During dragging, magnification settles to resting icon sizes and a live gap shows insertion. Overflowing docks scroll near their viewport edges. A hidden dock uses its existing activation zone and reveal delay; the source and revealed destination stay visible during the relevant interaction.
 - Pin edits save only when a drop completes. Cancelled drags restore the saved arrangement. Invalid batches are rejected together, and save errors appear on the affected dock.
 
 Right-click a pin for **Move Left** and **Move Right** on a top or bottom dock, or **Move Up** and **Move Down** on a side dock. **Pin on Display…** works with every edge. With **Focus Dock** active, hold Option with the corresponding arrow key to reorder the selected pin; ordinary arrows navigate. VoiceOver exposes equivalent move and destination actions. The Pin on Display menu appends a new pin and leaves an existing destination pin in place.
 
-Finder imports retain read-only security-scoped bookmarks so user-selected application bundles and folders can remain accessible after restart. Application-only lists migrate once to typed v3 pins; the older bytes remain untouched for rollback and recovery. DDock uses app-scoped bookmarks for persistent pins; the separate Trash drop path requests read/write access only to items the user explicitly supplies. No Accessibility grant or system Dock preference changes are involved. Trash commands use a separate Finder Automation grant described below. Missing applications and unresolved folders remain visible as unavailable pins.
+Finder imports retain read-only security-scoped bookmarks so user-selected application bundles and folders can remain accessible after restart. Application-only lists migrate once to typed v3 pins; the older bytes remain untouched for rollback and recovery. DOKK uses app-scoped bookmarks for persistent pins; the separate Trash drop path requests read/write access only to items the user explicitly supplies. No Accessibility grant or system Dock preference changes are involved. Trash commands use a separate Finder Automation grant described below. Missing applications and unresolved folders remain visible as unavailable pins.
 
-Selecting multiple pins within DDock remains outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
+Selecting multiple pins within DOKK remains outside this slice. File and folder opening is described below. Runtime acceptance for dragging, focus, auto-hide, cross-display copying, and sandbox access remains pending; see the latest acceptance entry.
 
 ## Folder stacks
 
@@ -263,19 +263,19 @@ Fan and Automatic presentations, search, multi-selection, file promises, move op
 
 ## Features
 
-**Settings → Features** collects DDock's opt-in capabilities: Session Capsules, the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
+**Settings → Features** collects DOKK's opt-in capabilities: Session Capsules, the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
 
-That is the distinction the sidebar draws. Panes under **Defaults** describe how a dock looks and where it sits, so each display can override them individually. A feature is either on or off for DDock as a whole; no display holds its own copy. Appearance, Position, and Behavior keep their per-display overrides exactly as before.
+That is the distinction the sidebar draws. Panes under **Defaults** describe how a dock looks and where it sits, so each display can override them individually. A feature is either on or off for DOKK as a whole; no display holds its own copy. Appearance, Position, and Behavior keep their per-display overrides exactly as before.
 
 ## Session Capsules
 
-Session Capsules save mental context without restoring window geometry. Open the shared Capsules tile, choose up to twelve visible windows, and create a draft. DDock captures those windows once with ScreenCaptureKit, runs on-device Vision OCR, and gives the images plus window metadata to the system default Apple Intelligence model. Foundation Models produces typed structured output for the title, summary, and unfinished tasks; the prompt never asks for JSON. If the model is unavailable or generation fails, DDock creates a plain editable draft from the selected window metadata instead.
+Session Capsules save mental context without restoring window geometry. Open the shared Capsules tile, choose up to twelve visible windows, and create a draft. DOKK captures those windows once with ScreenCaptureKit, runs on-device Vision OCR, and gives the images plus window metadata to the system default Apple Intelligence model. Foundation Models produces typed structured output for the title, summary, and unfinished tasks; the prompt never asks for JSON. If the model is unavailable or generation fails, DOKK creates a plain editable draft from the selected window metadata instead.
 
 Nothing is saved until you review the draft and choose **Save Capsule**. For ordinary capsules, raw screenshots and recognized text remain in memory only for draft creation and are discarded afterward. Breadcrumbs can retain reviewed text previews as described below. Each saved checkpoint then appears beside the collection tile as its own temporary, title-bearing Dock item until you delete it. The persisted capsule contains the approved text, optional personal note, application bundle identities, and window titles. **Resume** reopens missing applications and uses Accessibility to raise a unique app/title match when available, otherwise it activates a referenced app. It deliberately does not move, resize, or rearrange windows.
 
 Choose **Leave a breadcrumb** before switching away. Select relevant windows, then write your note and next step. **Write manually** also works without Screen Recording or Apple Intelligence. **Capture & draft with Apple Intelligence** is a separate, explicit action. Review its interpretation alongside your own writing before saving. A breadcrumb uses the same capsule collection and can be edited after restart.
 
-Saved source cards show historical text previews, dates, and current window availability. **Show window** rechecks a unique app/title match. **Open app**, **Open link**, and **Open saved document** describe separate actions. Add web links yourself or choose saved documents through the file picker. DDock never infers reopening paths from a model or window title. Unsaved documents, Spaces, and exact window positions cannot be restored reliably.
+Saved source cards show historical text previews, dates, and current window availability. **Show window** rechecks a unique app/title match. **Open app**, **Open link**, and **Open saved document** describe separate actions. Add web links yourself or choose saved documents through the file picker. DOKK never infers reopening paths from a model or window title. Unsaved documents, Spaces, and exact window positions cannot be restored reliably.
 
 Each source can retain at most 2,000 characters of captured text. Screenshots are never saved. Remove a source or preview in Edit and save, or delete the capsule to remove all its retained context and document bookmarks. Source documents remain untouched. Nothing captures on idle, app switches, or return from a break. See the [breadcrumb acceptance checklist](docs/BREADCRUMBS.md) for validation status and limits.
 
@@ -305,7 +305,7 @@ Keyboard, while the panel is open: Up and Down select, Return opens, ⌘R shows 
 
 Select items the way a Finder list does: click to replace the selection, Command-click to toggle one, Shift-click to extend from the last, and drag across empty space to sweep a rubber band. The band never starts on an item or over the scroller, so pressing an item still drags it and the list still scrolls. Dragging any selected item carries the whole selection at once; dragging an unselected one carries just that item.
 
-Removal is always explicit. Use a row's Remove, **Clear Shelf…** from the tile menu or the panel header, or drag an item onto the dock's Trash tile — that drop reads **Remove from Shelf**, discards the reference, and leaves the file on disk. A Finder batch dropped on Trash still reads **Move to Trash** and still trashes; the two paths stay distinct because a Shelf drag also carries a private pasteboard type that only DDock reads.
+Removal is always explicit. Use a row's Remove, **Clear Shelf…** from the tile menu or the panel header, or drag an item onto the dock's Trash tile — that drop reads **Remove from Shelf**, discards the reference, and leaves the file on disk. A Finder batch dropped on Trash still reads **Move to Trash** and still trashes; the two paths stay distinct because a Shelf drag also carries a private pasteboard type that only DOKK reads.
 
 The Shelf holds at most 50 items; a larger drop is accepted up to the limit and reports the rest on the initiating dock. A file that is moved or deleted stays listed as unavailable rather than disappearing, so you can see what happened and remove it yourself. Unreadable stored bytes are reported and never overwritten.
 
@@ -314,7 +314,7 @@ Keyboard, while the panel is open: Up and Down select, Return shows the selected
 Select a Shelf item and press Space, or choose Quick Look from its context menu, to preview it inside the panel. Space or Escape returns to the list. Up and Down preview the previous or next item. A preview holds the file access until its native view closes.
 
 Open **Shelf → Compost** to enable automatic archiving after 7, 14, or 30 days. It starts off.
-Age counts from the last addition or restoration, including time while DDock is closed.
+Age counts from the last addition or restoration, including time while DOKK is closed.
 Choosing a rule archives eligible entries immediately. Compost keeps the file references and
 bookmarks, with a leaf-and-soil illustration and a brief leaf bounce when an item is restored.
 
@@ -330,15 +330,15 @@ Reordering individual Shelf entries and multiple named shelves remain planned.
 
 Trash appears as the final tile after its own divider and is enabled by default. Under **Features → Trash**, turn it off for the whole app. The tile is independent of the pinned and running sections, including their hidden and collapsed states.
 
-Click Trash, press Return while it is selected in Focus Dock, or choose **Open Trash** from its menu to open Trash in Finder. VoiceOver exposes its name, status, hint, and actions. The first explicit Open or Empty command asks for permission to automate Finder. DDock does not read the protected Trash directory directly. After permission exists, a serialized Finder item-count check every two seconds keeps the empty/full artwork synchronized with changes made by Finder or the system Dock.
+Click Trash, press Return while it is selected in Focus Dock, or choose **Open Trash** from its menu to open Trash in Finder. VoiceOver exposes its name, status, hint, and actions. The first explicit Open or Empty command asks for permission to automate Finder. DOKK does not read the protected Trash directory directly. After permission exists, a serialized Finder item-count check every two seconds keeps the empty/full artwork synchronized with changes made by Finder or the system Dock.
 
-Drop one or more files, folders, or packages from Finder directly on the tile to move the complete batch to Trash through `NSWorkspace`. The exact tile highlights and shows **Move to Trash**. Security-scoped access remains alive until macOS completes the operation; failures are reported on the initiating dock. Internal pin drags cannot target Trash, and dropping onto Trash never alters DDock's pin configuration.
+Drop one or more files, folders, or packages from Finder directly on the tile to move the complete batch to Trash through `NSWorkspace`. The exact tile highlights and shows **Move to Trash**. Security-scoped access remains alive until macOS completes the operation; failures are reported on the initiating dock. Internal pin drags cannot target Trash, and dropping onto Trash never alters DOKK's pin configuration.
 
-The context menu and VoiceOver offer **Empty Trash…** only when Trash contains items. **Features → Trash → Confirm before emptying Trash** controls DDock's native destructive warning. Confirmation is on by default and applies to every display. DDock then asks Finder to empty Trash. Finder owns the protected home and mounted-volume Trash locations. DDock's sandbox entitlements allow Apple events only for Finder, with the Finder Trash scripting access group plus a Finder-only compatibility exception for opening and counting. It receives no general home-directory access and uses no deprecated workspace operation, Finder UI scripting, or private API.
+The context menu and VoiceOver offer **Empty Trash…** only when Trash contains items. **Features → Trash → Confirm before emptying Trash** controls DOKK's native destructive warning. Confirmation is on by default and applies to every display. DOKK then asks Finder to empty Trash. Finder owns the protected home and mounted-volume Trash locations. DOKK's sandbox entitlements allow Apple events only for Finder, with the Finder Trash scripting access group plus a Finder-only compatibility exception for opening and counting. It receives no general home-directory access and uses no deprecated workspace operation, Finder UI scripting, or private API.
 
 ## Open files and folders in an app
 
-Drag files, document packages, or folders from Finder onto an available app icon. With Window Peek enabled, a running app shows **Hold to choose a window** and opens Peek after its configured delay. Dropping on the icon opens destination selection; dropping on a card opens the explicit [file handoff](docs/WINDOW-FILE-HANDOFF.md). For a closed app or with Peek disabled, **Open in {app}** submits the batch at app level. The receiving app decides which types it supports. DDock does not move or overwrite the source files.
+Drag files, document packages, or folders from Finder onto an available app icon. With Window Peek enabled, a running app shows **Hold to choose a window** and opens Peek after its configured delay. Dropping on the icon opens destination selection; dropping on a card opens the explicit [file handoff](docs/WINDOW-FILE-HANDOFF.md). For a closed app or with Peek disabled, **Open in {app}** submits the batch at app level. The receiving app decides which types it supports. DOKK does not move or overwrite the source files.
 
 Application bundles still use the pinning behavior above. Mixing applications and documents rejects the whole batch. Web links, pasted content, and promised files are not supported. While **Checking items…** is visible, the batch is not yet ready to drop. Missing or inaccessible items reject the batch before handoff.
 
@@ -346,15 +346,15 @@ Hover over a collapsed pinned or running section for half a second to expose its
 
 File hover on an app no longer spring-activates or launches it. A deliberate Peek dwell keeps the original application in front. Folder spring-loading still follows the macOS hover and Force Click preferences.
 
-Known limitation on the development Mac: Escape cancels a Finder drag before switching apps, but did not cancel after spring activation. The same failure occurred when switching with Command-Tab without using DDock. Escape cancellation after an app switch is therefore not guaranteed in this environment.
+Known limitation on the development Mac: Escape cancels a Finder drag before switching apps, but did not cancel after spring activation. The same failure occurred when switching with Command-Tab without using DOKK. Escape cancellation after an app switch is therefore not guaranteed in this environment.
 
-Right-click an available app and choose **Open Files…** to select files and folders in a native picker. VoiceOver exposes the same action. With **Focus Dock**, select an app and press **⌘O**. One picker is shared by all displays; it retains the app selected when it opened. Cancelling restores the originating dock selection or previous app when DDock still owns focus.
+Right-click an available app and choose **Open Files…** to select files and folders in a native picker. VoiceOver exposes the same action. With **Focus Dock**, select an app and press **⌘O**. One picker is shared by all displays; it retains the app selected when it opened. Cancelling restores the originating dock selection or previous app when DOKK still owns focus.
 
 Each direct app-level drop or **Open Files…** picker confirmation submits its own batch, including consecutive drops onto an app that is still launching. The Peek file picker instead retains files for destination selection. Failures appear on the initiating dock. A successful macOS handoff does not prove that the receiving app displayed every item. Document access is temporary, with no saved bookmarks or document history. See the [acceptance record](docs/ACCEPTANCE.md) for build evidence and outstanding runtime checks.
 
 ## Position and appearance settings
 
-Choose **Settings…** from the menu-bar item or app menu (⌘, while DDock is active). The single native Settings window applies valid edits immediately and saves them automatically.
+Choose **Settings…** from the menu-bar item or app menu (⌘, while DOKK is active). The single native Settings window applies valid edits immediately and saves them automatically.
 
 | Control | Range / options | Default |
 | --- | --- | --- |
@@ -507,7 +507,7 @@ Auto-hide does not inspect overlapping app windows, use pressure gestures, modif
 
 One application catalog owns workspace observation, running order, icon caching, and duplicate-suppressed launches. A coordinator reconciles display snapshots and owns global pointer monitoring and exclusive keyboard focus. Each panel keeps its own pins, selection, hover, scroll state, geometry, and error feedback. Removing a dock invalidates its launch callbacks without cancelling shared work; quitting cancels pending tasks and removes observers, monitors, and panels. Geometry, identity resolution, ordering, focus routing, and visibility policy are independent of native windows. Each panel owns a cancellable visibility controller with monotonic deadlines and finite animation ticks; idle settled docks schedule no visibility work. Drawing and native click passthrough share the same animation sample, while context-menu tracking is scoped to the owning dock.
 
-The shared `DeeDock` scheme includes `DeeDockTests`, a Swift Testing target hosted in the app. Tests use `@testable import DeeDock`, so every app type is available without a separate source list. The test host starts no dock, menu-bar item, or services, and tests inject their own `UserDefaults` suites and directories, because the host shares DDock's preferences domain. Its tests cover geometry, magnification, overflow, ordering, favorites persistence, display identity and focus policy, migration, empty-pin seeding, per-setting inheritance, stale launch/cancellation behavior, auto-hide deadlines and reversals, ten animation styles and masks, behavior migration, and temporary preview lifetimes without launching DDock. Drag coverage adds batch insertion, cross-display pin independence, deliberate unpinning, cancellation, insertion geometry, import validation, bookmark compatibility, blocked writes, and visibility holds. Follow `AGENTS.md` before running them.
+The shared `DeeDock` scheme includes `DeeDockTests`, a Swift Testing target hosted in the app. Tests use `@testable import DeeDock`, so every app type is available without a separate source list. The test host starts no dock, menu-bar item, or services, and tests inject their own `UserDefaults` suites and directories, because the host shares DOKK's preferences domain. Its tests cover geometry, magnification, overflow, ordering, favorites persistence, display identity and focus policy, migration, empty-pin seeding, per-setting inheritance, stale launch/cancellation behavior, auto-hide deadlines and reversals, ten animation styles and masks, behavior migration, and temporary preview lifetimes without launching DOKK. Drag coverage adds batch insertion, cross-display pin independence, deliberate unpinning, cancellation, insertion geometry, import validation, bookmark compatibility, blocked writes, and visibility holds. Follow `AGENTS.md` before running them.
 
 ## Source organization
 
@@ -524,7 +524,7 @@ The shared `DeeDock` scheme includes `DeeDockTests`, a Swift Testing target host
 - `DeeDock/Dock/Popover` owns the transient panel shell shared by folder stacks and the Shelf: its window, dismissal monitors, animation, inward placement geometry, and pointer shape, plus the presenter that keeps only one open.
 - `DeeDock/Dock/Shelf` holds the staged-item model, its repository, the shared controller, security-scoped access, the panel state and view, the native drag sources, and the coordinator.
 - `DeeDock/Dock/SemanticStacks` owns metadata-only grouping, streamed result repair, process-lifetime caching, and the Foundation Models adapter shared by folder stacks and the Shelf. Identical live requests share one generation. When Smart is selected, Shelf edits silently prepare the next grouping after a short debounce unless Low Power Mode is active.
-- `DeeDock/Dock/History` owns the shared DDock-local pin and Focus Session event model, persistence, and dock-axis scrub mapping. DEE-45 can reuse the same events for session playback.
+- `DeeDock/Dock/History` owns the shared DOKK-local pin and Focus Session event model, persistence, and dock-axis scrub mapping. DEE-45 can reuse the same events for session playback.
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.
 - `DeeDock/Modes` owns named configurations, the keyboard picker, and optional workspace recipes. Recipe execution lives in `WorkspaceRecipeCoordinator` with per-run state that is never persisted.
@@ -544,9 +544,9 @@ Use generated `LocalizedStringResource` symbols in SwiftUI and defer error-messa
 
 Open **Settings → Features → Action Tiles** and pin a shortcut. Installed Shortcuts load when that page appears; **Reload Shortcuts** refreshes the list. Tiles appear in the same order on every display, independently of Dock Modes. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
 
-Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DDock never retries a run automatically.
+Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DOKK never retries a run automatically.
 
-Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DDock does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.
+Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DOKK does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.
 
 ## Focus Sessions
 
@@ -555,7 +555,7 @@ up to eight work apps for your party, then start a normal session. A boss health
 remaining time, and completion adds a brief, silent trophy. Disable the skin at any time
 without changing the timer. See [Boss Fight behavior and acceptance](docs/BOSS-FIGHT.md).
 
-Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or use the timer button beside a mode in **Settings → Modes**. DDock activates that mode and starts a shared timer. You can also start from the already-active mode. Only one session can run or pause at a time; switching modes later does not replace its timer.
+Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or use the timer button beside a mode in **Settings → Modes**. DOKK activates that mode and starts a shared timer. You can also start from the already-active mode. Only one session can run or pause at a time; switching modes later does not replace its timer.
 
 The timer tile appears on every display. Its ring shows time remaining. Click it for **Pause**, **Resume**, **Add 5 Minutes**, and **Finish**. A finished session keeps a checkmark tile until dismissed or replaced by a new session. **Save Session Capsule** opens the usual window-selection and draft-review flow; finishing never captures or saves anything automatically.
 
@@ -567,29 +567,29 @@ was a promise to let its timer finish. Finishing or cancelling early added one t
 
 ## Local History
 
-Choose **Browse Local History** from the menu-bar item, or press **H** in Focus Dock. The dock under the pointer becomes a time axis of DDock-local pin and Focus Session events. Drag along the chrome to scrub; arrows move to the previous or next event. Escape or **H** again leaves the timeline. Nothing is imported from macOS Screen Time or other apps. **Settings → Features → Local History** can pause recording and clear stored events. An empty dock shows a privacy explanation instead of a blank track. Session events share an identifier so a later session-scrub feature can replay one Focus Session from the same log.
+Choose **Browse Local History** from the menu-bar item, or press **H** in Focus Dock. The dock under the pointer becomes a time axis of DOKK-local pin and Focus Session events. Drag along the chrome to scrub; arrows move to the previous or next event. Escape or **H** again leaves the timeline. Nothing is imported from macOS Screen Time or other apps. **Settings → Features → Local History** can pause recording and clear stored events. An empty dock shows a privacy explanation instead of a blank track. Session events share an identifier so a later session-scrub feature can replay one Focus Session from the same log.
 
 **Show pins while browsing** is off until you turn it on in that same settings card. With it on, the dock waits until you pause on a moment, then shows that pin order using the usual insert, remove, and move animations. Saved pins do not change. Leaving the timeline restores the current layout.
 
-Running timers use a saved wall-clock deadline, so sleep and app downtime count. Paused timers retain their remaining duration. Reopening DDock after the deadline marks the session finished without replaying a celebration. Changing focus defaults does not restart the current session. Renaming or deleting a Dock Mode does not erase a timer already started from it.
+Running timers use a saved wall-clock deadline, so sleep and app downtime count. Paused timers retain their remaining duration. Reopening DOKK after the deadline marks the session finished without replaying a celebration. Changing focus defaults does not restart the current session. Renaming or deleting a Dock Mode does not erase a timer already started from it.
 
 ## App updates
 
-Direct builds use Sparkle’s update engine with a DDock-owned native update window. Consent, release notes, download progress, errors, and installation choices use DDock’s UI. Choose **Check for Updates…** from the DDock menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DDock quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. Esi owns the Release workflow and dispatches it herself. `watch` is a Linux dry-run. `ship` archives on `xcode-27` and opens a draft on Linux; Latest stays off until `publish_latest` is set. See [release instructions](docs/UPDATES.md) for signing, publishing, the required archive scheme, and the secrets checklist.
+Direct builds use Sparkle’s update engine with a DOKK-owned native update window. Consent, release notes, download progress, errors, and installation choices use DOKK’s UI. Choose **Check for Updates…** from the DOKK menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DOKK quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. Esi owns the Release workflow and dispatches it herself. `watch` is a Linux dry-run. `ship` archives on `xcode-27` and opens a draft on Linux; Latest stays off until `publish_latest` is set. See [release instructions](docs/UPDATES.md) for signing, publishing, the required archive scheme, and the secrets checklist.
 
 ## App badges
 
 Enable **Settings → Features → App badges → Show app badges**, then allow Accessibility access using the controls in that card. The setting is off by default and applies to every display. Screen Recording is not required.
 
-DDock mirrors badge text exposed by application items in the system Dock, matched by application URL. Apps absent from the system Dock and custom-drawn badges may not provide readable text. AX changes trigger a refresh where supported; a fallback five seconds after each completed scan covers missing notifications and permission changes. Long labels are visually truncated, with their full text available to VoiceOver.
+DOKK mirrors badge text exposed by application items in the system Dock, matched by application URL. Apps absent from the system Dock and custom-drawn badges may not provide readable text. AX changes trigger a refresh where supported; a fallback five seconds after each completed scan covers missing notifications and permission changes. Long labels are visually truncated, with their full text available to VoiceOver.
 
 AX reads run outside the main actor and do not depend on pointer movement or animation frames. Disabling badges, disabling all docks, sleep, and shutdown clear badge state and stop the reader. Permission loss clears badges on the next refresh. Compilation is verified; live badge coverage and performance still need native acceptance. See [the acceptance record](docs/ACCEPTANCE.md#app-badges-dee-10).
 
 ## Find a window
 
-Choose **Find a Window** from the DDock menu, press Command-Shift-Space globally, or press `/` in Focus Dock. Search live window titles and app names without AI. Use **Choose Windows…** and **Capture Selected** to search visible text from up to four selected windows. **Search Images with AI** separately checks those screenshots and labels matches as model suggestions. Captures stay in memory for at most ten minutes and are cleared when search closes.
+Choose **Find a Window** from the DOKK menu, press Command-Shift-Space globally, or press `/` in Focus Dock. Search live window titles and app names without AI. Use **Choose Windows…** and **Capture Selected** to search visible text from up to four selected windows. **Search Images with AI** separately checks those screenshots and labels matches as model suggestions. Captures stay in memory for at most ten minutes and are cleared when search closes.
 
-**Saved Capsules** searches historical checkpoints and supports deletion. “Yesterday” requires a capsule saved yesterday; DDock does not collect a continuous screen history. See the [window search reference](docs/WINDOW_SEARCH.md) for limits, keyboard controls, and pending acceptance.
+**Saved Capsules** searches historical checkpoints and supports deletion. “Yesterday” requires a capsule saved yesterday; DOKK does not collect a continuous screen history. See the [window search reference](docs/WINDOW_SEARCH.md) for limits, keyboard controls, and pending acceptance.
 
 ## Badge memory
 

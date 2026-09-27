@@ -22,10 +22,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* DOKK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DOKK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
-		525BD98535225C6EE024849D /* DDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		525BD98535225C6EE024849D /* DOKK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DOKK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEE400000000000000000002 /* Sparkle-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Sparkle-LICENSE.txt"; path = "ThirdParty/Sparkle-LICENSE.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,9 +78,9 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* DDock.app */,
+				000000000000000000000120 /* DOKK.app */,
 				DD0000000000000000000003 /* DeeDockTests.xctest */,
-				525BD98535225C6EE024849D /* DDock.app */,
+				525BD98535225C6EE024849D /* DOKK.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,7 +116,7 @@
 				C7F376D8610F320F205B46E7 /* Sparkle */,
 			);
 			productName = MyApp;
-			productReference = 000000000000000000000120 /* DDock.app */;
+			productReference = 000000000000000000000120 /* DOKK.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7C2885433F43592EF492D80F /* DeeDock-TestFlight */ = {
@@ -135,7 +135,7 @@
 			);
 			name = "DeeDock-TestFlight";
 			productName = "DeeDock-TestFlight";
-			productReference = 525BD98535225C6EE024849D /* DDock.app */;
+			productReference = 525BD98535225C6EE024849D /* DOKK.app */;
 			productType = "com.apple.product-type.application";
 		};
 		DD0000000000000000000006 /* DeeDockTests */ = {
@@ -430,7 +430,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "DDock Dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
@@ -484,7 +484,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = DDock;
+				INFOPLIST_KEY_CFBundleDisplayName = DOKK;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
@@ -643,7 +643,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DDock.app/Contents/MacOS/DDock";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DOKK.app/Contents/MacOS/DOKK";
 			};
 			name = Debug;
 		};
@@ -667,7 +667,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DDock.app/Contents/MacOS/DDock";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DOKK.app/Contents/MacOS/DOKK";
 			};
 			name = Release;
 		};
@@ -759,7 +759,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Configuration/Direct-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "DDock Dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = NO;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
@@ -868,7 +868,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DDock.app/Contents/MacOS/DDock";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DOKK.app/Contents/MacOS/DOKK";
 			};
 			name = Preview;
 		};

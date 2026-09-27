@@ -60,7 +60,7 @@ nonisolated enum ClipboardVaultKeychain {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
-            kSecAttrLabel as String: "DDock Clipboard Museum",
+            kSecAttrLabel as String: "DOKK Clipboard Museum",
             kSecAttrSynchronizable as String: false,
             kSecValueData as String: data,
         ]

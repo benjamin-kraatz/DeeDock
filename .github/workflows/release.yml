@@ -401,9 +401,9 @@ jobs:
             -archivePath "$ARCHIVE_PATH" \
             -exportPath "$export_dir" \
             -exportOptionsPlist "$options"
-          app="$export_dir/DDock.app"
+          app="$export_dir/DOKK.app"
           if [ ! -d "$app" ]; then
-            echo "Export did not produce DDock.app"
+            echo "Export did not produce DOKK.app"
             ls -la "$export_dir"
             exit 1
           fi
@@ -454,8 +454,8 @@ jobs:
             "$APP_PATH" "$update_dir/DDock.zip"
           echo "UPDATE_DIR=$update_dir" >> "$GITHUB_ENV"
           zipinfo -1 "$update_dir/DDock.zip" | head -n 20
-          if ! zipinfo -1 "$update_dir/DDock.zip" | grep -q '^DDock.app/'; then
-            echo "DDock.zip must contain DDock.app at its root."
+          if ! zipinfo -1 "$update_dir/DDock.zip" | grep -q '^DOKK.app/'; then
+            echo "DDock.zip must contain DOKK.app at its root."
             exit 1
           fi
 

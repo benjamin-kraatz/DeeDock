@@ -80,7 +80,7 @@ Use a fresh staging directory containing only this release's exported app archiv
 ```sh
 RELEASE_TAG='v0.1.2'
 UPDATE_DIR='/absolute/path/to/update-staging'
-EXPORTED_APP='/absolute/path/to/export/DDock.app'
+EXPORTED_APP='/absolute/path/to/export/DOKK.app'
 mkdir -p "$UPDATE_DIR"
 codesign --verify --deep --strict --verbose=2 "$EXPORTED_APP"
 xcrun stapler validate "$EXPORTED_APP"
@@ -92,7 +92,7 @@ xcrun stapler validate "$EXPORTED_APP"
   --maximum-deltas 0 "$UPDATE_DIR"
 ```
 
-Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DDock.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
+Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DOKK.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
 
 Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. When `docs/releases/<MARKETING_VERSION>.md` exists, copy it beside the ZIP as `DDock.md` before `generate_appcast`, and upload that `DDock.md` with the draft. When `docs/releases/<MARKETING_VERSION>-comic.md` is on the shipped commit, the Release workflow also stages it as `DDock-comic.md`, copies each `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` as a flat `panel-0N.png`, and uploads those files on the same draft. The staged comic rewrites `assets/<ver>/panel-0N.png` links to `panel-0N.png` so the Update window can load art next to `DDock-comic.md`. A missing comic file is skipped and the notes-only ship still succeeds. Write the GitHub Release body in English only. Sparkle notes stay bilingual German and English. 0.4.1 has no comic package.
 
@@ -116,7 +116,7 @@ Keep an encrypted backup. On another release machine, use the same account with 
 
 ## Archive for TestFlight
 
-Select `DeeDock-TestFlight` and archive that target. Its app still has the product name `DDock.app`, with ordinary build products isolated under `TestFlight`. Inspect the archive before upload: there must be no `Sparkle.framework`, Sparkle helpers, Sparkle load command, `SUFeedURL`, or `SUPublicEDKey`.
+Select `DeeDock-TestFlight` and archive that target. Its app still has the product name `DOKK.app`, with ordinary build products isolated under `TestFlight`. Inspect the archive before upload: there must be no `Sparkle.framework`, Sparkle helpers, Sparkle load command, `SUFeedURL`, or `SUPublicEDKey`.
 
 This target preserves the existing signing and sandbox settings. It establishes updater exclusion, not App Store Connect acceptance. Address any TestFlight entitlement or sandbox requirements separately rather than exporting the direct target as TestFlight. TestFlight uploads stay on Xcode Cloud. The Release workflow does not notarize or upload that scheme, and it does not use App Store Connect API keys.
 

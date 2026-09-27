@@ -27,7 +27,7 @@ final class WindowPeekDiagnostics {
         let card = WindowPeekGeometry.cardSize(settings)
         let thumbnail = settings.windowPeekSize.thumbnailSize
         var lines: [String] = []
-        lines.append("DDock \(AppVersionInfo.current.settingsValue) · macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
+        lines.append("DOKK \(AppVersionInfo.current.settingsValue) · macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
         lines.append("Scroll bars: \(NSScroller.preferredScrollerStyle == .legacy ? "legacy (always shown)" : "overlay")")
         lines.append("Peek: size=\(settings.windowPeekSize.rawValue) layout=\(settings.windowPeekLayout.rawValue) "
                      + "style=\(settings.windowPeekStyle.rawValue) split=\(settings.windowPeekSplitEnabled) "

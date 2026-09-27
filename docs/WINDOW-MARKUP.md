@@ -50,7 +50,7 @@ a mark selected, changing either restyles that mark.
 - **Copy Text** (⇧⌘C) copies the Live Text selection, or the recognised text of the crop or picture.
 - **Search Web** opens the configured engine with the selection or the first recognised lines.
   Pixels never leave the Mac: there is no public API for a browser's reverse image search, and
-  uploading the capture to a third party is not something DeeDock does.
+  uploading the capture to a third party is not something DOKK does.
 - **Frame** wraps the export in a mat coloured from the app icon, with rounded corners.
 
 Escape finishes typing, leaves Live Text, clears the selection, drops the crop, and finally closes
@@ -61,7 +61,7 @@ discards them.
 
 **Settings → Features → Window Peek → Markup** holds the saved file format (PNG or JPEG), the search
 engine for Search Web (Google, DuckDuckGo, Bing, Ecosia), and the markup folder. The folder defaults
-to `~/Pictures/DeeDock Markups`. It is created on first use by Send to Shelf.
+to `~/Pictures/DOKK Markups`. It is created on first use by Send to Shelf.
 
 ## Holding the enlarged preview
 

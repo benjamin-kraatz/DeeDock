@@ -13,7 +13,7 @@ enum DDockMenuBarMark {
     private static let icon = template(named: "DDockMark", size: NSSize(width: 18, height: 18))
     /// Same letter height as before the tracking change; the extra is only as wide as the lockup.
     /// Aspect matches the cropped `DDockWordmark` viewBox so AppKit's SVG size cannot pad the sides.
-    private static let wordmarkAspect: CGFloat = 496 / 59
+    private static let wordmarkAspect: CGFloat = 388 / 59
     private static let wordmark = template(named: "DDockWordmark",
                                           size: NSSize(width: 12 * wordmarkAspect, height: 18),
                                           aspect: wordmarkAspect)

@@ -92,7 +92,7 @@ struct DockSettings: Codable, Equatable {
     var windowMarkupFormat: WindowMarkupFormat = .png
     /// Where **Search Web** in a markup sends recognised text.
     var windowMarkupSearchEngine: WindowMarkupSearchEngine = .google
-    /// Folder for Send to Shelf and the save panel's starting place; `nil` is `~/Pictures/DeeDock Markups`.
+    /// Folder for Send to Shelf and the save panel's starting place; `nil` is `~/Pictures/DOKK Markups`.
     var windowMarkupFolder: String? = nil
     var tooltipPreset: DockTooltipPreset = .classic
     var runningIndicatorStyle: RunningIndicatorStyle = .dot

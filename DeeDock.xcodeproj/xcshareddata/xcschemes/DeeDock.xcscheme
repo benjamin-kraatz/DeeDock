@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "000000000000000100000000"
-               BuildableName = "DDock.app"
+               BuildableName = "DOKK.app"
                BlueprintName = "DeeDock"
                ReferencedContainer = "container:DeeDock.xcodeproj">
             </BuildableReference>
@@ -55,7 +55,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "DDock.app"
+            BuildableName = "DOKK.app"
             BlueprintName = "DeeDock"
             ReferencedContainer = "container:DeeDock.xcodeproj">
          </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "DDock.app"
+            BuildableName = "DOKK.app"
             BlueprintName = "DeeDock"
             ReferencedContainer = "container:DeeDock.xcodeproj">
          </BuildableReference>
