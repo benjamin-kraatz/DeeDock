@@ -1,5 +1,10 @@
 # DeeDock acceptance record
 
+For the current validation results, remaining gaps, and reconciliation of open feature tickets,
+see [Acceptance gaps](ACCEPTANCE-GAPS.md). The sections below preserve the evidence from each
+implementation slice. Statements such as "tests were not run" describe that slice's original
+validation, unless a later dated result supersedes them.
+
 ## Deprecated personality features
 
 Dock Sims (including AI icon rumours), Focus breathing, Focus debt, Pin weather / icon rust,
@@ -420,7 +425,7 @@ These observations establish the specific behaviors above, not complete visual o
 - Check horizontal overflow and keyboard scrolling with enough running apps to exceed the display width.
 - Compare glass, shadows, icon movement, label placement, and click targets against the macOS Dock on light and dark desktop content.
 - Exercise VoiceOver, Reduce Motion, and Reduce Transparency. The implementation includes these behaviors; system settings were not changed during inspection.
-- Reconfigure/unplug/reconnect displays, including displays with negative origins and different scaling. Confirm the single dock follows the primary display and stays within its usable frame.
+- Reconfigure/unplug/reconnect displays, including displays with negative origins and different scaling. Confirm each enabled logical display keeps its own configured dock within its usable frame, as implemented in slice 2.
 - Exercise normal Spaces, full-screen apps, Mission Control, and sleep/wake. The panel joins normal desktop Spaces; it does not request full-screen auxiliary overlay behavior. Exact OS behavior still needs hands-on acceptance.
 - Exercise unavailable favorite apps and failed launches. Check the visible error message, dismissal, and removal of missing favorites.
 - Confirm idle resource use and smoothness with Instruments before making performance claims; verify complete observer/panel teardown under repeated lifecycle changes.
@@ -1699,6 +1704,11 @@ Check both layouts, category and letter grouping, Escape and outside-click dismi
 query and filter changes, changed app results, keyboard navigation after reopening,
 optional suggestions, Reduce Motion, and independent positions on two displays.
 
+Follow-up on 2026-09-29: on installed 0.11.0, the current browse layout retained its scroll
+offset across Back to Dock and reopen. A nonmatching query showed zero results, and clearing
+it restored browsing at the top. The other scenarios above remain pending. See
+[current evidence](ACCEPTANCE-GAPS.md#current-evidence) for the observed values and environment.
+
 ## DEE-8: App Launcher
 
 Implemented from DEE-8 and its September 7 clarification. A permanent utility tile expands
@@ -2811,3 +2821,11 @@ derived-data folder. Tests for the arc geometry and the destination choice were 
 but not run. Nothing was launched. Pending hands-on acceptance: the flight on every dock edge and on
 a secondary display, the tile bounce, Peek staying open until landing with auto-hide on, the first
 write to Downloads (macOS may ask for folder access), Shelf-full handling, and Reduce Motion.
+
+Follow-up on 2026-09-29, user-reported: the enlarged preview stayed open throughout Save to
+Shelf's flight, the image landed in Shelf, and Peek closed automatically roughly 1–1.5 seconds
+later. This closes the normal Shelf-delivery and retention-through-landing checks for the
+exercised configuration. The delay was estimated, and the dock edge, display, and auto-hide
+setting were not recorded. The user separately confirmed that Peek dismisses when the pointer
+moves away, closing that check for the exercised configuration. Other configurations and the
+remaining failure and accessibility scenarios above are still open.

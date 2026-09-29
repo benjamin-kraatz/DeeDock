@@ -159,11 +159,14 @@ struct WindowMarkupTests {
         #expect(WindowMarkupGeometry.hit(CGPoint(x: 305, y: 255), in: marks + [cover], metrics: metrics) == cover.id)
     }
 
-    @Test("Metrics scale with the picture so marks read the same on small and large captures")
+    @Test("Marks scale proportionally above the readability floor and remain usable on small captures")
     func metricsScale() {
         let small = WindowMarkupMetrics(documentSize: CGSize(width: 400, height: 300))
+        let medium = WindowMarkupMetrics(documentSize: CGSize(width: 1600, height: 1200))
         let large = WindowMarkupMetrics(documentSize: CGSize(width: 4000, height: 3000))
-        #expect(large.penWidth(.regular) > small.penWidth(.regular) * 5)
+        #expect(abs(large.penWidth(.regular) / 3000 - medium.penWidth(.regular) / 1200) < 0.000_001)
+        #expect(small.penWidth(.regular) >= 3)
+        #expect(large.penWidth(.regular) > small.penWidth(.regular))
         #expect(small.penWidth(.bold) > small.penWidth(.thin))
         #expect(small.pixelBlock >= 8)
     }
@@ -178,7 +181,12 @@ struct WindowMarkupTests {
         #expect(frame.width >= WindowMarkupLayout.minimumSize.width && frame.height >= WindowMarkupLayout.minimumSize.height)
         #expect(abs(frame.midX - visible.midX) < 1 && abs(frame.midY - visible.midY) < 1)
         let tiny = WindowMarkupLayout.panelFrame(documentSize: CGSize(width: 200, height: 100), visibleFrame: visible)
-        #expect(tiny.size.width == WindowMarkupLayout.minimumSize.width)
+        let sameAspect = WindowMarkupLayout.panelFrame(documentSize: CGSize(width: 2000, height: 1000), visibleFrame: visible)
+        // Opening geometry depends on aspect ratio and screen space, not capture resolution.
+        #expect(tiny == sameAspect)
+        #expect(visible.contains(tiny))
+        #expect(tiny.width >= WindowMarkupLayout.minimumSize.width && tiny.height >= WindowMarkupLayout.minimumSize.height)
+        #expect(abs(tiny.midX - visible.midX) < 1 && abs(tiny.midY - visible.midY) < 1)
     }
 
     @Test("The picture is aspect-fitted and centred in the stage")
