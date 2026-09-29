@@ -63,6 +63,16 @@ final class FolderStackCoordinator {
         next.state.copyFailed = { [weak panel] message in panel?.store.errorMessage = .folderDropError(message) }
         panel.holdPopover(true)
         presenter.didOpen(.folderStack)
+        next.state.stageOnShelf = { [weak next, weak panel] entry in
+            guard let next, let panel, let lease = next.state.dragLease() else { return }
+            // Keep the parent scope alive until the Shelf has saved the child's bookmark.
+            let access = DocumentResourceAccess([entry.url], retaining: [lease])
+            if !panel.store.stageOnShelf(access), let message = panel.store.errorMessage {
+                next.state.report(String(localized: message)) { [weak next] in
+                    next?.state.stageOnShelf?(entry)
+                }
+            }
+        }
         next.state.openEntry = { [weak next] in next?.open($0) }
         next.state.presentationChanged = { [weak panel] in panel?.store.setFolderPresentation($0, for: reference.id) == true }
         next.state.dragCompleted = { [weak next] accepted in

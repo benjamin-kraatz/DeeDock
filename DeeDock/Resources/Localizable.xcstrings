@@ -14721,6 +14721,24 @@
         }
       }
     },
+    "folderItemAddToShelf" : {
+      "comment" : "Context menu and accessibility action to stage a file or folder reference on the Shelf without moving or copying it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ablage legen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Shelf"
+          }
+        }
+      }
+    },
     "folderItemShare" : {
       "comment" : "Opens native macOS sharing destinations for the selected folder stack file or folder.",
       "extractionState" : "manual",

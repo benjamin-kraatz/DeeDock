@@ -61,6 +61,10 @@ struct DockFolderButton: View {
         .accessibilityActions {
             Button(.folderStackOpen) { primaryAction() }
             if item.isAvailable { Button(.folderStackShowInFinder) { interaction.revealFolder?(item) } }
+            if item.isAvailable {
+                Button(.folderItemAddToShelf) { interaction.stageFolderOnShelf?(item) }
+                    .disabled(interaction.stageFolderOnShelf == nil)
+            }
             Button(item.reference.presentation == .grid ? .folderStackUseList : .folderStackUseGrid) {
                 interaction.setFolderPresentation?(item.reference.id, item.reference.presentation == .grid ? .list : .grid)
             }

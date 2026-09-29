@@ -242,17 +242,25 @@ struct FolderStackView: View {
         .accessibilityHint(Text(entry.reference.isFolder ? .folderStackBrowseHint : .folderStackOpenHint))
         .accessibilityAddTraits(state.selectedID == entry.id ? .isSelected : [])
         .contextMenu {
+            Button(.actionOpen, systemImage: "arrow.up.forward.app") { state.openEntry?(entry.reference) }
+            Button(.filePreviewAction, systemImage: "eye") { state.showPreview(entry.reference) }
+            Button(.folderStackShowInFinder, systemImage: "finder") {
+                NSWorkspace.shared.activateFileViewerSelecting([entry.reference.url])
+            }
+            Divider()
+            Button(.folderItemAddToShelf, systemImage: "tray.and.arrow.down") {
+                state.stageOnShelf?(entry.reference)
+            }
+            .disabled(state.stageOnShelf == nil)
             ShareLink(item: entry.reference.url) {
                 Label(.folderItemShare, systemImage: "square.and.arrow.up")
             }
-            Button(.filePreviewAction) { state.showPreview(entry.reference) }
-            Button(.folderStackShowInFinder) { NSWorkspace.shared.activateFileViewerSelecting([entry.reference.url]) }
         }
         .accessibilityActions {
             Button(.filePreviewAction) { state.showPreview(entry.reference) }
-            Button(.actionOpen) {
-                state.openEntry?(entry.reference)
-            }
+            Button(.actionOpen) { state.openEntry?(entry.reference) }
+            Button(.folderItemAddToShelf) { state.stageOnShelf?(entry.reference) }
+                .disabled(state.stageOnShelf == nil)
         }
         .modifier(QuarantineItemModifier(id: entry.reference.url.standardizedFileURL.path,
                                          url: entry.reference.url, name: entry.reference.name))

@@ -35,6 +35,8 @@ struct FolderContextMenuBridge: NSViewRepresentable {
             let menu = NSMenu(); menu.delegate = self
             add(.folderStackOpen, action: #selector(openStack), symbol: "square.grid.2x2", to: menu, enabled: item.isAvailable)
             add(.folderStackShowInFinder, action: #selector(showInFinder), symbol: "finder", to: menu, enabled: item.isAvailable)
+            add(.folderItemAddToShelf, action: #selector(stageOnShelf), symbol: "tray.and.arrow.down", to: menu,
+                enabled: item.isAvailable && interaction?.stageFolderOnShelf != nil)
             menu.addItem(.separator())
             add(.folderStackGrid, action: #selector(useGrid), symbol: "square.grid.2x2", to: menu,
                 state: item.reference.presentation == .grid ? .on : .off)
@@ -42,15 +44,17 @@ struct FolderContextMenuBridge: NSViewRepresentable {
                 state: item.reference.presentation == .list ? .on : .off)
             menu.addItem(.separator())
             let vertical = interaction?.layout.edge.isVertical == true
-            add(vertical ? .actionMoveUp : .actionMoveLeft, action: #selector(movePrevious), to: menu,
+            add(vertical ? .actionMoveUp : .actionMoveLeft, action: #selector(movePrevious), symbol: vertical ? "arrow.up" : "arrow.left", to: menu,
                 enabled: (item.isDownloads ? interaction?.canMoveUtility : interaction?.canMovePin)?(item.id, -1) == true)
-            add(vertical ? .actionMoveDown : .actionMoveRight, action: #selector(moveNext), to: menu,
+            add(vertical ? .actionMoveDown : .actionMoveRight, action: #selector(moveNext), symbol: vertical ? "arrow.down" : "arrow.right", to: menu,
                 enabled: (item.isDownloads ? interaction?.canMoveUtility : interaction?.canMovePin)?(item.id, 1) == true)
             if !item.isDownloads, let destinations = interaction?.pinDestinations, !destinations.isEmpty {
                 let parent = NSMenuItem(title: String(localized: .actionPinOnDisplay), action: nil, keyEquivalent: "")
+                parent.image = NSImage(systemSymbolName: "display", accessibilityDescription: nil)
                 let submenu = NSMenu()
                 for destination in destinations {
                     let child = NSMenuItem(title: destination.name, action: #selector(copyToDisplay(_:)), keyEquivalent: "")
+                    child.image = NSImage(systemSymbolName: "display", accessibilityDescription: nil)
                     child.target = self; child.representedObject = destination.id; submenu.addItem(child)
                 }
                 parent.submenu = submenu; menu.addItem(parent)
@@ -75,6 +79,7 @@ struct FolderContextMenuBridge: NSViewRepresentable {
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
         @objc private func openStack() { if let item { interaction?.openFolder?(item, false) } }
+        @objc private func stageOnShelf() { if let item { interaction?.stageFolderOnShelf?(item) } }
         @objc private func showInFinder() { if let item { interaction?.revealFolder?(item) } }
         @objc private func useGrid() { if let item { interaction?.setFolderPresentation?(item.reference.id, .grid) } }
         @objc private func useList() { if let item { interaction?.setFolderPresentation?(item.reference.id, .list) } }

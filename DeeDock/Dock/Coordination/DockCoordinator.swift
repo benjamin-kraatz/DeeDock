@@ -561,6 +561,15 @@ final class DockCoordinator {
                 if !folder.isDownloads { pinWeather.recordUse(folder.id) }
                 folderStacks.show(folder, on: panel, keyboard: keyboard)
             }
+            panel.interaction.stageFolderOnShelf = { [weak panel] folder in
+                guard let panel, folder.isAvailable else { return }
+                let access = FolderResourceAccess(folder.reference)
+                guard access.isAvailable else {
+                    panel.store.errorMessage = .folderStackUnavailable
+                    return
+                }
+                panel.store.stageOnShelf(DocumentResourceAccess([access.url], retaining: [access]))
+            }
             panel.interaction.revealFolder = { [weak self, weak panel] folder in
                 guard folder.isAvailable else { return }
                 if !folder.isDownloads { self?.pinWeather.recordUse(folder.id) }

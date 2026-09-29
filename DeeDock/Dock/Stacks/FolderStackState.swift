@@ -36,6 +36,7 @@ final class FolderStackState {
     var selectedID: String?
     var presentationFocused = false
     var chrome = DockPopoverChrome(edge: .bottom, attachment: DockPopoverGeometry.idealSize.width / 2)
+    @ObservationIgnored var stageOnShelf: ((FolderStackEntryReference) -> Void)?
     @ObservationIgnored var openEntry: ((FolderStackEntryReference) -> Void)?
     @ObservationIgnored var presentationChanged: ((FolderStackPresentation) -> Bool)?
     @ObservationIgnored var dragCompleted: ((Bool) -> Void)?
@@ -535,6 +536,6 @@ final class FolderStackState {
         preview = nil
         copyFailed = nil
         sortChanged = nil
-        openEntry = nil; presentationChanged = nil; dragCompleted = nil
+        openEntry = nil; stageOnShelf = nil; presentationChanged = nil; dragCompleted = nil
     }
 }

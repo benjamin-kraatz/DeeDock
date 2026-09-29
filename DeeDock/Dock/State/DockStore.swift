@@ -262,17 +262,23 @@ final class DockStore {
 
     // MARK: - Shelf
 
-    /// Stages a user-supplied Finder batch. The files themselves are never moved or copied.
-    func stageOnShelf(_ access: DocumentResourceAccess) {
+    /// Stages file references without moving or copying files. Returns false on failure.
+    @discardableResult
+    func stageOnShelf(_ access: DocumentResourceAccess) -> Bool {
         guard let shelf else {
             errorMessage = .shelfUnavailable
-            return
+            return false
         }
         do {
             let rejected = try shelf.add(access.urls)
-            if rejected > 0 { errorMessage = .shelfFull(limit: ShelfDocument.capacity) }
+            if rejected > 0 {
+                errorMessage = .shelfFull(limit: ShelfDocument.capacity)
+                return false
+            }
+            return true
         } catch {
             errorMessage = .errorSaveShelf(details: error.localizedDescription)
+            return false
         }
     }
 
