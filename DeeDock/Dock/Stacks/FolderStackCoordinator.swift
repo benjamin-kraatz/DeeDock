@@ -8,6 +8,10 @@ final class FolderStackCoordinator {
     private var controller: FolderStackPanelController?
     private var displayID: String?
     private var folderID: UUID?
+    /// The tile the open stack points at. A folder's own tile unless the caller named another,
+    /// such as a volume showing its root.
+    private var anchorTarget: DockEntryID?
+    private var folderURL: URL?
     private var springOpened = false
     private var springCleanup: Task<Void, Never>?
     private weak var sourcePanel: DockPanelController?
@@ -21,7 +25,10 @@ final class FolderStackCoordinator {
         presenter.register(.folderStack) { [weak self] in self?.close(returnFocus: false) }
     }
 
-    func show(_ folder: FolderDockItem, on panel: DockPanelController, keyboard: Bool, spring: Bool = false) {
+    /// - Parameter target: The tile to attach to. Defaults to the folder's own tile.
+    func show(_ folder: FolderDockItem, on panel: DockPanelController, keyboard: Bool, spring: Bool = false,
+              anchoredTo target: DockEntryID? = nil) {
+        let target = target ?? .folder(folder.reference.id)
         guard !QuarantineStore.shared.contains(folder.id, url: folder.reference.url),
               !QuarantineStore.shared.unreadable else {
             panel.store.errorMessage = .quarantineBlocked
@@ -35,7 +42,7 @@ final class FolderStackCoordinator {
         }
         close(returnFocus: false)
         presenter.prepareToOpen(.folderStack)
-        guard folder.isAvailable, let anchor = panel.popoverAnchor(for: .folder(folder.reference.id)) else {
+        guard folder.isAvailable, let anchor = panel.popoverAnchor(for: target) else {
             panel.store.errorMessage = .folderStackUnavailable
             return
         }
@@ -57,6 +64,8 @@ final class FolderStackCoordinator {
         next.state.sortChanged = { UserDefaults.standard.set($0.rawValue, forKey: sortKey) }
         displayID = panel.store.displayID
         folderID = reference.id
+        anchorTarget = target
+        folderURL = reference.url.standardizedFileURL
         sourcePanel = panel
         controller = next
         springOpened = spring
@@ -82,7 +91,8 @@ final class FolderStackCoordinator {
             let sourceID = panel?.store.displayID
             panel?.holdPopover(false)
             self?.presenter.didClose(.folderStack)
-            self?.controller = nil; self?.displayID = nil; self?.folderID = nil; self?.sourcePanel = nil
+            self?.controller = nil; self?.displayID = nil; self?.folderID = nil
+            self?.anchorTarget = nil; self?.folderURL = nil; self?.sourcePanel = nil
             if returnFocus { panel?.focus() }
             else if keyboard, let sourceID { self?.keyboardDismissed?(sourceID) }
         }
@@ -108,12 +118,22 @@ final class FolderStackCoordinator {
     }
 
     func reanchor() {
-        guard let controller, let sourcePanel, let folderID,
-              let anchor = sourcePanel.popoverAnchor(for: .folder(folderID)) else {
+        guard let controller, let sourcePanel, let anchorTarget,
+              let anchor = sourcePanel.popoverAnchor(for: anchorTarget) else {
             close(returnFocus: false)
             return
         }
         controller.update(anchor)
+    }
+
+    /// Closes the stack when it shows `url` or anything inside it. Its directory watcher holds the
+    /// folder open, which would make an unmount of that volume fail.
+    func close(within url: URL) {
+        let root = url.standardizedFileURL.path
+        guard let folderURL else { return }
+        let path = folderURL.path
+        guard path == root || path.hasPrefix(root.hasSuffix("/") ? root : root + "/") else { return }
+        close(returnFocus: false)
     }
 
     func close(for displayID: String? = nil, returnFocus: Bool = false) {

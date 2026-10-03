@@ -71,6 +71,15 @@ final class DockInteraction {
     @ObservationIgnored var openTrash: (() -> Void)?
     @ObservationIgnored var emptyTrash: (() -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    /// Opens a volume's contents as a stack.
+    @ObservationIgnored var openVolume: ((VolumeDockItem) -> Void)?
+    /// Opens the volume in a Finder window.
+    @ObservationIgnored var revealVolume: ((VolumeDockItem) -> Void)?
+    /// Starts an eject, including any confirmation the volume needs.
+    @ObservationIgnored var ejectVolume: ((VolumeDockItem) -> Void)?
+    /// Reports the volume tile under the pointer, or nil when the pointer leaves it.
+    @ObservationIgnored var volumeHoverChanged: ((VolumeDockItem?) -> Void)?
+    @ObservationIgnored var beginVolumeDrag: ((VolumeDockItem, NSView, NSEvent) -> Void)?
     @ObservationIgnored var pasteToShelf: (() -> Void)?
     @ObservationIgnored var canPasteToShelf: (() -> Bool)?
     @ObservationIgnored var openSessionCapsules: (() -> Void)?

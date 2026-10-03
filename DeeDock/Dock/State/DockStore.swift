@@ -39,6 +39,8 @@ final class DockStore {
     @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    /// Opens a volume's contents as a stack. The flag is true for keyboard activation.
+    @ObservationIgnored var openVolume: ((VolumeDockItem, Bool) -> Void)?
     @ObservationIgnored var openSessionCapsules: (() -> Void)?
     @ObservationIgnored var openSessionCapsule: ((UUID) -> Void)?
     /// Presentation pins. Historical preview replaces this list without touching persistence.
@@ -57,9 +59,11 @@ final class DockStore {
     @ObservationIgnored private let profiles: DisplayProfilesStore
     @ObservationIgnored private let trash: TrashController?
     @ObservationIgnored private let shelf: ShelfController?
+    @ObservationIgnored private let volumes: VolumeController?
     @ObservationIgnored private let capsules: SessionCapsuleController?
     @ObservationIgnored private var showsTrash = true
     @ObservationIgnored private var showsShelf = true
+    @ObservationIgnored private var volumeVisibility = VolumeVisibility.hidden
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
@@ -86,7 +90,7 @@ final class DockStore {
     @ObservationIgnored private let pinWeather: PinWeatherStore?
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
-         trash: TrashController? = nil, shelf: ShelfController? = nil,
+         trash: TrashController? = nil, shelf: ShelfController? = nil, volumes: VolumeController? = nil,
          capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil,
          focusSession: FocusSessionController? = nil, history: DockLocalHistoryStore? = nil,
          pinWeather: PinWeatherStore? = nil) {
@@ -97,6 +101,7 @@ final class DockStore {
         self.profiles = profiles
         self.trash = trash
         self.shelf = shelf
+        self.volumes = volumes
         self.capsules = capsules
         self.history = history
         self.pinWeather = pinWeather
@@ -189,11 +194,12 @@ final class DockStore {
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
+                                                  volumes: volumes?.items.filter { volumeVisibility.includes($0.kind) } ?? [],
                                                   trash: showsTrash ? trash?.item : nil)
         content.insert(contentsOf: pairs.flatMap { pair in pair.applicationIDs.indices.map { DockRenderSlot.melt(pair, $0) } },
                        at: content.firstIndex(where: \.isUtility) ?? content.count)
         let downloads = DockRenderSlot.folder(DownloadsDockItem.item(displayID: displayID))
-        let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.trash != nil } ?? content.count
+        let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.volume != nil || $0.trash != nil } ?? content.count
         content.insert(downloads, at: insertion)
         let order = utilityOrder
         let positions = content.indices.filter { content[$0].movableUtilityID != nil }
@@ -251,6 +257,12 @@ final class DockStore {
     func configureShelf(_ visible: Bool) {
         guard showsShelf != visible else { return }
         showsShelf = visible
+        refreshEntries()
+    }
+
+    func configureVolumes(_ visibility: VolumeVisibility) {
+        guard volumeVisibility != visibility else { return }
+        volumeVisibility = visibility
         refreshEntries()
     }
 
@@ -409,6 +421,11 @@ final class DockStore {
     }
 
     func setFolderPresentation(_ presentation: FolderStackPresentation, for id: UUID) -> Bool {
+        if let volume = volumes?.items.first(where: { $0.stackID == id }) {
+            UserDefaults.standard.set(presentation.rawValue,
+                                      forKey: VolumeStackIdentity.presentationKey(displayID: displayID, stackID: volume.stackID))
+            return true
+        }
         if id == DownloadsDockItem.id {
             UserDefaults.standard.set(presentation.rawValue, forKey: "downloadsPresentation.\(displayID)")
             refreshEntries()
@@ -519,6 +536,7 @@ final class DockStore {
         case .sessionCapsule(let item): openSessionCapsule?(item.capsuleID)
         case .sessionCapsules: openSessionCapsules?()
         case .shelf: openShelf?()
+        case .volume(let item): openVolume?(item, keyboardFocus)
         case .trash: openTrash()
         case .gap: break
         }
@@ -528,5 +546,5 @@ final class DockStore {
     func stop() {
         if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
         stampObserver = nil
-        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

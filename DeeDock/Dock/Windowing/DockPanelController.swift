@@ -17,6 +17,7 @@ final class DockPanelController {
     private var pickerHeld = false
     private var popoverHeld = false
     private var windowPeekHeld = false
+    private var volumeCardHeld = false
     private var modePickerHeld = false
     private var lastDisplay: DisplaySnapshot?
     private var lastSettings: DockSettings?
@@ -127,6 +128,7 @@ final class DockPanelController {
         store.configureLauncherPosition(settings.launcherAtStart)
         store.configureSessionCapsules(settings.showSessionCapsules)
         store.configureTrash(settings.showTrash)
+        store.configureVolumes(VolumeVisibility(settings: settings))
         interaction.confirmsTrashEmpty = settings.confirmBeforeEmptyingTrash
         interaction.tooltipPreset = settings.tooltipPreset
         let exposedIDs = Set(store.entries.compactMap(\.target).map(\.hitID))
@@ -223,14 +225,14 @@ final class DockPanelController {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
-        let suppress = pickerHeld || popoverHeld || windowPeekHeld || modePickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+        let suppress = pickerHeld || popoverHeld || windowPeekHeld || volumeCardHeld || modePickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
             || timelineHeld
             || (visibility.phase != .visible && visibility.phase != .hideDelay)
         if suppress != interaction.suppressTooltips {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = pickerHeld || popoverHeld || windowPeekHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
+        let held = pickerHeld || popoverHeld || windowPeekHeld || volumeCardHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
         // Tooltips are absent from `rects`, so their transparent reservation stays excluded.
@@ -282,6 +284,10 @@ final class DockPanelController {
         interaction.beginFolderDrag = { [weak self, weak coordinator] item, view, event in
             guard self?.interaction.timeline?.isActive != true else { return }
             coordinator?.begin(item, from: id, view: view, event: event)
+        }
+        interaction.beginVolumeDrag = { [weak self, weak coordinator] item, view, event in
+            guard self?.interaction.timeline?.isActive != true else { return }
+            coordinator?.beginVolume(item, from: id, view: view, event: event)
         }
         interaction.scrollChanged = { [weak coordinator] in coordinator?.geometryChanged() }
         interaction.geometryDidChange = { [weak self, weak coordinator] in
@@ -471,6 +477,17 @@ final class DockPanelController {
         if held { visibility.showImmediately(); interaction.tooltips.clear() }
         updatePointer()
     }
+
+    /// Held while a volume card is showing over this display, so the dock stays revealed under it.
+    func holdVolumeCard(_ held: Bool) {
+        guard volumeCardHeld != held else { return }
+        volumeCardHeld = held
+        if held { visibility.showImmediately(); interaction.tooltips.clear() }
+        updatePointer()
+    }
+
+    /// The settings this dock last rendered with, or nil before its first update or after stop.
+    var currentSettings: DockSettings? { stopped ? nil : lastSettings }
 
     func holdModePicker(_ held: Bool) {
         modePickerHeld = held
@@ -684,6 +701,8 @@ final class DockPanelController {
         interaction.openBadgeMemory = nil
         interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil; interaction.stageFolderOnShelf = nil
         interaction.openTrash = nil; interaction.emptyTrash = nil
+        interaction.openVolume = nil; interaction.revealVolume = nil; interaction.ejectVolume = nil
+        interaction.volumeHoverChanged = nil; interaction.beginVolumeDrag = nil
         interaction.openFocusSession = nil
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
         interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil
@@ -702,7 +721,7 @@ final class DockPanelController {
         interaction.sims = nil
         windowSearchRequested = nil
         modePickerRequested = nil
-        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; modePickerHeld = false
+        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; volumeCardHeld = false; modePickerHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }
 }

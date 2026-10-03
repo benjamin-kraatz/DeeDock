@@ -159,7 +159,7 @@ struct DockSettingsView: View {
         let value = context.source().value
         let isOn: Bool
         switch page {
-        case .shelfAndTrash: isOn = value.showShelf || value.showTrash
+        case .shelfAndTrash: isOn = value.showShelf || value.showTrash || value.showVolumes
         case .capsules: isOn = value.showSessionCapsules
         case .badges: isOn = value.showAppBadges
         case .windowPeek: isOn = value.windowPeekEnabled

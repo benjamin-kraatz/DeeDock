@@ -26,7 +26,7 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case launcher, focus, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, trash
+    case launcher, focus, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, volume(String), trash
     var hitID: String {
         switch self {
         case .melt(let id): "melt:\(id.uuidString)"
@@ -39,6 +39,7 @@ enum DockEntryID: Hashable {
         case .sessionCapsule(let id): "session-capsule:\(id.uuidString)"
         case .sessionCapsules: "session-capsules"
         case .shelf: "shelf"
+        case .volume(let id): "volume:\(id)"
         case .trash: "trash"
         }
     }
@@ -67,7 +68,7 @@ enum DockSectionProjection {
                         actions: [ActionDockItem] = [], focus: FocusDockItem? = nil,
                         sessionCapsules: [SessionCapsuleDockItem] = [],
                         capsules: CapsuleDockItem? = nil, shelf: ShelfDockItem? = nil,
-                        trash: TrashDockItem? = nil) -> [DockRenderSlot] {
+                        volumes: [VolumeDockItem] = [], trash: TrashDockItem? = nil) -> [DockRenderSlot] {
         let pinned: [DockRenderSlot]
         if let pins {
             let applications = Dictionary(uniqueKeysWithValues: items.filter(\.isFavorite).map { ($0.reference.id, $0) })
@@ -91,10 +92,11 @@ enum DockSectionProjection {
             }
             return entries
         }
-        // Utility tiles trail every application, sharing one divider.
+        // Utility tiles trail every application, sharing one divider. Volumes sit next to Trash,
+        // where the system Dock kept removable media.
         return applications + actions.map(DockRenderSlot.action) + (focus.map { [.focus($0)] } ?? []) + sessionCapsules.map(DockRenderSlot.sessionCapsule)
             + (capsules.map { [.sessionCapsules($0)] } ?? [])
-            + (shelf.map { [.shelf($0)] } ?? []) + (trash.map { [.trash($0)] } ?? [])
+            + (shelf.map { [.shelf($0)] } ?? []) + volumes.map(DockRenderSlot.volume) + (trash.map { [.trash($0)] } ?? [])
     }
 
     /// Retains identity, then the disappearing app's group control, then the nearest surviving entry.

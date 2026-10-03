@@ -131,6 +131,17 @@ struct DockEntryView: View {
                 }
             )
             .modifier(DockTileArrivalBounce(hitID: DockEntryID.shelf.hitID, interaction: interaction))
+        case .volume(let item):
+            DockVolumeButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.volume(item.volumeID).hitID, $0)
+                }
+            )
         case .trash(let item):
             DockTrashButton(
                 item: item,
