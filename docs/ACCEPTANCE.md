@@ -38,6 +38,17 @@ The list follows NSWorkspace mount, unmount, and rename notifications. Nothing p
   name with Show in Finder for their program file. Each app gets Show and Quit, and the eject retries once every quit app has
   exited. Try Again and Eject Anyway (forced through Disk Arbitration) are also offered.
   Eject Anyway asks first.
+- **File drops:** dragging files onto a drive tile highlights it and shows a label beside the
+  cursor, “Copy to “Stick”” with a “⇧ Move” hint. Holding Shift switches the label to an orange
+  “Move to “Stick””. Dropping copies or moves into the drive's root; the drive's stack opens to
+  show progress and errors. ⌘ drags (move-only from Finder) are refused with the dock's
+  rejection message, and ⌥ keeps a copy. Names already on the drive refuse the batch, so nothing
+  is overwritten.
+- **Spring-loading:** resting on a drive tile during a file drag opens its stack. Resting on a
+  folder inside opens it, as far down as the folders go. In a drive's stack the back button
+  widens to name the parent while a drag is over the stack; dropping on it lands in the parent,
+  and resting on it climbs one level. Pinned-folder stacks keep copy-only drops and a plain back
+  button.
 - **Hard disks:** “Ask before ejecting hard disks” (on by default) asks in the card before
   ejecting a fixed external disk. Removable media ejects right away. If the tile is scrolled out of view,
   the card has nowhere to attach, so a system alert asks instead.
@@ -84,6 +95,11 @@ previews, app launch, and hands-on interaction were not run.
   Close it after a refusal, hover the tile during a slow eject, and confirm it shows “Ejecting…”.
 - Confirm a refusal caused by a system process shows its name, “macOS system process”, and
   Show in Finder.
+- Drag files from Finder onto a stick tile: confirm the highlight, the cursor label, and that
+  Shift flips it to Move while the pointer is still. Drop with and without Shift; confirm the
+  source stays or leaves. Drop a name that already exists and confirm nothing is replaced.
+- Rest on the tile until the stack opens, spring two folders deep, climb back with the back
+  button, and drop at each level. Confirm a ⌘ drag shows the rejection and drops nothing.
 - Check Reduce Motion (fades instead of springs), Reduce Transparency (opaque card), German
   copy, left, right, and top dock edges, and sleep/wake with a volume attached.
 

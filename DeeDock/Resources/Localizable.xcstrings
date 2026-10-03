@@ -46094,6 +46094,78 @@
           }
         }
       }
+    },
+    "dropHintCopy" : {
+      "comment": "Label beside the cursor and above the dock while files are dragged over a drive or a folder in its stack. destination is a volume or folder name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach „%1$(destination)@“ kopieren"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy to “%1$(destination)@”"
+          }
+        }
+      }
+    },
+    "dropHintMove" : {
+      "comment": "Label beside the cursor and above the dock while files are dragged over a drive with Shift held. destination is a volume or folder name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach „%1$(destination)@“ verschieben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move to “%1$(destination)@”"
+          }
+        }
+      }
+    },
+    "dropHintShiftToMove" : {
+      "comment": "Small key hint in the cursor label: hold Shift to move instead of copy. Keep it very short.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧ Verschieben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧ Move"
+          }
+        }
+      }
+    },
+    "folderDrop.moveHere" : {
+      "comment": "Caption at the bottom of a drive's stack while files dragged over it will be moved.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Ordner verschieben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move into Folder"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

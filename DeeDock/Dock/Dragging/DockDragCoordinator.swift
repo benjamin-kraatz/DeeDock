@@ -25,6 +25,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var shelfDestinationID: String?
     private var actionDestination: (String, UUID)?
     private var folderDestination: (String, FolderDockItem)?
+    /// A volume tile under a file drag: drop copies (Shift moves), dwell opens its stack.
+    private var volumeDestination: (String, VolumeDockItem)?
+    /// The external source's latest operation mask, recorded by native destination callbacks so
+    /// pointer-driven updates decide copy or move exactly as the drop will.
+    private var sourceMask: NSDragOperation = []
     private var launcherDestinationID: String?
     private var meltDestination: (String, ApplicationReference, ApplicationReference)?
     private var meltHoverID: String?
@@ -32,6 +37,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var meltApplications: ((ApplicationReference, ApplicationReference) -> Void)?
     var openSpringFolder: ((FolderDockItem, DockPanelController) -> Void)?
     var dropInFolder: ((NSDraggingInfo, FolderDockItem, DockPanelController) -> Bool)?
+    var openSpringVolume: ((VolumeDockItem, DockPanelController) -> Void)?
+    var dropInVolume: ((NSDraggingInfo, VolumeDockItem, DockPanelController) -> Bool)?
     var springDragEnded: (() -> Void)?
     /// Ejects a volume dropped outside the docks. Receives the panel the drag started on.
     var ejectVolume: ((VolumeDockItem, DockPanelController) -> Void)?
@@ -179,6 +186,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
 
     func entered(_ info: NSDraggingInfo, on displayID: String) -> NSDragOperation {
         nativeDisplayID = displayID
+        sourceMask = info.draggingSourceOperationMask
         guard validates(info.draggingPasteboard) else { return [] }
         nativeDisplayID = displayID // Loading a new payload clears the preceding session.
         update(at: NSEvent.mouseLocation)
@@ -191,6 +199,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if actionDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if launcherDestinationID == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
+        if volumeDestination?.0 == displayID { return FolderFileDrop.operation(info, allowsMove: true) }
         if shelfDestinationID == displayID { return .copy }
         // Removing a staged reference is a discard, not a file operation, but the poof cursor is right.
         if trashDestinationID == displayID {
@@ -256,6 +265,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if accepted { completion.committed = true; cancel() }
             return accepted
         }
+        if let (id, volume) = volumeDestination, id == displayID, let panel = panels[id] {
+            let accepted = dropInVolume?(info, volume, panel) ?? false
+            if accepted { completion.committed = true; cancel() }
+            return accepted
+        }
         if shelfDestinationID == displayID, let access = payload.stageableItems,
            let panel = panels[displayID] {
             completion.committed = true
@@ -315,6 +329,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     func springTarget(_ info: NSDraggingInfo, on displayID: String) -> String? {
         guard !entered(info, on: displayID).isEmpty else { return nil }
         if let (id, folder) = folderDestination { return id + folder.reference.id.uuidString }
+        if let (id, volume) = volumeDestination { return id + volume.id }
         // App icons use Peek's own cancellable dwell, without AppKit spring activation.
         return nil
     }
@@ -322,13 +337,15 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     func springActivate(_ info: NSDraggingInfo, on displayID: String) {
         guard springTarget(info, on: displayID) != nil, let panel = panels[displayID] else { return }
         if let (_, folder) = folderDestination { openSpringFolder?(folder, panel) }
+        if let (_, volume) = volumeDestination { openSpringVolume?(volume, panel) }
         // File drags over apps use the deliberate Peek dwell. Native spring loading must
         // never activate an app while the user is still deciding where to send the files.
     }
 
     func springHighlight(_ info: NSDraggingInfo, on displayID: String) {
         guard let panel = panels[displayID] else { return }
-        panel.interaction.springEmphasized = documentDrag.displayID == displayID && info.springLoadingHighlight == .emphasized
+        let targeted = documentDrag.displayID == displayID || volumeDestination?.0 == displayID
+        panel.interaction.springEmphasized = targeted && info.springLoadingHighlight == .emphasized
     }
 
     /// Peek accepts only the already-validated native session. Private pins and replacement
@@ -474,6 +491,14 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         defer { updating = false }
         let point = magnetizedPoint(rawPoint)
         destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; launcherDestinationID = nil
+        panels.values.forEach { $0.interaction.volumeTargetID = nil }
+        let hadVolumeDestination = volumeDestination != nil
+        volumeDestination = nil
+        defer {
+            // The cursor hint belongs to the volume tile while it is the target, and to a stack's
+            // own targets otherwise; release it only when this tile stops being the target.
+            if hadVolumeDestination, volumeDestination == nil { DockDropHintController.shared.hide() }
+        }
         unpinDestinationID = nil
         meltDestination = nil
         let candidate = panels.values.first { $0.containsDragRegion(point) }
@@ -567,6 +592,40 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 panel.updateSectionDragHover(at: point, valid: false)
                 panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
                                           message: targeted ? .actionsDrop : nil)
+            }
+            updateScrollTimer()
+            return
+        }
+        if sourceID == nil, payload.isReady, payload.stageableItems != nil,
+           let candidate, candidate.store.displayID == nativeDisplayID,
+           let volume = candidate.volumeTarget(at: point) {
+            let operation = FolderFileDrop.operation(mask: sourceMask, allowsMove: true)
+            if operation.isEmpty {
+                // A move-only (⌘) drag cannot land here. Say so instead of offering a copy.
+                documentDrag.clear()
+                for panel in panels.values {
+                    let targeted = panel === candidate
+                    panel.updateSectionDragHover(at: point, valid: false)
+                    panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
+                                              message: targeted ? .dragRejected : nil)
+                }
+                updateScrollTimer()
+                return
+            }
+            volumeDestination = (candidate.store.displayID, volume)
+            documentDrag.clear()
+            let moving = operation == .move
+            DockDropHintController.shared.show(destination: volume.name, moving: moving, offersMove: true)
+            for panel in panels.values {
+                let targeted = panel === candidate
+                panel.interaction.documentTargetID = nil
+                panel.interaction.trashTargeted = false
+                panel.interaction.shelfTargeted = false
+                panel.interaction.volumeTargetID = targeted ? volume.id : nil
+                panel.updateSectionDragHover(at: point, valid: false)
+                panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
+                    message: targeted ? (moving ? .dropHintMove(destination: volume.name)
+                                                : .dropHintCopy(destination: volume.name)) : nil)
             }
             updateScrollTimer()
             return
@@ -746,6 +805,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             $0.interaction.springEmphasized = false
             $0.interaction.trashTargeted = false
             $0.interaction.shelfTargeted = false
+            $0.interaction.volumeTargetID = nil
             $0.setDragPresentation(proposal: nil, source: nil, targeted: false, message: nil)
             $0.endSectionDrag()
         }
@@ -769,6 +829,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
         unpinDestinationID = nil
         trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; shelfSourceIDs = []
+        if volumeDestination != nil { DockDropHintController.shared.hide() }
+        volumeDestination = nil; sourceMask = []
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }
         pasteboardChange = nil
         if revealAttachments { magneticAttachments.revealAfterDrag() }

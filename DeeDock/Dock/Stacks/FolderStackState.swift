@@ -13,6 +13,24 @@ final class FolderStackState {
     /// A native source must retain this lease even when another popover replaces its view.
     func dragLease() -> FolderResourceAccess? { access }
     var dropTargeted = false
+    /// Volume stacks move dropped files while Shift is held; other stacks always copy.
+    @ObservationIgnored var allowsMoveDrops = false
+    /// Volume stacks turn the back button into a drop and spring-loading target, so a drag that
+    /// sprang into a subfolder can climb out again. Other stacks keep a plain back button.
+    var springsUp = false
+    /// True while a file drag hovers the back button.
+    var upTargeted = false
+    /// True while the current drop target would move rather than copy, for the in-panel caption.
+    var dropMoving = false
+    /// True while a file drag is anywhere over this stack: its body, a folder row, or the back
+    /// button. The back button widens to name its destination meanwhile.
+    var dragInside = false
+    /// The parent a back step returns to, or nil at the stack's root.
+    var parentDirectory: URL? { history.last }
+    var parentName: String? {
+        guard let parent = history.last else { return nil }
+        return history.count == 1 ? folder.name : parent.lastPathComponent
+    }
     @ObservationIgnored var copyFailed: ((String) -> Void)?
     var directoryName: String { history.isEmpty ? folder.name : directory.lastPathComponent }
     private(set) var entries: [FolderStackEntry] = []
@@ -186,17 +204,37 @@ final class FolderStackState {
         preview = DockFilePreviewItem(url: entry.url, leases: [access])
     }
 
-    /// Copies into the current directory or an immediate folder child; never alters the source.
+    /// What a drop here does: copy, or move with Shift in a volume stack. Empty while busy.
+    func dropOperation(_ info: NSDraggingInfo) -> NSDragOperation {
+        guard !copying else { return [] }
+        return FolderFileDrop.operation(info, allowsMove: allowsMoveDrops)
+    }
+
+    /// Keeps the cursor hint and the in-panel caption in step with the target under the pointer.
+    /// Only volume stacks show the cursor hint; other stacks keep their original caption.
+    func dropTargetChanged(_ info: NSDraggingInfo?, destination: String) {
+        let operation = info.map(dropOperation) ?? []
+        dropMoving = operation == .move
+        dragInside = !operation.isEmpty
+        guard allowsMoveDrops else { return }
+        if operation.isEmpty { DockDropHintController.shared.hide() }
+        else { DockDropHintController.shared.show(destination: destination, moving: dropMoving, offersMove: true) }
+    }
+
+    /// Copies, or moves in a volume stack with Shift, into the current directory, an immediate
+    /// folder child, or a folder on the way back up. Copying never alters the source.
     func receive(_ info: NSDraggingInfo, into url: URL? = nil) -> Bool {
-        guard !copying, let urls = FolderFileDrop.urls(info), let access else { return false }
+        let operation = dropOperation(info)
+        dropTargetChanged(nil, destination: "")
+        guard !operation.isEmpty, let urls = FolderFileDrop.urls(info), let access else { return false }
         let destination = url ?? directory
-        guard destination == rootURL || destination == directory || entries.contains(where: {
+        guard destination == rootURL || destination == directory || history.contains(destination) || entries.contains(where: {
             $0.reference.url == destination && $0.reference.isFolder
         }) else { return false }
         receivedDrop = true
         copying = true
         let failure = copyFailed
-        FolderFileDrop.copy(urls, to: destination, lease: access) { [weak self] error in
+        FolderFileDrop.copy(urls, to: destination, lease: access, move: operation == .move) { [weak self] error in
             self?.copying = false
             self?.reload()
             if let error {

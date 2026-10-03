@@ -25,9 +25,12 @@ final class FolderStackCoordinator {
         presenter.register(.folderStack) { [weak self] in self?.close(returnFocus: false) }
     }
 
-    /// - Parameter target: The tile to attach to. Defaults to the folder's own tile.
+    /// - Parameters:
+    ///   - target: The tile to attach to. Defaults to the folder's own tile.
+    ///   - volumeRoot: Shows a mounted volume. Its stack moves drops with Shift and lets a drag
+    ///     climb back out through the back button; folder stacks keep plain copying.
     func show(_ folder: FolderDockItem, on panel: DockPanelController, keyboard: Bool, spring: Bool = false,
-              anchoredTo target: DockEntryID? = nil) {
+              anchoredTo target: DockEntryID? = nil, volumeRoot: Bool = false) {
         let target = target ?? .folder(folder.reference.id)
         guard !QuarantineStore.shared.contains(folder.id, url: folder.reference.url),
               !QuarantineStore.shared.unreadable else {
@@ -62,6 +65,8 @@ final class FolderStackCoordinator {
         let next = FolderStackPanelController(folder: reference, anchor: anchor, keyboard: keyboard,
                                               organizer: organizer, sort: sort)
         next.state.sortChanged = { UserDefaults.standard.set($0.rawValue, forKey: sortKey) }
+        next.state.allowsMoveDrops = volumeRoot
+        next.state.springsUp = volumeRoot
         displayID = panel.store.displayID
         folderID = reference.id
         anchorTarget = target
@@ -99,8 +104,9 @@ final class FolderStackCoordinator {
         next.show()
     }
 
-    func receive(_ info: NSDraggingInfo, folder: FolderDockItem, on panel: DockPanelController) -> Bool {
-        show(folder, on: panel, keyboard: false, spring: true)
+    func receive(_ info: NSDraggingInfo, folder: FolderDockItem, on panel: DockPanelController,
+                 anchoredTo target: DockEntryID? = nil, volumeRoot: Bool = false) -> Bool {
+        show(folder, on: panel, keyboard: false, spring: true, anchoredTo: target, volumeRoot: volumeRoot)
         return controller?.state.receive(info, into: controller?.state.rootURL) ?? false
     }
 

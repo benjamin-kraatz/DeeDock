@@ -91,7 +91,24 @@ final class VolumeDockCoordinator {
         guard !volume.isEjecting else { return }
         cards.dismiss()
         folderStacks.show(volume.stackItem(displayID: panel.store.displayID), on: panel, keyboard: keyboard,
-                          anchoredTo: .volume(volume.volumeID))
+                          anchoredTo: .volume(volume.volumeID), volumeRoot: true)
+    }
+
+    /// Spring-opens the volume's stack while files hover its tile, so they can be dropped deeper.
+    func springOpen(_ volume: VolumeDockItem, on panel: DockPanelController) {
+        guard !volume.isEjecting else { return }
+        cards.dismiss()
+        folderStacks.show(volume.stackItem(displayID: panel.store.displayID), on: panel, keyboard: false, spring: true,
+                          anchoredTo: .volume(volume.volumeID), volumeRoot: true)
+    }
+
+    /// Copies, or with Shift moves, files dropped on the tile into the volume's root. The stack
+    /// opens to show progress and any failure, as it does for a pinned folder.
+    func receive(_ info: NSDraggingInfo, volume: VolumeDockItem, on panel: DockPanelController) -> Bool {
+        guard !volume.isEjecting else { return false }
+        cards.dismiss()
+        return folderStacks.receive(info, folder: volume.stackItem(displayID: panel.store.displayID), on: panel,
+                                    anchoredTo: .volume(volume.volumeID), volumeRoot: true)
     }
 
     private func openInFinder(_ volume: VolumeDockItem) {

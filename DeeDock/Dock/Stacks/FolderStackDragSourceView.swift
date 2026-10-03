@@ -11,12 +11,17 @@ struct FolderStackDragSourceView: NSViewRepresentable {
     var navigate: () -> Void = {}
     var receive: (NSDraggingInfo) -> Bool = { _ in false }
     var acceptsDrop: () -> Bool = { false }
+    /// Copy or move for a drop on this folder row. Defaults to copy.
+    var operation: (NSDraggingInfo) -> NSDragOperation = { _ in .copy }
+    /// Reports the drag entering (with its info) or leaving (nil) this folder row.
+    var targetChanged: (NSDraggingInfo?) -> Void = { _ in }
 
     func makeNSView(context: Context) -> SourceView { SourceView() }
     func updateNSView(_ view: SourceView, context: Context) {
         view.entry = entry; view.openEntry = open; view.completed = completed
         view.lease = lease
         view.select = select; view.navigate = navigate; view.receive = receive; view.acceptsDrop = acceptsDrop
+        view.operation = operation; view.targetChanged = targetChanged
         if entry.reference.isFolder { view.registerForDraggedTypes([.fileURL]) }
         else { view.unregisterDraggedTypes() }
     }
@@ -37,6 +42,8 @@ struct FolderStackDragSourceView: NSViewRepresentable {
         var navigate: (() -> Void)?
         var receive: ((NSDraggingInfo) -> Bool)?
         var acceptsDrop: (() -> Bool)?
+        var operation: ((NSDraggingInfo) -> NSDragOperation)?
+        var targetChanged: ((NSDraggingInfo?) -> Void)?
         private var stopped = false
 
         override func draw(_ dirtyRect: NSRect) {
@@ -59,10 +66,12 @@ struct FolderStackDragSourceView: NSViewRepresentable {
         override func draggingExited(_ sender: NSDraggingInfo?) {
             highlighted = false
             needsDisplay = true
+            targetChanged?(nil)
         }
         override func draggingEnded(_ sender: NSDraggingInfo) {
             highlighted = false
             needsDisplay = true
+            targetChanged?(nil)
         }
         // Let SwiftUI own secondary clicks and its context menu.
         override func hitTest(_ point: NSPoint) -> NSView? {
@@ -74,7 +83,9 @@ struct FolderStackDragSourceView: NSViewRepresentable {
         override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
             guard !stopped, entry?.reference.isFolder == true, acceptsDrop?() == true,
                   FolderFileDrop.urls(sender) != nil else { return [] }
-            return .copy
+            let result = operation?(sender) ?? .copy
+            targetChanged?(result.isEmpty ? nil : sender)
+            return result
         }
         override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation { draggingEntered(sender) }
         override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool { !draggingEntered(sender).isEmpty }
@@ -136,6 +147,7 @@ struct FolderStackDragSourceView: NSViewRepresentable {
             stopped = true; unregisterDraggedTypes()
             entry = nil; openEntry = nil; completed = nil
             lease = nil; select = nil; navigate = nil; receive = nil; acceptsDrop = nil
+            operation = nil; targetChanged = nil
         }
     }
 }

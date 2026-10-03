@@ -53,6 +53,8 @@ final class DockInteraction {
     var documentTargetID: String?
     var trashTargeted = false
     var shelfTargeted = false
+    /// The volume tile a file drag is over, which highlights to show it will receive the drop.
+    var volumeTargetID: String?
     /// Per tile hit ID, how many things have landed in it; each increment plays the arrival bounce.
     var arrivals: [String: Int] = [:]
     var springEmphasized = false

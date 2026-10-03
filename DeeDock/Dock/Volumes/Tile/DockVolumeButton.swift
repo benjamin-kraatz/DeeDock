@@ -26,6 +26,11 @@ struct DockVolumeButton: View {
                 available: !item.isEjecting, running: false, launching: false,
                 keyboardSelected: selected, artworkOpacity: artworkOpacity,
                 artworkAnimation: interaction.idleFade.animation)
+                .overlay {
+                    if interaction.volumeTargetID == item.id {
+                        DockDocumentHighlight(emphasized: interaction.springEmphasized).allowsHitTesting(false)
+                    }
+                }
                 .overlay(alignment: .bottomTrailing) {
                     DockVolumeBadge(kind: item.kind, ejecting: item.isEjecting, size: size)
                         .offset(x: -2, y: -DockGeometry.indicatorAreaDepth - 2)

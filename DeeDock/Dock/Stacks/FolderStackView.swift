@@ -58,7 +58,7 @@ struct FolderStackView: View {
         }
         .overlay(alignment: .bottom) {
             if state.dropTargeted {
-                Text(.folderDropCopyHere).font(.callout)
+                Text(state.dropMoving ? .folderDropMoveHere : .folderDropCopyHere).font(.callout)
                     .padding(8).background(.regularMaterial, in: .capsule)
                     .padding(12).allowsHitTesting(false)
             }
@@ -75,9 +75,7 @@ struct FolderStackView: View {
     private var header: some View {
         HStack(spacing: 12) {
             if !state.history.isEmpty {
-                Button(.folderStackBack, systemImage: "chevron.left") { state.back() }
-                    .labelStyle(.iconOnly)
-                    .disabled(state.copying)
+                FolderStackBackButton(state: state, reduceMotion: reduceMotion)
             }
             Image(systemName: "folder.fill").foregroundStyle(.tint).accessibilityHidden(true)
             Text(verbatim: state.directoryName).font(.headline).lineLimit(1)
@@ -234,7 +232,9 @@ struct FolderStackView: View {
                                       select: { state.selectedID = entry.id; state.presentationFocused = false },
                                       navigate: { state.navigate(to: entry.reference.url) },
                                       receive: { state.receive($0, into: entry.reference.url) },
-                                      acceptsDrop: { !state.copying })
+                                      acceptsDrop: { !state.copying },
+                                      operation: { state.dropOperation($0) },
+                                      targetChanged: { state.dropTargetChanged($0, destination: entry.reference.name) })
         }
         .help(FolderStackItemDetails(reference: entry.reference).help)
         .accessibilityLabel(Text(verbatim: entry.reference.name))

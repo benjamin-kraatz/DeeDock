@@ -248,6 +248,12 @@ final class DockCoordinator {
         dragging.dropInFolder = { [weak self] info, folder, panel in
             self?.folderStacks.receive(info, folder: folder, on: panel) ?? false
         }
+        dragging.openSpringVolume = { [weak self] volume, panel in
+            self?.volumeDock.springOpen(volume, on: panel)
+        }
+        dragging.dropInVolume = { [weak self] info, volume, panel in
+            self?.volumeDock.receive(info, volume: volume, on: panel) ?? false
+        }
         dragging.documentHoverChanged = { [weak self] item, panel, documents in
             self?.windowPeeks.hoverFiles(item, on: panel, documents: documents)
         }

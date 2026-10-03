@@ -95,7 +95,7 @@ final class VolumeController {
         scanTask = Task { [weak self] in
             let scanned = await Task.detached(priority: .utility) { VolumeScanner.scan() }.value
             guard let self, !Task.isCancelled, generation == token else { return }
-            let missing = scanned.filter { icons[$0.volumeID] == nil }
+            let missing = scanned.filter { self.icons[$0.volumeID] == nil }
             if !missing.isEmpty {
                 let loaded = await Task.detached(priority: .utility) { VolumeIcons.load(missing) }.value
                 guard !Task.isCancelled, generation == token else { return }

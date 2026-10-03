@@ -26,12 +26,16 @@ final class FolderStackPanelController {
         popover.willClose = { [weak state] in state?.stop() }
         popover.enableFileDrops()
         popover.dragEntered = { [weak state] info in
-            guard let state, !state.copying, state.preview == nil,
-                  FolderFileDrop.urls(info) != nil else { return [] }
-            state.dropTargeted = true
-            return .copy
+            guard let state, state.preview == nil else { return [] }
+            let operation = state.dropOperation(info)
+            state.dropTargeted = !operation.isEmpty
+            state.dropTargetChanged(info, destination: state.directoryName)
+            return operation
         }
-        popover.dragExited = { [weak state] in state?.dropTargeted = false }
+        popover.dragExited = { [weak state] in
+            state?.dropTargeted = false
+            state?.dropTargetChanged(nil, destination: "")
+        }
         popover.dragPerformed = { [weak state] info in
             state?.dropTargeted = false
             return state?.receive(info) ?? false

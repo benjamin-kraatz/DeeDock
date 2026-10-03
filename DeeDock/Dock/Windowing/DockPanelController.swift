@@ -437,6 +437,11 @@ final class DockPanelController {
     /// Pixel density of the screen this dock is on, for artwork generated at native resolution.
     var backingScaleFactor: CGFloat { panel.screen?.backingScaleFactor ?? 2 }
 
+    /// The volume tile under a file drag, using the same mask and icon rectangles as clicks.
+    func volumeTarget(at point: CGPoint) -> VolumeDockItem? {
+        store.entries.compactMap(\.volume).first { !$0.isEjecting && utilityTarget(.volume($0.volumeID), at: point) }
+    }
+
     func actionTarget(at point: CGPoint) -> ActionDockItem? {
         store.entries.compactMap(\.action).first {
             !$0.status.busy && utilityTarget(.action($0.tile.id), at: point)
