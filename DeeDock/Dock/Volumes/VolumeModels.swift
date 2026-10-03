@@ -11,6 +11,12 @@ nonisolated enum VolumeKind: String, Codable, Equatable, Sendable {
     case diskImage
     /// A file server share mounted over the network.
     case network
+    /// A Time Machine backup destination. macOS keeps its contents behind Full Disk Access, so
+    /// docks leave it out unless the user opts in.
+    case timeMachine
+
+    /// True for disks that stay connected, where an eject is worth confirming first.
+    var isFixedDisk: Bool { self == .externalDisk || self == .timeMachine }
 
     /// Symbol drawn in the tile's corner badge so the kind is recognizable at dock size.
     var badgeSymbol: String {
@@ -19,6 +25,7 @@ nonisolated enum VolumeKind: String, Codable, Equatable, Sendable {
         case .externalDisk: "externaldrive.fill"
         case .diskImage: "opticaldisc.fill"
         case .network: "network"
+        case .timeMachine: "clock.arrow.circlepath"
         }
     }
 }
@@ -40,27 +47,32 @@ nonisolated struct VolumeVisibility: Equatable, Sendable {
     var showsVolumes: Bool
     var showsDiskImages: Bool
     var showsNetworkVolumes: Bool
+    var showsTimeMachineVolumes: Bool
 
     static let hidden = VolumeVisibility(showsVolumes: false, showsDiskImages: false, showsNetworkVolumes: false)
 
-    init(showsVolumes: Bool, showsDiskImages: Bool, showsNetworkVolumes: Bool) {
+    init(showsVolumes: Bool, showsDiskImages: Bool, showsNetworkVolumes: Bool, showsTimeMachineVolumes: Bool = false) {
         self.showsVolumes = showsVolumes
         self.showsDiskImages = showsDiskImages
         self.showsNetworkVolumes = showsNetworkVolumes
+        self.showsTimeMachineVolumes = showsTimeMachineVolumes
     }
 
     init(settings: DockSettings) {
         self.init(showsVolumes: settings.showVolumes, showsDiskImages: settings.showDiskImages,
-                  showsNetworkVolumes: settings.showNetworkVolumes)
+                  showsNetworkVolumes: settings.showNetworkVolumes,
+                  showsTimeMachineVolumes: settings.showTimeMachineVolumes)
     }
 
-    /// The master switch gates every kind; disk images and network shares have their own opt-ins.
+    /// The master switch gates every kind; disk images, network shares, and Time Machine backups
+    /// have their own opt-ins.
     func includes(_ kind: VolumeKind) -> Bool {
         guard showsVolumes else { return false }
         switch kind {
         case .removable, .externalDisk: return true
         case .diskImage: return showsDiskImages
         case .network: return showsNetworkVolumes
+        case .timeMachine: return showsTimeMachineVolumes
         }
     }
 }

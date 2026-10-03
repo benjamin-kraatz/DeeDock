@@ -16,7 +16,8 @@ struct VolumeArrangementSettingsCard: View {
 
     private var rows: [VolumeArrangementEntry] {
         let kinds = VolumeVisibility(showsVolumes: true, showsDiskImages: visibility.showsDiskImages,
-                                     showsNetworkVolumes: visibility.showsNetworkVolumes)
+                                     showsNetworkVolumes: visibility.showsNetworkVolumes,
+                                     showsTimeMachineVolumes: visibility.showsTimeMachineVolumes)
         return store.entries.filter { kinds.includes($0.kind) }
     }
 

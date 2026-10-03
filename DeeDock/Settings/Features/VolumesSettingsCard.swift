@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// External drives, disk images, and network shares in the dock, plus the hard-disk eject question.
+/// External drives, disk images, network shares, and Time Machine backups in the dock, plus the
+/// hard-disk eject question.
 /// Every option below the first depends on the drives switch and dims with it.
 struct VolumesSettingsCard: View {
     let source: SettingsValueSource
@@ -12,6 +13,10 @@ struct VolumesSettingsCard: View {
             SettingsToggleRow(title: .settingsShowDiskImages, isOn: source.binding(\.showDiskImages),
                               disabled: !showsVolumes.wrappedValue)
             SettingsToggleRow(title: .settingsShowNetworkVolumes, isOn: source.binding(\.showNetworkVolumes),
+                              disabled: !showsVolumes.wrappedValue)
+            SettingsToggleRow(title: .settingsShowTimeMachineVolumes,
+                              subtitle: .settingsShowTimeMachineVolumesHelp,
+                              isOn: source.binding(\.showTimeMachineVolumes),
                               disabled: !showsVolumes.wrappedValue)
             SettingsToggleRow(title: .settingsConfirmBeforeEjectingDisks,
                               subtitle: .settingsConfirmBeforeEjectingDisksHelp,

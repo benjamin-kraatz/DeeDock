@@ -71,7 +71,7 @@ final class VolumeDockCoordinator {
     func requestEject(_ volume: VolumeDockItem, on panel: DockPanelController, keyboard: Bool) {
         guard !volume.isEjecting, ejectTasks[volume.volumeID] == nil else { return }
         let confirms = panel.currentSettings?.confirmBeforeEjectingDisks ?? DockSettings.defaults.confirmBeforeEjectingDisks
-        if volume.kind == .externalDisk, confirms {
+        if volume.kind.isFixedDisk, confirms {
             if cards.present(volume, on: panel, phase: .confirmDisk, keyboard: keyboard) != nil { return }
             // The tile is scrolled out of view, so the card has nowhere to attach. Ask anyway.
             guard VolumeEjectAlert.confirmDisk(named: volume.name) else { return }

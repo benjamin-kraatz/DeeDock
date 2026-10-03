@@ -45861,6 +45861,132 @@
         }
       }
     },
+    "volumeKindTimeMachine" : {
+      "comment": "Kind of volume: a Time Machine backup disk. Time Machine is Apple's product name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time Machine-Backup"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time Machine backup"
+          }
+        }
+      }
+    },
+    "settingsShowTimeMachineVolumes" : {
+      "comment": "Toggle that also shows Time Machine backup disks in the dock. Time Machine is Apple's product name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time Machine-Backups anzeigen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Time Machine backups"
+          }
+        }
+      }
+    },
+    "settingsShowTimeMachineVolumesHelp" : {
+      "comment": "Subtitle for the Time Machine backups toggle. Full Disk Access is the macOS privacy setting; use Apple's localized name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS lässt DOKK ein Backup-Laufwerk nur mit Festplattenvollzugriff durchsuchen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS only lets DOKK browse a backup disk with Full Disk Access."
+          }
+        }
+      }
+    },
+    "folderStackAccessDeniedTitle" : {
+      "comment": "Title of a folder stack whose contents macOS refuses to list.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Zugriff"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No access"
+          }
+        }
+      }
+    },
+    "folderStackAccessDeniedPrivacy" : {
+      "comment": "Description when macOS privacy protection blocks a folder stack. name is the folder or drive name supplied by macOS. Full Disk Access is the macOS privacy setting; use Apple's localized name.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS schützt „%1$(name)@“. Um den Inhalt hier zu sehen, erlaube DOKK unter „Festplattenvollzugriff“ und starte DOKK neu. Der Finder kann es sofort öffnen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS protects “%1$(name)@”. To browse it here, allow DOKK under Full Disk Access, then quit and reopen DOKK. Finder can open it right away."
+          }
+        }
+      }
+    },
+    "folderStackAccessDeniedPermissions" : {
+      "comment": "Description when file permissions block a folder stack. name is the folder or drive name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Account hat keine Zugriffsrechte, um „%1$(name)@“ anzuzeigen. Der Finder kann es möglicherweise öffnen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your account does not have permission to view “%1$(name)@”. Finder may be able to open it."
+          }
+        }
+      }
+    },
+    "folderStackOpenFullDiskAccess" : {
+      "comment": "Button that opens the Full Disk Access pane of System Settings. Use Apple's localized name for Full Disk Access.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen für Festplattenvollzugriff …"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Full Disk Access Settings…"
+          }
+        }
+      }
+    },
     "volumeKindNetwork" : {
       "comment": "Kind of volume: a mounted network share.",
       "extractionState": "manual",

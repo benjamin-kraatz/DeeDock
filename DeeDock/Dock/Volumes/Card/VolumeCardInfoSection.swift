@@ -16,7 +16,7 @@ struct VolumeCardInfoSection: View {
                 Button { perform(.openInFinder) } label: {
                     Text(.volumeOpenInFinder).frame(maxWidth: .infinity)
                 }
-                if kind == .externalDisk {
+                if kind.isFixedDisk {
                     Button { perform(.eject) } label: {
                         Label { Text(.volumeEject) } icon: {
                             Image(systemName: "eject.fill").foregroundStyle(.red)
