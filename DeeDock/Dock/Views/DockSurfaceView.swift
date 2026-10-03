@@ -90,7 +90,8 @@ struct DockSurfaceView: View {
             if drawsBackground && surfaceStyle == .iceBlocks {
                 DockIceBlocksBackground(blocks: iceBlocks, layout: layout, sizes: sizes, centers: centers,
                                         cornerRadius: interaction.idleFade.settings.cornerRadius,
-                                        reduceTransparency: reduceTransparency) {
+                                        reduceTransparency: reduceTransparency,
+                                        backdrop: interaction.iceBackdrop) {
                     breathingChrome(cornerRadius: $0)
                 }
                 .opacity(opacity.background)

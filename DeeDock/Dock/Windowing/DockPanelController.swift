@@ -7,6 +7,8 @@ final class DockPanelController {
     let store: DockStore
     let visibility: DockVisibilityController
     let interaction = DockInteraction()
+    /// Experiment: captures what is behind this panel for the Ice Blocks refraction shader.
+    private let iceBackdrop = DockIceBackdrop()
     private let panel: DockPanel
     let launcher: LauncherState
     private let launcherPresentation: LauncherPresentationController
@@ -50,6 +52,7 @@ final class DockPanelController {
         panel.isReleasedWhenClosed = false; panel.hidesOnDeactivate = false; panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
         panel.acceptsMouseMovedEvents = true; panel.becomesKeyOnlyIfNeeded = true
+        interaction.iceBackdrop = iceBackdrop
         panel.contentView = DockHostingView(rootView: DockView(launcher: launcher, store: store, interaction: interaction, visibility: visibility))
         launcherPresentation.didClose = { [weak self] in
             guard let self, !stopped else { return }
@@ -176,6 +179,8 @@ final class DockPanelController {
         let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
         geometry = updated
+        iceBackdrop.configure(displayID: display.runtimeID, displayFrame: display.frame, rect: updated.windowFrame,
+                              scale: panel.screen?.backingScaleFactor ?? 2, active: settings.surfaceStyle == .iceBlocks)
         interaction.contentOrigin = updated.contentOrigin; interaction.windowSize = updated.windowFrame.size
         launcherPresentation.origin = restingDragBounds
         if launcher.isPresented {
@@ -256,6 +261,7 @@ final class DockPanelController {
             interaction.suppressTooltips = true; interaction.tooltips.clear()
         }
         interaction.exposesContent = visibility.exposesContent
+        iceBackdrop.setVisible(visibility.exposesContent)
         if !visibility.exposesContent {
             panel.ignoresMouseEvents = true; interaction.setPointer(nil)
             if panel.isVisible { panel.orderOut(nil) }
@@ -717,6 +723,7 @@ final class DockPanelController {
     func stop() {
         launcherPresentation.stop(); launcherWillOpen = nil; interaction.openLauncher = nil
         invalidateDrag?(); invalidateDrag = nil
+        iceBackdrop.stop(); interaction.iceBackdrop = nil
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.openBadgeMemory = nil

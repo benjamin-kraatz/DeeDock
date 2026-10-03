@@ -22,7 +22,10 @@ struct AppearanceSettingsPane: View {
                                   selection: $surfaceStyle)
                     .settingsOverride(overrideContext, field: .surfaceStyle)
             }
-            if surfaceStyle == .iceBlocks { DockIceTuningCard() }
+            if surfaceStyle == .iceBlocks {
+                DockIceTuningCard()
+                DockIceRefractionCard()
+            }
             SettingsCard(title: .settingsCornerRadius, footnote: .settingsCornerRadiusHelp) {
                 SettingsSliderRow(title: .settingsCornerRadius, unit: .settingsPoints,
                                   value: $cornerRadius, range: 0...100, step: 1,

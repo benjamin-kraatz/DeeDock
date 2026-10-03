@@ -19,6 +19,15 @@ enum DockIceTuning {
     /// Raw `DockIceGlassMode`.
     static let glassKey = "iceBlocks.glassMode"
     static let glassDefault = DockIceGlassMode.edges.rawValue
+    /// Whether blocks redraw a live screen capture of their backdrop through the refraction
+    /// shader. Replaces system glass while on.
+    static let refractionKey = "iceBlocks.refraction"
+    /// How far the rim displaces the backdrop, in points. Negative bends toward the middle.
+    static let refractionStrengthKey = "iceBlocks.refractionStrength"
+    static let refractionStrengthDefault = 14.0
+    /// Upper bound on captured frames per second. An unchanged screen delivers none.
+    static let refractionRateKey = "iceBlocks.refractionRate"
+    static let refractionRateDefault = 30.0
 }
 
 /// Where a block uses system glass. Glass bends the backdrop but also blurs it, even in its
@@ -63,8 +72,46 @@ struct DockIceTuningCard: View {
     }
 }
 
+/// Controls and a cost readout for the screen-capture refraction experiment.
+struct DockIceRefractionCard: View {
+    @AppStorage(DockIceTuning.refractionKey) private var enabled = false
+    @AppStorage(DockIceTuning.refractionStrengthKey) private var strength = DockIceTuning.refractionStrengthDefault
+    @AppStorage(DockIceTuning.refractionRateKey) private var rate = DockIceTuning.refractionRateDefault
+    private var stats: DockIceBackdropStats { .shared }
+
+    var body: some View {
+        SettingsCard(title: .iceRefractionTitle, footnote: .iceRefractionHelp) {
+            SettingsToggleRow(title: .iceRefractionEnabled, isOn: $enabled)
+            SettingsSliderRow(title: .iceRefractionStrength, unit: .settingsPoints, value: $strength,
+                              range: -40...40, step: 1, minimumSymbol: "arrow.down.right.and.arrow.up.left",
+                              maximumSymbol: "arrow.up.left.and.arrow.down.right",
+                              defaultValue: DockIceTuning.refractionStrengthDefault)
+            SettingsSliderRow(title: .iceRefractionRate, unit: .iceRefractionRateUnit, value: $rate,
+                              range: 5...60, step: 5, minimumSymbol: "tortoise", maximumSymbol: "hare",
+                              defaultValue: DockIceTuning.refractionRateDefault)
+            if enabled {
+                Group {
+                    if let frames = stats.framesPerSecond {
+                        Text(.iceRefractionStats(frames: frames,
+                                                 cost: stats.conversionMilliseconds.formatted(.number.precision(.fractionLength(2)))))
+                    } else {
+                        Text(.iceRefractionIdle)
+                    }
+                }
+                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, SettingsMetrics.rowInset).padding(.vertical, 8)
+            }
+        }
+    }
+}
+
 #if DEBUG
 #Preview("Ice tuning card") {
-    DockIceTuningCard().padding(24).frame(width: 560)
+    VStack(spacing: 16) {
+        DockIceTuningCard()
+        DockIceRefractionCard()
+    }
+    .padding(24).frame(width: 560)
 }
 #endif

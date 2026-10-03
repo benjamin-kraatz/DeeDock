@@ -1,6 +1,150 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "iceRefractionTitle": {
+    "comment": "Heading for the experimental Ice Blocks option that captures the screen behind the dock and bends it like glass.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Live refraction (experiment)"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Live-Lichtbrechung (Experiment)"
+        }
+      }
+    }
+  },
+  "iceRefractionHelp": {
+    "comment": "Help for the live refraction experiment. It needs Screen Recording access and shows the macOS capture indicator.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Captures the screen behind the dock while the dock is visible and bends it at each block’s rim. Needs Screen Recording access, and macOS shows its capture indicator. Replaces System glass while on."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nimmt den Bildschirm hinter dem Dock auf, solange das Dock sichtbar ist, und bricht ihn am Rand jedes Blocks. Benötigt Zugriff auf die Bildschirmaufnahme, und macOS zeigt die Aufnahmeanzeige. Ersetzt Systemglas, solange aktiv."
+        }
+      }
+    }
+  },
+  "iceRefractionEnabled": {
+    "comment": "Toggle label: turn the live refraction experiment on.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Capture and refract the background"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hintergrund aufnehmen und brechen"
+        }
+      }
+    }
+  },
+  "iceRefractionStrength": {
+    "comment": "Slider label: how far the rim of an ice block displaces the background, in points.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bend"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Krümmung"
+        }
+      }
+    }
+  },
+  "iceRefractionRate": {
+    "comment": "Slider label: maximum captured frames per second for the live refraction experiment.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Maximum frame rate"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Maximale Bildrate"
+        }
+      }
+    }
+  },
+  "iceRefractionRateUnit": {
+    "comment": "Unit for a frame rate value: frames per second.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "fps"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "fps"
+        }
+      }
+    }
+  },
+  "iceRefractionStats": {
+    "comment": "Readout of the live refraction cost. frames is delivered frames per second; cost is milliseconds spent converting each frame.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%(frames)lld frames per second delivered, %(cost)@ ms to convert each"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "%(frames)lld Bilder pro Sekunde geliefert, %(cost)@ ms Umwandlung pro Bild"
+        }
+      }
+    }
+  },
+  "iceRefractionIdle": {
+    "comment": "Readout when the live refraction capture is delivering no frames, because the screen is unchanged, the dock is hidden, or access is missing.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No frames right now. The screen is unchanged, the dock is hidden, or Screen Recording access is missing."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Gerade keine Bilder. Der Bildschirm ist unverändert, das Dock ist ausgeblendet oder der Zugriff auf die Bildschirmaufnahme fehlt."
+        }
+      }
+    }
+  },
   "iceTuningGlassOff": {
     "comment": "System glass option for Ice Blocks: no system glass, fully sharp background.",
     "extractionState": "manual",

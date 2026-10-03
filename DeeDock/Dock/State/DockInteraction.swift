@@ -15,6 +15,8 @@ final class DockInteraction {
     var pinWeather: PinWeatherStore?
     /// Shared attention signals. Nil keeps previews independent of live app state.
     var focusBreathing: FocusBreathingStore?
+    /// Experiment: live backdrop capture for the Ice Blocks refraction shader.
+    @ObservationIgnored var iceBackdrop: DockIceBackdrop?
     var focusSession: FocusSessionController?
     var dockModes: DockModesStore?
     @ObservationIgnored var actionTiles: ActionTilesController?

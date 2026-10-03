@@ -12,15 +12,22 @@ struct DockIceBlockView: View {
     let reduceTransparency: Bool
     /// A bar of light resting on the lit side, as on the reference's drives block.
     var lightBar = false
+    /// Experiment: a captured picture of what is behind the dock. When present, the block
+    /// redraws it through the refraction shader instead of using system glass.
+    var backdrop: DockIceBackdrop.Frame? = nil
 
     @AppStorage(DockIceTuning.tintKey) private var tintPercent = DockIceTuning.tintDefault
     @AppStorage(DockIceTuning.shadeKey) private var shadePercent = DockIceTuning.shadeDefault
     @AppStorage(DockIceTuning.glowKey) private var glowPercent = DockIceTuning.glowDefault
     @AppStorage(DockIceTuning.frostKey) private var frostPercent = DockIceTuning.frostDefault
     @AppStorage(DockIceTuning.glassKey) private var glassMode = DockIceTuning.glassDefault
+    @AppStorage(DockIceTuning.refractionStrengthKey) private var refraction = DockIceTuning.refractionStrengthDefault
 
     /// Width of the refracting rim in the edges-only glass mode.
     private static let glassEdge: CGFloat = 8
+    /// Width of the rim the refraction shader bends, and its colour fringing.
+    private static let refractionEdge: CGFloat = 14
+    private static let refractionDispersion: CGFloat = 0.12
     /// Width of the lighter band that reads as the slab's side wall.
     private static let bevel: CGFloat = 4
 
@@ -65,6 +72,18 @@ struct DockIceBlockView: View {
             // Even the clearest system glass blurs what is behind it, so clear ice keeps glass
             // out of the middle of the block: either a refracting ring along the rim, or none.
             Group {
+                if let backdrop {
+                    // The capture covers the panel's window frame, so this view's window
+                    // coordinates are its position in the picture.
+                    GeometryReader { proxy in
+                        Rectangle().fill(.black)
+                            .colorEffect(ShaderLibrary.dockIceRefraction(
+                                .float2(proxy.size), .float(cornerRadius),
+                                .float2(proxy.frame(in: .global).origin), .float(backdrop.scale),
+                                .float(Self.refractionEdge), .float(refraction), .float(Self.refractionDispersion),
+                                .image(Image(decorative: backdrop.image, scale: 1))))
+                    }
+                } else {
                 switch DockIceGlassMode(rawValue: glassMode) ?? .edges {
                 case .full:
                     shape.fill(.clear).glassEffect(.clear, in: .rect(cornerRadius: cornerRadius))
@@ -73,6 +92,7 @@ struct DockIceBlockView: View {
                         .glassEffect(.clear, in: shape.inset(by: Self.glassEdge / 2).stroke(lineWidth: Self.glassEdge))
                 case .none:
                     shape.fill(.clear)
+                }
                 }
             }
                 .overlay {
