@@ -14,6 +14,8 @@ nonisolated struct VolumeTraits: Equatable, Sendable {
     var deviceProtocol: String?
     /// Disk Arbitration's device model. Mounted disk images report `Disk Image`.
     var deviceModel: String?
+    /// True when Time Machine uses the volume as a backup destination.
+    var isTimeMachineBackup = false
 }
 
 /// Reads mounted volumes. Every call does file system I/O, which can stall on a slow network
@@ -49,7 +51,8 @@ nonisolated enum VolumeScanner {
             isRemovable: values.volumeIsRemovable ?? false,
             isEjectable: values.volumeIsEjectable ?? false,
             deviceProtocol: description?[kDADiskDescriptionDeviceProtocolKey as String] as? String,
-            deviceModel: description?[kDADiskDescriptionDeviceModelKey as String] as? String)
+            deviceModel: description?[kDADiskDescriptionDeviceModelKey as String] as? String,
+            isTimeMachineBackup: isTimeMachineBackup(url))
         guard let kind = classify(traits) else { return nil }
         let name = values.volumeLocalizedName ?? url.lastPathComponent
         let available = VolumeCapacityFormat.available(important: values.volumeAvailableCapacityForImportantUsage,
@@ -62,6 +65,8 @@ nonisolated enum VolumeScanner {
     /// partitions never appear; only what a user can plug in, mount, or eject does.
     static func classify(_ traits: VolumeTraits) -> VolumeKind? {
         guard traits.isBrowsable, !traits.isRootFileSystem, traits.path.hasPrefix("/Volumes/") else { return nil }
+        // Checked first: a backup destination can also be a disk image or an ejectable disk.
+        if traits.isTimeMachineBackup { return .timeMachine }
         if !traits.isLocal { return .network }
         // Disk Arbitration names disk images by model; older systems used the protocol instead.
         let imageMarkers: Set<String> = ["Disk Image", "Virtual Interface"]
@@ -73,5 +78,31 @@ nonisolated enum VolumeScanner {
         if traits.isRemovable { return .removable }
         if traits.isEjectable || traits.deviceProtocol != nil { return .externalDisk }
         return nil
+    }
+
+    /// Whether Time Machine backs up to the volume mounted at `url`.
+    ///
+    /// The backup service tags an APFS destination's root with `com.apple.backupd.*` and
+    /// `com.apple.timemachine.*` extended attributes, and an HFS+ destination holds
+    /// `Backups.backupdb`. Attribute names stay readable without Full Disk Access, even though
+    /// the volume's contents do not, so this never needs the access it is used to detect.
+    static func isTimeMachineBackup(_ url: URL) -> Bool {
+        let path = url.path
+        let size = listxattr(path, nil, 0, 0)
+        if size > 0 {
+            var buffer = [CChar](repeating: 0, count: size)
+            let length = listxattr(path, &buffer, size, 0)
+            if length > 0, isTimeMachineBackup(attributeNames: buffer.prefix(length).split(separator: 0).map {
+                String(decoding: $0.map(UInt8.init(bitPattern:)), as: UTF8.self)
+            }) {
+                return true
+            }
+        }
+        return FileManager.default.fileExists(atPath: url.appendingPathComponent("Backups.backupdb").path)
+    }
+
+    /// Whether a volume root's extended attribute names include a Time Machine destination marker.
+    static func isTimeMachineBackup(attributeNames: [String]) -> Bool {
+        attributeNames.contains { $0.hasPrefix("com.apple.backupd.") || $0.hasPrefix("com.apple.timemachine.") }
     }
 }

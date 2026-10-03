@@ -39,6 +39,8 @@ final class FolderStackState {
     private(set) var organizing = false
     private(set) var semanticError: String?
     var error: String?
+    /// Set with `error` when macOS refused to list the folder, so the panel can offer a way around it.
+    private(set) var accessDenial: FolderStackAccessDenial?
     /// Narrows what the panel shows without touching the loaded listing. Cleared on navigation.
     var query = "" {
         didSet {
@@ -72,7 +74,8 @@ final class FolderStackState {
     @ObservationIgnored private let mediaCache: FolderStackMediaCache
 
     init(folder: FolderReference, entries: [FolderStackEntry] = [], loading: Bool = false,
-         error: String? = nil, sort: FolderStackSort = .alphabetical,
+         error: String? = nil, accessDenial: FolderStackAccessDenial? = nil,
+         sort: FolderStackSort = .alphabetical,
          organizer: any SemanticStackOrganizing = UnavailableSemanticStackOrganizer(),
          mediaCache: FolderStackMediaCache = .shared) {
         self.sort = sort
@@ -84,6 +87,7 @@ final class FolderStackState {
         self.entries = entries.sorted { sort.precedes($0.reference, $1.reference) }
         self.loading = loading
         self.error = error
+        self.accessDenial = accessDenial
         selectedID = self.entries.first?.id
         if presentation == .smart, !entries.isEmpty { refreshSemanticOrganization() }
     }
@@ -118,6 +122,7 @@ final class FolderStackState {
         let directory = directory
         loading = true
         error = nil
+        accessDenial = nil
         retryAction = nil
         loadTask = Task { [weak self] in
             let worker = Task.detached { Result { try FolderStackLoader.contents(of: access, directory: directory) } }
@@ -151,6 +156,7 @@ final class FolderStackState {
                 enrichMedia(from: references, access: access, token: token)
             case .failure(let error):
                 report(error.localizedDescription) { [weak self] in self?.reload() }
+                accessDenial = FolderStackAccessDenial(error)
             }
             loadTask = nil
         }
@@ -324,6 +330,7 @@ final class FolderStackState {
     func retry() {
         let action = retryAction
         error = nil
+        accessDenial = nil
         retryAction = nil
         action?()
     }

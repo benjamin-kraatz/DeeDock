@@ -132,6 +132,12 @@ struct FolderStackView: View {
         if state.loading && state.entries.isEmpty {
             ProgressView().controlSize(.small).frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityLabel(Text(.folderStackLoading))
+        } else if let denial = state.accessDenial, state.entries.isEmpty {
+            FolderStackAccessDeniedView(
+                denial: denial, name: state.directoryName,
+                openInFinder: { NSWorkspace.shared.open(state.directory) },
+                openFullDiskAccess: FolderStackAccessDeniedView.openFullDiskAccessSettings,
+                retry: { state.retry() })
         } else if let error = state.error, state.entries.isEmpty {
             ContentUnavailableView {
                 Label(.folderStackUnavailableTitle, systemImage: "folder.badge.questionmark")
@@ -318,10 +324,11 @@ struct FolderStackView: View {
     static func state(_ mode: FolderStackPresentation = .grid, name: String = "Projects",
                       entries suppliedEntries: [FolderStackEntry]? = nil,
                       loading: Bool = false, error: String? = nil,
+                      accessDenial: FolderStackAccessDenial? = nil,
                       sort: FolderStackSort = .alphabetical) -> FolderStackState {
         FolderStackState(folder: FolderReference(url: URL(fileURLWithPath: "/Preview"), name: name,
                                                   bookmarkData: Data(), presentation: mode),
-                         entries: suppliedEntries ?? entries, loading: loading, error: error, sort: sort)
+                         entries: suppliedEntries ?? entries, loading: loading, error: error, accessDenial: accessDenial, sort: sort)
     }
 }
 
@@ -346,6 +353,11 @@ struct FolderStackView: View {
 }
 #Preview("Unavailable") {
     FolderStackView(state: FolderStackPreviewData.state(entries: [], error: "This folder is unavailable."), keyboard: false)
+        .frame(width: 560, height: 420).padding()
+}
+#Preview("Access denied") {
+    FolderStackView(state: FolderStackPreviewData.state(name: "TimeMachine", entries: [], error: "No permission.",
+                                                        accessDenial: .privacyProtection), keyboard: false)
         .frame(width: 560, height: 420).padding()
 }
 #Preview("Recoverable error") {

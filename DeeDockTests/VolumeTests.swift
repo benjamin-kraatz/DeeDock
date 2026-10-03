@@ -8,10 +8,10 @@ struct VolumeTests {
     private func traits(path: String = "/Volumes/Stick", browsable: Bool = true, root: Bool = false,
                         local: Bool = true, isInternal: Bool = false, removable: Bool = false,
                         ejectable: Bool = false, deviceProtocol: String? = "USB",
-                        model: String? = "Flash Drive") -> VolumeTraits {
+                        model: String? = "Flash Drive", timeMachine: Bool = false) -> VolumeTraits {
         VolumeTraits(path: path, isBrowsable: browsable, isRootFileSystem: root, isLocal: local,
                      isInternal: isInternal, isRemovable: removable, isEjectable: ejectable,
-                     deviceProtocol: deviceProtocol, deviceModel: model)
+                     deviceProtocol: deviceProtocol, deviceModel: model, isTimeMachineBackup: timeMachine)
     }
 
     private func volume(_ id: String, kind: VolumeKind) -> VolumeDockItem {
@@ -39,6 +39,36 @@ struct VolumeTests {
         #expect(VolumeScanner.classify(traits(deviceProtocol: nil, model: nil)) == nil)
         // An internal Mac can still mount a disk image; the image check comes first.
         #expect(VolumeScanner.classify(traits(isInternal: true, deviceProtocol: "Disk Image", model: "Disk Image")) == .diskImage)
+    }
+
+    @Test("A Time Machine destination is its own kind, whatever disk carries it, and stays off by default")
+    func timeMachine() {
+        #expect(VolumeScanner.classify(traits(ejectable: true, timeMachine: true)) == .timeMachine)
+        #expect(VolumeScanner.classify(traits(removable: true, timeMachine: true)) == .timeMachine)
+        #expect(VolumeScanner.classify(traits(deviceProtocol: "Disk Image", model: "Disk Image", timeMachine: true)) == .timeMachine)
+        #expect(VolumeScanner.classify(traits(browsable: false, timeMachine: true)) == nil)
+        #expect(VolumeScanner.isTimeMachineBackup(attributeNames: ["com.apple.backupd.HostUUID"]))
+        #expect(VolumeScanner.isTimeMachineBackup(attributeNames: ["com.apple.timemachine.private.structure.metadata"]))
+        #expect(!VolumeScanner.isTimeMachineBackup(attributeNames: ["com.apple.FinderInfo", "purgeable-drecs-fixed"]))
+        #expect(!VolumeVisibility(settings: .defaults).includes(.timeMachine))
+        var settings = DockSettings.defaults
+        settings.showTimeMachineVolumes = true
+        #expect(VolumeVisibility(settings: settings).includes(.timeMachine))
+        settings.showVolumes = false
+        #expect(!VolumeVisibility(settings: settings).includes(.timeMachine))
+        #expect(VolumeKind.timeMachine.isFixedDisk && VolumeKind.externalDisk.isFixedDisk && !VolumeKind.removable.isFixedDisk)
+    }
+
+    @Test("A refused folder listing is told apart by cause; other errors are not access denials")
+    func accessDenial() {
+        func refusal(_ code: Int32) -> NSError {
+            NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoPermissionError,
+                    userInfo: [NSUnderlyingErrorKey: NSError(domain: NSPOSIXErrorDomain, code: Int(code))])
+        }
+        #expect(FolderStackAccessDenial(refusal(EPERM)) == .privacyProtection)
+        #expect(FolderStackAccessDenial(refusal(EACCES)) == .filePermissions)
+        #expect(FolderStackAccessDenial(CocoaError(.fileReadNoPermission)) == .filePermissions)
+        #expect(FolderStackAccessDenial(CocoaError(.fileReadNoSuchFile)) == nil)
     }
 
     @Test("The master switch gates every kind; images and shares have their own opt-ins")
@@ -143,12 +173,13 @@ struct VolumeTests {
     @Test("Volume settings decode with defaults and stay app-wide")
     func settings() throws {
         var legacy = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(DockSettings.defaults)) as? [String: Any])
-        for key in ["showVolumes", "showDiskImages", "showNetworkVolumes", "confirmBeforeEjectingDisks"] {
+        for key in ["showVolumes", "showDiskImages", "showNetworkVolumes", "showTimeMachineVolumes",
+                    "confirmBeforeEjectingDisks"] {
             legacy.removeValue(forKey: key)
         }
         let decoded = try JSONDecoder().decode(DockSettings.self, from: JSONSerialization.data(withJSONObject: legacy))
         #expect(decoded.showVolumes && decoded.showDiskImages && !decoded.showNetworkVolumes)
-        #expect(decoded.confirmBeforeEjectingDisks)
+        #expect(decoded.confirmBeforeEjectingDisks && !decoded.showTimeMachineVolumes)
         var defaults = DockSettings.defaults
         defaults.showVolumes = false; defaults.showNetworkVolumes = true; defaults.confirmBeforeEjectingDisks = false
         let resolved = DockSettingsOverrides().resolving(defaults)

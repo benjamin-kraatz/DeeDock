@@ -20,7 +20,7 @@ assume they stay on after launch no longer apply.
 
 Implemented on `feature/dee-83`. Mounted USB sticks, SD cards, and external disks get tiles
 between the Shelf and Trash, one per volume, on every dock. Disk images (on by default) and
-network shares (off by default) have their own switches in Settings › Dock Extras › Drives.
+network shares (off by default), and Time Machine backups (off by default) have their own switches in Settings › Dock Extras › Drives.
 The list follows NSWorkspace mount, unmount, and rename notifications. Nothing polls.
 
 - **Click** shows the volume root as a folder stack, like Downloads. Grid or list is stored per
@@ -63,6 +63,17 @@ The list follows NSWorkspace mount, unmount, and rename notifications. Nothing p
   every display and stored in `dock.volume-arrangement.v1`. New drives join at the end, and a
   reconnected drive returns to its place. Up to 64 drives are remembered; beyond that, the
   drives disconnected longest are forgotten, but hidden ones are always kept.
+- **Time Machine backups:** a Time Machine destination is its own kind and gets no tile unless
+  “Show Time Machine backups” (off by default) is on. DOKK recognizes a destination by the
+  `com.apple.backupd.*` or `com.apple.timemachine.*` extended attributes on the volume root, or
+  a `Backups.backupdb` folder, none of which need Full Disk Access. macOS refuses to list a
+  backup disk without Full Disk Access, so with the switch on and no access the stack shows
+  “No access” with Open in Finder, Full Disk Access Settings…, and Retry. Any other folder
+  stack that macOS refuses to list gets the same view; the settings button appears only when
+  privacy protection (`EPERM`) is the cause, not file permissions (`EACCES`). A backup disk
+  asks before ejecting, like other fixed disks. DOKK never requests or changes the grant.
+  Limits: a network share the user mounts in Finder is not recognized as a backup destination,
+  and the share macOS mounts for backups is hidden from Finder and DOKK alike.
 
 While an eject runs, the card stays open until it succeeds or fails; outside clicks and Escape
 do not close it, and hovering the dimmed tile again shows the eject in progress.
@@ -123,6 +134,18 @@ Hide and reorder validation: one Debug build of the app and test target with an 
 DerivedData folder. `VolumeArrangementTests` covers arrival order, last-seen stamps, gap-index
 moves, hiding, pruning, and persistence. The tests, previews, app launch, and hands-on
 interaction were not run.
+
+- Time Machine: with a browsable backup disk attached, confirm no tile and no row in “Drives in
+  the Dock” by default. Turn on “Show Time Machine backups” and confirm the tile, its badge, and
+  the row. Without Full Disk Access, click the tile and confirm “No access”, that Open in Finder
+  opens the disk, and that the settings button opens Privacy & Security › Full Disk Access.
+  Grant access, reopen DOKK, and confirm the stack lists the backups.
+
+Time Machine validation: one Debug build of the app and test target with an isolated DerivedData
+folder. `VolumeTests` covers the kind, its default-off switch, marker attribute names, and the
+two refusal causes. Detection and both refusal codes were observed with a throwaway script on one
+Mac whose backup volumes are hidden from Finder. The tests, previews, app launch, hands-on
+interaction, and the Full Disk Access grant were not run.
 
 ## DEE-76 update awareness and idle install
 

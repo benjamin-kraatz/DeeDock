@@ -123,6 +123,7 @@ extension VolumeKind {
         case .externalDisk: .volumeKindExternalDisk
         case .diskImage: .volumeKindDiskImage
         case .network: .volumeKindNetwork
+        case .timeMachine: .volumeKindTimeMachine
         }
     }
 }
