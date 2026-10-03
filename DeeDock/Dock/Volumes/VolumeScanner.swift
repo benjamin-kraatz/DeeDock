@@ -52,8 +52,8 @@ nonisolated enum VolumeScanner {
             deviceModel: description?[kDADiskDescriptionDeviceModelKey as String] as? String)
         guard let kind = classify(traits) else { return nil }
         let name = values.volumeLocalizedName ?? url.lastPathComponent
-        let available = values.volumeAvailableCapacityForImportantUsage
-            ?? values.volumeAvailableCapacity.map(Int64.init)
+        let available = VolumeCapacityFormat.available(important: values.volumeAvailableCapacityForImportantUsage,
+                                                       plain: values.volumeAvailableCapacity.map(Int64.init))
         return VolumeInfo(volumeID: values.volumeUUIDString ?? "path:\(traits.path)", url: url, name: name, kind: kind,
                           totalCapacity: values.volumeTotalCapacity.map(Int64.init), availableCapacity: available)
     }

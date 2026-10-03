@@ -140,6 +140,18 @@ nonisolated enum VolumeCapacityFormat {
         ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
     }
 
+    /// Free space to show. The important-usage figure adds purgeable space on APFS, but FAT32 and
+    /// exFAT (most USB sticks and SD cards) report it as 0 while the plain figure is correct, so
+    /// the larger of the two wins.
+    static func available(important: Int64?, plain: Int64?) -> Int64? {
+        switch (important, plain) {
+        case let (important?, plain?): max(important, plain)
+        case let (important?, nil): important
+        case let (nil, plain?): plain
+        case (nil, nil): nil
+        }
+    }
+
     /// Fraction of the volume in use, clamped to 0...1, or nil when either value is unknown.
     static func usedFraction(total: Int64?, available: Int64?) -> Double? {
         guard let total, let available, total > 0 else { return nil }

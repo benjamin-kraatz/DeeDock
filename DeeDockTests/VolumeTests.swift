@@ -121,6 +121,17 @@ struct VolumeTests {
         #expect(launchd.name == "launchd" && launchd.isSystem)
     }
 
+    @Test("Free space ignores the zero important-usage figure FAT32 and exFAT report")
+    func availableCapacity() {
+        // Measured on FAT32 and exFAT images: important usage 0, plain capacity correct.
+        #expect(VolumeCapacityFormat.available(important: 0, plain: 222_341_120) == 222_341_120)
+        // APFS adds purgeable space to the important-usage figure.
+        #expect(VolumeCapacityFormat.available(important: 900, plain: 600) == 900)
+        #expect(VolumeCapacityFormat.available(important: nil, plain: 600) == 600)
+        #expect(VolumeCapacityFormat.available(important: 700, plain: nil) == 700)
+        #expect(VolumeCapacityFormat.available(important: nil, plain: nil) == nil)
+    }
+
     @Test("Used fraction is clamped and unknown without both capacities")
     func capacity() {
         #expect(VolumeCapacityFormat.usedFraction(total: 100, available: 25) == 0.75)
