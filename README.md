@@ -417,6 +417,23 @@ Group buttons participate in Focus Dock navigation. Press Return or Space to tog
 
 Hold a valid app drag over a collapsed pinned-group button for 0.5 seconds to expose insertion positions. The section returns to its previous expansion state when the drag ends. Dropping directly on the button appends pins. Completely hidden pins reject direct drops; **Pin** and **Pin on Display** remain available through app menus.
 
+## DOKK Islands
+
+Each section of a dock is its own glass island. Desktop shows in the gap between islands. DOKK builds the islands from the tiles already on that display, in the order the dock already uses. It omits a section that has nothing to show.
+
+- A leading App Launcher is its own island when pinned apps follow it.
+- Pinned apps and pinned folders share an island.
+- Unpinned running apps share an island. App Fusion melts stay with them.
+- Downloads, the Shelf, Session Capsules, Focus, and Action Tiles share an island when they sit together.
+- Drives share an island.
+- Trash is its own island.
+
+Open **Settings → Dock → Islands** to edit one display. On the shared Dock page, pick the display first when more than one dock is showing. The same page is on each display. Rename an island, move it up or down, or move a tile onto another island. **Add Island** creates an empty island (up to 24). **Delete Island** keeps that island's tiles on a neighbor, so nothing leaves the dock. **Reset to Automatic** discards the edits for that display and builds the sections again.
+
+Tiles inside an island stay in the dock's own order. Pin and utility dragging still open their gap beside the matching tile. Edits are stored per display under `dock.island-layout.v1`. An island with no custom name uses its section name. App names stay the names macOS supplied.
+
+VoiceOver announces the island, then its icons. Reduce Transparency uses the same opaque glass as the rest of the dock.
+
 ## App-name tooltip presets
 
 Under **Appearance → App names**, choose one complete preset. Every choice combines its design, placement, hover delay, and entrance. Shared defaults and independent per-display overrides work like running indicators. **Classic** preserves the original rounded material label; **Off** hides visual labels while keeping accessible app names.
@@ -518,6 +535,7 @@ The shared `DeeDock` scheme includes `DeeDockTests`, a Swift Testing target host
 - `DeeDock/App` owns the app entry point and native lifecycle composition.
 - `DeeDock/Dock/Models` defines application references, render snapshots, and ordering.
 - `DeeDock/Dock/Layout` contains platform-independent placement and magnification calculations.
+- `DeeDock/Dock/Islands` builds the glass sections, stores per-display edits, and leaves drawing to the dock surface.
 - `DeeDock/Dock/Persistence` and `Services` isolate preferences and workspace operations.
 - `DeeDock/Displays` supplies display snapshots, persistent identity resolution, and selection policies.
 - `DeeDock/Dock/Coordination` owns panel reconciliation and application-wide event/focus routing.

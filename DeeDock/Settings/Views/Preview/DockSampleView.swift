@@ -24,12 +24,15 @@ struct DockSampleView: View {
         let pointer = pointerAlong ?? (magnified && layout.restingCenters.count > 2 ? layout.restingCenters[2] : nil)
         let sizes = layout.sizes(pointerAlong: pointer, reduceMotion: reduceMotion)
         let centers = layout.centers(sizes: sizes)
-        let glass = layout.surfaceFrame(sizes: sizes)
+        let islands = layout.islandFrames(sizes: sizes)
+        let glasses = islands.isEmpty ? [layout.surfaceFrame(sizes: sizes)] : islands
         ZStack(alignment: .topLeading) {
-            DockBackgroundView(reduceTransparency: reduceTransparency,
-                cornerRadius: min(appearanceSettings.cornerRadius, min(glass.width, glass.height) / 2),
-                idleOpacity: opacity.background)
-                .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
+            ForEach(Array(glasses.enumerated()), id: \.offset) { _, glass in
+                DockBackgroundView(reduceTransparency: reduceTransparency,
+                    cornerRadius: min(appearanceSettings.cornerRadius, min(glass.width, glass.height) / 2),
+                    idleOpacity: opacity.background)
+                    .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
+            }
             ForEach(centers.indices, id: \.self) { index in
                 let rect = layout.iconFrame(centerAlong: centers[index], size: sizes[index])
                 RoundedRectangle(cornerRadius: sizes[index] * 0.2)

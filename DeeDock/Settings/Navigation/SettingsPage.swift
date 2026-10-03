@@ -19,6 +19,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case position
     case behavior
     case shownApps
+    case islands
 
     // General — app-wide, never display-scoped.
     case about
@@ -69,7 +70,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
 
     var group: Group {
         switch self {
-        case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
+        case .appearance, .appNames, .background, .position, .behavior, .shownApps, .islands: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
         case .shelfAndTrash, .drives, .capsules, .badges, .windowPeek,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
@@ -82,7 +83,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     static let dockGroups: [[SettingsPage]] = [
         [.appearance, .appNames, .background],
         [.position, .behavior],
-        [.shownApps],
+        [.shownApps, .islands],
     ]
 
     /// Every page a display profile can override.
@@ -96,6 +97,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .position: .settingsPosition
         case .behavior: .settingsBehavior
         case .shownApps: .settingsAppVisibility
+        case .islands: .islandsTitle
         case .about: Self.aboutTitle
         case .softwareUpdate: .updatesSectionTitle
         case .menuBar: .menuBarIconTitle
@@ -179,6 +181,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .position: .dock
         case .behavior: .symbol("sparkles")
         case .shownApps: .symbol("square.grid.2x2.fill")
+        case .islands: .symbol("rectangle.split.3x1")
         case .about: .symbol("info")
         case .softwareUpdate: .symbol("arrow.down.circle.fill")
         case .menuBar: .symbol("menubar.rectangle")
@@ -216,6 +219,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .position: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .behavior: Color(red: 0.12, green: 0.62, blue: 0.47)
         case .shownApps: Color(red: 0.86, green: 0.48, blue: 0.10)
+        case .islands: Color(red: 0.18, green: 0.62, blue: 0.72)
         case .about, .menuBar: Color(red: 0.42, green: 0.45, blue: 0.50)
         case .softwareUpdate: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .startup: Color(red: 0.20, green: 0.66, blue: 0.32)
@@ -252,6 +256,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .position: [Color(red: 0.32, green: 0.78, blue: 1.0), Color(red: 0.06, green: 0.42, blue: 0.94)]
         case .behavior: [.mint, .teal]
         case .shownApps: [Color(red: 1.0, green: 0.70, blue: 0.24), Color(red: 0.86, green: 0.40, blue: 0.05)]
+        case .islands: [Color(red: 0.45, green: 0.82, blue: 0.90), Color(red: 0.10, green: 0.48, blue: 0.62)]
         case .about, .menuBar: [Color(red: 0.62, green: 0.65, blue: 0.70), Color(red: 0.36, green: 0.39, blue: 0.44)]
         case .softwareUpdate: [Color(red: 0.42, green: 0.78, blue: 1.0), Color(red: 0.10, green: 0.44, blue: 0.92)]
         case .startup: [Color(red: 0.44, green: 0.84, blue: 0.46), Color(red: 0.10, green: 0.56, blue: 0.24)]
@@ -298,6 +303,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords
+        case .islands: .islandsSettingsKeywords
         case .about, .softwareUpdate, .menuBar, .startup: .settingsGeneralKeywords
         case .drives: .settingsDrivesKeywords
         case .shelfAndTrash, .capsules, .badges, .windowPeek,

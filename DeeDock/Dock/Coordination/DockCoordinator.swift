@@ -95,6 +95,8 @@ final class DockCoordinator {
     @ObservationIgnored private let shelf = ShelfController()
     /// Mounted drives and their shared arrangement. Settings reads both to manage drive order.
     @ObservationIgnored let volumes = VolumeController()
+    /// Per-display glass sections. Settings and every dock edit the same store.
+    let islands = DockIslandStore()
     @ObservationIgnored private let volumeDock: VolumeDockCoordinator
     @ObservationIgnored private let capsules = SessionCapsuleController()
     @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
@@ -168,6 +170,9 @@ final class DockCoordinator {
         timeline.onEnd = { [weak self] in
             self?.panels.values.forEach { $0.refreshLayout() }
             self?.endFocus(restore: true)
+        }
+        islands.didChange = { [weak self] in
+            self?.panels.values.forEach { $0.store.noteIslandEdit() }
         }
     }
 
@@ -458,7 +463,8 @@ final class DockCoordinator {
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, volumes: volumes, capsules: capsules, actions: actionTiles,
-                                  focusSession: focusSession, history: localHistory, pinWeather: pinWeather)
+                                  focusSession: focusSession, history: localHistory, pinWeather: pinWeather,
+                                  islands: islands)
             store.appMelt = appMelt
             store.refresh()
             appMelt.changed = { [weak self] in

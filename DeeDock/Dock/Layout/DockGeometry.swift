@@ -15,6 +15,9 @@ enum DockGeometry {
     /// Inset of the glass surface from the panel outer edge, in points.
     static let outerMargin: CGFloat = 8
     static let separatorLength: CGFloat = 16
+    /// Clear space between two glass islands, not including each island's own padding.
+    /// The screenshot's sections are separate capsules, so this gap shows the desktop through.
+    static let islandGap: CGFloat = 22
 
     /// A resting canvas and viewport for one ordered collection of dock items.
     struct Layout {
@@ -51,8 +54,13 @@ enum DockGeometry {
         let canvasLength: CGFloat
         /// Stable canvas-space along-axis positions; never replace these with animated positions.
         let restingCenters: [CGFloat]
-        /// Entry indices preceded by a divider, for app-section and trailing utility boundaries.
+        /// Entry indices that begin a new glass island. Index 0 is never included.
+        ///
+        /// The gap replaces the old hairline divider: each island draws its own material,
+        /// and `islandGap` of desktop shows between them.
         let separatorIndices: Set<Int>
+        /// Spoken names for the islands, in visual order. Empty when a caller only needed geometry.
+        let islandTitles: [String]
 
         /// Computes icon dimensions from a canvas-space pointer along-axis coordinate.
         /// A nil pointer or Reduce Motion returns resting sizes.
@@ -73,10 +81,42 @@ enum DockGeometry {
             let width = contentLength(sizes: sizes)
             var x = (canvasLength - width) / 2 + DockGeometry.padding
             return sizes.enumerated().map { index, size in
-                if separatorIndices.contains(index) { x += DockGeometry.separatorLength }
+                // The previous icon already added ordinary spacing. A boundary replaces that
+                // spacing with this island's trailing padding, the open gap, and the next
+                // island's leading padding.
+                if separatorIndices.contains(index) {
+                    x += DockGeometry.padding * 2 + DockGeometry.islandGap - itemSpacing
+                }
                 let center = x + size / 2
                 x += size + itemSpacing
                 return center
+            }
+        }
+
+        /// One glass capsule per island, in top-left canvas coordinates.
+        /// Magnification changes length and never thickness. A single island matches `surfaceFrame`.
+        func islandFrames(sizes: [CGFloat]) -> [CGRect] {
+            let centers = centers(sizes: sizes)
+            let count = min(sizes.count, centers.count)
+            guard count > 0 else { return [] }
+            let boundaries = separatorIndices.filter { $0 > 0 && $0 < count }.sorted()
+            var ranges: [(Int, Int)] = []
+            var start = 0
+            for boundary in boundaries {
+                ranges.append((start, boundary))
+                start = boundary
+            }
+            ranges.append((start, count))
+            let height = surfaceDepth
+            return ranges.map { start, end in
+                let first = start
+                let last = end - 1
+                let minAlong = centers[first] - sizes[first] / 2 - DockGeometry.padding
+                let maxAlong = centers[last] + sizes[last] / 2 + DockGeometry.padding
+                return edge.rect(CGRect(x: minAlong,
+                                         y: panelDepth - DockGeometry.outerMargin - height,
+                                         width: max(1, maxAlong - minAlong),
+                                         height: height), depth: panelDepth)
             }
         }
 
@@ -113,10 +153,15 @@ enum DockGeometry {
             return edge.rect(CGRect(x: 0, y: 0, width: length, height: max(1, inner)), depth: panelDepth)
         }
 
-        /// Length of the painted surface, including padding, spacing, and any section gap.
+        /// Length of every island, including each island's padding and the open gaps between them.
         func contentLength(sizes: [CGFloat]) -> CGFloat {
-            max(64, sizes.reduce(0, +) + CGFloat(max(0, sizes.count - 1)) * itemSpacing
-                + DockGeometry.padding * 2 + CGFloat(separatorIndices.count) * DockGeometry.separatorLength)
+            let boundaries = separatorIndices.filter { $0 > 0 && $0 < sizes.count }.count
+            let islands = sizes.isEmpty ? 0 : boundaries + 1
+            let spacing = max(0, sizes.count - 1 - boundaries)
+            let length = sizes.reduce(0, +) + CGFloat(spacing) * itemSpacing
+                + CGFloat(boundaries) * DockGeometry.islandGap
+                + CGFloat(islands) * DockGeometry.padding * 2
+            return max(64, length)
         }
     }
 
@@ -130,18 +175,27 @@ enum DockGeometry {
     ///   - settings: Requested appearance; invalid values fall back to defaults.
     ///   - calloutReserve: Override the inward label band. Timeline browsing passes a taller
     ///     reserve so the glance card is not clipped by the panel envelope.
-    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults, calloutReserve: CGFloat? = nil) -> Layout {
+    /// - Parameter islandStarts: Indices that begin a glass island. When present, these replace
+    ///   the pinned and utility boundaries derived from the counts. Index 0 is implied.
+    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults, calloutReserve: CGFloat? = nil, islandStarts: [Int]? = nil, islandTitles: [String] = []) -> Layout {
         let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableLength - 16)
         let utilityCount = min(max(0, utilityCount), count)
         let leading = min(max(0, leadingUtilityCount), count - utilityCount)
         let appCount = count - utilityCount - leading
         var separators = Set<Int>()
-        if favoriteCount > 0 && favoriteCount < appCount { separators.insert(leading + favoriteCount) }
-        if utilityCount > 0 && appCount > 0 { separators.insert(leading + appCount) }
+        if let islandStarts {
+            separators = Set(islandStarts.filter { $0 > 0 && $0 < count })
+        } else {
+            if favoriteCount > 0 && favoriteCount < appCount { separators.insert(leading + favoriteCount) }
+            if utilityCount > 0 && appCount > 0 { separators.insert(leading + appCount) }
+        }
         let itemSpacing = CGFloat(settings.itemSpacing)
-        let extra = padding * 2 + CGFloat(max(0, count - 1)) * itemSpacing
-            + CGFloat(separators.count) * separatorLength
+        let boundaries = separators.filter { $0 > 0 && $0 < count }.count
+        let islands = count == 0 ? 0 : boundaries + 1
+        let spacing = max(0, count - 1 - boundaries)
+        let extra = CGFloat(spacing) * itemSpacing + CGFloat(boundaries) * islandGap
+            + CGFloat(islands) * padding * 2
         // Reserve the magnification envelope, rather than resizing the window on every mouse move.
         let size = min(CGFloat(settings.iconSize), max(32, (viewportLimit - extra) / CGFloat(max(1, count) + 2)))
         let restingWidth = max(64, CGFloat(count) * size + extra)
@@ -151,9 +205,9 @@ enum DockGeometry {
         let viewport = min(viewportLimit, canvas)
         let reserve = calloutReserve ?? (settings.edge.isVertical ? 260 : 72)
         let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), calloutReserve: reserve, viewportLength: viewport, canvasLength: canvas,
-                             restingCenters: [], separatorIndices: separators)
+                             restingCenters: [], separatorIndices: separators, islandTitles: islandTitles)
         let centers = initial.centers(sizes: Array(repeating: size, count: count))
         return Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), calloutReserve: reserve, viewportLength: viewport, canvasLength: canvas,
-                      restingCenters: centers, separatorIndices: separators)
+                      restingCenters: centers, separatorIndices: separators, islandTitles: islandTitles)
     }
 }

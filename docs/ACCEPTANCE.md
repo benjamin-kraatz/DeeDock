@@ -16,6 +16,20 @@ soap bubbles stay first-class.
 The slices below remain the record of how those features were built. Hands-on checks that
 assume they stay on after launch no longer apply.
 
+## DEE-85 DOKK Islands
+
+Implemented on `feature/dee-85`. Each dock draws one Liquid Glass capsule per section instead of one bar with hairline separators. The open gap between capsules is 22 points, plus the padding each capsule already has. One section still uses the same glass bounds as the old single bar.
+
+DOKK builds the sections from the tiles on that display, in the dock's existing order. A section starts when the role changes: pinned, running, extras, drives, Trash. A leading App Launcher is its own island. Empty roles are left out. Automatic mode does not reorder tiles.
+
+**Settings → Dock → Islands** edits that display. The shared Dock page asks which display when more than one dock is showing. Rename an island, move it, move a tile onto another island, add an empty island (up to 24), or delete one. Delete keeps the tiles on a neighboring island. **Reset to Automatic** deletes the saved layout for that display. The first edit stores the generated sections in `dock.island-layout.v1`. Automatic layouts are not written. A custom name is at most 40 characters. An empty name uses the localized section name.
+
+Tiles inside an island stay in the dock's own order, so pin and utility dragging still insert beside the matching tile. A pin gap is placed at that pin when another section sits in front of the pins.
+
+VoiceOver hears a section header at the leading edge of each island. The glass is hidden from accessibility. The update indicator stays on the last island.
+
+`DeeDockTests/DockIslandTests.swift` covers automatic breaks, edits, persistence, the gap between capsules, and pin-gap insertion. This environment has no Xcode, so those tests were not run and the app was not compiled. Multi-display editing, dragging across islands, Reduce Motion, Reduce Transparency, and Spaces were not exercised on a Mac.
+
 ## DEE-83 external volumes
 
 Implemented on `feature/dee-83`. Mounted USB sticks, SD cards, and external disks get tiles

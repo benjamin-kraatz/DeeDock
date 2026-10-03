@@ -145,8 +145,23 @@ enum DockRenderSlot: Identifiable {
         if entries.contains(where: { if case .group(let c) = $0 { return c.group == .pinned && !c.expanded }; return false }) { return entries }
         let boundary = pins.prefix(max(0, proposal.index)).filter { !ids.contains($0.id) }.count
         var result = entries.filter { slot in slot.pin.map { !ids.contains($0.id) } ?? true }
-        let controlCount = result.prefix { if case .launcher = $0 { return true }; if case .group(let c) = $0 { return c.group == .pinned }; return false }.count
-        result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: min(controlCount + boundary, result.count))
+        // Islands can place other tiles between pins. The gap belongs beside the pin at
+        // `boundary`, not at a fixed offset from the leading controls.
+        let pinPositions = result.indices.filter { result[$0].pin != nil }
+        let insertAt: Int
+        if boundary < pinPositions.count {
+            insertAt = pinPositions[boundary]
+        } else if let last = pinPositions.last {
+            insertAt = last + 1
+        } else {
+            let controlCount = result.prefix { slot in
+                if case .launcher = slot { return true }
+                if case .group(let control) = slot { return control.group == .pinned }
+                return false
+            }.count
+            insertAt = controlCount
+        }
+        result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: min(insertAt, result.count))
         return result
     }
 
