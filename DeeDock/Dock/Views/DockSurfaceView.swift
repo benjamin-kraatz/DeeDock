@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Composes app buttons, the pinned-section separator, and labels in a stable canvas.
+/// Composes app buttons, one glass island per section, and labels in a stable canvas.
 ///
 /// Sizes and positions come from the same layout snapshot. App identity survives section moves,
 /// and the existing spring applies to the whole surface rather than separate icon subtrees.
@@ -50,49 +50,69 @@ struct DockSurfaceView: View {
     }
 
     var body: some View {
-        // Computed once per pass. Each slot and separator reads it, and this body runs on every
+        // Computed once per pass. Each slot and island reads it, and this body runs on every
         // pointer move over the dock and every auto-hide frame.
         let centers = layout.centers(sizes: sizes)
+        let islands = layout.islandFrames(sizes: sizes)
+        let frames = islands.isEmpty ? [surface] : islands
+        let ranges = layout.islandRanges(count: min(slots.count, sizes.count))
         ZStack(alignment: .topLeading) {
             if drawsBackground {
-                DockBackgroundView(
-                    reduceTransparency: reduceTransparency,
-                    cornerRadius: min(
-                        interaction.idleFade.settings.cornerRadius,
-                        min(surface.width, surface.height) / 2
-                    ),
-                    idleOpacity: opacity.background
-                )
-                .animation(
-                    interaction.idleFade.animation,
-                    value: opacity.background
-                )
-                .overlay {
-                    if let breathing = interaction.focusBreathing {
-                        FocusBreathingChrome(
-                            active: interaction.exposesContent && breathing.isActive(
-                                modeID: interaction.dockModes?.activeMode.id,
-                                sessionRunning: interaction.focusSession?.session?.phase == .running
-                            ),
-                            intensity: breathing.intensity,
-                            reduceMotion: reduceMotion,
-                            cornerRadius: min(interaction.idleFade.settings.cornerRadius,
-                                              min(surface.width, surface.height) / 2),
-                            backgroundOpacity: opacity.background
+                if !reduceTransparency, !slots.isEmpty {
+                    ForEach(Array(frames.enumerated()), id: \.offset) { index, frame in
+                        DockIslandGlow(color: islandTint(index, ranges: ranges), frame: frame, edge: layout.edge)
+                            .opacity(opacity.background)
+                            .animation(interaction.idleFade.animation, value: opacity.background)
+                    }
+                }
+                ForEach(Array(frames.enumerated()), id: \.offset) { index, frame in
+                    let radius = min(interaction.idleFade.settings.cornerRadius, min(frame.width, frame.height) / 2)
+                    let title = layout.islandTitles.indices.contains(index) ? layout.islandTitles[index] : nil
+                    ZStack(alignment: .leading) {
+                        DockBackgroundView(
+                            reduceTransparency: reduceTransparency,
+                            cornerRadius: radius,
+                            idleOpacity: opacity.background,
+                            tint: reduceTransparency || slots.isEmpty ? nil : islandTint(index, ranges: ranges),
+                            edge: layout.edge
                         )
+                        .animation(interaction.idleFade.animation, value: opacity.background)
+                        .overlay {
+                            if let breathing = interaction.focusBreathing {
+                                FocusBreathingChrome(
+                                    active: interaction.exposesContent && breathing.isActive(
+                                        modeID: interaction.dockModes?.activeMode.id,
+                                        sessionRunning: interaction.focusSession?.session?.phase == .running
+                                    ),
+                                    intensity: breathing.intensity,
+                                    reduceMotion: reduceMotion,
+                                    cornerRadius: radius,
+                                    backgroundOpacity: opacity.background
+                                )
+                            }
+                        }
+                        .overlay(alignment: pipAlignment) {
+                            #if DIRECT_DISTRIBUTION
+                            if index == frames.count - 1, interaction.updateAwareness?.showsIndicators == true {
+                                UpdateAwarenessPip(reduceMotion: reduceMotion)
+                                    .padding(7)
+                                    .allowsHitTesting(false)
+                            }
+                            #endif
+                        }
+                        .accessibilityHidden(true)
+                        if let title {
+                            // A point at the leading edge, so VoiceOver hears the section before its icons
+                            // without a glass element covering those icons.
+                            Color.clear
+                                .frame(width: 1, height: 1)
+                                .accessibilityLabel(Text(title))
+                                .accessibilityAddTraits(.isHeader)
+                        }
                     }
+                    .frame(width: frame.width, height: frame.height)
+                    .position(x: frame.midX, y: frame.midY)
                 }
-                .overlay(alignment: pipAlignment) {
-                    #if DIRECT_DISTRIBUTION
-                    if interaction.updateAwareness?.showsIndicators == true {
-                        UpdateAwarenessPip(reduceMotion: reduceMotion)
-                            .padding(7)
-                            .allowsHitTesting(false)
-                    }
-                    #endif
-                }
-                .frame(width: surface.width, height: surface.height)
-                .position(x: surface.midX, y: surface.midY)
             }
             if slots.isEmpty {
                 Text(.dockEmptyState)
@@ -103,32 +123,6 @@ struct DockSurfaceView: View {
                     )
                     .minimumScaleFactor(0.7)
                     .position(x: surface.midX, y: surface.midY)
-            }
-            ForEach(layout.separatorIndices.sorted(), id: \.self) { index in
-                if index < centers.count {
-                    let icon = layout.iconFrame(
-                        centerAlong: centers[index],
-                        size: layout.iconSize
-                    )
-                    let position = centers[index] - sizes[index] / 2 - 12
-                    Rectangle().fill(.primary.opacity(0.18))
-                        .animation(interaction.idleFade.animation) {
-                            $0.opacity(opacity.background)
-                        }
-                        .frame(
-                            width: layout.edge.isVertical
-                                ? layout.iconSize * 0.65 : 1,
-                            height: layout.edge.isVertical
-                                ? 1 : layout.iconSize * 0.65
-                        )
-                        .position(
-                            x: layout.edge.isVertical ? icon.midX : position,
-                            y: layout.edge.isVertical
-                                ? position
-                                : icon.midY + (layout.edge == .top ? -3 : 3)
-                        )
-                        .accessibilityHidden(true)
-                }
             }
             AppMeltDockBackgrounds(slots: slots, layout: layout, sizes: sizes,
                                    opacity: opacity.background, reduceTransparency: reduceTransparency)
@@ -225,5 +219,13 @@ struct DockSurfaceView: View {
                 ? nil : .interpolatingSpring(stiffness: 300, damping: 30),
             value: sizes
         )
+    }
+
+    /// Light for island `index`. A range that is missing falls back to every tile, which only
+    /// happens for the single empty-dock surface, and that path does not ask for a tint.
+    private func islandTint(_ index: Int, ranges: [Range<Int>]) -> Color {
+        let count = min(slots.count, sizes.count)
+        let range = ranges.indices.contains(index) ? ranges[index] : 0..<count
+        return DockIslandTint.color(for: slots, in: range, island: index)
     }
 }

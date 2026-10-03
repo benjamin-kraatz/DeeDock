@@ -24,12 +24,28 @@ struct DockSampleView: View {
         let pointer = pointerAlong ?? (magnified && layout.restingCenters.count > 2 ? layout.restingCenters[2] : nil)
         let sizes = layout.sizes(pointerAlong: pointer, reduceMotion: reduceMotion)
         let centers = layout.centers(sizes: sizes)
-        let glass = layout.surfaceFrame(sizes: sizes)
+        let islands = layout.islandFrames(sizes: sizes)
+        let glasses = islands.isEmpty ? [layout.surfaceFrame(sizes: sizes)] : islands
+        let ranges = layout.islandRanges(count: centers.count)
+        let tintAt: (Int) -> Color = { index in
+            let start = ranges.indices.contains(index) ? ranges[index].lowerBound : index
+            return colors[start % colors.count]
+        }
         ZStack(alignment: .topLeading) {
-            DockBackgroundView(reduceTransparency: reduceTransparency,
-                cornerRadius: min(appearanceSettings.cornerRadius, min(glass.width, glass.height) / 2),
-                idleOpacity: opacity.background)
-                .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
+            if !reduceTransparency {
+                ForEach(Array(glasses.enumerated()), id: \.offset) { index, glass in
+                    DockIslandGlow(color: tintAt(index), frame: glass, edge: layout.edge)
+                        .opacity(opacity.background)
+                }
+            }
+            ForEach(Array(glasses.enumerated()), id: \.offset) { index, glass in
+                DockBackgroundView(reduceTransparency: reduceTransparency,
+                    cornerRadius: min(appearanceSettings.cornerRadius, min(glass.width, glass.height) / 2),
+                    idleOpacity: opacity.background,
+                    tint: reduceTransparency ? nil : tintAt(index),
+                    edge: layout.edge)
+                    .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
+            }
             ForEach(centers.indices, id: \.self) { index in
                 let rect = layout.iconFrame(centerAlong: centers[index], size: sizes[index])
                 RoundedRectangle(cornerRadius: sizes[index] * 0.2)

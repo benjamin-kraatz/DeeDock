@@ -46490,6 +46490,150 @@
           }
         }
       }
+    },
+    "islandsTitle" : {
+      "comment" : "Settings page title for the glass sections on a dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Inseln" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Islands" } }
+      }
+    },
+    "islandsHelp" : {
+      "comment" : "Explains that dock sections are separate glass islands and that the person can edit them. Shown before any edit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "DOKK baut für jeden Abschnitt eine eigene Glasinsel: Angeheftet, Laufend, Extras, Laufwerke und Papierkorb. Benenne eine Insel um, ändere ihre Reihenfolge oder verschiebe Objekte zwischen Inseln. Zurücksetzen stellt die automatischen Abschnitte wieder her." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "DOKK builds one glass island for each section: pinned, running, extras, drives, and Trash. Rename an island, change its order, or move items between islands. Reset restores the automatic sections." } }
+      }
+    },
+    "islandsResetHelp" : {
+      "comment" : "Footnote after the person has edited this display's islands. Reset throws away those edits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zurücksetzen stellt die automatischen Abschnitte für diesen Bildschirm wieder her." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset restores the automatic sections for this display." } }
+      }
+    },
+    "islandsPinned" : {
+      "comment" : "Automatic name of the island that holds pinned apps and pinned folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Angeheftet" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pinned" } }
+      }
+    },
+    "islandsRunning" : {
+      "comment" : "Automatic name of the island that holds unpinned running apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Laufend" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Running" } }
+      }
+    },
+    "islandsExtras" : {
+      "comment" : "Automatic name of the island that holds Downloads, the Shelf, capsules, Focus, and Action Tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Extras" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Extras" } }
+      }
+    },
+    "islandsDrives" : {
+      "comment" : "Automatic name of the island that holds external drives.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Laufwerke" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Drives" } }
+      }
+    },
+    "islandsTrash" : {
+      "comment" : "Automatic name of the island that holds the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Papierkorb" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Trash" } }
+      }
+    },
+    "islandsNewName" : {
+      "comment" : "Name shown for an island that has no section and no custom name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Insel" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Island" } }
+      }
+    },
+    "islandsAdd" : {
+      "comment" : "Button that adds an empty island on this display.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Insel hinzufügen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add Island" } }
+      }
+    },
+    "islandsDelete" : {
+      "comment" : "Menu item that removes an island and keeps its items on a neighboring island.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Insel löschen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete Island" } }
+      }
+    },
+    "islandsReset" : {
+      "comment" : "Button that discards this display's island edits and generates sections again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Auf automatisch zurücksetzen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset to Automatic" } }
+      }
+    },
+    "islandsEmpty" : {
+      "comment" : "Caption under an island that currently holds no dock items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Diese Insel ist leer. Verschiebe Objekte von einer anderen Insel hierher." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This island is empty. Move items here from another island." } }
+      }
+    },
+    "islandsMoveTo" : {
+      "comment" : "Menu that moves one dock item onto another island. The menu lists island names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Auf Insel verschieben" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move to Island" } }
+      }
+    },
+    "islandsNameField" : {
+      "comment" : "Accessibility label for the field that renames an island.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Name der Insel" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Island name" } }
+      }
+    },
+    "islandsDisplay" : {
+      "comment" : "Label for the display picker on the shared Islands settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bildschirm" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Display" } }
+      }
+    },
+    "islandsSettingsKeywords" : {
+      "comment" : "Search synonyms for the Islands settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Insel Abschnitt Gruppe" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "island section group" } }
+      }
+    },
+    "islandsUnavailable" : {
+      "comment" : "Shown when a dock has no items that can be grouped into islands.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieses Dock hat noch keine Objekte, die sich gruppieren lassen." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This dock has no items to group yet." } }
+      }
     }
   },
   "version" : "1.3"

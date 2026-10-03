@@ -29,6 +29,7 @@ struct DockView: View {
     }
 
     @ViewBuilder private func dock(drawsBackground: Bool = true) -> some View {
+        let _ = store.islandGeneration
         let size = interaction.layout.viewportSize
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
                                                   size: size, reduceMotion: reduceMotion, edge: interaction.layout.edge)
@@ -39,7 +40,7 @@ struct DockView: View {
         ZStack(alignment: .topLeading) {
             DockContentView(
                 items: store.items,
-                entries: store.entries,
+                entries: store.arrangedEntries,
                 launchingIDs: store.launching,
                 selectedTarget: store.selectedTarget,
                 keyboardFocus: store.keyboardFocus,

@@ -50,6 +50,8 @@ struct DockPageContent: View {
                 BehaviorSettingsPane(source: source, showZone: showZone)
             case .shownApps:
                 AppVisibilitySettingsPane(source: source)
+            case .islands:
+                IslandsSettingsPane(context: context, pinnedDisplayID: override?.id)
             default:
                 EmptyView()
             }
