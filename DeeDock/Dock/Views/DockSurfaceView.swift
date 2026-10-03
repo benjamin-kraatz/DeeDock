@@ -54,9 +54,17 @@ struct DockSurfaceView: View {
         // pointer move over the dock and every auto-hide frame.
         let centers = layout.centers(sizes: sizes)
         let islands = layout.islandFrames(sizes: sizes)
+        let frames = islands.isEmpty ? [surface] : islands
+        let ranges = layout.islandRanges(count: min(slots.count, sizes.count))
         ZStack(alignment: .topLeading) {
             if drawsBackground {
-                let frames = islands.isEmpty ? [surface] : islands
+                if !reduceTransparency, !slots.isEmpty {
+                    ForEach(Array(frames.enumerated()), id: \.offset) { index, frame in
+                        DockIslandGlow(color: islandTint(index, ranges: ranges), frame: frame, edge: layout.edge)
+                            .opacity(opacity.background)
+                            .animation(interaction.idleFade.animation, value: opacity.background)
+                    }
+                }
                 ForEach(Array(frames.enumerated()), id: \.offset) { index, frame in
                     let radius = min(interaction.idleFade.settings.cornerRadius, min(frame.width, frame.height) / 2)
                     let title = layout.islandTitles.indices.contains(index) ? layout.islandTitles[index] : nil
@@ -64,7 +72,9 @@ struct DockSurfaceView: View {
                         DockBackgroundView(
                             reduceTransparency: reduceTransparency,
                             cornerRadius: radius,
-                            idleOpacity: opacity.background
+                            idleOpacity: opacity.background,
+                            tint: reduceTransparency || slots.isEmpty ? nil : islandTint(index, ranges: ranges),
+                            edge: layout.edge
                         )
                         .animation(interaction.idleFade.animation, value: opacity.background)
                         .overlay {
@@ -209,5 +219,13 @@ struct DockSurfaceView: View {
                 ? nil : .interpolatingSpring(stiffness: 300, damping: 30),
             value: sizes
         )
+    }
+
+    /// Light for island `index`. A range that is missing falls back to every tile, which only
+    /// happens for the single empty-dock surface, and that path does not ask for a tint.
+    private func islandTint(_ index: Int, ranges: [Range<Int>]) -> Color {
+        let count = min(slots.count, sizes.count)
+        let range = ranges.indices.contains(index) ? ranges[index] : 0..<count
+        return DockIslandTint.color(for: slots, in: range, island: index)
     }
 }

@@ -64,31 +64,31 @@ final class DockIslandStore {
     }
 
     func rename(displayID: String, islandID: String, to name: String) {
-        edit(displayID) { document, snapshots in
+        edit(displayID: displayID) { document, snapshots in
             DockIslandArrangement.renaming(document, islandID: islandID, to: name, snapshots: snapshots)
         }
     }
 
     func moveIsland(displayID: String, id: String, by distance: Int) {
-        edit(displayID) { document, snapshots in
+        edit(displayID: displayID) { document, snapshots in
             DockIslandArrangement.movingIsland(document, id: id, by: distance, snapshots: snapshots)
         }
     }
 
     func moveMember(displayID: String, memberID: String, to islandID: String) {
-        edit(displayID) { document, snapshots in
+        edit(displayID: displayID) { document, snapshots in
             DockIslandArrangement.movingMember(document, memberID: memberID, to: islandID, snapshots: snapshots)
         }
     }
 
     func addIsland(displayID: String) {
-        edit(displayID) { document, snapshots in
+        edit(displayID: displayID) { document, snapshots in
             DockIslandArrangement.addingIsland(document, snapshots: snapshots)
         }
     }
 
     func deleteIsland(displayID: String, id: String) {
-        edit(displayID) { document, snapshots in
+        edit(displayID: displayID) { document, snapshots in
             DockIslandArrangement.deletingIsland(document, id: id, snapshots: snapshots)
         }
     }

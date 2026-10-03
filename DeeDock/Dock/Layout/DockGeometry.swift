@@ -93,24 +93,31 @@ enum DockGeometry {
             }
         }
 
+        /// Half-open tile ranges, one per glass island, in visual order.
+        ///
+        /// Index 0 begins the first island. Each later entry in `separatorIndices` begins the next.
+        func islandRanges(count: Int) -> [Range<Int>] {
+            guard count > 0 else { return [] }
+            let boundaries = separatorIndices.filter { $0 > 0 && $0 < count }.sorted()
+            var ranges: [Range<Int>] = []
+            var start = 0
+            for boundary in boundaries where boundary > start {
+                ranges.append(start..<boundary)
+                start = boundary
+            }
+            if start < count { ranges.append(start..<count) }
+            return ranges
+        }
+
         /// One glass capsule per island, in top-left canvas coordinates.
         /// Magnification changes length and never thickness. A single island matches `surfaceFrame`.
         func islandFrames(sizes: [CGFloat]) -> [CGRect] {
             let centers = centers(sizes: sizes)
             let count = min(sizes.count, centers.count)
-            guard count > 0 else { return [] }
-            let boundaries = separatorIndices.filter { $0 > 0 && $0 < count }.sorted()
-            var ranges: [(Int, Int)] = []
-            var start = 0
-            for boundary in boundaries {
-                ranges.append((start, boundary))
-                start = boundary
-            }
-            ranges.append((start, count))
             let height = surfaceDepth
-            return ranges.map { start, end in
-                let first = start
-                let last = end - 1
+            return islandRanges(count: count).map { range in
+                let first = range.lowerBound
+                let last = range.upperBound - 1
                 let minAlong = centers[first] - sizes[first] / 2 - DockGeometry.padding
                 let maxAlong = centers[last] + sizes[last] / 2 + DockGeometry.padding
                 return edge.rect(CGRect(x: minAlong,
