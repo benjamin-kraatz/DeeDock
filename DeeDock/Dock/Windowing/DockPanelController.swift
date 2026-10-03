@@ -156,20 +156,11 @@ final class DockPanelController {
         let timelineCallout: CGFloat? = interaction.timeline?.isActive(on: store.displayID) == true
             ? (settings.edge.isVertical ? 260 : 168)
             : nil
-        baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
-                                         utilityCount: store.entries.filter(\.isUtility).count - (settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0),
-                                         leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
-                                         availableLength: settings.edge.length(of: reference.size),
-                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings,
-                                         calloutReserve: timelineCallout)
+        let arranged = store.arrangedEntries
+        baseLayout = makeLayout(entries: arranged, settings: settings, reference: reference, calloutReserve: timelineCallout)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
-        let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
-        interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                                                 utilityCount: slots.filter(\.isUtility).count - (settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0),
-                                                 leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
-                                                 availableLength: settings.edge.length(of: reference.size),
-                                         availableDepth: settings.edge.depth(of: reference.size), settings: settings,
-                                         calloutReserve: timelineCallout)
+        let slots = DockRenderSlot.slots(entries: arranged, proposal: interaction.dragProposal)
+        interaction.layout = makeLayout(entries: slots, settings: settings, reference: reference, calloutReserve: timelineCallout)
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
         let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
@@ -299,6 +290,23 @@ final class DockPanelController {
         invalidateDrag = { [weak coordinator] in if coordinator?.committing != true { coordinator?.cancel() } }
     }
 
+    /// Glass islands follow the slots actually drawn, including a drag gap, rather than pin counts.
+    private func makeLayout(entries: [DockRenderSlot], settings: DockSettings, reference: CGRect,
+                            calloutReserve: CGFloat?) -> DockGeometry.Layout {
+        let islands = store.islandLayout(for: entries)
+        let launcherLeading = settings.launcherAtStart && entries.contains { $0.target == .launcher }
+        return DockGeometry.layout(count: entries.count,
+                                   favoriteCount: entries.filter(\.isPinned).count,
+                                   utilityCount: entries.filter(\.isUtility).count - (launcherLeading ? 1 : 0),
+                                   leadingUtilityCount: launcherLeading ? 1 : 0,
+                                   availableLength: settings.edge.length(of: reference.size),
+                                   availableDepth: settings.edge.depth(of: reference.size),
+                                   settings: settings,
+                                   calloutReserve: calloutReserve,
+                                   islandStarts: islands.starts,
+                                   islandTitles: islands.titles)
+    }
+
     private func contentPoint(_ screenPoint: CGPoint) -> CGPoint {
         let local = panel.convertPoint(fromScreen: screenPoint)
         let point = CGPoint(x: local.x - interaction.contentOrigin.x,
@@ -320,7 +328,7 @@ final class DockPanelController {
     func magneticPeerFrames(excluding pinID: String?) -> [CGRect] {
         guard !stopped, visibility.exposesContent, !baseRestingFrame.isEmpty else { return [] }
         let size = baseLayout.iconSize
-        return zip(store.entries.indices, store.entries).compactMap { index, entry in
+        return zip(store.arrangedEntries.indices, store.arrangedEntries).compactMap { index, entry in
             guard index < baseLayout.restingCenters.count else { return nil }
             let isPeer: Bool
             if let pin = entry.pin {
@@ -368,7 +376,7 @@ final class DockPanelController {
         guard !launcher.isPresented, visibility.exposesContent, restingDragBounds.contains(point), !baseRestingFrame.isEmpty else { return nil }
         let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
         return DockSectionInsertion.index(point: local, scrollOffset: interaction.scrollOffset,
-            layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
+            layout: baseLayout, entries: store.arrangedEntries, pinCount: store.pins.count, visibility: store.sections.visibility)
     }
 
     /// Utility boundaries use the original layout, so a moving gap cannot retarget itself.
@@ -387,22 +395,24 @@ final class DockPanelController {
     private func insertionIndex(at point: CGPoint, sourceID: String, member: (DockRenderSlot) -> Bool) -> Int? {
         guard !stopped, !launcher.isPresented, visibility.exposesContent,
               restingDragBounds.contains(point) else { return nil }
-        let positions = store.entries.indices.filter { member(store.entries[$0]) }
+        let entries = store.arrangedEntries
+        let positions = entries.indices.filter { member(entries[$0]) }
         let centers = baseLayout.restingCenters
         guard let first = positions.first, let last = positions.last, last < centers.count,
-              positions.contains(where: { store.entries[$0].id == sourceID }) else { return nil }
+              positions.contains(where: { entries[$0].id == sourceID }) else { return nil }
         let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
         let along = baseLayout.edge.along(local) - interaction.scrollOffset
         let padding = baseLayout.iconSize / 2 + baseLayout.itemSpacing / 2
         guard along >= centers[first] - padding, along <= centers[last] + padding else { return nil }
-        return positions.filter { store.entries[$0].id != sourceID && along > centers[$0] }.count
+        return positions.filter { entries[$0].id != sourceID && along > centers[$0] }.count
     }
 
     /// Uses resting section bounds so insertion previews cannot move the unpin destination.
     /// Includes spacing between running apps and a collapsed running-section control.
     func runningSectionTarget(at point: CGPoint) -> Bool {
         guard !launcher.isPresented, visibility.exposesContent, restingDragBounds.contains(point) else { return false }
-        let indices = store.entries.indices.filter { store.entries[$0].appGroup == .running }
+        let entries = store.arrangedEntries
+        let indices = entries.indices.filter { entries[$0].appGroup == .running }
         guard let first = indices.first, let last = indices.last,
               last < baseLayout.restingCenters.count else { return false }
         let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
@@ -567,8 +577,9 @@ final class DockPanelController {
 
     func setDragPresentation(proposal: DockDragProposal?, source: String?, targeted: Bool, message: LocalizedStringResource?) {
         guard !stopped else { return }
-        let previousSlots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
-        let nextSlots = DockRenderSlot.slots(entries: store.entries, proposal: proposal)
+        let arranged = store.arrangedEntries
+        let previousSlots = DockRenderSlot.slots(entries: arranged, proposal: interaction.dragProposal)
+        let nextSlots = DockRenderSlot.slots(entries: arranged, proposal: proposal)
         // Moving one preview between boundaries changes slot order, not panel geometry. Avoid
         // synchronously setting the native window frame again from AppKit's drag callback.
         let layoutChanged = previousSlots.count != nextSlots.count
@@ -635,7 +646,7 @@ final class DockPanelController {
         store.keyboardFocus = true
         visibility.showImmediately()
         panel.acceptsKeyboardFocus = true
-        store.selectedTarget = store.selectedTarget ?? store.entries.first?.target
+        store.selectedTarget = store.selectedTarget ?? store.arrangedEntries.first?.target
         ExplicitWindowPresenter.shared.present(panel)
         panel.makeFirstResponder(panel)
         updatePointer()

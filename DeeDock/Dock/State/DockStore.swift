@@ -88,12 +88,16 @@ final class DockStore {
 
     @ObservationIgnored private let history: DockLocalHistoryStore?
     @ObservationIgnored private let pinWeather: PinWeatherStore?
+    /// Shared with Settings and the other displays. Edits here change every dock that uses this store.
+    let islands: DockIslandStore
+    /// Bumped when a person edits islands, so the dock redraws even if the tile list is unchanged.
+    private(set) var islandGeneration = 0
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
          trash: TrashController? = nil, shelf: ShelfController? = nil, volumes: VolumeController? = nil,
          capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil,
          focusSession: FocusSessionController? = nil, history: DockLocalHistoryStore? = nil,
-         pinWeather: PinWeatherStore? = nil) {
+         pinWeather: PinWeatherStore? = nil, islands: DockIslandStore? = nil) {
         self.focusSession = focusSession
         self.actions = actions
         self.displayID = displayID
@@ -105,6 +109,7 @@ final class DockStore {
         self.capsules = capsules
         self.history = history
         self.pinWeather = pinWeather
+        self.islands = islands ?? DockIslandStore()
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
@@ -215,6 +220,24 @@ final class DockStore {
             : ordinary
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
+        islands.remember(displayID: displayID, slots: next)
+    }
+
+    /// Tiles in island order. Automatic sections keep the dock's own order.
+    var arrangedEntries: [DockRenderSlot] {
+        islands.arrangedSlots(entries, displayID: displayID)
+    }
+
+    /// Island starts and spoken names for the slots about to be drawn, including a drag gap.
+    func islandLayout(for slots: [DockRenderSlot]) -> (starts: [Int], titles: [String]) {
+        let breaks = islands.breaks(in: slots, displayID: displayID)
+        return (breaks.map(\.start), breaks.map { islands.resolvedTitle($0.title) })
+    }
+
+    /// Relays a Settings edit into this panel. Tile refreshes do not come through here.
+    func noteIslandEdit() {
+        islandGeneration += 1
+        presentationDidChange?()
     }
 
     private var utilityOrderKey: String { "dockUtilityOrder.\(displayID)" }
@@ -537,6 +560,7 @@ final class DockStore {
         }
     }
     func moveSelection(by distance: Int) {
+        let entries = arrangedEntries
         guard !entries.isEmpty else { return }
         let index = selectedTarget.flatMap { id in entries.firstIndex { $0.target == id } } ?? 0
         selectedTarget = entries[(index + distance + entries.count) % entries.count].target
