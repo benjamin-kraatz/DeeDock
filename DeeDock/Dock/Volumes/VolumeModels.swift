@@ -118,6 +118,10 @@ nonisolated struct VolumeBlocker: Identifiable, Equatable, Sendable {
     let name: String
     /// True when `pid` belongs to a regular application that can be shown or asked to quit.
     let isApplication: Bool
+    /// The program file of a bare process, for Show in Finder. Nil for applications.
+    var executablePath: String? = nil
+    /// True for a process that runs as another user and belongs to macOS.
+    var isSystem = false
     var id: pid_t { pid }
 }
 

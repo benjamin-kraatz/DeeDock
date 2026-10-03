@@ -89,13 +89,13 @@ final class VolumeDockCoordinator {
 
     private func openStack(_ volume: VolumeDockItem, on panel: DockPanelController, keyboard: Bool) {
         guard !volume.isEjecting else { return }
-        cards.close()
+        cards.dismiss()
         folderStacks.show(volume.stackItem(displayID: panel.store.displayID), on: panel, keyboard: keyboard,
                           anchoredTo: .volume(volume.volumeID))
     }
 
     private func openInFinder(_ volume: VolumeDockItem) {
-        cards.close()
+        cards.dismiss()
         NSWorkspace.shared.open(volume.url)
     }
 
@@ -125,6 +125,8 @@ final class VolumeDockCoordinator {
             pending.quitting.insert(pid)
             retryAfterQuit[volume.volumeID] = pending
             state?.quitting.insert(pid)
+        case .revealExecutable(let path):
+            NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)])
         case .dismiss: cards.close()
         }
     }

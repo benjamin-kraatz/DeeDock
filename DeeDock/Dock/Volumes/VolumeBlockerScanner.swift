@@ -3,13 +3,18 @@ import Darwin
 
 /// Finds the processes that keep a volume busy, using libproc's public volume query.
 ///
-/// Only processes of the current user are visible. Root daemons such as Spotlight can still block
-/// an eject without appearing here, which is why the card also handles an empty blocker list.
+/// The volume query only sees processes of the current user. A system process, such as the one
+/// that keeps Preview's document versions, can still block an eject; macOS then names it only as
+/// the unmount's dissenter, and `describe` turns that bare process ID into a name and a path.
 nonisolated enum VolumeBlockerScanner {
     /// A process that holds files on the volume, before it is mapped to an application.
     struct Process: Equatable, Sendable {
         let pid: pid_t
         let name: String
+        /// The program file, when macOS reports it.
+        var path: String? = nil
+        /// True when the process runs as another user, typically root, and so belongs to macOS.
+        var isSystem = false
     }
 
     /// Lists processes with open files, working directories, or mapped files on the volume.
@@ -30,22 +35,37 @@ nonisolated enum VolumeBlockerScanner {
         let own = ProcessInfo.processInfo.processIdentifier
         return pids.prefix(Int(bytes) / MemoryLayout<pid_t>.stride)
             .filter { $0 > 0 && $0 != own }
-            .map { Process(pid: $0, name: name(of: $0)) }
+            .map(describe)
     }
 
-    /// The BSD parent of `pid`, or nil once the chain reaches launchd or an unreadable process.
+    /// Names any process, including root-owned ones that libproc refuses to inspect. The kernel
+    /// process table answers for every process; libproc then adds the full program path, whose file
+    /// name is not cut off at 16 characters the way the table's command name is.
+    static func describe(_ pid: pid_t) -> Process {
+        let entry = kernelEntry(pid)
+        var buffer = [CChar](repeating: 0, count: Int(MAXPATHLEN))
+        let path = proc_pidpath(pid, &buffer, UInt32(buffer.count)) > 0 ? String(cString: buffer) : nil
+        let command = entry.map { entry in
+            withUnsafeBytes(of: entry.kp_proc.p_comm) { String(cString: $0.bindMemory(to: CChar.self).baseAddress!) }
+        }
+        let name = path.map { URL(fileURLWithPath: $0).lastPathComponent } ?? command ?? "\(pid)"
+        let isSystem = entry.map { $0.kp_eproc.e_ucred.cr_uid != getuid() } ?? true
+        return Process(pid: pid, name: name, path: path, isSystem: isSystem)
+    }
+
+    /// The BSD parent of `pid`, or nil once the chain reaches launchd or an unknown process.
     static func parent(of pid: pid_t) -> pid_t? {
-        var info = proc_bsdinfo()
-        let size = Int32(MemoryLayout<proc_bsdinfo>.stride)
-        guard proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &info, size) == size else { return nil }
-        let parent = pid_t(info.pbi_ppid)
-        return parent > 1 ? parent : nil
+        guard let parent = kernelEntry(pid)?.kp_eproc.e_ppid, parent > 1 else { return nil }
+        return parent
     }
 
-    private static func name(of pid: pid_t) -> String {
-        var buffer = [CChar](repeating: 0, count: 256)
-        let length = proc_name(pid, &buffer, UInt32(buffer.count))
-        return length > 0 ? String(cString: buffer) : "\(pid)"
+    /// The kernel's process-table entry, readable for every process without extra privileges.
+    private static func kernelEntry(_ pid: pid_t) -> kinfo_proc? {
+        var entry = kinfo_proc()
+        var size = MemoryLayout<kinfo_proc>.stride
+        var query: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, pid]
+        guard sysctl(&query, UInt32(query.count), &entry, &size, nil, 0) == 0, size > 0 else { return nil }
+        return entry
     }
 }
 
@@ -72,7 +92,8 @@ enum VolumeBlockerResolver {
                 current = parent(pid)
                 steps += 1
             }
-            let blocker = resolved ?? VolumeBlocker(pid: process.pid, name: process.name, isApplication: false)
+            let blocker = resolved ?? VolumeBlocker(pid: process.pid, name: process.name, isApplication: false,
+                                                    executablePath: process.path, isSystem: process.isSystem)
             // DOKK closes its own stack before ejecting, so it never lists itself as the culprit.
             guard blocker.pid != ProcessInfo.processInfo.processIdentifier else { continue }
             if seen.insert(blocker.pid).inserted { result.append(blocker) }

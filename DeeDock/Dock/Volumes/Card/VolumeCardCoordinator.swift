@@ -60,7 +60,8 @@ final class VolumeCardCoordinator {
             guard let self, let panel, !Task.isCancelled, generation == token else { return }
             dwellTask = nil
             guard sourceHovered, let current = volumes.item(volume.volumeID) else { return }
-            present(current, on: panel, phase: .info, keyboard: false)
+            // An eject started elsewhere (menu, drag, an earlier card) is still running; show it.
+            present(current, on: panel, phase: current.isEjecting ? .ejecting : .info, keyboard: false)
         }
     }
 
@@ -93,9 +94,9 @@ final class VolumeCardCoordinator {
             // which closes the card through the popover presenter.
             guard let self, let next, controller === next else { return }
             if next.contains(NSEvent.mouseLocation) { return }
-            close()
+            dismiss()
         }
-        next.escape = { [weak self] in self?.close() }
+        next.escape = { [weak self] in self?.dismiss() }
         controller = next
         sourcePanel = panel
         volumeID = volume.volumeID
@@ -144,6 +145,14 @@ final class VolumeCardCoordinator {
         if sourcePanel?.store.displayID == displayID { close() }
     }
 
+    /// Closes the card on a user's way out (outside click, Escape, another popover), except while
+    /// an eject runs: that card stays until the eject succeeds or fails, then reports the outcome.
+    func dismiss() {
+        guard controller?.state.phase != .ejecting else { return }
+        close()
+    }
+
+    /// Closes unconditionally, for teardown such as sleep or a removed display.
     func close() {
         generation = UUID()
         dwellTask?.cancel(); dwellTask = nil

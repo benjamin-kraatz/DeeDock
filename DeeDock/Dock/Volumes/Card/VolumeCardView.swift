@@ -106,7 +106,10 @@ private enum VolumeCardPreviewData {
 
     static let preview = VolumeBlocker(pid: 101, name: "Preview", isApplication: true)
     static let terminal = VolumeBlocker(pid: 102, name: "Terminal", isApplication: true)
-    static let shell = VolumeBlocker(pid: 103, name: "rsync", isApplication: false)
+    static let shell = VolumeBlocker(pid: 103, name: "rsync", isApplication: false, executablePath: "/usr/bin/rsync")
+    static let daemon = VolumeBlocker(pid: 104, name: "revisiond", isApplication: false,
+                                      executablePath: "/System/Library/PrivateFrameworks/GenerationalStorage.framework/Versions/A/Support/revisiond",
+                                      isSystem: true)
 }
 
 #Preview("Info, not in use") {
@@ -149,6 +152,10 @@ private enum VolumeCardPreviewData {
                                                       VolumeCardPreviewData.shell]))
     state.quitting = [VolumeCardPreviewData.terminal.pid]
     return VolumeCardView(state: state).padding()
+}
+
+#Preview("Blocked by a system process") {
+    VolumeCardView(state: VolumeCardPreviewData.state(.blocked([VolumeCardPreviewData.daemon]))).padding()
 }
 
 #Preview("Blocked, nothing named") {

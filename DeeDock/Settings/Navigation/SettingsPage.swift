@@ -28,6 +28,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
 
     // Features — app-wide capabilities.
     case shelfAndTrash
+    case drives
     case capsules
     case badges
     case windowPeek
@@ -70,7 +71,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup: .general
-        case .shelfAndTrash, .capsules, .badges, .windowPeek,
+        case .shelfAndTrash, .drives, .capsules, .badges, .windowPeek,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
              .discovery, .quarantine: .features
@@ -100,6 +101,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .menuBar: .menuBarIconTitle
         case .startup: .settingsStartup
         case .shelfAndTrash: .settingsShelfAndTrash
+        case .drives: .settingsVolumes
         case .capsules: .settingsCapsules
         case .badges: .appBadgesTitle
         case .windowPeek: .windowPeekTitle
@@ -144,6 +146,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     var subtitle: LocalizedStringResource? {
         switch self {
         case .shelfAndTrash: .settingsFeatureShelfSubtitle
+        case .drives: .settingsFeatureDrivesSubtitle
         case .capsules: .settingsFeatureCapsulesSubtitle
         case .badges: .settingsFeatureBadgesSubtitle
         case .windowPeek: .settingsFeaturePeekSubtitle
@@ -181,6 +184,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .menuBar: .symbol("menubar.rectangle")
         case .startup: .symbol("power")
         case .shelfAndTrash: .symbol("tray.full.fill")
+        case .drives: .symbol("externaldrive.fill")
         case .capsules: .symbol("capsule.portrait.fill")
         case .badges: .symbol("app.badge.fill")
         case .windowPeek: .symbol("macwindow.on.rectangle")
@@ -216,6 +220,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .softwareUpdate: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .startup: Color(red: 0.20, green: 0.66, blue: 0.32)
         case .shelfAndTrash: Color(red: 0.70, green: 0.50, blue: 0.28)
+        case .drives: Color(red: 0.42, green: 0.48, blue: 0.58)
         case .capsules: Color(red: 0.16, green: 0.62, blue: 0.80)
         case .badges: Color(red: 0.88, green: 0.24, blue: 0.28)
         case .windowPeek: Color(red: 0.24, green: 0.50, blue: 0.94)
@@ -251,6 +256,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .softwareUpdate: [Color(red: 0.42, green: 0.78, blue: 1.0), Color(red: 0.10, green: 0.44, blue: 0.92)]
         case .startup: [Color(red: 0.44, green: 0.84, blue: 0.46), Color(red: 0.10, green: 0.56, blue: 0.24)]
         case .shelfAndTrash: [Color(red: 0.86, green: 0.68, blue: 0.42), Color(red: 0.56, green: 0.38, blue: 0.18)]
+        case .drives: [Color(red: 0.66, green: 0.71, blue: 0.79), Color(red: 0.30, green: 0.35, blue: 0.44)]
         case .capsules: [Color(red: 0.40, green: 0.82, blue: 0.96), Color(red: 0.08, green: 0.50, blue: 0.72)]
         case .badges: [Color(red: 1.0, green: 0.44, blue: 0.42), Color(red: 0.80, green: 0.14, blue: 0.20)]
         case .windowPeek: [Color(red: 0.44, green: 0.68, blue: 1.0), Color(red: 0.14, green: 0.36, blue: 0.88)]
@@ -293,6 +299,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords
         case .about, .softwareUpdate, .menuBar, .startup: .settingsGeneralKeywords
+        case .drives: .settingsDrivesKeywords
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
              .focusSessions, .actionTiles, .multipleDisplays, .permissions: .settingsFeaturesKeywords
         }

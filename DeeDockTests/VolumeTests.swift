@@ -104,6 +104,23 @@ struct VolumeTests {
         #expect(blockers.map(\.isApplication) == [true, true, false])
     }
 
+    @Test("Bare processes keep their path and system flag for the card's Show in Finder")
+    func bareProcessDetails() {
+        let daemon = VolumeBlockerScanner.Process(pid: 500, name: "revisiond", path: "/usr/libexec/revisiond", isSystem: true)
+        let blockers = VolumeBlockerResolver.blockers(from: [daemon], parent: { _ in nil }, application: { _ in nil })
+        #expect(blockers == [VolumeBlocker(pid: 500, name: "revisiond", isApplication: false,
+                                           executablePath: "/usr/libexec/revisiond", isSystem: true)])
+    }
+
+    @Test("Process IDs resolve to names, including root-owned processes")
+    func describeProcesses() {
+        let own = VolumeBlockerScanner.describe(ProcessInfo.processInfo.processIdentifier)
+        #expect(own.name != "\(own.pid)" && !own.isSystem && own.path != nil)
+        // launchd runs as root; the volume query cannot inspect it, but the process table can.
+        let launchd = VolumeBlockerScanner.describe(1)
+        #expect(launchd.name == "launchd" && launchd.isSystem)
+    }
+
     @Test("Used fraction is clamped and unknown without both capacities")
     func capacity() {
         #expect(VolumeCapacityFormat.usedFraction(total: 100, available: 25) == 0.75)

@@ -29296,13 +29296,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dateien ablegen, den Papierkorb verwalten und Laufwerke auswerfen."
+            "value" : "Dateien ablegen und den Papierkorb verwalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stage files, manage the Trash, and eject drives."
+            "value" : "Stage files and manage the Trash."
           }
         }
       }
@@ -29332,13 +29332,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Laufwerk Laufwerke USB-Stick SD-Karte externe Festplatte Volume auswerfen Disk-Image DMG Netzwerk Freigabe Server Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen veraltet abgekündigt Quarantäne Stempel Patchbay Atem Fokus-Zähler"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen veraltet abgekündigt Quarantäne Stempel Patchbay Atem Fokus-Zähler"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm drive drives usb stick sd card external disk volume eject disk image dmg network share server window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop deprecated quarantine stamp patch bay breathing focus debt"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop deprecated quarantine stamp patch bay breathing focus debt"
           }
         }
       }
@@ -30556,13 +30556,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ablage, Papierkorb, Laufwerke, Quarantäne"
+            "value" : "Ablage, Papierkorb, Quarantäne"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shelf, Trash, Drives, Quarantine"
+            "value" : "Shelf, Trash, Quarantine"
           }
         }
       }
@@ -46001,6 +46001,96 @@
           "stringUnit": {
             "state": "translated",
             "value": "USB sticks and SD cards always eject right away."
+          }
+        }
+      }
+    },
+    "settingsFeatureDrivesSubtitle" : {
+      "comment": "Subtitle of the Drives settings page in the Dock Extras overview.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Externe Laufwerke anzeigen, durchsuchen und auswerfen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show, browse, and eject external drives."
+          }
+        }
+      }
+    },
+    "settingsDrivesKeywords" : {
+      "comment": "Search terms for the Drives settings page. Not shown; separate words with spaces.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufwerk Laufwerke USB-Stick SD-Karte externe Festplatte SSD Volume auswerfen trennen Disk-Image DMG Netzwerk Freigabe Server"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "drive drives usb stick sd card external disk hard disk ssd volume eject unmount disk image dmg network share server"
+          }
+        }
+      }
+    },
+    "volumeBlockedOneProcess" : {
+      "comment": "Volume card message above a single process that keeps the volume busy and is not an app.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Prozess hat noch Dateien auf dem Volume geöffnet:"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A process still has files open on the volume:"
+          }
+        }
+      }
+    },
+    "volumeBlockerSystemProcess" : {
+      "comment": "Caption under a blocking process that belongs to macOS rather than the user.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS-Systemprozess"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS system process"
+          }
+        }
+      }
+    },
+    "volumeBlockerReveal" : {
+      "comment": "Button in the volume card that shows a blocking process's program file in Finder.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Finder zeigen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show in Finder"
           }
         }
       }

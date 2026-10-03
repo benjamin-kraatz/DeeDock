@@ -25,6 +25,7 @@ struct FeaturesPageContent: View {
                 #endif
             }
             .disabled(locked)
+        case .drives:
             VolumesSettingsCard(source: source).disabled(locked)
         case .capsules:
             SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {

@@ -133,7 +133,7 @@ Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to 
 
 ## External drives
 
-Connected USB sticks, SD cards, and external disks appear between the Shelf and Trash. Click one to browse it in a stack, or hover over it for a card with capacity, Open in Finder, and Eject. You can also drag the tile off the dock to eject it; “Eject” appears before you release. The tile dims while ejecting and leaves once the drive is safe to remove. If an app still has a file open, the card names the app and offers Show, Quit (the eject then retries), Try Again, and Eject Anyway. Disk images and network shares have their own switches in Settings › Shelf, Trash, Drives, Quarantine, and DOKK can ask before ejecting a hard disk. See [acceptance notes](docs/ACCEPTANCE.md#dee-83-external-volumes) for limits and pending hands-on checks.
+Connected USB sticks, SD cards, and external disks appear between the Shelf and Trash. Click one to browse it in a stack, or hover over it for a card with capacity, Open in Finder, and Eject. You can also drag the tile off the dock to eject it; “Eject” appears before you release. The tile dims while ejecting and leaves once the drive is safe to remove. If an app still has a file open, the card names the app and offers Show, Quit (the eject then retries), Try Again, and Eject Anyway. Disk images and network shares have their own switches in Settings › Dock Extras › Drives, and DOKK can ask before ejecting a hard disk. See [acceptance notes](docs/ACCEPTANCE.md#dee-83-external-volumes) for limits and pending hands-on checks.
 
 ## App Fusion
 

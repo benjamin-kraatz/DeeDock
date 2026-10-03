@@ -298,7 +298,7 @@ final class DockCoordinator {
         popovers.openChanged = { [weak self] open in
             if open {
                 self?.windowPeeks.close(returnFocus: false)
-                self?.volumeDock.cards.close()
+                self?.volumeDock.cards.dismiss()
                 self?.modePicker.close(returnFocus: false)
             }
             self?.panels.values.forEach { $0.holdPopover(open) }

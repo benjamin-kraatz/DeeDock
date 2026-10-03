@@ -39,6 +39,8 @@ enum VolumeCardAction: Equatable {
     case cancel
     case showApplication(pid_t)
     case quitApplication(pid_t)
+    /// Selects a blocking process's program file in Finder.
+    case revealExecutable(String)
     case dismiss
 }
 

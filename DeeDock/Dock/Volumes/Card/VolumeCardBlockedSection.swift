@@ -42,6 +42,7 @@ struct VolumeCardBlockedSection: View {
         if let failure { return .volumeEjectFailedDetails(details: failure) }
         let applications = blockers.filter(\.isApplication)
         if blockers.count == 1, let only = applications.first { return .volumeBlockedOneApp(app: only.name) }
+        if blockers.count == 1 { return .volumeBlockedOneProcess }
         return blockers.isEmpty ? .volumeBlockedUnknown : .volumeBlockedMany
     }
 }
@@ -55,9 +56,15 @@ struct VolumeBlockerRow: View {
     var body: some View {
         HStack(spacing: 10) {
             icon.frame(width: 24, height: 24)
-            Text(verbatim: blocker.name)
-                .font(.callout.weight(.medium))
-                .lineLimit(1)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(verbatim: blocker.name)
+                    .font(.callout.weight(.medium))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                if blocker.isSystem {
+                    Text(.volumeBlockerSystemProcess).font(.caption).foregroundStyle(.secondary)
+                }
+            }
             Spacer(minLength: 8)
             if quitting {
                 ProgressView().controlSize(.small)
@@ -65,6 +72,9 @@ struct VolumeBlockerRow: View {
             } else if blocker.isApplication {
                 Button { perform(.showApplication(blocker.pid)) } label: { Text(.volumeBlockerShow) }
                 Button { perform(.quitApplication(blocker.pid)) } label: { Text(.volumeBlockerQuit) }
+            } else if let path = blocker.executablePath {
+                Button { perform(.revealExecutable(path)) } label: { Text(.volumeBlockerReveal) }
+                    .help(Text(verbatim: path))
             }
         }
         .buttonStyle(.bordered)
@@ -79,7 +89,8 @@ struct VolumeBlockerRow: View {
         if blocker.isApplication, let image = NSRunningApplication(processIdentifier: blocker.pid)?.icon {
             Image(nsImage: image).resizable().accessibilityHidden(true)
         } else {
-            Image(systemName: "terminal").font(.system(size: 15)).foregroundStyle(.secondary)
+            Image(systemName: blocker.isSystem ? "gearshape.2" : "terminal")
+                .font(.system(size: 15)).foregroundStyle(.secondary)
                 .accessibilityHidden(true)
         }
     }

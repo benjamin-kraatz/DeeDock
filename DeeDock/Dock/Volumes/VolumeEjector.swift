@@ -20,7 +20,7 @@ nonisolated enum VolumeEjector {
             let dissenter = (error as NSError).userInfo[NSFileManagerUnmountDissentingProcessIdentifierErrorKey] as? NSNumber
             var candidates = processes
             if let pid = dissenter?.int32Value, pid > 0, !candidates.contains(where: { $0.pid == pid }) {
-                candidates.insert(VolumeBlockerScanner.Process(pid: pid, name: "\(pid)"), at: 0)
+                candidates.insert(VolumeBlockerScanner.describe(pid), at: 0)
             }
             let found = candidates
             let blockers = await MainActor.run { VolumeBlockerResolver.blockers(from: found) }
