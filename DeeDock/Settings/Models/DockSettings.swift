@@ -53,6 +53,8 @@ struct DockSettings: Codable, Equatable {
     var itemSpacing: Double = 4
     /// Requested background corner radius in points; rendering caps it to half the shortest side.
     var cornerRadius: Double = 22
+    /// Background and running-marker look. Documents saved before this key decode as glass.
+    var surfaceStyle: DockSurfaceStyle = .glass
     var appVisibility: DockAppVisibility = .showAll
     /// Filters secondary docks' running-only apps by visible windows; preserves section settings.
     var secondaryDisplayAppsOnly = false
@@ -184,7 +186,7 @@ extension DockSettings {
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case windowMarkupFormat, windowMarkupSearchEngine, windowMarkupFolder
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, cornerRadius, surfaceStyle, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -235,6 +237,7 @@ extension DockSettings {
         magnification = try values.decode(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing) ?? 4
         cornerRadius = values.contains(.cornerRadius) ? try values.decode(Double.self, forKey: .cornerRadius) : 22
+        surfaceStyle = try values.decodeIfPresent(DockSurfaceStyle.self, forKey: .surfaceStyle) ?? .glass
         runningIndicatorStyle = values.contains(.runningIndicatorStyle)
             ? try values.decode(RunningIndicatorStyle.self, forKey: .runningIndicatorStyle) : .dot
         animateIndicators = values.contains(.animateIndicators)

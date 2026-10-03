@@ -53,6 +53,11 @@ enum DockGeometry {
         let restingCenters: [CGFloat]
         /// Entry indices preceded by a divider, for app-section and trailing utility boundaries.
         let separatorIndices: Set<Int>
+        /// Along-axis inset from the surface edge to the first and last icon squares.
+        var endPadding: CGFloat = DockGeometry.padding
+        /// Along-axis room reserved at each separator. Ice Blocks widens both so every block
+        /// keeps its own padding and a visible gap to its neighbour.
+        var separatorLength: CGFloat = DockGeometry.separatorLength
 
         /// Computes icon dimensions from a canvas-space pointer along-axis coordinate.
         /// A nil pointer or Reduce Motion returns resting sizes.
@@ -71,9 +76,9 @@ enum DockGeometry {
         /// - Parameter sizes: One size per item, in the layout’s original order.
         func centers(sizes: [CGFloat]) -> [CGFloat] {
             let width = contentLength(sizes: sizes)
-            var x = (canvasLength - width) / 2 + DockGeometry.padding
+            var x = (canvasLength - width) / 2 + endPadding
             return sizes.enumerated().map { index, size in
-                if separatorIndices.contains(index) { x += DockGeometry.separatorLength }
+                if separatorIndices.contains(index) { x += separatorLength }
                 let center = x + size / 2
                 x += size + itemSpacing
                 return center
@@ -116,7 +121,7 @@ enum DockGeometry {
         /// Length of the painted surface, including padding, spacing, and any section gap.
         func contentLength(sizes: [CGFloat]) -> CGFloat {
             max(64, sizes.reduce(0, +) + CGFloat(max(0, sizes.count - 1)) * itemSpacing
-                + DockGeometry.padding * 2 + CGFloat(separatorIndices.count) * DockGeometry.separatorLength)
+                + endPadding * 2 + CGFloat(separatorIndices.count) * separatorLength)
         }
     }
 
@@ -130,7 +135,9 @@ enum DockGeometry {
     ///   - settings: Requested appearance; invalid values fall back to defaults.
     ///   - calloutReserve: Override the inward label band. Timeline browsing passes a taller
     ///     reserve so the glance card is not clipped by the panel envelope.
-    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults, calloutReserve: CGFloat? = nil) -> Layout {
+    ///   - separators: Replaces the section dividers derived from the counts. Ice Blocks passes
+    ///     one index per block boundary; indices outside `1..<count` are ignored.
+    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults, calloutReserve: CGFloat? = nil, separators override: Set<Int>? = nil) -> Layout {
         let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableLength - 16)
         let utilityCount = min(max(0, utilityCount), count)
@@ -139,8 +146,12 @@ enum DockGeometry {
         var separators = Set<Int>()
         if favoriteCount > 0 && favoriteCount < appCount { separators.insert(leading + favoriteCount) }
         if utilityCount > 0 && appCount > 0 { separators.insert(leading + appCount) }
+        if let override { separators = override.filter { $0 > 0 && $0 < count } }
         let itemSpacing = CGFloat(settings.itemSpacing)
-        let extra = padding * 2 + CGFloat(max(0, count - 1)) * itemSpacing
+        let ice = settings.surfaceStyle == .iceBlocks
+        let endPadding = ice ? DockIceMetrics.alongPadding : padding
+        let separatorLength = ice ? DockIceMetrics.separatorLength : Self.separatorLength
+        let extra = endPadding * 2 + CGFloat(max(0, count - 1)) * itemSpacing
             + CGFloat(separators.count) * separatorLength
         // Reserve the magnification envelope, rather than resizing the window on every mouse move.
         let size = min(CGFloat(settings.iconSize), max(32, (viewportLimit - extra) / CGFloat(max(1, count) + 2)))
@@ -151,9 +162,9 @@ enum DockGeometry {
         let viewport = min(viewportLimit, canvas)
         let reserve = calloutReserve ?? (settings.edge.isVertical ? 260 : 72)
         let initial = Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), calloutReserve: reserve, viewportLength: viewport, canvasLength: canvas,
-                             restingCenters: [], separatorIndices: separators)
+                             restingCenters: [], separatorIndices: separators, endPadding: endPadding, separatorLength: separatorLength)
         let centers = initial.centers(sizes: Array(repeating: size, count: count))
         return Layout(iconSize: size, magnification: CGFloat(settings.magnification), itemSpacing: itemSpacing, edge: settings.edge, availableDepth: max(64, availableDepth), calloutReserve: reserve, viewportLength: viewport, canvasLength: canvas,
-                      restingCenters: centers, separatorIndices: separators)
+                      restingCenters: centers, separatorIndices: separators, endPadding: endPadding, separatorLength: separatorLength)
     }
 }

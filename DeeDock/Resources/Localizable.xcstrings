@@ -1,6 +1,258 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "iceTuningGlassOff": {
+    "comment": "System glass option for Ice Blocks: no system glass, fully sharp background.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Off"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aus"
+        }
+      }
+    }
+  },
+  "iceTuningGlassEdges": {
+    "comment": "System glass option for Ice Blocks: glass only along the rim, so the middle stays sharp.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Edges only"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nur Ränder"
+        }
+      }
+    }
+  },
+  "iceTuningGlassFull": {
+    "comment": "System glass option for Ice Blocks: glass across the whole block, which blurs the background.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Whole block"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ganzer Block"
+        }
+      }
+    }
+  },
+  "iceTuningFrost": {
+    "comment": "Slider label: cloudy haze just inside the rim of Ice Blocks, in percent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Edge frost"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Randfrost"
+        }
+      }
+    }
+  },
+  "iceTuningGlass": {
+    "comment": "Picker label: where Ice Blocks use system glass, which bends but also blurs whatever is behind the dock.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "System glass"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Systemglas"
+        }
+      }
+    }
+  },
+  "iceTuningTitle": {
+    "comment": "Heading for temporary sliders that tune the experimental Ice Blocks dock style.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ice Blocks tuning"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eisblöcke anpassen"
+        }
+      }
+    }
+  },
+  "iceTuningTint": {
+    "comment": "Slider label: strength of the colour wash on Ice Blocks, in percent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Colour"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Farbe"
+        }
+      }
+    }
+  },
+  "iceTuningShade": {
+    "comment": "Slider label: how much dark smoke Ice Blocks add behind the icons, in percent. Zero is fully clear glass.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Darkness"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dunkelheit"
+        }
+      }
+    }
+  },
+  "iceTuningGlow": {
+    "comment": "Slider label: strength of the glowing rim and halo of Ice Blocks, in percent.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Glow"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Leuchten"
+        }
+      }
+    }
+  },
+  "iceTuningHelp": {
+    "comment": "Help under the Ice Blocks tuning sliders. They are temporary evaluation controls shared by all displays.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Temporary controls for evaluating the look. They apply to every display."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Vorläufige Regler zum Ausprobieren des Looks. Sie gelten für alle Displays."
+        }
+      }
+    }
+  },
+  "settingsSurfaceStyle": {
+    "comment": "Label for the picker that chooses how the dock background is drawn.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dock style"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dock-Stil"
+        }
+      }
+    }
+  },
+  "settingsSurfaceStyleGlass": {
+    "comment": "Dock style option: the standard single glass surface.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Glass"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Glas"
+        }
+      }
+    }
+  },
+  "settingsSurfaceStyleIceBlocks": {
+    "comment": "Dock style option: an experimental look with one tinted glass block per dock section.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ice Blocks (experimental)"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eisblöcke (experimentell)"
+        }
+      }
+    }
+  },
+  "settingsSurfaceStyleHelp": {
+    "comment": "Help for the dock style picker. Ice Blocks is experimental and replaces the running indicator style and the section dividers.",
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ice Blocks is an experimental look. It splits the dock into tinted glass blocks, one per section, and draws its own running indicators in place of the style chosen below."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eisblöcke ist ein experimenteller Look. Das Dock wird in getönte Glasblöcke aufgeteilt, einer pro Bereich, und zeigt eigene Indikatoren für laufende Apps statt des unten gewählten Stils."
+        }
+      }
+    }
+  },
   "meltSetupDistinctWindows": {
     "comment": "App Fusion window picker setup action or validation.",
     "extractionState": "manual",

@@ -25,11 +25,21 @@ struct DockSampleView: View {
         let sizes = layout.sizes(pointerAlong: pointer, reduceMotion: reduceMotion)
         let centers = layout.centers(sizes: sizes)
         let glass = layout.surfaceFrame(sizes: sizes)
+        let iceBlocks = appearanceSettings.surfaceStyle == .iceBlocks
+            ? DockIceBlock.sampleBlocks(count: centers.count, separators: layout.separatorIndices) : []
+        let iceTints = DockIceBlock.tints(iceBlocks)
         ZStack(alignment: .topLeading) {
-            DockBackgroundView(reduceTransparency: reduceTransparency,
-                cornerRadius: min(appearanceSettings.cornerRadius, min(glass.width, glass.height) / 2),
-                idleOpacity: opacity.background)
-                .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
+            if appearanceSettings.surfaceStyle == .iceBlocks {
+                DockIceBlocksBackground(blocks: iceBlocks, layout: layout, sizes: sizes, centers: centers,
+                                        cornerRadius: appearanceSettings.cornerRadius,
+                                        reduceTransparency: reduceTransparency) { _ in EmptyView() }
+                    .opacity(opacity.background)
+            } else {
+                DockBackgroundView(reduceTransparency: reduceTransparency,
+                    cornerRadius: min(appearanceSettings.cornerRadius, min(glass.width, glass.height) / 2),
+                    idleOpacity: opacity.background)
+                    .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
+            }
             ForEach(centers.indices, id: \.self) { index in
                 let rect = layout.iconFrame(centerAlong: centers[index], size: sizes[index])
                 RoundedRectangle(cornerRadius: sizes[index] * 0.2)
@@ -43,7 +53,7 @@ struct DockSampleView: View {
                     .padding(sizes[index] * 0.08)
                     .frame(width: rect.width, height: rect.height)
                     .modifier(DockIconIndicator(style: runningIndicatorStyle,
-                                                running: index.isMultiple(of: 2), size: sizes[index],
+                                                running: index.isMultiple(of: 2) && iceTints.isEmpty, size: sizes[index],
                                                 variant: DockIndicatorVariant(identity: symbols[index % symbols.count]),
                                                 animated: appearanceSettings.animateIndicators && !reduceMotion))
                     .opacity(opacity.icons)
@@ -53,9 +63,15 @@ struct DockSampleView: View {
                     let depth = sizes[index] + DockGeometry.indicatorAreaDepth
                     let marker = layout.edge.point(CGPoint(x: sizes[index] / 2,
                         y: sizes[index] + DockGeometry.indicatorSpacing + DockGeometry.indicatorSize / 2), depth: depth)
-                    DockRunningIndicator(style: runningIndicatorStyle, edge: layout.edge)
-                        .opacity(opacity.icons)
-                        .position(x: button.minX + marker.x, y: button.minY + marker.y)
+                    Group {
+                        if index < iceTints.count {
+                            DockIceRunningIndicator(tint: iceTints[index], edge: layout.edge)
+                        } else {
+                            DockRunningIndicator(style: runningIndicatorStyle, edge: layout.edge)
+                        }
+                    }
+                    .opacity(opacity.icons)
+                    .position(x: button.minX + marker.x, y: button.minY + marker.y)
                 }
             }
         }

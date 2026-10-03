@@ -69,3 +69,10 @@ extension DockSettings.RunningIndicatorStyle {
          SettingsOption(value: .hidden, title: .settingsIndicatorHidden, symbol: "eye.slash")]
     }
 }
+
+extension DockSurfaceStyle {
+    static var settingsOptions: [SettingsOption<Self>] {
+        [SettingsOption(value: .glass, title: .settingsSurfaceStyleGlass, symbol: "rectangle.fill"),
+         SettingsOption(value: .iceBlocks, title: .settingsSurfaceStyleIceBlocks, symbol: "rectangle.split.3x1.fill")]
+    }
+}

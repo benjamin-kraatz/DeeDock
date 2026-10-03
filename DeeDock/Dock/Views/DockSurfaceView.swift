@@ -39,6 +39,33 @@ struct DockSurfaceView: View {
         )
     }
 
+    private var surfaceStyle: DockSurfaceStyle { interaction.idleFade.settings.surfaceStyle }
+
+    @ViewBuilder private func breathingChrome(cornerRadius: CGFloat) -> some View {
+        if let breathing = interaction.focusBreathing {
+            FocusBreathingChrome(
+                active: interaction.exposesContent && breathing.isActive(
+                    modeID: interaction.dockModes?.activeMode.id,
+                    sessionRunning: interaction.focusSession?.session?.phase == .running
+                ),
+                intensity: breathing.intensity,
+                reduceMotion: reduceMotion,
+                cornerRadius: cornerRadius,
+                backgroundOpacity: opacity.background
+            )
+        }
+    }
+
+    @ViewBuilder private var updatePip: some View {
+        #if DIRECT_DISTRIBUTION
+        if interaction.updateAwareness?.showsIndicators == true {
+            UpdateAwarenessPip(reduceMotion: reduceMotion)
+                .padding(7)
+                .allowsHitTesting(false)
+        }
+        #endif
+    }
+
     /// Inward-trailing corner of DDock glass, not an app pin.
     private var pipAlignment: Alignment {
         switch layout.edge {
@@ -53,44 +80,39 @@ struct DockSurfaceView: View {
         // Computed once per pass. Each slot and separator reads it, and this body runs on every
         // pointer move over the dock and every auto-hide frame.
         let centers = layout.centers(sizes: sizes)
+        let cornerRadius = min(interaction.idleFade.settings.cornerRadius, min(surface.width, surface.height) / 2)
+        // Ice Blocks draws one block per section and no divider lines. Its tints also reach the
+        // items, so their running markers match the block even while the launcher owns the glass.
+        let iceBlocks = surfaceStyle == .iceBlocks
+            ? DockIceBlock.blocks(roles: slots.map(\.iceRole), separators: layout.separatorIndices) : []
+        let iceTints = DockIceBlock.tints(iceBlocks)
         ZStack(alignment: .topLeading) {
-            if drawsBackground {
+            if drawsBackground && surfaceStyle == .iceBlocks {
+                DockIceBlocksBackground(blocks: iceBlocks, layout: layout, sizes: sizes, centers: centers,
+                                        cornerRadius: interaction.idleFade.settings.cornerRadius,
+                                        reduceTransparency: reduceTransparency) {
+                    breathingChrome(cornerRadius: $0)
+                }
+                .opacity(opacity.background)
+                .animation(interaction.idleFade.animation, value: opacity.background)
+                // The pip keeps its corner of the whole dock, which is the last block's corner.
+                Color.clear
+                    .overlay(alignment: pipAlignment) { updatePip }
+                    .frame(width: surface.width, height: surface.height)
+                    .position(x: surface.midX, y: surface.midY)
+                    .allowsHitTesting(false)
+            } else if drawsBackground {
                 DockBackgroundView(
                     reduceTransparency: reduceTransparency,
-                    cornerRadius: min(
-                        interaction.idleFade.settings.cornerRadius,
-                        min(surface.width, surface.height) / 2
-                    ),
+                    cornerRadius: cornerRadius,
                     idleOpacity: opacity.background
                 )
                 .animation(
                     interaction.idleFade.animation,
                     value: opacity.background
                 )
-                .overlay {
-                    if let breathing = interaction.focusBreathing {
-                        FocusBreathingChrome(
-                            active: interaction.exposesContent && breathing.isActive(
-                                modeID: interaction.dockModes?.activeMode.id,
-                                sessionRunning: interaction.focusSession?.session?.phase == .running
-                            ),
-                            intensity: breathing.intensity,
-                            reduceMotion: reduceMotion,
-                            cornerRadius: min(interaction.idleFade.settings.cornerRadius,
-                                              min(surface.width, surface.height) / 2),
-                            backgroundOpacity: opacity.background
-                        )
-                    }
-                }
-                .overlay(alignment: pipAlignment) {
-                    #if DIRECT_DISTRIBUTION
-                    if interaction.updateAwareness?.showsIndicators == true {
-                        UpdateAwarenessPip(reduceMotion: reduceMotion)
-                            .padding(7)
-                            .allowsHitTesting(false)
-                    }
-                    #endif
-                }
+                .overlay { breathingChrome(cornerRadius: cornerRadius) }
+                .overlay(alignment: pipAlignment) { updatePip }
                 .frame(width: surface.width, height: surface.height)
                 .position(x: surface.midX, y: surface.midY)
             }
@@ -105,7 +127,7 @@ struct DockSurfaceView: View {
                     .position(x: surface.midX, y: surface.midY)
             }
             ForEach(layout.separatorIndices.sorted(), id: \.self) { index in
-                if index < centers.count {
+                if index < centers.count, surfaceStyle != .iceBlocks {
                     let icon = layout.iconFrame(
                         centerAlong: centers[index],
                         size: layout.iconSize
@@ -160,6 +182,7 @@ struct DockSurfaceView: View {
                         menuTracking: menuTracking,
                         accessibilityFocus: accessibilityFocus
                     )
+                    .environment(\.dockIceTint, index < iceTints.count ? iceTints[index] : nil)
                     .onHover { inside in
                         if inside {
                             hoveredID = slot.target

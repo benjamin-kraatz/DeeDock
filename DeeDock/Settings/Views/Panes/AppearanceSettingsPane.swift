@@ -8,6 +8,7 @@ struct AppearanceSettingsPane: View {
     @Binding var magnification: Double
     @Binding var itemSpacing: Double
     @Binding var cornerRadius: Double
+    @Binding var surfaceStyle: DockSurfaceStyle
     @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
     @Binding var animateIndicators: Bool
     @Binding var launchAnimation: DockLaunchAnimation
@@ -16,6 +17,12 @@ struct AppearanceSettingsPane: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsMetrics.cardSpacing) {
+            SettingsCard(title: .settingsSurfaceStyle, footnote: .settingsSurfaceStyleHelp) {
+                SettingsPickerRow(title: .settingsSurfaceStyle, options: DockSurfaceStyle.settingsOptions,
+                                  selection: $surfaceStyle)
+                    .settingsOverride(overrideContext, field: .surfaceStyle)
+            }
+            if surfaceStyle == .iceBlocks { DockIceTuningCard() }
             SettingsCard(title: .settingsCornerRadius, footnote: .settingsCornerRadiusHelp) {
                 SettingsSliderRow(title: .settingsCornerRadius, unit: .settingsPoints,
                                   value: $cornerRadius, range: 0...100, step: 1,
@@ -47,8 +54,10 @@ struct AppearanceSettingsPane: View {
             SettingsCard(title: .settingsRunningIndicators, footnote: .settingsRunningIndicatorsHelp) {
                 RunningIndicatorPicker(edge: edge, selection: $runningIndicatorStyle, animated: animateIndicators)
                     .settingsOverride(overrideContext, field: .runningIndicatorStyle)
+                    // Ice Blocks draws its own marker, so the saved style is kept but unused.
+                    .disabled(surfaceStyle == .iceBlocks)
                 SettingsToggleRow(title: .settingsAnimateIndicators, isOn: $animateIndicators)
-                    .disabled(!runningIndicatorStyle.animates)
+                    .disabled(!runningIndicatorStyle.animates || surfaceStyle == .iceBlocks)
                     .settingsOverride(overrideContext, field: .animateIndicators)
             }
         }
@@ -61,10 +70,12 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var magnification: Double = 1.4
     @Previewable @State var itemSpacing: Double = 4
     @Previewable @State var cornerRadius: Double = 22
+    @Previewable @State var surfaceStyle: DockSurfaceStyle = .glass
     @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .stardust
     @Previewable @State var animate = true
     ScrollView {
         AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,
+                               surfaceStyle: $surfaceStyle,
                                runningIndicatorStyle: $indicator, animateIndicators: $animate, launchAnimation: .constant(DockSettings.defaults.launchAnimation))
             .padding(24)
     }

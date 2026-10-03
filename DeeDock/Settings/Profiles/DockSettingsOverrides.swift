@@ -7,7 +7,7 @@ import Foundation
 enum DockSettingField: String, CaseIterable, Codable {
     case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
     case launcherAtStart, appVisibility, tooltipPreset
-    case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
+    case iconSize, magnification, itemSpacing, cornerRadius, surfaceStyle, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
     case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
@@ -31,6 +31,7 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .magnification: \.magnification
         case .itemSpacing: \.itemSpacing
         case .cornerRadius: \.cornerRadius
+        case .surfaceStyle: \.surfaceStyle
         case .runningIndicatorStyle: \.runningIndicatorStyle
         case .animateIndicators: \.animateIndicators
         case .launchAnimation: \.launchAnimation
@@ -70,6 +71,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     var magnification: Double?
     var itemSpacing: Double?
     var cornerRadius: Double?
+    var surfaceStyle: DockSurfaceStyle?
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle?
     var animateIndicators: Bool?
     var launchAnimation: DockLaunchAnimation?
@@ -93,7 +95,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case launcherAtStart, appVisibility, tooltipPreset
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
+        case iconSize, magnification, itemSpacing, cornerRadius, surfaceStyle, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
         case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
@@ -106,6 +108,7 @@ struct DockSettingsOverrides: Codable, Equatable {
                      runningIndicatorStyle: runningIndicatorStyle ?? defaults.runningIndicatorStyle,
                      edge: edge ?? defaults.edge, alignment: alignment ?? defaults.alignment, alongEdgeOffset: alongEdgeOffset ?? defaults.alongEdgeOffset,
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
+        result.surfaceStyle = surfaceStyle ?? defaults.surfaceStyle
         result.animateIndicators = animateIndicators ?? defaults.animateIndicators
         result.launchAnimation = launchAnimation ?? defaults.launchAnimation
         result.launcherAtStart = launcherAtStart ?? defaults.launcherAtStart
@@ -176,6 +179,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .magnification: magnification != nil
         case .itemSpacing: itemSpacing != nil
         case .cornerRadius: cornerRadius != nil
+        case .surfaceStyle: surfaceStyle != nil
         case .runningIndicatorStyle: runningIndicatorStyle != nil
         case .animateIndicators: animateIndicators != nil
         case .launchAnimation: launchAnimation != nil
@@ -214,6 +218,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .magnification: magnification = value?.magnification
         case .itemSpacing: itemSpacing = value?.itemSpacing
         case .cornerRadius: cornerRadius = value?.cornerRadius
+        case .surfaceStyle: surfaceStyle = value?.surfaceStyle
         case .runningIndicatorStyle: runningIndicatorStyle = value?.runningIndicatorStyle
         case .animateIndicators: animateIndicators = value?.animateIndicators
         case .launchAnimation: launchAnimation = value?.launchAnimation
@@ -270,6 +275,7 @@ extension DockSettingsOverrides {
         magnification = try values.decodeIfPresent(Double.self, forKey: .magnification)
         itemSpacing = try values.decodeIfPresent(Double.self, forKey: .itemSpacing)
         cornerRadius = try values.decodeIfPresent(Double.self, forKey: .cornerRadius)
+        surfaceStyle = try values.decodeIfPresent(DockSurfaceStyle.self, forKey: .surfaceStyle)
         runningIndicatorStyle = try values.decodeIfPresent(DockSettings.RunningIndicatorStyle.self, forKey: .runningIndicatorStyle)
         animateIndicators = try values.decodeIfPresent(Bool.self, forKey: .animateIndicators)
         launchAnimation = try values.decodeIfPresent(DockLaunchAnimation.self, forKey: .launchAnimation)

@@ -65,13 +65,15 @@ struct DockPreviewContent: View {
             let entries: [DockRenderSlot] = showsLauncher ? [.launcher] + content : content
             let slots = DockRenderSlot.slots(entries: entries, proposal: dragProposal)
             interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                availableLength: availableLength, settings: settings)
+                availableLength: availableLength, settings: settings,
+                separators: DockIceBlock.separators(for: slots, style: settings.surfaceStyle))
         }
         _sections = State(initialValue: sections)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.showAppBadgeCounts = settings.showAppBadgeCounts
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                                                  availableLength: availableLength, settings: settings)
+                                                  availableLength: availableLength, settings: settings,
+                                                  separators: DockIceBlock.separators(for: slots, style: settings.surfaceStyle))
         if magnified, let x = interaction.layout.restingCenters.first {
             interaction.pointer = settings.edge.point(CGPoint(x: x, y: interaction.layout.panelDepth - 36), depth: interaction.layout.panelDepth)
         }

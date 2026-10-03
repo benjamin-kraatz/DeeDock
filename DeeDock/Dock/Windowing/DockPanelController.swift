@@ -161,7 +161,8 @@ final class DockPanelController {
                                          leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
                                          availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
-                                         calloutReserve: timelineCallout)
+                                         calloutReserve: timelineCallout,
+                                         separators: DockIceBlock.separators(for: store.entries, style: settings.surfaceStyle))
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
@@ -169,7 +170,8 @@ final class DockPanelController {
                                                  leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
                                                  availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
-                                         calloutReserve: timelineCallout)
+                                         calloutReserve: timelineCallout,
+                                         separators: DockIceBlock.separators(for: slots, style: settings.surfaceStyle))
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
         let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone

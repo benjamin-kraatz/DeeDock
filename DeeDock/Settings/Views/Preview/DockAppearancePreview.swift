@@ -10,9 +10,18 @@ struct DockAppearancePreview: View {
 
     var appearanceSettings = DockSettings.defaults
 
+    /// The sample's own geometry inputs, plus the style, which changes block padding and gaps.
+    private var layoutSettings: DockSettings {
+        var settings = DockSettings(iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing, edge: edge)
+        settings.surfaceStyle = appearanceSettings.surfaceStyle
+        return settings
+    }
+
     var body: some View {
-        let settings = DockSettings(iconSize: iconSize, magnification: magnification, itemSpacing: itemSpacing, edge: edge)
-        let layout = DockGeometry.layout(count: 6, favoriteCount: 6, availableLength: 1000, settings: settings)
+        let settings = layoutSettings
+        // Ice Blocks needs section gaps to show more than one block; glass keeps a single surface.
+        let layout = DockGeometry.layout(count: 6, favoriteCount: 6, availableLength: 1000, settings: settings,
+                                         separators: appearanceSettings.surfaceStyle == .iceBlocks ? [3, 5] : nil)
         DockSampleView(layout: layout, magnified: true, runningIndicatorStyle: runningIndicatorStyle, appearanceSettings: appearanceSettings)
             .scaleEffect(0.5, anchor: .topLeading)
             .frame(width: layout.viewportSize.width * 0.5, height: layout.viewportSize.height * 0.5, alignment: .topLeading)

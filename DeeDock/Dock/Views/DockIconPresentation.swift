@@ -7,6 +7,8 @@ import SwiftUI
 struct DockIconPresentation<Artwork: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.pinWeatherSample) private var pinWeatherSample
+    /// Set inside an ice block, which replaces the configured indicator with its own marker.
+    @Environment(\.dockIceTint) private var iceTint
     let artwork: Artwork
     let size: CGFloat
     let edge: DockEdge
@@ -67,7 +69,7 @@ struct DockIconPresentation<Artwork: View>: View {
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
                 .modifier(PinWeatherChrome(sample: pinWeatherSample))
-                .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size,
+                .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running && iceTint == nil, size: size,
                                             variant: indicatorVariant, animated: indicatorAnimated))
                 .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                 .modifier(DockLaunchMotion(style: launchAnimation, request: launchRequest, busy: launching,
@@ -94,9 +96,15 @@ struct DockIconPresentation<Artwork: View>: View {
                 }
                 .position(iconCenter)
             if running {
-                DockRunningIndicator(style: runningIndicatorStyle, edge: edge)
-                    .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
-                    .position(marker)
+                Group {
+                    if let iceTint {
+                        DockIceRunningIndicator(tint: iceTint, edge: edge)
+                    } else {
+                        DockRunningIndicator(style: runningIndicatorStyle, edge: edge)
+                    }
+                }
+                .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
+                .position(marker)
             }
         }
         .frame(width: bounds.width, height: bounds.height)

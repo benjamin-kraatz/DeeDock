@@ -25,6 +25,7 @@ struct DockPageContent: View {
                                        magnification: binding(\.magnification),
                                        itemSpacing: binding(\.itemSpacing),
                                        cornerRadius: binding(\.cornerRadius),
+                                       surfaceStyle: binding(\.surfaceStyle),
                                        runningIndicatorStyle: binding(\.runningIndicatorStyle),
                                        animateIndicators: binding(\.animateIndicators),
                                        launchAnimation: binding(\.launchAnimation),
