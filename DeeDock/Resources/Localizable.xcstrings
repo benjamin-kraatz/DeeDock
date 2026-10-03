@@ -45248,6 +45248,924 @@
           }
         }
       }
+    },
+    "volumeEject" : {
+      "comment": "Eject button and menu item for a mounted volume, and the label shown under a volume tile while dragging it off the dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswerfen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eject"
+          }
+        }
+      }
+    },
+    "volumeOpen" : {
+      "comment": "Volume tile action that shows the volume's contents as a stack in the dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        }
+      }
+    },
+    "volumeOpenInFinder" : {
+      "comment": "Volume card button and menu item that opens the volume in a Finder window.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Finder öffnen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in Finder"
+          }
+        }
+      }
+    },
+    "volumeCapacitySummary" : {
+      "comment": "Volume card capacity line. total and available are formatted sizes such as “128 GB”.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(total)@ · %2$(available)@ frei"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(total)@ · %2$(available)@ free"
+          }
+        }
+      }
+    },
+    "volumeCapacityTotal" : {
+      "comment": "Volume card capacity line when free space is unknown. total is a formatted size such as “128 GB”.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(total)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(total)@"
+          }
+        }
+      }
+    },
+    "volumeCapacityUnknown" : {
+      "comment": "Volume card capacity line when macOS reports no capacity, typically for network shares.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapazität nicht verfügbar"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capacity unavailable"
+          }
+        }
+      }
+    },
+    "volumeUsageChecking" : {
+      "comment": "Volume card status while DOKK looks for apps with files open on the volume.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche nach geöffneten Dateien …"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking for open files…"
+          }
+        }
+      }
+    },
+    "volumeUsageIdle" : {
+      "comment": "Volume card status when no app has files open on the volume.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht in Verwendung"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not in use"
+          }
+        }
+      }
+    },
+    "volumeUsageInUse" : {
+      "comment": "Volume card status naming the apps with files open on the volume. names is a localized list of app names supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird verwendet von %1$(names)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In use by %1$(names)@"
+          }
+        }
+      }
+    },
+    "volumeEjecting" : {
+      "comment": "Volume card status and VoiceOver value while a volume is being ejected.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird ausgeworfen …"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecting…"
+          }
+        }
+      }
+    },
+    "volumeEjectedTitle" : {
+      "comment": "Volume card title after a successful eject.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kann entfernt werden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safe to Remove"
+          }
+        }
+      }
+    },
+    "volumeEjectedMessage" : {
+      "comment": "Volume card message after a successful eject. name is the volume name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%1$(name)@“ kann jetzt getrennt werden."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$(name)@” can be unplugged now."
+          }
+        }
+      }
+    },
+    "volumeConfirmDiskTitle" : {
+      "comment": "Volume card question before ejecting a fixed external disk. name is the volume name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%1$(name)@“ auswerfen?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eject “%1$(name)@”?"
+          }
+        }
+      }
+    },
+    "volumeConfirmDiskMessage" : {
+      "comment": "Volume card explanation before ejecting a fixed external disk, shown when Settings asks for confirmation.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Festplatte ist fester Bestandteil deines Systems. Apps und Backups, die sie verwenden, verlieren den Zugriff, bis du sie wieder anschließt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This disk is a permanent part of your setup. Apps and backups that use it lose access until you connect it again."
+          }
+        }
+      }
+    },
+    "volumeCancel" : {
+      "comment": "Volume card button that dismisses a question without ejecting.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "volumeEjectFailedTitle" : {
+      "comment": "Volume card title when macOS refused to eject a volume.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswerfen nicht möglich"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t Eject"
+          }
+        }
+      }
+    },
+    "volumeEjectFailedDetails" : {
+      "comment": "Volume card message when an eject failed for a reason other than open files. details is the description supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS meldet: %1$(details)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS reported: %1$(details)@"
+          }
+        }
+      }
+    },
+    "volumeBlockedOneApp" : {
+      "comment": "Volume card message when one app keeps the volume busy. app is the application name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Datei ist noch in %1$(app)@ geöffnet."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A file is still open in %1$(app)@."
+          }
+        }
+      }
+    },
+    "volumeBlockedMany" : {
+      "comment": "Volume card message above the list of apps and processes that keep the volume busy.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Programme haben noch Dateien auf dem Volume geöffnet:"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These still have files open on the volume:"
+          }
+        }
+      }
+    },
+    "volumeBlockedUnknown" : {
+      "comment": "Volume card message when macOS refused the eject without naming an app DOKK can see.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etwas verwendet dieses Volume noch. Schließe alle Dateien davon und versuche es erneut."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Something is still using this volume. Close any files from it, then try again."
+          }
+        }
+      }
+    },
+    "volumeBlockerShow" : {
+      "comment": "Button in the volume card that brings the app blocking an eject to the front.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeigen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show"
+          }
+        }
+      }
+    },
+    "volumeBlockerQuit" : {
+      "comment": "Button in the volume card that asks the app blocking an eject to quit. The eject retries once it has quit.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beenden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit"
+          }
+        }
+      }
+    },
+    "volumeBlockerQuitting" : {
+      "comment": "Volume card status next to an app that was asked to quit.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird beendet …"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitting…"
+          }
+        }
+      }
+    },
+    "volumeRetry" : {
+      "comment": "Volume card button that tries the eject again.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erneut versuchen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try Again"
+          }
+        }
+      }
+    },
+    "volumeForceEject" : {
+      "comment": "Volume card button that ejects even though files are open.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trotzdem auswerfen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eject Anyway"
+          }
+        }
+      }
+    },
+    "volumeConfirmForceTitle" : {
+      "comment": "Volume card question before forcing an eject past open files.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trotzdem auswerfen?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eject Anyway?"
+          }
+        }
+      }
+    },
+    "volumeConfirmForceMessage" : {
+      "comment": "Volume card warning before forcing an eject past open files.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps mit geöffneten Dateien auf diesem Volume können ungesicherte Änderungen verlieren."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps with files open on this volume can lose unsaved changes."
+          }
+        }
+      }
+    },
+    "volumeEjectFailed" : {
+      "comment": "Dock error when an eject fails and the volume card cannot be shown. name is the volume name; details is the reason. Placeholders may be reordered.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%1$(name)@“ konnte nicht ausgeworfen werden. %2$(details)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$(name)@” couldn’t be ejected. %2$(details)@"
+          }
+        }
+      }
+    },
+    "volumeUnavailable" : {
+      "comment": "Reported when an eject is requested for a volume that is no longer mounted.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Volume ist nicht mehr verfügbar."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This volume is no longer available."
+          }
+        }
+      }
+    },
+    "volumeDockHint" : {
+      "comment": "VoiceOver hint for a volume tile.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeigt den Inhalt. Mit den Aktionen kannst du es im Finder öffnen oder auswerfen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shows the contents. Use the actions to open it in Finder or eject it."
+          }
+        }
+      }
+    },
+    "volumeAccessibilityValue" : {
+      "comment": "VoiceOver value for a volume tile. kind is the volume kind, such as “External disk”; capacity is the capacity line, such as “128 GB · 42 GB free”.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(kind)@, %2$(capacity)@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$(kind)@, %2$(capacity)@"
+          }
+        }
+      }
+    },
+    "volumeKindRemovable" : {
+      "comment": "Kind of volume: a USB stick, SD card, or other removable media.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wechselmedium"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removable media"
+          }
+        }
+      }
+    },
+    "volumeKindExternalDisk" : {
+      "comment": "Kind of volume: an external disk with fixed media.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Externe Festplatte"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "External disk"
+          }
+        }
+      }
+    },
+    "volumeKindDiskImage" : {
+      "comment": "Kind of volume: a mounted disk image.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disk-Image"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disk image"
+          }
+        }
+      }
+    },
+    "volumeKindNetwork" : {
+      "comment": "Kind of volume: a mounted network share.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerkvolume"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network volume"
+          }
+        }
+      }
+    },
+    "settingsVolumes" : {
+      "comment": "Settings card title for external drives and other volumes in the dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufwerke"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drives"
+          }
+        }
+      }
+    },
+    "settingsVolumesHelp" : {
+      "comment": "Help under the Drives settings card.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbundene USB-Sticks, SD-Karten und externe Festplatten erscheinen neben dem Papierkorb. Klicke darauf, um den Inhalt zu sehen, zeige darauf für Speicherplatz und Auswerfen, oder ziehe sie aus dem Dock, um sie auszuwerfen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected USB sticks, SD cards, and external disks appear next to Trash. Click one to browse it, hover for capacity and Eject, or drag it off the dock to eject it."
+          }
+        }
+      }
+    },
+    "settingsShowVolumes" : {
+      "comment": "Toggle that shows external drives in the dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Externe Laufwerke anzeigen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show external drives"
+          }
+        }
+      }
+    },
+    "settingsShowDiskImages" : {
+      "comment": "Toggle that also shows mounted disk images in the dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disk-Images anzeigen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show disk images"
+          }
+        }
+      }
+    },
+    "settingsShowNetworkVolumes" : {
+      "comment": "Toggle that also shows mounted network shares in the dock.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzwerkvolumes anzeigen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show network volumes"
+          }
+        }
+      }
+    },
+    "settingsConfirmBeforeEjectingDisks" : {
+      "comment": "Toggle that makes DOKK ask before ejecting a fixed external disk.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vor dem Auswerfen von Festplatten fragen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask before ejecting hard disks"
+          }
+        }
+      }
+    },
+    "settingsConfirmBeforeEjectingDisksHelp" : {
+      "comment": "Subtitle for the hard-disk eject confirmation toggle.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-Sticks und SD-Karten werden immer sofort ausgeworfen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB sticks and SD cards always eject right away."
+          }
+        }
+      }
+    },
+    "settingsFeatureDrivesSubtitle" : {
+      "comment": "Subtitle of the Drives settings page in the Dock Extras overview.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Externe Laufwerke anzeigen, durchsuchen und auswerfen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show, browse, and eject external drives."
+          }
+        }
+      }
+    },
+    "settingsDrivesKeywords" : {
+      "comment": "Search terms for the Drives settings page. Not shown; separate words with spaces.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufwerk Laufwerke USB-Stick SD-Karte externe Festplatte SSD Volume auswerfen trennen Disk-Image DMG Netzwerk Freigabe Server"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "drive drives usb stick sd card external disk hard disk ssd volume eject unmount disk image dmg network share server"
+          }
+        }
+      }
+    },
+    "volumeBlockedOneProcess" : {
+      "comment": "Volume card message above a single process that keeps the volume busy and is not an app.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Prozess hat noch Dateien auf dem Volume geöffnet:"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A process still has files open on the volume:"
+          }
+        }
+      }
+    },
+    "volumeBlockerSystemProcess" : {
+      "comment": "Caption under a blocking process that belongs to macOS rather than the user.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS-Systemprozess"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS system process"
+          }
+        }
+      }
+    },
+    "volumeBlockerReveal" : {
+      "comment": "Button in the volume card that shows a blocking process's program file in Finder.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Finder zeigen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show in Finder"
+          }
+        }
+      }
+    },
+    "dropHintCopy" : {
+      "comment": "Label beside the cursor and above the dock while files are dragged over a drive or a folder in its stack. destination is a volume or folder name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach „%1$(destination)@“ kopieren"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy to “%1$(destination)@”"
+          }
+        }
+      }
+    },
+    "dropHintMove" : {
+      "comment": "Label beside the cursor and above the dock while files are dragged over a drive with Shift held. destination is a volume or folder name supplied by macOS.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach „%1$(destination)@“ verschieben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move to “%1$(destination)@”"
+          }
+        }
+      }
+    },
+    "dropHintShiftToMove" : {
+      "comment": "Small key hint in the cursor label: hold Shift to move instead of copy. Keep it very short.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧ Verschieben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧ Move"
+          }
+        }
+      }
+    },
+    "folderDrop.moveHere" : {
+      "comment": "Caption at the bottom of a drive's stack while files dragged over it will be moved.",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Ordner verschieben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move into Folder"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

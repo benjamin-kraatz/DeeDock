@@ -91,6 +91,8 @@ final class DockCoordinator {
     var recipeApplications: any ApplicationServicing { catalog.service }
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
+    @ObservationIgnored private let volumes = VolumeController()
+    @ObservationIgnored private let volumeDock: VolumeDockCoordinator
     @ObservationIgnored private let capsules = SessionCapsuleController()
     @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
     private(set) var searchShortcutAvailable = false
@@ -134,6 +136,7 @@ final class DockCoordinator {
         timeline = DockTimelineController(history: localHistory)
         focusPopover = FocusSessionCoordinator(focus: focusSession, presenter: popovers)
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
+        volumeDock = VolumeDockCoordinator(volumes: volumes, folderStacks: folderStacks)
         fusion = FusionCoordinator(shelf: shelf)
         shelves = ShelfCoordinator(shelf: shelf, presenter: popovers, organizer: semanticStacks)
         sessionCapsules = SessionCapsuleCoordinator(capsules: capsules, presenter: popovers,
@@ -245,6 +248,12 @@ final class DockCoordinator {
         dragging.dropInFolder = { [weak self] info, folder, panel in
             self?.folderStacks.receive(info, folder: folder, on: panel) ?? false
         }
+        dragging.openSpringVolume = { [weak self] volume, panel in
+            self?.volumeDock.springOpen(volume, on: panel)
+        }
+        dragging.dropInVolume = { [weak self] info, volume, panel in
+            self?.volumeDock.receive(info, volume: volume, on: panel) ?? false
+        }
         dragging.documentHoverChanged = { [weak self] item, panel, documents in
             self?.windowPeeks.hoverFiles(item, on: panel, documents: documents)
         }
@@ -295,6 +304,7 @@ final class DockCoordinator {
         popovers.openChanged = { [weak self] open in
             if open {
                 self?.windowPeeks.close(returnFocus: false)
+                self?.volumeDock.cards.dismiss()
                 self?.modePicker.close(returnFocus: false)
             }
             self?.panels.values.forEach { $0.holdPopover(open) }
@@ -325,6 +335,10 @@ final class DockCoordinator {
         }
         catalog.didChange = { [weak self] in self?.occupancy.invalidate(); self?.refreshPanels() }
         trash.didChange = { [weak self] in self?.refreshPanels() }
+        volumes.didChange = { [weak self] in self?.refreshPanels() }
+        dragging.ejectVolume = { [weak self] volume, panel in
+            self?.volumeDock.requestEject(volume, on: panel, keyboard: false)
+        }
         // One shared Shelf: an edit on any display re-renders every dock and the open panel.
         shelf.didChange = { [weak self] in
             self?.scheduleShelfSemanticWarmup()
@@ -361,6 +375,8 @@ final class DockCoordinator {
         catalog.start()
         trash.start()
         shelf.start()
+        volumeDock.start()
+        volumes.start()
         capsules.start()
         searchShortcutAvailable = searchShortcut.start { [weak self] in self?.searchWindows() }
         scheduleShelfSemanticWarmup()
@@ -380,6 +396,7 @@ final class DockCoordinator {
                 self?.fusion.suspend()
                 self?.timeline.end()
                 self?.popovers.closeAll()
+                self?.volumeDock.cards.close()
                 self?.windowPeeks.dismissFileHandoff()
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
@@ -428,6 +445,7 @@ final class DockCoordinator {
             filePicker.cancel(for: id)
             folderStacks.close(for: id, returnFocus: false)
             shelves.close(for: id, returnFocus: false)
+            volumeDock.cards.close(for: id)
             focusPopover.close(for: id)
             sessionCapsules.close(for: id, returnFocus: false)
             if focusedID == id { endFocus(restore: true) }
@@ -436,7 +454,7 @@ final class DockCoordinator {
         }
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
-                                  trash: trash, shelf: shelf, capsules: capsules, actions: actionTiles,
+                                  trash: trash, shelf: shelf, volumes: volumes, capsules: capsules, actions: actionTiles,
                                   focusSession: focusSession, history: localHistory, pinWeather: pinWeather)
             store.appMelt = appMelt
             store.refresh()
@@ -488,6 +506,8 @@ final class DockCoordinator {
                 if !dragging.isDragging || !windowPeeks.isFileDragActive {
                     windowPeeks.close(returnFocus: false)
                 }
+                // A context menu or drag replaces the plain card; a question or refusal stays.
+                if volumeDock.cards.isOpen, volumeDock.cards.isShowingInfo { volumeDock.cards.close() }
                 modePicker.close(returnFocus: false)
             }
             panel.windowSearchRequested = { [weak self] in self?.searchWindows() }
@@ -522,6 +542,7 @@ final class DockCoordinator {
                 )
             }
             panel.connectDragging(dragging)
+            volumeDock.connect(panel) { [weak self] in self?.dragging.isDragging == true }
             panel.interaction.openFiles = { [weak self, weak panel] item in
                 guard let self, let panel else { return }
                 self.openFiles(for: item, on: panel)
@@ -687,6 +708,7 @@ final class DockCoordinator {
         }
         folderStacks.reanchor()
         shelves.reanchor()
+        volumeDock.cards.refresh()
         focusPopover.reanchor()
         sessionCapsules.reanchor()
         windowPeeks.refresh()
@@ -703,6 +725,7 @@ final class DockCoordinator {
         let wasOverDock = panels.values.contains { $0.interaction.pointer != nil }
         panels.values.forEach { $0.updatePointer(eventType: eventType) }
         windowPeeks.updatePointer()
+        volumeDock.cards.updatePointer()
         if !wasOverDock, panels.values.contains(where: { $0.interaction.pointer != nil }) {
             trash.refreshForDockAttention()
         }
@@ -981,6 +1004,8 @@ final class DockCoordinator {
         clipboardMuseum.stop()
         badges.focusSession = nil
         catalog.stop()
+        volumeDock.stop()
+        volumes.stop()
         trash.stop()
         #if DIRECT_DISTRIBUTION
         updateAwareness = nil

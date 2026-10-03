@@ -186,6 +186,11 @@ struct DockContentView: View {
             if let hoveredID, !ids.contains(hoveredID) { self.hoveredID = nil }
         }
         .onChange(of: hoveredID) { _, target in
+            if case .volume(let id) = target, let volume = slots.compactMap(\.volume).first(where: { $0.volumeID == id }) {
+                interaction.volumeHoverChanged?(volume)
+            } else {
+                interaction.volumeHoverChanged?(nil)
+            }
             guard case .app(let id) = target,
                 let item = slots.compactMap(\.item).first(where: { $0.id == id }
                 )
@@ -195,7 +200,10 @@ struct DockContentView: View {
             }
             interaction.windowPeekHoverChanged?(item)
         }
-        .onDisappear { interaction.windowPeekHoverChanged?(nil) }
+        .onDisappear {
+            interaction.windowPeekHoverChanged?(nil)
+            interaction.volumeHoverChanged?(nil)
+        }
     }
 }
 

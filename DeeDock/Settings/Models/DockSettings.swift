@@ -75,6 +75,14 @@ struct DockSettings: Codable, Equatable {
     var magneticEdges: Bool = true
     /// Whether Empty Trash requires DeeDock's destructive confirmation alert.
     var confirmBeforeEmptyingTrash: Bool = true
+    /// Whether docks show tiles for mounted USB sticks, SD cards, and external disks.
+    var showVolumes: Bool = true
+    /// Whether mounted disk images get tiles too. Needs `showVolumes`.
+    var showDiskImages: Bool = true
+    /// Whether mounted network shares get tiles too. Needs `showVolumes`.
+    var showNetworkVolumes: Bool = false
+    /// Whether ejecting a fixed external disk asks first. Removable media ejects at once.
+    var confirmBeforeEjectingDisks: Bool = true
     /// Whether hovering a running app can present its windows.
     var windowPeekEnabled: Bool = true
     /// Shows two captured windows from the same app together. Shared across displays and opt-in.
@@ -169,6 +177,7 @@ extension DockSettings {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges, showAppBadgeCounts
         case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
+        case showVolumes, showDiskImages, showNetworkVolumes, confirmBeforeEjectingDisks
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case windowMarkupFormat, windowMarkupSearchEngine, windowMarkupFolder
@@ -200,6 +209,10 @@ extension DockSettings {
         magneticEdges = try values.decodeIfPresent(Bool.self, forKey: .magneticEdges) ?? true
         confirmBeforeEmptyingTrash = values.contains(.confirmBeforeEmptyingTrash)
             ? try values.decode(Bool.self, forKey: .confirmBeforeEmptyingTrash) : true
+        showVolumes = try values.decodeIfPresent(Bool.self, forKey: .showVolumes) ?? true
+        showDiskImages = try values.decodeIfPresent(Bool.self, forKey: .showDiskImages) ?? true
+        showNetworkVolumes = try values.decodeIfPresent(Bool.self, forKey: .showNetworkVolumes) ?? false
+        confirmBeforeEjectingDisks = try values.decodeIfPresent(Bool.self, forKey: .confirmBeforeEjectingDisks) ?? true
         windowPeekEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnabled) ?? true
         windowPeekSplitEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekSplitEnabled) ?? false
         windowPeekEnlargeEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnlargeEnabled) ?? false

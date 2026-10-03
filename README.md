@@ -117,7 +117,7 @@ DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK app
 
 The default icons are 48 points, with 4-point item spacing and 6-point glass padding. Crowded docks reduce icon size to 32 points before scrolling along the dock, horizontally above or below, or vertically beside the display. Reduce Motion disables magnification, and Reduce Transparency uses an opaque native background.
 
-Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, Session Capsules, the Shelf, Trash, and Window Peek are implemented.
+Enabled docks stay visible by default; auto-hide is opt-in under Behavior. Folder stacks, Session Capsules, the Shelf, Trash, external drives, and Window Peek are implemented.
 
 ## Downloads and utility order
 
@@ -130,6 +130,10 @@ Downloads appears to the left of Capsules and Shelf by default. Click it to brow
 Drag Downloads, Capsules, or Shelf within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display, independently of Dock Modes. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder the three tiles.
 
 Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
+
+## External drives
+
+Connected USB sticks, SD cards, and external disks appear between the Shelf and Trash. Click one to browse it in a stack, or hover over it for a card with capacity, Open in Finder, and Eject. You can also drag the tile off the dock to eject it; “Eject” appears before you release. The tile dims while ejecting and leaves once the drive is safe to remove. If an app still has a file open, the card names the app and offers Show, Quit (the eject then retries), Try Again, and Eject Anyway. Drag files onto a drive tile to copy them there, or hold Shift to move them; a label beside the cursor says which. Rest on the tile to open the drive's stack and keep resting on folders to go deeper; the stack's back button takes drops and climbs a level when you rest on it. Disk images and network shares have their own switches in Settings › Dock Extras › Drives, and DOKK can ask before ejecting a hard disk. See [acceptance notes](docs/ACCEPTANCE.md#dee-83-external-volumes) for limits and pending hands-on checks.
 
 ## App Fusion
 

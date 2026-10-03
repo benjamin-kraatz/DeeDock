@@ -16,6 +16,93 @@ soap bubbles stay first-class.
 The slices below remain the record of how those features were built. Hands-on checks that
 assume they stay on after launch no longer apply.
 
+## DEE-83 external volumes
+
+Implemented on `feature/dee-83`. Mounted USB sticks, SD cards, and external disks get tiles
+between the Shelf and Trash, one per volume, on every dock. Disk images (on by default) and
+network shares (off by default) have their own switches in Settings › Dock Extras › Drives.
+The list follows NSWorkspace mount, unmount, and rename notifications. Nothing polls.
+
+- **Click** shows the volume root as a folder stack, like Downloads. Grid or list is stored per
+  display and volume.
+- **Hover** opens the volume card after the Window Peek hover delay. It shows the name,
+  capacity with a bar, Open in Finder, Eject, and whether anything has files open. Free space
+  and usage are read when the card opens.
+- **Eject** dims the tile and turns its badge into a spinner. The tile leaves only after the
+  unmount succeeds. The card then shows “Safe to Remove” and closes after about two seconds.
+  The card button, context menu, VoiceOver action, and drag all run the same flow.
+- **Drag off the dock** past the unpin distance ejects. “Eject” appears under the drag image
+  and above the dock before release.
+- **Refusal** keeps the card open and names the blocking apps, for example “A file is still
+  open in Preview.” Processes that are not apps, including macOS system processes, appear by
+  name with Show in Finder for their program file. Each app gets Show and Quit, and the eject retries once every quit app has
+  exited. Try Again and Eject Anyway (forced through Disk Arbitration) are also offered.
+  Eject Anyway asks first.
+- **File drops:** dragging files onto a drive tile highlights it and shows a label beside the
+  cursor, “Copy to “Stick”” with a “⇧ Move” hint. Holding Shift switches the label to an orange
+  “Move to “Stick””. Dropping copies or moves into the drive's root; the drive's stack opens to
+  show progress and errors. ⌘ drags (move-only from Finder) are refused with the dock's
+  rejection message, and ⌥ keeps a copy. Names already on the drive refuse the batch, so nothing
+  is overwritten.
+- **Spring-loading:** resting on a drive tile during a file drag opens its stack. Resting on a
+  folder inside opens it, as far down as the folders go. In a drive's stack the back button
+  widens to name the parent while a drag is over the stack; dropping on it lands in the parent,
+  and resting on it climbs one level. Pinned-folder stacks keep copy-only drops and a plain back
+  button.
+- **Hard disks:** “Ask before ejecting hard disks” (on by default) asks in the card before
+  ejecting a fixed external disk. Removable media ejects right away. If the tile is scrolled out of view,
+  the card has nowhere to attach, so a system alert asks instead.
+
+While an eject runs, the card stays open until it succeeds or fails; outside clicks and Escape
+do not close it, and hovering the dimmed tile again shows the eject in progress.
+
+DOKK closes its own stack on a volume before ejecting it, and when Finder announces an unmount,
+so the stack's directory watcher does not block the eject.
+
+API limits: `proc_listpidspath` only sees the current user's processes. A root daemon such as
+Spotlight can refuse an eject; it is named only when macOS reports it as the unmount's
+dissenter, and its name and path then come from the kernel process table. Event-only watchers, such as a Finder window
+on the volume, are excluded because they never block an unmount. When nothing is named, the card says “Something is still
+using this volume.” Shells resolve to their terminal app through the parent chain. There is no
+public API for active file transfers, so the card reports open files instead of the mock-up's
+“no transfer active.” Volume icons come from `NSWorkspace.icon(forFile:)`, as in Finder.
+
+Out of scope: Mike's proposed section for permanent access to all disks. Benn asked a
+follow-up question on DEE-83 that is still unanswered.
+
+Validation: the Debug build and test build succeed with an isolated DerivedData folder. Swift
+Testing coverage in `VolumeTests` covers classification and exclusions, the visibility
+switches, placement before Trash, selection repair, stack identity, blocker resolution,
+capacity math, settings decoding and app-wide resolution, and sticky card phases. Tests,
+previews, app launch, and hands-on interaction were not run.
+
+### Required hands-on acceptance
+
+- Plug in a USB stick, an external SSD, and mount a `.dmg`. Confirm tiles, icons, badges,
+  tooltip names, and order (Shelf, volumes, Trash) on every display. Toggle each switch in
+  Settings. Mount a network share with the share switch on and off.
+- Click a volume: the stack opens on its tile; click again to close. Switch grid and list,
+  eject and reinsert, and confirm the choice persists.
+- Hover: confirm the delay, the capacity bar, the status line, and that moving from the tile
+  into the card keeps it open. Confirm hover never steals focus.
+- Eject an idle stick from the card, the context menu, VoiceOver, and by dragging it off the
+  dock. Confirm the dimmed tile, the farewell, and that macOS shows no warning on unplug.
+- Open a file from the stick in Preview, then eject: confirm the refusal names Preview, Show
+  brings it forward, Quit retries and ejects. Repeat with a Terminal tab `cd`'d into the
+  volume. Confirm Eject Anyway asks first and ejects.
+- Eject the SSD with confirmation on and off.
+- Start an eject from the card, click elsewhere, and confirm the card stays until the result.
+  Close it after a refusal, hover the tile during a slow eject, and confirm it shows “Ejecting…”.
+- Confirm a refusal caused by a system process shows its name, “macOS system process”, and
+  Show in Finder.
+- Drag files from Finder onto a stick tile: confirm the highlight, the cursor label, and that
+  Shift flips it to Move while the pointer is still. Drop with and without Shift; confirm the
+  source stays or leaves. Drop a name that already exists and confirm nothing is replaced.
+- Rest on the tile until the stack opens, spring two folders deep, climb back with the back
+  button, and drop at each level. Confirm a ⌘ drag shows the rejection and drops nothing.
+- Check Reduce Motion (fades instead of springs), Reduce Transparency (opaque card), German
+  copy, left, right, and top dock edges, and sleep/wake with a volume attached.
+
 ## DEE-76 update awareness and idle install
 
 Implemented for direct distribution only. A scheduled Sparkle offer shows a dismissible

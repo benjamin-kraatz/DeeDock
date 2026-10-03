@@ -118,6 +118,10 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.showTrash = defaults.showTrash
         result.magneticEdges = defaults.magneticEdges
         result.confirmBeforeEmptyingTrash = defaults.confirmBeforeEmptyingTrash
+        result.showVolumes = defaults.showVolumes
+        result.showDiskImages = defaults.showDiskImages
+        result.showNetworkVolumes = defaults.showNetworkVolumes
+        result.confirmBeforeEjectingDisks = defaults.confirmBeforeEjectingDisks
         result.windowPeekEnabled = defaults.windowPeekEnabled
         result.windowPeekSplitEnabled = defaults.windowPeekSplitEnabled
         result.windowPeekEnlargeEnabled = defaults.windowPeekEnlargeEnabled
