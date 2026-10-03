@@ -8,7 +8,10 @@ import UniformTypeIdentifiers
 /// volume card opens, which is the only place it is shown.
 @MainActor @Observable
 final class VolumeController {
+    /// Every mounted volume in arrangement order, hidden ones included. Settings lists these.
     private(set) var items: [VolumeDockItem] = []
+    /// Order and visibility the user chose. Edits republish `items`.
+    let arrangement: VolumeArrangementStore
     /// Called after `items` changes, so every dock can rebuild its entries.
     @ObservationIgnored var didChange: (() -> Void)?
     /// Called before a volume unmounts, from DOKK or from Finder, so DOKK can release open
@@ -21,6 +24,18 @@ final class VolumeController {
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored private var scanTask: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
+    /// Volume IDs mounted when the arrangement last recorded them, so arrivals and departures
+    /// can be told apart.
+    @ObservationIgnored private var remembered: Set<String> = []
+
+    /// Uses the standard-defaults arrangement unless one is supplied.
+    init(arrangement: VolumeArrangementStore? = nil) {
+        self.arrangement = arrangement ?? VolumeArrangementStore()
+        self.arrangement.didChange = { [weak self] in self?.publish() }
+    }
+
+    /// The volumes docks show: mounted, in arrangement order, without hidden drives.
+    var dockItems: [VolumeDockItem] { items.filter { !arrangement.isHidden($0.volumeID) } }
 
     func start() {
         guard observers.isEmpty else { return }
@@ -112,7 +127,10 @@ final class VolumeController {
         let ids = Set(infos.map(\.volumeID))
         icons = icons.filter { ids.contains($0.key) }
         ejecting.formIntersection(ids)
-        items = infos.map { info in
+        // Saves only on an arrival, departure, or rename, so capacity refreshes write nothing.
+        arrangement.remember(infos, previouslyMounted: remembered)
+        remembered = ids
+        items = arrangement.arrangement.arranged(infos, id: \.volumeID).map { info in
             VolumeDockItem(info: info, icon: icon(for: info), isEjecting: ejecting.contains(info.volumeID))
         }
         didChange?()

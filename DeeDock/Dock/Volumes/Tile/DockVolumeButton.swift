@@ -48,7 +48,7 @@ struct DockVolumeButton: View {
         }
         .overlay {
             VolumeContextMenuBridge(item: item, interaction: interaction, openSettings: {
-                interaction.prepareSettings?()
+                interaction.prepareVolumeSettings?()
                 openWindow.openDockSettings()
             }, tracking: menuTracking)
         }
@@ -63,6 +63,17 @@ struct DockVolumeButton: View {
             Button(.volumeOpen) { interaction.openVolume?(item) }
             Button(.volumeOpenInFinder) { interaction.revealVolume?(item) }
             Button(.volumeEject) { interaction.ejectVolume?(item) }
+            Button(.volumeHideFromDock) { interaction.hideVolume?(item) }
+            if interaction.canMoveVolume?(item.volumeID, -1) == true {
+                Button { interaction.moveVolume?(item.volumeID, -1) } label: {
+                    Text(interaction.layout.edge.isVertical ? .actionMoveUp : .actionMoveLeft)
+                }
+            }
+            if interaction.canMoveVolume?(item.volumeID, 1) == true {
+                Button { interaction.moveVolume?(item.volumeID, 1) } label: {
+                    Text(interaction.layout.edge.isVertical ? .actionMoveDown : .actionMoveRight)
+                }
+            }
         }
     }
 

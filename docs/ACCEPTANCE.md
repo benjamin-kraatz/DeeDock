@@ -52,6 +52,17 @@ The list follows NSWorkspace mount, unmount, and rename notifications. Nothing p
 - **Hard disks:** “Ask before ejecting hard disks” (on by default) asks in the card before
   ejecting a fixed external disk. Removable media ejects right away. If the tile is scrolled out of view,
   the card has nowhere to attach, so a system alert asks instead.
+- **Hide and reorder:** the tile's context menu and VoiceOver offer Hide from Dock. A hidden
+  drive stays mounted and leaves every dock. Manage Drives… opens Settings › Dock Extras › Drives,
+  where “Drives in the Dock” lists every remembered drive in dock order with its status
+  (Connected, or when it was last connected). The eye shows or hides a drive. Dragging a row
+  reorders it live, and the docks follow at once. The row menu has Move Up, Move Down, and,
+  for a disconnected drive, Forget Drive. In the dock, dragging a drive tile along the other
+  drive tiles opens a gap and reorders on release; pulling it clear of every dock still ejects.
+  VoiceOver offers Move Left/Right (Up/Down on side docks). Order and hidden flags are shared by
+  every display and stored in `dock.volume-arrangement.v1`. New drives join at the end, and a
+  reconnected drive returns to its place. Up to 64 drives are remembered; beyond that, the
+  drives disconnected longest are forgotten, but hidden ones are always kept.
 
 While an eject runs, the card stays open until it succeeds or fails; outside clicks and Escape
 do not close it, and hovering the dimmed tile again shows the eject in progress.
@@ -102,6 +113,16 @@ previews, app launch, and hands-on interaction were not run.
   button, and drop at each level. Confirm a ⌘ drag shows the rejection and drops nothing.
 - Check Reduce Motion (fades instead of springs), Reduce Transparency (opaque card), German
   copy, left, right, and top dock edges, and sleep/wake with a volume attached.
+- Hide a stick from its context menu: the tile, card, and any open stack leave every dock and
+  the stick stays mounted. Show it again from Settings. Reorder rows by dragging and with the
+  row menu while the docks are visible. Drag tiles along the drive run in the dock on two
+  displays, then confirm a pull off the dock still ejects. Unplug a drive, confirm “Last
+  connected”, plug it back in, and confirm it returns to its place. Forget a disconnected drive.
+
+Hide and reorder validation: one Debug build of the app and test target with an isolated
+DerivedData folder. `VolumeArrangementTests` covers arrival order, last-seen stamps, gap-index
+moves, hiding, pruning, and persistence. The tests, previews, app launch, and hands-on
+interaction were not run.
 
 ## DEE-76 update awareness and idle install
 

@@ -30,6 +30,8 @@ final class DockCoordinator {
     var settingsFeaturesRequest = false
     /// One-shot route opened from the menu-bar mode submenu.
     var settingsModesRequest = false
+    /// One-shot route opened from a drive tile's Manage Drives command.
+    var settingsDrivesRequest = false
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
@@ -91,7 +93,8 @@ final class DockCoordinator {
     var recipeApplications: any ApplicationServicing { catalog.service }
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
-    @ObservationIgnored private let volumes = VolumeController()
+    /// Mounted drives and their shared arrangement. Settings reads both to manage drive order.
+    @ObservationIgnored let volumes = VolumeController()
     @ObservationIgnored private let volumeDock: VolumeDockCoordinator
     @ObservationIgnored private let capsules = SessionCapsuleController()
     @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
@@ -651,6 +654,8 @@ final class DockCoordinator {
                 settingsDisplayRequest = profiles.displays.count > 1
                     && profiles.displays.contains(where: { $0.id == display.id }) ? display.id : nil
             }
+            // Drive order and visibility are app-wide, so there is no display to select.
+            panel.interaction.prepareVolumeSettings = { [weak self] in self?.settingsDrivesRequest = true }
             panel.launcher.createCapsule = { [weak self, weak panel] application in
                 guard let self, let panel, panels[display.id] === panel else { return }
                 panel.closeLauncher()
@@ -965,6 +970,7 @@ final class DockCoordinator {
         settingsDisplayRequest = nil
         settingsFeaturesRequest = false
         settingsModesRequest = false
+        settingsDrivesRequest = false
         filePicker.stop()
         dragging.stop()
         folderStacks.stop()

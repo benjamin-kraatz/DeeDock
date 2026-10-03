@@ -62,6 +62,8 @@ final class DockPanelController {
         interaction.openLauncher = store.openLauncher
         interaction.canMoveUtility = { [weak store] id, distance in store?.canMoveUtility(id, by: distance) == true }
         interaction.moveUtility = { [weak store] id, distance in store?.moveUtility(id, by: distance) }
+        interaction.canMoveVolume = { [weak store] id, distance in store?.canMoveVolume(id, by: distance) == true }
+        interaction.moveVolume = { [weak store] id, distance in store?.moveVolume(id, by: distance) }
         interaction.movePin = { [weak store] id, distance in store?.movePin(id, by: distance) }
         interaction.canMovePin = { [weak store] id, distance in store?.canMovePin(id, by: distance) ?? false }
         interaction.copyPin = { [weak store] reference, displayID in store?.copyPin?(reference, displayID) }
@@ -371,9 +373,21 @@ final class DockPanelController {
 
     /// Utility boundaries use the original layout, so a moving gap cannot retarget itself.
     func utilityInsertionIndex(at point: CGPoint, sourceID: String) -> Int? {
+        insertionIndex(at: point, sourceID: sourceID) { $0.movableUtilityID != nil }
+    }
+
+    /// Where a dragged drive would land among this dock's drives, or nil when the pointer is
+    /// outside their run. Uses the original layout, like utilities.
+    func volumeInsertionIndex(at point: CGPoint, sourceID: String) -> Int? {
+        insertionIndex(at: point, sourceID: sourceID) { $0.volume != nil }
+    }
+
+    /// The gap index among the entries matching `member` (with the source removed), when the
+    /// pointer lies within half an icon of the first and last such entry.
+    private func insertionIndex(at point: CGPoint, sourceID: String, member: (DockRenderSlot) -> Bool) -> Int? {
         guard !stopped, !launcher.isPresented, visibility.exposesContent,
               restingDragBounds.contains(point) else { return nil }
-        let positions = store.entries.indices.filter { store.entries[$0].movableUtilityID != nil }
+        let positions = store.entries.indices.filter { member(store.entries[$0]) }
         let centers = baseLayout.restingCenters
         guard let first = positions.first, let last = positions.last, last < centers.count,
               positions.contains(where: { store.entries[$0].id == sourceID }) else { return nil }
@@ -708,6 +722,8 @@ final class DockPanelController {
         interaction.openTrash = nil; interaction.emptyTrash = nil
         interaction.openVolume = nil; interaction.revealVolume = nil; interaction.ejectVolume = nil
         interaction.volumeHoverChanged = nil; interaction.beginVolumeDrag = nil
+        interaction.hideVolume = nil; interaction.prepareVolumeSettings = nil
+        interaction.canMoveVolume = nil; interaction.moveVolume = nil
         interaction.openFocusSession = nil
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
         interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil

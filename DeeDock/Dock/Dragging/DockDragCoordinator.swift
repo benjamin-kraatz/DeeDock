@@ -193,7 +193,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if sourceUtilityID != nil {
             return destinationID == displayID && destinationIndex != nil ? .move : []
         }
-        if sourceVolume != nil { return [] }
+        if sourceVolume != nil {
+            return destinationID == displayID && destinationIndex != nil ? .move : []
+        }
         if meltDestination?.0 == displayID { return .copy }
         if unpinDestinationID == displayID { return .move }
         if actionDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
@@ -215,9 +217,18 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
 
     func perform(_ info: NSDraggingInfo, on displayID: String) -> Bool {
         guard !completion.committed, !completion.cancelled, validates(info.draggingPasteboard) else { return false }
-        if sourceVolume != nil { return false }
         nativeDisplayID = displayID
         update(at: NSEvent.mouseLocation)
+        if let volume = sourceVolume {
+            guard sourceID == displayID, destinationID == displayID, let index = destinationIndex,
+                  let panel = panels[displayID] else { return false }
+            committing = true
+            panel.store.moveVolume(volume.volumeID, to: index)
+            committing = false
+            completion.committed = true
+            clearFeedback()
+            return true
+        }
         if let (destination, first, second) = meltDestination, destination == displayID,
            let meltApplications {
             finishMeltDrop()
@@ -519,14 +530,22 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             return
         }
         if let volume = sourceVolume {
-            let ejecting = volumeEjectArmed(at: point)
+            // Within the source dock's run of drives the tile reorders; pulled clear of every dock
+            // it ejects. Other displays show the same drives but cannot take the drop.
+            if let candidate, candidate.store.displayID == sourceID,
+               let index = candidate.volumeInsertionIndex(at: point, sourceID: volume.id) {
+                destinationID = sourceID; destinationIndex = index
+            }
+            let ejecting = destinationIndex == nil && volumeEjectArmed(at: point)
             for (id, panel) in panels {
-                panel.setDragPresentation(proposal: nil, source: id == sourceID ? volume.id : nil, targeted: false,
+                let proposal = id == destinationID ? destinationIndex.map { DockDragProposal(index: $0, volumeID: volume.id) } : nil
+                panel.setDragPresentation(proposal: proposal, source: id == sourceID ? volume.id : nil,
+                                          targeted: id == destinationID,
                                           message: id == sourceID && ejecting ? .volumeEject : nil)
             }
             nativeSession?.animatesToStartingPositionsOnCancelOrFail = !ejecting
             setDragLabel(ejecting ? String(localized: .volumeEject) : nil, icon: volume.icon)
-            trackingID = nil
+            if trackingID != sourceID { trackingID = nil }
             updateScrollTimer()
             return
         }
@@ -771,7 +790,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if event.type == .keyDown, event.keyCode == 53 { completion.cancelled = true }
         }
         if let volume = sourceVolume, let sourceID, let panel = panels[sourceID] {
-            let eject = completion.released && !completion.cancelled && volumeEjectArmed(at: screenPoint)
+            let eject = completion.released && !completion.cancelled && !completion.committed
+                && volumeEjectArmed(at: screenPoint)
             cancel()
             if eject { ejectVolume?(volume, panel) }
             return

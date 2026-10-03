@@ -1,7 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Right-click menu for a volume tile: Open, Open in Finder, Eject, and Settings.
+/// Right-click menu for a volume tile: Open, Open in Finder, Eject, Hide from Dock, and the Drives
+/// settings page.
 struct VolumeContextMenuBridge: NSViewRepresentable {
     let item: VolumeDockItem
     let interaction: DockInteraction
@@ -45,7 +46,8 @@ struct VolumeContextMenuBridge: NSViewRepresentable {
             menu.addItem(.separator())
             add(.volumeEject, action: #selector(eject), symbol: "eject", to: menu, enabled: available)
             menu.addItem(.separator())
-            add(.actionSettings, action: #selector(settings), symbol: "gear", to: menu)
+            add(.volumeHideFromDock, action: #selector(hide), symbol: "eye.slash", to: menu)
+            add(.volumeManageDrives, action: #selector(settings), symbol: "gear", to: menu)
             trackedMenu = menu
             NSMenu.popUpContextMenu(menu, with: event, for: self)
             tracking?(false)
@@ -66,6 +68,7 @@ struct VolumeContextMenuBridge: NSViewRepresentable {
         @objc private func open() { if let item { interaction?.openVolume?(item) } }
         @objc private func reveal() { if let item { interaction?.revealVolume?(item) } }
         @objc private func eject() { if let item { interaction?.ejectVolume?(item) } }
+        @objc private func hide() { if let item { interaction?.hideVolume?(item) } }
         @objc private func settings() { openSettings?() }
 
         func stop() {

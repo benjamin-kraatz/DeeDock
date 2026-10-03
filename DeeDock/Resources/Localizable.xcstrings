@@ -46166,6 +46166,204 @@
           }
         }
       }
+    },
+    "volumeHideFromDock" : {
+      "comment" : "Volume tile menu item and VoiceOver action that hides the drive from every dock. The drive stays mounted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Dock ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide from Dock"
+          }
+        }
+      }
+    },
+    "volumeManageDrives" : {
+      "comment" : "Volume tile menu item that opens the Drives settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufwerke verwalten…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Drives…"
+          }
+        }
+      }
+    },
+    "settingsDriveList" : {
+      "comment" : "Settings card title for the list of remembered drives, where they can be reordered and hidden.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufwerke im Dock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drives in the Dock"
+          }
+        }
+      }
+    },
+    "settingsDriveListHelp" : {
+      "comment" : "Help under the list of drives in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe ein Laufwerk, um seinen Platz im Dock zu ändern, oder verschiebe seine Kachel direkt im Dock. Ein ausgeblendetes Laufwerk bleibt verbunden und lässt sich hier wieder einblenden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag a drive to change its place in the dock, or drag its tile within the dock. A hidden drive stays connected, and you can show it again here."
+          }
+        }
+      }
+    },
+    "settingsDriveListEmpty" : {
+      "comment" : "Shown in the Settings drive list before any drive has been connected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbundene Laufwerke erscheinen hier, damit du sie neu anordnen oder ausblenden kannst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected drives appear here, so you can reorder or hide them."
+          }
+        }
+      }
+    },
+    "settingsDriveConnected" : {
+      "comment" : "Status of a drive in the Settings list that is mounted right now.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected"
+          }
+        }
+      }
+    },
+    "settingsDriveLastConnected" : {
+      "comment" : "Status of a disconnected drive in the Settings list. when is a relative date supplied by macOS, such as “yesterday” or “3 days ago”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt verbunden %1$(when)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last connected %1$(when)@"
+          }
+        }
+      }
+    },
+    "settingsDriveSubtitle" : {
+      "comment" : "Second line of a drive row in Settings. kind is the drive kind, such as “USB stick”; status is “Connected” or when it was last connected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(kind)@ · %2$(status)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(kind)@ · %2$(status)@"
+          }
+        }
+      }
+    },
+    "settingsDriveShow" : {
+      "comment" : "Help and VoiceOver label of the eye button that shows a hidden drive in the dock again. name is the drive name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$(name)@“ im Dock anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show “%1$(name)@” in the Dock"
+          }
+        }
+      }
+    },
+    "settingsDriveHide" : {
+      "comment" : "Help and VoiceOver label of the eye button that hides a drive from the dock. name is the drive name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$(name)@“ im Dock ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide “%1$(name)@” from the Dock"
+          }
+        }
+      }
+    },
+    "settingsDriveForget" : {
+      "comment" : "Menu item that removes a disconnected drive from the Settings list. It returns, shown, the next time it is connected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufwerk vergessen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forget Drive"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

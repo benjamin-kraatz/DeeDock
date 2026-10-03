@@ -59,6 +59,7 @@ final class VolumeDockCoordinator {
             guard let self, let panel else { return }
             requestEject(volume, on: panel, keyboard: panel.store.keyboardFocus)
         }
+        panel.interaction.hideVolume = { [weak self] volume in self?.hide(volume) }
         panel.interaction.volumeHoverChanged = { [weak self, weak panel] volume in
             guard let self, let panel else { return }
             if volume != nil, isDragging() { return }
@@ -109,6 +110,14 @@ final class VolumeDockCoordinator {
         cards.dismiss()
         return folderStacks.receive(info, folder: volume.stackItem(displayID: panel.store.displayID), on: panel,
                                     anchoredTo: .volume(volume.volumeID), volumeRoot: true)
+    }
+
+    /// Hides the drive from every dock. Its card and stack close first, since the tile they hang
+    /// from is about to leave. An eject already running carries on.
+    private func hide(_ volume: VolumeDockItem) {
+        cards.close()
+        folderStacks.close(within: volume.url)
+        volumes.arrangement.setHidden(volume.volumeID, true)
     }
 
     private func openInFinder(_ volume: VolumeDockItem) {
