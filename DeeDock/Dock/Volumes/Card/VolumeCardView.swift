@@ -35,7 +35,8 @@ struct VolumeCardView: View {
         let perform: (VolumeCardAction) -> Void = { action in state.perform?(action) }
         switch state.phase {
         case .info:
-            VolumeCardInfoSection(usage: state.usage, reduceMotion: state.reduceMotion, perform: perform)
+            VolumeCardInfoSection(kind: state.volume.kind, usage: state.usage,
+                                  reduceMotion: state.reduceMotion, perform: perform)
         case .confirmDisk:
             VolumeCardConfirmation(symbol: "externaldrive.fill.badge.exclamationmark",
                                    title: .volumeConfirmDiskTitle(name: state.volume.name),
@@ -126,6 +127,12 @@ private enum VolumeCardPreviewData {
         volume: VolumeCardPreviewData.volume(name: "Fotos 2026 – Sicherung mit sehr langem Namen",
                                              kind: .externalDisk, total: 2_000_000_000_000,
                                              available: 60_000_000_000))).padding()
+}
+
+#Preview("Info, hard disk") {
+    VolumeCardView(state: VolumeCardPreviewData.state(
+        .info, volume: VolumeCardPreviewData.volume(name: "WDElements", kind: .externalDisk,
+                                                    total: 3_000_000_000_000, available: 2_260_000_000_000))).padding()
 }
 
 #Preview("Info, capacity unknown") {
