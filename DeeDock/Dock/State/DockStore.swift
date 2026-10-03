@@ -194,7 +194,7 @@ final class DockStore {
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
-                                                  volumes: volumes?.items.filter { volumeVisibility.includes($0.kind) } ?? [],
+                                                  volumes: volumes?.dockItems.filter { volumeVisibility.includes($0.kind) } ?? [],
                                                   trash: showsTrash ? trash?.item : nil)
         content.insert(contentsOf: pairs.flatMap { pair in pair.applicationIDs.indices.map { DockRenderSlot.melt(pair, $0) } },
                        at: content.firstIndex(where: \.isUtility) ?? content.count)
@@ -258,6 +258,24 @@ final class DockStore {
         guard showsShelf != visible else { return }
         showsShelf = visible
         refreshEntries()
+    }
+
+    /// Moves a drive to `index` among the drives this dock shows, with the drive itself removed,
+    /// matching a drag's insertion gap. The arrangement is shared, so every dock follows.
+    func moveVolume(_ volumeID: String, to index: Int) {
+        volumes?.arrangement.move(volumeID, to: index, within: entries.compactMap(\.volume?.volumeID))
+    }
+
+    func canMoveVolume(_ volumeID: String, by distance: Int) -> Bool {
+        let visible = entries.compactMap(\.volume?.volumeID)
+        guard let index = visible.firstIndex(of: volumeID) else { return false }
+        return visible.indices.contains(index + distance)
+    }
+
+    func moveVolume(_ volumeID: String, by distance: Int) {
+        guard canMoveVolume(volumeID, by: distance),
+              let index = entries.compactMap(\.volume?.volumeID).firstIndex(of: volumeID) else { return }
+        moveVolume(volumeID, to: index + distance)
     }
 
     func configureVolumes(_ visibility: VolumeVisibility) {

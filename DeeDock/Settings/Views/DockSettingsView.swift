@@ -72,6 +72,11 @@ struct DockSettingsView: View {
             coordinator?.settingsModesRequest = false
             select(.modes)
         }
+        .onChange(of: coordinator?.settingsDrivesRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsDrivesRequest = false
+            select(.extras, page: .drives)
+        }
         .onChange(of: coordinator?.settingsFeaturesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false

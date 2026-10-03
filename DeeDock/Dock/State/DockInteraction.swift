@@ -82,6 +82,13 @@ final class DockInteraction {
     /// Reports the volume tile under the pointer, or nil when the pointer leaves it.
     @ObservationIgnored var volumeHoverChanged: ((VolumeDockItem?) -> Void)?
     @ObservationIgnored var beginVolumeDrag: ((VolumeDockItem, NSView, NSEvent) -> Void)?
+    /// Hides the drive from every dock. It stays mounted and can be shown again in Settings.
+    @ObservationIgnored var hideVolume: ((VolumeDockItem) -> Void)?
+    /// Routes the next Settings window to the Drives page.
+    @ObservationIgnored var prepareVolumeSettings: (() -> Void)?
+    @ObservationIgnored var canMoveVolume: ((String, Int) -> Bool)?
+    /// Moves a drive by a number of positions among the drives this dock shows.
+    @ObservationIgnored var moveVolume: ((String, Int) -> Void)?
     @ObservationIgnored var pasteToShelf: (() -> Void)?
     @ObservationIgnored var canPasteToShelf: (() -> Bool)?
     @ObservationIgnored var openSessionCapsules: (() -> Void)?

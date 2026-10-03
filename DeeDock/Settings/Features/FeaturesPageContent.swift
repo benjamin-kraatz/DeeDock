@@ -27,6 +27,11 @@ struct FeaturesPageContent: View {
             .disabled(locked)
         case .drives:
             VolumesSettingsCard(source: source).disabled(locked)
+            if let volumes = context.coordinator?.volumes {
+                VolumeArrangementSettingsCard(store: volumes.arrangement, mounted: volumes.items,
+                                              visibility: VolumeVisibility(settings: source.value))
+                    .disabled(!source.value.showVolumes)
+            }
         case .capsules:
             SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {
                 SettingsToggleRow(title: .settingsShowCapsules, isOn: source.binding(\.showSessionCapsules))

@@ -2,7 +2,7 @@ import AppKit
 import CryptoKit
 
 /// The categories of mounted volume a dock can show, each with its own Settings switch.
-nonisolated enum VolumeKind: String, Equatable, Sendable {
+nonisolated enum VolumeKind: String, Codable, Equatable, Sendable {
     /// Removable media such as USB sticks and SD cards.
     case removable
     /// An external disk whose media is fixed, typically a drive that stays connected.

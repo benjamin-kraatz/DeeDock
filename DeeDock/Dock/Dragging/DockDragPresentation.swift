@@ -6,6 +6,9 @@ struct DockDragProposal: Equatable {
     let index: Int
     /// When present, index is the destination in the visible utility order after removing the source.
     var utilityID: String? = nil
+    /// A volume tile's slot ID. When present, index is the destination among the dock's drives
+    /// after removing the source.
+    var volumeID: String? = nil
 }
 
 /// A stable render identity for either an application or one place in a multi-app insertion gap.
@@ -131,14 +134,10 @@ enum DockRenderSlot: Identifiable {
     static func slots(entries: [Self], proposal: DockDragProposal?) -> [Self] {
         guard let proposal else { return entries }
         if let utilityID = proposal.utilityID {
-            let positions = entries.indices.filter { entries[$0].movableUtilityID != nil }
-            var utilities = positions.map { entries[$0] }
-            guard let source = utilities.firstIndex(where: { $0.id == utilityID }) else { return entries }
-            utilities.remove(at: source)
-            utilities.insert(.gap("utility:" + utilityID), at: min(max(0, proposal.index), utilities.count))
-            var result = entries
-            for (position, slot) in zip(positions, utilities) { result[position] = slot }
-            return result
+            return reordered(entries, moving: utilityID, to: proposal.index) { $0.movableUtilityID != nil }
+        }
+        if let volumeID = proposal.volumeID {
+            return reordered(entries, moving: volumeID, to: proposal.index) { $0.volume != nil }
         }
         let ids = Set(proposal.pins.map(\.id))
         let pins = entries.compactMap(\.pin)
@@ -148,6 +147,20 @@ enum DockRenderSlot: Identifiable {
         var result = entries.filter { slot in slot.pin.map { !ids.contains($0.id) } ?? true }
         let controlCount = result.prefix { if case .launcher = $0 { return true }; if case .group(let c) = $0 { return c.group == .pinned }; return false }.count
         result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: min(controlCount + boundary, result.count))
+        return result
+    }
+
+    /// Moves `sourceID` to a gap at `index` among the slots matching `member`, leaving every other
+    /// slot in place. The gap's `utility:` prefix keeps it inside the trailing divider.
+    private static func reordered(_ entries: [Self], moving sourceID: String, to index: Int,
+                                  member: (Self) -> Bool) -> [Self] {
+        let positions = entries.indices.filter { member(entries[$0]) }
+        var members = positions.map { entries[$0] }
+        guard let source = members.firstIndex(where: { $0.id == sourceID }) else { return entries }
+        members.remove(at: source)
+        members.insert(.gap("utility:" + sourceID), at: min(max(0, index), members.count))
+        var result = entries
+        for (position, slot) in zip(positions, members) { result[position] = slot }
         return result
     }
 }
