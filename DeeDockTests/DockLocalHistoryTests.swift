@@ -15,6 +15,15 @@ struct DockLocalHistoryTests {
         .application(DisplayFixtures.app(id))
     }
 
+    /// Waits until `condition` holds or `limit` passes. A fixed sleep longer than the dwell is
+    /// not enough when parallel suites keep the main actor busy.
+    private func waitUntil(within limit: Duration = .seconds(2), _ condition: () -> Bool) async throws {
+        let deadline = ContinuousClock.now + limit
+        while !condition(), ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+    }
+
     @Test("Pin add, remove, and move are recorded; presentation-only writes are not")
     func pinMutations() throws {
         let safari = pin("safari")
@@ -440,7 +449,7 @@ struct DockLocalHistoryTests {
         timeline.update(progress: 0)
         #expect(applied.isEmpty)
         #expect(timeline.replayPending)
-        try await Task.sleep(for: .milliseconds(80))
+        try await waitUntil { !applied.isEmpty }
         #expect(applied == [[pin("one").id]])
         #expect(timeline.isReplayingPins)
 

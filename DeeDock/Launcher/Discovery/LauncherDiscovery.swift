@@ -31,14 +31,27 @@ nonisolated enum LauncherDiscovery {
             }
         }
         let nested = nestedURLs(urls, home: manager.homeDirectoryForCurrentUser)
-        var applications: [String: LauncherApplication] = [:]
+        var candidates: [LauncherApplication] = []
         for url in urls.sorted(by: { $0.path < $1.path }) {
             try Task.checkCancellation()
-            guard let application = read(url, isNested: nested.contains(url)),
-                  applications[application.id] == nil else { continue }
-            applications[application.id] = application
+            if let application = read(url, isNested: nested.contains(url)) { candidates.append(application) }
         }
-        return Snapshot(applications: applications.values.sorted { $0.reference.name.localizedStandardCompare($1.reference.name) == .orderedAscending }, skippedDirectories: skipped)
+        return Snapshot(applications: deduplicated(candidates).sorted { $0.reference.name.localizedStandardCompare($1.reference.name) == .orderedAscending }, skippedDirectories: skipped)
+    }
+
+    /// Keeps one copy per ``LauncherApplication/id``, preferring a copy that is not nested.
+    ///
+    /// Copies of one bundle share an id, and the Launcher hides nested copies by default. If a nested
+    /// copy won, the top-level install would vanish and Show Nested Apps would only reveal the nested
+    /// one. Among copies with the same nesting, the first in `candidates` wins, so the scan's path
+    /// order keeps results stable. The result is unordered.
+    static func deduplicated(_ candidates: [LauncherApplication]) -> [LauncherApplication] {
+        var applications: [String: LauncherApplication] = [:]
+        for candidate in candidates {
+            if let kept = applications[candidate.id], !kept.isNested || candidate.isNested { continue }
+            applications[candidate.id] = candidate
+        }
+        return Array(applications.values)
     }
 
     /// Returns the bundles under an Applications folder that sit in a subfolder of a directory that
@@ -49,8 +62,8 @@ nonisolated enum LauncherDiscovery {
     /// nested; `Unity Bug Reporter.app`, a sibling of `Unity.app`, is not. The Applications root itself
     /// never counts as a holding folder, so `/Applications/Utilities/Terminal.app` stays top level.
     ///
-    /// Uses every enumerated URL, before bundle-identifier deduplication drops other copies of the
-    /// parent app. Lexical only, so it adds no filesystem work to the scan.
+    /// Uses every enumerated URL, before ``deduplicated(_:)`` drops other copies of the parent app.
+    /// Lexical only, so it adds no filesystem work to the scan.
     static func nestedURLs(_ urls: [URL], home: URL) -> Set<URL> {
         let roots = LauncherLocationFilter.applicationsRoots(home: home)
         let paths = urls.map { LauncherLocationFilter.comparablePath($0) }
