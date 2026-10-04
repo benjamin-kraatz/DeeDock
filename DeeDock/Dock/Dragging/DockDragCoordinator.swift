@@ -106,9 +106,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     }
 
     /// Uses a native drag image and the same insertion presentation as application pins.
+    /// The launcher takes this path too; its drop saves a new launcher position instead.
     func beginUtility(_ slot: DockRenderSlot, from displayID: String, view: NSView, event: NSEvent) {
-        guard let panel = panels[displayID], let id = slot.movableUtilityID,
-              panel.store.entries.contains(where: { $0.id == id }), let icon = slot.icon else { return }
+        guard let panel = panels[displayID], let id = slot.dragMoveID,
+              id != DockEntryID.launcher.hitID || panel.store.canEditPins,
+              panel.store.entries.contains(where: { $0.id == id }), let icon = slot.icon ?? (slot.isLauncher ? LauncherTileArtwork.image(size: min(view.bounds.width, view.bounds.height)) : nil)
+        else { return }
         cancel()
         active = true; sourceID = displayID; sourceUtilityID = id
         payload = .selection(pins: [], documents: nil, stageableItems: nil)
@@ -235,6 +238,16 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
            let meltApplications {
             finishMeltDrop()
             DispatchQueue.main.async { meltApplications(first, second) }
+            return true
+        }
+        if sourceUtilityID == DockEntryID.launcher.hitID {
+            guard sourceID == displayID, destinationID == displayID, let index = destinationIndex,
+                  let panel = panels[displayID] else { return false }
+            committing = true
+            panel.store.moveLauncher(toStop: index)
+            committing = false
+            completion.committed = true
+            clearFeedback()
             return true
         }
         if let utilityID = sourceUtilityID {

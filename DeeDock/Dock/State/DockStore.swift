@@ -174,12 +174,44 @@ final class DockStore {
         refreshEntries()
     }
 
-    private var launcherAtStart = true
+    /// The saved launcher position for this display, from its settings.
+    private(set) var launcherPosition = LauncherDockPosition.start
 
-    func configureLauncherPosition(_ atStart: Bool) {
-        guard launcherAtStart != atStart else { return }
-        launcherAtStart = atStart
+    func configureLauncherPosition(_ position: LauncherDockPosition) {
+        guard launcherPosition != position else { return }
+        launcherPosition = position
         refreshEntries()
+    }
+
+    /// Whether a keyboard or VoiceOver move can shift the launcher `distance` stops.
+    func canMoveLauncher(by distance: Int) -> Bool {
+        guard canEditPins else { return false }
+        let content = entries.filter { !$0.isLauncher }
+        guard let current = DockLauncherPlacement.renderedPosition(in: entries),
+              let index = DockLauncherPlacement.stops(in: content).firstIndex(of: current) else { return false }
+        return DockLauncherPlacement.stops(in: content).indices.contains(index + distance)
+    }
+
+    /// Moves the launcher one or more stops, such as from after one pin to after the next.
+    func moveLauncher(by distance: Int) {
+        guard canMoveLauncher(by: distance), let current = DockLauncherPlacement.renderedPosition(in: entries),
+              let index = DockLauncherPlacement.stops(in: entries.filter { !$0.isLauncher }).firstIndex(of: current) else { return }
+        moveLauncher(toStop: index + distance)
+    }
+
+    /// Saves the launcher at `stop`, an index into ``DockLauncherPlacement/stops(in:)`` for this
+    /// dock's entries without the launcher. Drag drops and keyboard moves both end here.
+    func moveLauncher(toStop stop: Int) {
+        let stops = DockLauncherPlacement.stops(in: entries.filter { !$0.isLauncher })
+        guard canEditPins, stops.indices.contains(stop) else { return }
+        saveLauncherPosition(stops[stop])
+    }
+
+    /// Writes the position where this display's value comes from: its override if it has one,
+    /// otherwise the shared default. The settings change then reconfigures every affected dock.
+    private func saveLauncherPosition(_ position: LauncherDockPosition) {
+        guard position != launcherPosition else { return }
+        profiles.updateInheritedSource(displayID, keyPath: \.launcherPosition, to: position)
     }
 
     private func refreshEntries() {
@@ -210,7 +242,7 @@ final class DockStore {
             (order.firstIndex(of: $0.id) ?? order.count) < (order.firstIndex(of: $1.id) ?? order.count)
         }
         for (index, slot) in zip(positions, utilities) { content[index] = slot }
-        let ordinary: [DockRenderSlot] = launcherAtStart ? [.launcher] + content : content + [.launcher]
+        let ordinary = DockLauncherPlacement.entries(content, position: launcherPosition, pinOrder: pins.map(\.id))
         // Use the same projection for rendering, layout, keyboard selection, and native targets.
         // Utility actions and running-only apps cannot be stamped and must not remain clickable.
         let next = QuarantineStampController.shared.armed
@@ -239,13 +271,16 @@ final class DockStore {
         presentationDidChange?()
     }
 
+    /// Also answers for the launcher, whose moves step through pins rather than utilities.
     func canMoveUtility(_ id: String, by distance: Int) -> Bool {
+        if id == DockEntryID.launcher.hitID { return canMoveLauncher(by: distance) }
         let visible = entries.compactMap(\.movableUtilityID)
         guard let index = visible.firstIndex(of: id) else { return false }
         return visible.indices.contains(index + distance)
     }
 
     func moveUtility(_ id: String, by distance: Int) {
+        if id == DockEntryID.launcher.hitID { return moveLauncher(by: distance) }
         let visible = entries.compactMap(\.movableUtilityID)
         guard let index = visible.firstIndex(of: id), visible.indices.contains(index + distance) else { return }
         moveUtility(id, to: visible[index + distance])
@@ -404,8 +439,9 @@ final class DockStore {
     }
 
     /// Persists one completed edit. Preview state must never call this method.
+    /// - Parameter relocated: Pins this edit moved, so a launcher placed after one stays put.
     @discardableResult
-    func savePins(_ proposed: [DockPin]) -> Bool {
+    func savePins(_ proposed: [DockPin], relocated: Set<String> = []) -> Bool {
         guard previewPins == nil else { return false }
         guard proposed != persistedPins else { return true }
         let previous = persistedPins
@@ -413,6 +449,8 @@ final class DockStore {
             try profiles.savePins(proposed, for: displayID)
             history?.recordPinChange(previous: previous, next: proposed, displayID: displayID)
             reportPinChange(previous: previous, next: proposed)
+            saveLauncherPosition(DockLauncherPlacement.reanchored(launcherPosition, previous: previous.map(\.id),
+                                                                   next: proposed.map(\.id), relocated: relocated))
             return true
         } catch {
             errorMessage = .errorSavePins(details: error.localizedDescription)
@@ -440,7 +478,7 @@ final class DockStore {
         let previous = persistedPins
         willMutateFavoriteIDs?(incoming.map(\.id))
         pinIDsHiddenFromDock.subtract(incoming.map(\.id))
-        let succeeded = savePins(DockPinEditing.inserting(incoming, into: pins, at: index))
+        let succeeded = savePins(DockPinEditing.inserting(incoming, into: pins, at: index), relocated: Set(incoming.map(\.id)))
         if let itemID = incoming.compactMap(\.application?.id).first {
             notePinInteraction(itemID, previous: previous, succeeded: succeeded)
         }
@@ -448,7 +486,7 @@ final class DockStore {
     }
 
     func movePin(_ id: String, by distance: Int) {
-        _ = savePins(DockPinEditing.moving(id, in: pins, by: distance))
+        _ = savePins(DockPinEditing.moving(id, in: pins, by: distance), relocated: [id])
     }
 
     func canMovePin(_ id: String, by distance: Int) -> Bool {

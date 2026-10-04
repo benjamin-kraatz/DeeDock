@@ -118,6 +118,19 @@ final class DisplayProfilesStore {
         edit(id) { $0.overrides.set(field, from: normalized) }
     }
 
+    /// Edits the value a display shows where it comes from: the display's override when it has one,
+    /// otherwise the shared default, which every inheriting display picks up.
+    ///
+    /// For edits made on the dock itself, so a single-display setup never gains a hidden override.
+    func updateInheritedSource<Value>(_ id: String, keyPath: WritableKeyPath<DockSettings, Value>, to value: Value) {
+        guard let field = DockSettingField.allCases.first(where: { $0.keyPath == keyPath }) else { return }
+        if document.profiles[id]?.overrides.contains(field) == true {
+            update(id, keyPath: keyPath, to: value)
+        } else {
+            defaults.update(keyPath, to: value)
+        }
+    }
+
     /// Applies several explicit overrides as one saved display-profile edit.
     func update(_ id: String, fields: [DockSettingField], mutation: (inout DockSettings) -> Void) {
         var effective = effectiveSettings(for: id)

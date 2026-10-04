@@ -5,6 +5,7 @@ struct DockDragProposal: Equatable {
     var pins: [DockPin] = []
     let index: Int
     /// When present, index is the destination in the visible utility order after removing the source.
+    /// For the App Launcher, index is a stop from ``DockLauncherPlacement/stops(in:)``.
     var utilityID: String? = nil
     /// A volume tile's slot ID. When present, index is the destination among the dock's drives
     /// after removing the source.
@@ -29,6 +30,9 @@ enum DockRenderSlot: Identifiable {
     case trash(TrashDockItem)
     case gap(String)
 
+    /// The gap that stands in for the App Launcher while it is dragged.
+    static let launcherGapID = "launcher"
+
     var id: String {
         switch self {
         case .melt(let pair, let index): return pair.dockIdentity(at: index).hitID
@@ -51,7 +55,7 @@ enum DockRenderSlot: Identifiable {
         switch self {
         case .app(let item): return item.isFavorite
         case .folder(let item): return !item.isDownloads
-        case .gap(let id): return !id.hasPrefix("utility:")
+        case .gap(let id): return !id.hasPrefix("utility:") && id != Self.launcherGapID
         case .group(let control): return control.group == .pinned
         case .melt, .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .volume, .update, .trash: return false
         }
@@ -69,8 +73,17 @@ enum DockRenderSlot: Identifiable {
     var action: ActionDockItem? { if case .action(let item) = self { return item }; return nil }
     var focus: FocusDockItem? { if case .focus(let item) = self { return item }; return nil }
     var isUtility: Bool {
-        if case .gap(let id) = self { return id.hasPrefix("utility:") }
+        if case .gap(let id) = self { return id.hasPrefix("utility:") || id == Self.launcherGapID }
         return melt != nil || folder?.isDownloads == true || target == .launcher || focus != nil || action != nil || trash != nil || update != nil || shelf != nil || volume != nil || capsules != nil || capsule != nil
+    }
+    /// The launcher tile, or the gap holding its place during a drag.
+    var isLauncher: Bool {
+        if case .gap(let id) = self { return id == Self.launcherGapID }
+        return target == .launcher
+    }
+    /// What a drag-to-move gesture carries: a reorderable utility, or the launcher.
+    var dragMoveID: String? {
+        movableUtilityID ?? (target == .launcher ? id : nil)
     }
     var appGroup: DockAppGroup? {
         switch self {
@@ -139,6 +152,9 @@ enum DockRenderSlot: Identifiable {
     /// Gap indices refer to persisted pins, excluding section controls and incoming duplicates.
     static func slots(entries: [Self], proposal: DockDragProposal?) -> [Self] {
         guard let proposal else { return entries }
+        if proposal.utilityID == DockEntryID.launcher.hitID {
+            return launcherMoved(entries, to: proposal.index)
+        }
         if let utilityID = proposal.utilityID {
             return reordered(entries, moving: utilityID, to: proposal.index) { $0.movableUtilityID != nil }
         }
@@ -151,9 +167,34 @@ enum DockRenderSlot: Identifiable {
         if entries.contains(where: { if case .group(let c) = $0 { return c.group == .pinned && !c.expanded }; return false }) { return entries }
         let boundary = pins.prefix(max(0, proposal.index)).filter { !ids.contains($0.id) }.count
         var result = entries.filter { slot in slot.pin.map { !ids.contains($0.id) } ?? true }
-        let controlCount = result.prefix { if case .launcher = $0 { return true }; if case .group(let c) = $0 { return c.group == .pinned }; return false }.count
-        result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: min(controlCount + boundary, result.count))
+        result.insert(contentsOf: proposal.pins.map { .gap($0.id) }, at: pinGapPosition(in: result, boundary: boundary))
         return result
+    }
+
+    /// Where a gap after `boundary` remaining pins goes, matching where the dropped pins will render.
+    ///
+    /// A launcher placed after a pin keeps following that pin, so pins inserted after it land past
+    /// the launcher. The gap goes before the next pin, or after the last pin and any launcher
+    /// directly behind it.
+    private static func pinGapPosition(in result: [Self], boundary: Int) -> Int {
+        let pinPositions = result.indices.filter { result[$0].pin != nil }
+        if pinPositions.indices.contains(boundary) { return pinPositions[boundary] }
+        if let last = pinPositions.last {
+            return result.indices.contains(last + 1) && result[last + 1].isLauncher ? last + 2 : last + 1
+        }
+        return result.prefix { if case .launcher = $0 { return true }; if case .group(let c) = $0 { return c.group == .pinned }; return false }.count
+    }
+
+    /// Replaces the launcher with a gap at `stop`, one of ``DockLauncherPlacement/stops(in:)``.
+    private static func launcherMoved(_ entries: [Self], to stop: Int) -> [Self] {
+        guard let source = entries.firstIndex(where: { $0.target == .launcher }) else { return entries }
+        var content = entries
+        content.remove(at: source)
+        let stops = DockLauncherPlacement.stops(in: content)
+        let position = stops[min(max(0, stop), stops.count - 1)]
+        return DockLauncherPlacement.entries(content, position: position, pinOrder: []).map {
+            $0.target == .launcher ? .gap(launcherGapID) : $0
+        }
     }
 
     /// Moves `sourceID` to a gap at `index` among the slots matching `member`, leaving every other
