@@ -24,6 +24,8 @@ enum DockRenderSlot: Identifiable {
     case sessionCapsules(CapsuleDockItem)
     case shelf(ShelfDockItem)
     case volume(VolumeDockItem)
+    /// Temporary tile for a waiting or freshly installed DOKK update.
+    case update(UpdateDockItem)
     case trash(TrashDockItem)
     case gap(String)
 
@@ -41,6 +43,7 @@ enum DockRenderSlot: Identifiable {
         case .sessionCapsules(let item): return item.id
         case .shelf(let item): return item.id
         case .volume(let item): return item.id
+        case .update(let item): return item.id
         case .trash(let item): return item.id
         }
     }
@@ -50,7 +53,7 @@ enum DockRenderSlot: Identifiable {
         case .folder(let item): return !item.isDownloads
         case .gap(let id): return !id.hasPrefix("utility:")
         case .group(let control): return control.group == .pinned
-        case .melt, .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .volume, .trash: return false
+        case .melt, .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .volume, .update, .trash: return false
         }
     }
     var item: DockItem? { if case .app(let item) = self { return item }; return nil }
@@ -58,6 +61,7 @@ enum DockRenderSlot: Identifiable {
     var trash: TrashDockItem? { if case .trash(let item) = self { return item }; return nil }
     var shelf: ShelfDockItem? { if case .shelf(let item) = self { return item }; return nil }
     var volume: VolumeDockItem? { if case .volume(let item) = self { return item }; return nil }
+    var update: UpdateDockItem? { if case .update(let item) = self { return item }; return nil }
     var capsules: CapsuleDockItem? { if case .sessionCapsules(let item) = self { return item }; return nil }
     var capsule: SessionCapsuleDockItem? { if case .sessionCapsule(let item) = self { return item }; return nil }
     /// Trailing tiles that are neither pins nor running applications, and share one divider.
@@ -66,14 +70,14 @@ enum DockRenderSlot: Identifiable {
     var focus: FocusDockItem? { if case .focus(let item) = self { return item }; return nil }
     var isUtility: Bool {
         if case .gap(let id) = self { return id.hasPrefix("utility:") }
-        return melt != nil || folder?.isDownloads == true || target == .launcher || focus != nil || action != nil || trash != nil || shelf != nil || volume != nil || capsules != nil || capsule != nil
+        return melt != nil || folder?.isDownloads == true || target == .launcher || focus != nil || action != nil || trash != nil || update != nil || shelf != nil || volume != nil || capsules != nil || capsule != nil
     }
     var appGroup: DockAppGroup? {
         switch self {
         case .app(let item): item.isFavorite ? .pinned : .running
         case .folder(let item): item.isDownloads ? nil : .pinned
         case .group(let control): control.group
-        case .melt, .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .volume, .trash, .gap: nil
+        case .melt, .launcher, .focus, .action, .sessionCapsule, .sessionCapsules, .shelf, .volume, .update, .trash, .gap: nil
         }
     }
     var pin: DockPin? {
@@ -103,6 +107,7 @@ enum DockRenderSlot: Identifiable {
         case .sessionCapsules: String(localized: .capsulesName)
         case .shelf: String(localized: .shelfName)
         case .volume(let item): item.name
+        case .update(let item): String(localized: item.title)
         case .trash: String(localized: .trashName)
         case .gap: ""
         }
@@ -121,6 +126,7 @@ enum DockRenderSlot: Identifiable {
         case .sessionCapsules: .sessionCapsules
         case .shelf: .shelf
         case .volume(let item): .volume(item.volumeID)
+        case .update: .update
         case .trash: .trash
         case .gap: nil
         }

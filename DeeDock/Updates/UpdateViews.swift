@@ -11,10 +11,14 @@ struct CheckForUpdatesButton: View {
     let updater: AppUpdater
 
     var body: some View {
-        Button(action: updater.checkForUpdates) {
-            Text(updater.updateAvailable ? .updatesAvailable : updater.updateInProgress ? .updatesShowProgress : .updatesCheck)
+        if updater.showsInstalledNotice {
+            Button(action: updater.showWhatsNew) { Text(.updatesInstalledMenu) }
+        } else {
+            Button(action: updater.checkForUpdates) {
+                Text(updater.updateAvailable ? .updatesAvailable : updater.updateInProgress ? .updatesShowProgress : .updatesCheck)
+            }
+            .disabled(!updater.canCheckForUpdates)
         }
-        .disabled(!updater.canCheckForUpdates)
     }
 }
 

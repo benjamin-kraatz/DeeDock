@@ -39,6 +39,7 @@ final class DockStore {
     @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    @ObservationIgnored var openUpdate: ((UpdateDockItem) -> Void)?
     /// Opens a volume's contents as a stack. The flag is true for keyboard activation.
     @ObservationIgnored var openVolume: ((VolumeDockItem, Bool) -> Void)?
     @ObservationIgnored var openSessionCapsules: (() -> Void)?
@@ -62,6 +63,7 @@ final class DockStore {
     @ObservationIgnored private let volumes: VolumeController?
     @ObservationIgnored private let capsules: SessionCapsuleController?
     @ObservationIgnored private var showsTrash = true
+    @ObservationIgnored private var updateTile: UpdateDockItem?
     @ObservationIgnored private var showsShelf = true
     @ObservationIgnored private var volumeVisibility = VolumeVisibility.hidden
     @ObservationIgnored private var showsSessionCapsules = true
@@ -195,6 +197,7 @@ final class DockStore {
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
                                                   volumes: volumes?.dockItems.filter { volumeVisibility.includes($0.kind) } ?? [],
+                                                  update: updateTile,
                                                   trash: showsTrash ? trash?.item : nil)
         content.insert(contentsOf: pairs.flatMap { pair in pair.applicationIDs.indices.map { DockRenderSlot.melt(pair, $0) } },
                        at: content.firstIndex(where: \.isUtility) ?? content.count)
@@ -246,6 +249,13 @@ final class DockStore {
         let visible = entries.compactMap(\.movableUtilityID)
         guard let index = visible.firstIndex(of: id), visible.indices.contains(index + distance) else { return }
         moveUtility(id, to: visible[index + distance])
+    }
+
+    /// Shows or removes the temporary update tile. Nil when no update waits or was just installed.
+    func configureUpdateTile(_ item: UpdateDockItem?) {
+        guard updateTile != item else { return }
+        updateTile = item
+        refreshEntries()
     }
 
     func configureTrash(_ visible: Bool) {
@@ -554,6 +564,7 @@ final class DockStore {
         case .sessionCapsule(let item): openSessionCapsule?(item.capsuleID)
         case .sessionCapsules: openSessionCapsules?()
         case .shelf: openShelf?()
+        case .update(let item): openUpdate?(item)
         case .volume(let item): openVolume?(item, keyboardFocus)
         case .trash: openTrash()
         case .gap: break
@@ -564,5 +575,5 @@ final class DockStore {
     func stop() {
         if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
         stampObserver = nil
-        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

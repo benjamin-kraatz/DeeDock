@@ -67,6 +67,9 @@ struct DeeDockApp: App {
                 .keyboardShortcut(",")
             #if DIRECT_DISTRIBUTION
             CheckForUpdatesButton(updater: delegate.updater)
+            #if DEBUG
+            UpdateDebugMenu(updater: delegate.updater)
+            #endif
             #endif
             Button(.onboardingShowWelcome) { delegate.onboarding.present() }
             Divider()
@@ -136,7 +139,7 @@ private struct MenuBarExtraLabel: View {
         Image(nsImage: DDockMenuBarMark.image(for: controller.style))
             .overlay(alignment: .topTrailing) {
                 #if DIRECT_DISTRIBUTION
-                if updater?.awareness.showsIndicators == true {
+                if updater?.awareness.showsMenuBadge == true {
                     UpdateAwarenessBadge(diameter: 7)
                         .offset(x: 1, y: -1)
                 }
@@ -144,7 +147,8 @@ private struct MenuBarExtraLabel: View {
             }
             .accessibilityLabel(Text(.appName))
             #if DIRECT_DISTRIBUTION
-            .accessibilityValue(updater?.awareness.showsIndicators == true ? Text(.updatesAwarenessBadge) : Text(""))
+            .accessibilityValue(updater?.awareness.showsIndicators == true ? Text(.updatesAwarenessBadge)
+                : updater?.awareness.installedFromVersion != nil ? Text(.updatesInstalledBadge) : Text(""))
             #endif
     }
 }

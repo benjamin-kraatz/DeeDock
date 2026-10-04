@@ -151,31 +151,51 @@ interaction, and the Full Disk Access grant were not run.
 
 Implemented for direct distribution only. A scheduled Sparkle offer shows a dismissible
 callout on the main display, a menu-bar badge, a Settings badge on General and Software
-Update, and a soft indigo-to-coral pip on DDock glass plus DDock’s own tile. Reduce Motion
-keeps the pip static. Dismiss, opening the Update window, install, and skip clear the
+Update, an animated update tile before Trash on every dock, plus a pip on
+DOKK’s own tile. Reduce Motion
+keeps the tile and pip static. Dismiss, opening the Update window, install, and skip clear the
 indicators. The same offer stays quiet until a later identity or the next launch.
 
-**Install & relaunch when idle** is off by default. Settings and the ready-to-install Update
+**Install & relaunch when idle** is on by default. Settings and the ready-to-install Update
 window share the switch. The ready-window switch is not on the onboarding tour. Idle install
-waits for a 30-second quiet period and blocks on pin drag, an open Focus panel, the Update
-window, a file picker, a dock popover, or menu tracking. One attempt; otherwise install-on-quit.
+waits until no dock has been used for 10 minutes and blocks on pin drag, an open Focus panel,
+the Update window, a file picker, a dock popover, Window Peek, or menu tracking. One attempt;
+otherwise install-on-quit.
+
+Automatic checks are on by default and hourly. A silently downloaded update is adopted through
+Sparkle's `willInstallUpdateOnQuit` delegate hook and waits at the ready screen. Its badge and
+update tile show at once; its callout waits two hours unless idle install is off. After an automatic
+install the menu-bar badge and **Latest Version Installed…** stay until opened, with a one-time
+callout, and the update tile. The window then lists the notes of every version since the previous one.
 
 Validation: English and German strings are in the catalog. Model tests cover dismiss policy,
-cold discovery, idle gates, and the one-shot install. Tests, preview rendering, app launch,
-and native visual or interaction acceptance were not run. Compilation, if performed later,
-proves the types build. It does not prove Sparkle discovery, callout placement, or relaunch.
+cold discovery, staged-offer callout timing, the installed notice, the changelog version
+range, idle gates, and the one-shot install. The direct target and the tests compile. Tests,
+preview rendering, app launch, and native visual or interaction acceptance were not run.
+Compilation does not prove Sparkle discovery, the silent-download hand-off, callout
+placement, or relaunch.
 
 ### Required hands-on acceptance
 
 - Let a scheduled check find an update. Confirm the main-display callout, menu-bar badge,
-  Settings badges, and dock pip. Dismiss the callout and confirm the marks stay gone until
+  Settings badges, and the dock update tile. Dismiss the callout and confirm the marks stay gone until
   quit and relaunch, or until a different offer.
 - Open the Update window from the callout, menu, and Settings. Confirm the marks clear.
 - Enable idle install in Settings and on the ready screen. Confirm it does not run while
   dragging a pin, while the Focus panel is open, or while the Update window is up. Confirm
   one relaunch when idle, and install-on-quit if idle never comes.
-- Confirm Reduce Motion keeps the pip static. Confirm German and English. Confirm onboarding
-  does not show the idle switch.
+- Let an hourly check download an update silently. Confirm the badge and update tile without a
+  callout, the ready screen from the menu, and one relaunch after 10 minutes without dock use.
+- After that relaunch, confirm the callout, the update tile, the menu-bar badge, and **Latest Version
+  Installed…**. Open it and confirm the notes since the previous version, that the notice
+  clears, and that **Check for Updates…** starts a new check.
+- Turn idle install off and confirm the ready callout appears at once.
+- Click the update tile in each state and confirm it opens the Update window or the changelog.
+- Confirm the callout drops from under the menu bar as a bead, opens into the island, and folds back
+  on **Dismiss** and on its primary button. Confirm clicks beside and below the island reach the
+  windows behind it.
+- Confirm Reduce Motion keeps the update tile static and only fades the callout. Confirm German and English. Confirm
+  onboarding does not show the idle switch.
 
 ## DEE-37 Focus breathing
 

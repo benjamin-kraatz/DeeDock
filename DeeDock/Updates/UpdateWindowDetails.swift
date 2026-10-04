@@ -29,7 +29,7 @@ struct UpdateWindowDetails: View {
                 UpdateProgressView(presentation: presentation)
             }
 
-            if presentation.phase == .available {
+            if presentation.showsNotes {
                 VStack(alignment: .leading, spacing: 16) {
                     if let comic = presentation.comic {
                         VStack(alignment: .leading, spacing: 12) {

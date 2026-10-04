@@ -142,6 +142,16 @@ struct DockEntryView: View {
                     accessibilityFocus(DockEntryID.volume(item.volumeID).hitID, $0)
                 }
             )
+        case .update(let item):
+            DockUpdateButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.update.hitID, $0)
+                }
+            )
         case .trash(let item):
             DockTrashButton(
                 item: item,
