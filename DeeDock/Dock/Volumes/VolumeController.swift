@@ -7,7 +7,7 @@ import UniformTypeIdentifiers
 /// Mount changes come from NSWorkspace notifications; nothing polls. Free space is re-read when a
 /// volume card opens, which is the only place it is shown. Local volumes publish before any
 /// network share is read, and each share is read on its own, so a slow file server holds back
-/// only its own tile.
+/// only its own tile. Shares are not read at all while the share switch is off.
 @MainActor @Observable
 final class VolumeController {
     /// Every mounted volume in arrangement order, hidden ones included. Settings lists these.
@@ -26,6 +26,8 @@ final class VolumeController {
     /// Share reads in flight, by mount URL. A rescan never starts a second read of the same
     /// share, so a wedged server ties up one thread however many mount notifications arrive.
     @ObservationIgnored private var shareReads: [URL: Task<Void, Never>] = [:]
+    /// Whether shares are read and kept. Off until `configure(readsShares:)` says otherwise.
+    @ObservationIgnored private var readsShares = false
     @ObservationIgnored private var icons: [String: NSImage] = [:]
     @ObservationIgnored private var ejecting: Set<String> = []
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
@@ -74,6 +76,21 @@ final class VolumeController {
         didChange = nil; volumeWillUnmount = nil
     }
 
+    /// Sets whether network shares are read. Turn it on only while shares can be shown: reading
+    /// one nobody sees still risks a stall on its server. Turning it on reads the mounted shares at
+    /// once. Turning it off drops their tiles, and reads still in flight are discarded.
+    func configure(readsShares: Bool) {
+        guard self.readsShares != readsShares else { return }
+        self.readsShares = readsShares
+        guard !observers.isEmpty else { return }
+        let shares = mounts.filter { !$0.isLocal }.map(\.url)
+        if readsShares {
+            for share in shares { readShare(share) }
+        } else {
+            commit(infos.filter { !shares.contains($0.url) })
+        }
+    }
+
     func item(_ volumeID: String) -> VolumeDockItem? { items.first { $0.volumeID == volumeID } }
 
     /// Re-reads one volume's capacity for an opening card. Returns nil once the volume is gone.
@@ -116,7 +133,8 @@ final class VolumeController {
     }
 
     /// Re-reads mounted volumes in two steps. Local volumes are read and published first, and
-    /// nothing touches a share before that publish. Each share is then read on its own.
+    /// nothing touches a share before that publish. Each share is then read on its own, unless
+    /// `readsShares` is off, in which case shares are skipped and their tiles leave.
     ///
     /// Until its read returns, a share keeps the info from its previous read, so mounting a USB
     /// stick does not blank every share tile. A share that is no longer mounted leaves with the
@@ -137,7 +155,7 @@ final class VolumeController {
             }
             scanTask = nil
             self.mounts = mounts
-            let shares = mounts.filter { !$0.isLocal }.map(\.url)
+            let shares = readsShares ? mounts.filter { !$0.isLocal }.map(\.url) : []
             commit(local + infos.filter { shares.contains($0.url) })
             for share in shares { readShare(share) }
         }
@@ -156,8 +174,9 @@ final class VolumeController {
                 for (id, icon) in loaded { icons[id] = icon.image }
             }
             shareReads[url] = nil
-            // A share that unmounted during its read already left with a later scan's publish.
-            guard mounts.contains(where: { $0.url == url && !$0.isLocal }) else { return }
+            // A share that unmounted during its read already left with a later scan's publish, and
+            // one read before the share switch went off has no tile to fill.
+            guard readsShares, mounts.contains(where: { $0.url == url && !$0.isLocal }) else { return }
             commit(infos.filter { $0.url != url } + (info.map { [$0] } ?? []))
         }
     }
