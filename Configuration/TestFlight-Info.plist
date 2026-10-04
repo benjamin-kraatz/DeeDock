@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-    <key>SUFeedURL</key><string>$(SPARKLE_FEED_URL)</string>
-    <key>SUPublicEDKey</key><string>$(SPARKLE_PUBLIC_ED_KEY)</string>
-    <key>SUAutomaticallyUpdate</key><true/>
-    <key>SUEnableAutomaticChecks</key><true/>
-    <key>SUScheduledCheckInterval</key><integer>3600</integer>
     <key>DOKKAnalyticsAPIKey</key><string>$(POSTHOG_PROJECT_TOKEN)</string>
     <key>DOKKAnalyticsHost</key><string>$(POSTHOG_HOST)</string>
 </dict></plist>
