@@ -59,6 +59,20 @@ struct VolumeTests {
         #expect(VolumeKind.timeMachine.isFixedDisk && VolumeKind.externalDisk.isFixedDisk && !VolumeKind.removable.isFixedDisk)
     }
 
+    @Test("Shares read after local volumes keep mount order, and unmounted ones drop out")
+    func mountOrder() {
+        func info(_ name: String, _ kind: VolumeKind) -> VolumeInfo {
+            VolumeInfo(volumeID: name, url: URL(fileURLWithPath: "/Volumes/\(name)", isDirectory: true), name: name, kind: kind)
+        }
+        let stick = info("Stick", .removable), share = info("Share", .network), image = info("Image", .diskImage)
+        let mounts = [share, stick, image].map { MountedVolume(url: $0.url, isLocal: $0.kind != .network) }
+        // Local volumes publish first; a share read later still lands in its mount position.
+        #expect(VolumeScanner.ordered([stick, image, share], by: mounts) == [share, stick, image])
+        #expect(VolumeScanner.ordered([stick, image, share], by: Array(mounts.dropFirst())) == [stick, image])
+        // The kernel listing never offers the boot volume or anything outside /Volumes.
+        #expect(VolumeScanner.mounts().allSatisfy { $0.url.path.hasPrefix("/Volumes/") })
+    }
+
     @Test("A refused folder listing is told apart by cause; other errors are not access denials")
     func accessDenial() {
         func refusal(_ code: Int32) -> NSError {
