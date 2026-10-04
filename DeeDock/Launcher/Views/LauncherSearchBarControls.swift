@@ -29,6 +29,8 @@ struct LauncherSearchBarOverflowMenu: View {
                     appsFilter
                     locationSortGroup
                     layout
+                    Divider()
+                    nestedApps
                 }
                 Divider()
                 Button {
@@ -114,10 +116,6 @@ struct LauncherSearchBarOverflowMenu: View {
         } label: {
             Text(.launcherLocation)
         }
-        Toggle(isOn: $state.showsNestedApplications) {
-            Text(.launcherShowNestedApps)
-        }
-        .help(Text(.launcherShowNestedAppsHelp))
         Picker(selection: $state.sort) {
             ForEach(LauncherSort.allCases) { sort in
                 Text(sort.title).tag(sort)
@@ -132,6 +130,13 @@ struct LauncherSearchBarOverflowMenu: View {
         } label: {
             Text(.launcherGroup)
         }
+    }
+
+    private var nestedApps: some View {
+        Toggle(isOn: $state.showsNestedApplications) {
+            Text(.launcherShowNestedApps)
+        }
+        .help(Text(.launcherShowNestedAppsHelp))
     }
 
     private var layout: some View {
