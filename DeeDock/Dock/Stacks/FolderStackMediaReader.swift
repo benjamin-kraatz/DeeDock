@@ -103,7 +103,10 @@ nonisolated enum FolderStackMediaReader {
     }
 
     private static func audiovisualMetadata(at url: URL, video: Bool) async -> FolderStackMediaMetadata? {
-        let asset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: false])
+        // No options: imprecise timing is already the default. On macOS 27, passing
+        // `AVURLAssetPreferPreciseDurationAndTimingKey: false` explicitly makes the duration load
+        // fail (OSStatus -17770) for WAV, AIFF, and CAF files.
+        let asset = AVURLAsset(url: url)
         do {
             let duration = try await asset.load(.duration)
             guard duration.isNumeric, !duration.isIndefinite else { return nil }

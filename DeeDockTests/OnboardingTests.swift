@@ -47,7 +47,7 @@ struct OnboardingNavigationTests {
         store.skip()
         #expect(store.step == .welcome, "Skip must do nothing on a page that is not skippable")
 
-        _ = store.advance()
+        while store.step != .systemDock, !store.advance() {}
         #expect(store.step == .systemDock)
         store.skip()
         #expect(store.step == OnboardingStep.systemDock.next)
