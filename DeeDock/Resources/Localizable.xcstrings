@@ -633,6 +633,402 @@
         }
       }
     },
+    "analyticsCollectedCounts" : {
+      "comment" : "List item: usage data includes counts such as the number of pinned apps, never which apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie viele Apps und Ordner angeheftet sind"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How many apps and folders are pinned"
+          }
+        }
+      }
+    },
+    "analyticsCollectedFeatures" : {
+      "comment" : "List item: usage data includes which DOKK features are used and whether by click, keyboard, drag, or VoiceOver.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welche Funktionen du nutzt und wie du sie startest"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which features you use, and how you start them"
+          }
+        }
+      }
+    },
+    "analyticsCollectedSettings" : {
+      "comment" : "List item: usage data includes DOKK settings as numeric values and chosen options.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine DOKK-Einstellungen als Zahlen und Optionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your DOKK settings, as numbers and options"
+          }
+        }
+      }
+    },
+    "analyticsCollectedSystem" : {
+      "comment" : "List item: usage data includes the macOS version, the Mac model, and display resolutions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS-Version, Mac-Modell und Displaygrößen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS version, Mac model, and display sizes"
+          }
+        }
+      }
+    },
+    "analyticsCollectedTitle" : {
+      "comment" : "Heading of the list of things included in anonymous usage data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geteilt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared"
+          }
+        }
+      }
+    },
+    "analyticsIntelligenceNote" : {
+      "comment" : "Caveat under the two lists in the Privacy card and the tour: Apple Intelligence features are an exception to the 'Stays on this Mac' list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausnahme: Wenn du eine Apple-Intelligence-Funktion nutzt, werden Anfrage und Antwort vollständig geteilt. Sie können App-Namen, Fenstertitel und kopierten Text enthalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exception: when you use an Apple Intelligence feature, its request and its answer are shared in full. They can contain app names, window titles, and text you copied."
+          }
+        }
+      }
+    },
+    "analyticsLearnMore" : {
+      "comment" : "Link to the documentation page listing every analytics event DOKK sends.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles ansehen, was DOKK erfasst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See everything DOKK collects"
+          }
+        }
+      }
+    },
+    "analyticsNeverCollectedTitle" : {
+      "comment" : "Heading of the list of things that are never included in usage data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleibt auf diesem Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stays on this Mac"
+          }
+        }
+      }
+    },
+    "analyticsNeverContent" : {
+      "comment" : "List item: usage data never includes file contents, file paths, or URLs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateiinhalte, Pfade und Webadressen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File contents, paths, and web addresses"
+          }
+        }
+      }
+    },
+    "analyticsNeverNames" : {
+      "comment" : "List item: usage data never includes names of apps, files, folders, or windows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namen von Apps, Dateien, Ordnern oder Fenstern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Names of apps, files, folders, or windows"
+          }
+        }
+      }
+    },
+    "analyticsNeverText" : {
+      "comment" : "List item: usage data never includes typed text, clipboard contents, or names the person chose, such as Dock Mode names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles, was du tippst, kopierst oder selbst benennst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anything you type, copy, or name yourself"
+          }
+        }
+      }
+    },
+    "analyticsProfileSubtitle" : {
+      "comment" : "Explains the anonymous profile toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert deine aktuellen Einstellungen unter einer zufälligen ID, damit sie sich mit der Nutzung der Funktionen vergleichen lassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stores your current settings under a random ID, so settings can be compared with how features are used."
+          }
+        }
+      }
+    },
+    "analyticsProfileTitle" : {
+      "comment" : "Toggle for storing the current DOKK configuration on an anonymous profile identified by a random ID.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonymes Profil führen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep an anonymous profile"
+          }
+        }
+      }
+    },
+    "analyticsRecentEmpty" : {
+      "comment" : "Shown in the recently sent list when no analytics event has been sent since launch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seit dem Start von DOKK wurde nichts gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing has been sent since DOKK started."
+          }
+        }
+      }
+    },
+    "analyticsRecentTitle" : {
+      "comment" : "Label of the expandable list of analytics events sent since the app started.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt gesendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently sent"
+          }
+        }
+      }
+    },
+    "analyticsResetAction" : {
+      "comment" : "Button that replaces the anonymous identifier with a new random one.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "analyticsResetDone" : {
+      "comment" : "Shown in place of the explanation after the anonymous identifier was reset.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine neue ID wird verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A new ID is in use."
+          }
+        }
+      }
+    },
+    "analyticsResetSubtitle" : {
+      "comment" : "Explains what resetting the anonymous identifier does.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine zufällige Kennung. Nach dem Zurücksetzen sind neue Daten nicht mehr mit früheren verbunden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A random identifier. Resetting it separates future data from past data."
+          }
+        }
+      }
+    },
+    "analyticsResetTitle" : {
+      "comment" : "Row title for the random identifier attached to usage data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonyme ID"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonymous ID"
+          }
+        }
+      }
+    },
+    "analyticsShareSubtitle" : {
+      "comment" : "Explains the usage data toggle. Turning it off takes effect immediately and deletes unsent data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt, welche Funktionen genutzt werden, damit die richtigen verbessert werden. Beim Ausschalten endet die Erfassung sofort, und noch nicht Gesendetes wird gelöscht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows which features are used, so the right ones get improved. Turning this off stops collection at once and deletes anything not yet sent."
+          }
+        }
+      }
+    },
+    "analyticsShareTitle" : {
+      "comment" : "Toggle that turns anonymous usage analytics on or off. On by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonyme Nutzungsdaten teilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share anonymous usage data"
+          }
+        }
+      }
+    },
+    "analyticsUnavailable" : {
+      "comment" : "Notice in the Privacy card of a build that has no analytics key and therefore sends no usage data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Build sendet keine Nutzungsdaten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This build does not send usage data."
+          }
+        }
+      }
+    },
     "animationBounceFadeSubtitle" : {
       "comment" : "Plain-language description of the animation style.",
       "extractionState" : "manual",
@@ -24228,6 +24624,42 @@
         }
       }
     },
+    "onboardingAnalyticsSummary" : {
+      "comment" : "Body of the tour page about usage data. 'Settings › General › Privacy' is the path in DOKK's Settings window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK teilt, welche Funktionen genutzt werden und wie es eingerichtet ist. Apple-Intelligence-Funktionen teilen außerdem ihre Anfragen und Antworten. Ausschalten kannst du das unter Einstellungen › Allgemein › Datenschutz."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK shares which features are used and how it is set up. Apple Intelligence features also share their requests and answers. You can turn this off in Settings › General › Privacy."
+          }
+        }
+      }
+    },
+    "onboardingAnalyticsTitle" : {
+      "comment" : "Title of the tour page that informs about anonymous usage data. Informational, not a question.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonyme Nutzungsdaten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonymous usage data"
+          }
+        }
+      }
+    },
     "onboardingAppearanceSummary" : {
       "comment" : "Body of tour page 4, which demonstrates the appearance settings.",
       "extractionState" : "manual",
@@ -32321,6 +32753,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "An illustration of your settings, not a live view of your dock."
+          }
+        }
+      }
+    },
+    "settingsPrivacy" : {
+      "comment" : "Settings page and card title for the anonymous usage data switches.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
           }
         }
       }

@@ -3,6 +3,9 @@ import AppKit
 /// Composition root; all docks and application-wide resources share this explicit lifetime.
 @MainActor
 final class DeeDockDelegate: NSObject, NSApplicationDelegate {
+    /// First, so the consent store can tell a new install from an update before any other
+    /// component writes its preferences.
+    let analytics = Analytics.shared
     let windowAccess = WindowAccessController(service: SystemWindowAccessService())
     let screenCapture = ScreenCaptureAccessController(service: SystemScreenCaptureAccessService())
     private(set) lazy var coordinator = DockCoordinator(windowAccess: windowAccess, screenCapture: screenCapture)
@@ -24,6 +27,8 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !isRunningForCanvasPreview else { return }
         NSApp.setActivationPolicy(.accessory)
+        analytics.contextInputs = { [weak self] in self?.analyticsContextInputs() ?? AnalyticsContextInputs() }
+        Analytics.shared.start()
         AppDockPresence.shared.start()
         loginItems.refresh()
         windowAccess.refresh()
@@ -44,6 +49,8 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         // After the docks exist, so a first-time reader sees the real thing behind the tour
         // rather than an empty desktop and a description of one.
         onboarding.presentIfNeeded()
+        // The docks and the updater exist now, so the context can describe them.
+        analytics.contextDidChange()
     }
 
     /// Reopening the app restores an owned window without creating another scene.
@@ -66,5 +73,6 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         windowAccess.stop()
         screenCapture.stop()
         coordinator.stop()
+        Analytics.shared.stop()
     }
 }
