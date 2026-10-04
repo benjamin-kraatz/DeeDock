@@ -130,6 +130,8 @@ final class ShelfCoordinator {
             else if keyboard, let sourceID { self?.keyboardDismissed?(sourceID) }
         }
         next.show()
+        Analytics.track(.shelf(.opened, itemCount: shelf.items.count, source: nil,
+                               trigger: Analytics.trigger(keyboard: keyboard)))
     }
 
     /// Begins a native file drag out of the Shelf tile itself, carrying every staged reference.
@@ -220,6 +222,7 @@ final class ShelfCoordinator {
             state?.report(String(localized: .shelfUnavailableItems)) { [weak self] in self?.reload() }
             return
         }
+        Analytics.track(.shelf(.itemsOpened, itemCount: resolved.count, source: nil, trigger: Analytics.trigger()))
         let configuration = NSWorkspace.OpenConfiguration()
         for access in resolved {
             NSWorkspace.shared.open(access.url, configuration: configuration) { [weak self] _, error in
@@ -344,6 +347,7 @@ final class ShelfCoordinator {
             icon.size = NSSize(width: DockDragGeometry.imageSize, height: DockDragGeometry.imageSize)
             return icon
         }
+        Analytics.track(.shelf(.draggedOut, itemCount: resolved.count, source: nil, trigger: .drag))
         let started = ShelfDragSession.begin(accesses: resolved.map(\.0), ids: resolved.map(\.1.id),
                                              icons: icons, from: view, event: event) { [weak self] _ in
             // A completed drag never removes the item; only the panel needs to settle.

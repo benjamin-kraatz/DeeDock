@@ -15,6 +15,8 @@ final class FolderStackState {
     var dropTargeted = false
     /// Volume stacks move dropped files while Shift is held; other stacks always copy.
     @ObservationIgnored var allowsMoveDrops = false
+    /// What this stack shows, for analytics only.
+    @ObservationIgnored var analyticsKind: AnalyticsStackKind = .folder
     /// Volume stacks turn the back button into a drop and spring-loading target, so a drag that
     /// sprang into a subfolder can climb out again. Other stacks keep a plain back button.
     var springsUp = false
@@ -192,7 +194,7 @@ final class FolderStackState {
     func previewSelection() {
         if preview != nil { preview = nil; return }
         guard let entry = entries.first(where: { $0.id == selectedID }), let access else { return }
-        showPreview(entry.reference, access: access)
+        Analytics.performing(.keyboard) { showPreview(entry.reference, access: access) }
     }
 
     func showPreview(_ entry: FolderStackEntryReference) {
@@ -208,6 +210,7 @@ final class FolderStackState {
             return
         }
         preview = DockFilePreviewItem(url: entry.url, leases: [access])
+        Analytics.track(.stackQuickLook(fileType: AnalyticsFileType(url: entry.url), trigger: Analytics.trigger()))
     }
 
     /// What a drop here does: copy, or move with Shift in a volume stack. Empty while busy.
@@ -229,7 +232,7 @@ final class FolderStackState {
 
     /// Copies, or moves in a volume stack with Shift, into the current directory, an immediate
     /// folder child, or a folder on the way back up. Copying never alters the source.
-    func receive(_ info: NSDraggingInfo, into url: URL? = nil) -> Bool {
+    func receive(_ info: NSDraggingInfo, into url: URL? = nil, target: AnalyticsDropTarget = .stack) -> Bool {
         let operation = dropOperation(info)
         dropTargetChanged(nil, destination: "")
         guard !operation.isEmpty, let urls = FolderFileDrop.urls(info), let access else { return false }
@@ -240,7 +243,10 @@ final class FolderStackState {
         receivedDrop = true
         copying = true
         let failure = copyFailed
+        let fileType = AnalyticsFileType.common(of: urls)
         FolderFileDrop.copy(urls, to: destination, lease: access, move: operation == .move) { [weak self] error in
+            Analytics.track(.stackDrop(operation == .move ? .move : .copy, itemCount: urls.count, fileType: fileType,
+                                       target: target, outcome: error == nil ? .succeeded : .failed))
             self?.copying = false
             self?.reload()
             if let error {
@@ -257,6 +263,7 @@ final class FolderStackState {
         sort = value
         entries.sort { value.precedes($0.reference, $1.reference) }
         sortChanged?(value)
+        Analytics.track(.stackSorted(value, itemCount: entries.count))
     }
 
     /// The field earns its space only on long listings, and stays while a query is still narrowing one.
@@ -313,7 +320,9 @@ final class FolderStackState {
         guard value != presentation else { return }
         let previous = presentation
         presentation = value
-        if presentationChanged?(value) != true {
+        if presentationChanged?(value) == true {
+            Analytics.track(.stackPresentationChanged(value, kind: analyticsKind, trigger: Analytics.trigger()))
+        } else {
             presentation = previous
             report(String(localized: .folderStackSaveFailed)) { [weak self] in self?.choose(value) }
             return
@@ -357,7 +366,7 @@ final class FolderStackState {
 
     func openSelection() {
         guard let entry = entries.first(where: { $0.id == selectedID }) else { return }
-        openEntry?(entry.reference)
+        Analytics.performing(.keyboard) { openEntry?(entry.reference) }
     }
 
     /// Measures folder children after the listing is on screen. Navigation and dismissal cancel the walks.

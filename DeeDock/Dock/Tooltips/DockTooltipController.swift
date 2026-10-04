@@ -28,6 +28,7 @@ final class DockTooltipController {
         // Only dock captions preserve the old label during a new target's delay.
         if next.preset.placement != .dockCenter { visible = nil }
         let reveal = { [weak self] in
+            if self?.visible != target { Analytics.count(.tooltipShown(keyboard: next.keyboard)) }
             withAnimation(next.preset.animation(reduceMotion: next.reduceMotion)) { self?.visible = target }
         }
         if next.keyboard || next.preset.delay == 0 { reveal(); return }

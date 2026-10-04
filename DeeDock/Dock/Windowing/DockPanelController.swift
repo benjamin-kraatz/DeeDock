@@ -96,6 +96,10 @@ final class DockPanelController {
         interaction.idleFade.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.didChange = { [weak self] in self?.present() }
+        visibility.didReveal = { [weak self] in
+            guard let self else { return }
+            Analytics.count(.autoHideReveal(zone: visibility.settings.activationLocation, edge: interaction.layout.edge))
+        }
         store.presentationDidChange = { [weak self] in
             guard let self, !updatingGeometry, let display = lastDisplay, let settings = lastSettings else { return }
             if QuarantineStampController.shared.armed, launcher.isPresented { closeLauncher() }
@@ -624,6 +628,8 @@ final class DockPanelController {
             target: LauncherGeometry.frame(visibleFrame: display.visibleFrame, origin: origin, edge: settings.edge),
             dockWindow: geometry?.windowFrame ?? origin,
             pins: store.pins.compactMap(\.application), previousApplication: previousApplication)
+        Analytics.track(.launcherOpened(files != nil ? .fileDrop : store.keyboardFocus ? .keyboard : .tile,
+                                        fileCount: 0))
         if let files { launcher.adoptFiles(files) }
     }
 
@@ -650,16 +656,19 @@ final class DockPanelController {
         guard !launcher.isPresented, store.keyboardFocus else { return false }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
            event.charactersIgnoringModifiers == "/" {
+            Analytics.track(.focusDockCommand(.windowSearch))
             windowSearchRequested?(); return true
         }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
            event.charactersIgnoringModifiers?.lowercased() == "m" {
+            Analytics.track(.focusDockCommand(.modePicker))
             modePickerRequested?()
             return true
         }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
            event.charactersIgnoringModifiers?.lowercased() == "o" {
             if let item = store.entries.compactMap(\.item).first(where: { $0.id == store.selectedID }), item.isAvailable {
+                Analytics.track(.focusDockCommand(.openFiles))
                 interaction.openFiles?(item)
             }
             return true
@@ -667,12 +676,14 @@ final class DockPanelController {
         if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
            event.charactersIgnoringModifiers?.lowercased() == "b" {
             if let item = store.entries.compactMap(\.item).first(where: { $0.id == store.selectedID }) {
+                Analytics.track(.focusDockCommand(.badgeMemory))
                 interaction.openBadgeMemory?(item)
             }
             return true
         }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
            event.charactersIgnoringModifiers?.lowercased() == "h" {
+            Analytics.track(.focusDockCommand(.history))
             timelineRequested?()
             return true
         }
@@ -687,19 +698,25 @@ final class DockPanelController {
         if let distance = interaction.layout.edge.navigationStep(keyCode: event.keyCode) {
             if event.modifierFlags.contains(.option),
                let pin = store.entries.first(where: { $0.target == store.selectedTarget })?.pin {
-                store.movePin(pin.id, by: distance)
+                Analytics.track(.focusDockCommand(.movePin))
+                Analytics.performing(.keyboard) { store.movePin(pin.id, by: distance) }
             } else {
                 store.moveSelection(by: distance)
             }
             return true
         }
         switch event.keyCode {
-        case 36, 76: store.openSelection()
+        case 36, 76:
+            Analytics.track(.focusDockCommand(.open))
+            Analytics.performing(.keyboard) { store.openSelection() }
         case 49:
+            Analytics.track(.focusDockCommand(.windowPeek))
             if case .app(let id) = store.selectedTarget,
                let item = store.items.first(where: { $0.id == id }) { interaction.openWindowPeek?(item) }
             else if case .group = store.selectedTarget { store.openSelection() }
-        case 53: escape?()
+        case 53:
+            Analytics.track(.focusDockCommand(.exit))
+            escape?()
         default: return false
         }
         return true

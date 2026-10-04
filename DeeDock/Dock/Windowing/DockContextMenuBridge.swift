@@ -239,7 +239,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
             DispatchQueue.main.async { controller.showSetup(first: url) }
         }
 
-        @objc private func openApplication() { open?() }
+        @objc private func openApplication() { Analytics.performing(.menu) { open?() } }
 
         @objc private func openFiles() {
             guard let item, item.isAvailable else { return }
@@ -266,9 +266,9 @@ struct DockContextMenuBridge: NSViewRepresentable {
             DispatchQueue.main.async { handler?(action, item) }
         }
 
-        @objc private func changePin() { togglePin?() }
-        @objc private func movePinLeft() { if let item { interaction?.movePin?(item.id, -1) } }
-        @objc private func movePinRight() { if let item { interaction?.movePin?(item.id, 1) } }
+        @objc private func changePin() { Analytics.performing(.menu) { togglePin?() } }
+        @objc private func movePinLeft() { if let item { Analytics.performing(.menu) { interaction?.movePin?(item.id, -1) } } }
+        @objc private func movePinRight() { if let item { Analytics.performing(.menu) { interaction?.movePin?(item.id, 1) } } }
         @objc private func copyPinToDisplay(_ sender: NSMenuItem) {
             if let item, let id = sender.representedObject as? String { interaction?.copyPin?(.application(item.reference), id) }
         }

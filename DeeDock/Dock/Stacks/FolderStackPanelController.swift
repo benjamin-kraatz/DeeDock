@@ -67,8 +67,11 @@ final class FolderStackPanelController {
             return
         }
         if entry.isFolder {
+            Analytics.track(.stackItemOpened(fileType: .folder, isFolder: true, trigger: Analytics.trigger()))
             state.navigate(to: entry.url)
         } else if NSWorkspace.shared.open(entry.url) {
+            Analytics.track(.stackItemOpened(fileType: AnalyticsFileType(url: entry.url), isFolder: false,
+                                             trigger: Analytics.trigger()))
             close(returnFocus: false)
         } else {
             state.report(String(localized: .folderStackOpenFailed(itemName: entry.name))) { [weak self] in self?.open(entry) }

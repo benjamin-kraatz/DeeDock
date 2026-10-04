@@ -78,14 +78,18 @@ struct FolderContextMenuBridge: NSViewRepresentable {
 
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
-        @objc private func openStack() { if let item { interaction?.openFolder?(item, false) } }
-        @objc private func stageOnShelf() { if let item { interaction?.stageFolderOnShelf?(item) } }
+        @objc private func openStack() { if let item { Analytics.performing(.menu) { interaction?.openFolder?(item, false) } } }
+        @objc private func stageOnShelf() { if let item { Analytics.performing(.menu) { interaction?.stageFolderOnShelf?(item) } } }
         @objc private func showInFinder() { if let item { interaction?.revealFolder?(item) } }
         @objc private func useGrid() { if let item { interaction?.setFolderPresentation?(item.reference.id, .grid) } }
         @objc private func useList() { if let item { interaction?.setFolderPresentation?(item.reference.id, .list) } }
-        @objc private func movePrevious() { if let item { (item.isDownloads ? interaction?.moveUtility : interaction?.movePin)?(item.id, -1) } }
-        @objc private func moveNext() { if let item { (item.isDownloads ? interaction?.moveUtility : interaction?.movePin)?(item.id, 1) } }
-        @objc private func unpin() { if let item { interaction?.removePin?(item.id) } }
+        @objc private func movePrevious() {
+            if let item { Analytics.performing(.menu) { (item.isDownloads ? interaction?.moveUtility : interaction?.movePin)?(item.id, -1) } }
+        }
+        @objc private func moveNext() {
+            if let item { Analytics.performing(.menu) { (item.isDownloads ? interaction?.moveUtility : interaction?.movePin)?(item.id, 1) } }
+        }
+        @objc private func unpin() { if let item { Analytics.performing(.menu) { interaction?.removePin?(item.id) } } }
         @objc private func copyToDisplay(_ sender: NSMenuItem) {
             if let item, let id = sender.representedObject as? String { interaction?.copyPin?(.folder(item.reference), id) }
         }

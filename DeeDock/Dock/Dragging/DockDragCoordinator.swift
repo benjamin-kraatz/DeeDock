@@ -88,6 +88,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var updating = false
     private var cancelling = false
     private var lastRemovalCue: Bool?
+    /// Whether the dragged drive is past the eject distance, so each arming is counted once.
+    private var ejectArmed = false
     private var monitor: Any?
     private var scrollTimer: Timer?
     private(set) var committing = false
@@ -129,7 +131,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     func beginVolume(_ item: VolumeDockItem, from displayID: String, view: NSView, event: NSEvent) {
         guard let panel = panels[displayID], !item.isEjecting, ejectVolume != nil else { return }
         cancel()
-        active = true; sourceID = displayID; sourceVolume = item
+        active = true; sourceID = displayID; sourceVolume = item; ejectArmed = false
         payload = .selection(pins: [], documents: nil, stageableItems: nil)
         token = UUID().uuidString; sourceBounds = panel.restingDragBounds
         completion = DockDragCompletion()
@@ -250,7 +252,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if unpinDestinationID == displayID, sourceID == displayID,
            let sourcePin, let panel = panels[displayID] {
             committing = true
-            let success = panel.store.removePin(sourcePin.id)
+            let success = Analytics.performing(.drag) { panel.store.removePin(sourcePin.id) }
             committing = false
             // A failed save must not fall through to drag-out removal on completion.
             completion.committed = true
@@ -322,7 +324,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard !completion.cancelled, destinationID == displayID, let index = destinationIndex,
               let panel = panels[displayID], !pins.isEmpty else { return false }
         committing = true
-        let success = panel.store.insertPins(pins, at: panel.store.persistedInsertionIndex(forVisibleIndex: index))
+        let success = Analytics.performing(.drag) {
+            panel.store.insertPins(pins, at: panel.store.persistedInsertionIndex(forVisibleIndex: index))
+        }
         committing = false
         // A rejected save must not be reinterpreted as dragging out to unpin the source.
         completion.committed = true
@@ -537,6 +541,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 destinationID = sourceID; destinationIndex = index
             }
             let ejecting = destinationIndex == nil && volumeEjectArmed(at: point)
+            if ejecting, !ejectArmed { Analytics.count(.dragToEjectArmed) }
+            ejectArmed = ejecting
             for (id, panel) in panels {
                 let proposal = id == destinationID ? destinationIndex.map { DockDragProposal(index: $0, volumeID: volume.id) } : nil
                 panel.setDragPresentation(proposal: proposal, source: id == sourceID ? volume.id : nil,
@@ -793,7 +799,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             let eject = completion.released && !completion.cancelled && !completion.committed
                 && volumeEjectArmed(at: screenPoint)
             cancel()
-            if eject { ejectVolume?(volume, panel) }
+            if eject { Analytics.performing(.drag) { ejectVolume?(volume, panel) } }
             return
         }
         let snap = computeSnap(at: screenPoint)
@@ -808,7 +814,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                                   overDock: panels.contains { id, target in target.protectsDragRemoval(at: screenPoint, isSource: id == sourceID) },
                                   magnetized: magnetized) {
             committing = true
-            _ = panel.store.removePin(sourcePin.id)
+            _ = Analytics.performing(.drag) { panel.store.removePin(sourcePin.id) }
             committing = false
         }
         cancel()

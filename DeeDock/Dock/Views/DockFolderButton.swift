@@ -62,22 +62,22 @@ struct DockFolderButton: View {
             Button(.folderStackOpen) { primaryAction() }
             if item.isAvailable { Button(.folderStackShowInFinder) { interaction.revealFolder?(item) } }
             if item.isAvailable {
-                Button(.folderItemAddToShelf) { interaction.stageFolderOnShelf?(item) }
+                Button(.folderItemAddToShelf) { Analytics.performing(.voiceOver) { interaction.stageFolderOnShelf?(item) } }
                     .disabled(interaction.stageFolderOnShelf == nil)
             }
             Button(item.reference.presentation == .grid ? .folderStackUseList : .folderStackUseGrid) {
                 interaction.setFolderPresentation?(item.reference.id, item.reference.presentation == .grid ? .list : .grid)
             }
             if !item.isDownloads {
-                Button(.actionUnpin) { interaction.removePin?(item.id) }
+                Button(.actionUnpin) { Analytics.performing(.voiceOver) { interaction.removePin?(item.id) } }
                 Button {
-                    interaction.movePin?(item.id, -1)
+                    Analytics.performing(.voiceOver) { interaction.movePin?(item.id, -1) }
                 } label: {
                     Text(interaction.layout.edge.isVertical ? .actionMoveUp : .actionMoveLeft)
                 }
                 .disabled(interaction.canMovePin?(item.id, -1) != true)
                 Button {
-                    interaction.movePin?(item.id, 1)
+                    Analytics.performing(.voiceOver) { interaction.movePin?(item.id, 1) }
                 } label: {
                     Text(interaction.layout.edge.isVertical ? .actionMoveDown : .actionMoveRight)
                 }
@@ -85,7 +85,7 @@ struct DockFolderButton: View {
             }
             ForEach(item.isDownloads ? [] : interaction.pinDestinations) { destination in
                 Button {
-                    interaction.copyPin?(.folder(item.reference), destination.id)
+                    Analytics.performing(.voiceOver) { interaction.copyPin?(.folder(item.reference), destination.id) }
                 } label: {
                     Text(.actionPinOnDisplayName(display: destination.name))
                 }

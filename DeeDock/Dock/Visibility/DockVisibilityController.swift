@@ -38,6 +38,8 @@ import Observation
     /// Native owners resample the actual pointer before a delayed action; tests can supply stored input.
     @ObservationIgnored var refreshInput: (() -> Void)?
     @ObservationIgnored var didChange: (() -> Void)?
+    /// Runs when the pointer entering the activation zone starts revealing a hidden dock.
+    @ObservationIgnored var didReveal: (() -> Void)?
     @ObservationIgnored private var model: DockVisibilityState
     @ObservationIgnored private let scheduler: any DockVisibilityScheduling
     @ObservationIgnored private var scheduled: DockScheduledAction?
@@ -85,9 +87,15 @@ import Observation
         scheduled?.cancel()
         scheduled = nil
         generation = UUID()
+        let previous = phase
         change(&model)
         progress = model.progress(at: scheduler.now)
         phase = model.phase
+        // A reveal the pointer asked for by entering the activation zone. Reveals held open by
+        // a popover, a drag, or keyboard focus are not counted.
+        if activation, previous == .hidden || previous == .revealDelay, phase == .revealing || phase == .visible {
+            didReveal?()
+        }
         didChange?()
         if let time = model.nextUpdate(after: scheduler.now) {
             let token = generation
