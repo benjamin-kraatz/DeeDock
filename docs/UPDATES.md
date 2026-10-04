@@ -166,7 +166,7 @@ Esi dispatches it. She chooses `intent=watch` for a dry-run, or `intent=ship` af
 
 Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` only in `Configuration/App.xcconfig` and adds bilingual notes at `docs/releases/<MARKETING_VERSION>.md`. Confirm `DeeDock.xcodeproj/project.pbxproj` target build settings inherit those keys instead of repeating them. Esi merges that PR before she dispatches. Feature work does not bump those versions.
 
-**watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the six secrets by name, checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section, and reports whether `docs/releases/<MARKETING_VERSION>-comic.md` and any `panel-0N.png` files exist. A missing comic does not fail watch or ship. It does not archive, import a certificate, or start `xcode-27`.
+**watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the seven secrets by name, checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section, and reports whether `docs/releases/<MARKETING_VERSION>-comic.md` and any `panel-0N.png` files exist. A missing comic does not fail watch or ship. It does not archive, import a certificate, or start `xcode-27`.
 
 **archive** (`xcode-27`). `intent=ship` only, after watch succeeds. Watch fails first if a secret or the bilingual notes file is missing, so the Mac job does not start. Then, in order:
 
@@ -191,7 +191,7 @@ On failure, Esi opens a high-priority Linear issue on project or label `release-
 
 ## Secrets checklist
 
-The Release workflow consumes these six repository secrets. Names only. Do not put values in the repository, the workflow file, issue comments, or logs.
+The Release workflow consumes these seven repository secrets. Names only. Do not put values in the repository, the workflow file, issue comments, or logs.
 
 Apple ID notarization for `notarytool` (`--apple-id`, `--password`, `--team-id`):
 
@@ -207,6 +207,10 @@ Developer ID signing:
 Sparkle EdDSA private key. The matching public key is `SPARKLE_PUBLIC_ED_KEY` in the direct target. Today's login Keychain account is `de.benjaminkraatz.DeeDock`. Never commit the private key or generate a replacement for each release:
 
 - [ ] `SPARKLE_PRIVATE_ED_KEY`
+
+PostHog analytics. `Local.xcconfig` is git-ignored, so this secret is the only source of the token on CI. The archive step fails if the built `Info.plist` has no `phc_` token. The optional repository variable `POSTHOG_HOST` overrides the default `https://eu.i.posthog.com`:
+
+- [ ] `POSTHOG_PROJECT_TOKEN`
 
 These are the assumed secret formats. Confirm them against what is stored. Never paste those values into the repo, a PR, or logs.
 

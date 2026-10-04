@@ -26,10 +26,12 @@
 # ship does not mark the release Latest unless publish_latest is true.
 # First smoke stays draft-only.
 #
-# Do not put secret values in this file. The six repository secrets are
+# Do not put secret values in this file. The seven repository secrets are
 # APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID,
 # DEVELOPER_ID_APPLICATION_CERTIFICATE,
-# DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD, and SPARKLE_PRIVATE_ED_KEY.
+# DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD, SPARKLE_PRIVATE_ED_KEY,
+# and POSTHOG_PROJECT_TOKEN. The optional repository variable POSTHOG_HOST
+# overrides the EU ingestion host.
 # Notarization uses Apple ID plus app-specific password plus team ID.
 # Do not add App Store Connect API keys. DOKK ships only as a direct download.
 #
@@ -40,6 +42,8 @@
 #   SPARKLE_PRIVATE_ED_KEY is the first line of generate_keys -x output:
 #   Sparkle's base64 EdDSA secret. The job writes that line to stdin for
 #   generate_appcast --ed-key-file -. It does not use deprecated -s.
+#   POSTHOG_PROJECT_TOKEN is the PostHog project token (it starts with phc_).
+#   Local.xcconfig is git-ignored, so CI has no other source for it.
 #
 # Runner: xcode-27 is Benn's Mac image. Only the archive job uses it.
 
@@ -125,6 +129,7 @@ jobs:
           HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE != '' }}
           HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD != '' }}
           HAS_SPARKLE_PRIVATE_ED_KEY: ${{ secrets.SPARKLE_PRIVATE_ED_KEY != '' }}
+          HAS_POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN != '' }}
         run: |
           set -eu
           echo "Secret presence only. Values are never printed."
@@ -134,6 +139,7 @@ jobs:
           echo "DEVELOPER_ID_APPLICATION_CERTIFICATE=$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE"
           echo "DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD=$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD"
           echo "SPARKLE_PRIVATE_ED_KEY=$HAS_SPARKLE_PRIVATE_ED_KEY"
+          echo "POSTHOG_PROJECT_TOKEN=$HAS_POSTHOG_PROJECT_TOKEN"
           echo "GITHUB_TOKEN is the default token for a draft release."
           missing=0
           require_secret() {
@@ -148,6 +154,7 @@ jobs:
           require_secret DEVELOPER_ID_APPLICATION_CERTIFICATE "$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE"
           require_secret DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD "$HAS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD"
           require_secret SPARKLE_PRIVATE_ED_KEY "$HAS_SPARKLE_PRIVATE_ED_KEY"
+          require_secret POSTHOG_PROJECT_TOKEN "$HAS_POSTHOG_PROJECT_TOKEN"
           echo "secrets_missing=$missing" >> "$GITHUB_OUTPUT"
 
       - name: Locate bilingual Sparkle notes
@@ -211,7 +218,7 @@ jobs:
           set -eu
           failed=0
           if [ "$SECRETS_MISSING" != "0" ]; then
-            echo "ship needs the six named secrets. Values stay out of logs."
+            echo "ship needs the seven named secrets. Values stay out of logs."
             failed=1
           fi
           if [ -z "${NOTES_PATH:-}" ]; then
@@ -348,6 +355,8 @@ jobs:
       - name: Archive DeeDock
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
         run: |
           set -eu
           archive="$RUNNER_TEMP/DDock.xcarchive"
@@ -366,7 +375,22 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Developer ID Application" \
             OTHER_CODE_SIGN_FLAGS="--timestamp --options runtime" \
+            POSTHOG_PROJECT_TOKEN="$POSTHOG_PROJECT_TOKEN" \
+            POSTHOG_HOST="$POSTHOG_HOST" \
             archive
+          # Analytics credentials come from build settings only. An empty token
+          # builds fine and silently disables analytics, so check the result.
+          info="$archive/Products/Applications/DOKK.app/Contents/Info.plist"
+          api_key="$(/usr/libexec/PlistBuddy -c 'Print :DOKKAnalyticsAPIKey' "$info" 2>/dev/null || true)"
+          host="$(/usr/libexec/PlistBuddy -c 'Print :DOKKAnalyticsHost' "$info" 2>/dev/null || true)"
+          case "$api_key" in
+            phc_?*) echo "DOKKAnalyticsAPIKey is set. Value not printed." ;;
+            *) echo "DOKKAnalyticsAPIKey is empty or not a phc_ token. Check POSTHOG_PROJECT_TOKEN."; exit 1 ;;
+          esac
+          case "$host" in
+            https://?*) echo "DOKKAnalyticsHost=$host" ;;
+            *) echo "DOKKAnalyticsHost is empty or not an https URL. Check POSTHOG_HOST."; exit 1 ;;
+          esac
           echo "ARCHIVE_PATH=$archive" >> "$GITHUB_ENV"
 
       - name: Export Developer ID, notarize, and staple
