@@ -73,6 +73,7 @@ final class DockInteraction {
     @ObservationIgnored var openTrash: (() -> Void)?
     @ObservationIgnored var emptyTrash: (() -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    @ObservationIgnored var openUpdate: ((UpdateDockItem) -> Void)?
     /// Opens a volume's contents as a stack.
     @ObservationIgnored var openVolume: ((VolumeDockItem) -> Void)?
     /// Opens the volume in a Finder window.

@@ -3,13 +3,26 @@ import Foundation
 
 /// HTTPS and local-file rules for What’s New comic markdown and panel PNGs.
 ///
-/// Remote fetches start only at GitHub Releases or `raw.githubusercontent.com` for
-/// `benjamin-kraatz/DeeDock`. Redirects may continue onto `githubusercontent.com`
+/// Remote fetches start only at GitHub Releases, the releases index of the GitHub API, or
+/// `raw.githubusercontent.com` for `benjamin-kraatz/DeeDock`. Redirects may continue onto `githubusercontent.com`
 /// hosts so a release asset can resolve. Local `file` URLs are for previews and tests.
 nonisolated enum UpdateComicResourcePolicy {
     nonisolated static let githubOwner = "benjamin-kraatz"
     nonisolated static let githubRepository = "DeeDock"
     nonisolated static let companionMarkdownName = "DDock-comic.md"
+    nonisolated static let notesMarkdownName = "DDock.md"
+
+    /// Newest releases of the repository, used to find the versions an automatic install
+    /// skipped. Unauthenticated; the response lists tag names and assets only.
+    nonisolated static var releasesIndexURL: URL? {
+        URL(string: "https://api.github.com/repos/\(githubOwner)/\(githubRepository)/releases?per_page=15")
+    }
+
+    /// Sparkle notes asset of one published version.
+    nonisolated static func notesURL(version: String) -> URL? {
+        guard version.range(of: "^[0-9]+(\\.[0-9]+)*$", options: .regularExpression) != nil else { return nil }
+        return URL(string: "https://github.com/\(githubOwner)/\(githubRepository)/releases/download/v\(version)/\(notesMarkdownName)")
+    }
 
     /// Accepts an explicit first-hop URL the app chose, or a local file.
     nonisolated static func allowsInitial(_ url: URL) -> Bool {
@@ -69,6 +82,9 @@ nonisolated enum UpdateComicResourcePolicy {
         if host == "raw.githubusercontent.com" {
             return path.hasPrefix("\(repo)/")
         }
+        if host == "api.github.com" {
+            return path == "/repos\(repo)/releases"
+        }
         return false
     }
 
@@ -120,7 +136,9 @@ nonisolated enum UpdateComicLoader {
         return nil
     }
 
-    @concurrent private static func download(_ url: URL, limit: Int) async -> Data? {
+    /// Fetches one allowlisted resource. Returns nil for a rejected URL, a non-200 response,
+    /// a transport error, or a body above `limit`.
+    @concurrent static func download(_ url: URL, limit: Int) async -> Data? {
         if url.isFileURL {
             guard UpdateComicResourcePolicy.allowsInitial(url),
                   let data = try? Data(contentsOf: url),

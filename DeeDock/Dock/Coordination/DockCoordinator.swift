@@ -43,7 +43,20 @@ final class DockCoordinator {
     #if DIRECT_DISTRIBUTION
     /// Shared with the updater so every dock can draw the waiting-update pip.
     var updateAwareness: UpdateAwarenessStore? {
-        didSet { refreshPanels() }
+        didSet { refreshPanels(); trackUpdateTile() }
+    }
+    /// Opens the Update window or the changelog for the dock's update tile.
+    @ObservationIgnored var openUpdateTile: ((UpdateDockItem) -> Void)?
+
+    /// Rebuilds every dock when the update tile appears, changes state, or goes away.
+    /// Observation fires once, so each change registers the next one.
+    private func trackUpdateTile() {
+        withObservationTracking { _ = updateAwareness?.dockItem } onChange: { [weak self] in
+            Task { @MainActor in
+                self?.refreshPanels()
+                self?.trackUpdateTile()
+            }
+        }
     }
 
     /// Main-display screen for the update callout. Falls back to `NSScreen.main`.
@@ -65,7 +78,8 @@ final class DockCoordinator {
             isPopoverOpen: popovers.isOpen,
             isMenuTracking: panels.values.contains(where: \.isMenuTracking),
             isWindowPeekOpen: windowPeeks.isOpen,
-            secondsSinceInput: UpdateIdleGate.secondsSinceLastInput()
+            // Without any dock there is nothing a relaunch could interrupt.
+            secondsSinceDockUse: panels.values.map(\.secondsSinceUse).min() ?? .greatestFiniteMagnitude
         )
     }
 
@@ -705,6 +719,9 @@ final class DockCoordinator {
             panel.interaction.sims = sims
             #if DIRECT_DISTRIBUTION
             panel.interaction.updateAwareness = updateAwareness
+            panel.store.configureUpdateTile(updateAwareness?.dockItem)
+            panel.store.openUpdate = { [weak self] in self?.openUpdateTile?($0) }
+            panel.interaction.openUpdate = { [weak self] in self?.openUpdateTile?($0) }
             #endif
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil

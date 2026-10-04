@@ -5,6 +5,8 @@ import Observation
 /// UI-only phases. Sparkle remains authoritative about which operation can run next.
 enum UpdatePhase: Equatable {
     case idle, permission, checking, available, downloading, extracting, ready, installing, notFound, failed, installed
+    /// Changelog after an automatic install. DOKK owns this phase; Sparkle has no session.
+    case whatsNew
 }
 
 /// The user-facing facts about an offer, copied before an installer may replace the app bundle.
@@ -36,6 +38,8 @@ struct UpdateOffer {
 /// Actions carry no Sparkle callbacks; the driver validates their generation before responding.
 enum UpdateAction: Hashable {
     case allowChecks, declineChecks, install, skip, later, cancel, hide, retryTermination, done, information
+    /// Leaves the installed-version changelog and starts a fresh user-initiated check.
+    case checkAgain
 }
 
 /// Observable presentation shared by the window and menu. Constructing it performs no work.
@@ -56,6 +60,9 @@ final class UpdatePresentation {
     var message: LocalizedStringResource?
     var diagnostic: String?
     var canRetryTermination = false
+    /// A silently downloaded offer that DOKK installs itself. It cannot be cancelled or
+    /// skipped, only installed now or left for idle install and quit.
+    var staged = false
     /// Invalidates a button rendered for an earlier callback, including queued double-clicks.
     var actionToken = UUID()
 
@@ -64,6 +71,8 @@ final class UpdatePresentation {
     }
 
     var isActive: Bool { phase != .idle }
+    /// Phases that show release notes below the header.
+    var showsNotes: Bool { phase == .available || phase == .whatsNew || (phase == .ready && staged) }
     var updateAvailable: Bool { phase == .available || phase == .ready }
 
     var progress: Double? {
@@ -85,6 +94,7 @@ final class UpdatePresentation {
         case .notFound: .updatesNoUpdateTitle
         case .failed: .updatesFailedTitle
         case .installed: .updatesInstalledTitle
+        case .whatsNew: .updatesWhatsNewTitle
         }
     }
 
@@ -100,11 +110,12 @@ final class UpdatePresentation {
             return .updatesFoundBody
         case .downloading: return .updatesDownloadingBody
         case .extracting: return .updatesPreparingBody
-        case .ready: return .updatesReadyBody
+        case .ready: return staged ? .updatesStagedBody : .updatesReadyBody
         case .installing: return canRetryTermination ? .updatesWaitingToQuit : .updatesInstallingBody
         case .notFound: return .updatesNoCompatibleUpdate
         case .failed: return .updatesFailureBody
         case .installed: return .updatesInstalledBody
+        case .whatsNew: return .updatesWhatsNewBody(version: currentVersion)
         case .idle: return .updatesAutomaticDescription
         }
     }
@@ -113,11 +124,12 @@ final class UpdatePresentation {
         switch phase {
         case .permission: "arrow.trianglehead.2.clockwise"
         case .checking: "magnifyingglass"
-        case .available: "arrow.down.circle"
+        case .available: "arrow.down"
         case .downloading: "arrow.down"
         case .extracting: "shippingbox"
         case .ready, .installing: "arrow.clockwise"
         case .notFound, .installed: "checkmark"
+        case .whatsNew: "sparkles"
         case .failed: "exclamationmark.triangle"
         case .idle: "dock.rectangle"
         }
@@ -134,9 +146,10 @@ final class UpdatePresentation {
             return offer?.critical == true ? [.later, .install] : [.skip, .later, .install]
         case .downloading: return [.cancel, .hide]
         case .extracting: return [.hide]
-        case .ready: return [.cancel, .later, .install]
+        case .ready: return staged ? [.later, .install] : [.cancel, .later, .install]
         case .installing: return canRetryTermination ? [.hide, .retryTermination] : [.hide]
         case .notFound, .failed, .installed: return [.done]
+        case .whatsNew: return [.checkAgain, .done]
         case .idle: return []
         }
     }
@@ -150,12 +163,13 @@ final class UpdatePresentation {
             else if offer?.stage == .downloaded { .updatesInstall }
             else { .updatesDownload }
         case .skip: offer?.major == true ? .updatesSkipUpgrade : .updatesSkipVersion
-        case .later: phase == .ready || offer?.stage == .installing ? .updatesInstallOnQuit : .updatesLater
+        case .later: staged ? .updatesLater : phase == .ready || offer?.stage == .installing ? .updatesInstallOnQuit : .updatesLater
         case .cancel: .updatesCancel
         case .hide: .updatesHide
         case .retryTermination: .updatesRetryQuit
         case .done: .updatesDone
         case .information: .updatesLearnMore
+        case .checkAgain: .updatesCheck
         }
     }
 }

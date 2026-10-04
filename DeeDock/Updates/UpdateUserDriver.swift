@@ -9,9 +9,11 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     let presentation = UpdatePresentation()
     let awareness: UpdateAwarenessStore
     var isWindowVisible: Bool { window.isVisible }
-    // Cache artwork before the app bundle can be replaced by an installation.
-    private let icon = NSImage(named: NSImage.applicationIconName)
-    private lazy var window = UpdateWindowController(presentation: presentation, awareness: awareness, icon: icon,
+    /// Starts a user-initiated Sparkle check. Used when leaving the installed-version changelog.
+    var requestCheck: () -> Void = {}
+    /// The island that shows this driver's session, and awareness callouts between sessions.
+    var island: UpdateIslandController { window }
+    private lazy var window = UpdateIslandController(presentation: presentation, awareness: awareness,
         action: { [weak self] action, token in self?.perform(action, token: token) },
         close: { [weak self] in self?.closeWindow() })
 
@@ -26,6 +28,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         case cancellation(() -> Void)
         case acknowledgement(() -> Void)
         case termination(() -> Void)
+        /// Sparkle's immediate-install handler for a silently downloaded update.
+        case staged(() -> Void)
     }
     private var response: Response?
     private var notesTask: Task<Void, Never>?
@@ -44,8 +48,6 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState,
                          reply: @escaping (SPUUserUpdateChoice) -> Void) {
-        notesTask?.cancel()
-        comicTask?.cancel()
         transition(.available, response: .choice(reply))
         let stage: UpdateOffer.Stage
         switch state.stage {
@@ -53,26 +55,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         case .installing: stage = .installing
         default: stage = .notDownloaded
         }
-        presentation.offer = UpdateOffer(version: appcastItem.displayVersionString,
-            identity: appcastItem.versionString, stage: stage,
-            critical: appcastItem.isCriticalUpdate, major: appcastItem.isMajorUpgrade,
-            informational: appcastItem.isInformationOnlyUpdate,
-            informationURL: UpdateReleaseNotes.safeLink(appcastItem.infoURL),
-            releaseNotesURL: UpdateReleaseNotes.safeLink(appcastItem.releaseNotesURL))
+        adopt(appcastItem, stage: stage, expectsNotesDownload: true)
         awareness.noteWaitingOffer(identity: appcastItem.versionString,
                                    version: appcastItem.displayVersionString,
                                    userInitiated: state.userInitiated)
-        presentation.notes = nil
-        presentation.notesUnavailable = false
-        presentation.comic = nil
-        presentation.loadingNotes = appcastItem.releaseNotesURL != nil
-        if let text = appcastItem.itemDescription, !text.isEmpty {
-            loadNotes(text, format: appcastItem.itemDescriptionFormat ?? "html")
-        }
-        if let relatedURL = UpdateReleaseNotes.safeLink(appcastItem.releaseNotesURL)
-            ?? UpdateReleaseNotes.safeLink(appcastItem.fileURL) {
-            loadComic(from: relatedURL)
-        }
         // A scheduled offer is retained for the menu, never brought in front of another app.
         if state.userInitiated {
             awareness.noteWindowOpened()
@@ -170,6 +156,14 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func dismissUpdateInstallation() {
+        // A scheduled check that ends without an offer must not close the changelog DOKK
+        // opened on its own.
+        guard presentation.phase != .whatsNew else { return }
+        resetSession()
+    }
+
+    /// Returns the window and presentation to idle without answering any Sparkle callback.
+    private func resetSession() {
         notesTask?.cancel()
         notesTask = nil
         comicTask?.cancel()
@@ -186,10 +180,72 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         presentation.expectedBytes = 0
         presentation.extractionProgress = nil
         presentation.canRetryTermination = false
+        presentation.staged = false
         presentation.message = nil
         presentation.diagnostic = nil
         awareness.noteSessionEnded()
         window.dismiss()
+    }
+
+    /// Adopts an update Sparkle downloaded and prepared without any user driver call.
+    ///
+    /// The automatic driver would otherwise wait for a quit that a dock never gets. The offer
+    /// sits at the ready phase so the menu, the callout, and idle install can all finish it
+    /// through `install`. Nothing is brought in front of another app.
+    func showStagedUpdate(_ appcastItem: SUAppcastItem, install: @escaping () -> Void) {
+        transition(.ready, response: .staged(install))
+        // Sparkle fetches linked notes only for its own UI flow, so nothing else will arrive.
+        adopt(appcastItem, stage: .installing, expectsNotesDownload: false)
+        awareness.noteStagedOffer(identity: appcastItem.versionString,
+                                  version: appcastItem.displayVersionString)
+    }
+
+    #if DEBUG
+    /// Puts a made-up staged offer at the ready screen. `install` stands in for Sparkle's handler.
+    func debugStage(version: String, install: @escaping () -> Void) {
+        notesTask?.cancel()
+        comicTask?.cancel()
+        transition(.ready, response: .staged(install))
+        presentation.offer = UpdateOffer(version: version, stage: .installing, critical: false, major: false,
+                                         informational: false, informationURL: nil, releaseNotesURL: nil)
+        presentation.comic = nil
+        presentation.loadingNotes = false
+        presentation.notesUnavailable = false
+        presentation.notes = [
+            UpdateReleaseNoteBlock(id: 0, style: .heading(2), text: AttributedString("Simulated update")),
+            UpdateReleaseNoteBlock(id: 1, text: AttributedString("Nothing is downloaded or installed."), marker: "•")
+        ]
+    }
+
+    /// Ends a simulated session.
+    func debugReset() { resetSession() }
+    #endif
+
+    /// Shows the changelog since `previousVersion` after an automatic install.
+    /// An active Sparkle session keeps the window; it is shown instead.
+    func showWhatsNew(since previousVersion: String) {
+        guard !presentation.isActive else { showUpdateInFocus(); return }
+        notesTask?.cancel()
+        comicTask?.cancel()
+        transition(.whatsNew)
+        presentation.offer = nil
+        presentation.notes = nil
+        presentation.notesUnavailable = false
+        presentation.comic = nil
+        presentation.loadingNotes = true
+        let current = presentation.currentVersion
+        let german = Bundle.main.preferredLocalizations.first?.hasPrefix("de") == true
+        notesTask = Task { [weak self] in
+            let notes = await UpdateInstalledNotes.load(after: previousVersion, through: current, german: german)
+            guard !Task.isCancelled else { return }
+            self?.presentation.notes = notes
+            self?.presentation.loadingNotes = false
+            self?.presentation.notesUnavailable = notes == nil
+        }
+        if let relatedURL = UpdateComicResourcePolicy.notesURL(version: current) {
+            loadComic(from: relatedURL)
+        }
+        window.present(activate: true)
     }
 
     func showUpdateInFocus() {
@@ -201,12 +257,14 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     /// One idle-install attempt. No-ops when the ready reply is no longer valid.
     func attemptIdleInstall() {
         guard presentation.phase == .ready, presentation.actions.contains(.install) else { return }
+        // Written before the bundle is replaced so the next launch can announce the update.
+        awareness.recordAutomaticInstall()
         perform(.install, token: presentation.actionToken)
     }
 
     /// Called only at process termination. Does not synthesize an install/skip reply.
     func stop() {
-        dismissUpdateInstallation()
+        resetSession()
         window.stop()
     }
 
@@ -217,6 +275,31 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         presentation.message = nil
         presentation.diagnostic = nil
         presentation.canRetryTermination = false
+        if case .staged = response { presentation.staged = true } else { presentation.staged = false }
+    }
+
+    /// Copies the offer's user-facing facts and starts loading its embedded notes and comic.
+    /// - Parameter expectsNotesDownload: Whether Sparkle will deliver linked release notes later.
+    private func adopt(_ appcastItem: SUAppcastItem, stage: UpdateOffer.Stage, expectsNotesDownload: Bool) {
+        notesTask?.cancel()
+        comicTask?.cancel()
+        presentation.offer = UpdateOffer(version: appcastItem.displayVersionString,
+            identity: appcastItem.versionString, stage: stage,
+            critical: appcastItem.isCriticalUpdate, major: appcastItem.isMajorUpgrade,
+            informational: appcastItem.isInformationOnlyUpdate,
+            informationURL: UpdateReleaseNotes.safeLink(appcastItem.infoURL),
+            releaseNotesURL: UpdateReleaseNotes.safeLink(appcastItem.releaseNotesURL))
+        presentation.notes = nil
+        presentation.notesUnavailable = false
+        presentation.comic = nil
+        presentation.loadingNotes = expectsNotesDownload && appcastItem.releaseNotesURL != nil
+        if let text = appcastItem.itemDescription, !text.isEmpty {
+            loadNotes(text, format: appcastItem.itemDescriptionFormat ?? "html")
+        }
+        if let relatedURL = UpdateReleaseNotes.safeLink(appcastItem.releaseNotesURL)
+            ?? UpdateReleaseNotes.safeLink(appcastItem.fileURL) {
+            loadComic(from: relatedURL)
+        }
     }
 
     private func loadNotes(_ text: String, format: String) {
@@ -248,6 +331,12 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             if let url = presentation.offer?.informationURL { NSWorkspace.shared.open(url) }
             return
         }
+        if presentation.phase == .whatsNew, action == .done || action == .checkAgain {
+            // No Sparkle callback backs this phase. Return to idle before a new check starts.
+            resetSession()
+            if action == .checkAgain { requestCheck() }
+            return
+        }
         guard let response else { return }
         // Invalidate the rendered action before calling any client callback.
         self.response = nil
@@ -261,6 +350,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             // Installing an already-prepared offer may immediately restart the app.
             transition(presentation.phase == .ready || presentation.offer?.stage == .installing ? .installing : .extracting)
             reply(.install)
+        case (.staged(let install), .install):
+            // Sparkle relaunches without further driver calls. If termination is refused the
+            // update still installs on quit.
+            transition(.installing)
+            install()
+        case (.staged, .later):
+            // The update stays prepared for idle install, a later click, or quit.
+            self.response = response
+            window.dismiss()
         case (.choice(let reply), .skip):
             dismissUpdateInstallation()
             reply(.skip)
@@ -290,7 +388,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         case .permission: action = .declineChecks
         case .checking: action = .cancel
         case .available, .ready: action = .later
-        case .failed, .notFound, .installed: action = .done
+        case .failed, .notFound, .installed, .whatsNew: action = .done
         default: window.dismiss(); return
         }
         perform(action, token: presentation.actionToken)

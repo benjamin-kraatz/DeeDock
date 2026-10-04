@@ -1,6 +1,5 @@
 #if DIRECT_DISTRIBUTION
 import AppKit
-import CoreGraphics
 
 /// Watches a ready-to-install offer and asks Sparkle to install once DDock is idle.
 ///
@@ -15,6 +14,10 @@ final class UpdateIdleInstallController {
     var gateSnapshot: () -> UpdateIdleGate = { UpdateIdleGate() }
     var install: () -> Void = {}
     private var timer: Timer?
+    #if DEBUG
+    /// Shortens the unused-dock period for the update simulation. Busy gates still apply.
+    var debugIdleThreshold: TimeInterval?
+    #endif
 
     init(awareness: UpdateAwarenessStore) {
         self.awareness = awareness
@@ -44,17 +47,17 @@ final class UpdateIdleInstallController {
         guard awareness.canAttemptIdleInstall, isReadyToInstall() else { return }
         var gate = gateSnapshot()
         gate.isUpdateWindowOpen = gate.isUpdateWindowOpen || isWindowVisible() || awareness.windowIsOpen
+        #if DEBUG
+        if let debugIdleThreshold {
+            guard !gate.isBusy, gate.secondsSinceDockUse >= debugIdleThreshold else { return }
+        } else {
+            guard gate.isIdle else { return }
+        }
+        #else
         guard gate.isIdle else { return }
+        #endif
         awareness.markIdleInstallAttempted()
         install()
-    }
-}
-
-extension UpdateIdleGate {
-    /// Seconds since any session HID event. `UInt32.max` is the combined-event sentinel
-    /// used by Atmosphere and Discovery.
-    static func secondsSinceLastInput() -> TimeInterval {
-        CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: CGEventType(rawValue: UInt32.max)!)
     }
 }
 #endif

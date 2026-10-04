@@ -13,6 +13,11 @@ final class DockPanelController {
     var launcherWillOpen: (() -> NSRunningApplication?)?
     private(set) var geometry: DockPresentationGeometry?
     private var mouseHeld = false
+    /// When the pointer or a held interaction last touched this dock. Starts at creation so a
+    /// relaunch after an update does not count as idle straight away.
+    private var lastUse = Date()
+    /// Feeds the update idle gate. Wall-clock time, so sleep counts as not using the dock.
+    var secondsSinceUse: TimeInterval { max(0, Date().timeIntervalSince(lastUse)) }
     private var dragHeld = false
     private var pickerHeld = false
     private var popoverHeld = false
@@ -235,6 +240,7 @@ final class DockPanelController {
             if suppress { interaction.tooltips.clear() }
         }
         let held = pickerHeld || popoverHeld || windowPeekHeld || volumeCardHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
+        if inside || held { lastUse = Date() }
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
         // Tooltips are absent from `rects`, so their transparent reservation stays excluded.

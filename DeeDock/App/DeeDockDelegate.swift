@@ -32,6 +32,9 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         #if DIRECT_DISTRIBUTION
         updater.start()
         coordinator.updateAwareness = updater.awareness
+        coordinator.openUpdateTile = { [weak updater] item in
+            if item.state == .installed { updater?.showWhatsNew() } else { updater?.checkForUpdates() }
+        }
         updater.bindDesktop(
             isBusy: { [weak coordinator] in coordinator?.isUpdateAwarenessBlocked ?? true },
             isIdleBusy: { [weak coordinator] in coordinator?.updateIdleGate ?? UpdateIdleGate() },

@@ -1,7 +1,7 @@
 #if DIRECT_DISTRIBUTION
 import SwiftUI
 
-/// Soft indigo-to-coral mark used by the menu-bar badge, Settings badge, and dock pip.
+/// Soft indigo-to-coral mark used by the menu-bar badge, Settings badge, update tile, and the pip on DOKK's own tile.
 enum UpdateAwarenessMark {
     static let indigo = Color(red: 0.45, green: 0.42, blue: 0.92)
     static let coral = Color(red: 0.96, green: 0.48, blue: 0.42)
@@ -24,9 +24,11 @@ struct UpdateAwarenessBadge: View {
     }
 }
 
-/// Dock-adjacent pip on DDock glass. Reduce Motion keeps it static.
+/// Pip on DOKK's own tile when that tile is in the dock. Reduce Motion keeps it static.
 struct UpdateAwarenessPip: View {
     let reduceMotion: Bool
+    /// Announces a finished automatic install instead of a waiting offer.
+    var installed = false
     @State private var pulse = false
 
     var body: some View {
@@ -39,7 +41,7 @@ struct UpdateAwarenessPip: View {
             .animation(reduceMotion ? nil : .easeInOut(duration: 2.4).repeatForever(autoreverses: true),
                        value: pulse)
             .onAppear { pulse = !reduceMotion }
-            .accessibilityLabel(Text(.updatesAwarenessPip))
+            .accessibilityLabel(Text(installed ? .updatesInstalledBadge : .updatesAwarenessPip))
     }
 }
 
