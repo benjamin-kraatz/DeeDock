@@ -16,7 +16,8 @@ final class AppUpdater {
     let awareness = UpdateAwarenessStore()
     @ObservationIgnored private lazy var driver = UpdateUserDriver(awareness: awareness)
     @ObservationIgnored private lazy var idleInstall = UpdateIdleInstallController(awareness: awareness)
-    @ObservationIgnored private lazy var callout = UpdateAwarenessController(awareness: awareness)
+    /// The driver's island also shows awareness callouts between sessions.
+    @ObservationIgnored private var callout: UpdateIslandController { driver.island }
     // SPUUpdater holds its delegate weakly.
     @ObservationIgnored private let silentInstall = UpdateSilentInstallDelegate()
     @ObservationIgnored private var updater: SPUUpdater?

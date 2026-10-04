@@ -11,9 +11,9 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     var isWindowVisible: Bool { window.isVisible }
     /// Starts a user-initiated Sparkle check. Used when leaving the installed-version changelog.
     var requestCheck: () -> Void = {}
-    // Cache artwork before the app bundle can be replaced by an installation.
-    private let icon = NSImage(named: NSImage.applicationIconName)
-    private lazy var window = UpdateWindowController(presentation: presentation, awareness: awareness, icon: icon,
+    /// The island that shows this driver's session, and awareness callouts between sessions.
+    var island: UpdateIslandController { window }
+    private lazy var window = UpdateIslandController(presentation: presentation, awareness: awareness,
         action: { [weak self] action, token in self?.perform(action, token: token) },
         close: { [weak self] in self?.closeWindow() })
 

@@ -124,7 +124,7 @@ final class UpdatePresentation {
         switch phase {
         case .permission: "arrow.trianglehead.2.clockwise"
         case .checking: "magnifyingglass"
-        case .available: "arrow.down.circle"
+        case .available: "arrow.down"
         case .downloading: "arrow.down"
         case .extracting: "shippingbox"
         case .ready, .installing: "arrow.clockwise"

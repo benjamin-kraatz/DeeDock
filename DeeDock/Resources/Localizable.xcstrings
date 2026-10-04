@@ -10686,6 +10686,9 @@
         }
       }
     },
+    "Downloading" : {
+
+    },
     "downloadsName" : {
       "comment" : "Built-in Downloads folder tile in the trailing dock section.",
       "extractionState" : "manual",
@@ -27999,6 +28002,9 @@
         }
       }
     },
+    "Ready" : {
+
+    },
     "recipeAdd" : {
       "comment" : "Menu that adds a step to a workspace recipe.",
       "extractionState" : "manual",
@@ -40100,6 +40106,9 @@
           }
         }
       }
+    },
+    "Up to date" : {
+
     },
     "updatesAllowChecks" : {
       "comment" : "Custom DOKK update window: Check Automatically",

@@ -192,8 +192,13 @@ placement, or relaunch.
 - Turn idle install off and confirm the ready callout appears at once.
 - Click the update tile in each state and confirm it opens the Update window or the changelog.
 - Confirm the callout drops from under the menu bar as a bead, opens into the island, and folds back
-  on **Dismiss** and on its primary button. Confirm clicks beside and below the island reach the
-  windows behind it.
+  on **Dismiss**. Confirm its primary button grows the same island into the update panel, with the
+  copy in front of the glass and nothing drawn outside it while it grows.
+- Open the update panel from the menu, Settings, and the update tile with no callout showing. Walk
+  checking, available, downloading, ready, up to date, and an error; confirm the island resizes per
+  phase, long notes scroll inside it, Return triggers the primary action, and Escape closes it.
+- Confirm clicks beside and below the island reach the windows behind it, in both sizes, and that
+  the panel never activates DOKK. Check a full-screen Space and a display change while it is open.
 - Confirm Reduce Motion keeps the update tile static and only fades the callout. Confirm German and English. Confirm
   onboarding does not show the idle switch.
 
