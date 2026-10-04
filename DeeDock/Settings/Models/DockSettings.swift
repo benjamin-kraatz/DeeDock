@@ -63,8 +63,10 @@ struct DockSettings: Codable, Equatable {
     var showAppBadgeCounts: Bool = false
     /// Whether each display dock includes the trailing Shelf tile.
     var showShelf: Bool = true
+    /// Where the App Launcher tile sits. Documents saved before this key keep their
+    /// `launcherAtStart` choice as `start` or `end`.
+    var launcherPosition: LauncherDockPosition = .start
     /// Whether each display dock includes the shared Session Capsules tile.
-    var launcherAtStart: Bool = true
     var showSessionCapsules: Bool = true
     /// Whether each display dock includes the trailing system Trash tile.
     var showTrash: Bool = true
@@ -179,7 +181,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges, showAppBadgeCounts
-        case launcherAtStart, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
+        case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
         case showVolumes, showDiskImages, showNetworkVolumes, showTimeMachineVolumes, confirmBeforeEjectingDisks
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
@@ -188,6 +190,9 @@ extension DockSettings {
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
+
+    /// Keys read once to migrate older documents, never written.
+    private enum LegacyCodingKeys: String, CodingKey { case launcherAtStart }
 
     /// Only an absent new key receives defaults. Existing required keys and malformed values still throw.
     init(from decoder: Decoder) throws {
@@ -206,7 +211,9 @@ extension DockSettings {
         showAppBadges = try values.decodeIfPresent(Bool.self, forKey: .showAppBadges) ?? false
         showAppBadgeCounts = try values.decodeIfPresent(Bool.self, forKey: .showAppBadgeCounts) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
-        launcherAtStart = try values.decodeIfPresent(Bool.self, forKey: .launcherAtStart) ?? true
+        let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+        launcherPosition = try values.decodeIfPresent(LauncherDockPosition.self, forKey: .launcherPosition)
+            ?? LauncherDockPosition(legacyAtStart: legacy.decodeIfPresent(Bool.self, forKey: .launcherAtStart) ?? true)
         showSessionCapsules = try values.decodeIfPresent(Bool.self, forKey: .showSessionCapsules) ?? true
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true
         magneticEdges = try values.decodeIfPresent(Bool.self, forKey: .magneticEdges) ?? true

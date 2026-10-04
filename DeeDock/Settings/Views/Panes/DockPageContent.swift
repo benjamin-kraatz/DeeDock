@@ -16,6 +16,17 @@ struct DockPageContent: View {
         source.binding(keyPath)
     }
 
+    /// This display's pins, or the main display's for the shared defaults, which new displays copy.
+    private var launcherAnchorPins: [DockPin] {
+        let profiles = context.profiles
+        let id = override?.id ?? profiles.displays.first(where: \.isPrimary)?.id
+        return id.flatMap { profiles.pinLists[$0] } ?? []
+    }
+
+    private var allPinNames: [String: String] {
+        Dictionary(context.profiles.pinLists.values.joined().map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
+    }
+
     var body: some View {
         Group {
             switch page {
@@ -38,14 +49,9 @@ struct DockPageContent: View {
                                      alignment: binding(\.alignment),
                                      alongEdgeOffset: binding(\.alongEdgeOffset),
                                      edgeDistance: binding(\.edgeDistance), overrideContext: override)
-                SettingsCard(title: .launcherTitle, footnote: .settingsLauncherPositionHelp) {
-                    Picker(selection: binding(\.launcherAtStart)) {
-                        Text(source.value.edge.isVertical ? .settingsLauncherTop : .settingsLauncherLeft).tag(true)
-                        Text(source.value.edge.isVertical ? .settingsLauncherBottom : .settingsLauncherRight).tag(false)
-                    } label: { Text(.settingsLauncherPosition) }
-                    .pickerStyle(.segmented)
-                    .settingsOverride(override, field: .launcherAtStart)
-                }
+                LauncherPositionSettingsCard(edge: source.value.edge, pins: launcherAnchorPins,
+                                             otherPinNames: allPinNames,
+                                             position: binding(\.launcherPosition), overrideContext: override)
             case .behavior:
                 BehaviorSettingsPane(source: source, showZone: showZone)
             case .shownApps:

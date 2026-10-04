@@ -6,7 +6,7 @@ import Foundation
 /// always app-wide, so neither appears here.
 enum DockSettingField: String, CaseIterable, Codable {
     case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-    case launcherAtStart, appVisibility, tooltipPreset
+    case launcherPosition, appVisibility, tooltipPreset
     case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
@@ -24,7 +24,7 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .idleDelay: \.idleDelay
         case .fadeOutDuration: \.fadeOutDuration
         case .restoreDuration: \.restoreDuration
-        case .launcherAtStart: \.launcherAtStart
+        case .launcherPosition: \.launcherPosition
         case .appVisibility: \.appVisibility
         case .tooltipPreset: \.tooltipPreset
         case .iconSize: \.iconSize
@@ -63,7 +63,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     var idleDelay: Double?
     var fadeOutDuration: Double?
     var restoreDuration: Double?
-    var launcherAtStart: Bool?
+    var launcherPosition: LauncherDockPosition?
     var appVisibility: DockAppVisibility?
     var tooltipPreset: DockTooltipPreset?
     var iconSize: Double?
@@ -92,7 +92,7 @@ struct DockSettingsOverrides: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
-        case launcherAtStart, appVisibility, tooltipPreset
+        case launcherPosition, appVisibility, tooltipPreset
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
@@ -108,7 +108,7 @@ struct DockSettingsOverrides: Codable, Equatable {
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
         result.animateIndicators = animateIndicators ?? defaults.animateIndicators
         result.launchAnimation = launchAnimation ?? defaults.launchAnimation
-        result.launcherAtStart = launcherAtStart ?? defaults.launcherAtStart
+        result.launcherPosition = launcherPosition ?? defaults.launcherPosition
         result.appVisibility = appVisibility ?? defaults.appVisibility
         // Features are configured once for the whole app in Settings > Features. They still travel
         // in the resolved settings each dock reads, but no display can hold its own value.
@@ -169,7 +169,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .idleDelay: idleDelay != nil
         case .fadeOutDuration: fadeOutDuration != nil
         case .restoreDuration: restoreDuration != nil
-        case .launcherAtStart: launcherAtStart != nil
+        case .launcherPosition: launcherPosition != nil
         case .appVisibility: appVisibility != nil
         case .tooltipPreset: tooltipPreset != nil
         case .iconSize: iconSize != nil
@@ -207,7 +207,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .idleDelay: idleDelay = value?.idleDelay
         case .fadeOutDuration: fadeOutDuration = value?.fadeOutDuration
         case .restoreDuration: restoreDuration = value?.restoreDuration
-        case .launcherAtStart: launcherAtStart = value?.launcherAtStart
+        case .launcherPosition: launcherPosition = value?.launcherPosition
         case .appVisibility: appVisibility = value?.appVisibility
         case .tooltipPreset: tooltipPreset = value?.tooltipPreset
         case .iconSize: iconSize = value?.iconSize
@@ -252,6 +252,9 @@ struct DisplayProfilesDocument: Codable, Equatable {
 }
 
 extension DockSettingsOverrides {
+    /// Keys read once to migrate older documents, never written.
+    private enum LegacyCodingKeys: String, CodingKey { case launcherAtStart }
+
     /// Existing nullable overrides retain their decoding rules. A present edge must be a known value.
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -263,7 +266,9 @@ extension DockSettingsOverrides {
         idleDelay = try values.decodeIfPresent(Double.self, forKey: .idleDelay)
         fadeOutDuration = try values.decodeIfPresent(Double.self, forKey: .fadeOutDuration)
         restoreDuration = try values.decodeIfPresent(Double.self, forKey: .restoreDuration)
-        launcherAtStart = try values.decodeIfPresent(Bool.self, forKey: .launcherAtStart)
+        let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+        launcherPosition = try values.decodeIfPresent(LauncherDockPosition.self, forKey: .launcherPosition)
+            ?? legacy.decodeIfPresent(Bool.self, forKey: .launcherAtStart).map(LauncherDockPosition.init(legacyAtStart:))
         appVisibility = try values.decodeIfPresent(DockAppVisibility.self, forKey: .appVisibility)
         tooltipPreset = try values.decodeIfPresent(DockTooltipPreset.self, forKey: .tooltipPreset)
         iconSize = try values.decodeIfPresent(Double.self, forKey: .iconSize)

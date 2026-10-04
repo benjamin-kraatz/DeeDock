@@ -287,6 +287,22 @@ Shortcut, or copy them into a chosen folder. See the [launcher reference](LAUNCH
 for controls and discovery limits, and the [acceptance notes](ACCEPTANCE.md#dee-8-app-launcher)
 for validation status.
 
+### Launcher position
+
+The launcher sits at the far left of a horizontal dock, or the top of a vertical one, by default.
+Drag the tile to another spot to move it: before the pins, right after any pin, or past
+running apps and utilities to the far end. Click it to open the launcher as usual. VoiceOver move actions step it one spot at a time.
+**Settings → Dock → Position → App Launcher** offers the same choices as a menu.
+
+A launcher placed after a pin stays beside that pin when other pins are added or removed. If you
+move or unpin that pin, the launcher stays put and follows the pin that was before it. Where a display
+doesn't have that pin, or it is parked on a magnetic edge, the launcher follows the nearest
+earlier pin, or the far left if none. A launcher between pins shares the pinned section and adds no divider.
+
+The position is a dock setting, saved with the other settings and kept across restarts. A drag
+updates the shared default, or that display's own value when it already overrides the default.
+Pins differ per display, so the shared Settings menu lists the main display's pins.
+
 ### App suggestions
 
 Optional **App suggestions** learn from local app activity after opt-in under **Settings → Features → App suggestions**.
@@ -369,6 +385,7 @@ Choose **Settings…** from the menu-bar item or app menu (⌘, while DOKK is ac
 | Along-edge offset | −1,000 to +1,000 points | 0 |
 | Edge distance | 0–300 points | 8 |
 | Position relative to | Usable desktop / Screen edge | Usable desktop |
+| App Launcher position | Far end left or top / after any pin / far end right or bottom | Far left or top |
 
 Numeric controls support sliders and locale-aware typed values. Invalid drafts never enter layout calculations; leaving the field restores the last accepted value. **Restore Defaults** on the Defaults page resets shared configuration only and preserves display overrides, visibility, and pins. Unreadable saved settings are left intact and reported in Settings; Restore Defaults explicitly replaces them.
 

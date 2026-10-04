@@ -32289,14 +32289,68 @@
         }
       }
     },
-    "settingsLauncherBottom" : {
+    "settingsLauncherAfterPin" : {
+      "comment" : "Launcher placement menu item. The argument is a pinned app or folder name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach %1$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After %1$@"
+          }
+        }
+      }
+    },
+    "settingsLauncherAfterPinElsewhere" : {
+      "comment" : "Launcher placement menu item for a saved position whose app is pinned only on another display. The argument is that app or folder name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach %1$@ (hier nicht angeheftet)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After %1$@ (not pinned here)"
+          }
+        }
+      }
+    },
+    "settingsLauncherAfterRemovedPin" : {
+      "comment" : "Launcher placement menu item for a saved position whose app is no longer pinned anywhere. The launcher then shows at the start of the dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach einer nicht mehr angehefteten App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After an unpinned app"
+          }
+        }
+      }
+    },
+    "settingsLauncherFarBottom" : {
       "comment" : "Launcher placement setting; directions refer to physical dock ends.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unten"
+            "value" : "Ganz unten"
           }
         },
         "en" : {
@@ -32307,20 +32361,56 @@
         }
       }
     },
-    "settingsLauncherLeft" : {
+    "settingsLauncherFarLeft" : {
       "comment" : "Launcher placement setting; directions refer to physical dock ends.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Links"
+            "value" : "Ganz links"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Left"
+            "value" : "Far Left"
+          }
+        }
+      }
+    },
+    "settingsLauncherFarRight" : {
+      "comment" : "Launcher placement setting; directions refer to physical dock ends.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ganz rechts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Far Right"
+          }
+        }
+      }
+    },
+    "settingsLauncherFarTop" : {
+      "comment" : "Launcher placement setting; directions refer to physical dock ends.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ganz oben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top"
           }
         }
       }
@@ -32350,49 +32440,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Launcher bleibt im Dock. Wähle, an welchem Ende er erscheint."
+            "value" : "Platziere den Launcher an einem Ende des Docks oder direkt hinter einer angehefteten App. Du kannst ihn auch im Dock verschieben."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The launcher stays in the dock. Choose which end it appears at."
-          }
-        }
-      }
-    },
-    "settingsLauncherRight" : {
-      "comment" : "Launcher placement setting; directions refer to physical dock ends.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechts"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Right"
-          }
-        }
-      }
-    },
-    "settingsLauncherTop" : {
-      "comment" : "Launcher placement setting; directions refer to physical dock ends.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oben"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Top"
+            "value" : "Place the launcher at either end of the dock or right after a pinned app. You can also drag it along the dock."
           }
         }
       }
@@ -32692,13 +32746,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rand unten links rechts oben Mitte Ausrichtung Versatz Abstand nutzbar Schreibtisch Bildschirm Position vertikal horizontal"
+            "value" : "Rand unten links rechts oben Mitte Ausrichtung Versatz Abstand nutzbar Schreibtisch Bildschirm Position vertikal horizontal Launcher App-Launcher"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "edge bottom left right top center alignment offset distance usable desktop screen position vertical horizontal"
+            "value" : "edge bottom left right top center alignment offset distance usable desktop screen position vertical horizontal launcher app launcher"
           }
         }
       }

@@ -136,7 +136,7 @@ final class DockPanelController {
         lastDisplay = display; lastSettings = settings
         store.sections.configure(settings.appVisibility)
         store.configureShelf(settings.showShelf)
-        store.configureLauncherPosition(settings.launcherAtStart)
+        store.configureLauncherPosition(settings.launcherPosition)
         store.configureSessionCapsules(settings.showSessionCapsules)
         store.configureTrash(settings.showTrash)
         store.configureVolumes(VolumeVisibility(settings: settings))
@@ -165,17 +165,19 @@ final class DockPanelController {
         let timelineCallout: CGFloat? = interaction.timeline?.isActive(on: store.displayID) == true
             ? (settings.edge.isVertical ? 260 : 168)
             : nil
-        baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: store.entries.filter(\.isPinned).count,
-                                         utilityCount: store.entries.filter(\.isUtility).count - (settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0),
-                                         leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
+        let restingSections = DockLauncherPlacement.sectionCounts(store.entries)
+        baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: restingSections.favorites,
+                                         utilityCount: restingSections.utilities,
+                                         leadingUtilityCount: restingSections.leading,
                                          availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
                                          calloutReserve: timelineCallout)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
-        interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                                                 utilityCount: slots.filter(\.isUtility).count - (settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0),
-                                                 leadingUtilityCount: settings.launcherAtStart && store.entries.contains(where: { $0.target == .launcher }) ? 1 : 0,
+        let sections = DockLauncherPlacement.sectionCounts(slots)
+        interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: sections.favorites,
+                                                 utilityCount: sections.utilities,
+                                                 leadingUtilityCount: sections.leading,
                                                  availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
                                          calloutReserve: timelineCallout)
@@ -383,7 +385,30 @@ final class DockPanelController {
 
     /// Utility boundaries use the original layout, so a moving gap cannot retarget itself.
     func utilityInsertionIndex(at point: CGPoint, sourceID: String) -> Int? {
-        insertionIndex(at: point, sourceID: sourceID) { $0.movableUtilityID != nil }
+        if sourceID == DockEntryID.launcher.hitID { return launcherInsertionStop(at: point) }
+        return insertionIndex(at: point, sourceID: sourceID) { $0.movableUtilityID != nil }
+    }
+
+    /// The launcher stop under `point`, an index into ``DockLauncherPlacement/stops(in:)`` for the
+    /// entries without the launcher. Like utilities, this reads the resting layout.
+    ///
+    /// Before the first pin is `start`. Over the pins it is the last pin whose center the pointer
+    /// passed. Past the pins, the first trailing tile's leading edge separates "after the last pin"
+    /// from `end`, so dropping beside running apps or utilities sends the launcher to the far end.
+    func launcherInsertionStop(at point: CGPoint) -> Int? {
+        guard !stopped, !launcher.isPresented, visibility.exposesContent,
+              restingDragBounds.contains(point) else { return nil }
+        let entries = store.entries
+        let centers = baseLayout.restingCenters
+        guard entries.count <= centers.count, entries.contains(where: \.isLauncher) else { return nil }
+        let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
+        let along = baseLayout.edge.along(local) - interaction.scrollOffset
+        let pins = entries.indices.filter { entries[$0].pin != nil }
+        let passed = pins.filter { along > centers[$0] }.count
+        guard passed == pins.count else { return passed }
+        let trailing = entries.indices.first { $0 > (pins.last ?? -1) && !entries[$0].isLauncher }
+        guard let trailing else { return pins.count }
+        return along > centers[trailing] - baseLayout.iconSize / 2 ? pins.count + 1 : pins.count
     }
 
     /// Where a dragged drive would land among this dock's drives, or nil when the pointer is

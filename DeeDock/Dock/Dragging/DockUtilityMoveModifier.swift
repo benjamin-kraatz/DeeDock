@@ -2,18 +2,22 @@ import AppKit
 import SwiftUI
 
 /// Keeps built-in tile movement separate from file and pin drags.
+///
+/// Covers the reorderable utilities and the App Launcher. The launcher's moves step between pins
+/// and the dock's ends rather than among utilities, but share the same gesture and actions.
 struct DockUtilityMoveModifier: ViewModifier {
     let slot: DockRenderSlot
     let interaction: DockInteraction
 
     func body(content: Content) -> some View {
-        if let id = slot.movableUtilityID {
+        if let id = slot.dragMoveID {
             content
                 .overlay {
                     DockUtilityMoveSource(
                         optionDragsFiles: slot.shelf != nil,
                         click: {
                             if let folder = slot.folder { interaction.openFolder?(folder, false) }
+                            else if slot.isLauncher { interaction.openLauncher?() }
                             else if slot.shelf != nil { interaction.openShelf?() }
                             else { interaction.openSessionCapsules?() }
                         },
