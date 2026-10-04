@@ -63,6 +63,13 @@ Current configuration:
 
 Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For direct updates and the separate TestFlight build, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DOKK requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DOKK does not change the system Dock’s preferences.
 
+### Usage analytics in local builds
+
+A build sends anonymous usage data only when it carries a PostHog project token. To run with one
+from Xcode, copy `Configuration/Local.xcconfig.example` to `Configuration/Local.xcconfig` and fill
+in the token. The file is git-ignored and optional. See
+[docs/ANALYTICS.md](docs/ANALYTICS.md#supplying-the-posthog-token).
+
 ## Working in this repository
 
 Read [AGENTS.md](AGENTS.md) for implementation guidance, scope boundaries, and validation expectations.

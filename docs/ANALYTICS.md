@@ -64,13 +64,38 @@ analytics. Make it an enum or a count.
 | TestFlight | yes | `testflight` |
 | Debug | only with the debug-menu switch "Debug: Send Analytics" | `debug` |
 
-All three share one PostHog project. A build without an API key sends nothing. No key is
-hard-coded. The key and host are the build settings `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST`,
-which the Info.plist files in `Configuration/` copy into the `DOKKAnalyticsAPIKey` and
-`DOKKAnalyticsHost` keys. For local builds, copy `Configuration/Local.xcconfig.example` to `Configuration/Local.xcconfig`
-and fill in both values. The file is git-ignored and optional; `App.xcconfig` includes it when it
-exists. `xcodebuild` also picks both settings up from its environment, which is the route for CI
-and releases when no `Local.xcconfig` is present. Xcode does not read `.env` files.
+All three share one PostHog project. A build without a project token sends nothing, and the
+Privacy card then shows "This build does not send usage data." No token is hard-coded.
+
+## Supplying the PostHog token
+
+The token and host are two build settings, `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST`. The
+Info.plist files in `Configuration/` copy them into the `DOKKAnalyticsAPIKey` and
+`DOKKAnalyticsHost` keys, which `AnalyticsCredentials` reads at launch.
+
+### Running from Xcode
+
+Xcode does not read `.env` files, and a scheme's environment variables only reach the running
+process, not the build. Builds made in Xcode take both settings from a local xcconfig file:
+
+1. Copy `Configuration/Local.xcconfig.example` to `Configuration/Local.xcconfig`.
+2. Set `POSTHOG_PROJECT_TOKEN` to the project token (it starts with `phc_`).
+3. Leave `POSTHOG_HOST` as it is for the EU cloud. `//` starts a comment in an xcconfig file, so
+   the URL is written `https:/$()/eu.i.posthog.com`.
+4. Clean the build folder once, so Info.plist is regenerated.
+
+`Local.xcconfig` is git-ignored. `App.xcconfig` includes it with `#include?`, so a checkout
+without the file still builds and sends nothing. Every scheme and both app targets pick it up.
+Each checkout and worktree needs its own copy.
+
+To see events arrive during development, run the **DeeDock Release** scheme. It builds the
+Release configuration, which sends like a shipped build with `channel=direct`. The Debug
+configuration sends only while the debug-menu switch is on.
+
+### Command line and CI
+
+`xcodebuild` takes the two settings from its environment when no `Local.xcconfig` defines them.
+`.env.example` lists the names. A value in `Local.xcconfig` wins over the environment.
 
 ## What the SDK sends by itself
 
