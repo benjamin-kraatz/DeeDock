@@ -146,10 +146,14 @@ final class DisplayProfilesStore {
         mutation(&profile)
         var proposed = document
         proposed.profiles[id] = profile
+        let before = effectiveSettings(for: id)
         do {
             try repository?.save(proposed)
             document = proposed
             errorMessage = nil
+            let isMain = displays.first { $0.id == id }?.isPrimary == true
+            Analytics.shared.settingsChanged(from: before, to: effectiveSettings(for: id), area: .display,
+                                             display: isMain ? .main : .secondary)
             didChange?()
         } catch { errorMessage = .displayProfilesError }
     }

@@ -20,6 +20,13 @@ final class MenuBarIconController {
     func setStyle(_ style: MenuBarIconStyle) {
         guard style != self.style else { return }
         defaults.set(style.rawValue, forKey: Self.key)
+        Analytics.shared.settingsChanged(from: AnalyticsSnapshot(style: self.style), to: AnalyticsSnapshot(style: style),
+                                         area: .menuBar)
         self.style = style
+    }
+
+    /// The shape `setting_changed` reflects, so the key is reported as `style`.
+    private struct AnalyticsSnapshot {
+        let style: MenuBarIconStyle
     }
 }

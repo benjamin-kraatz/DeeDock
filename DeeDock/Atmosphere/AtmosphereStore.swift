@@ -7,6 +7,7 @@ import ImageIO
 final class AtmosphereStore {
     var settings: AtmosphereSettings { didSet {
         if let data = try? JSONEncoder().encode(settings) { defaults?.set(data, forKey: Self.key) }
+        if defaults != nil { Analytics.shared.settingsChanged(from: oldValue, to: settings, area: .atmosphere) }
         changed?()
     } }
     private(set) var decorImage: NSImage?
