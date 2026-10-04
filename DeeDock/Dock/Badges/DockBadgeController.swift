@@ -16,6 +16,7 @@ final class DockBadgeController {
     @ObservationIgnored private var suspensionReasons: Set<SuspensionReason> = []
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var workerSession: UUID?
+    @ObservationIgnored private var retention = BadgeScanRetention()
 
     /// Starts observation only for an enabled feature with at least one configured Dock.
     func configure(enabled: Bool) {
@@ -79,9 +80,15 @@ final class DockBadgeController {
                 let scanStarted = Date()
                 let next = await reader.read(pid: pid)
                 guard !Task.isCancelled, let self, generation == session else { break }
-                memory.observe(next, session: focusSession?(), scanStarted: scanStarted)
-                let nextLabels = next.compactMapValues(\.label)
-                if labels != nextLabels { labels = nextLabels }
+                // One AX timeout must not blank every dot or write unknown values into history.
+                switch retention.resolve(next, at: .now) {
+                case .retain:
+                    memory.markGap(session: focusSession?(), scanStarted: scanStarted)
+                case .update(let snapshot):
+                    memory.observe(snapshot, session: focusSession?(), scanStarted: scanStarted)
+                    let nextLabels = snapshot.compactMapValues(\.label)
+                    if labels != nextLabels { labels = nextLabels }
+                }
                 scheduleFallback()
             }
             await reader.stop()
@@ -117,6 +124,8 @@ final class DockBadgeController {
         continuation?.finish()
         continuation = nil
         worker?.cancel()
+        // Labels are cleared here, so a failure after resuming has nothing to retain.
+        retention = BadgeScanRetention()
         if !labels.isEmpty { labels = [:] }
         memory.observe([:], session: focusSession?())
     }

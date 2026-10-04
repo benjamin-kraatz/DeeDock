@@ -8,9 +8,12 @@ actor DockBadgeReader {
     private var dockPID: pid_t?
     private var observed: [AXUIElement] = []
 
-    /// Returns a complete snapshot keyed by standardized application URL. Any failed scan clears
-    /// the snapshot rather than keeping a count which may no longer be true.
-    func read(pid: pid_t?) async -> [String: BadgeObservation] {
+    /// Returns a complete snapshot keyed by standardized application URL.
+    ///
+    /// Without Accessibility trust or a running Dock, the snapshot is empty because no badge can
+    /// be observed. Returns `nil` when a scan throws, such as a 0.15 s child timeout or
+    /// cancellation, so the caller can tell a transient failure from a Dock without badges.
+    func read(pid: pid_t?) async -> [String: BadgeObservation]? {
         guard !Task.isCancelled, AXIsProcessTrusted(), let pid else { stop(); return [:] }
         if dockPID != pid {
             stop()
@@ -53,7 +56,7 @@ actor DockBadgeReader {
             return result
         } catch {
             stop()
-            return [:]
+            return nil
         }
     }
 

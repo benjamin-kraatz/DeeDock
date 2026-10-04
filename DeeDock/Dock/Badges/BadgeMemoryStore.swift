@@ -66,6 +66,20 @@ final class BadgeMemoryStore {
         if document != before { persist() }
     }
 
+    /// Records a failed scan whose last snapshot is still being presented.
+    ///
+    /// Current values and history stay unchanged, so a transient failure does not add an
+    /// unknown transition and a second one back. The active digest is marked incomplete because
+    /// changes during the failure may have been missed. A scan begun before a start or resume
+    /// boundary does not mark the new interval.
+    func markGap(session: FocusSession?, at date: Date = .now, scanStarted: Date? = nil) {
+        synchronize(session: session, at: date)
+        guard !requiresReset, (scanStarted ?? date) >= collectionNotBefore,
+              document.active?.incomplete == false else { return }
+        document.active?.incomplete = true
+        persist()
+    }
+
     /// A session's deadline is checked before accepting a sample, even if its timer task is delayed.
     func synchronize(session: FocusSession?, at date: Date = .now, allowStart: Bool = true) {
         if session?.id != self.session?.id || session?.phase != self.session?.phase {
