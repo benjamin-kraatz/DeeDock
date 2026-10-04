@@ -122,7 +122,7 @@ struct DockSettingsView: View {
             }
         case .modes:
             DockModesSettingsPane(store: profiles.modes,
-                                  activateMode: { coordinator?.activateMode($0) ?? profiles.modes.activate($0) },
+                                  activateMode: { coordinator?.activateMode($0, source: .settings) ?? profiles.modes.activate($0) },
                                   deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
                                   startFocus: { coordinator?.startFocus($0) }, canStartFocus: coordinator?.canStartFocus == true,
                                   applications: coordinator?.recipeApplications,

@@ -9,7 +9,7 @@ struct DockModesMenu: View {
         Menu(.dockModesMenuTitle) {
             ForEach(coordinator.profiles.modes.modes) { mode in
                 Button {
-                    _ = coordinator.activateMode(mode.id)
+                    _ = coordinator.activateMode(mode.id, source: .menuBar)
                 } label: {
                     if mode.id == coordinator.profiles.modes.document.activeModeID {
                         Label(mode.name, systemImage: "checkmark")

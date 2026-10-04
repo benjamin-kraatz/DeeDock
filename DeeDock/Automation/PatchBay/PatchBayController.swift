@@ -47,12 +47,14 @@ final class PatchBayController {
                                             appID: appID, folderID: folderID,
                                             appName: app.name, folderName: folder.name))
         save(proposed)
+        Analytics.track(.patchBay(.connected, cableCount: document.cables.count, outcome: nil))
     }
 
     func disconnect(_ id: UUID) {
         var proposed = document
         proposed.cables.removeAll { $0.id == id }
         save(proposed)
+        Analytics.track(.patchBay(.disconnected, cableCount: document.cables.count, outcome: nil))
     }
 
     /// Called only after a successful app open, with the mode captured before that open began.
@@ -61,7 +63,7 @@ final class PatchBayController {
               let cable = document.cables.first(where: {
                   $0.displayID == displayID && $0.modeID == modeID && $0.appID == appID
               }) else { return }
-        run(cable)
+        Analytics.performing(.automatic) { run(cable) }
     }
 
     func isAvailable(_ cable: PatchBayCable) -> Bool { folder(for: cable) != nil }
@@ -71,6 +73,8 @@ final class PatchBayController {
     func run(_ cable: PatchBayCable) {
         guard !requiresReset, document.enabled, document.cables.contains(cable) else { return }
         guard runningCableID == nil else { return }
+        let action: AnalyticsPatchBayAction = Analytics.shared.ambientTrigger == .automatic ? .ranAutomatically : .ranManually
+        let cableCount = document.cables.count
         guard let folder = folder(for: cable) else {
             lastCableID = cable.id
             message = .patchBayUnavailable
@@ -103,9 +107,11 @@ final class PatchBayController {
                 configuration.activates = false
                 _ = try await NSWorkspace.shared.open(access.urls, withApplicationAt: finder, configuration: configuration)
                 guard !Task.isCancelled, generation == token else { return }
+                Analytics.track(.patchBay(action, cableCount: cableCount, outcome: .succeeded))
                 finish(.patchBayOpened)
             } catch {
                 guard let self, !Task.isCancelled, generation == token else { return }
+                Analytics.track(.patchBay(action, cableCount: cableCount, outcome: .failed))
                 finish(.patchBayOpenFailed)
             }
         }

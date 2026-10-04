@@ -533,7 +533,7 @@ final class DockCoordinator {
                 modePicker.show(modes: profiles.modes.modes,
                                 activeModeID: profiles.modes.document.activeModeID,
                                 on: panel,
-                                choose: { [weak self] id in self?.activateMode(id) ?? false },
+                                choose: { [weak self] id in self?.activateMode(id, source: .picker) ?? false },
                                 prepare: { [weak self] id in
                                     guard let self, let mode = profiles.modes.modes.first(where: { $0.id == id }) else { return }
                                     prepareWorkspace(mode)
@@ -804,12 +804,16 @@ final class DockCoordinator {
 
     func focusNextPortal() { windowPeeks.focusNextPortal() }
 
+    /// The dock state for one display, or nil when that display hosts no dock.
+    func dockStore(for displayID: String) -> DockStore? { panels[displayID]?.store }
+
     /// Opens metadata search only after a menu or keyboard action.
     func searchWindows() {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         timeline.end()
         endFocus(restore: false)
+        Analytics.track(.toolOpened(.windowSearch, trigger: Analytics.trigger()))
         windowSearch.show(returningTo: lastExternalApplication)
     }
 
@@ -818,6 +822,7 @@ final class DockCoordinator {
         endFocus(restore: false)
         previousApplication = lastExternalApplication
         focusedID = id
+        Analytics.track(.focusDockEntered(trigger: .menu))
         panel.focus()
     }
 
@@ -838,6 +843,7 @@ final class DockCoordinator {
         previousApplication = lastExternalApplication
         focusedID = id
         let pins = panels[id]?.store.persistedPins ?? []
+        Analytics.track(.toolOpened(.localHistory, trigger: Analytics.trigger()))
         timeline.begin(on: id, currentPins: pins, archive: localHistory.pinArchive)
         panels[id]?.refreshLayout()
         panels[id]?.focus()
@@ -850,7 +856,8 @@ final class DockCoordinator {
     func startFocus(_ mode: DockMode) {
         guard canStartFocus, let current = profiles.modes.modes.first(where: { $0.id == mode.id }) else { return }
         // Activating the already-active mode is a no-op in DockModesStore, not a failed start.
-        if current.id != profiles.modes.document.activeModeID, !activateMode(current.id) { return }
+        if current.id != profiles.modes.document.activeModeID, !activateMode(current.id, source: .focusSession) { return }
+        Analytics.track(.focusSession(.started))
         focusSession.begin(modeID: current.id, name: current.name)
     }
 
@@ -859,7 +866,7 @@ final class DockCoordinator {
         recipes.prepare(mode: current, canActivate: canSwitchModes) { [weak self] id in
             guard let self else { return false }
             if id == profiles.modes.document.activeModeID { return true }
-            return activateMode(id)
+            return activateMode(id, source: .prepareWorkspace)
         }
         if recipes.run != nil { recipeProgress.show() }
     }
@@ -920,7 +927,7 @@ final class DockCoordinator {
                 }
                 // Keep completion or failure visible. The action owner enforces one run per UUID.
             case .mode(let id):
-                guard profiles.modes.modes.contains(where: { $0.id == id }), activateMode(id) else {
+                guard profiles.modes.modes.contains(where: { $0.id == id }), activateMode(id, source: .launcher) else {
                     search.actionError = String(localized: .unifiedModeUnavailable); return
                 }
                 launcher.close?()
@@ -929,20 +936,25 @@ final class DockCoordinator {
     }
 
     @discardableResult
-    func activateMode(_ id: UUID) -> Bool {
+    func activateMode(_ id: UUID, source: AnalyticsModeSource) -> Bool {
         guard canSwitchModes else { return false }
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
         timeline.end()
         applicationMenus.cancelAllDiscoveries()
-        return profiles.modes.activate(id)
+        let activated = profiles.modes.activate(id)
+        if activated {
+            Analytics.track(.dockModeActivated)
+            Analytics.track(.modeSwitched(source, modeCount: profiles.modes.modes.count))
+        }
+        return activated
     }
 
     @discardableResult
     func activatePreviousMode() -> Bool {
         guard let id = profiles.modes.previousMode?.id else { return false }
-        return activateMode(id)
+        return activateMode(id, source: .previousMode)
     }
 
     @discardableResult
@@ -954,7 +966,9 @@ final class DockCoordinator {
         modePicker.close(returnFocus: false)
         timeline.end()
         applicationMenus.cancelAllDiscoveries()
-        return profiles.modes.delete(id)
+        let deleted = profiles.modes.delete(id)
+        if deleted { Analytics.track(.modeEdited(.deleted, modeCount: profiles.modes.modes.count)) }
+        return deleted
     }
 
     private func endFocus(restore: Bool) {
@@ -967,7 +981,10 @@ final class DockCoordinator {
         if restore, let previous, !previous.isTerminated { previous.activate(options: []) }
     }
 
-    func showFusion() { fusion.show() }
+    func showFusion() {
+        Analytics.track(.toolOpened(.fusion, trigger: Analytics.trigger()))
+        fusion.show()
+    }
 
     func stop() {
         discovery.stop()

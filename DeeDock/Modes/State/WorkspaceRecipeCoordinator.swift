@@ -18,6 +18,8 @@ final class WorkspaceRecipeCoordinator {
     }
 
     var isPreparing: Bool { run?.phase.isActive == true }
+    /// When the current run began, for the duration reported with its outcome.
+    @ObservationIgnored private var startedAt: Date?
 
     /// Starts an explicit prepare. Ordinary mode switching never calls this.
     func prepare(mode: DockMode, canActivate: Bool, activate: @escaping (UUID) -> Bool) {
@@ -27,18 +29,22 @@ final class WorkspaceRecipeCoordinator {
         }
         let recipe = mode.recipe.sanitized
         guard !recipe.isEmpty else {
+            Analytics.track(.workspacePrepared(stepCount: 0, completedStepCount: 0, outcome: .noSteps, duration: 0))
             report(mode: mode, message: .recipeNoSteps)
             return
         }
         guard canActivate else {
+            reportPrepared(.blocked, stepCount: recipe.steps.count)
             report(mode: mode, message: .recipePrepareBlocked)
             return
         }
         guard activate(mode.id) else {
+            reportPrepared(.blocked, stepCount: recipe.steps.count)
             report(mode: mode, message: .recipePrepareBlocked)
             return
         }
         snapshot = recipe.steps
+        startedAt = Date()
         run = WorkspaceRecipeRun(
             id: UUID(),
             modeID: mode.id,
@@ -51,6 +57,8 @@ final class WorkspaceRecipeCoordinator {
             message: nil
         )
         didChange?()
+        Analytics.track(.workspaceRecipeStarted)
+        Analytics.log("workspace recipe started", attributes: ["recipe_step_count": AnalyticsValue(recipe.steps.count)])
         task?.cancel()
         task = Task { [weak self] in
             await self?.execute(from: 0)
@@ -72,7 +80,7 @@ final class WorkspaceRecipeCoordinator {
     }
 
     /// Stops work that has not finished. Already opened apps and Shortcut effects stay as they are.
-    func cancel() {
+    func cancel(track: Bool = true) {
         guard run?.phase.isActive == true else { return }
         task?.cancel()
         task = nil
@@ -87,6 +95,11 @@ final class WorkspaceRecipeCoordinator {
             run = current
         }
         didChange?()
+        if track {
+            Analytics.track(.workspaceRecipeCanceled)
+            reportPrepared(.canceled, stepCount: snapshot.count)
+            Analytics.log("workspace recipe canceled", attributes: ["recipe_step_count": AnalyticsValue(snapshot.count)])
+        }
     }
 
     func dismiss() {
@@ -97,7 +110,7 @@ final class WorkspaceRecipeCoordinator {
     }
 
     func stop() {
-        cancel()
+        cancel(track: false)
         run = nil
         snapshot = []
         didChange = nil
@@ -164,6 +177,7 @@ final class WorkspaceRecipeCoordinator {
                     current.phase = .waiting
                     current.message = .recipeStoppedOnFailure
                 }
+                reportPrepared(.stoppedOnFailure, stepCount: snapshot.count)
                 return
             }
         }
@@ -171,6 +185,16 @@ final class WorkspaceRecipeCoordinator {
             current.phase = .succeeded
             current.message = .recipeCompleted
         }
+        Analytics.track(.workspaceRecipeCompleted)
+        Analytics.log("workspace recipe completed", attributes: ["recipe_step_count": AnalyticsValue(snapshot.count)])
+        reportPrepared(.succeeded, stepCount: snapshot.count)
+    }
+
+    /// Reports how a prepare ended: how many steps it had, how many finished, and how long it ran.
+    private func reportPrepared(_ outcome: AnalyticsRecipeOutcome, stepCount: Int) {
+        let completed = run?.steps.count { $0.phase == .succeeded } ?? 0
+        Analytics.track(.workspacePrepared(stepCount: stepCount, completedStepCount: completed, outcome: outcome,
+                                           duration: startedAt.map { Date().timeIntervalSince($0) } ?? 0))
     }
 
     private enum Outcome {

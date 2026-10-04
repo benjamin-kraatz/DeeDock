@@ -56,8 +56,10 @@ final class ClipboardMuseumController {
     }
 
     func setCaptureEnabled(_ enabled: Bool) {
+        let wasEnabled = store.captureEnabled
         if enabled { didUse?() }
         store.setCaptureEnabled(enabled)
+        if enabled, !wasEnabled { Analytics.track(.clipboardCaptureEnabled) }
         updateWatcher()
     }
 
@@ -72,6 +74,7 @@ final class ClipboardMuseumController {
 
     /// Opens the museum from an explicit command. Hover never opens it.
     func show(returningTo application: NSRunningApplication?) {
+        Analytics.track(.clipboardMuseum(.opened, kind: nil, itemCount: store.exhibits.count))
         didUse?()
         let windowController = windowController
             ?? ClipboardMuseumWindowController(store: store, actions: actions)
@@ -103,6 +106,7 @@ final class ClipboardMuseumController {
     @discardableResult
     func restore(_ exhibit: ClipboardExhibit, revealed: ClipboardVeiledPayload? = nil) -> Bool {
         if exhibit.isRedacted, revealed == nil { return false }
+        Analytics.track(.clipboardMuseum(.restored, kind: exhibit.kind, itemCount: nil))
         let text = exhibit.isRedacted ? revealed?.text : exhibit.text
         let item = NSPasteboardItem()
         var objects: [any NSPasteboardWriting] = []
@@ -159,6 +163,7 @@ final class ClipboardMuseumController {
     private func playSlideshow(_ ids: [UUID], startingAt start: UUID?) {
         let exhibits = ids.compactMap(store.exhibit).filter { !$0.isRedacted }
         guard !exhibits.isEmpty else { return }
+        Analytics.track(.clipboardMuseum(.slideshowStarted, kind: nil, itemCount: exhibits.count))
         slideshow.show(exhibits: exhibits, startAt: start, imageURL: { [weak self] in self?.store.imageURL(for: $0) })
     }
 
