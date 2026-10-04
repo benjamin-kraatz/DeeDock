@@ -30,16 +30,45 @@ nonisolated enum LauncherDiscovery {
                 if url.pathExtension.lowercased() == "app" { urls.append(url); enumerator.skipDescendants() }
             }
         }
+        let nested = nestedURLs(urls, home: manager.homeDirectoryForCurrentUser)
         var applications: [String: LauncherApplication] = [:]
         for url in urls.sorted(by: { $0.path < $1.path }) {
             try Task.checkCancellation()
-            guard let application = read(url), applications[application.id] == nil else { continue }
+            guard let application = read(url, isNested: nested.contains(url)),
+                  applications[application.id] == nil else { continue }
             applications[application.id] = application
         }
         return Snapshot(applications: applications.values.sorted { $0.reference.name.localizedStandardCompare($1.reference.name) == .orderedAscending }, skippedDirectories: skipped)
     }
 
-    private static func read(_ url: URL) -> LauncherApplication? {
+    /// Returns the bundles under an Applications folder that sit in a subfolder of a directory that
+    /// directly holds another `.app`.
+    ///
+    /// Unity installs `Unity.app` into `/Applications/Unity/Hub/Editor/<version>/` and a dozen
+    /// `UnityPlayer.app` build templates further down under `PlaybackEngines/`. Those templates are
+    /// nested; `Unity Bug Reporter.app`, a sibling of `Unity.app`, is not. The Applications root itself
+    /// never counts as a holding folder, so `/Applications/Utilities/Terminal.app` stays top level.
+    ///
+    /// Uses every enumerated URL, before bundle-identifier deduplication drops other copies of the
+    /// parent app. Lexical only, so it adds no filesystem work to the scan.
+    static func nestedURLs(_ urls: [URL], home: URL) -> Set<URL> {
+        let roots = LauncherLocationFilter.applicationsRoots(home: home)
+        let paths = urls.map { LauncherLocationFilter.comparablePath($0) }
+        let holdingFolders = Set(paths.map { ($0 as NSString).deletingLastPathComponent })
+        var nested: Set<URL> = []
+        for (url, path) in zip(urls, paths) {
+            guard let root = roots.first(where: { path.hasPrefix($0 + "/") }) else { continue }
+            // Start above the app's own folder: siblings in one folder are peers, not nested.
+            var folder = ((path as NSString).deletingLastPathComponent as NSString).deletingLastPathComponent
+            while folder.hasPrefix(root + "/") {
+                if holdingFolders.contains(folder) { nested.insert(url); break }
+                folder = (folder as NSString).deletingLastPathComponent
+            }
+        }
+        return nested
+    }
+
+    private static func read(_ url: URL, isNested: Bool) -> LauncherApplication? {
         guard url.pathExtension.lowercased() == "app", FileManager.default.fileExists(atPath: url.path),
               let bundle = Bundle(url: url), let info = bundle.infoDictionary,
               (info["CFBundlePackageType"] as? String ?? "APPL") == "APPL",
@@ -54,7 +83,8 @@ nonisolated enum LauncherDiscovery {
             ?? info["CFBundleDisplayName"] as? String ?? info["CFBundleName"] as? String ?? fallback
         let reference = ApplicationReference(bundleIdentifier: bundle.bundleIdentifier, url: url, name: name)
         let aliases = [info["CFBundleName"], info["CFBundleDisplayName"], info["CFBundleExecutable"]].compactMap { $0 as? String }
-        return LauncherApplication(reference: reference, category: info["LSApplicationCategoryType"] as? String ?? "", aliases: aliases)
+        return LauncherApplication(reference: reference, category: info["LSApplicationCategoryType"] as? String ?? "",
+                                   aliases: aliases, isNested: isNested)
     }
 
     /// Spotlight also indexes framework helpers, caches named .app, and device build products.

@@ -10,7 +10,8 @@ nonisolated enum LauncherSearchIndex {
             let home = FileManager.default.homeDirectoryForCurrentUser
             for app in input.applications {
                 guard !Task.isCancelled else { return [] }
-                guard input.options.locationFilter.includes(app.reference.url, home: home) else { continue }
+                guard input.options.locationFilter.includes(app.reference.url, home: home),
+                      input.options.showsNestedApplications || !app.isNested else { continue }
                 switch input.options.filter {
                 case .all: break
                 case .running: guard input.options.running.contains(app.id) else { continue }

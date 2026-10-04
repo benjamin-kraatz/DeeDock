@@ -29,6 +29,8 @@ struct LauncherSearchBarOverflowMenu: View {
                     appsFilter
                     locationSortGroup
                     layout
+                    Divider()
+                    nestedApps
                 }
                 Divider()
                 Button {
@@ -81,6 +83,7 @@ struct LauncherSearchBarOverflowMenu: View {
         if state.search.kind != .all { parts.append(Text(state.search.kind.title)) }
         if state.filter != .all, !hasDiscreteKindSelected { parts.append(Text(state.filter.title)) }
         if state.locationFilter != .applicationsFolders { parts.append(Text(state.locationFilter.title)) }
+        if state.showsNestedApplications { parts.append(Text(.launcherShowNestedApps)) }
         if state.sort != .name { parts.append(Text(state.sort.title)) }
         if state.grouping != .none { parts.append(Text(state.grouping.title)) }
         return parts.dropFirst().reduce(parts.first ?? Text(verbatim: "")) { Text("\($0), \($1)") }
@@ -127,6 +130,13 @@ struct LauncherSearchBarOverflowMenu: View {
         } label: {
             Text(.launcherGroup)
         }
+    }
+
+    private var nestedApps: some View {
+        Toggle(isOn: $state.showsNestedApplications) {
+            Text(.launcherShowNestedApps)
+        }
+        .help(Text(.launcherShowNestedAppsHelp))
     }
 
     private var layout: some View {

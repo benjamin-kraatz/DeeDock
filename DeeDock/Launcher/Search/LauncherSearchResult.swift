@@ -74,6 +74,8 @@ nonisolated struct LauncherSearchOptions: Equatable, Sendable {
     var filter: LauncherFilter = .all
     /// Defaults to all so a ranking snapshot without a copied location includes every supplied app.
     var locationFilter: LauncherLocationFilter = .all
+    /// Defaults to true for the same reason: a snapshot without a copied choice hides nothing.
+    var showsNestedApplications = true
     var sort: LauncherSort = .name
     var grouping: LauncherGrouping = .none
     var running: Set<String> = []

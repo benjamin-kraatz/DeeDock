@@ -7,6 +7,7 @@ struct LauncherBrowseScroll {
         let query: String
         let filter: LauncherFilter
         let locationFilter: LauncherLocationFilter
+        let showsNestedApplications: Bool
         let sort: LauncherSort
         let grouping: LauncherGrouping
         let layout: LauncherLayout
@@ -18,6 +19,7 @@ struct LauncherBrowseScroll {
             query = state.query
             filter = state.filter
             locationFilter = state.locationFilter
+            showsNestedApplications = state.showsNestedApplications
             sort = state.sort
             grouping = state.grouping
             layout = state.layout

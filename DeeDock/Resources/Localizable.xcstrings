@@ -20193,6 +20193,42 @@
         }
       }
     },
+    "launcherShowNestedApps" : {
+      "comment" : "Launcher menu checkbox. When on, the Launcher also lists apps stored in a subfolder of another app's folder, such as Unity player templates.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verschachtelte Apps anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Nested Apps"
+          }
+        }
+      }
+    },
+    "launcherShowNestedAppsHelp" : {
+      "comment" : "Help tag for the Show Nested Apps checkbox in the Launcher menu.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt auch Apps, die in einem Unterordner neben einer anderen App liegen, etwa Vorlagen eines Editors."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Also lists apps stored in a subfolder next to another app, such as an editor's build templates."
+          }
+        }
+      }
+    },
     "launcherSort" : {
       "comment" : "Sort picker menu label.",
       "extractionState" : "manual",

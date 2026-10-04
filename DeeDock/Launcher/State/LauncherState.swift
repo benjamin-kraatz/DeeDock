@@ -46,7 +46,8 @@ final class LauncherState {
         return search.visible.first(where: { $0.id == id })?.application != nil
     }
     var searchOptions: LauncherSearchOptions {
-        LauncherSearchOptions(filter: filter, locationFilter: locationFilter, sort: sort, grouping: grouping,
+        LauncherSearchOptions(filter: filter, locationFilter: locationFilter,
+            showsNestedApplications: showsNestedApplications, sort: sort, grouping: grouping,
             running: Set(catalog.runningIDs), pinned: pinnedIDs, favorites: favorites.ids,
             visits: history.visits.mapValues { .init(count: $0.count, lastOpened: $0.lastOpened) })
     }
@@ -74,13 +75,23 @@ final class LauncherState {
             search.invalidateQuery()
         }
     }
+    /// Shows apps that live in a subfolder of another app's folder, such as Unity's player templates.
+    ///
+    /// Off by default and session-scoped like ``locationFilter``. See ``LauncherApplication/isNested``.
+    var showsNestedApplications = false {
+        didSet {
+            guard oldValue != showsNestedApplications else { return }
+            selectedID = nil
+            search.invalidateQuery()
+        }
+    }
     var sort: LauncherSort = .name { didSet { if oldValue != sort { search.invalidateQuery() } } }
     var grouping: LauncherGrouping = .none { didSet { if oldValue != grouping { search.invalidateQuery() } } }
     var layout: LauncherLayout = .grid
-    /// True when result type, app filter, location, sort, or grouping differs from its default.
-    /// Layout is a presentation choice and does not count.
+    /// True when result type, app filter, location, nested apps, sort, or grouping differs from its
+    /// default. Layout is a presentation choice and does not count.
     var hasCustomBrowseOptions: Bool {
-        search.kind != .all || filter != .all || locationFilter != .applicationsFolders
+        search.kind != .all || filter != .all || locationFilter != .applicationsFolders || showsNestedApplications
             || sort != .name || grouping != .none
     }
     /// Restores the defaults that ``hasCustomBrowseOptions`` checks. Layout stays as chosen.
@@ -88,6 +99,7 @@ final class LauncherState {
         search.kind = .all
         filter = .all
         locationFilter = .applicationsFolders
+        showsNestedApplications = false
         sort = .name
         grouping = .none
     }
@@ -125,12 +137,17 @@ final class LauncherState {
         fileActions.catalog = catalog
     }
 
-    /// True when at least one discovered app passes the current location filter.
+    /// True when at least one discovered app passes the current location and nested-app filters.
     ///
     /// Ask Robi uses this set, not Running, Pinned, or Recent.
     var hasLocationMatchingApplications: Bool {
         let home = FileManager.default.homeDirectoryForCurrentUser
-        return library.applications.contains { locationFilter.includes($0.reference.url, home: home) }
+        return library.applications.contains { isBrowsable($0, home: home) }
+    }
+
+    /// The on-disk constraints: location, then whether nested apps are shown.
+    private func isBrowsable(_ app: LauncherApplication, home: URL) -> Bool {
+        locationFilter.includes(app.reference.url, home: home) && (showsNestedApplications || !app.isNested)
     }
 
     /// Inputs that determine ``results``. Reading them here keeps observation tracking intact.
@@ -139,6 +156,7 @@ final class LauncherState {
         let query: String
         let filter: LauncherFilter
         let locationFilter: LauncherLocationFilter
+        let showsNestedApplications: Bool
         let sort: LauncherSort
         let robiIDs: [String]?
         let applications: [LauncherApplication]
@@ -154,7 +172,8 @@ final class LauncherState {
     @ObservationIgnored private var groupsCache: (grouping: LauncherGrouping, results: [LauncherApplication], value: [Group])?
 
     var results: [LauncherApplication] {
-        let key = ResultsKey(query: query, filter: filter, locationFilter: locationFilter, sort: sort, robiIDs: robiIDs,
+        let key = ResultsKey(query: query, filter: filter, locationFilter: locationFilter,
+            showsNestedApplications: showsNestedApplications, sort: sort, robiIDs: robiIDs,
             applications: library.applications, running: catalog.runningIDs, pinned: pinnedIDs,
             favorites: favorites.ids, visits: history.visits)
         if let resultsCache, resultsCache.key == key { return resultsCache.value }
@@ -170,7 +189,8 @@ final class LauncherState {
         let home = FileManager.default.homeDirectoryForCurrentUser
         let visits = key.visits
         let matches: [(LauncherApplication, Int)] = key.applications.compactMap { app in
-            guard key.locationFilter.includes(app.reference.url, home: home) else { return nil }
+            guard key.locationFilter.includes(app.reference.url, home: home),
+                  key.showsNestedApplications || !app.isNested else { return nil }
             switch key.filter {
             case .all: break
             case .running: guard running.contains(app.id) else { return nil }
@@ -316,7 +336,7 @@ final class LauncherState {
         let token = UUID(); robiGeneration = token
         let home = FileManager.default.homeDirectoryForCurrentUser
         let task = query
-        let apps = library.applications.filter { locationFilter.includes($0.reference.url, home: home) }
+        let apps = library.applications.filter { isBrowsable($0, home: home) }
         let robi = robi
         robiBusy = true
         robiTask = Task { [weak self] in
