@@ -8,12 +8,17 @@ nonisolated struct LauncherApplication: Identifiable, Sendable, Equatable {
     let searchName: String
     let searchAliases: String
     let initials: String
+    /// True when the bundle sits in a subfolder below a folder that holds another app inside an
+    /// Applications folder, such as the player variants a Unity editor install ships next to `Unity.app`.
+    /// The Launcher hides these unless Show Nested Apps is on.
+    let isNested: Bool
     var id: String { reference.id }
 
-    init(reference: ApplicationReference, category: String = "", aliases: [String] = []) {
+    init(reference: ApplicationReference, category: String = "", aliases: [String] = [], isNested: Bool = false) {
         self.reference = reference
         self.category = category
         self.aliases = aliases
+        self.isNested = isNested
         searchName = Self.normalize(reference.name)
         searchAliases = Self.normalize(([reference.bundleIdentifier ?? "", reference.url.deletingPathExtension().lastPathComponent] + aliases).joined(separator: " "))
         initials = searchName.split(whereSeparator: { !$0.isLetter && !$0.isNumber }).compactMap(\.first).map(String.init).joined()

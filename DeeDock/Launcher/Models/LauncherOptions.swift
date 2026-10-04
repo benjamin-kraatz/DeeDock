@@ -66,7 +66,8 @@ nonisolated enum LauncherLocationFilter: String, CaseIterable, Identifiable, Sen
         }
     }
 
-    private static func applicationsRoots(home: URL) -> [String] {
+    /// Lowercased, firmlink-normalized `/Applications` and `~/Applications`, for lexical prefix checks.
+    static func applicationsRoots(home: URL) -> [String] {
         let homePath = comparablePath(home)
         let userApplications = homePath == "/" ? "/applications" : homePath + "/applications"
         return [comparablePath("/Applications"), userApplications]
@@ -84,7 +85,7 @@ nonisolated enum LauncherLocationFilter: String, CaseIterable, Identifiable, Sen
     }
 
     /// Lexical only. `standardizedFileURL` and symlink resolution would query the filesystem.
-    private static func comparablePath(_ url: URL) -> String {
+    static func comparablePath(_ url: URL) -> String {
         comparablePath(url.standardized.path)
     }
 

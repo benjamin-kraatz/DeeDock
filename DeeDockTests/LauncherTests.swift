@@ -54,6 +54,24 @@ struct LauncherTests {
         #expect(!LauncherLocationFilter.applicationsFolders.includes(URL(fileURLWithPath: path), home: home))
     }
 
+    @Test("Apps below another app's folder are nested; siblings and top-level folders are not")
+    func nestedApplications() {
+        let home = URL(fileURLWithPath: "/Users/example")
+        let editor = "/Applications/Unity/Hub/Editor/6000.6.0f1"
+        let paths = [
+            "\(editor)/Unity.app",
+            "\(editor)/Unity Bug Reporter.app",
+            "\(editor)/PlaybackEngines/MacStandaloneSupport/Variations/macos_arm64_mono/UnityPlayer.app",
+            "/Applications/Safari.app",
+            "/Applications/Utilities/Terminal.app",
+            "/Users/example/Projects/Tool.app",
+            "/Users/example/Projects/Build/Products/Editor.app",
+        ]
+        let urls = paths.map { URL(fileURLWithPath: $0) }
+        let nested = LauncherDiscovery.nestedURLs(urls, home: home).map(\.path)
+        #expect(nested == ["\(editor)/PlaybackEngines/MacStandaloneSupport/Variations/macos_arm64_mono/UnityPlayer.app"])
+    }
+
     @Test("Standard Mac locations add /System/Applications only", arguments: [
         "/Applications/Safari.app",
         "/Users/example/Applications/Pixel.app",
