@@ -36,13 +36,26 @@ struct UpdateIslandHeadline: View {
         }
     }
 
+    /// The panel names the offer's version beside its title while that offer is in play.
+    /// A callout already has it in its message.
+    private var offerVersion: String? {
+        guard model.content == .panel,
+              [.available, .downloading, .extracting, .ready].contains(presentation.phase) else { return nil }
+        return presentation.offer?.version
+    }
+
     var body: some View {
         ZStack(alignment: .leading) {
             if let copy {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(copy.title)
-                        .font(.headline)
-                        .accessibilityAddTraits(.isHeader)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(copy.title)
+                            .font(.headline)
+                            .accessibilityAddTraits(.isHeader)
+                        if let offerVersion {
+                            UpdateVersionBadge(version: offerVersion)
+                        }
+                    }
                     Text(copy.message)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -63,31 +76,38 @@ struct UpdateIslandCloseButton: View {
     var body: some View {
         Button(.updatesAwarenessDismiss, systemImage: "xmark", action: action)
             .labelStyle(.iconOnly)
+            .tint(.secondary)
             .buttonStyle(.bordered)
             .buttonBorderShape(.circle)
             .help(Text(.updatesAwarenessDismiss))
     }
 }
 
-/// The phase's details under the header. They scroll only when they outgrow the island.
+/// The phase's details under a hairline that sets them off from the header.
+///
+/// The island is only as tall as the details need. They scroll once they outgrow the height
+/// the canvas offers.
 struct UpdateIslandDetails: View {
     let presentation: UpdatePresentation
     let awareness: UpdateAwarenessStore?
-    let maxHeight: CGFloat
 
     var body: some View {
-        // A bare ScrollView would claim the full height for a two-line phase.
-        ViewThatFits(in: .vertical) {
-            details
-            ScrollView { details }
-                .scrollBounceBehavior(.basedOnSize)
+        VStack(alignment: .leading, spacing: 14) {
+            Divider()
+            // A bare ScrollView would claim all offered height for a two-line phase, and a
+            // flexible frame around this would centre short details in it.
+            ViewThatFits(in: .vertical) {
+                details
+                ScrollView { details }
+                    .scrollBounceBehavior(.basedOnSize)
+            }
         }
-        .frame(maxHeight: maxHeight)
     }
 
     private var details: some View {
-        UpdateWindowDetails(presentation: presentation, awareness: awareness)
-            .frame(maxWidth: .infinity, alignment: .leading)
+        UpdatePanelDetails(presentation: presentation, awareness: awareness)
+            // Body text and the idle switch must not inherit the island's large controls.
+            .controlSize(.regular)
     }
 }
 

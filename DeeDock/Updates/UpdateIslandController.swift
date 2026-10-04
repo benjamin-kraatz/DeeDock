@@ -80,7 +80,7 @@ final class UpdateIslandController {
         if let panel, let model {
             if model.content != .panel, let screen = panel.screen ?? targetScreen() ?? NSScreen.main {
                 // Grow the canvas first; the island is anchored top-centre and stays put.
-                layoutForPanel(panel, model: model, on: screen)
+                layoutForPanel(panel, on: screen)
                 model.content = .panel
             }
         } else if let screen = targetScreen() ?? NSScreen.main {
@@ -149,7 +149,7 @@ final class UpdateIslandController {
             close: close
         ))
         if content == .panel {
-            layoutForPanel(panel, model: model, on: screen)
+            layoutForPanel(panel, on: screen)
         } else {
             // A callout stays out of full-screen Spaces. Its canvas is sized for the tallest
             // callout, because the island starts as a bead and cannot be measured yet. It
@@ -172,12 +172,11 @@ final class UpdateIslandController {
 
     /// Sizes the canvas for the tallest panel the screen allows. A requested panel also
     /// shows over full-screen apps.
-    private func layoutForPanel(_ panel: UpdateIslandPanel, model: UpdateIslandModel, on screen: NSScreen) {
+    private func layoutForPanel(_ panel: UpdateIslandPanel, on screen: NSScreen) {
         let insets = UpdateIslandView.canvasInsets
         let visible = screen.visibleFrame
         let width = UpdateIslandView.panelWidth + insets.leading + insets.trailing
         let height = min(visible.height - 16, 760)
-        model.maxIslandHeight = max(160, height - insets.top - insets.bottom)
         panel.collectionBehavior = [.transient, .canJoinAllSpaces, .fullScreenAuxiliary]
         panel.setFrame(CGRect(x: visible.midX - width / 2, y: visible.maxY - height, width: width, height: height),
                        display: true)
@@ -186,7 +185,7 @@ final class UpdateIslandController {
     private func screensChanged() {
         guard let panel, let model else { return }
         if model.content == .panel, let screen = targetScreen() ?? NSScreen.main {
-            layoutForPanel(panel, model: model, on: screen)
+            layoutForPanel(panel, on: screen)
         } else {
             // The next refresh presents the callout again in the new arrangement.
             closePanel()

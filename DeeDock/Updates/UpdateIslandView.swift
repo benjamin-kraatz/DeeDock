@@ -32,8 +32,6 @@ struct UpdateIslandView: View {
     private static let inset: CGFloat = 14
     /// The bead wraps the mark with a slimmer margin than the open island.
     private static let beadInset: CGFloat = 8
-    /// Height of the action row and its spacing, kept free below the details.
-    private static let actionRowAllowance: CGFloat = 58
 
     private enum Stage {
         /// Above the resting position and invisible.
@@ -117,9 +115,7 @@ struct UpdateIslandView: View {
                 }
             }
             if showsBody, hasDetails {
-                UpdateIslandDetails(presentation: presentation, awareness: awareness,
-                                    maxHeight: model.maxIslandHeight - UpdateIslandMark.diameter
-                                        - Self.inset * 3 - Self.actionRowAllowance)
+                UpdateIslandDetails(presentation: presentation, awareness: awareness)
                     .transition(reveal(3))
             }
             if showsBody, !presentation.actions.isEmpty {

@@ -33,8 +33,6 @@ final class UpdateIslandModel {
     /// True once the island should fold up and leave. The owner closes the panel after
     /// `UpdateIslandView.departureDuration(reduceMotion:)`.
     var isLeaving = false
-    /// Tallest island the hosting canvas can hold.
-    var maxIslandHeight: CGFloat = 520
 
     init(content: Content) {
         self.content = content
