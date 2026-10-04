@@ -118,6 +118,7 @@ extension LauncherState {
             suggestions.removeUnavailable(application.id)
             return
         }
+        Analytics.track(.launcherSuggestionAccepted(trigger: Analytics.trigger()))
         open(application)
     }
 

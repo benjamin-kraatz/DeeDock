@@ -295,9 +295,11 @@ final class LauncherState {
 
     func togglePin(_ application: LauncherApplication) {
         guard let dockStore else { return }
-        let succeeded = pinnedIDs.contains(application.id)
-            ? dockStore.removePin(application.id)
-            : dockStore.insertPins([.application(application.reference)], at: dockStore.pins.count)
+        let succeeded = Analytics.performing(.launcher) {
+            pinnedIDs.contains(application.id)
+                ? dockStore.removePin(application.id)
+                : dockStore.insertPins([.application(application.reference)], at: dockStore.pins.count)
+        }
         if !succeeded { error = dockStore.errorMessage }
     }
 
@@ -344,10 +346,12 @@ final class LauncherState {
                 let ids = try await robi.suggestions(task: task, applications: apps)
                 guard !Task.isCancelled, let self, robiGeneration == token else { return }
                 robiIDs = ids; robiBusy = false; robiTask = nil
+                Analytics.track(.launcherAssistantAsked(queryLength: task.count, resultCount: ids.count, outcome: .succeeded))
                 robiMessage = ids.isEmpty ? .launcherRobiNoResults : .launcherRobiSuggestions
             } catch {
                 guard !Task.isCancelled, let self, robiGeneration == token else { return }
                 robiBusy = false; robiTask = nil
+                Analytics.track(.launcherAssistantAsked(queryLength: task.count, resultCount: 0, outcome: .failed))
                 robiMessage = error is LauncherRobi.Failure ? .launcherRobiUnavailable : .launcherRobiFailed
             }
         }
