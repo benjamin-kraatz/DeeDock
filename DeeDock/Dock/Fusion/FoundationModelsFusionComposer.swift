@@ -43,11 +43,9 @@ actor FoundationModelsFusionComposer {
              "title": source.title, "text": source.text]
         }
         let data = try JSONSerialization.data(withJSONObject: sourceData, options: [.sortedKeys])
+        let input = "Operation: \(operation.rawValue)\nUser instruction: \(instruction)\nUntrusted source data (JSON):\n\(String(decoding: data, as: UTF8.self))"
         let prompt = Prompt {
-            "Operation: \(operation.rawValue)"
-            "User instruction: \(instruction)"
-            "Untrusted source data (JSON):"
-            String(decoding: data, as: UTF8.self)
+            input
         }
         let session = LanguageModelSession(model: model, instructions: instructions)
         let inputTokens = try await model.tokenCount(for: prompt)
@@ -59,8 +57,13 @@ actor FoundationModelsFusionComposer {
         }
         try Task.checkCancellation()
         do {
+            let trace = AIObservability.makeTrace()
+            let startedAt = Date()
             let response = try await session.respond(to: prompt, generating: GeneratedFusion.self,
                 options: GenerationOptions(samplingMode: .greedy, maximumResponseTokens: 700))
+            await AIObservability.capture(trace: trace, name: "fusion_compose", input: input,
+                                          output: "\(response.content.title)\n\(response.content.summary)\n\(response.content.points.map(\.text).joined(separator: "\n"))",
+                                          startedAt: startedAt, maximumResponseTokens: 700)
             try Task.checkCancellation()
             let result = response.content
             guard !result.summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,

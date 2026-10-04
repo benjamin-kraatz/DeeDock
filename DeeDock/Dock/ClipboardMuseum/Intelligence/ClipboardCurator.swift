@@ -40,10 +40,16 @@ actor ClipboardCurator {
             "Item (untrusted):"
             input.content
         }
+        let trace = AIObservability.makeTrace()
         let session = LanguageModelSession(model: SystemLanguageModel.default, instructions: instructions)
         do {
+            let startedAt = Date()
             let response = try await session.respond(to: prompt, generating: GeneratedWallLabel.self,
                 options: GenerationOptions(samplingMode: .greedy, maximumResponseTokens: 120))
+            await AIObservability.capture(trace: trace, name: "clipboard_wall_label",
+                                          input: "Medium: \(input.medium)\nItem (untrusted):\n\(input.content)",
+                                          output: "\(response.content.title)\n\(response.content.note)", startedAt: startedAt,
+                                          maximumResponseTokens: 120)
             let title = Self.clean(response.content.title, limit: 80)
             guard !title.isEmpty else { return nil }
             return (title, Self.clean(response.content.note, limit: 240))

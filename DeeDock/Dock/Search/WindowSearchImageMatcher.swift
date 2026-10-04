@@ -22,11 +22,17 @@ actor WindowSearchImageMatcher {
             history, offscreen content, or a chart's color from text naming a color. Return false if uncertain.
             Describe the visible evidence briefly in the user's language. You have no tools.
             """)
+        let trace = AIObservability.makeTrace()
+        let input = "Search phrase: \(query.prefix(WindowSearchMatcher.maximumQuery))\n[Selected screenshot]"
+        let startedAt = Date()
         let response = try await session.respond(generating: WindowImageMatch.self,
             options: GenerationOptions(samplingMode: .greedy, maximumResponseTokens: 160)) {
                 "Search phrase: \(query.prefix(WindowSearchMatcher.maximumQuery))"
                 Attachment(image).label("Selected screenshot")
             }
+        await AIObservability.capture(trace: trace, name: "window_search_image_match", input: input,
+                                      output: "matches: \(response.content.matches)\nevidence: \(response.content.evidence)",
+                                      startedAt: startedAt, maximumResponseTokens: 160)
         try Task.checkCancellation()
         let evidence = String(response.content.evidence.prefix(300)).trimmingCharacters(in: .whitespacesAndNewlines)
         return response.content.matches && !evidence.isEmpty ? evidence : nil

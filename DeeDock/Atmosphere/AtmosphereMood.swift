@@ -24,8 +24,13 @@ final class AtmosphereMood {
         generating = true; failed = false
         task = Task { [weak self, weak store] in
             do {
+                let trace = AIObservability.makeTrace()
+                let input = String(mood.prefix(500))
                 let session = LanguageModelSession(instructions: "Create a harmonious two-color ambient palette matching the user's mood. Return only colors.")
-                let result = try await session.respond(to: String(mood.prefix(500)), generating: AtmosphereMoodResponse.self)
+                let startedAt = Date()
+                let result = try await session.respond(to: input, generating: AtmosphereMoodResponse.self)
+                await AIObservability.capture(trace: trace, name: "atmosphere_mood_palette", input: input,
+                                              output: "\(result.content.first), \(result.content.second)", startedAt: startedAt)
                 try Task.checkCancellation()
                 guard let store, store.settings.source == .mood, store.settings.mood == mood else {
                     self?.generating = false
