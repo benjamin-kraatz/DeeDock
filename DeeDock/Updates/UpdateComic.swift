@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 
 /// Bilingual What’s New comic parsed from the locked `*-comic.md` shape.
@@ -194,4 +193,3 @@ nonisolated enum UpdateComicParser {
         return String(line.dropFirst(2).dropLast(2)).trimmingCharacters(in: .whitespaces)
     }
 }
-#endif

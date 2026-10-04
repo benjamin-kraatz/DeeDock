@@ -31,12 +31,10 @@ extension DeeDockDelegate {
         inputs.loginItem = loginItems.status
         inputs.systemDockHidden = SystemDockReservation.reservedEdge(
             in: NSScreen.screens.map { ($0.frame, $0.visibleFrame) }) == nil
-        #if DIRECT_DISTRIBUTION
         inputs.updates = AnalyticsContextInputs.Updates(
             checksAutomatically: updater.automaticallyChecksForUpdates,
             installsAutomatically: updater.automaticallyInstallsUpdates,
             installsWhenIdle: updater.awareness.installWhenIdle)
-        #endif
         return inputs
     }
 }

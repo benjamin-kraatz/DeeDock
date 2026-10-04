@@ -4,7 +4,7 @@ Use the `DeeDock` scheme for direct distribution. Its resources include the unch
 
 `https://github.com/benjamin-kraatz/DeeDock/releases/latest/download/appcast.xml`
 
-The `DeeDock-TestFlight` scheme compiles the same app with `TESTFLIGHT` instead of `DIRECT_DISTRIBUTION`. It has no Sparkle package dependency, updater UI, or updater Info.plist keys. Choosing TestFlight at export time does not remove Sparkle from a direct archive. Always archive the correct scheme.
+DOKK ships only as a notarized Developer ID download. There is no App Store or TestFlight build. Those channels require the App Sandbox, and the sandbox blocks the Accessibility control of other apps' windows that DOKK depends on. Every build includes Sparkle.
 
 ## Who publishes
 
@@ -79,7 +79,7 @@ The Release workflow does not use a keychain profile. CI notarization runs:
 xcrun notarytool submit <zip> --apple-id --password --team-id --wait
 ```
 
-It reads `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID`. It does not use an App Store Connect API key. TestFlight stays on Xcode Cloud.
+It reads `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID`. It does not use an App Store Connect API key.
 
 ## Generate and publish the feed
 
@@ -104,7 +104,7 @@ Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS downlo
 
 Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. When `docs/releases/<MARKETING_VERSION>.md` exists, copy it beside the ZIP as `DDock.md` before `generate_appcast`, and upload that `DDock.md` with the draft. When `docs/releases/<MARKETING_VERSION>-comic.md` is on the shipped commit, the Release workflow also stages it as `DDock-comic.md`, copies each `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` as a flat `panel-0N.png`, and uploads those files on the same draft. The staged comic rewrites `assets/<ver>/panel-0N.png` links to `panel-0N.png` so the Update window can load art next to `DDock-comic.md`. A missing comic file is skipped and the notes-only ship still succeeds. Write the GitHub Release body in English only. Sparkle notes stay bilingual German and English. 0.4.1 has no comic package.
 
-The Release workflow stops at that draft. Leave `publish_latest` off until Benn confirms a Latest cut. Verify both assets before anyone marks the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a TestFlight-only or prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
+The Release workflow stops at that draft. Leave `publish_latest` off until Benn confirms a Latest cut. Verify both assets before anyone marks the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
 
 A feed containing only the newest version is sufficient while supported OS and architecture requirements remain the same. If those requirements change, retain compatible older appcast entries and their original asset URLs so existing users still receive the last compatible build. Do not rewrite older enclosures to point at the newest release tag.
 
@@ -121,12 +121,6 @@ umask 077
 ```
 
 Keep an encrypted backup. On another release machine, use the same account with `-f /secure/location/DeeDock-sparkle-private-key`, then compare the public key using `-p`. Never put the private key in Git, release assets, issue comments, or logs. Consult Sparkle's key-rotation guidance before changing an established public key.
-
-## Archive for TestFlight
-
-Select `DeeDock-TestFlight` and archive that target. Its app still has the product name `DOKK.app`, with ordinary build products isolated under `TestFlight`. Inspect the archive before upload: there must be no `Sparkle.framework`, Sparkle helpers, Sparkle load command, `SUFeedURL`, or `SUPublicEDKey`.
-
-This target preserves the existing signing and sandbox settings. It establishes updater exclusion, not App Store Connect acceptance. Address any TestFlight entitlement or sandbox requirements separately rather than exporting the direct target as TestFlight. TestFlight uploads stay on Xcode Cloud. The Release workflow does not notarize or upload that scheme, and it does not use App Store Connect API keys.
 
 ## Verify an update before release
 
@@ -179,7 +173,7 @@ Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETIN
 1. Confirm the image has Xcode 27 and the macOS 27 SDK.
 2. Resolve Sparkle tools from the pinned 2.9.6 package (`generate_appcast` under the cloned `artifacts/sparkle` tree).
 3. Import `DEVELOPER_ID_APPLICATION_CERTIFICATE` into a temporary keychain. The job deletes that keychain when it finishes.
-4. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime. This is not TestFlight.
+4. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime.
 5. Export with a generated Developer ID options plist, then `xcrun notarytool submit ... --apple-id --password --team-id --wait`, then `stapler staple`. Nested Sparkle code stays signed. The job does not weaken hardened runtime.
 6. Verify `codesign --deep --strict` and `stapler validate`.
 7. Build `DDock.zip` with `ditto`, copy bilingual notes to `DDock.md`, copy a What’s New comic to `DDock-comic.md` plus flat `panel-0N.png` files when that comic exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`.
@@ -220,7 +214,7 @@ These are the assumed secret formats. Confirm them against what is stored. Never
 - `DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD` is that `.p12` password.
 - `SPARKLE_PRIVATE_ED_KEY` is the first line written by `generate_keys --account de.benjaminkraatz.DeeDock -x`. That line is Sparkle's base64 EdDSA secret. The workflow feeds it to `generate_appcast --ed-key-file -`. It does not use deprecated `-s`.
 
-Do not add App Store Connect API key secrets. TestFlight stays on Xcode Cloud.
+Do not add App Store Connect API key secrets.
 
 `GITHUB_TOKEN` with `contents: write` opens the draft, uploads assets, and can publish Latest only when `publish_latest` is true. There is no separate GitHub token secret.
 

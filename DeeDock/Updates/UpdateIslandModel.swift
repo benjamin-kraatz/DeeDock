@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 import Observation
 
@@ -38,4 +37,3 @@ final class UpdateIslandModel {
         self.content = content
     }
 }
-#endif

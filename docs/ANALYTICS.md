@@ -61,16 +61,14 @@ analytics. Make it an enum or a count.
 | Build | Sends | `channel` |
 | --- | --- | --- |
 | Direct (Developer ID) | yes | `direct` |
-| TestFlight | yes | `testflight` |
 | Debug | only with the debug-menu switch "Debug: Send Analytics" | `debug` |
 
-All three share one PostHog project. A build without a project token sends nothing, and the
+Both share one PostHog project. A build without a project token sends nothing, and the
 Privacy card then shows "This build does not send usage data." No token is hard-coded.
 
 ## Supplying the PostHog token
 
-The token and host are two build settings, `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST`. The
-Info.plist files in `Configuration/` copy them into the `DOKKAnalyticsAPIKey` and
+The token and host are two build settings, `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST`. `Configuration/Direct-Info.plist` copies them into the `DOKKAnalyticsAPIKey` and
 `DOKKAnalyticsHost` keys, which `AnalyticsCredentials` reads at launch.
 
 ### Running from Xcode
@@ -85,7 +83,7 @@ process, not the build. Builds made in Xcode take both settings from a local xcc
 4. Clean the build folder once, so Info.plist is regenerated.
 
 `Local.xcconfig` is git-ignored. `App.xcconfig` includes it with `#include?`, so a checkout
-without the file still builds and sends nothing. Every scheme and both app targets pick it up.
+without the file still builds and sends nothing. Every scheme picks it up.
 Each checkout and worktree needs its own copy.
 
 To see events arrive during development, run the **DeeDock Release** scheme. It builds the
@@ -135,7 +133,7 @@ Registered with the SDK's `register`, so every event carries them.
 
 | Property | Value |
 | --- | --- |
-| `channel` | `direct`, `testflight`, `debug` |
+| `channel` | `direct`, `debug` |
 | `chip_family`, `chip_generation`, `chip_tier` | for example `apple_silicon`, `3`, `pro` |
 | `app_language` | `en`, `de`, `other` |
 | `appearance` | `light`, `dark` |
@@ -147,7 +145,7 @@ Registered with the SDK's `register`, so every event carries them.
 | `dock_mode_count` | exact |
 | `system_dock_hidden` | whether the macOS Dock has released its desktop space |
 | `login_item` | `not_registered`, `enabled`, `requires_approval`, `not_found`, `unknown` |
-| `updates_check_automatically`, `updates_install_automatically`, `updates_install_when_idle` | direct builds only |
+| `updates_check_automatically`, `updates_install_automatically`, `updates_install_when_idle` | Bool |
 | `dock_edge`, `dock_alignment`, `dock_position_reference` | main dock |
 | `dock_icon_size`, `dock_magnification` | exact |
 | `dock_auto_hide`, `dock_activation_location`, `dock_animation_style` | |

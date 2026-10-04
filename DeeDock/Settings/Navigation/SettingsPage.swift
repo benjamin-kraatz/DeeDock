@@ -126,22 +126,14 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         }
     }
 
-    /// A directly distributed build folds Software Update into About, so the page says both.
+    /// Software Update lives in About, so the page title names both.
     private static var aboutTitle: LocalizedStringResource {
-        #if DIRECT_DISTRIBUTION
         .settingsAboutUpdates
-        #else
-        .settingsAbout
-        #endif
     }
 
     /// Update wording that should find the About page, since that is where updates now live.
     private static var aboutKeywords: [LocalizedStringResource] {
-        #if DIRECT_DISTRIBUTION
         [.updatesSectionTitle, .updatesCheck, .updatesAutomatic, .updatesIdleInstall]
-        #else
-        []
-        #endif
     }
 
     /// Brief descriptions on the Features overview, before opening a page.

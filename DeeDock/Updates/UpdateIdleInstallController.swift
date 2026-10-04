@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import AppKit
 
 /// Watches a ready-to-install offer and asks Sparkle to install once DDock is idle.
@@ -60,4 +59,3 @@ final class UpdateIdleInstallController {
         install()
     }
 }
-#endif

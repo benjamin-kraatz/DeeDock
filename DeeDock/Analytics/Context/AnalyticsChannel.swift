@@ -1,15 +1,13 @@
 import Foundation
 
-/// How this build reached the Mac. TestFlight and direct builds share one PostHog project and
-/// are told apart by this value and the version.
+/// Which kind of build is running. Release and debug builds share one PostHog project and are
+/// told apart by this value and the version.
 nonisolated enum AnalyticsChannel: String, AnalyticsToken {
-    case direct, testflight, debug
+    case direct, debug
 
     static var current: AnalyticsChannel {
         #if DEBUG
         .debug
-        #elseif TESTFLIGHT
-        .testflight
         #else
         .direct
         #endif

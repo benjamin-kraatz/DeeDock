@@ -65,11 +65,9 @@ struct DeeDockApp: App {
             Divider()
             OpenDockSettingsButton()
                 .keyboardShortcut(",")
-            #if DIRECT_DISTRIBUTION
             CheckForUpdatesButton(updater: delegate.updater)
             #if DEBUG
             UpdateDebugMenu(updater: delegate.updater)
-            #endif
             #endif
             #if DEBUG
             AnalyticsDebugMenu(analytics: delegate.analytics)
@@ -80,9 +78,7 @@ struct DeeDockApp: App {
                 .keyboardShortcut("q")
         } label: {
             MenuBarExtraLabel(controller: delegate.menuBarIcon)
-            #if DIRECT_DISTRIBUTION
                 .environment(\.appUpdater, delegate.updater)
-            #endif
         }
         .commands {
             CommandGroup(replacing: .appSettings) {
@@ -90,9 +86,7 @@ struct DeeDockApp: App {
             }
             CommandGroup(after: .appInfo) {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
-                #if DIRECT_DISTRIBUTION
                 CheckForUpdatesButton(updater: delegate.updater)
-                #endif
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
                 Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
 
@@ -113,9 +107,7 @@ struct DeeDockApp: App {
                              screenCapture: delegate.screenCapture,
                              coordinator: delegate.coordinator)
             .background { SettingsWindowRegistration() }
-            #if DIRECT_DISTRIBUTION
             .environment(\.appUpdater, delegate.updater)
-            #endif
         }
         .windowToolbarStyle(.unified)
         .defaultLaunchBehavior(.suppressed)
@@ -134,24 +126,18 @@ struct DeeDockApp: App {
 /// Isolated so Observation tracks the controller when the extra's label refreshes.
 private struct MenuBarExtraLabel: View {
     let controller: MenuBarIconController
-    #if DIRECT_DISTRIBUTION
     @Environment(\.appUpdater) private var updater
-    #endif
 
     var body: some View {
         Image(nsImage: DDockMenuBarMark.image(for: controller.style))
             .overlay(alignment: .topTrailing) {
-                #if DIRECT_DISTRIBUTION
                 if updater?.awareness.showsMenuBadge == true {
                     UpdateAwarenessBadge(diameter: 7)
                         .offset(x: 1, y: -1)
                 }
-                #endif
             }
             .accessibilityLabel(Text(.appName))
-            #if DIRECT_DISTRIBUTION
             .accessibilityValue(updater?.awareness.showsIndicators == true ? Text(.updatesAwarenessBadge)
                 : updater?.awareness.installedFromVersion != nil ? Text(.updatesInstalledBadge) : Text(""))
-            #endif
     }
 }

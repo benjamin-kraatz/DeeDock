@@ -5,9 +5,7 @@ import SwiftUI
 struct GeneralPageContent: View {
     let page: SettingsPage
     let context: SettingsContext
-    #if DIRECT_DISTRIBUTION
     @Environment(\.appUpdater) private var updater
-    #endif
 
     var body: some View {
         switch page {
@@ -31,10 +29,9 @@ struct GeneralPageContent: View {
         }
     }
 
-    /// Version and updates share one page. Only a directly distributed build updates itself, so
-    /// elsewhere the page is just the version and acknowledgements.
+    /// Version and updates share one page. Previews have no updater, so there the page is just
+    /// the version and acknowledgements.
     @ViewBuilder private var about: some View {
-        #if DIRECT_DISTRIBUTION
         if let updater {
             UpdateSettingsCard(currentVersion: AppVersionInfo.current.settingsValue,
                                automaticallyChecks: updater.automaticallyChecksForUpdates,
@@ -50,9 +47,6 @@ struct GeneralPageContent: View {
         } else {
             AppAboutCard(version: AppVersionInfo.current.settingsValue)
         }
-        #else
-        AppAboutCard(version: AppVersionInfo.current.settingsValue)
-        #endif
         AppAcknowledgementsCard()
     }
 }

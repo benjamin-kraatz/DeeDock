@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import SwiftUI
 
 /// The one surface for DOKK updates: a compact callout and the full update panel.
@@ -244,4 +243,3 @@ private struct UpdateIslandPreviewStage: View {
         .environment(\.locale, Locale(identifier: "de"))
         .preferredColorScheme(.dark)
 }
-#endif

@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import AppKit
 import SwiftUI
 
@@ -234,4 +233,3 @@ enum UpdateComicPreviewData {
 
     static var missingArt: UpdateComic { sample }
 }
-#endif

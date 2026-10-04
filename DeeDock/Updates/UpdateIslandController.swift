@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import AppKit
 import SwiftUI
 
@@ -249,4 +248,3 @@ private final class UpdateIslandPanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 }
-#endif

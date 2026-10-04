@@ -40,7 +40,6 @@ final class DockCoordinator {
         profiles.modes.canEdit && !dragging.isDragging && !filePicker.isActive
             && !panels.values.contains(where: \.isMenuTracking)
     }
-    #if DIRECT_DISTRIBUTION
     /// Shared with the updater so every dock can draw the waiting-update pip.
     var updateAwareness: UpdateAwarenessStore? {
         didSet { refreshPanels(); trackUpdateTile() }
@@ -88,7 +87,6 @@ final class DockCoordinator {
         dragging.isDragging || focusPopover.isOpen || filePicker.isActive || popovers.isOpen
             || panels.values.contains(where: \.isMenuTracking) || windowPeeks.isOpen
     }
-    #endif
     @ObservationIgnored private let dragging = DockDragCoordinator()
     @ObservationIgnored private let popovers = DockPopoverPresenter()
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
@@ -717,12 +715,10 @@ final class DockCoordinator {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
             panel.interaction.sims = sims
-            #if DIRECT_DISTRIBUTION
             panel.interaction.updateAwareness = updateAwareness
             panel.store.configureUpdateTile(updateAwareness?.dockItem)
             panel.store.openUpdate = { [weak self] in self?.openUpdateTile?($0) }
             panel.interaction.openUpdate = { [weak self] in self?.openUpdateTile?($0) }
-            #endif
             panel.store.visibleApplicationIDs = satelliteMode && !display.isPrimary
                 ? occupancy.applications?[display.runtimeID] : nil
             panel.store.refresh()
@@ -1047,8 +1043,6 @@ final class DockCoordinator {
         volumeDock.stop()
         volumes.stop()
         trash.stop()
-        #if DIRECT_DISTRIBUTION
         updateAwareness = nil
-        #endif
     }
 }

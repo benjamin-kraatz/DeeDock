@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import SwiftUI
 
 /// The island's title and message. The copy dissolves through blur when the callout kind
@@ -143,4 +142,3 @@ struct UpdateIslandActions: View {
         }
     }
 }
-#endif

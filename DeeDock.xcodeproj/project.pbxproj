@@ -10,7 +10,6 @@
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = DEE400000000000000000002 /* Sparkle-LICENSE.txt */; };
 		E1A000000000000000000001 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = E1A000000000000000000004 /* PostHog */; };
-		E1A000000000000000000002 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = E1A000000000000000000005 /* PostHog */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,7 +26,6 @@
 		000000000000000000000120 /* DOKK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DOKK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
-		525BD98535225C6EE024849D /* DOKK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DOKK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD0000000000000000000003 /* DeeDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DeeDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEE400000000000000000002 /* Sparkle-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Sparkle-LICENSE.txt"; path = "ThirdParty/Sparkle-LICENSE.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -51,12 +49,6 @@
 			files = (
 				2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */,
 				E1A000000000000000000001 /* PostHog in Frameworks */,
-			);
-		};
-		14FA4413957E93FAAFDD77B6 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-				E1A000000000000000000002 /* PostHog in Frameworks */,
 			);
 		};
 		DD0000000000000000000005 /* Frameworks */ = {
@@ -84,7 +76,6 @@
 			children = (
 				000000000000000000000120 /* DOKK.app */,
 				DD0000000000000000000003 /* DeeDockTests.xctest */,
-				525BD98535225C6EE024849D /* DOKK.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -122,29 +113,6 @@
 			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* DOKK.app */;
-			productType = "com.apple.product-type.application";
-		};
-		7C2885433F43592EF492D80F /* DeeDock-TestFlight */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A699A85E4BEDB630913E6016 /* Build configuration list for PBXNativeTarget "DeeDock-TestFlight" */;
-			buildPhases = (
-				09C4672B70E9497ED199B2DF /* Sources */,
-				14FA4413957E93FAAFDD77B6 /* Frameworks */,
-				E1A000000000000000000008 /* Stage PostHog resource bundles */,
-				0DAD087831ADC2A21667D035 /* Resources */,
-				B7A1C0FFEE0000000000C001 /* Stamp git commit */,
-			);
-			buildRules = (
-			);
-			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* DeeDock */,
-			);
-			name = "DeeDock-TestFlight";
-			packageProductDependencies = (
-				E1A000000000000000000005 /* PostHog */,
-			);
-			productName = "DeeDock-TestFlight";
-			productReference = 525BD98535225C6EE024849D /* DOKK.app */;
 			productType = "com.apple.product-type.application";
 		};
 		DD0000000000000000000006 /* DeeDockTests */ = {
@@ -204,7 +172,6 @@
 			targets = (
 				000000000000000100000000 /* DeeDock */,
 				DD0000000000000000000006 /* DeeDockTests */,
-				7C2885433F43592EF492D80F /* DeeDock-TestFlight */,
 			);
 		};
 /* End PBXProject section */
@@ -214,11 +181,6 @@
 			isa = PBXResourcesBuildPhase;
 			files = (
 				DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */,
-			);
-		};
-		0DAD087831ADC2A21667D035 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
 			);
 		};
 		DD8000000000000000000002 /* Resources */ = {
@@ -258,32 +220,10 @@
 				"/bin/sh \"${SRCROOT}/scripts/stamp-git-commit.sh\"",
 			);
 		};
-		E1A000000000000000000008 /* Stage PostHog resource bundles */ = {
-			isa = PBXShellScriptBuildPhase;
-			inputPaths = (
-				"$(TARGET_BUILD_DIR)/../PostHog_PostHog.bundle",
-				"$(TARGET_BUILD_DIR)/../PostHog_PHPLCrashReporter.bundle",
-			);
-			name = "Stage PostHog resource bundles";
-			outputPaths = (
-				"$(TARGET_BUILD_DIR)/PostHog_PostHog.bundle",
-				"$(TARGET_BUILD_DIR)/PostHog_PHPLCrashReporter.bundle",
-			);
-			shellPath = /bin/sh;
-			shellScript = (
-				"/usr/bin/ditto \"${TARGET_BUILD_DIR}/../PostHog_PostHog.bundle\" \"${TARGET_BUILD_DIR}/PostHog_PostHog.bundle\"",
-				"/usr/bin/ditto \"${TARGET_BUILD_DIR}/../PostHog_PHPLCrashReporter.bundle\" \"${TARGET_BUILD_DIR}/PostHog_PHPLCrashReporter.bundle\"",
-			);
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		000000000000000120000000 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
-		09C4672B70E9497ED199B2DF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
@@ -487,7 +427,6 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -541,7 +480,6 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -549,110 +487,6 @@
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
-		};
-		9E514861E6355270C243C974 /* Release configuration for PBXNativeTarget "DeeDock-TestFlight" */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
-			buildSettings = {
-				AUTOMATION_APPLE_EVENTS = NO;
-				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/TestFlight";
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Configuration/TestFlight-Info.plist";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				REGISTER_APP_GROUPS = YES;
-				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
-				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
-				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
-				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = macosx;
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TESTFLIGHT";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		A418A470147009CA5A39EDDB /* Debug configuration for PBXNativeTarget "DeeDock-TestFlight" */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
-			buildSettings = {
-				AUTOMATION_APPLE_EVENTS = NO;
-				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/TestFlight";
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Configuration/TestFlight-Info.plist";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				REGISTER_APP_GROUPS = YES;
-				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
-				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
-				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
-				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = macosx;
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TESTFLIGHT";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
 		};
 		DD0000000000000000000009 /* Debug configuration for PBXNativeTarget "DeeDockTests" */ = {
 			isa = XCBuildConfiguration;
@@ -820,59 +654,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION DDOCK_CANVAS_HOST";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Preview;
-		};
-		DDCA00000000000000000002 /* Preview configuration for PBXNativeTarget "DeeDock-TestFlight" */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EE3B5E31B6358B0F2F32162 /* App.xcconfig */;
-			buildSettings = {
-				AUTOMATION_APPLE_EVENTS = NO;
-				CODE_SIGN_ENTITLEMENTS = DeeDock/DeeDock.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/TestFlight";
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Configuration/TestFlight-Info.plist";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				REGISTER_APP_GROUPS = YES;
-				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
-				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
-				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
-				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = macosx;
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TESTFLIGHT";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DDOCK_CANVAS_HOST";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -926,15 +708,6 @@
 			);
 			defaultConfigurationName = Release;
 		};
-		A699A85E4BEDB630913E6016 /* Build configuration list for PBXNativeTarget "DeeDock-TestFlight" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9E514861E6355270C243C974 /* Release configuration for PBXNativeTarget "DeeDock-TestFlight" */,
-				A418A470147009CA5A39EDDB /* Debug configuration for PBXNativeTarget "DeeDock-TestFlight" */,
-				DDCA00000000000000000002 /* Preview configuration for PBXNativeTarget "DeeDock-TestFlight" */,
-			);
-			defaultConfigurationName = Release;
-		};
 		DD0000000000000000000007 /* Build configuration list for PBXNativeTarget "DeeDockTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -972,11 +745,6 @@
 			productName = Sparkle;
 		};
 		E1A000000000000000000004 /* PostHog */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E1A000000000000000000003 /* XCRemoteSwiftPackageReference "posthog-ios" */;
-			productName = PostHog;
-		};
-		E1A000000000000000000005 /* PostHog */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E1A000000000000000000003 /* XCRemoteSwiftPackageReference "posthog-ios" */;
 			productName = PostHog;
