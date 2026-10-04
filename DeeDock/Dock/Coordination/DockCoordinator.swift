@@ -379,6 +379,7 @@ final class DockCoordinator {
             reconcile(profiles.displays, resetVisibility: false)
         }
         settings.settingsDidChange = { [weak self] in
+            self?.configureVolumeReads()
             self?.scheduleShelfSemanticWarmup()
             self?.refreshPanels()
         }
@@ -391,6 +392,7 @@ final class DockCoordinator {
         trash.start()
         shelf.start()
         volumeDock.start()
+        configureVolumeReads()
         volumes.start()
         capsules.start()
         searchShortcutAvailable = searchShortcut.start { [weak self] in self?.searchWindows() }
@@ -701,6 +703,14 @@ final class DockCoordinator {
             }
         }
         refreshPanels(resetVisibility: resetVisibility)
+    }
+
+    /// Reads network shares only while the share switch is on. Volume settings are app-wide, so
+    /// the shared settings decide for every display. The Drives master switch is left out on
+    /// purpose: Manage Drives still lists shares while it is off, and needs them to show as
+    /// connected.
+    private func configureVolumeReads() {
+        volumes.configure(readsShares: settings.value.showNetworkVolumes)
     }
 
     private func refreshPanels(resetVisibility: Bool = false) {

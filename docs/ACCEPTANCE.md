@@ -80,7 +80,9 @@ The list follows NSWorkspace mount, unmount, and rename notifications. Nothing p
   time, outside the Swift concurrency thread pool. A slow or unresponsive server delays only its
   own tile. Until its read returns, a share already in the dock keeps its last tile; a new share
   appears once its read finishes. The backup-destination check only runs on volumes that can
-  appear at all. Shares are read even when the share switch is off.
+  appear at all. While the share switch is off, shares are not read at all. Turning it on reads
+  the mounted shares at once; turning it off removes their tiles. The Drives switch does not
+  stop share reads, because Manage Drives still lists shares as connected while it is off.
 
 While an eject runs, the card stays open until it succeeds or fails; outside clicks and Escape
 do not close it, and hovering the dimmed tile again shows the eject in progress.
@@ -113,6 +115,8 @@ previews, app launch, and hands-on interaction were not run.
 - Mount an SMB share, then disconnect the server from the network (or block it with a
   firewall) so the share stops responding. Plug in a USB stick: its tile must appear at once,
   and the share's tile must stay.
+- With the share switch off and an unresponsive share mounted, mount and unmount a stick and
+  confirm DOKK never stalls. Turn the switch on: a responsive share appears without a remount.
 - Click a volume: the stack opens on its tile; click again to close. Switch grid and list,
   eject and reinsert, and confirm the choice persists.
 - Hover: confirm the delay, the capacity bar, the status line, and that moving from the tile
