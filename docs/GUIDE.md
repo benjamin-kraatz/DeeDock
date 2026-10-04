@@ -299,7 +299,7 @@ Enable **Settings → Features → App badges → Show app badges**, then allow 
 
 DOKK mirrors badge text exposed by application items in the system Dock, matched by application URL. Apps absent from the system Dock and custom-drawn badges may not provide readable text. AX changes trigger a refresh where supported; a fallback five seconds after each completed scan covers missing notifications and permission changes. Long labels are visually truncated, with their full text available to VoiceOver.
 
-AX reads run outside the main actor and do not depend on pointer movement or animation frames. Disabling badges, disabling all docks, sleep, and shutdown clear badge state and stop the reader. Permission loss clears badges on the next refresh. Compilation is verified; live badge coverage and performance still need native acceptance. See [the acceptance record](ACCEPTANCE.md#app-badges-dee-10).
+AX reads run outside the main actor and do not depend on pointer movement or animation frames. Disabling badges, disabling all docks, sleep, and shutdown clear badge state and stop the reader. Permission loss clears badges on the next refresh. A failed scan, such as an Accessibility timeout, keeps the last badges until a later scan succeeds. Compilation is verified; live badge coverage and performance still need native acceptance. See [the acceptance record](ACCEPTANCE.md#app-badges-dee-10).
 
 ### Badge memory
 

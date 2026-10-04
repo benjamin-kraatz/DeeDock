@@ -79,9 +79,14 @@ final class DockBadgeController {
                 let scanStarted = Date()
                 let next = await reader.read(pid: pid)
                 guard !Task.isCancelled, let self, generation == session else { break }
-                memory.observe(next, session: focusSession?(), scanStarted: scanStarted)
-                let nextLabels = next.compactMapValues(\.label)
-                if labels != nextLabels { labels = nextLabels }
+                // Badge memory records a failed scan as a coverage gap.
+                memory.observe(next ?? [:], session: focusSession?(), scanStarted: scanStarted)
+                // One AX timeout must not blank every dot until the fallback scan. Keep the last
+                // good labels; a successful scan that finds no badges still clears them.
+                if let next {
+                    let nextLabels = next.compactMapValues(\.label)
+                    if labels != nextLabels { labels = nextLabels }
+                }
                 scheduleFallback()
             }
             await reader.stop()
