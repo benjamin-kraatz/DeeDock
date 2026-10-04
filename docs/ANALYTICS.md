@@ -95,6 +95,12 @@ configuration sends only while the debug-menu switch is on.
 `xcodebuild` takes the two settings from its environment when no `Local.xcconfig` defines them.
 `.env.example` lists the names. A value in `Local.xcconfig` wins over the environment.
 
+The Release workflow passes both settings to `xcodebuild archive` as arguments. The token comes
+from the `POSTHOG_PROJECT_TOKEN` repository secret. The host comes from the `POSTHOG_HOST`
+repository variable and falls back to `https://eu.i.posthog.com`. The archive step fails when
+the built `Info.plist` lacks a `phc_` token or an `https` host, so a release can no longer ship
+with analytics silently off.
+
 ## What the SDK sends by itself
 
 DOKK does not modify SDK payloads and installs no sanitizer. IP handling and GDPR processing
