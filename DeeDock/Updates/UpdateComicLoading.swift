@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 
 /// HTTPS and local-file rules for What’s New comic markdown and panel PNGs.
@@ -182,4 +181,3 @@ nonisolated private final class UpdateComicRedirectGate: NSObject, URLSessionTas
         completionHandler(request)
     }
 }
-#endif

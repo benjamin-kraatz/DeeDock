@@ -4,9 +4,7 @@ import SwiftUI
 struct SettingsSectionRow: View {
     let section: SettingsSection
     let isSelected: Bool
-    #if DIRECT_DISTRIBUTION
     @Environment(\.appUpdater) private var updater
-    #endif
 
     var body: some View {
         Label {
@@ -14,12 +12,10 @@ struct SettingsSectionRow: View {
         } icon: {
             SettingsIconTile(glyph: section.glyph, colors: section.tileColors, size: 20)
                 .overlay(alignment: .topTrailing) {
-                    #if DIRECT_DISTRIBUTION
                     if section == .general, updater?.awareness.showsIndicators == true {
                         UpdateAwarenessBadge(diameter: 7)
                             .offset(x: 2, y: -2)
                     }
-                    #endif
                 }
         }
     }

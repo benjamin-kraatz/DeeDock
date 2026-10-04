@@ -1,4 +1,4 @@
-#if DIRECT_DISTRIBUTION && DEBUG
+#if DEBUG
 import SwiftUI
 
 /// Debug-only menu that mimics update states without Sparkle, a download, or a relaunch.

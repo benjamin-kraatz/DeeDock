@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 import Observation
 
@@ -173,4 +172,3 @@ final class UpdatePresentation {
         }
     }
 }
-#endif

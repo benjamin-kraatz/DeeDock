@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import SwiftUI
 
 /// Everything the update panel shows under its header: offer flags, progress, the What’s
@@ -247,4 +246,3 @@ struct UpdateIdleInstallSwitch: View {
     ]
     return UpdatePanelDetails(presentation: model).padding().frame(width: 532)
 }
-#endif

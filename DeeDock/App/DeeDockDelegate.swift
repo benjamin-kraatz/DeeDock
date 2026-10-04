@@ -6,9 +6,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let windowAccess = WindowAccessController(service: SystemWindowAccessService())
     let screenCapture = ScreenCaptureAccessController(service: SystemScreenCaptureAccessService())
     private(set) lazy var coordinator = DockCoordinator(windowAccess: windowAccess, screenCapture: screenCapture)
-    #if DIRECT_DISTRIBUTION
     let updater = AppUpdater()
-    #endif
     let loginItems = LoginItemController(service: SystemLoginItemService())
     let menuBarIcon = MenuBarIconController()
     private(set) lazy var onboarding = OnboardingWindowController(
@@ -29,7 +27,6 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         windowAccess.refresh()
         screenCapture.refresh()
         coordinator.start()
-        #if DIRECT_DISTRIBUTION
         updater.start()
         coordinator.updateAwareness = updater.awareness
         coordinator.openUpdateTile = { [weak updater] item in
@@ -40,7 +37,6 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
             isIdleBusy: { [weak coordinator] in coordinator?.updateIdleGate ?? UpdateIdleGate() },
             targetScreen: { [weak coordinator] in coordinator?.primaryEnabledScreen }
         )
-        #endif
         // After the docks exist, so a first-time reader sees the real thing behind the tour
         // rather than an empty desktop and a description of one.
         onboarding.presentIfNeeded()
@@ -57,9 +53,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         guard !isRunningForCanvasPreview else { return }
-        #if DIRECT_DISTRIBUTION
         updater.stop()
-        #endif
         AppDockPresence.shared.stop()
         onboarding.stop()
         loginItems.stop()

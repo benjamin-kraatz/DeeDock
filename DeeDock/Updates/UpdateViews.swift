@@ -1,8 +1,7 @@
-#if DIRECT_DISTRIBUTION
 import SwiftUI
 
 extension EnvironmentValues {
-    /// Only the direct app composition supplies an updater. Previews default to no service.
+    /// Only the app composition supplies an updater. Previews default to no service.
     @Entry var appUpdater: AppUpdater? = nil
 }
 
@@ -87,4 +86,3 @@ struct UpdateSettingsCard: View {
         .environment(\.locale, Locale(identifier: "de"))
         .padding().frame(width: 640)
 }
-#endif

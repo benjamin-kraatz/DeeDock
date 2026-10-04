@@ -79,7 +79,6 @@ struct DockAppButton: View {
                             .allowsHitTesting(false)
                             .accessibilityHidden(true)
                     }
-                    #if DIRECT_DISTRIBUTION
                     if AppDockPresence.representsCurrentApplication(item.reference),
                        let awareness = interaction?.updateAwareness, awareness.showsDockPip {
                         UpdateAwarenessPip(reduceMotion: reduceMotion, installed: !awareness.showsIndicators)
@@ -87,7 +86,6 @@ struct DockAppButton: View {
                             .padding(2)
                             .allowsHitTesting(false)
                     }
-                    #endif
                 }
                 .contentShape(.rect)
         }

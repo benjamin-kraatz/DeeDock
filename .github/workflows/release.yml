@@ -31,7 +31,7 @@
 # DEVELOPER_ID_APPLICATION_CERTIFICATE,
 # DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD, and SPARKLE_PRIVATE_ED_KEY.
 # Notarization uses Apple ID plus app-specific password plus team ID.
-# Do not add App Store Connect API keys. TestFlight stays on Xcode Cloud.
+# Do not add App Store Connect API keys. DOKK ships only as a direct download.
 #
 # Secret format assumptions (names only; never log values):
 #   DEVELOPER_ID_APPLICATION_CERTIFICATE is a base64-encoded PKCS#12 (.p12)

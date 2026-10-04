@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import SwiftUI
 
 /// Soft indigo-to-coral mark used by the menu-bar badge, Settings badge, update tile, and the pip on DOKK's own tile.
@@ -53,4 +52,3 @@ struct UpdateAwarenessPip: View {
     }
     .padding(24)
 }
-#endif

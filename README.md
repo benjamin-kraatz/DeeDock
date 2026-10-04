@@ -58,10 +58,10 @@ Current configuration:
 | Swift language mode | Swift 5 (`SWIFT_VERSION = 5.0`) |
 | Default actor isolation | MainActor |
 | Approachable concurrency | Enabled |
-| App Sandbox | Disabled in the current targets |
+| App Sandbox | Disabled; DOKK ships only as a direct download |
 | External package dependencies | Sparkle 2.9.6 for direct distribution |
 
-Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For direct updates and the separate TestFlight build, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DOKK requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DOKK does not change the system Dock’s preferences.
+Use Xcode 27 and macOS 27. The app retains Swift 5 language mode and the existing signing configuration. For updates and releases, see [release instructions](docs/UPDATES.md). Broader OS support remains outside this slice. DOKK requests Accessibility or Screen Recording access only after an explicit Enable or Allow action; it never asks at startup. DOKK does not change the system Dock’s preferences.
 
 ## Working in this repository
 
@@ -579,7 +579,7 @@ Running timers use a saved wall-clock deadline, so sleep and app downtime count.
 
 ## App updates
 
-Direct builds use Sparkle’s update engine with a DOKK-owned native update window. Consent, release notes, download progress, errors, and installation choices use DOKK’s UI. Choose **Check for Updates…** from the DOKK menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DOKK quits. macOS may still show an administrator authorization dialog. TestFlight builds omit the updater. Esi owns the Release workflow and dispatches it herself. `watch` is a Linux dry-run. `ship` archives on `xcode-27` and opens a draft on Linux; Latest stays off until `publish_latest` is set. See [release instructions](docs/UPDATES.md) for signing, publishing, the required archive scheme, and the secrets checklist.
+DOKK uses Sparkle’s update engine with a DOKK-owned native update window. Consent, release notes, download progress, errors, and installation choices use DOKK’s UI. Choose **Check for Updates…** from the DOKK menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DOKK quits. macOS may still show an administrator authorization dialog. Esi owns the Release workflow and dispatches it herself. `watch` is a Linux dry-run. `ship` archives on `xcode-27` and opens a draft on Linux; Latest stays off until `publish_latest` is set. See [release instructions](docs/UPDATES.md) for signing, publishing, the required archive scheme, and the secrets checklist.
 
 ## App badges
 

@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 
 /// HTML structure becomes native blocks directly. Markup is never round-tripped through Markdown.
@@ -86,4 +85,3 @@ nonisolated enum HTMLReleaseNotesParser {
         return text
     }
 }
-#endif

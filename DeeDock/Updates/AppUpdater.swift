@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import AppKit
 import Combine
 import Observation
@@ -162,4 +161,3 @@ final class AppUpdater {
         observations.removeAll()
     }
 }
-#endif

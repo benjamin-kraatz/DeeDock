@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import AppKit
 import Sparkle
 
@@ -394,4 +393,3 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         perform(action, token: presentation.actionToken)
     }
 }
-#endif
