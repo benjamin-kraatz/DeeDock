@@ -16,6 +16,8 @@ struct OnboardingView: View {
     var settingsSelected: () -> Void = {}
     /// Ends the tour, which the owning window controller turns into a close.
     var finish: () -> Void = {}
+    /// Runs when the usage-data page comes on screen. The owner records the notice then.
+    var analyticsNoticeShown: () -> Void = {}
     /// Previews pass explicit values; the tour otherwise follows the system settings. Both are
     /// threaded into the stages, which cannot read a preview's environment override themselves.
     var reduceMotionOverride: Bool? = nil
@@ -84,6 +86,9 @@ struct OnboardingView: View {
         switch step {
         case .welcome:
             standard(step) { OnboardingWelcomeStage(reduceMotionOverride: reduceMotionOverride) }
+        case .analytics:
+            standard(step) { OnboardingAnalyticsStage(reduceMotionOverride: reduceMotionOverride) }
+                .onAppear(perform: analyticsNoticeShown)
         case .systemDock:
             VStack(alignment: .leading, spacing: 18) {
                 stage(step) {
@@ -194,6 +199,7 @@ enum OnboardingPreview {
 }
 
 #Preview("Tour — welcome") { OnboardingPreview.view(step: .welcome) }
+#Preview("Tour — usage data") { OnboardingPreview.view(step: .analytics) }
 #Preview("Tour — hide the macOS Dock") { OnboardingPreview.view(step: .systemDock) }
 #Preview("Tour — placement, dark") { OnboardingPreview.view(step: .placement).preferredColorScheme(.dark) }
 #Preview("Tour — appearance") { OnboardingPreview.view(step: .appearance) }

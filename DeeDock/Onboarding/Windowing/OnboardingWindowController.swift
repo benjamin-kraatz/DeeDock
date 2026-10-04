@@ -60,6 +60,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     /// Closing the window — by the final button, the close button, or Escape — is the same
     /// decision, and none of them should leave the tour queued for the next launch.
     func windowWillClose(_ notification: Notification) {
+        reportFinished(completed: false)
         store.complete()
         window = nil
         systemDock.stop()
@@ -87,13 +88,22 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
                                    self?.finish()
                                }
                            },
-                           finish: { [weak self] in self?.finish() })
+                           finish: { [weak self] in self?.finish() },
+                           analyticsNoticeShown: { Analytics.shared.noticeShown() })
                 .frame(width: OnboardingWindowMetrics.size.width, height: OnboardingWindowMetrics.size.height))
         return window
     }
 
     private func finish() {
+        reportFinished(completed: true)
         store.complete()
         stop()
+    }
+
+    /// One `onboarding_finished` per presentation, whichever way the window closes.
+    private func reportFinished(completed: Bool) {
+        guard window != nil else { return }
+        Analytics.track(.onboardingFinished(lastStep: store.step, completed: completed,
+                                            systemDockHidden: !systemDock.reservesSpace))
     }
 }

@@ -99,7 +99,7 @@ enum SettingsSection: Hashable, Identifiable {
     var pageGroups: [[SettingsPage]] {
         switch self {
         case .general:
-            [[.about], [.menuBar, .startup]]
+            [[.about], [.menuBar, .startup], [.privacy]]
         case .dock, .display:
             SettingsPage.dockGroups
         case .extras:

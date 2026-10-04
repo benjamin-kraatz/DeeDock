@@ -8,6 +8,8 @@ import Foundation
 enum OnboardingStep: String, CaseIterable, Identifiable, Hashable {
     /// What DDock is and where it lives.
     case welcome
+    /// What anonymous usage data covers. Informational; nothing is sent before it is shown.
+    case analytics
     /// Guidance for hiding the macOS Dock, the one step a person can reasonably skip.
     case systemDock
     /// Edge, alignment, offset, and distance.
@@ -26,6 +28,7 @@ enum OnboardingStep: String, CaseIterable, Identifiable, Hashable {
     var title: LocalizedStringResource {
         switch self {
         case .welcome: .onboardingWelcomeTitle
+        case .analytics: .onboardingAnalyticsTitle
         case .systemDock: .onboardingSystemDockTitle
         case .placement: .onboardingPlacementTitle
         case .appearance: .onboardingAppearanceTitle
@@ -39,6 +42,7 @@ enum OnboardingStep: String, CaseIterable, Identifiable, Hashable {
     var summary: LocalizedStringResource {
         switch self {
         case .welcome: .onboardingWelcomeSummary
+        case .analytics: .onboardingAnalyticsSummary
         case .systemDock: .onboardingSystemDockSummary
         case .placement: .onboardingPlacementSummary
         case .appearance: .onboardingAppearanceSummary
