@@ -6,6 +6,10 @@ PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock
 INFOPLIST_KEY_CFBundleName = DOKK
 INFOPLIST_KEY_CFBundleDisplayName = DOKK
 
+// Injected by the build environment. AnalyticsCredentials reads these generated Info.plist keys.
+INFOPLIST_KEY_DOKKAnalyticsAPIKey = $(POSTHOG_PROJECT_TOKEN)
+INFOPLIST_KEY_DOKKAnalyticsHost = $(POSTHOG_HOST)
+
 // Development builds get their own identity so macOS privacy grants
 // (Accessibility, Screen Recording, Automation) for the Apple Development
 // signed build never replace the Developer ID signed release's grants.
@@ -20,3 +24,8 @@ ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
 
 // Keep the saved previous icon as source material, outside app resources.
 EXCLUDED_SOURCE_FILE_NAMES = $(inherited) AppIcon-old.icon
+
+// Per-developer values that stay out of git, such as the PostHog token. The file is optional:
+// without it POSTHOG_PROJECT_TOKEN is empty and analytics are a no-op. Copy
+// Local.xcconfig.example to Local.xcconfig to create it.
+#include? "Local.xcconfig"

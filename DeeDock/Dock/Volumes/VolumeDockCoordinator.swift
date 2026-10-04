@@ -91,6 +91,7 @@ final class VolumeDockCoordinator {
     private func openStack(_ volume: VolumeDockItem, on panel: DockPanelController, keyboard: Bool) {
         guard !volume.isEjecting else { return }
         cards.dismiss()
+        Analytics.track(.drive(.stackOpened, kind: volume.kind, trigger: Analytics.trigger(keyboard: keyboard)))
         folderStacks.show(volume.stackItem(displayID: panel.store.displayID), on: panel, keyboard: keyboard,
                           anchoredTo: .volume(volume.volumeID), volumeRoot: true)
     }
@@ -122,6 +123,7 @@ final class VolumeDockCoordinator {
 
     private func openInFinder(_ volume: VolumeDockItem) {
         cards.dismiss()
+        Analytics.track(.drive(.openedInFinder, kind: volume.kind, trigger: Analytics.trigger()))
         NSWorkspace.shared.open(volume.url)
     }
 
@@ -169,10 +171,20 @@ final class VolumeDockCoordinator {
             state.quitting = []
             state.phase = .ejecting
         }
+        let trigger = Analytics.trigger(keyboard: keyboard)
         ejectTasks[volumeID] = Task { [weak self, weak panel] in
             guard let self else { return }
             let result = await volumes.eject(volumeID, force: force)
             ejectTasks[volumeID] = nil
+            switch result {
+            case .ejected:
+                Analytics.track(.driveEjected(volume.kind, outcome: .ejected, forced: force, blockerCount: 0, trigger: trigger))
+            case .blocked(let blockers):
+                Analytics.track(.driveEjected(volume.kind, outcome: .blocked, forced: force, blockerCount: blockers.count,
+                                              trigger: trigger))
+            case .failed:
+                Analytics.track(.driveEjected(volume.kind, outcome: .failed, forced: force, blockerCount: 0, trigger: trigger))
+            }
             guard !Task.isCancelled, let panel else { return }
             switch result {
             case .ejected:

@@ -84,6 +84,9 @@ actor FoundationModelsRumourComposer {
         let history = String(decoding: try encoder.encode(Array(recent.suffix(3))), as: UTF8.self)
         let expectedTurns = intensity.turnCount(available: participants.count)
         let contract = "\(intensity.instructions) Return exactly \(expectedTurns) turns using exactly \(intensity.participantCount(available: participants.count)) distinct candidates."
+        let trace = AIObservability.makeTrace()
+        let input = "Requested locale: \(locale.identifier)\nUntrusted candidates JSON: \(candidates)\nUntrusted recent exchanges JSON: \(history)\n\(contract)\nCreate one new gossip round."
+        let startedAt = Date()
         let response = try await session.respond(to: Prompt {
             "Requested locale: \(locale.identifier)"
             "Untrusted candidates JSON: \(candidates)"
@@ -92,12 +95,17 @@ actor FoundationModelsRumourComposer {
             "Create one new gossip round."
         }, generating: GeneratedDockRumour.self,
         options: GenerationOptions(maximumResponseTokens: 1200))
+        await AIObservability.capture(trace: trace, name: "dock_rumour_compose", input: input,
+                                      output: response.content.turns.map(\.message).joined(separator: "\n"),
+                                      startedAt: startedAt, maximumResponseTokens: 1200)
         try Task.checkCancellation()
         do {
             return try validated(response.content, participants: participants, intensity: intensity)
         } catch Failure.invalidOutput(let reason) {
             // Repair structural errors once. Natural phrasing never needs a length-only retry.
             logger.notice("Revising rumour after validation: \(reason, privacy: .public)")
+            let revisionInput = "Revise the previous exchange. Validation reported: \(reason).\n\(contract)\nKeep valid candidate numbers, the same language, and the same fictional scandal. Repair every validation issue.\nKeep the dialogue conversational and concise. Do not count characters or sacrifice the punchline.\nReturn complete spoken sentences. No line breaks or labels. Return the revised structured exchange."
+            let revisionStartedAt = Date()
             let revision = try await session.respond(to: Prompt {
                 "Revise the previous exchange. Validation reported: \(reason)."
                 contract
@@ -105,6 +113,9 @@ actor FoundationModelsRumourComposer {
                 "Keep the dialogue conversational and concise. Do not count characters or sacrifice the punchline."
                 "Return complete spoken sentences. No line breaks or labels. Return the revised structured exchange."
             }, generating: GeneratedDockRumour.self, options: GenerationOptions(maximumResponseTokens: 1200))
+            await AIObservability.capture(trace: trace, name: "dock_rumour_revise", input: revisionInput,
+                                          output: revision.content.turns.map(\.message).joined(separator: "\n"),
+                                          startedAt: revisionStartedAt, maximumResponseTokens: 1200)
             try Task.checkCancellation()
             return try validated(revision.content, participants: participants, intensity: intensity)
         }

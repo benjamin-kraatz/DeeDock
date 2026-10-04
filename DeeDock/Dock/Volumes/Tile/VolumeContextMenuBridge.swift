@@ -67,7 +67,7 @@ struct VolumeContextMenuBridge: NSViewRepresentable {
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
         @objc private func open() { if let item { interaction?.openVolume?(item) } }
         @objc private func reveal() { if let item { interaction?.revealVolume?(item) } }
-        @objc private func eject() { if let item { interaction?.ejectVolume?(item) } }
+        @objc private func eject() { if let item { Analytics.performing(.menu) { interaction?.ejectVolume?(item) } } }
         @objc private func hide() { if let item { interaction?.hideVolume?(item) } }
         @objc private func settings() { openSettings?() }
 

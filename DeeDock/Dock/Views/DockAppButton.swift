@@ -144,7 +144,7 @@ struct DockAppButton: View {
         .accessibilityHint(Text(.appOpenHint))
         .accessibilityAction(
             named: Text(item.isFavorite ? .actionUnpin : .actionPin),
-            togglePin
+            { Analytics.performing(.voiceOver, togglePin) }
         )
         .accessibilityActions {
             if interaction?.openBadgeMemory != nil {
@@ -181,13 +181,13 @@ struct DockAppButton: View {
             }
             if item.isFavorite {
                 Button {
-                    interaction?.movePin?(item.id, -1)
+                    Analytics.performing(.voiceOver) { interaction?.movePin?(item.id, -1) }
                 } label: {
                     Text(interaction?.layout.edge.isVertical == true ? .actionMoveUp : .actionMoveLeft)
                 }
                 .disabled(interaction?.canMovePin?(item.id, -1) != true)
                 Button {
-                    interaction?.movePin?(item.id, 1)
+                    Analytics.performing(.voiceOver) { interaction?.movePin?(item.id, 1) }
                 } label: {
                     Text(interaction?.layout.edge.isVertical == true ? .actionMoveDown : .actionMoveRight)
                 }
@@ -195,7 +195,7 @@ struct DockAppButton: View {
             }
             ForEach(interaction?.pinDestinations ?? []) { destination in
                 Button {
-                    interaction?.copyPin?(.application(item.reference), destination.id)
+                    Analytics.performing(.voiceOver) { interaction?.copyPin?(.application(item.reference), destination.id) }
                 } label: {
                     Text(.actionPinOnDisplayName(display: destination.name))
                 }

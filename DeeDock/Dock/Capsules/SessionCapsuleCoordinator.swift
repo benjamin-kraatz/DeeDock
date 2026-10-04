@@ -104,6 +104,8 @@ final class SessionCapsuleCoordinator {
             else if let sourceID { self?.keyboardDismissed?(sourceID) }
         }
         next.show()
+        Analytics.track(.capsule(.panelOpened, windowCount: nil, capsuleCount: capsules.capsules.count,
+                                 trigger: Analytics.trigger()))
     }
 
     /// The user explicitly chooses this from a finished focus session. Discovery and approval
@@ -239,6 +241,8 @@ final class SessionCapsuleCoordinator {
     private func save(_ draft: SessionCapsuleDraft, for state: SessionCapsulePanelState?) {
         do {
             try capsules.save(draft.capsule())
+            Analytics.track(.capsule(.saved, windowCount: draft.windows.count, capsuleCount: capsules.capsules.count,
+                                     trigger: Analytics.trigger()))
             state?.didSave(capsules.capsules)
         } catch {
             state?.error = String(localized: .capsulesSaveFailed(details: error.localizedDescription))
@@ -250,6 +254,8 @@ final class SessionCapsuleCoordinator {
         do {
             anchorTarget = .sessionCapsules
             try capsules.delete(id)
+            Analytics.track(.capsule(.deleted, windowCount: nil, capsuleCount: capsules.capsules.count,
+                                     trigger: Analytics.trigger()))
             state?.didDelete(capsules.capsules)
         } catch {
             state?.error = String(localized: .capsulesDeleteFailed(details: error.localizedDescription))
@@ -259,6 +265,8 @@ final class SessionCapsuleCoordinator {
     /// Reopens missing applications, then raises the first currently matchable saved window.
     /// Geometry is intentionally untouched: a capsule restores context, not a workspace layout.
     private func resume(_ capsule: SessionCapsule) {
+        Analytics.track(.capsule(.resumed, windowCount: capsule.windows.count, capsuleCount: capsules.capsules.count,
+                                 trigger: Analytics.trigger()))
         task?.cancel()
         task = Task { [weak self] in
             guard let self else { return }

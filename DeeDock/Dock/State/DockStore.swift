@@ -315,6 +315,7 @@ final class DockStore {
                 errorMessage = .shelfFull(limit: ShelfDocument.capacity)
                 return false
             }
+            Analytics.track(.shelf(.added, itemCount: access.urls.count, source: nil, trigger: Analytics.trigger()))
             return true
         } catch {
             errorMessage = .errorSaveShelf(details: error.localizedDescription)
@@ -327,7 +328,10 @@ final class DockStore {
             errorMessage = .shelfUnavailable
             return
         }
-        do { try shelf.remove(ids: ids) } catch { errorMessage = .errorSaveShelf(details: error.localizedDescription) }
+        do {
+            try shelf.remove(ids: ids)
+            Analytics.track(.shelf(.removed, itemCount: ids.count, source: nil, trigger: Analytics.trigger()))
+        } catch { errorMessage = .errorSaveShelf(details: error.localizedDescription) }
     }
 
     func clearShelf() {
@@ -335,7 +339,11 @@ final class DockStore {
             errorMessage = .shelfUnavailable
             return
         }
-        do { try shelf.clear() } catch { errorMessage = .errorSaveShelf(details: error.localizedDescription) }
+        let count = shelf.items.count
+        do {
+            try shelf.clear()
+            Analytics.track(.shelf(.cleared, itemCount: count, source: nil, trigger: Analytics.trigger()))
+        } catch { errorMessage = .errorSaveShelf(details: error.localizedDescription) }
     }
 
     func openTrash() {
@@ -344,7 +352,10 @@ final class DockStore {
             errorMessage = .trashUnavailable
             return
         }
+        let trigger = Analytics.trigger(keyboard: keyboardFocus)
         trash.open { [weak self] errorDescription in
+            Analytics.track(.trash(.opened, itemCount: nil, outcome: errorDescription == nil ? .succeeded : .failed,
+                                   trigger: trigger))
             guard let self, session.accepts(token), let errorDescription else { return }
             errorMessage = .trashAutomationActionFailed(details: errorDescription)
         }
@@ -356,7 +367,10 @@ final class DockStore {
             errorMessage = .trashUnavailable
             return
         }
+        let trigger = Analytics.trigger()
         trash.empty { [weak self] errorDescription in
+            Analytics.track(.trash(.emptied, itemCount: nil, outcome: errorDescription == nil ? .succeeded : .failed,
+                                   trigger: trigger))
             guard let self, session.accepts(token), let errorDescription else { return }
             errorMessage = .trashAutomationActionFailed(details: errorDescription)
         }
@@ -368,7 +382,9 @@ final class DockStore {
             errorMessage = .trashUnavailable
             return
         }
+        let count = access.urls.count
         trash.recycle(access) { [weak self] error in
+            Analytics.track(.trash(.dropped, itemCount: count, outcome: error == nil ? .succeeded : .failed, trigger: .drag))
             guard let self, session.accepts(token), let error else { return }
             errorMessage = .trashMoveFailed(details: error.localizedDescription)
         }
@@ -396,10 +412,27 @@ final class DockStore {
         do {
             try profiles.savePins(proposed, for: displayID)
             history?.recordPinChange(previous: previous, next: proposed, displayID: displayID)
+            reportPinChange(previous: previous, next: proposed)
             return true
         } catch {
             errorMessage = .errorSavePins(details: error.localizedDescription)
             return false
+        }
+    }
+
+    /// Reports what a saved pin edit did, by count and kind. Which app or folder is never sent.
+    private func reportPinChange(previous: [DockPin], next: [DockPin]) {
+        let before = Set(previous.map(\.id)), after = Set(next.map(\.id))
+        let source = AnalyticsPinSource(Analytics.shared.ambientTrigger)
+        func kind(_ pins: [DockPin]) -> AnalyticsPinKind {
+            let folders = pins.count { $0.folder != nil }
+            return folders == 0 ? .application : folders == pins.count ? .folder : .mixed
+        }
+        let added = next.filter { !before.contains($0.id) }, removed = previous.filter { !after.contains($0.id) }
+        if !added.isEmpty { Analytics.track(.pinChanged(.pin, kind: kind(added), count: added.count, source: source)) }
+        if !removed.isEmpty { Analytics.track(.pinChanged(.unpin, kind: kind(removed), count: removed.count, source: source)) }
+        if added.isEmpty, removed.isEmpty, previous.map(\.id) != next.map(\.id) {
+            Analytics.track(.pinChanged(.reorder, kind: kind(next), count: next.count, source: source))
         }
     }
 
@@ -484,6 +517,7 @@ final class DockStore {
         }
         if item.isFavorite { pinWeather?.recordUse(item.id) }
         soapBubblePlay?(item.id)
+        Analytics.count(.appActivated(Analytics.trigger()))
         let token = session.token
         let modeID = profiles.modes.activeMode.id
         let isPatchBaySource = item.isFavorite && !isPreviewingTimeline

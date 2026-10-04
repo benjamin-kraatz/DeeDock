@@ -69,6 +69,9 @@ struct DeeDockApp: App {
             #if DEBUG
             UpdateDebugMenu(updater: delegate.updater)
             #endif
+            #if DEBUG
+            AnalyticsDebugMenu(analytics: delegate.analytics)
+            #endif
             Button(.onboardingShowWelcome) { delegate.onboarding.present() }
             Divider()
             Button(.actionQuit) { NSApp.terminate(nil) }

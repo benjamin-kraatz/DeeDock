@@ -187,6 +187,7 @@ final class WindowMarkupSession {
             show(.init(message: .markupNoticeCopyFailed, symbol: "exclamationmark.triangle", kind: .failure))
             return
         }
+        Analytics.track(.markup(.copied, hasMarks: document.hasMarks))
         show(.init(message: .markupNoticeCopied, symbol: "checkmark", kind: .success))
     }
 
@@ -208,6 +209,7 @@ final class WindowMarkupSession {
             guard let self, response == .OK, let url = panel.url else { return }
             do {
                 try data.write(to: url, options: .atomic)
+                Analytics.track(.markup(.saved, hasMarks: document.hasMarks))
                 show(.init(message: .markupNoticeSaved, symbol: "checkmark", kind: .success))
             } catch {
                 Self.logger.error("Markup not saved: \(error.localizedDescription, privacy: .public)")
@@ -245,6 +247,7 @@ final class WindowMarkupSession {
             if rejected > 0 {
                 show(.init(message: .markupNoticeShelfFull, symbol: "tray.full", kind: .failure))
             } else {
+                Analytics.track(.markup(.sentToShelf, hasMarks: document.hasMarks))
                 show(.init(message: .markupNoticeShelved, symbol: "tray.and.arrow.down", kind: .success))
             }
         } catch {

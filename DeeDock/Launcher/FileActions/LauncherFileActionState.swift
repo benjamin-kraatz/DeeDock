@@ -11,7 +11,10 @@ final class LauncherFileActionState {
     var kind: LauncherFileActionKind = .all {
         didSet { if oldValue != kind { filter(query: lastQuery) } }
     }
-    private(set) var status: LauncherFileOperationStatus = .idle
+    private(set) var status: LauncherFileOperationStatus = .idle { didSet { reportFinishedAction() } }
+    /// The activation whose outcome has not been reported yet.
+    @ObservationIgnored private var unreportedAction: (kind: LauncherFileActionKind, count: Int,
+                                                       source: LauncherFileSource, fileType: AnalyticsFileType?)?
     private(set) var ranking = false
     private(set) var limit = 40
     var destinations = LauncherFileDestinationsStore()
@@ -182,6 +185,15 @@ final class LauncherFileActionState {
         status = .pending
         let token = UUID()
         operationGeneration = token
+        if let context {
+            let kind: LauncherFileActionKind = switch item.id {
+            case .openWith: .application
+            case .shortcut: .shortcut
+            case .copyTo, .chooseFolder: .folder
+            }
+            unreportedAction = (kind, context.inputs.count, context.source,
+                                AnalyticsFileType.common(of: context.inputs.map(\.url)))
+        }
         switch item.id {
         case .openWith(let id):
             openWith(id, item: item, token: token)
@@ -192,6 +204,21 @@ final class LauncherFileActionState {
         case .chooseFolder:
             chooseFolder(token: token)
         }
+    }
+
+    /// Reports a file action once it settles. Failure text stays local; only the outcome is sent.
+    private func reportFinishedAction() {
+        guard let action = unreportedAction else { return }
+        let outcome: AnalyticsFileOperationStatus
+        switch status {
+        case .completed: outcome = .completed
+        case .failed: outcome = .failed
+        case .partial: outcome = .partial
+        case .idle, .pending: return
+        }
+        unreportedAction = nil
+        Analytics.track(.launcherFileAction(action.kind, inputCount: action.count, source: action.source,
+                                            fileType: action.fileType, status: outcome))
     }
 
     func shortcutStatus(for id: UUID) -> ActionTileStatus {

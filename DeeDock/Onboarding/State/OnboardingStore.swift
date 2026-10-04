@@ -38,6 +38,7 @@ final class OnboardingStore {
         }
         isMovingForward = true
         step = next
+        Analytics.track(.onboardingStepReached(next, index: next.index))
         return false
     }
 
@@ -50,6 +51,7 @@ final class OnboardingStore {
     /// Passes over a skippable step without treating it as a dismissal of the whole tour.
     func skip() {
         guard step.isSkippable else { return }
+        Analytics.track(.onboardingStepSkipped(step))
         advance()
     }
 
@@ -57,8 +59,13 @@ final class OnboardingStore {
     func restart() {
         isMovingForward = true
         step = .welcome
+        Analytics.track(.onboardingStepReached(.welcome, index: 0))
     }
 
     /// Records that the tour has been seen. Safe to call more than once.
-    func complete() { repository.complete() }
+    func complete() {
+        guard repository.needsOnboarding() else { return }
+        repository.complete()
+        Analytics.track(.onboardingCompleted)
+    }
 }

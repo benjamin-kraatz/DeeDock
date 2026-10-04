@@ -16,3 +16,7 @@ build/
 # Local scripting caches
 __pycache__/
 *.pyc
+.env
+
+# Per-developer build settings (PostHog token)
+Configuration/Local.xcconfig

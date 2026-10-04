@@ -9,6 +9,7 @@ extension OnboardingStep {
     var glyph: SettingsGlyph {
         switch self {
         case .welcome: .dock
+        case .analytics: .symbol("hand.raised.fill")
         case .systemDock: .symbol("macwindow.on.rectangle")
         case .placement: .dock
         case .appearance: .symbol("paintbrush.pointed.fill")
@@ -23,6 +24,7 @@ extension OnboardingStep {
     var tint: Color {
         switch self {
         case .welcome, .ready: Color(red: 0.16, green: 0.55, blue: 0.98)
+        case .analytics: SettingsPage.privacy.tint
         case .systemDock: Color(red: 0.94, green: 0.52, blue: 0.20)
         case .placement: SettingsPage.position.tint
         case .appearance: SettingsPage.appearance.tint
@@ -35,6 +37,7 @@ extension OnboardingStep {
     var tileColors: [Color] {
         switch self {
         case .welcome, .ready: SettingsPage.position.tileColors
+        case .analytics: SettingsPage.privacy.tileColors
         case .systemDock: [Color(red: 0.99, green: 0.72, blue: 0.30), Color(red: 0.94, green: 0.44, blue: 0.13)]
         case .placement: SettingsPage.position.tileColors
         case .appearance: SettingsPage.appearance.tileColors

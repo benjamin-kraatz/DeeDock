@@ -71,6 +71,7 @@ private struct LauncherToolButton: View {
             state.close?()
             openWindow.openSystemSettingsClone()
         } else {
+            Analytics.track(.launcherToolOpened(tool))
             state.openTool?(tool)
         }
     }

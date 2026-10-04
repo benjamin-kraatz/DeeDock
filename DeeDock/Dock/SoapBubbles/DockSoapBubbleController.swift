@@ -33,6 +33,7 @@ final class DockSoapBubbleController {
         if bursts.count >= Self.maximumConcurrentBursts {
             finish(bursts[0].id)
         }
+        Analytics.count(.soapBubbleBurst)
         let burst = Burst(id: UUID(), itemID: itemID, startedAt: .now)
         bursts.append(burst)
         removalTasks[burst.id] = Task { @MainActor [weak self] in

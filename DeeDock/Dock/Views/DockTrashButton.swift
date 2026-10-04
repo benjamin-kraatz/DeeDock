@@ -45,8 +45,8 @@ struct DockTrashButton: View {
         .accessibilityLabel(Text(.trashName))
         .accessibilityValue(Text(accessibilityValue))
         .accessibilityHint(Text(.trashOpenHint))
-        .accessibilityAction(named: Text(.trashOpen)) { interaction.openTrash?() }
-        .accessibilityAction(named: Text(.trashEmptyAction)) { confirmEmptyTrash() }
+        .accessibilityAction(named: Text(.trashOpen)) { Analytics.performing(.voiceOver) { interaction.openTrash?() } }
+        .accessibilityAction(named: Text(.trashEmptyAction)) { Analytics.performing(.voiceOver) { confirmEmptyTrash() } }
     }
 
     private func confirmEmptyTrash() {
@@ -139,8 +139,8 @@ private struct TrashContextMenuBridge: NSViewRepresentable {
 
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
-        @objc private func openTrash() { interaction?.openTrash?() }
-        @objc private func empty() { emptyTrash?() }
+        @objc private func openTrash() { Analytics.performing(.menu) { interaction?.openTrash?() } }
+        @objc private func empty() { Analytics.performing(.menu) { emptyTrash?() } }
         @objc private func settings() { openSettings?() }
 
         func stop() {

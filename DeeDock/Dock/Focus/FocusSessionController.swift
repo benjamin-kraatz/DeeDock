@@ -68,6 +68,7 @@ final class FocusSessionController {
     }
     func pause() {
         guard var session, session.phase == .running else { return }
+        Analytics.track(.focusSession(.paused))
         let remaining = session.remaining(at: .now)
         guard remaining > 0 else { finish(); return }
         session.remainingWhenPaused = remaining; session.deadline = nil; session.phase = .paused
@@ -75,11 +76,13 @@ final class FocusSessionController {
     }
     func resume() {
         guard var session, session.phase == .paused else { return }
+        Analytics.track(.focusSession(.resumed))
         session.deadline = Date().addingTimeInterval(session.remainingWhenPaused); session.phase = .running
         setSession(session)
     }
     func extend() {
         guard var session, session.phase != .completed, session.duration <= 86100 else { return }
+        Analytics.track(.focusSession(.extended))
         session.duration += 300
         if session.phase == .running { session.deadline = max(session.deadline ?? .now, .now).addingTimeInterval(300) }
         else { session.remainingWhenPaused += 300 }
@@ -87,6 +90,7 @@ final class FocusSessionController {
     }
     func finish(celebrate: Bool = true) {
         guard var session, session.phase != .completed, !requiresReset else { return }
+        Analytics.track(.focusSession(.finished))
         var next = document
         var debt = focusDebt
         // Record against the original phase/deadline, in the same save as completion.

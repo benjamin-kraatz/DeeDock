@@ -25,6 +25,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case softwareUpdate
     case menuBar
     case startup
+    case privacy
 
     // Features — app-wide capabilities.
     case shelfAndTrash
@@ -70,7 +71,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     var group: Group {
         switch self {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
-        case .about, .softwareUpdate, .menuBar, .startup: .general
+        case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
         case .shelfAndTrash, .drives, .capsules, .badges, .windowPeek,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
@@ -100,6 +101,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .softwareUpdate: .updatesSectionTitle
         case .menuBar: .menuBarIconTitle
         case .startup: .settingsStartup
+        case .privacy: .settingsPrivacy
         case .shelfAndTrash: .settingsShelfAndTrash
         case .drives: .settingsVolumes
         case .capsules: .settingsCapsules
@@ -175,6 +177,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .softwareUpdate: .symbol("arrow.down.circle.fill")
         case .menuBar: .symbol("menubar.rectangle")
         case .startup: .symbol("power")
+        case .privacy: .symbol("hand.raised.fill")
         case .shelfAndTrash: .symbol("tray.full.fill")
         case .drives: .symbol("externaldrive.fill")
         case .capsules: .symbol("capsule.portrait.fill")
@@ -211,6 +214,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .about, .menuBar: Color(red: 0.42, green: 0.45, blue: 0.50)
         case .softwareUpdate: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .startup: Color(red: 0.20, green: 0.66, blue: 0.32)
+        case .privacy: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .shelfAndTrash: Color(red: 0.70, green: 0.50, blue: 0.28)
         case .drives: Color(red: 0.42, green: 0.48, blue: 0.58)
         case .capsules: Color(red: 0.16, green: 0.62, blue: 0.80)
@@ -247,6 +251,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .about, .menuBar: [Color(red: 0.62, green: 0.65, blue: 0.70), Color(red: 0.36, green: 0.39, blue: 0.44)]
         case .softwareUpdate: [Color(red: 0.42, green: 0.78, blue: 1.0), Color(red: 0.10, green: 0.44, blue: 0.92)]
         case .startup: [Color(red: 0.44, green: 0.84, blue: 0.46), Color(red: 0.10, green: 0.56, blue: 0.24)]
+        case .privacy: [Color(red: 0.42, green: 0.78, blue: 1.0), Color(red: 0.10, green: 0.44, blue: 0.92)]
         case .shelfAndTrash: [Color(red: 0.86, green: 0.68, blue: 0.42), Color(red: 0.56, green: 0.38, blue: 0.18)]
         case .drives: [Color(red: 0.66, green: 0.71, blue: 0.79), Color(red: 0.30, green: 0.35, blue: 0.44)]
         case .capsules: [Color(red: 0.40, green: 0.82, blue: 0.96), Color(red: 0.08, green: 0.50, blue: 0.72)]
@@ -290,7 +295,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords
-        case .about, .softwareUpdate, .menuBar, .startup: .settingsGeneralKeywords
+        case .about, .softwareUpdate, .menuBar, .startup, .privacy: .settingsGeneralKeywords
         case .drives: .settingsDrivesKeywords
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
              .focusSessions, .actionTiles, .multipleDisplays, .permissions: .settingsFeaturesKeywords

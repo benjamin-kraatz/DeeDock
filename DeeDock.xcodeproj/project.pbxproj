@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = DEE400000000000000000002 /* Sparkle-LICENSE.txt */; };
+		E1A000000000000000000001 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = E1A000000000000000000004 /* PostHog */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */,
+				E1A000000000000000000001 /* PostHog in Frameworks */,
 			);
 		};
 		DD0000000000000000000005 /* Frameworks */ = {
@@ -107,6 +109,7 @@
 			name = DeeDock;
 			packageProductDependencies = (
 				C7F376D8610F320F205B46E7 /* Sparkle */,
+				E1A000000000000000000004 /* PostHog */,
 			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* DOKK.app */;
@@ -160,6 +163,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				81630C8DE54D7D27B0AA3138 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				E1A000000000000000000003 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
@@ -724,6 +728,14 @@
 				version = 2.9.6;
 			};
 		};
+		E1A000000000000000000003 /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.59.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -731,6 +743,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 81630C8DE54D7D27B0AA3138 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		E1A000000000000000000004 /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1A000000000000000000003 /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

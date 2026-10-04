@@ -67,6 +67,12 @@ final class FolderStackCoordinator {
         next.state.sortChanged = { UserDefaults.standard.set($0.rawValue, forKey: sortKey) }
         next.state.allowsMoveDrops = volumeRoot
         next.state.springsUp = volumeRoot
+        let kind: AnalyticsStackKind = volumeRoot ? .drive : folder.isDownloads ? .downloads : .folder
+        next.state.analyticsKind = kind
+        if spring, Analytics.shared.ambientTrigger == nil { Analytics.count(.springLoad(kind)) }
+        Analytics.track(.stackOpened(kind, presentation: reference.presentation, sort: sort,
+                                     trigger: spring ? Analytics.shared.ambientTrigger ?? .springLoad
+                                         : Analytics.trigger(keyboard: keyboard)))
         displayID = panel.store.displayID
         folderID = reference.id
         anchorTarget = target
@@ -106,8 +112,11 @@ final class FolderStackCoordinator {
 
     func receive(_ info: NSDraggingInfo, folder: FolderDockItem, on panel: DockPanelController,
                  anchoredTo target: DockEntryID? = nil, volumeRoot: Bool = false) -> Bool {
-        show(folder, on: panel, keyboard: false, spring: true, anchoredTo: target, volumeRoot: volumeRoot)
-        return controller?.state.receive(info, into: controller?.state.rootURL) ?? false
+        // A drop opens the stack the way spring loading does, but it is a drop, not a spring.
+        Analytics.performing(.drag) {
+            show(folder, on: panel, keyboard: false, spring: true, anchoredTo: target, volumeRoot: volumeRoot)
+        }
+        return controller?.state.receive(info, into: controller?.state.rootURL, target: .tile) ?? false
     }
 
     /// A spring-opened stack survives a successful copy so progress and failures stay visible.

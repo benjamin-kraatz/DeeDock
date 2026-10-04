@@ -46,6 +46,7 @@ final class DockSettingsStore {
     private func save(_ settings: DockSettings) {
         do {
             try repository?.save(settings)
+            Analytics.shared.settingsChanged(from: value, to: settings, area: .sharedDock)
             value = settings
             requiresReset = false
             errorMessage = nil

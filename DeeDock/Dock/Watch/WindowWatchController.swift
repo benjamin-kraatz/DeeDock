@@ -23,6 +23,7 @@ final class WindowWatchController: NSObject, NSWindowDelegate {
 
     func show(_ summary: ApplicationWindowSummary, visibleFrame: CGRect) {
         if let panel { panel.makeKeyAndOrderFront(nil); return }
+        Analytics.track(.watchSetupOpened(trigger: Analytics.trigger()))
         let session = WindowWatchSession(summary: summary, after: previousWork, presets: presets)
         let panel = WindowWatchPanel(contentRect: CGRect(x: 0, y: 0, width: 520, height: 780),
                                      styleMask: [.titled, .closable, .nonactivatingPanel], backing: .buffered, defer: false)

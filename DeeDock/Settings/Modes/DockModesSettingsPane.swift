@@ -112,7 +112,7 @@ struct DockModesSettingsPane: View {
             SettingsMoreMenu(label: Text(.dockModesActions(modeName: mode.name))) {
                 Button(.dockModesRename) { beginRename(mode) }
                 Button(.dockModesDuplicate) {
-                    _ = store.duplicate(mode.id)
+                    if store.duplicate(mode.id) != nil { Analytics.track(.modeEdited(.duplicated, modeCount: store.modes.count)) }
                 }
                 Divider()
                 Button(.dockModesMoveUp) { _ = store.move(mode.id, by: -1) }.disabled(index == 0)
@@ -158,7 +158,10 @@ struct DockModesSettingsPane: View {
     private func saveName() {
         switch namingAction {
         case .create:
-            if let id = store.duplicateActive(named: draftName) { _ = activate(id) }
+            if let id = store.duplicateActive(named: draftName) {
+                Analytics.track(.modeEdited(.created, modeCount: store.modes.count))
+                _ = activate(id)
+            }
         case .rename(let mode): _ = store.rename(mode.id, to: draftName)
         case nil: break
         }

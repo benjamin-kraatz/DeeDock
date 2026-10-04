@@ -22,6 +22,8 @@ struct GeneralPageContent: View {
                                   refresh: controller.refresh, openSettings: controller.openSystemSettings,
                                   dismissError: controller.dismissError)
                 .onAppear { controller.refresh() }
+        case .privacy:
+            AnalyticsSettingsCard(analytics: .shared)
         default:
             EmptyView()
         }

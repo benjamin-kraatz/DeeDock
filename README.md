@@ -42,7 +42,7 @@ DOKK works without special permissions. A few features need one, and DOKK asks o
 | Screen Recording | Window Peek thumbnails and features that capture window contents, such as Session Capsules, markup, and window search. Also secondary docks that show only the apps with windows on their display |
 | Automation for Finder | Opening and emptying the Trash, and App Fusion folder navigation |
 
-DOKK has no account and no server. Settings, pins, and history stay on your Mac. Features that use Apple Intelligence run the on-device model. App suggestions and Peek history learn from your activity, and both stay off until you opt in. DOKK makes two kinds of network request. It checks GitHub Releases for updates. When you use **Ask Robi** in the App Launcher, it looks up short descriptions of your Mac App Store apps through Apple's public lookup service.
+DOKK has no account. Settings, pins, and history stay on your Mac. Features that use Apple Intelligence run the on-device model. App suggestions and Peek history learn from your activity, and both stay off until you opt in. DOKK makes three kinds of network request. It checks GitHub Releases for updates. It sends anonymous usage data to PostHog, which you can turn off in **Settings → General → Privacy**; [docs/ANALYTICS.md](docs/ANALYTICS.md) lists what is sent, including the requests and answers of Apple Intelligence features. When you use **Ask Robi** in the App Launcher, it looks up short descriptions of your Mac App Store apps through Apple's public lookup service.
 
 ## Project status
 

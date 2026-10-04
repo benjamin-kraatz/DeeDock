@@ -376,6 +376,7 @@ final class WindowPeekEnlargeController {
         guard !stopped, !blocked, let peek, let screen = peek.screen,
               let card = peek.state.cards.first(where: { $0.id == token }),
               let preview = card.thumbnail else { return }
+        Analytics.count(.peekEnlarge)
         let imageSize = CGSize(width: CGFloat(preview.width) / max(1, screen.backingScaleFactor),
                                height: CGFloat(preview.height) / max(1, screen.backingScaleFactor))
         guard let hero = WindowPeekEnlargeGeometry.hero(windowSize: card.window.frame?.size ?? imageSize,

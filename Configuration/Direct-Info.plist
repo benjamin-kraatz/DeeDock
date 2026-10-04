@@ -6,4 +6,6 @@
     <key>SUAutomaticallyUpdate</key><true/>
     <key>SUEnableAutomaticChecks</key><true/>
     <key>SUScheduledCheckInterval</key><integer>3600</integer>
+    <key>DOKKAnalyticsAPIKey</key><string>$(POSTHOG_PROJECT_TOKEN)</string>
+    <key>DOKKAnalyticsHost</key><string>$(POSTHOG_HOST)</string>
 </dict></plist>

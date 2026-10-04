@@ -20,6 +20,7 @@ import Observation
     @ObservationIgnored private var displayObserver: NSObjectProtocol?
 
     func showSetup() {
+        Analytics.track(.appMelt(.setupOpened, pairCount: pairs.count, outcome: .succeeded))
         installObservers()
         if let composer {
             composerState?.beginPresentation()
@@ -99,6 +100,7 @@ import Observation
         pair.ratio = min(0.75, max(0.25, firstFrame.width / (firstFrame.width + secondFrame.width)))
         // Record the group before mutating so a partial AX write still has a visible recovery path.
         pairs.append(pair)
+        Analytics.track(.appMelt(.created, pairCount: pairs.count, outcome: .succeeded))
         pair.chrome = AppMeltChrome(pair: pair, controller: self)
         pair.observation.changed = { [weak self, weak pair] in
             guard let pair else { return }; self?.scheduleRefresh(pair)
@@ -203,6 +205,7 @@ import Observation
     /// observers or adopt handles after this returns.
     func unpair(_ pair: AppMeltPair) {
         guard pairs.contains(where: { $0.id == pair.id }) else { return }
+        Analytics.track(.appMelt(.unpaired, pairCount: pairs.count - 1, outcome: .succeeded))
         pair.invalidated = true
         service.seal(sessionID: pair.sessionID)
         pair.operationEpoch &+= 1

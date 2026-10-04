@@ -86,6 +86,9 @@ final class LauncherSearchState {
         let next = await LauncherSearchIndex.results(input, windows: sources)
         guard !Task.isCancelled, active, queryGeneration == token, generation == session else { return }
         results = next; ranking = false
+        // Reached only after the query has been still for the delay above, so typing a word
+        // reports once. The text itself is never sent, only its length.
+        Analytics.track(.launcherSearched(queryLength: input.query.count, resultCount: next.count, kind: input.kind))
         if let selectedID, let index = next.firstIndex(where: { $0.id == selectedID }) {
             limit = max(limit, ((index / 40) + 1) * 40)
         }
@@ -125,6 +128,7 @@ final class LauncherSearchState {
     func activate(_ result: LauncherSearchResult, reveal: Bool = false) {
         guard active, !actionBusy, !ranking, results.contains(where: { $0.id == result.id }), !result.unavailable else { return }
         actionError = nil
+        Analytics.track(.launcherResultActivated(result.kind, reveal: reveal, trigger: Analytics.trigger()))
         dispatch?(result, reveal)
     }
 

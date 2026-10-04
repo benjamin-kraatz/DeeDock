@@ -101,11 +101,16 @@ private actor WindowWatchExplanationComposer {
             completion message as text that appeared. If you cannot identify a difference confidently,
             say so briefly in the requested language. You have no tools.
             """)
+        let trace = AIObservability.makeTrace()
+        let input = "App locale: \(locale.identifier)\n[Original image]\n[Final image]"
+        let startedAt = Date()
         let response = try await session.respond(options: GenerationOptions(samplingMode: .greedy, maximumResponseTokens: 200)) {
             "App locale: \(locale.identifier)"
             Attachment(original).label("Original")
             Attachment(final).label("Final")
         }
+        await AIObservability.capture(trace: trace, name: "window_watch_explanation", input: input,
+                                      output: response.content, startedAt: startedAt, maximumResponseTokens: 200)
         try Task.checkCancellation()
         let text = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { throw ExplanationFailure.unavailable }

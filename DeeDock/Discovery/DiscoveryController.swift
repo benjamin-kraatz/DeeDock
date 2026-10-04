@@ -157,9 +157,16 @@ final class DiscoveryController {
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency,
             open: { [weak self] in
                 guard let self else { return }
+                Analytics.track(.discoveryCallout(proposal.destination, action: .opened))
                 markUsed(proposal.destination)
                 openDestination(proposal.destination)
-            }, snooze: { [weak self] in self?.finish() }, dismiss: { [weak self] in self?.finish(forever: true) }))
+            }, snooze: { [weak self] in
+                Analytics.track(.discoveryCallout(proposal.destination, action: .snoozed))
+                self?.finish()
+            }, dismiss: { [weak self] in
+                Analytics.track(.discoveryCallout(proposal.destination, action: .dismissed))
+                self?.finish(forever: true)
+            }))
         let size = view.fittingSize
         // AppKit points, constrained to the chosen enabled display's usable frame.
         let available = screen.visibleFrame.insetBy(dx: 16, dy: 16)
@@ -175,6 +182,7 @@ final class DiscoveryController {
             self?.finish(); return event
         }) { monitors.append(monitor) }
         panel.orderFrontRegardless()
+        Analytics.track(.discoveryCallout(proposal.destination, action: .shown))
     }
 
     private func finish(forever: Bool = false) {
