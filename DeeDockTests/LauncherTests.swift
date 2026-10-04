@@ -72,6 +72,28 @@ struct LauncherTests {
         #expect(nested == ["\(editor)/PlaybackEngines/MacStandaloneSupport/Variations/macos_arm64_mono/UnityPlayer.app"])
     }
 
+    @Test("A top-level copy wins over a nested copy with the same id, whichever comes first", arguments: [false, true])
+    func deduplicationPrefersTopLevelCopy(nestedFirst: Bool) {
+        func copy(_ path: String, nested: Bool) -> LauncherApplication {
+            LauncherApplication(reference: ApplicationReference(bundleIdentifier: "example.tool",
+                url: URL(fileURLWithPath: path), name: "Tool"), isNested: nested)
+        }
+        let nested = copy("/Applications/Vendor/Bundled/Tool.app", nested: true)
+        let topLevel = copy("/Users/example/Applications/Tool.app", nested: false)
+        let kept = LauncherDiscovery.deduplicated(nestedFirst ? [nested, topLevel] : [topLevel, nested])
+        #expect(kept == [topLevel])
+    }
+
+    @Test("Among copies with the same nesting, the first in scan order wins")
+    func deduplicationKeepsFirstPeer() {
+        let paths = ["/Applications/Tool.app", "/Users/example/Applications/Tool.app"]
+        let copies = paths.map {
+            LauncherApplication(reference: ApplicationReference(bundleIdentifier: "example.tool",
+                url: URL(fileURLWithPath: $0), name: "Tool"))
+        }
+        #expect(LauncherDiscovery.deduplicated(copies).map(\.reference.url.path) == ["/Applications/Tool.app"])
+    }
+
     @Test("Standard Mac locations add /System/Applications only", arguments: [
         "/Applications/Safari.app",
         "/Users/example/Applications/Pixel.app",
