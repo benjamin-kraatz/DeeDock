@@ -74,6 +74,13 @@ The list follows NSWorkspace mount, unmount, and rename notifications. Nothing p
   asks before ejecting, like other fixed disks. DOKK never requests or changes the grant.
   Limits: a network share the user mounts in Finder is not recognized as a backup destination,
   and the share macOS mounts for backups is hidden from Finder and DOKK alike.
+- **Slow shares:** a mount change lists mounts from the kernel's cached table (`MNT_NOWAIT`),
+  which tells local volumes from shares without contacting a server. Local volumes are read
+  and published first. Each share is then read on its own, at most one read per share at a
+  time, outside the Swift concurrency thread pool. A slow or unresponsive server delays only its
+  own tile. Until its read returns, a share already in the dock keeps its last tile; a new share
+  appears once its read finishes. The backup-destination check only runs on volumes that can
+  appear at all. Shares are read even when the share switch is off.
 
 While an eject runs, the card stays open until it succeeds or fails; outside clicks and Escape
 do not close it, and hovering the dimmed tile again shows the eject in progress.
@@ -93,7 +100,7 @@ Out of scope: Mike's proposed section for permanent access to all disks. Benn as
 follow-up question on DEE-83 that is still unanswered.
 
 Validation: the Debug build and test build succeed with an isolated DerivedData folder. Swift
-Testing coverage in `VolumeTests` covers classification and exclusions, the visibility
+Testing coverage in `VolumeTests` covers classification and exclusions, mount order for late share reads, the visibility
 switches, placement before Trash, selection repair, stack identity, blocker resolution,
 capacity math, settings decoding and app-wide resolution, and sticky card phases. Tests,
 previews, app launch, and hands-on interaction were not run.
@@ -103,6 +110,9 @@ previews, app launch, and hands-on interaction were not run.
 - Plug in a USB stick, an external SSD, and mount a `.dmg`. Confirm tiles, icons, badges,
   tooltip names, and order (Shelf, volumes, Trash) on every display. Toggle each switch in
   Settings. Mount a network share with the share switch on and off.
+- Mount an SMB share, then disconnect the server from the network (or block it with a
+  firewall) so the share stops responding. Plug in a USB stick: its tile must appear at once,
+  and the share's tile must stay.
 - Click a volume: the stack opens on its tile; click again to close. Switch grid and list,
   eject and reinsert, and confirm the choice persists.
 - Hover: confirm the delay, the capacity bar, the status line, and that moving from the tile

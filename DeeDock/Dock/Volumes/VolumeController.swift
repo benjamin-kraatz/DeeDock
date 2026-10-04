@@ -5,7 +5,9 @@ import UniformTypeIdentifiers
 /// Owns the shared snapshot of mounted volumes and every eject DOKK starts.
 ///
 /// Mount changes come from NSWorkspace notifications; nothing polls. Free space is re-read when a
-/// volume card opens, which is the only place it is shown.
+/// volume card opens, which is the only place it is shown. Local volumes publish before any
+/// network share is read, and each share is read on its own, so a slow file server holds back
+/// only its own tile.
 @MainActor @Observable
 final class VolumeController {
     /// Every mounted volume in arrangement order, hidden ones included. Settings lists these.
@@ -19,6 +21,11 @@ final class VolumeController {
     @ObservationIgnored var volumeWillUnmount: ((URL) -> Void)?
 
     @ObservationIgnored private var infos: [VolumeInfo] = []
+    /// Dock-candidate mounts from the latest scan, in mount order.
+    @ObservationIgnored private var mounts: [MountedVolume] = []
+    /// Share reads in flight, by mount URL. A rescan never starts a second read of the same
+    /// share, so a wedged server ties up one thread however many mount notifications arrive.
+    @ObservationIgnored private var shareReads: [URL: Task<Void, Never>] = [:]
     @ObservationIgnored private var icons: [String: NSImage] = [:]
     @ObservationIgnored private var ejecting: Set<String> = []
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
@@ -62,6 +69,8 @@ final class VolumeController {
         observers = []
         generation = UUID()
         scanTask?.cancel(); scanTask = nil
+        shareReads.values.forEach { $0.cancel() }
+        shareReads = [:]
         didChange = nil; volumeWillUnmount = nil
     }
 
@@ -71,7 +80,7 @@ final class VolumeController {
     func refreshCapacity(_ volumeID: String) async -> VolumeDockItem? {
         guard let url = item(volumeID)?.url else { return nil }
         let token = generation
-        let fresh = await Task.detached(priority: .userInitiated) { VolumeScanner.info(for: url) }.value
+        let fresh = await VolumeReads.run(qos: .userInitiated) { VolumeScanner.info(for: url) }
         guard generation == token, let fresh, fresh.volumeID == volumeID,
               let index = infos.firstIndex(where: { $0.volumeID == volumeID }) else {
             return item(volumeID)
@@ -96,6 +105,8 @@ final class VolumeController {
         ejecting.remove(volumeID)
         if result == .ejected {
             infos.removeAll { $0.volumeID == volumeID }
+            // Keeps a share read still in flight from bringing the tile back.
+            mounts.removeAll { $0.url == url }
             // Replaces any scan that began before the unmount and would bring the tile back, and
             // drops sibling partitions that `.allPartitionsAndEjectDisk` unmounted with it.
             rescan()
@@ -104,23 +115,59 @@ final class VolumeController {
         return result
     }
 
+    /// Re-reads mounted volumes in two steps. Local volumes are read and published first, and
+    /// nothing touches a share before that publish. Each share is then read on its own.
+    ///
+    /// Until its read returns, a share keeps the info from its previous read, so mounting a USB
+    /// stick does not blank every share tile. A share that is no longer mounted leaves with the
+    /// first publish.
     private func rescan() {
         scanTask?.cancel()
         let token = generation
         scanTask = Task { [weak self] in
-            let scanned = await Task.detached(priority: .utility) { VolumeScanner.scan() }.value
+            // The kernel's cached mount table tells local volumes from shares without asking a server.
+            let mounts = await VolumeReads.run { VolumeScanner.mounts() }
+            let local = await VolumeReads.run { VolumeScanner.scan(mounts.filter(\.isLocal)) }
             guard let self, !Task.isCancelled, generation == token else { return }
-            let missing = scanned.filter { self.icons[$0.volumeID] == nil }
+            let missing = local.filter { self.icons[$0.volumeID] == nil }
             if !missing.isEmpty {
-                let loaded = await Task.detached(priority: .utility) { VolumeIcons.load(missing) }.value
+                let loaded = await VolumeReads.run { VolumeIcons.load(missing) }
                 guard !Task.isCancelled, generation == token else { return }
                 for (id, icon) in loaded { icons[id] = icon.image }
             }
             scanTask = nil
-            guard scanned != infos else { return }
-            infos = scanned
-            publish()
+            self.mounts = mounts
+            let shares = mounts.filter { !$0.isLocal }.map(\.url)
+            commit(local + infos.filter { shares.contains($0.url) })
+            for share in shares { readShare(share) }
         }
+    }
+
+    /// Reads one share and updates its tile, unless a read of it is already in flight.
+    private func readShare(_ url: URL) {
+        guard shareReads[url] == nil else { return }
+        let token = generation
+        shareReads[url] = Task { [weak self] in
+            let info = await VolumeReads.run { VolumeScanner.info(for: url) }
+            guard let self, generation == token else { return }
+            if let info, icons[info.volumeID] == nil {
+                let loaded = await VolumeReads.run { VolumeIcons.load([info]) }
+                guard generation == token else { return }
+                for (id, icon) in loaded { icons[id] = icon.image }
+            }
+            shareReads[url] = nil
+            // A share that unmounted during its read already left with a later scan's publish.
+            guard mounts.contains(where: { $0.url == url && !$0.isLocal }) else { return }
+            commit(infos.filter { $0.url != url } + (info.map { [$0] } ?? []))
+        }
+    }
+
+    /// Stores `volumes` in mount order and publishes when anything changed.
+    private func commit(_ volumes: [VolumeInfo]) {
+        let ordered = VolumeScanner.ordered(volumes, by: mounts)
+        guard ordered != infos else { return }
+        infos = ordered
+        publish()
     }
 
     private func publish() {
