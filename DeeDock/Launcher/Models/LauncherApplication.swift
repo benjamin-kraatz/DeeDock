@@ -4,6 +4,8 @@ import Foundation
 nonisolated struct LauncherApplication: Identifiable, Sendable, Equatable {
     let reference: ApplicationReference
     let category: String
+    /// Document-type summary from `LauncherAppCapabilities`, such as `edits image`. Empty when undeclared.
+    let capabilities: String
     let aliases: [String]
     let searchName: String
     let searchAliases: String
@@ -14,9 +16,11 @@ nonisolated struct LauncherApplication: Identifiable, Sendable, Equatable {
     let isNested: Bool
     var id: String { reference.id }
 
-    init(reference: ApplicationReference, category: String = "", aliases: [String] = [], isNested: Bool = false) {
+    init(reference: ApplicationReference, category: String = "", capabilities: String = "", aliases: [String] = [],
+         isNested: Bool = false) {
         self.reference = reference
         self.category = category
+        self.capabilities = capabilities
         self.aliases = aliases
         self.isNested = isNested
         searchName = Self.normalize(reference.name)
