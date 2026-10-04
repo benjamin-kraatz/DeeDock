@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 import Observation
 
@@ -231,4 +230,3 @@ struct UpdateIdleGate: Equatable, Sendable {
         !isBusy && secondsSinceDockUse >= Self.idleThreshold
     }
 }
-#endif

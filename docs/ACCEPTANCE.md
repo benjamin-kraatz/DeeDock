@@ -1673,6 +1673,8 @@ All 17 Settings sliders, their direct numeric fields, and the Focus Session dura
 
 Direct builds include Sparkle 2.9.6, manual update commands in both menus, and an automatic-check preference in General. Sparkle owns consent, scheduling, and preference persistence. Scheduled discoveries remain available through the menu without activating the app. TestFlight uses a separate target and shared scheme, with updater code behind `DIRECT_DISTRIBUTION` and no Sparkle dependency. Both targets share version and identity settings in `Configuration/App.xcconfig`.
 
+Superseded on 2026-10-04: the TestFlight target, its scheme, and the `DIRECT_DISTRIBUTION` flag were removed. DOKK needs Accessibility control of other apps, which the App Sandbox required by TestFlight does not allow, so every build is the direct build with Sparkle. The TestFlight results below are historical.
+
 A new EdDSA key was generated in the local Keychain under account `de.benjaminkraatz.DeeDock`. Only the public key is in the project. No private-key export, release publication, or feed upload was performed. The configured GitHub Latest feed needs an `appcast.xml` asset in the first Sparkle-enabled release. Existing v0.1.1 installations require a manual upgrade to that release. See [release instructions](UPDATES.md).
 
 Initial validation on 2026-09-05:

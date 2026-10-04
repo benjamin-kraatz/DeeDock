@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 import Sparkle
 
@@ -18,4 +17,3 @@ final class UpdateSilentInstallDelegate: NSObject, SPUUpdaterDelegate {
         return true
     }
 }
-#endif

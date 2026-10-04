@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import SwiftUI
 
 /// Indigo-to-coral lens that carries the island's glyph. It is the bead's only content.
@@ -73,4 +72,3 @@ struct UpdateIslandGlass: ViewModifier {
         }
     }
 }
-#endif

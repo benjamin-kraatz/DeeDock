@@ -1,4 +1,4 @@
-// Shared by direct and TestFlight app targets. These two keys are the
+// Shared app identity and version. These two keys are the
 // only version source. Target build settings must inherit them.
 CURRENT_PROJECT_VERSION = 43
 MARKETING_VERSION = 0.13.2

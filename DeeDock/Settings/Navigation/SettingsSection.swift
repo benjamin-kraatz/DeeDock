@@ -129,11 +129,7 @@ enum SettingsSection: Hashable, Identifiable {
     private var keywords: [LocalizedStringResource] {
         switch self {
         case .general:
-            #if DIRECT_DISTRIBUTION
             [.settingsGeneralKeywords, .updatesAutomatic, .updatesAutomaticInstallation, .updatesIdleInstall, .updatesCheck]
-            #else
-            [.settingsGeneralKeywords]
-            #endif
         case .dock: [.settingsAppearanceKeywords, .settingsPositionKeywords, .settingsBehaviorKeywords]
         case .extras, .windowsFocus, .suggestionsHistory: [.settingsFeatures, .settingsFeaturesKeywords]
         case .deprecated: [.settingsDeprecatedFeatureNotice]

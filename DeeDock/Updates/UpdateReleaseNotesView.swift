@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import SwiftUI
 
 /// Native block layout keeps publisher whitespace out of spacing and aligns wrapped list text.
@@ -52,4 +51,3 @@ private extension UpdateReleaseNoteBlock {
         if case .heading = style { true } else { false }
     }
 }
-#endif

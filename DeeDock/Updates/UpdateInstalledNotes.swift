@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 
 /// Release notes for the versions an automatic install skipped past.
@@ -88,4 +87,3 @@ nonisolated enum UpdateInstalledNotes {
         lhs.compare(rhs, options: .numeric)
     }
 }
-#endif

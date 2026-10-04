@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 
 /// What DOKK was running when it started an automatic install.
@@ -33,4 +32,3 @@ nonisolated struct UpdateInstallRecord: Codable, Equatable, Sendable {
         defaults.removeObject(forKey: key)
     }
 }
-#endif

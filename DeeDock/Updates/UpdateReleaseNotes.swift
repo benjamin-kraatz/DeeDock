@@ -1,4 +1,3 @@
-#if DIRECT_DISTRIBUTION
 import Foundation
 
 /// A semantic text block gives SwiftUI control of spacing, typography and hanging list indents.
@@ -113,4 +112,3 @@ enum UpdateReleaseNotes {
         return blocks
     }
 }
-#endif
