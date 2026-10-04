@@ -84,7 +84,7 @@ nonisolated enum LauncherDiscovery {
         let reference = ApplicationReference(bundleIdentifier: bundle.bundleIdentifier, url: url, name: name)
         let aliases = [info["CFBundleName"], info["CFBundleDisplayName"], info["CFBundleExecutable"]].compactMap { $0 as? String }
         return LauncherApplication(reference: reference, category: info["LSApplicationCategoryType"] as? String ?? "",
-                                   aliases: aliases, isNested: isNested)
+                                   capabilities: LauncherAppCapabilities.summary(info: info), aliases: aliases, isNested: isNested)
     }
 
     /// Spotlight also indexes framework helpers, caches named .app, and device build products.

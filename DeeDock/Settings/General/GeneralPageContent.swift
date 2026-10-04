@@ -30,7 +30,7 @@ struct GeneralPageContent: View {
     }
 
     /// Version and updates share one page. Only a directly distributed build updates itself, so
-    /// elsewhere the page is just the version.
+    /// elsewhere the page is just the version and acknowledgements.
     @ViewBuilder private var about: some View {
         #if DIRECT_DISTRIBUTION
         if let updater {
@@ -51,5 +51,6 @@ struct GeneralPageContent: View {
         #else
         AppAboutCard(version: AppVersionInfo.current.settingsValue)
         #endif
+        AppAcknowledgementsCard()
     }
 }

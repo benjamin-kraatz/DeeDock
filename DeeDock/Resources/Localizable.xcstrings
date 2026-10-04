@@ -29931,6 +29931,96 @@
         }
       }
     },
+    "settingsAcknowledgementsHomebrewDescription" : {
+      "comment" : "Acknowledgements row subtitle. Robi is the launcher's on-device app finder; keep the name. Homebrew is a product name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi nutzt Beschreibungen aus dem Homebrew-Cask-Katalog, um zu verstehen, was deine Apps können. Verwendet unter der BSD-2-Clause-Lizenz."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi uses descriptions from the Homebrew cask catalog to understand what your apps do. Used under the BSD 2-Clause License."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsHomebrewTitle" : {
+      "comment" : "Acknowledgements row title naming the Homebrew cask catalog as a data source.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Beschreibungen von Homebrew"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Descriptions from Homebrew"
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsShowLicense" : {
+      "comment" : "Disclosure label that reveals the full, untranslated license text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "License"
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsSource" : {
+      "comment" : "Link in the acknowledgements row that opens the Homebrew website.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsTitle" : {
+      "comment" : "Settings › About card heading crediting third-party data bundled with the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danksagungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acknowledgements"
+          }
+        }
+      }
+    },
     "settingsAlignBottom" : {
       "comment" : "Align a vertical dock near the bottom of the display.",
       "extractionState" : "manual",
