@@ -145,6 +145,9 @@ final class WindowWatchSession {
                                               presetName: appliedPresetName, configuration: draftConfiguration())
         runSnapshot = snapshot
         action.bind(snapshot, outcome: .watching)
+        Analytics.track(.watchStarted(usesPhrase: usesPhrase, playsSound: playSound,
+                                      completion: AnalyticsWatchCompletion(completion), usesPreset: appliedPresetID != nil,
+                                      hasRegion: region.clamped != WindowWatchRegion().clamped))
         run()
     }
 
@@ -197,6 +200,7 @@ final class WindowWatchSession {
     /// Returns a drain barrier so a replacement watch cannot overlap an in-flight OS request.
     @discardableResult
     func stop() -> Task<Void, Never> {
+        if active { reportEnded(.stopped) }
         explanation.cancel()
         action.mark(.cancelled)
         action.cancel()
@@ -297,6 +301,9 @@ final class WindowWatchSession {
                         finished = true
                         detected = true
                         message = watchedPhrase.isEmpty ? .watchChangeDetected : .watchPhraseDetected
+                        Analytics.track(.watchDetected(watchedPhrase.isEmpty ? .change : .phrase,
+                                                       duration: startDate.map { Date().timeIntervalSince($0) } ?? 0,
+                                                       checkCount: checkCount))
                         if playSound { NSSound.beep() }
                         action.mark(.detected)
                         explanation.explain(final: frame.regionImage)
@@ -351,8 +358,22 @@ final class WindowWatchSession {
         }
     }
 
+    /// Reports why a running watch ended without a detection, as a code.
+    private func reportEnded(_ reason: AnalyticsWatchEnd) {
+        Analytics.track(.watchEnded(reason, duration: startDate.map { Date().timeIntervalSince($0) } ?? 0,
+                                    checkCount: checkCount))
+    }
+
     private func fail(_ error: Error) {
         problem = true
+        if active {
+            switch error as? WindowWatchFailure {
+            case .permission: reportEnded(.permission)
+            case .closed: reportEnded(.closed)
+            // Offscreen and unavailable are transient; the watch keeps running.
+            default: break
+            }
+        }
         switch error as? WindowWatchFailure {
         case .permission:
             message = .watchPermission

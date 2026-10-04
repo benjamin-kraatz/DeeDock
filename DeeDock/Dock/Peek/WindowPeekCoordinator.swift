@@ -10,6 +10,8 @@ final class WindowPeekCoordinator {
     private let fileHandoff: WindowFileHandoffController
     private var fileDocuments: DocumentResourceAccess?
     private var fileDrag = false
+    /// How the open Peek was started, kept until its windows are known and it can be reported once.
+    private var unreportedTrigger: AnalyticsPeekTrigger?
     var chooseFiles: ((DockItem, DockPanelController) -> Void)?
     var validatedFileDrop: ((NSDraggingInfo) -> DocumentResourceAccess?)?
     var fileDropAccepted: (() -> Void)?
@@ -227,6 +229,7 @@ final class WindowPeekCoordinator {
         let next = WindowPeekPanelController(item: item, anchor: context.anchor,
                                              settings: context.settings, keyboard: keyboard)
         controller = next
+        unreportedTrigger = fileDocuments != nil || fileDrag ? .fileDrag : keyboard ? .keyboard : .hover
         panel.holdWindowPeek(true)
         next.closed = { [weak self] returnFocus in self?.close(returnFocus: returnFocus) }
         next.state.routingFiles = fileDocuments != nil
@@ -278,9 +281,11 @@ final class WindowPeekCoordinator {
         next.state.pinPortal = { [weak self, weak panel] window in
             guard let self else { return }
             guard portals.pin(window, appName: item.reference.name, keyboard: keyboard) else {
+                Analytics.track(.portalPinned(keyboard ? .keyboard : .button, outcome: .blocked))
                 panel?.store.errorMessage = .portalLimit
                 return
             }
+            Analytics.track(.portalPinned(keyboard ? .keyboard : .button, outcome: .succeeded))
             close(returnFocus: false)
         }
         next.state.portalTracking = { [weak self, weak next] tracking in
@@ -292,17 +297,21 @@ final class WindowPeekCoordinator {
             guard let self else { return }
             guard portals.pin(window, appName: item.reference.name, keyboard: false,
                               dropPoint: point, frozen: frozen) else {
+                Analytics.track(.portalPinned(.drag, outcome: .blocked))
                 panel?.store.errorMessage = .portalLimit
                 return
             }
+            Analytics.track(.portalPinned(.drag, outcome: .succeeded))
             close(returnFocus: false)
         }
         next.state.pinFrozen = { [weak self, weak panel] window in
             guard let self else { return }
             guard portals.pin(window, appName: item.reference.name, keyboard: keyboard, frozen: true) else {
+                Analytics.track(.portalPinned(.frozen, outcome: .blocked))
                 panel?.store.errorMessage = .portalLimit
                 return
             }
+            Analytics.track(.portalPinned(.frozen, outcome: .succeeded))
             close(returnFocus: false)
         }
         next.state.manage = { [weak self] token in self?.manage(token) }
@@ -445,6 +454,12 @@ final class WindowPeekCoordinator {
         controller.state.selectedID = ordered.first?.token
         controller.state.phase = .windows
         controller.update(anchor: context.anchor, settings: context.settings, count: ordered.count)
+        if let trigger = unreportedTrigger {
+            unreportedTrigger = nil
+            Analytics.track(.peekOpened(trigger, cardCount: ordered.count, totalWindowCount: allWindows.count,
+                                        layout: context.settings.windowPeekLayout, style: context.settings.windowPeekStyle,
+                                        size: context.settings.windowPeekSize))
+        }
     }
 
     private func requestThumbnail(_ token: ApplicationWindowToken) {
@@ -545,6 +560,8 @@ final class WindowPeekCoordinator {
         controller.state.actionMessage = nil
         cancelClose()
         let currentGeneration = generation
+        let trigger = Analytics.trigger(keyboard: isKeyboardActive)
+        var performed: AnalyticsWindowAction?
         let point = isKeyboardActive ? controller.actionMenuPoint : NSEvent.mouseLocation
         windowActionTask = Task { [weak self, weak controller] in
             guard let self, let controller else { return }
@@ -568,7 +585,9 @@ final class WindowPeekCoordinator {
                 guard let action = selection else { return }
                 guard !Task.isCancelled, generation == currentGeneration else { return }
                 closingWindow = action == .close
+                performed = AnalyticsWindowAction(action)
                 let result = try await menus.performWindowAction(action, token: token, displays: actionDisplaySnapshot())
+                Analytics.track(.peekWindowAction(AnalyticsWindowAction(action), outcome: .succeeded, trigger: trigger))
                 guard !Task.isCancelled, generation == currentGeneration else { return }
                 if action == .close {
                     // Dismiss without focus restoration so a native document prompt stays in charge.
@@ -579,6 +598,7 @@ final class WindowPeekCoordinator {
                 controller.state.actionMessage = .peekActionCompleted
             } catch is CancellationError { return }
             catch {
+                if let performed { Analytics.track(.peekWindowAction(performed, outcome: .failed, trigger: trigger)) }
                 guard !Task.isCancelled, generation == currentGeneration else { return }
                 if closingWindow {
                     sourcePanel?.store.errorMessage = .peekActionFailed
@@ -626,6 +646,7 @@ final class WindowPeekCoordinator {
         }
         // The staged image flies onto the window this selection brings forward, then fades to reveal it.
         enlarge?.land(token, windowFrame: allWindows.first { $0.token == token }?.frame)
+        Analytics.track(.peekWindowChosen(trigger: Analytics.trigger(keyboard: isKeyboardActive)))
         menus.perform(.selectWindow(token), for: item) { [weak self, weak panel] error in
             if let error { panel?.store.errorMessage = error }
             else { panel?.store.applicationOpened?() }
@@ -650,6 +671,7 @@ final class WindowPeekCoordinator {
             backingScale: controller.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2,
             settings: context.settings, shelfAvailable: context.settings.showShelf)
         close(returnFocus: false)
+        Analytics.track(.markup(.opened, hasMarks: nil))
         markups.show(request)
     }
 
