@@ -1,0 +1,9 @@
+// Copy this file to Local.xcconfig (git-ignored) and fill in the PostHog project values.
+// Xcode and xcodebuild both read it through the include at the end of App.xcconfig.
+
+// The project token from PostHog > Settings > Project. It starts with "phc_".
+POSTHOG_PROJECT_TOKEN = phc_your_project_token
+
+// The ingestion host. `//` starts a comment in xcconfig files, so write the URL with `/$()/`
+// in place of `//`. This line resolves to https://eu.i.posthog.com.
+POSTHOG_HOST = https:/$()/eu.i.posthog.com

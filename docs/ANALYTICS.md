@@ -67,9 +67,10 @@ analytics. Make it an enum or a count.
 All three share one PostHog project. A build without an API key sends nothing. No key is
 hard-coded. The key and host are the build settings `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST`,
 which the Info.plist files in `Configuration/` copy into the `DOKKAnalyticsAPIKey` and
-`DOKKAnalyticsHost` keys. `xcodebuild` picks both settings up from its environment
-(`.env.example` lists them). Xcode's GUI does not read `.env`, so a build made there has no key
-unless the two settings are defined for it.
+`DOKKAnalyticsHost` keys. For local builds, copy `Configuration/Local.xcconfig.example` to `Configuration/Local.xcconfig`
+and fill in both values. The file is git-ignored and optional; `App.xcconfig` includes it when it
+exists. `xcodebuild` also picks both settings up from its environment, which is the route for CI
+and releases when no `Local.xcconfig` is present. Xcode does not read `.env` files.
 
 ## What the SDK sends by itself
 
