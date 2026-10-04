@@ -2,7 +2,7 @@
 
 ## Product intent
 
-DDock is a native macOS Dock alternative. Read `README.md` first. Match the system Dock's familiarity, visual quality, interaction, and responsiveness, then add precise configuration for displays, positioning, activation zones, size, fade, and behavior.
+DDock is a native macOS Dock alternative. Read `README.md` first, then `docs/DEVELOPMENT.md` for product goals and architecture. `docs/GUIDE.md` describes how each shipped feature behaves. Match the system Dock's familiarity, visual quality, interaction, and responsiveness, then add precise configuration for displays, positioning, activation zones, size, fade, and behavior.
 
 Treat look, behavior, and feel as separate acceptance criteria. A visually similar row of icons alone does not satisfy the product goal.
 
