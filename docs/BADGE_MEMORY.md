@@ -15,7 +15,7 @@ The single `DockBadgeReader` reads system Dock items through Accessibility. AX c
 | Nonnegative ASCII integer that fits Int64 | Observed count | Current minus checked count |
 | Empty status string or AX `noValue` | Explicitly cleared | Zero minus checked count |
 | Other nonempty string, including `99+` | Text badge | Unavailable |
-| Missing item, unsupported attribute, permission loss or failed scan | Unknown | Unavailable |
+| Missing item, unsupported attribute, permission loss, or scans failing for 15 seconds | Unknown | Unavailable |
 
 The reader keys observations by standardized installation path, matching DEE-10. A process restart at the same path keeps the explicit baseline. Multiple system Dock items for the same installation must agree; conflicting observations become unknown. Counts are never summed across processes. Moving an installation creates another identity. Source activation uses the recorded application URL and reports an error if opening fails.
 
@@ -27,7 +27,7 @@ Collection is off by default. Enable **Collect badge changes in future Focus Ses
 
 The existing Focus Session ID, phase and deadline define the collection interval. Each app's first and last observations produce a net change, independently of its checked baseline. Identical samples do not add history or persist redundant values. The first reliable observation seeds an endpoint with zero changes. Only rows with an observed state change appear in the digest.
 
-Pauses exclude samples and mark coverage incomplete. Sleep, permission loss and unavailable scans mark missing coverage. After DDock restarts, saved endpoints remain historical and current observations start unknown. A persisted active digest can continue for the same unexpired session, with a gap marker. Its deadline is retained separately so a relaunch after expiry closes it at the deadline, not the relaunch time. A completed or expired session closes before another sample is accepted. A scan begun before a start or resume boundary updates current details but is excluded from the digest. Relaunching DDock does not start collection for an existing session that has no active digest.
+Pauses exclude samples and mark coverage incomplete. Sleep, permission loss and unavailable scans mark missing coverage. A scan that fails within 15 seconds of a successful one keeps current values and history unchanged and only marks the active digest incomplete, so a transient Accessibility timeout cannot add unknown transitions to history or digest change counts. After DDock restarts, saved endpoints remain historical and current observations start unknown. A persisted active digest can continue for the same unexpired session, with a gap marker. Its deadline is retained separately so a relaunch after expiry closes it at the deadline, not the relaunch time. A completed or expired session closes before another sample is accepted. A scan begun before a start or resume boundary updates current details but is excluded from the digest. Relaunching DDock does not start collection for an existing session that has no active digest.
 
 Open **Focus badge digest** from the timer panel, including after completion, or **Review badge history** in Settings. Dismissing the timer does not delete completed digests. Each digest offers source-app activation and a delete control. Deleting an active digest stops its collection for that session.
 
@@ -54,7 +54,7 @@ No tests or automated visual checks were executed for this issue. These cases sh
 1. Check 37, then observe 41, 35, clear, text and unknown. Verify +4, -2, -37, no numeric comparison for text/unknown, and an unchanged checked baseline.
 2. Check a text value or clear, reset the baseline, then explicitly check a numeric value. App activation must never call `markChecked`.
 3. Duplicate samples do not append or save. Duplicate process items agree or resolve to unknown, never summed counts. Verify Int64 limits and text clipping.
-4. A failed scan, absent item and unsupported AX attribute remain unknown. Only explicit empty status or `noValue` becomes cleared.
+4. Scans failing for 15 seconds, absent items and unsupported AX attributes remain unknown. A failed scan inside that window keeps current values and history. Only explicit empty status or `noValue` becomes cleared.
 5. Opt-in before a new session collects; opt-in mid-session waits. Disabling stops immediately. Pauses, resume, extension, manual finish, deadline expiry, dismiss and new sessions maintain their boundaries.
 6. Persist and restart with a running, paused or expired session. No stale saved value becomes current; no post-deadline sample enters the old digest.
 7. Delete one app, one active/completed digest, and all history. Redundant samples must not recreate deleted rows. A later distinct observation can create a new app history.
