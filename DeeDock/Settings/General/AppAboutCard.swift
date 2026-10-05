@@ -7,10 +7,12 @@ struct AppAboutCard<Accessory: View>: View {
     @ViewBuilder var accessory: Accessory
 
     /// The bundle's own name; macOS supplies it, so it is not translated.
+    /// An alias week renames that supplied name in place.
     private var appName: String {
-        (Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
+        let bundled = (Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
             ?? (Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String)
             ?? ProcessInfo.processInfo.processName
+        return ProductAlias.applying(to: bundled)
     }
 
     var body: some View {

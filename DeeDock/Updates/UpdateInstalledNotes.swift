@@ -68,7 +68,8 @@ nonisolated enum UpdateInstalledNotes {
                   let notes = await UpdateReleaseNotes.render(localized(text, german: german), format: "markdown")
             else { continue }
             // Product name and version number are not translated.
-            blocks.append(UpdateReleaseNoteBlock(style: .heading(2), text: AttributedString("DOKK \(version)")))
+            blocks.append(UpdateReleaseNoteBlock(style: .heading(2),
+                text: AttributedString(ProductAlias.applying(to: "DOKK \(version)"))))
             blocks.append(contentsOf: notes)
         }
         guard !Task.isCancelled, !blocks.isEmpty else { return nil }

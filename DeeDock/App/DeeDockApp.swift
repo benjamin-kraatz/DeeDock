@@ -5,6 +5,10 @@ import SwiftUI
 private enum DeeDockEntryPoint {
     /// Canvas hosts must not construct the menu-bar app or its live service graph.
     static func main() {
+        // Test hosts compare localized copy that includes the real product name.
+        if !HostEnvironment.isTestHost {
+            ProductAlias.install()
+        }
         #if DDOCK_CANVAS_HOST
         DeeDockPreviewApp.main()
         #else

@@ -33,11 +33,12 @@ enum UpdateReleaseNotes {
     /// Parsing stays off the main actor; the driver cancels/discards results from older offers.
     @concurrent static func render(_ text: String, format: String) async -> [UpdateReleaseNoteBlock]? {
         guard text.utf8.count <= maximumBytes, !Task.isCancelled else { return nil }
+        let named = ProductAlias.applying(to: text)
         let blocks: [UpdateReleaseNoteBlock]
         if format.lowercased().contains("html") {
-            blocks = HTMLReleaseNotesParser.parse(text)
+            blocks = HTMLReleaseNotesParser.parse(named)
         } else {
-            blocks = textBlocks(text, markdown: format.lowercased().contains("markdown"))
+            blocks = textBlocks(named, markdown: format.lowercased().contains("markdown"))
         }
         guard !Task.isCancelled, !blocks.isEmpty else { return nil }
         return blocks.enumerated().map { index, block in

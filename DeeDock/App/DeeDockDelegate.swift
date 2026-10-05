@@ -14,6 +14,8 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let menuBarIcon = MenuBarIconController()
     private(set) lazy var onboarding = OnboardingWindowController(
         loginItems: loginItems, settings: coordinator.settings)
+    /// Reapplies the alias if SwiftUI rebuilds the application menu.
+    private var productAliasObserver: NSObjectProtocol?
 
     /// Xcode 27's JIT canvas uses the playground flag, while older preview hosts use the preview flag.
     private var isRunningForCanvasPreview: Bool {
@@ -51,6 +53,17 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         onboarding.presentIfNeeded()
         // The docks and the updater exist now, so the context can describe them.
         analytics.contextDidChange()
+        guard ProductAlias.presentsFestiveName else { return }
+        ProductAlias.applyRunningApplicationName()
+        productAliasObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification, object: NSApp, queue: .main
+        ) { [weak self] _ in
+            self?.refreshProductAliasName()
+        }
+    }
+
+    private func refreshProductAliasName() {
+        ProductAlias.applyRunningApplicationName()
     }
 
     /// Reopening the app restores an owned window without creating another scene.
@@ -64,6 +77,9 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         guard !isRunningForCanvasPreview else { return }
+        if let productAliasObserver {
+            NotificationCenter.default.removeObserver(productAliasObserver)
+        }
         updater.stop()
         AppDockPresence.shared.stop()
         onboarding.stop()
