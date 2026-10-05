@@ -49,6 +49,8 @@ nonisolated protocol AnalyticsBackend: AnyObject, Sendable {
     func captureLog(_ record: AnalyticsLogRecord)
     /// Captures the AI-specific payload documented by PostHog AI Observability.
     func captureAI(_ record: AIObservabilityRecord)
+    /// Captures a PostHog survey event built by ``AnalyticsSurveyRecord``.
+    func captureSurvey(_ record: AnalyticsSurveyRecord)
     /// Attaches `properties` to every later event until replaced or unregistered.
     func register(_ properties: AnalyticsProperties)
     func unregister(_ keys: [String])
@@ -74,6 +76,7 @@ nonisolated final class NoOpAnalyticsBackend: AnalyticsBackend {
     func capture(_ record: AnalyticsRecord) {}
     func captureLog(_ record: AnalyticsLogRecord) {}
     func captureAI(_ record: AIObservabilityRecord) {}
+    func captureSurvey(_ record: AnalyticsSurveyRecord) {}
     func register(_ properties: AnalyticsProperties) {}
     func unregister(_ keys: [String]) {}
     func setPersonProperties(_ properties: AnalyticsProperties) {}

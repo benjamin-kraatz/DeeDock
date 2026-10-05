@@ -16785,42 +16785,6 @@
         }
       }
     },
-    "launcher.suggestions.dismiss" : {
-      "comment" : "Dismiss the optional suggestion feedback prompt without sending a quality answer.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schließen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dismiss"
-          }
-        }
-      }
-    },
-    "launcher.suggestions.dontAsk" : {
-      "comment" : "Disable future optional suggestion quality prompts.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nicht mehr fragen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Don't ask again"
-          }
-        }
-      }
-    },
     "launcher.suggestions.enabled" : {
       "comment" : "Opt-in toggle enabling local app use learning and suggestions; off by default.",
       "extractionState" : "manual",
@@ -17109,24 +17073,6 @@
         }
       }
     },
-    "launcher.suggestions.no" : {
-      "comment" : "Negative answer to the aggregate suggestion quality question.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nein"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No"
-          }
-        }
-      }
-    },
     "launcher.suggestions.notNow" : {
       "comment" : "Contextual negative suggestion feedback; does not permanently exclude the app.",
       "extractionState" : "manual",
@@ -17199,24 +17145,6 @@
         }
       }
     },
-    "launcher.suggestions.prompt" : {
-      "comment" : "Optional inline aggregate quality question; feedback does not label individual apps.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Waren diese Vorschläge hilfreich?"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Were these suggestions useful?"
-          }
-        }
-      }
-    },
     "launcher.suggestions.promptsEnabled" : {
       "comment" : "Toggle controlling optional inline suggestion quality prompts.",
       "extractionState" : "manual",
@@ -17236,19 +17164,19 @@
       }
     },
     "launcher.suggestions.promptsHelp" : {
-      "comment" : "Explanation of optional inline feedback prompts.",
+      "comment" : "Explanation of the optional suggestions survey in App Launcher and its dependency on usage-data sharing.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nach einiger Nutzung gelegentlich eine freiwillige Frage im App Launcher anzeigen."
+            "value" : "Nach einiger Nutzung gelegentlich eine kurze, freiwillige Umfrage im App Launcher anzeigen. Erscheint nur, wenn du anonyme Nutzungsdaten teilst; deine Antworten werden mit ihnen gesendet."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Occasionally show an optional question in App Launcher after you have used suggestions for a while. No notifications or dialogs."
+            "value" : "Occasionally show a short, optional survey in App Launcher after you have used suggestions for a while. Appears only while you share anonymous usage data; your answers are sent with it. No notifications or dialogs."
           }
         }
       }
@@ -18225,20 +18153,272 @@
         }
       }
     },
-    "launcher.suggestions.yes" : {
-      "comment" : "Positive answer to the aggregate suggestion quality question.",
+    "launcher.survey.accessibilityLabel" : {
+      "comment" : "Container label for the optional App Recommendations survey card in App Launcher.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ja"
+            "value" : "Umfrage zu Vorschlägen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Yes"
+            "value" : "Suggestions survey"
+          }
+        }
+      }
+    },
+    "launcher.survey.answerLabel" : {
+      "comment" : "Accessibility label of the free-text answer field in the suggestions survey.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer"
+          }
+        }
+      }
+    },
+    "launcher.survey.answerPlaceholder" : {
+      "comment" : "Placeholder inside the free-text answer field of the suggestions survey.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Antwort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your answer"
+          }
+        }
+      }
+    },
+    "launcher.survey.characterCount" : {
+      "comment" : "Characters typed and the maximum allowed in a survey answer; arguments are the count and the limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld/%2$lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "launcher.survey.close" : {
+      "comment" : "Button that closes the suggestions survey without finishing it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umfrage schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close survey"
+          }
+        }
+      }
+    },
+    "launcher.survey.dismissedTitle" : {
+      "comment" : "Shown after a person closes the suggestions survey; this survey will not be offered again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles klar. Wir fragen das nicht noch einmal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Got it. We won't ask this again."
+          }
+        }
+      }
+    },
+    "launcher.survey.done" : {
+      "comment" : "Button that removes the survey's closing message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "launcher.survey.eyebrow" : {
+      "comment" : "Small label above a survey question in App Launcher, shown in capitals.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurze Frage"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick question"
+          }
+        }
+      }
+    },
+    "launcher.survey.progress" : {
+      "comment" : "Accessibility description of survey progress; arguments are the current question and the most questions that can follow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frage %1$lld von %2$lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Question %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "launcher.survey.ratingValue" : {
+      "comment" : "Accessibility label of one key on a survey rating scale; arguments are the value and the highest value.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld von %2$lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "launcher.survey.skip" : {
+      "comment" : "Button that skips an optional survey question.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "launcher.survey.stopAsking" : {
+      "comment" : "Button that turns off all future feedback questions about suggestions, same as the Settings switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht mehr nach Vorschlägen fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don't ask about suggestions"
+          }
+        }
+      }
+    },
+    "launcher.survey.submit" : {
+      "comment" : "Fallback submit button for a survey question when the survey author set no label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        }
+      }
+    },
+    "launcher.survey.thanksMessage" : {
+      "comment" : "Fallback thank-you text after the suggestions survey when the author set none.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das hilft, die Vorschläge für dich zu verbessern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It helps make suggestions better for you."
+          }
+        }
+      }
+    },
+    "launcher.survey.thanksTitle" : {
+      "comment" : "Fallback thank-you title after the suggestions survey when the author set none.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danke für dein Feedback!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thanks for your feedback!"
           }
         }
       }

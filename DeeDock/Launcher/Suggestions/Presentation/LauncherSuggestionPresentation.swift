@@ -11,12 +11,24 @@ final class LauncherSuggestionPresentation {
     @ObservationIgnored private var impressed = false
     #if DEBUG
     @ObservationIgnored private var usesPreviewAvailability = false
+    /// Random apps for ``LauncherSuggestionsStore/debugRandomSuggestions``, drawn once per presentation.
+    private(set) var debugRandomIDs: [String] = []
+    /// Changes on every presentation so the availability task runs again and draws new apps.
+    private(set) var debugDraw = 0
     #endif
 
     /// Runs when discovery or ranking changes, never while evaluating a SwiftUI body.
-    func updateAvailability(applications: [LauncherApplication]) async {
+    func updateAvailability(applications: [LauncherApplication], store: LauncherSuggestionsStore) async {
         #if DEBUG
         if usesPreviewAvailability { return }
+        if store.debugRandomSuggestions {
+            let ids = Set(applications.map(\.id))
+            if debugRandomIDs.isEmpty || !debugRandomIDs.allSatisfy(ids.contains) {
+                debugRandomIDs = applications.filter { $0.reference.bundleIdentifier != nil && $0.id != Bundle.main.bundleIdentifier }
+                    .shuffled().prefix(3).map(\.id)
+            }
+            return
+        }
         #endif
         guard let snapshot else { availableIDs = []; return }
         let snapshotID = snapshot.id
@@ -39,6 +51,9 @@ final class LauncherSuggestionPresentation {
 
     func begin(store: LauncherSuggestionsStore, foregroundID: String?, modeID: String?) {
         end()
+        #if DEBUG
+        debugDraw &+= 1
+        #endif
         guard let context = store.capture(foregroundID: foregroundID, modeID: modeID) else { return }
         let token = generation
         task = Task { [weak self] in
@@ -63,6 +78,7 @@ final class LauncherSuggestionPresentation {
         snapshot = nil; availableIDs = []; impressed = false
         #if DEBUG
         usesPreviewAvailability = false
+        debugRandomIDs = []
         #endif
     }
 
@@ -71,12 +87,26 @@ final class LauncherSuggestionPresentation {
 
 extension LauncherState {
     var suggestionAvailabilityKey: [String] {
-        [suggestions.snapshot?.id.uuidString ?? ""] + library.applications.map { $0.id + "|" + $0.reference.url.path }
+        var key = [suggestions.snapshot?.id.uuidString ?? ""]
+        #if DEBUG
+        key.append("debug|\(catalog.suggestions.debugRandomSuggestions)|\(suggestions.debugDraw)")
+        #endif
+        return key + library.applications.map { $0.id + "|" + $0.reference.url.path }
     }
 
     /// Candidates retain snapshot order, while filters and exclusions can remove them immediately.
     var suggestedApplications: [LauncherApplication] {
         let store = catalog.suggestions
+        #if DEBUG
+        // Random apps carry no snapshot, so they record no impressions or feedback and never
+        // touch the learned history.
+        if store.debugRandomSuggestions {
+            guard query.isEmpty, robiIDs == nil, !usesMixedResults else { return [] }
+            let eligible = Dictionary(results.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            return Array(suggestions.debugRandomIDs.compactMap { eligible[$0] }
+                .prefix(layout == .grid ? min(3, max(1, navigationColumns)) : 3))
+        }
+        #endif
         guard query.isEmpty, robiIDs == nil, !usesMixedResults, store.isActive,
               let snapshot = suggestions.snapshot, snapshot.generation == store.revision else { return [] }
         let eligible = Dictionary(uniqueKeysWithValues: results.map { ($0.id, $0) })

@@ -64,6 +64,11 @@ nonisolated final class PostHogAnalyticsBackend: AnalyticsBackend, @unchecked Se
         PostHogSDK.shared.capture(record.name, properties: record.properties)
     }
 
+    func captureSurvey(_ record: AnalyticsSurveyRecord) {
+        guard config != nil else { return }
+        PostHogSDK.shared.capture(record.name, properties: record.properties)
+    }
+
     func register(_ properties: AnalyticsProperties) {
         guard config != nil, !properties.isEmpty else { return }
         PostHogSDK.shared.register(properties.payload)

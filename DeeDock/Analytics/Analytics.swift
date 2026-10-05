@@ -26,6 +26,8 @@ final class Analytics {
     let recent: AnalyticsRecentLog
     /// False when this build has no API key or no analytics SDK; the Settings card says so.
     let isConfigured: Bool
+    /// Survey definitions authored in PostHog. Read through ``activeSurvey(id:)``.
+    private let surveys: AnalyticsSurveyCatalog
 
     /// See ``performing(_:_:)``.
     var ambientTrigger: AnalyticsTrigger?
@@ -76,13 +78,15 @@ final class Analytics {
     ///   - backend: where permitted events go. The default discards them.
     ///   - defaults: nil keeps consent and counters in memory, for previews and tests.
     ///   - recent: lets a preview show a prepared "recently sent" list.
+    ///   - surveySource: where survey definitions come from. Nil offers no surveys.
     init(backend: any AnalyticsBackend = NoOpAnalyticsBackend(), defaults: UserDefaults? = nil,
-         recent: AnalyticsRecentLog? = nil) {
+         recent: AnalyticsRecentLog? = nil, surveySource: (any AnalyticsSurveySource)? = nil) {
         let recent = recent ?? AnalyticsRecentLog()
         self.defaults = defaults
         self.recent = recent
         self.backend = RecordingAnalyticsBackend(base: backend, log: recent)
         isConfigured = backend.isConfigured
+        surveys = AnalyticsSurveyCatalog(source: surveySource)
         consent = AnalyticsConsentStore(defaults: defaults, isExistingInstall: {
             defaults.map(AnalyticsConsentStore.hasEarlierLaunch(in:)) ?? false
         })
@@ -93,7 +97,8 @@ final class Analytics {
     }
 
     private static func live() -> Analytics {
-        Analytics(backend: AnalyticsBackendFactory.live(), defaults: .standard)
+        Analytics(backend: AnalyticsBackendFactory.live(), defaults: .standard,
+                  surveySource: AnalyticsBackendFactory.liveSurveys())
     }
 
     // MARK: - Call-site API
@@ -131,6 +136,35 @@ final class Analytics {
     private func captureAI(_ record: AIObservabilityRecord) {
         guard acceptsEvents, backendStarted else { return }
         queue.async { [backend] in backend.captureAI(record) }
+    }
+
+    // MARK: - Surveys
+
+    /// Whether events are leaving the device right now. Surveys are offered only then, since an
+    /// answer that cannot be sent would be asked for nothing.
+    var isCollecting: Bool { backendStarted }
+
+    /// The PostHog survey with `id`, when it is running, DOKK can render it, and events are being
+    /// collected. May fetch definitions from the analytics host; see ``AnalyticsSurveyCatalog``.
+    func activeSurvey(id: String) async -> AnalyticsSurvey? {
+        guard isCollecting else { return nil }
+        let survey = await surveys.survey(id: id)
+        return isCollecting ? survey : nil
+    }
+
+    #if DEBUG
+    /// The survey with `id` whether or not events are collected, so its UI can be checked with
+    /// sending off. Its events are then dropped by ``captureSurvey(_:)`` as usual.
+    func debugSurvey(id: String) async -> AnalyticsSurvey? {
+        await surveys.survey(id: id)
+    }
+    #endif
+
+    /// Sends a survey event, including the person's own words for open questions. Dropped
+    /// unless events are being collected. See ``AnalyticsSurveyRecord``.
+    func captureSurvey(_ record: AnalyticsSurveyRecord) {
+        guard acceptsEvents, backendStarted else { return }
+        queue.async { [backend] in backend.captureSurvey(record) }
     }
 
     /// Reports one smart-grouping request from the organizer actor: whether groups were
@@ -286,6 +320,7 @@ final class Analytics {
         contextRefresh?.cancel()
         contextRefresh = nil
         counters.discard()
+        surveys.reset()
         registered = AnalyticsProperties()
         guard backendStarted else { return }
         backendStarted = false

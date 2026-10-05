@@ -8,6 +8,8 @@ final class ApplicationCatalog {
     let launcherFavorites: LauncherFavorites
     let launcherHistory: LauncherHistory
     let suggestions: LauncherSuggestionsStore
+    /// The App Recommendations survey, shared by every display's launcher.
+    let suggestionSurvey: LauncherSuggestionSurvey
     @ObservationIgnored private lazy var suggestionObservation = LauncherSuggestionObservation(store: suggestions)
     private(set) var running: [ApplicationReference] = []
     private(set) var runningIDs: [String] = []
@@ -26,12 +28,15 @@ final class ApplicationCatalog {
     @ObservationIgnored private var generation = UUID()
 
     init(service: any ApplicationServicing, launcherHistory: LauncherHistory? = nil, launcherLibrary: LauncherLibrary? = nil,
-         suggestions: LauncherSuggestionsStore? = nil, launcherFavorites: LauncherFavorites? = nil) {
+         suggestions: LauncherSuggestionsStore? = nil, launcherFavorites: LauncherFavorites? = nil,
+         surveyDefaults: UserDefaults? = nil) {
         self.launcherFavorites = launcherFavorites ?? LauncherFavorites(defaults: nil)
         self.service = service
         self.launcherHistory = launcherHistory ?? LauncherHistory(defaults: nil)
         self.launcherLibrary = launcherLibrary ?? LauncherLibrary()
-        self.suggestions = suggestions ?? LauncherSuggestionsStore(directory: nil, defaults: nil)
+        let suggestions = suggestions ?? LauncherSuggestionsStore(directory: nil, defaults: nil)
+        self.suggestions = suggestions
+        suggestionSurvey = LauncherSuggestionSurvey(store: suggestions, analytics: .shared, defaults: surveyDefaults)
     }
 
     func start() {

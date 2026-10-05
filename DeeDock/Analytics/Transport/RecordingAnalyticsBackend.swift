@@ -40,9 +40,15 @@ nonisolated final class RecordingAnalyticsBackend: AnalyticsBackend {
         Task { @MainActor [log] in log.append(record) }
     }
 
-
     func captureLog(_ record: AnalyticsLogRecord) { base.captureLog(record) }
     func captureAI(_ record: AIObservabilityRecord) { base.captureAI(record) }
+
+    /// Lists the event by name only. Its responses are not repeated in Settings.
+    func captureSurvey(_ record: AnalyticsSurveyRecord) {
+        base.captureSurvey(record)
+        let entry = AnalyticsRecord(name: record.name, properties: [:])
+        Task { @MainActor [log] in log.append(entry) }
+    }
     func register(_ properties: AnalyticsProperties) { base.register(properties) }
     func unregister(_ keys: [String]) { base.unregister(keys) }
     func setPersonProperties(_ properties: AnalyticsProperties) { base.setPersonProperties(properties) }

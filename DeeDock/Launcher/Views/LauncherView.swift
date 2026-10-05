@@ -41,22 +41,30 @@ struct LauncherView: View {
             }
         }
         .onChange(of: state.contentVisible) { _, visible in searchFocused = visible }
+        // Leaving the survey's answer field returns typing to the search field.
+        .onChange(of: state.surveyTextFocused) { _, focused in
+            if !focused, state.contentVisible { searchFocused = true }
+        }
         .onExitCommand {
-            // Esc steps out of Robi first, so leaving its answer never closes the launcher.
-            if state.robiActive { state.cancelRobi() } else { state.close?() }
+            // Esc leaves the survey's answer field first, then steps out of Robi, so neither
+            // closes the launcher by accident.
+            if state.surveyTextFocused { searchFocused = true }
+            else if state.robiActive { state.cancelRobi() } else { state.close?() }
         }
         .onKeyPress(.downArrow) {
+            guard !state.surveyTextFocused else { return .ignored }
             state.moveSelection(by: state.usesGridNavigation ? columns : 1); return .handled
         }
         .onKeyPress(.upArrow) {
+            guard !state.surveyTextFocused else { return .ignored }
             state.moveSelection(by: state.usesGridNavigation ? -columns : -1); return .handled
         }
         .onKeyPress(.leftArrow) {
-            guard !searchFocused else { return .ignored }
+            guard !searchFocused, !state.surveyTextFocused else { return .ignored }
             state.moveSelection(by: -1); return .handled
         }
         .onKeyPress(.rightArrow) {
-            guard !searchFocused else { return .ignored }
+            guard !searchFocused, !state.surveyTextFocused else { return .ignored }
             state.moveSelection(by: 1); return .handled
         }
         .confirmationDialog(Text(.launcherClearHistory), isPresented: $confirmClear) {

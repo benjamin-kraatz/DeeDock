@@ -74,7 +74,8 @@ struct DeeDockApp: App {
             UpdateDebugMenu(updater: delegate.updater)
             #endif
             #if DEBUG
-            AnalyticsDebugMenu(analytics: delegate.analytics)
+            AnalyticsDebugMenu(analytics: delegate.analytics, suggestions: delegate.coordinator.launcherSuggestions,
+                               survey: delegate.coordinator.suggestionSurvey)
             #endif
             Button(.onboardingShowWelcome) { delegate.onboarding.present() }
             Divider()

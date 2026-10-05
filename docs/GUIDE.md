@@ -311,6 +311,7 @@ Pins differ per display, so the shared Settings menu lists the main display's pi
 
 Optional **App suggestions** learn from local app activity after opt-in under **Settings → Features → App suggestions**.
 An empty Launcher query can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.
+After a week of use, a short optional survey about suggestion quality can appear below them while usage-data sharing is on.
 See [app suggestions](LAUNCHER-SUGGESTIONS.md) for the 90-day retention policy and observation limits.
 
 ## App badges
