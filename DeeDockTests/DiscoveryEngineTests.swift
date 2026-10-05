@@ -78,7 +78,9 @@ struct DiscoveryEngineTests {
         #expect(engine.advance(at: early, canPresent: true) == nil)
         #expect(engine.queue == ["second"])
 
+        // finish cleared the shared signal. Restore it after the spacing refusal.
         let due = start.addingTimeInterval(DiscoveryEngine.spacing)
+        engine.record(.clipboardChanged, at: due)
         #expect(engine.advance(at: due, canPresent: true)?.id == "second")
     }
 
