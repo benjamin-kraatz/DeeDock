@@ -139,11 +139,18 @@ private struct ClipboardExhibitImageArtwork: View {
 private struct ClipboardExhibitFilesArtwork: View {
     private static let shownFiles = 12
     let urls: [URL]
+    @State private var icons: [String: ClipboardExhibitFileIcon] = [:]
 
     var body: some View {
+        let shown = Array(urls.prefix(Self.shownFiles))
         VStack(spacing: 12) {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 96, maximum: 112), spacing: 14)], spacing: 14) {
-                ForEach(urls.prefix(Self.shownFiles), id: \.self) { ClipboardExhibitFileTile(url: $0) }
+                ForEach(shown, id: \.self) { url in
+                    ClipboardExhibitFileTile(
+                        url: url,
+                        icon: icons[url.path] ?? ClipboardExhibitFileIcons.cached(url.path)
+                    )
+                }
             }
             if urls.count > Self.shownFiles {
                 Text(.clipboardMuseumMoreFiles(urls.count - Self.shownFiles))
@@ -152,17 +159,30 @@ private struct ClipboardExhibitFilesArtwork: View {
             }
         }
         .frame(minWidth: 240, maxWidth: 520)
+        .task(id: shown) {
+            let keep = Set(shown.map(\.path))
+            if icons.keys.contains(where: { !keep.contains($0) }) {
+                icons = icons.filter { keep.contains($0.key) }
+            }
+            await ClipboardExhibitFileIcons.fill(shown) { path, icon in
+                icons[path] = icon
+            }
+        }
     }
 }
 
 /// A file's Finder icon and name. Files moved or deleted since the copy are dimmed.
+///
+/// The type icon is drawn immediately. Existence and `icon(forFile:)` arrive later, because
+/// both can stall on a network path. `icon` nil means that lookup has not finished.
 private struct ClipboardExhibitFileTile: View {
     let url: URL
+    let icon: ClipboardExhibitFileIcon?
 
     var body: some View {
-        let exists = FileManager.default.fileExists(atPath: url.path)
+        let exists = icon?.exists ?? true
         VStack(spacing: 6) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
+            Image(nsImage: icon?.image ?? ClipboardExhibitFileIcons.placeholder(for: url))
                 .resizable()
                 .frame(width: 48, height: 48)
                 .opacity(exists ? 1 : 0.4)
