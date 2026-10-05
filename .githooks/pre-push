@@ -1,0 +1,13 @@
+#!/bin/sh
+# Opt-in. This file does nothing until this clone sets:
+#   git config core.hooksPath .githooks
+set -eu
+
+root=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+
+if ! command -v xcodebuild >/dev/null 2>&1; then
+  echo "pre-push: xcodebuild is not on PATH. Build & Test needs a Mac with Xcode 27." >&2
+  exit 1
+fi
+
+exec "$root/scripts/build-and-test.sh"
