@@ -6,7 +6,7 @@ App badges must be enabled in Settings. Badge memory uses the same reader and Ac
 
 ## Observation and identity rules
 
-The single `DockBadgeReader` reads system Dock items through Accessibility. AX calls remain on its actor, with its existing coalescing, notifications and five-second fallback. History does not create another scraper or increase the polling frequency. Reading URLs for unbadged application items is necessary to distinguish explicit clears from missing items.
+The single `DockBadgeReader` reads system Dock items through Accessibility. Blocking AX copies for one pass run on a private serial queue, so they do not occupy the cooperative thread pool. Coalescing, notifications, and the five-second fallback stay as they are. History does not create another scraper or increase the polling frequency. Reading URLs for unbadged application items is necessary to distinguish explicit clears from missing items.
 
 `AXStatusLabel` is a system Dock attribute, not a documented public cross-app badge API. Public AX calls can return unsupported attributes, timeouts or incomplete item lists. DDock cannot promise every application exposes a badge, or that every transition between samples is observed.
 

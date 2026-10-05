@@ -27,17 +27,40 @@ nonisolated enum FolderStackMediaCacheValue: Equatable, Sendable {
     case unavailable
 }
 
-/// Shared, cancellable store for folder-stack media headers.
+/// Shared store for folder-stack media headers and remembered misses.
+///
+/// The cache keeps at most ``capacity`` entries. A long session stores one entry per image, PDF, or audio file, including failed reads (`.unavailable`). Without a cap the dictionary grows for the life of the process.
+/// 1024 covers a large folder plus stacks visited recently. Each value is a few integers, so this limit is higher than the 256-entry folder-metrics cache.
+/// Eviction drops the oldest insertion. Storing a key that is already present replaces its value and leaves the order list unchanged.
 actor FolderStackMediaCache {
     static let shared = FolderStackMediaCache()
 
+    /// Maximum retained headers and remembered misses, in insertion order.
+    nonisolated static let capacity = 1024
+
     private var values: [FolderStackMediaCacheKey: FolderStackMediaCacheValue] = [:]
+    private var insertionOrder: [FolderStackMediaCacheKey] = []
 
     func value(for key: FolderStackMediaCacheKey) -> FolderStackMediaCacheValue? {
         values[key]
     }
 
     func store(_ value: FolderStackMediaCacheValue, for key: FolderStackMediaCacheKey) {
+        // Updating a stored key must not append. A second slot would make eviction drop a live entry early.
+        if values[key] == nil {
+            insertionOrder.append(key)
+        }
         values[key] = value
+        evictIfNeeded()
+    }
+
+    /// Insertion-order slots. Equals the number of retained keys when each key occupies one slot.
+    var insertionCount: Int { insertionOrder.count }
+
+    private func evictIfNeeded() {
+        while values.count > Self.capacity, let oldest = insertionOrder.first {
+            insertionOrder.removeFirst()
+            values.removeValue(forKey: oldest)
+        }
     }
 }

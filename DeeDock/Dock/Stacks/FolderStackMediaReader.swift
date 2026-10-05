@@ -1,7 +1,7 @@
 import AVFoundation
+import CoreGraphics
 import Foundation
 import ImageIO
-import PDFKit
 import UniformTypeIdentifiers
 
 /// Reads image, PDF, and audiovisual headers away from the main actor.
@@ -95,9 +95,21 @@ nonisolated enum FolderStackMediaReader {
         return .image(width: size.width, height: size.height)
     }
 
+    /// Page count from the PDF catalog. CoreGraphics reads the cross-reference and page tree
+    /// and does not build PDFKit's page model.
+    ///
+    /// `PDFDocument.isLocked` is true only when a non-empty user password is required.
+    /// PDFKit tries `""` while opening, so an owner-password file (empty user password) is
+    /// encrypted and still readable. `CGPDFDocument` leaves that file locked until `""` is
+    /// supplied. After that attempt, `isUnlocked` matches `!isLocked`. A failed attempt,
+    /// a document that will not open, or a page count of zero all return `nil`.
     private static func pdfMetadata(at url: URL) -> FolderStackMediaMetadata? {
-        guard let document = PDFDocument(url: url), !document.isLocked else { return nil }
-        let count = document.pageCount
+        guard let document = CGPDFDocument(url as CFURL) else { return nil }
+        if document.isEncrypted, !document.isUnlocked {
+            "".withCString { _ = document.unlockWithPassword($0) }
+        }
+        guard document.isUnlocked else { return nil }
+        let count = document.numberOfPages
         guard count > 0 else { return nil }
         return .pdf(pageCount: count)
     }
