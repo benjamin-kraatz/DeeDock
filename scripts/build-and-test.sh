@@ -12,7 +12,10 @@
 # CI-only environment:
 #   CLONED_SOURCE_PACKAGES_PATH  stable directory for SPM checkouts
 #   SPM_SOURCES_CACHE_HIT        "true" when that directory was restored
-#   SPM_PRODUCTS_CACHE_PATH      compiled products of SPM dependencies only
+#   STRIP_APP_PRODUCTS           "1" deletes DOKK and DeeDockTests outputs
+#                                before xcodebuild. CI restores package
+#                                intermediates into DERIVED_DATA_PATH and
+#                                then sets this so the app is compiled again.
 #   ENABLE_CODE_COVERAGE         YES or NO; unset keeps the scheme setting
 #
 # Compile jobs follow hw.ncpu. Test runners stay at the scheme default:
@@ -31,21 +34,12 @@ physical=$(sysctl -n hw.physicalcpu)
 logical=$(sysctl -n hw.logicalcpu)
 echo "runner cores: hw.ncpu=$ncpu hw.physicalcpu=$physical hw.logicalcpu=$logical"
 echo "xcodebuild -jobs $ncpu"
+echo "workspace: $root"
+echo "DerivedData path: $derived"
 
-# App and test products must never enter the SPM product cache.
-is_app_owned_product() {
-  case "$1" in
-    DOKK.app|DOKK.app.dSYM|DeeDockTests.xctest|DeeDockTests.xctest.dSYM|DeeDock.swiftmodule|DeeDock.swiftdoc|DeeDock.swiftsourceinfo|DeeDock.abi.json|DeeDockTests.swiftmodule|DeeDockTests.swiftdoc|DeeDockTests.swiftsourceinfo|DeeDockTests.abi.json|*.dSYM)
-      return 0
-      ;;
-  esac
-  return 1
-}
-
-# Drop DOKK and DeeDockTests outputs after a package-product restore.
-# DerivedData for those targets stays uncached; deleting the leftovers
-# forces this job to compile and link them again. PIFCache and the
-# package task database stay, so unchanged package compiles can be skipped.
+# Delete DOKK and DeeDockTests outputs, including explicit modules named
+# for the app. Package intermediates stay. Missing app outputs make
+# xcodebuild compile and link those targets again.
 strip_app_products() {
   rm -rf \
     "$derived/Build/Intermediates.noindex/DeeDock.build" \
@@ -60,76 +54,40 @@ strip_app_products() {
     "$derived/Build/Products/Debug/DeeDockTests.swiftmodule" \
     "$derived/Build/Products/Debug/DeeDockTests.swiftdoc" \
     "$derived/Build/Products/Debug/DeeDockTests.swiftsourceinfo" \
-    "$derived/Build/Products/Debug/DeeDockTests.abi.json"
-}
+    "$derived/Build/Products/Debug/DeeDockTests.abi.json" \
+    "$derived/Index.noindex"
 
-# Copy cached package intermediates and products into this job's DerivedData.
-# The build database stores absolute paths and output timestamps, so the
-# copy preserves times and lands at the same DerivedData path.
-seed_spm_products() {
-  cache="${SPM_PRODUCTS_CACHE_PATH:-}"
-  [ -n "$cache" ] || return 0
-  if [ -d "$cache/Build" ]; then
-    echo "Seeding SPM build products from $cache"
-    rm -rf "$derived/Build"
-    mkdir -p "$derived"
-    cp -pR "$cache/Build" "$derived/"
-  else
-    echo "SPM build products cache is empty"
-  fi
-  strip_app_products
-}
+  for tree in \
+    "$derived/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules" \
+    "$derived/Build/Intermediates.noindex/ExplicitPrecompiledModules" \
+    "$derived/Build/Intermediates.noindex/PrecompiledHeaders" \
+    "$derived/ModuleCache.noindex" \
+    "$derived/SDKExplicitPrecompiledModules"
+  do
+    [ -d "$tree" ] || continue
+    find "$tree" \( -name '*DeeDock*' -o -name 'DOKK.app' -o -name 'DOKK.app.dSYM' \) -prune -exec rm -rf {} +
+  done
 
-# Keep package *.build directories, package products, and XCBuildData.
-# DeeDock.build is the app project (app target and DeeDockTests).
-export_spm_products() {
-  cache="${SPM_PRODUCTS_CACHE_PATH:-}"
-  [ -n "$cache" ] || return 0
-  rm -rf "$cache"
-  mkdir -p "$cache/Build/Intermediates.noindex" "$cache/Build/Products/Debug"
-
-  intermediates="$derived/Build/Intermediates.noindex"
-  if [ -d "$intermediates" ]; then
-    for dir in "$intermediates"/*.build; do
-      [ -d "$dir" ] || continue
-      base=$(basename "$dir")
-      case "$base" in
-        DeeDock.build) continue ;;
-      esac
-      cp -pR "$dir" "$cache/Build/Intermediates.noindex/"
-    done
-    if [ -d "$intermediates/GeneratedModuleMaps" ]; then
-      cp -pR "$intermediates/GeneratedModuleMaps" "$cache/Build/Intermediates.noindex/"
-    fi
-    if [ -d "$intermediates/XCBuildData" ]; then
-      cp -pR "$intermediates/XCBuildData" "$cache/Build/Intermediates.noindex/"
-    fi
-  fi
-
-  products="$derived/Build/Products/Debug"
-  if [ -d "$products" ]; then
-    for item in "$products"/*; do
-      [ -e "$item" ] || continue
-      base=$(basename "$item")
-      if is_app_owned_product "$base"; then
-        continue
-      fi
-      cp -pR "$item" "$cache/Build/Products/Debug/"
-    done
-  fi
-
-  if [ -e "$cache/Build/Products/Debug/DOKK.app" ] || [ -d "$cache/Build/Intermediates.noindex/DeeDock.build" ]; then
-    echo "Refusing to cache DeeDock app or test products." >&2
+  if [ -e "$derived/Build/Products/Debug/DOKK.app" ] || [ -d "$derived/Build/Intermediates.noindex/DeeDock.build" ]; then
+    echo "DeeDock products are still present after strip." >&2
     exit 1
   fi
-  echo "SPM products cache size: $(du -sh "$cache" | awk '{print $1}')"
 }
 
 mkdir -p "$(dirname "$derived")" "$(dirname "$results")"
 # xcodebuild refuses to overwrite an existing result bundle.
 rm -rf "$results"
 
-seed_spm_products
+if [ "${STRIP_APP_PRODUCTS:-}" = "1" ]; then
+  echo "Removing cached DOKK and DeeDockTests products"
+  strip_app_products
+fi
+
+if [ -d "$derived/Build/Intermediates.noindex/PostHog.build" ]; then
+  echo "SPM package intermediates: present"
+else
+  echo "SPM package intermediates: absent"
+fi
 
 set -- \
   -project "$root/DeeDock.xcodeproj" \
@@ -159,6 +117,12 @@ if [ -n "${ENABLE_CODE_COVERAGE:-}" ]; then
   set -- "$@" -enableCodeCoverage "$ENABLE_CODE_COVERAGE"
 fi
 
+# The index store is large, and a missing Index.noindex makes every
+# compile task look out of date. CI does not index.
+if [ "${STRIP_APP_PRODUCTS:-}" = "1" ]; then
+  set -- "$@" COMPILER_INDEX_STORE_ENABLE=NO
+fi
+
 xcodebuild "$@" \
   CODE_SIGNING_ALLOWED=NO \
   CODE_SIGNING_REQUIRED=NO \
@@ -166,7 +130,12 @@ xcodebuild "$@" \
   POSTHOG_HOST= \
   test
 
-export_spm_products
+if [ -d "$derived/Build/Intermediates.noindex/DeeDock.build" ]; then
+  echo "DeeDock intermediates: present"
+else
+  echo "DeeDock intermediates: absent" >&2
+  exit 1
+fi
 
 if [ -n "${CLONED_SOURCE_PACKAGES_PATH:-}" ]; then
   echo "SPM source packages size: $(du -sh "$CLONED_SOURCE_PACKAGES_PATH" | awk '{print $1}')"

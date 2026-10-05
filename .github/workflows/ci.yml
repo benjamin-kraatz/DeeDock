@@ -8,15 +8,12 @@
 # label. Xcode selection below is that job's discovery step: highest
 # installed Xcode, which must be major 27. It does not hardcode an app path.
 #
-# DOKK.app and DeeDockTests use a fresh DerivedData under RUNNER_TEMP.
-# This runner keeps a disk between jobs, and a restored app product can be
-# signed or stale, so the full DerivedData is not cached.
-#
-# actions/cache stores two trees:
-#   source packages, keyed on Package.resolved + Xcode version
-#   compiled products of those packages only, same key plus the hash of
-#   scripts/build-and-test.sh
-# The product restore deletes app and test outputs before xcodebuild runs.
+# DOKK.app and DeeDockTests are compiled every job. DerivedData lives at a
+# stable path under RUNNER_TEMP because XCBuild records absolute paths.
+# The job caches package checkouts and the compiled package artifacts at
+# that path. It does not cache DeeDock.build, DOKK.app, or DeeDockTests.
+# There is no restore-key prefix: a partial match could reuse objects
+# built for a different package lock, script, or project file.
 
 name: CI
 
@@ -98,14 +95,39 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/ci-cache/source-packages
-          key: spm-sources-v2-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          key: spm-sources-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
+      # Restore straight into DerivedData. A copy would change timestamps
+      # and the task database would treat every package output as stale.
+      # Keep this path list identical to the save step. DOKK.app,
+      # DeeDockTests, and DeeDock.build are not listed.
       - name: Restore SPM dependency products
         id: spm-products
         uses: actions/cache/restore@v4
         with:
-          path: ${{ runner.temp }}/ci-cache/spm-products
-          key: spm-products-v2-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ hashFiles('scripts/build-and-test.sh') }}
+          path: |
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/PostHog.build
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/XCBuildData
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/GeneratedModuleMaps
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/PrecompiledHeaders
+            ${{ runner.temp }}/DerivedData/ModuleCache.noindex
+            ${{ runner.temp }}/DerivedData/SDKStatCaches.noindex
+            ${{ runner.temp }}/DerivedData/SDKExplicitPrecompiledModules
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PackageFrameworks
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/Sparkle.framework
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog.swiftmodule
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog.appintents
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/phlibwebp.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PHPLCrashReporter.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHogObjCExceptionSupport.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog_PHPLCrashReporter.bundle
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog_PostHog.bundle
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/include
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/DerivedSources
+          key: spm-products-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved', '.github/workflows/ci.yml', 'scripts/build-and-test.sh', 'DeeDock.xcodeproj/project.pbxproj') }}
 
       - name: Build and test
         env:
@@ -113,7 +135,7 @@ jobs:
           RESULT_BUNDLE_PATH: ${{ runner.temp }}/DeeDock.xcresult
           CLONED_SOURCE_PACKAGES_PATH: ${{ runner.temp }}/ci-cache/source-packages
           SPM_SOURCES_CACHE_HIT: ${{ steps.spm-sources.outputs.cache-hit }}
-          SPM_PRODUCTS_CACHE_PATH: ${{ runner.temp }}/ci-cache/spm-products
+          STRIP_APP_PRODUCTS: "1"
           ENABLE_CODE_COVERAGE: "NO"
         run: |
           set -eu
@@ -131,8 +153,54 @@ jobs:
         if: success() && steps.spm-products.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ${{ runner.temp }}/ci-cache/spm-products
+          path: |
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/PostHog.build
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/XCBuildData
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/GeneratedModuleMaps
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+            ${{ runner.temp }}/DerivedData/Build/Intermediates.noindex/PrecompiledHeaders
+            ${{ runner.temp }}/DerivedData/ModuleCache.noindex
+            ${{ runner.temp }}/DerivedData/SDKStatCaches.noindex
+            ${{ runner.temp }}/DerivedData/SDKExplicitPrecompiledModules
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PackageFrameworks
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/Sparkle.framework
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog.swiftmodule
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog.appintents
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/phlibwebp.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PHPLCrashReporter.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHogObjCExceptionSupport.o
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog_PHPLCrashReporter.bundle
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/PostHog_PostHog.bundle
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/include
+            ${{ runner.temp }}/DerivedData/Build/Products/Debug/DerivedSources
           key: ${{ steps.spm-products.outputs.cache-primary-key }}
+
+      - name: Report SPM cache sizes
+        if: success()
+        run: |
+          set -eu
+          report() {
+            if [ -e "$1" ]; then
+              du -sh "$1"
+            else
+              echo "missing $1"
+            fi
+          }
+          report "${RUNNER_TEMP}/ci-cache/source-packages"
+          report "${RUNNER_TEMP}/DerivedData/Build/Intermediates.noindex/PostHog.build"
+          report "${RUNNER_TEMP}/DerivedData/Build/Intermediates.noindex/XCBuildData"
+          report "${RUNNER_TEMP}/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules"
+          report "${RUNNER_TEMP}/DerivedData/ModuleCache.noindex"
+          report "${RUNNER_TEMP}/DerivedData/SDKStatCaches.noindex"
+          report "${RUNNER_TEMP}/DerivedData/Build/Products/Debug/Sparkle.framework"
+          if [ -d "${RUNNER_TEMP}/DerivedData/Build/Products/Debug/DOKK.app" ]; then
+            echo "DOKK.app is present in DerivedData and is not on the cache path."
+          fi
+          if [ -d "${RUNNER_TEMP}/DerivedData/Build/Intermediates.noindex/DeeDock.build" ]; then
+            echo "DeeDock.build is present in DerivedData and is not on the cache path."
+          fi
 
       - name: Upload test results
         if: failure()
