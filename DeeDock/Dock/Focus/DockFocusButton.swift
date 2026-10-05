@@ -10,6 +10,10 @@ struct DockFocusButton: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @AccessibilityFocusState private var accessibilityFocused: Bool
+    /// Stable start for the one-second timeline. Recreating the schedule from `.now` on each accessibility refresh would skip ticks.
+    @State private var timelineAnchor = Date()
+    /// Date the running tile last drew. VoiceOver reads remaining time from this without rebuilding the button.
+    @State private var readingDate = Date()
 
     var body: some View {
         Button { interaction.openFocusSession?() } label: {
@@ -19,17 +23,34 @@ struct DockFocusButton: View {
                     idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons,
                 artworkAnimation: interaction.idleFade.animation) {
                 if item.session.phase == .running && interaction.exposesContent {
-                    TimelineView(.periodic(from: .now, by: 1)) { context in glyph(at: context.date) }
+                    TimelineView(.periodic(from: timelineAnchor, by: 1)) { context in
+                        glyph(at: context.date)
+                            .onChange(of: context.date, initial: true) { _, date in
+                                // Whole seconds only. A sub-second date on each refresh would republish state in a loop.
+                                let drawn = Int(readingDate.timeIntervalSinceReferenceDate)
+                                let next = Int(date.timeIntervalSinceReferenceDate)
+                                if drawn != next { readingDate = date }
+                            }
+                    }
                 } else { glyph(at: .now) }
             }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(.focusTileName(item.session.modeName)))
-        .accessibilityValue(Text(status))
+        .accessibilityValue(accessibilityValue(at: accessibilityDate))
         .accessibilityHint(Text(.focusTileHint))
         .accessibilityFocused($accessibilityFocused)
         .onChange(of: accessibilityFocused) { _, focused in accessibilityFocus(focused) }
         .onDisappear { accessibilityFocus(false) }
+    }
+
+    /// Visible running sessions follow the timeline. Hidden, paused, and completed tiles do not tick.
+    private var accessibilityDate: Date {
+        item.session.phase == .running && interaction.exposesContent ? readingDate : .now
+    }
+
+    private func accessibilityValue(at date: Date) -> Text {
+        Text(status) + Text(verbatim: ", \(item.session.spokenRemaining(at: date))")
     }
 
     private var status: LocalizedStringResource {
@@ -62,9 +83,21 @@ struct DockFocusButton: View {
             } else {
                 VStack(spacing: 0) {
                     if item.session.phase == .paused { Image(systemName: "pause.fill").font(.system(size: size * 0.15)) }
-                    Text(verbatim: item.session.timeLabel(at: date)).font(.system(size: size * 0.23, weight: .semibold)).monospacedDigit()
+                    countdown(at: date)
                 }.foregroundStyle(.white)
             }
+        }
+    }
+
+    /// `MM:SS` already sits inside the progress ring. `H:MM:SS` scales to the ring's inner diameter.
+    @ViewBuilder private func countdown(at date: Date) -> some View {
+        let label = Text(verbatim: item.session.timeLabel(at: date))
+            .font(.system(size: size * 0.23, weight: .semibold)).monospacedDigit()
+        if item.session.showsHours(at: date) {
+            label.lineLimit(1).minimumScaleFactor(0.55)
+                .frame(maxWidth: size * 0.8 - max(2, size * 0.06))
+        } else {
+            label
         }
     }
 }
