@@ -135,8 +135,12 @@ struct FolderStackTests {
         state.stop()
         gate.resume()
         #expect(await state.waitUntilOpen() == false)
-        while state.copying { await Task.yield() }
-        #expect(FileManager.default.fileExists(atPath: folder.appendingPathComponent("note.txt").path))
+        let copied = folder.appendingPathComponent("note.txt")
+        let deadline = ContinuousClock.now + .seconds(2)
+        while !FileManager.default.fileExists(atPath: copied.path), ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(FileManager.default.fileExists(atPath: copied.path))
         #expect(FileManager.default.fileExists(atPath: source.path))
         #expect(state.entries.isEmpty)
         #expect(state.error == nil)
