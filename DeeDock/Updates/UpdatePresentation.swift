@@ -2,15 +2,17 @@ import Foundation
 import Observation
 
 /// UI-only phases. Sparkle remains authoritative about which operation can run next.
-enum UpdatePhase: Equatable {
-    case idle, permission, checking, available, downloading, extracting, ready, installing, notFound, failed, installed
+/// Raw values are reported to analytics as `phase`.
+enum UpdatePhase: String, Equatable {
+    case idle, permission, checking, available, downloading, extracting, ready, installing
+    case notFound = "not_found", failed, installed
     /// Changelog after an automatic install. DOKK owns this phase; Sparkle has no session.
-    case whatsNew
+    case whatsNew = "whats_new"
 }
 
 /// The user-facing facts about an offer, copied before an installer may replace the app bundle.
 struct UpdateOffer {
-    enum Stage { case notDownloaded, downloaded, installing }
+    enum Stage: String { case notDownloaded = "not_downloaded", downloaded, installing }
     let version: String
     /// Sparkle build identity, distinct from the marketing version shown in the window.
     let identity: String
@@ -35,10 +37,12 @@ struct UpdateOffer {
 }
 
 /// Actions carry no Sparkle callbacks; the driver validates their generation before responding.
-enum UpdateAction: Hashable {
-    case allowChecks, declineChecks, install, skip, later, cancel, hide, retryTermination, done, information
+/// Raw values are reported to analytics as `action`.
+enum UpdateAction: String, Hashable {
+    case allowChecks = "allow_checks", declineChecks = "decline_checks", install, skip, later, cancel, hide
+    case retryTermination = "retry_quit", done, information = "learn_more"
     /// Leaves the installed-version changelog and starts a fresh user-initiated check.
-    case checkAgain
+    case checkAgain = "check_again"
 }
 
 /// Observable presentation shared by the window and menu. Constructing it performs no work.

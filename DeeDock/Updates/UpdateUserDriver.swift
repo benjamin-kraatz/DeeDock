@@ -7,17 +7,20 @@ import Sparkle
 final class UpdateUserDriver: NSObject, SPUUserDriver {
     let presentation = UpdatePresentation()
     let awareness: UpdateAwarenessStore
+    let analytics: UpdateAnalytics
     var isWindowVisible: Bool { window.isVisible }
     /// Starts a user-initiated Sparkle check. Used when leaving the installed-version changelog.
     var requestCheck: () -> Void = {}
     /// The island that shows this driver's session, and awareness callouts between sessions.
     var island: UpdateIslandController { window }
     private lazy var window = UpdateIslandController(presentation: presentation, awareness: awareness,
-        action: { [weak self] action, token in self?.perform(action, token: token) },
+        analytics: analytics,
+        action: { [weak self] action, token in self?.perform(action, token: token, via: .button) },
         close: { [weak self] in self?.closeWindow() })
 
-    init(awareness: UpdateAwarenessStore) {
+    init(awareness: UpdateAwarenessStore, analytics: UpdateAnalytics) {
         self.awareness = awareness
+        self.analytics = analytics
         super.init()
     }
 
@@ -37,6 +40,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func show(_ request: SPUUpdatePermissionRequest,
                                      reply: @escaping (SUUpdatePermissionResponse) -> Void) {
         transition(.permission, response: .permission(reply))
+        analytics.permissionRequested()
         window.present(activate: false)
     }
 
@@ -55,6 +59,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         default: stage = .notDownloaded
         }
         adopt(appcastItem, stage: stage, expectsNotesDownload: true)
+        analytics.offerShown(appcastItem, stage: stage, userInitiated: state.userInitiated)
         awareness.noteWaitingOffer(identity: appcastItem.versionString,
                                    version: appcastItem.displayVersionString,
                                    userInitiated: state.userInitiated)
@@ -71,6 +76,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
               let text = UpdateReleaseNotes.decode(downloadData.data, encodingName: downloadData.textEncodingName) else {
             presentation.loadingNotes = false
             presentation.notesUnavailable = true
+            analytics.releaseNotesFailed(.decode)
             return
         }
         loadNotes(text, format: downloadData.mimeType ?? "text/plain")
@@ -80,6 +86,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         notesTask?.cancel()
         presentation.loadingNotes = false
         presentation.notesUnavailable = true
+        analytics.releaseNotesFailed(.download, error: error)
     }
 
     func showUpdateNotFoundWithError(_ error: Error, acknowledgement: @escaping () -> Void) {
@@ -137,6 +144,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
         transition(.ready, response: .choice(reply))
+        analytics.ready(silent: false)
         if let offer = presentation.offer, !offer.informational {
             awareness.noteWaitingOffer(identity: offer.identity, version: offer.version, userInitiated: false)
         }
@@ -146,6 +154,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
                              retryTerminatingApplication: @escaping () -> Void) {
         transition(.installing, response: applicationTerminated ? nil : .termination(retryTerminatingApplication))
         presentation.canRetryTermination = !applicationTerminated
+        if !applicationTerminated { analytics.installWaitingForQuit() }
     }
 
     func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
@@ -195,6 +204,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         transition(.ready, response: .staged(install))
         // Sparkle fetches linked notes only for its own UI flow, so nothing else will arrive.
         adopt(appcastItem, stage: .installing, expectsNotesDownload: false)
+        analytics.ready(silent: true, item: appcastItem)
         awareness.noteStagedOffer(identity: appcastItem.versionString,
                                   version: appcastItem.displayVersionString)
     }
@@ -222,8 +232,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     /// Shows the changelog since `previousVersion` after an automatic install.
     /// An active Sparkle session keeps the window; it is shown instead.
-    func showWhatsNew(since previousVersion: String) {
+    /// - Parameter source: Where the person asked, reported to analytics.
+    func showWhatsNew(since previousVersion: String, source: AnalyticsUpdateSource) {
         guard !presentation.isActive else { showUpdateInFocus(); return }
+        analytics.whatsNewShown(source: source, previousVersion: previousVersion)
         notesTask?.cancel()
         comicTask?.cancel()
         transition(.whatsNew)
@@ -237,6 +249,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         notesTask = Task { [weak self] in
             let notes = await UpdateInstalledNotes.load(after: previousVersion, through: current, german: german)
             guard !Task.isCancelled else { return }
+            if notes == nil { self?.analytics.releaseNotesFailed(.whatsNew) }
             self?.presentation.notes = notes
             self?.presentation.loadingNotes = false
             self?.presentation.notesUnavailable = notes == nil
@@ -258,7 +271,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         guard presentation.phase == .ready, presentation.actions.contains(.install) else { return }
         // Written before the bundle is replaced so the next launch can announce the update.
         awareness.recordAutomaticInstall()
-        perform(.install, token: presentation.actionToken)
+        perform(.install, token: presentation.actionToken, via: .idle)
     }
 
     /// Called only at process termination. Does not synthesize an install/skip reply.
@@ -307,6 +320,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         notesTask = Task { [weak self] in
             let notes = await UpdateReleaseNotes.render(text, format: format)
             guard !Task.isCancelled else { return }
+            if notes == nil { self?.analytics.releaseNotesFailed(.render) }
             self?.presentation.notes = notes
             self?.presentation.loadingNotes = false
             self?.presentation.notesUnavailable = notes == nil
@@ -323,8 +337,9 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         }
     }
 
-    private func perform(_ action: UpdateAction, token: UUID) {
+    private func perform(_ action: UpdateAction, token: UUID, via: AnalyticsUpdateActionVia) {
         guard token == presentation.actionToken, presentation.actions.contains(action) else { return }
+        analytics.action(action, via: via)
         if action == .hide { window.dismiss(); return }
         if action == .information {
             if let url = presentation.offer?.informationURL { NSWorkspace.shared.open(url) }
@@ -390,6 +405,6 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         case .failed, .notFound, .installed, .whatsNew: action = .done
         default: window.dismiss(); return
         }
-        perform(action, token: presentation.actionToken)
+        perform(action, token: presentation.actionToken, via: .close)
     }
 }

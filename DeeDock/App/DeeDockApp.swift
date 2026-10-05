@@ -65,7 +65,7 @@ struct DeeDockApp: App {
             Divider()
             OpenDockSettingsButton()
                 .keyboardShortcut(",")
-            CheckForUpdatesButton(updater: delegate.updater)
+            CheckForUpdatesButton(updater: delegate.updater, source: .menuBar)
             #if DEBUG
             UpdateDebugMenu(updater: delegate.updater)
             #endif
@@ -86,7 +86,7 @@ struct DeeDockApp: App {
             }
             CommandGroup(after: .appInfo) {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
-                CheckForUpdatesButton(updater: delegate.updater)
+                CheckForUpdatesButton(updater: delegate.updater, source: .appMenu)
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
                 Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
 

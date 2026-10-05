@@ -13,12 +13,13 @@ final class AppUpdater {
     private(set) var startupFailed = false
     private var engineCanCheck = false
     let awareness = UpdateAwarenessStore()
-    @ObservationIgnored private lazy var driver = UpdateUserDriver(awareness: awareness)
+    @ObservationIgnored private let analytics = UpdateAnalytics()
+    @ObservationIgnored private lazy var driver = UpdateUserDriver(awareness: awareness, analytics: analytics)
     @ObservationIgnored private lazy var idleInstall = UpdateIdleInstallController(awareness: awareness)
     /// The driver's island also shows awareness callouts between sessions.
     @ObservationIgnored private var callout: UpdateIslandController { driver.island }
     // SPUUpdater holds its delegate weakly.
-    @ObservationIgnored private let silentInstall = UpdateSilentInstallDelegate()
+    @ObservationIgnored private let engineDelegate = UpdateEngineDelegate()
     @ObservationIgnored private var updater: SPUUpdater?
     @ObservationIgnored private var observations = Set<AnyCancellable>()
 
@@ -33,7 +34,10 @@ final class AppUpdater {
     /// Starts once after the dock. No standard Sparkle controller or window is instantiated.
     func start() {
         guard updater == nil else { return }
-        let updater = SPUUpdater(hostBundle: .main, applicationBundle: .main, userDriver: driver, delegate: silentInstall)
+        analytics.snapshot = { [weak self] in self?.analyticsSnapshot ?? UpdateAnalytics.Snapshot() }
+        analytics.reportLaunch()
+        engineDelegate.analytics = analytics
+        let updater = SPUUpdater(hostBundle: .main, applicationBundle: .main, userDriver: driver, delegate: engineDelegate)
         self.updater = updater
         // The custom consent flow does not offer system-profile sharing.
         updater.sendsSystemProfile = false
@@ -49,25 +53,23 @@ final class AppUpdater {
         updater.publisher(for: \.allowsAutomaticUpdates)
             .sink { [weak self] in self?.allowsAutomaticUpdates = $0 }
             .store(in: &observations)
-        silentInstall.stage = { [weak self] item, install in
+        engineDelegate.stage = { [weak self] item, install in
             self?.driver.showStagedUpdate(item, install: install)
         }
-        driver.requestCheck = { [weak self] in
-            guard let self, engineCanCheck else { return }
-            self.updater?.checkForUpdates()
-        }
+        driver.requestCheck = { [weak self] in self?.checkForUpdates(source: .checkAgain) }
         do {
             try updater.start()
         } catch {
             startupFailed = true
+            analytics.startupFailed(error)
             // Startup failures remain in Settings; do not present an unsolicited error on launch.
         }
         idleInstall.isReadyToInstall = { [weak self] in self?.driver.presentation.phase == .ready }
         idleInstall.isWindowVisible = { [weak self] in self?.driver.isWindowVisible ?? false }
         idleInstall.install = { [weak self] in self?.driver.attemptIdleInstall() }
         idleInstall.start()
-        callout.openUpdate = { [weak self] in self?.checkForUpdates() }
-        callout.openWhatsNew = { [weak self] in self?.showWhatsNew() }
+        callout.openUpdate = { [weak self] in self?.checkForUpdates(source: .callout) }
+        callout.openWhatsNew = { [weak self] in self?.showWhatsNew(source: .callout) }
         callout.start()
     }
 
@@ -80,32 +82,77 @@ final class AppUpdater {
     }
 
     /// Reopens the current custom session or asks Sparkle to start a fresh user-initiated check.
-    func checkForUpdates() {
-        if driver.presentation.isActive { driver.showUpdateInFocus() }
-        else if engineCanCheck { updater?.checkForUpdates() }
+    /// - Parameter source: Where the person asked, reported to analytics.
+    func checkForUpdates(source: AnalyticsUpdateSource) {
+        if driver.presentation.isActive {
+            analytics.opened(source, target: .currentSession)
+            driver.showUpdateInFocus()
+        } else if engineCanCheck, let updater {
+            analytics.opened(source, target: .newCheck)
+            updater.checkForUpdates()
+        } else {
+            analytics.opened(source, target: .unavailable)
+        }
     }
 
     /// Opens the changelog since the version before the last automatic install and
     /// acknowledges the notice. Falls back to a regular check when there is none.
-    func showWhatsNew() {
-        guard let previous = awareness.installedFromVersion else { checkForUpdates(); return }
+    /// - Parameter source: Where the person asked, reported to analytics.
+    func showWhatsNew(source: AnalyticsUpdateSource) {
+        guard let previous = awareness.installedFromVersion else { checkForUpdates(source: source); return }
+        analytics.opened(source, target: .whatsNew)
         awareness.acknowledgeInstalled()
-        driver.showWhatsNew(since: previous)
+        driver.showWhatsNew(since: previous, source: source)
     }
 
     /// Sparkle owns preference persistence and rescheduling.
     func setAutomaticallyChecksForUpdates(_ enabled: Bool) {
+        let old = settings
         updater?.automaticallyChecksForUpdates = enabled
+        reportSettings(from: old) { $0.checkAutomatically = enabled }
     }
 
     /// DOKK-owned idle relaunch. Sparkle is not involved until an install is requested.
     func setInstallWhenIdle(_ enabled: Bool) {
+        let old = settings
         awareness.setInstallWhenIdle(enabled)
+        reportSettings(from: old) { $0.installWhenIdle = enabled }
     }
 
     /// Sparkle persists this preference and uses its silent driver for scheduled checks.
     func setAutomaticallyInstallsUpdates(_ enabled: Bool) {
+        let old = settings
         updater?.automaticallyDownloadsUpdates = enabled
+        reportSettings(from: old) { $0.installAutomatically = enabled }
+    }
+
+    /// The update preferences as `setting_changed` reports them, with `area = updates`.
+    private struct Settings {
+        var checkAutomatically: Bool
+        var installAutomatically: Bool
+        var installWhenIdle: Bool
+    }
+
+    private var settings: Settings {
+        Settings(checkAutomatically: automaticallyChecksForUpdates, installAutomatically: automaticallyInstallsUpdates,
+                 installWhenIdle: awareness.installWhenIdle)
+    }
+
+    /// The published Sparkle values follow through KVO a moment later, so the new value is
+    /// applied to the old snapshot rather than read back.
+    private func reportSettings(from old: Settings, change: (inout Settings) -> Void) {
+        var new = old
+        change(&new)
+        Analytics.shared.settingsChanged(from: old, to: new, area: .updates)
+    }
+
+    private var analyticsSnapshot: UpdateAnalytics.Snapshot {
+        let presentation = driver.presentation
+        return UpdateAnalytics.Snapshot(
+            checksAutomatically: automaticallyChecksForUpdates, installsAutomatically: automaticallyInstallsUpdates,
+            installsWhenIdle: awareness.installWhenIdle, automaticInstallAllowed: allowsAutomaticUpdates,
+            phase: presentation.phase, staged: presentation.staged, stagedSince: awareness.stagedSince,
+            expectedBytes: presentation.expectedBytes, receivedBytes: presentation.receivedBytes)
     }
 
     #if DEBUG
@@ -153,11 +200,14 @@ final class AppUpdater {
 
     /// Process termination releases presentation, pending responses, and UI observers.
     func stop() {
+        // Before the driver resets its phase, which tells whether Sparkle installs on quit.
+        analytics.reportTermination()
         callout.stop()
         idleInstall.stop()
         driver.stop()
         driver.requestCheck = {}
-        silentInstall.stage = { _, _ in }
+        engineDelegate.stage = { _, _ in }
+        engineDelegate.analytics = nil
         observations.removeAll()
     }
 }

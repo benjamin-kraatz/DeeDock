@@ -2,9 +2,9 @@ import Foundation
 
 /// Everything DOKK reports about how it is used.
 ///
-/// Each case carries only enums, Bools, and exact numbers. There is no case that takes text,
-/// which is what keeps app names, bundle IDs, paths, window titles, queries, and user-entered
-/// names out by construction. `docs/ANALYTICS.md` lists every event with its properties and must
+/// Each case carries only enums, Bools, exact numbers, and DOKK's own version numbers
+/// (``AnalyticsVersion``). There is no case that takes free text, which is what keeps app
+/// names, bundle IDs, paths, window titles, queries, and user-entered names out by construction. `docs/ANALYTICS.md` lists every event with its properties and must
 /// be updated together with this enum.
 ///
 /// Events PostHog captures by itself (app opened, installed, updated) have no case here.
@@ -85,4 +85,8 @@ enum AnalyticsEvent {
     case focusDockEntered(trigger: AnalyticsTrigger)
     case focusDockCommand(AnalyticsFocusCommand)
     case focusSession(AnalyticsFocusSessionAction)
+
+    // Updates
+    /// One step of the update flow, with the versions, settings, and phase it happened in.
+    case update(AnalyticsUpdateEvent, AnalyticsUpdateFacts)
 }
