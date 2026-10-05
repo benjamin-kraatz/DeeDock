@@ -2667,9 +2667,9 @@ Pending native acceptance:
 - **Vault key.** One 256-bit key is stored as a non-synchronizable generic password in the login
   keychain. DDock is unsandboxed and has no keychain-access-group entitlement, so the key uses the
   file-based keychain. That keychain cannot require Touch ID per item. The Touch ID gate is
-  enforced in the app, and the key protects vault files at rest. If sealing fails, the content is
-  dropped instead of being left in plain view, and the exhibit reads as shredded. Unsigned
-  development builds may see Keychain access prompts after rebuilding.
+  enforced in the app, and the key protects vault files at rest. If sealing or the vault write
+  fails, the exhibit stays as it was and Settings shows the storage failure, so the plain file
+  is not deleted. Unsigned development builds may see Keychain access prompts after rebuilding.
 - **Vision.** After an image is stored, `ClassifyImageRequest` (labels with confidence at least
   0.3, top six) and `RecognizeTextRequest` (accurate, language correction, automatic language)
   run off the main actor. Labels and text show on the placard, are included in search, and are

@@ -18,6 +18,9 @@ final class ClipboardMuseumStore {
     /// Hash of the latest accession, kept in memory only and seeded per process by `Hasher`, so a
     /// repeated copy does not add a duplicate and nothing derived from content is written to disk.
     @ObservationIgnored private var lastFingerprint: Int?
+    /// A redact seal or vault write failed. `persist` surfaces it as `storageFailed` so a
+    /// following successful catalog save does not hide the failure.
+    @ObservationIgnored private var sealFailed = false
 
     var captureEnabled: Bool { document.captureEnabled }
     var redactSecrets: Bool { document.redactSecrets }
@@ -226,6 +229,7 @@ final class ClipboardMuseumStore {
         lastFingerprint = nil
         requiresReset = false
         storageFailed = false
+        sealFailed = false
     }
 
     func imageURL(for exhibit: ClipboardExhibit) -> URL? {
@@ -290,20 +294,30 @@ final class ClipboardMuseumStore {
         if document.redactSecrets { veil(&exhibit, reason: .detected) }
     }
 
-    /// Seals content into the vault, then clears every plain field that could echo it. When
-    /// sealing fails (for example, the Keychain refuses), the content is dropped rather than left
-    /// in plain view, and the exhibit reads as shredded.
+    /// Seals content into the vault, then clears every plain field that could echo it.
+    ///
+    /// A failed seal or vault write leaves the exhibit unchanged and records `storageFailed` on
+    /// the following save. The catalog still names the plain image, so prune cannot delete the
+    /// only copy. An image that cannot be read is the same failure: there is nothing to seal.
     private func veil(_ exhibit: inout ClipboardExhibit, reason: ClipboardRedaction) {
-        if let source = exhibit.text ?? exhibit.recognizedText, let secret = exhibit.secret {
-            exhibit.redactedHint = ClipboardSecretDetector.hint(for: source, secret: secret)
-        }
         let payload = ClipboardVeiledPayload(text: exhibit.text,
                                              image: exhibit.imageName.flatMap { name in
                                                  repository.imageURL(named: name).flatMap { try? Data(contentsOf: $0) }
                                              },
                                              recognizedText: exhibit.recognizedText)
-        if !payload.isEmpty, let sealed = try? vault.seal(payload), let name = try? repository.writeSealed(sealed) {
+        if exhibit.imageName != nil && payload.image == nil {
+            sealFailed = true
+            return
+        }
+        if !payload.isEmpty {
+            guard let sealed = try? vault.seal(payload), let name = try? repository.writeSealed(sealed) else {
+                sealFailed = true
+                return
+            }
             exhibit.sealedName = name
+        }
+        if let source = exhibit.text ?? exhibit.recognizedText, let secret = exhibit.secret {
+            exhibit.redactedHint = ClipboardSecretDetector.hint(for: source, secret: secret)
         }
         exhibit.text = nil
         exhibit.imageName = nil
@@ -326,11 +340,15 @@ final class ClipboardMuseumStore {
         SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
-    /// Saves the catalog first. Files it no longer names are deleted only after that write succeeds.
+    /// Saves the catalog first. Files it no longer names are deleted only after that write
+    /// succeeds. A failed seal still names the plain image, so prune keeps that file. A
+    /// successful seal names the sealed file instead, and prune then removes the plain copy.
     private func persist() {
+        let failedSeal = sealFailed
+        sealFailed = false
         do {
             try repository.save(document)
-            storageFailed = false
+            storageFailed = failedSeal
             repository.prune(keeping: document)
         } catch {
             storageFailed = true
