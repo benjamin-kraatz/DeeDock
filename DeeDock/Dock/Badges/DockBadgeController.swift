@@ -4,7 +4,7 @@ import Observation
 /// One cancellable badge reader for all display docks. Disabled and sleeping sessions do no AX work.
 @MainActor @Observable
 final class DockBadgeController {
-    let memory = BadgeMemoryStore()
+    let memory: BadgeMemoryStore
     @ObservationIgnored var focusSession: (() -> FocusSession?)?
     private(set) var labels: [String: String] = [:]
     @ObservationIgnored private var worker: Task<Void, Never>?
@@ -17,6 +17,11 @@ final class DockBadgeController {
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var workerSession: UUID?
     @ObservationIgnored private var retention = BadgeScanRetention()
+
+    /// - Parameter memory: Badge history for this controller. The app uses standard defaults.
+    init(memory: BadgeMemoryStore = BadgeMemoryStore()) {
+        self.memory = memory
+    }
 
     /// Starts observation only for an enabled feature with at least one configured Dock.
     func configure(enabled: Bool) {
@@ -81,14 +86,7 @@ final class DockBadgeController {
                 let next = await reader.read(pid: pid)
                 guard !Task.isCancelled, let self, generation == session else { break }
                 // One AX timeout must not blank every dot or write unknown values into history.
-                switch retention.resolve(next, at: .now) {
-                case .retain:
-                    memory.markGap(session: focusSession?(), scanStarted: scanStarted)
-                case .update(let snapshot):
-                    memory.observe(snapshot, session: focusSession?(), scanStarted: scanStarted)
-                    let nextLabels = snapshot.compactMapValues(\.label)
-                    if labels != nextLabels { labels = nextLabels }
-                }
+                self.applyScan(next, at: .now, scanStarted: scanStarted)
                 scheduleFallback()
             }
             await reader.stop()
@@ -117,17 +115,43 @@ final class DockBadgeController {
         self.timer = timer
     }
 
-    private func pause() {
+    /// Stops the reader and hides badges until the next scan result.
+    ///
+    /// Sleep, display sleep, session resign, and shutdown all come through here. Hiding the
+    /// badges is not an observation: history does not gain `.unknown`, and the grace clock
+    /// keeps running from the last successful scan. A failure inside that grace shows the
+    /// hidden snapshot again.
+    func pause() {
         generation = UUID()
         timer?.invalidate()
         timer = nil
         continuation?.finish()
         continuation = nil
         worker?.cancel()
-        // Labels are cleared here, so a failure after resuming has nothing to retain.
-        retention = BadgeScanRetention()
+        retention.suspend(keeping: memory.current)
+        memory.markGap(session: focusSession?())
         if !labels.isEmpty { labels = [:] }
-        memory.observe([:], session: focusSession?())
+        memory.present([:])
+    }
+
+    /// Applies one reader result. `snapshot` is nil when the scan threw.
+    func applyScan(_ snapshot: [String: BadgeObservation]?, at now: ContinuousClock.Instant, scanStarted: Date) {
+        switch retention.resolve(snapshot, at: now) {
+        case .retain(let hidden):
+            memory.markGap(session: focusSession?(), scanStarted: scanStarted)
+            if let hidden {
+                memory.present(hidden)
+                publish(hidden)
+            }
+        case .update(let snapshot):
+            memory.observe(snapshot, session: focusSession?(), scanStarted: scanStarted)
+            publish(snapshot)
+        }
+    }
+
+    private func publish(_ snapshot: [String: BadgeObservation]) {
+        let nextLabels = snapshot.compactMapValues(\.label)
+        if labels != nextLabels { labels = nextLabels }
     }
 
     /// Releases workspace/AX observation and clears presentation state.

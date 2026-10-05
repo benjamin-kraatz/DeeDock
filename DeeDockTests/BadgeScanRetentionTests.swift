@@ -12,13 +12,13 @@ struct BadgeScanRetentionTests {
         let start = ContinuousClock.now
         let snapshot: [String: BadgeObservation] = [mail: .count(3)]
         #expect(retention.resolve(snapshot, at: start) == .update(snapshot))
-        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(5))) == .retain)
-        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(10))) == .retain)
+        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(5))) == .retain(nil))
+        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(10))) == .retain(nil))
         #expect(retention.resolve(nil, at: start.advanced(by: BadgeScanRetention.gracePeriod)) == .update([:]))
         // Once unavailable, a later failure must not revive the old snapshot.
         #expect(retention.resolve(nil, at: start.advanced(by: .seconds(16))) == .update([:]))
         #expect(retention.resolve(snapshot, at: start.advanced(by: .seconds(20))) == .update(snapshot))
-        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(25))) == .retain)
+        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(25))) == .retain(nil))
     }
 
     @Test("A successful scan without badges clears immediately")
@@ -33,6 +33,25 @@ struct BadgeScanRetentionTests {
     func failureWithoutSnapshot() {
         var retention = BadgeScanRetention()
         #expect(retention.resolve(nil, at: .now) == .update([:]))
+    }
+
+    @Test("Suspension keeps the grace clock and hands back the hidden snapshot once")
+    func suspensionKeepsHeldSnapshot() {
+        var retention = BadgeScanRetention()
+        let start = ContinuousClock.now
+        let snapshot: [String: BadgeObservation] = [mail: .count(3)]
+        #expect(retention.resolve(snapshot, at: start) == .update(snapshot))
+        retention.suspend(keeping: snapshot)
+        // A second suspension, after the badges were hidden, must not replace the snapshot.
+        retention.suspend(keeping: [:])
+        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(5))) == .retain(snapshot))
+        #expect(retention.resolve(nil, at: start.advanced(by: .seconds(10))) == .retain(nil))
+        #expect(retention.resolve([mail: .count(1)], at: start.advanced(by: .seconds(11))) == .update([mail: .count(1)]))
+        retention.suspend(keeping: [mail: .count(1)])
+        let expired = start.advanced(by: .seconds(11) + BadgeScanRetention.gracePeriod)
+        #expect(retention.resolve(nil, at: expired) == .update([:]))
+        // The expired grace dropped the hidden snapshot, so a later failure cannot revive it.
+        #expect(retention.resolve(nil, at: expired.advanced(by: .seconds(1))) == .update([:]))
     }
 
     private func memory(_ suite: String) throws -> (BadgeMemoryStore, UserDefaults) {
@@ -76,6 +95,59 @@ struct BadgeScanRetentionTests {
         #expect(row.changes == 0)
         #expect(!row.hasGap)
         #expect(store.document.active?.incomplete == true)
+    }
+
+    @Test("Sleep hides badges without an unknown transition, and the grace shows them again")
+    func sleepKeepsGrace() throws {
+        let suite = "BadgeSleep.\(UUID().uuidString)"
+        let (store, defaults) = try memory(suite)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let base = Date()
+        let session = collecting(store, base: base)
+        let history = store.document.apps[mail]?.changes.map(\.value)
+        let controller = DockBadgeController(memory: store)
+        controller.focusSession = { session }
+        let start = ContinuousClock.now
+        controller.applyScan([mail: .count(4)], at: start, scanStarted: base.addingTimeInterval(3))
+
+        controller.pause()
+        controller.pause()
+
+        #expect(controller.labels.isEmpty)
+        #expect(store.current.isEmpty)
+        #expect(store.document.apps[mail]?.changes.map(\.value) == history)
+        let row = try #require(store.document.active?.rows[mail])
+        #expect(row.changes == 0)
+        #expect(!row.hasGap)
+        #expect(store.document.active?.incomplete == true)
+
+        controller.applyScan(nil, at: start.advanced(by: .seconds(5)), scanStarted: base.addingTimeInterval(8))
+        #expect(controller.labels[mail] == "4")
+        #expect(store.current[mail] == .count(4))
+        #expect(store.document.apps[mail]?.changes.map(\.value) == history)
+        #expect(store.document.active?.rows[mail]?.changes == 0)
+
+        controller.applyScan([mail: .count(5)], at: start.advanced(by: .seconds(6)), scanStarted: base.addingTimeInterval(9))
+        #expect(controller.labels[mail] == "5")
+        #expect(store.document.apps[mail]?.changes.map(\.value) == [.count(4), .count(5)])
+    }
+
+    @Test("A failure after the grace still records unknown when sleep hid the badges")
+    func sleepDoesNotExtendGrace() throws {
+        let suite = "BadgeSleepExpiry.\(UUID().uuidString)"
+        let (store, defaults) = try memory(suite)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let base = Date()
+        _ = collecting(store, base: base)
+        let controller = DockBadgeController(memory: store)
+        let start = ContinuousClock.now
+        controller.applyScan([mail: .count(4)], at: start, scanStarted: base.addingTimeInterval(3))
+        controller.pause()
+        let expired = start.advanced(by: BadgeScanRetention.gracePeriod)
+        controller.applyScan(nil, at: expired, scanStarted: base.addingTimeInterval(20))
+        #expect(controller.labels.isEmpty)
+        #expect(store.current.isEmpty)
+        #expect(store.document.apps[mail]?.changes.map(\.value) == [.count(4), .unknown])
     }
 
     @Test("A failed scan begun before the session started does not mark its digest")
