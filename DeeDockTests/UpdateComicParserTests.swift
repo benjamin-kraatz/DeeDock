@@ -131,7 +131,7 @@ struct UpdateComicParserTests {
 
         let sibling = UpdateComicResourcePolicy.imageCandidates(path: "panel-01.png", documentURL: document)
         #expect(!sibling.isEmpty)
-        #expect(sibling.allSatisfy(\.isFileURL))
+        #expect(sibling.allSatisfy { $0.isFileURL })
         #expect(sibling.allSatisfy { $0.lastPathComponent == "panel-01.png" })
         #expect(sibling.allSatisfy { Self.isInsideComicDirectory($0, documentURL: document) })
 
