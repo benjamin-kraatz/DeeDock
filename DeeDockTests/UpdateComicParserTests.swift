@@ -104,6 +104,88 @@ struct UpdateComicParserTests {
         #expect(urls[1].absoluteString.hasSuffix("/v9.9.9/panel-01.png"))
     }
 
+    @Test("A remote comic drops file images and keeps relative release URLs")
+    func remoteComicRejectsFileImages() throws {
+        let document = try #require(URL(string: "https://github.com/benjamin-kraatz/DeeDock/releases/download/v9.9.9/DDock-comic.md"))
+        let secret = UpdateComicResourcePolicy.imageCandidates(path: "file:///tmp/secret.png", documentURL: document)
+        #expect(secret.isEmpty)
+
+        let filePanel = UpdateComicResourcePolicy.imageCandidates(path: "file:///tmp/panel-01.png", documentURL: document)
+        #expect(!filePanel.isEmpty)
+        #expect(filePanel.allSatisfy { !$0.isFileURL })
+        #expect(filePanel.allSatisfy {
+            $0.absoluteString.hasPrefix("https://github.com/benjamin-kraatz/DeeDock/releases/download/v9.9.9/")
+        })
+
+        let relative = UpdateComicResourcePolicy.imageCandidates(path: "assets/9.9.9/panel-01.png", documentURL: document)
+        #expect(relative.map(\.lastPathComponent) == ["panel-01.png", "panel-01.png"])
+        #expect(relative[0].absoluteString.contains("/v9.9.9/assets/9.9.9/panel-01.png"))
+        #expect(relative[1].absoluteString.hasSuffix("/v9.9.9/panel-01.png"))
+        #expect(relative.allSatisfy { !$0.isFileURL })
+    }
+
+    @Test("A local comic accepts a sibling image and a nested path inside its directory")
+    func localComicAllowsImagesInsideDirectory() throws {
+        let document = Self.localComicDocument()
+        let folder = document.deletingLastPathComponent()
+
+        let sibling = UpdateComicResourcePolicy.imageCandidates(path: "panel-01.png", documentURL: document)
+        #expect(!sibling.isEmpty)
+        #expect(sibling.allSatisfy { $0.isFileURL })
+        #expect(sibling.allSatisfy { $0.lastPathComponent == "panel-01.png" })
+        #expect(sibling.allSatisfy { Self.isInsideComicDirectory($0, documentURL: document) })
+
+        let nested = UpdateComicResourcePolicy.imageCandidates(path: "assets/9.9.9/panel-01.png", documentURL: document)
+        #expect(nested.contains { $0.path.contains("/assets/9.9.9/panel-01.png") })
+        #expect(nested.allSatisfy { Self.isInsideComicDirectory($0, documentURL: document) })
+
+        let absoluteSibling = folder.appendingPathComponent("panel-02.png").absoluteString
+        let absolute = UpdateComicResourcePolicy.imageCandidates(path: absoluteSibling, documentURL: document)
+        #expect(!absolute.isEmpty)
+        #expect(absolute.allSatisfy { Self.isInsideComicDirectory($0, documentURL: document) })
+    }
+
+    @Test("A local comic rejects a parent escape, an absolute path elsewhere, and a prefixed cousin")
+    func localComicRejectsImagesOutsideDirectory() throws {
+        let document = Self.localComicDocument()
+        let root = document.deletingLastPathComponent().deletingLastPathComponent()
+        let cousin = root.appendingPathComponent("comic-evil").appendingPathComponent("secret.png")
+
+        #expect(UpdateComicResourcePolicy.imageCandidates(path: "../secret.png", documentURL: document).isEmpty)
+        #expect(UpdateComicResourcePolicy.imageCandidates(path: "file:///etc/passwd", documentURL: document).isEmpty)
+        #expect(UpdateComicResourcePolicy.imageCandidates(path: "/etc/passwd", documentURL: document).isEmpty)
+        #expect(UpdateComicResourcePolicy.imageCandidates(path: cousin.absoluteString, documentURL: document).isEmpty)
+
+        let absolutePanel = UpdateComicResourcePolicy.imageCandidates(path: "file:///etc/panel-01.png", documentURL: document)
+        #expect(!absolutePanel.contains { $0.path == "/etc/panel-01.png" })
+        #expect(absolutePanel.allSatisfy { Self.isInsideComicDirectory($0, documentURL: document) })
+    }
+
+    @Test("A local comic rejects a symlink that resolves outside its directory")
+    func localComicRejectsSymlinkEscape() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("UpdateComicSymlink.\(UUID().uuidString)", isDirectory: true)
+        let folder = root.appendingPathComponent("comic", isDirectory: true)
+        let outside = root.appendingPathComponent("outside", isDirectory: true)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: outside, withIntermediateDirectories: true)
+        try Data("secret".utf8).write(to: outside.appendingPathComponent("secret.png"))
+        try FileManager.default.createSymbolicLink(atPath: folder.appendingPathComponent("escape").path,
+                                                    withDestinationPath: "../outside")
+        try FileManager.default.createSymbolicLink(atPath: folder.appendingPathComponent("panel-01.png").path,
+                                                    withDestinationPath: "../outside/secret.png")
+        try Data("png".utf8).write(to: folder.appendingPathComponent("panel-02.png"))
+
+        let document = folder.appendingPathComponent("DDock-comic.md")
+        #expect(UpdateComicResourcePolicy.imageCandidates(path: "escape/secret.png", documentURL: document).isEmpty)
+        #expect(UpdateComicResourcePolicy.imageCandidates(path: "panel-01.png", documentURL: document).isEmpty)
+        let sibling = UpdateComicResourcePolicy.imageCandidates(path: "panel-02.png", documentURL: document)
+        #expect(!sibling.isEmpty)
+        #expect(sibling.allSatisfy { Self.isInsideComicDirectory($0, documentURL: document) })
+    }
+
     @Test("Remote fetches start only on the DeeDock GitHub allowlist")
     func allowlist() throws {
         let release = try #require(URL(string: "https://github.com/benjamin-kraatz/DeeDock/releases/download/v9.9.9/DDock-comic.md"))
@@ -143,6 +225,27 @@ struct UpdateComicParserTests {
         #expect(comic.panels.count == 2)
         #expect(comic.panels[0].imageData == png)
         #expect(comic.panels[1].imageData == png)
+    }
+
+    private static func localComicDocument() -> URL {
+        FileManager.default.temporaryDirectory
+            .appendingPathComponent("UpdateComicImages.\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("comic", isDirectory: true)
+            .appendingPathComponent("DDock-comic.md")
+    }
+
+    /// Mirrors the policy's component check so an outside URL cannot satisfy the allow tests.
+    private static func isInsideComicDirectory(_ url: URL, documentURL: URL) -> Bool {
+        let directory = containmentComponents(documentURL.deletingLastPathComponent())
+        let image = containmentComponents(url)
+        guard image.count > directory.count else { return false }
+        return zip(directory, image).allSatisfy { $0.0 == $0.1 }
+    }
+
+    private static func containmentComponents(_ url: URL) -> [String] {
+        var components = url.resolvingSymlinksInPath().standardizedFileURL.pathComponents
+        if components.last?.isEmpty == true { components.removeLast() }
+        return components
     }
 
     private static let fixtureMarkdown = """
