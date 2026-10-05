@@ -31,6 +31,14 @@ final class BadgeMemoryStore {
         synchronize(session: session, at: date, allowStart: false)
     }
 
+    /// Replaces the live snapshot without appending a transition.
+    ///
+    /// Suspension passes an empty snapshot to stop presenting. A retained failure passes the
+    /// hidden snapshot back. History and digest rows stay as they were.
+    func present(_ observations: [String: BadgeObservation]) {
+        if current != observations { current = observations }
+    }
+
     /// Called for actual snapshots, including unavailable scans. Identical samples do not persist.
     func observe(_ observations: [String: BadgeObservation], session: FocusSession?, at date: Date = .now, scanStarted: Date? = nil) {
         synchronize(session: session, at: date)

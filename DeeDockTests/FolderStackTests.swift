@@ -100,6 +100,52 @@ struct FolderStackTests {
         #expect(try DockPinImporter.kind(of: link) == .other)
     }
 
+    @Test("Stopping an open before it resumes does not publish a listing")
+    @MainActor func stopBeforeOpenPublishesNothing() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let state = FolderStackState(folder: FolderReference(url: root, name: "Root", bookmarkData: Data()))
+        let gate = OpenGate()
+        gate.arm(state)
+        defer { state.pauseOpen = nil; state.stop() }
+        state.start()
+        await gate.untilPaused()
+        state.stop()
+        gate.resume()
+        #expect(await state.waitUntilOpen() == false)
+        #expect(state.entries.isEmpty)
+        #expect(state.error == nil)
+    }
+
+    @Test("An accepted tile drop still copies when the stack closes during open")
+    @MainActor func dropCopiesWhenOpenCloses() async throws {
+        let parent = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: parent) }
+        let folder = parent.appendingPathComponent("Folder")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+        let source = parent.appendingPathComponent("note.txt")
+        try Data("hi".utf8).write(to: source)
+        let state = FolderStackState(folder: FolderReference(url: folder, name: "Folder", bookmarkData: Data()))
+        let gate = OpenGate()
+        gate.arm(state)
+        defer { state.pauseOpen = nil; state.stop() }
+        state.start()
+        #expect(state.accept([source], into: folder, move: false, target: .tile))
+        await gate.untilPaused()
+        state.stop()
+        gate.resume()
+        #expect(await state.waitUntilOpen() == false)
+        let copied = folder.appendingPathComponent("note.txt")
+        let deadline = ContinuousClock.now + .seconds(2)
+        while !FileManager.default.fileExists(atPath: copied.path), ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(FileManager.default.fileExists(atPath: copied.path))
+        #expect(FileManager.default.fileExists(atPath: source.path))
+        #expect(state.entries.isEmpty)
+        #expect(state.error == nil)
+    }
+
     @Test("A folder listing is visible before file icons, and a stale fill does not replace it")
     @MainActor func listingPublishesBeforeFileIcons() async throws {
         let root = try temporaryDirectory()
@@ -356,6 +402,30 @@ struct FolderStackTests {
         case .top: #expect(dismissed.minY > frame.minY)
         case .left: #expect(dismissed.minX < frame.minX)
         case .right: #expect(dismissed.minX > frame.minX)
+        }
+    }
+
+    @MainActor private final class OpenGate {
+        private var wait: CheckedContinuation<Void, Never>?
+        private var hold: CheckedContinuation<Void, Never>?
+
+        func arm(_ state: FolderStackState) {
+            state.pauseOpen = { [weak self] in
+                await withCheckedContinuation { (hold: CheckedContinuation<Void, Never>) in
+                    self?.hold = hold
+                    self?.wait?.resume()
+                    self?.wait = nil
+                }
+            }
+        }
+
+        func untilPaused() async {
+            await withCheckedContinuation { wait = $0 }
+        }
+
+        func resume() {
+            hold?.resume()
+            hold = nil
         }
     }
 

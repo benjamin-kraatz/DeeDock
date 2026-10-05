@@ -50,29 +50,28 @@ final class FolderStackCoordinator {
             return
         }
 
-        var reference = folder.reference
-        let access = FolderResourceAccess(reference)
-        if access.isAvailable, access.bookmarkIsStale,
-           let bookmark = try? access.url.bookmarkData(options: [.withSecurityScope, .securityScopeAllowOnlyReadAccess],
-                                                       includingResourceValuesForKeys: nil, relativeTo: nil) {
-            reference.bookmarkData = bookmark
-            if !panel.store.refreshFolderReference(reference) { return }
-        }
-
+        let reference = folder.reference
         let sortKey = "folderStackSort.\(panel.store.displayID).\(reference.id.uuidString)"
         let sort = UserDefaults.standard.string(forKey: sortKey).flatMap(FolderStackSort.init(rawValue:))
             ?? (folder.isDownloads ? .recency : .alphabetical)
         let next = FolderStackPanelController(folder: reference, anchor: anchor, keyboard: keyboard,
                                               organizer: organizer, sort: sort)
+        next.state.bookmarkRefresh = { [weak panel] bookmark in
+            var updated = reference
+            updated.bookmarkData = bookmark
+            return panel?.store.refreshFolderReference(updated) == true
+        }
         next.state.sortChanged = { UserDefaults.standard.set($0.rawValue, forKey: sortKey) }
         next.state.allowsMoveDrops = volumeRoot
         next.state.springsUp = volumeRoot
         let kind: AnalyticsStackKind = volumeRoot ? .drive : folder.isDownloads ? .downloads : .folder
         next.state.analyticsKind = kind
-        if spring, Analytics.shared.ambientTrigger == nil { Analytics.count(.springLoad(kind)) }
-        Analytics.track(.stackOpened(kind, presentation: reference.presentation, sort: sort,
-                                     trigger: spring ? Analytics.shared.ambientTrigger ?? .springLoad
-                                         : Analytics.trigger(keyboard: keyboard)))
+        next.appeared = {
+            if spring, Analytics.shared.ambientTrigger == nil { Analytics.count(.springLoad(kind)) }
+            Analytics.track(.stackOpened(kind, presentation: reference.presentation, sort: sort,
+                                         trigger: spring ? Analytics.shared.ambientTrigger ?? .springLoad
+                                             : Analytics.trigger(keyboard: keyboard)))
+        }
         displayID = panel.store.displayID
         folderID = reference.id
         anchorTarget = target

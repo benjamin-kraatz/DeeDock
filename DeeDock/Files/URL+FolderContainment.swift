@@ -55,8 +55,11 @@ nonisolated extension URL {
 
     /// True only when the volume explicitly supports case-sensitive names.
     ///
+    /// Folder containment and batch destination reservation both follow this rule.
     /// Volume attributes can fail for a path that does not exist yet. Walk to the nearest
     /// existing parent so a missing final component still uses that volume's rule.
+    /// When no ancestor reports a value, the result is false, so callers fold case the
+    /// way the default APFS volume does.
     /// Badge paths that differ only by case join when this is false. The stored key is not rewritten.
     var volumeReportsCaseSensitiveNames: Bool {
         var url = self
