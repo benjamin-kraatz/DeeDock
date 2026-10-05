@@ -35,8 +35,7 @@ final class ClipboardMuseumStore {
     func start() {
         do {
             if let stored = try repository.load() { document = stored }
-            repository.prune(keepingImages: Set(document.exhibits.compactMap(\.imageName)),
-                             sealed: Set(document.exhibits.compactMap(\.sealedName)))
+            repository.prune(keeping: document)
         } catch {
             requiresReset = true
             storageFailed = true
@@ -90,7 +89,7 @@ final class ClipboardMuseumStore {
         document.exhibits.insert(exhibit, at: 0)
         document.nextCatalogNumber += 1
         while document.exhibits.count > ClipboardMuseumLimits.maximumExhibits {
-            discardFiles(of: document.exhibits.removeLast())
+            document.exhibits.removeLast()
         }
         persist()
         return exhibit
@@ -184,7 +183,6 @@ final class ClipboardMuseumStore {
         }
         exhibit.text = payload.text
         exhibit.recognizedText = payload.recognizedText
-        if let name = exhibit.sealedName { repository.removeSealed(named: name) }
         exhibit.sealedName = nil
         exhibit.redaction = nil
         exhibit.secret = nil
@@ -198,15 +196,14 @@ final class ClipboardMuseumStore {
 
     /// Deletes a redacted exhibit's encrypted content. Redaction becomes permanent.
     func shred(_ id: UUID) {
-        guard !requiresReset, let index = index(of: id), let name = document.exhibits[index].sealedName else { return }
-        repository.removeSealed(named: name)
+        guard !requiresReset, let index = index(of: id), document.exhibits[index].sealedName != nil else { return }
         document.exhibits[index].sealedName = nil
         persist()
     }
 
     func remove(_ id: UUID) {
         guard !requiresReset, let index = index(of: id) else { return }
-        discardFiles(of: document.exhibits.remove(at: index))
+        document.exhibits.remove(at: index)
         persist()
     }
 
@@ -214,7 +211,6 @@ final class ClipboardMuseumStore {
     /// accession numbers are never reused.
     func clear() {
         guard !requiresReset else { return }
-        document.exhibits.forEach(discardFiles)
         document.exhibits = []
         lastFingerprint = nil
         persist()
@@ -306,7 +302,6 @@ final class ClipboardMuseumStore {
         if !payload.isEmpty, let sealed = try? vault.seal(payload), let name = try? repository.writeSealed(sealed) {
             exhibit.sealedName = name
         }
-        if let name = exhibit.imageName { repository.removeImage(named: name) }
         exhibit.text = nil
         exhibit.imageName = nil
         exhibit.recognizedText = nil
@@ -328,15 +323,12 @@ final class ClipboardMuseumStore {
         SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
-    private func discardFiles(of exhibit: ClipboardExhibit) {
-        if let name = exhibit.imageName { repository.removeImage(named: name) }
-        if let name = exhibit.sealedName { repository.removeSealed(named: name) }
-    }
-
+    /// Saves the catalog first. Files it no longer names are deleted only after that write succeeds.
     private func persist() {
         do {
             try repository.save(document)
             storageFailed = false
+            repository.prune(keeping: document)
         } catch {
             storageFailed = true
         }

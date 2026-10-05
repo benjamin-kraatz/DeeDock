@@ -173,6 +173,32 @@ struct ClipboardMuseumTests {
         #expect(store.exhibit(plain.id)?.matches("shopping") == true)
     }
 
+    @Test("A failed catalog save keeps exhibit files until a later save prunes them")
+    func failedSaveKeepsExhibitFiles() throws {
+        let (store, repository) = collecting()
+        defer { try? repository.removeAll() }
+        let image = try #require(store.accession(ClipboardCapture(payload: .image(png: Data([1, 2, 3]), width: 1, height: 1))))
+        let imageURL = try #require(store.imageURL(for: image))
+        // A directory in place of the catalog file makes the next save throw. Image and vault deletes would still succeed.
+        try FileManager.default.removeItem(at: repository.documentURL)
+        try FileManager.default.createDirectory(at: repository.documentURL, withIntermediateDirectories: false)
+        store.redact(image.id)
+        let sealedName = try #require(store.exhibit(image.id)?.sealedName)
+        let sealed = try repository.readSealed(named: sealedName)
+        #expect(store.storageFailed)
+        #expect(FileManager.default.fileExists(atPath: imageURL.path))
+        #expect(!sealed.isEmpty)
+        try FileManager.default.removeItem(at: repository.documentURL)
+        store.setCaptureEnabled(false)
+        let saved = try #require(repository.load())
+        #expect(!store.storageFailed)
+        #expect(saved.exhibits.first?.imageName == nil)
+        #expect(saved.exhibits.first?.sealedName == sealedName)
+        let kept = try repository.readSealed(named: sealedName)
+        #expect(!FileManager.default.fileExists(atPath: imageURL.path))
+        #expect(!kept.isEmpty)
+    }
+
     @Test("Remove and clear delete files and keep catalog numbers unique")
     func removeClear() throws {
         let (store, repository) = collecting()
