@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 /// FIFO scheduling and local suppression. Dates are injected so scheduling has no UI dependency.
-/// A missed calm opportunity advances to the next 69-second slot, never a catch-up burst.
+/// The 69-second slot moves only when a tip is presented, so a skipped tip cannot spend it and a late timer cannot release a burst.
 @MainActor @Observable
 final class DiscoveryEngine {
     static let spacing: TimeInterval = 69
@@ -59,25 +59,20 @@ final class DiscoveryEngine {
         }
     }
 
-    /// Consumes at most one due slot. The caller must verify native gates before passing true.
+    /// Presents the first eligible queued tip. Spacing moves only when that presentation happens.
+    /// The caller must verify native gates before passing true.
     func advance(at now: Date, canPresent: Bool) -> DiscoveryProposal? {
         guard enabled, visible == nil, !queue.isEmpty else { return nil }
         queue.removeAll { id in catalog.first(where: { $0.id == id }).map(suppressed) ?? true }
-        guard let id = queue.first, let proposal = catalog.first(where: { $0.id == id }) else { return nil }
-        if let slot = nextSlot {
-            guard now >= slot else { return nil }
-            let missed = floor(now.timeIntervalSince(slot) / Self.spacing)
-            nextSlot = slot.addingTimeInterval((missed + 1) * Self.spacing)
-        }
-        guard canPresent, sessionCount < 2,
-              now >= saved.snoozed[id, default: .distantPast],
-              let signal = signals[proposal.signal], now.timeIntervalSince(signal.last) >= proposal.calmInterval
-        else { return nil }
+        guard !queue.isEmpty else { return nil }
+        if let slot = nextSlot, now < slot { return nil }
+        guard canPresent, sessionCount < 2, let index = firstEligibleIndex(at: now),
+              let proposal = catalog.first(where: { $0.id == queue[index] }) else { return nil }
         if !Calendar.current.isDate(saved.day, inSameDayAs: now) {
             saved.day = now; saved.dailyCount = 0
         }
         guard saved.dailyCount < 3 else { return nil }
-        queue.removeFirst()
+        queue.remove(at: index)
         visible = proposal
         sessionCount += 1; saved.dailyCount += 1
         saved.lastPresentation = now
@@ -85,6 +80,16 @@ final class DiscoveryEngine {
         nextSlot = now.addingTimeInterval(Self.spacing)
         persist()
         return proposal
+    }
+
+    /// First queue entry that is past its snooze and whose calm interval has elapsed.
+    private func firstEligibleIndex(at now: Date) -> Int? {
+        queue.firstIndex { id in
+            guard let proposal = catalog.first(where: { $0.id == id }),
+                  now >= saved.snoozed[id, default: .distantPast],
+                  let signal = signals[proposal.signal] else { return false }
+            return now.timeIntervalSince(signal.last) >= proposal.calmInterval
+        }
     }
 
     func finish(forever: Bool, at now: Date) {
