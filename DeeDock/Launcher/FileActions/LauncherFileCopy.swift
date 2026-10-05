@@ -26,7 +26,7 @@ enum LauncherFileCopy {
             }
             let canonical = source.resolvingSymlinksInPath().standardizedFileURL
             let originalName = source.lastPathComponent
-            if target == canonical || target.path.hasPrefix(canonical.path + "/") {
+            if target.isSameOrDescendant(of: canonical) {
                 outcome.failed.append((originalName, String(localized: .launcherFileCopyIntoSelf)))
                 continue
             }

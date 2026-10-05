@@ -67,6 +67,22 @@ One application catalog owns workspace observation, running order, icon caching,
 
 The shared `DeeDock` scheme includes `DeeDockTests`, a Swift Testing target hosted in the app. Tests use `@testable import DeeDock`, so every app type is available without a separate source list. The test host starts no dock, menu-bar item, or services, and tests inject their own `UserDefaults` suites and directories, because the host shares DOKK's preferences domain. Its tests cover geometry, magnification, overflow, ordering, favorites persistence, display identity and focus policy, migration, empty-pin seeding, per-setting inheritance, stale launch/cancellation behavior, auto-hide deadlines and reversals, ten animation styles and masks, behavior migration, and temporary preview lifetimes without launching DOKK. Drag coverage adds batch insertion, cross-display pin independence, deliberate unpinning, cancellation, insertion geometry, import validation, bookmark compatibility, blocked writes, and visibility holds. Follow `AGENTS.md` before running them.
 
+## Continuous integration
+
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) builds DOKK and runs `DeeDockTests` on pull requests to `main`, pushes to `main`, and manual runs. The check name is **Build & Test**.
+
+The job runs on the `xcode-27` runner and selects Xcode the same way the Release archive job does: the highest Xcode on that machine, which has to be Xcode 27 with the macOS 27 SDK. The build is Debug and unsigned (`CODE_SIGNING_ALLOWED=NO`). It does not notarize, and it does not read Sparkle or PostHog secrets. With no token, analytics stay off. A failure uploads `DeeDock.xcresult` and `xcodebuild.log` as the `build-and-test-results` artifact.
+
+CI caches Swift package checkouts. The key is `Package.resolved`, the runner OS and architecture, and the selected Xcode version. There is no restore-key prefix. Compiled package products are not cached. Restoring PostHog intermediates and `XCBuildData` skipped those package compiles, and `DOKK` was still built from source, but the package compile is about 20–30 seconds and DeeDock's own compile is 2–4 minutes on this runner. Each job uses a fresh DerivedData directory under `RUNNER_TEMP`. CI sets `ENABLE_CODE_COVERAGE=NO`, which the script passes as `-enableCodeCoverage NO`. Leave that variable unset for a local run, including the pre-push hook, and the script keeps the shared scheme's coverage setting. Compile jobs follow `hw.ncpu`. The job log prints that count as `runner cores:`. Test runners stay at the scheme default.
+
+The workflow and the optional pre-push hook both call [`scripts/build-and-test.sh`](../scripts/build-and-test.sh). To turn the hook on in one clone:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+Git does not enable that path on its own. The hook needs `xcodebuild`. Skip it for one push with `git push --no-verify`.
+
 ## Source organization
 
 - `DeeDock/App` owns the app entry point and native lifecycle composition.
