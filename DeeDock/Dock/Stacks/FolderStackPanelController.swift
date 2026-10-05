@@ -60,8 +60,6 @@ final class FolderStackPanelController {
         reveal?.cancel()
         reveal = Task { [weak self] in
             guard let self else { return }
-            // The window stays hidden until bookmark resolution, the directory check, and the
-            // watch have returned. A close during that wait must not order the panel front.
             guard await state.waitUntilOpen(), !Task.isCancelled, !dismissed else {
                 if !dismissed { close(returnFocus: false) }
                 return

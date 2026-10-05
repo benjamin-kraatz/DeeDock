@@ -4,9 +4,8 @@ import Foundation
 
 /// Watches one open folder without keeping any idle polling alive.
 ///
-/// `open` can block in the kernel on a wedged volume. Callers create the monitor on
-/// `VolumeReads` and keep it only when the stack is still opening. The source is resumed
-/// before the instance is published; `stop` is the only later mutation.
+/// `open` can block on a wedged volume, so callers create this on `VolumeReads` and publish it
+/// only if the stack is still opening. `stop` is the only later mutation.
 nonisolated final class FolderDirectoryMonitor: @unchecked Sendable {
     private var source: DispatchSourceFileSystemObject?
 

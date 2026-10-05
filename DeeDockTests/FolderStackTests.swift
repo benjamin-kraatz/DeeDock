@@ -105,9 +105,39 @@ struct FolderStackTests {
         let root = try temporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let state = FolderStackState(folder: FolderReference(url: root, name: "Root", bookmarkData: Data()))
+        let gate = OpenGate()
+        gate.arm(state)
+        defer { state.pauseOpen = nil; state.stop() }
         state.start()
+        await gate.untilPaused()
         state.stop()
-        await waitUntil { !state.entries.isEmpty || state.error != nil }
+        gate.resume()
+        #expect(await state.waitUntilOpen() == false)
+        #expect(state.entries.isEmpty)
+        #expect(state.error == nil)
+    }
+
+    @Test("An accepted tile drop still copies when the stack closes during open")
+    @MainActor func dropCopiesWhenOpenCloses() async throws {
+        let parent = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: parent) }
+        let folder = parent.appendingPathComponent("Folder")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+        let source = parent.appendingPathComponent("note.txt")
+        try Data("hi".utf8).write(to: source)
+        let state = FolderStackState(folder: FolderReference(url: folder, name: "Folder", bookmarkData: Data()))
+        let gate = OpenGate()
+        gate.arm(state)
+        defer { state.pauseOpen = nil; state.stop() }
+        state.start()
+        #expect(state.accept([source], into: folder, move: false, target: .tile))
+        await gate.untilPaused()
+        state.stop()
+        gate.resume()
+        #expect(await state.waitUntilOpen() == false)
+        while state.copying { await Task.yield() }
+        #expect(FileManager.default.fileExists(atPath: folder.appendingPathComponent("note.txt").path))
+        #expect(FileManager.default.fileExists(atPath: source.path))
         #expect(state.entries.isEmpty)
         #expect(state.error == nil)
     }
@@ -368,6 +398,30 @@ struct FolderStackTests {
         case .top: #expect(dismissed.minY > frame.minY)
         case .left: #expect(dismissed.minX < frame.minX)
         case .right: #expect(dismissed.minX > frame.minX)
+        }
+    }
+
+    @MainActor private final class OpenGate {
+        private var wait: CheckedContinuation<Void, Never>?
+        private var hold: CheckedContinuation<Void, Never>?
+
+        func arm(_ state: FolderStackState) {
+            state.pauseOpen = { [weak self] in
+                await withCheckedContinuation { (hold: CheckedContinuation<Void, Never>) in
+                    self?.hold = hold
+                    self?.wait?.resume()
+                    self?.wait = nil
+                }
+            }
+        }
+
+        func untilPaused() async {
+            await withCheckedContinuation { wait = $0 }
+        }
+
+        func resume() {
+            hold?.resume()
+            hold = nil
         }
     }
 
