@@ -57,7 +57,7 @@ nonisolated extension URL {
     ///
     /// Volume attributes can fail for a path that does not exist yet. Walk to the nearest
     /// existing parent so a missing final component still uses that volume's rule.
-    /// Badge installation keys fold case only when this is false.
+    /// Badge paths that differ only by case join when this is false. The stored key is not rewritten.
     var volumeReportsCaseSensitiveNames: Bool {
         var url = self
         var previous = ""

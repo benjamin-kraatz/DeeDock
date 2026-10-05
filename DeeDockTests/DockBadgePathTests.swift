@@ -30,8 +30,9 @@ nonisolated struct DockBadgePathTests {
         try FileManager.default.createSymbolicLink(at: link, withDestinationURL: real)
 
         #expect(link.standardizedFileURL.path != real.standardizedFileURL.path)
-        #expect(DockBadgePath.key(for: link) == DockBadgePath.key(for: real))
-        #expect(DockBadgePath.key(for: link).hasSuffix(".app"))
+        let key = DockBadgePath.key(for: link)
+        #expect(key == DockBadgePath.key(for: real))
+        #expect(key.hasSuffix("Safari.app"))
     }
 
     @Test("Case-only spellings follow the volume")
@@ -41,23 +42,24 @@ nonisolated struct DockBadgePathTests {
         let real = root.appendingPathComponent("Mail.app", isDirectory: true)
         try FileManager.default.createDirectory(at: real, withIntermediateDirectories: true)
         let otherCase = root.appendingPathComponent("mail.app")
+        #expect(DockBadgePath.key(for: real).hasSuffix("Mail.app"))
+        #expect(DockBadgePath.sameInstallation(real.path, otherCase.path) == !caseSensitive(root))
         if caseSensitive(root) {
             #expect(DockBadgePath.key(for: real) != DockBadgePath.key(for: otherCase))
         } else {
-            let key = DockBadgePath.key(for: otherCase)
-            #expect(key == DockBadgePath.key(for: real))
-            #expect(key == key.lowercased(with: Locale(identifier: "en_US_POSIX")))
+            #expect(DockBadgePath.key(for: otherCase) == DockBadgePath.key(for: real))
         }
     }
 
-    @Test("A missing path folds case only on a case-insensitive volume")
+    @Test("A missing path keeps its spelling")
     func missingPath() throws {
         let root = try makeRoot()
         defer { try? FileManager.default.removeItem(at: root) }
         let upper = root.appendingPathComponent("Missing.app")
         let lower = root.appendingPathComponent("missing.app")
-        let same = DockBadgePath.key(for: upper) == DockBadgePath.key(for: lower)
-        #expect(same == !caseSensitive(root))
+        #expect(DockBadgePath.key(for: upper).hasSuffix("Missing.app"))
+        #expect(DockBadgePath.key(for: lower).hasSuffix("missing.app"))
+        #expect(DockBadgePath.sameInstallation(upper.path, lower.path) == !caseSensitive(root))
     }
 
     @Test("Two installations stay distinct")
