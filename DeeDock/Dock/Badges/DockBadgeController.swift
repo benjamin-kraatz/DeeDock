@@ -18,9 +18,10 @@ final class DockBadgeController {
     @ObservationIgnored private var workerSession: UUID?
     @ObservationIgnored private var retention = BadgeScanRetention()
 
-    /// - Parameter memory: Badge history for this controller. The app uses standard defaults.
-    init(memory: BadgeMemoryStore = BadgeMemoryStore()) {
-        self.memory = memory
+    /// `nil` uses standard defaults. The store is created in this body because a default
+    /// argument is type-checked outside the main actor.
+    init(memory: BadgeMemoryStore? = nil) {
+        self.memory = memory ?? BadgeMemoryStore()
     }
 
     /// Starts observation only for an enabled feature with at least one configured Dock.
