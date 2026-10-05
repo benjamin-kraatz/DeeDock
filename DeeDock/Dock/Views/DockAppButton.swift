@@ -48,11 +48,11 @@ struct DockAppButton: View {
 
     private var badgeLabel: String? {
         guard item.isAvailable else { return nil }
-        return interaction?.badges?.labels[(item.resolvedURL ?? item.reference.url).standardizedFileURL.path]
+        return interaction?.badges?.labels[DockBadgePath.key(for: item.resolvedURL ?? item.reference.url)]
     }
 
     var body: some View {
-        // Standardizes the app URL for the lookup; read once per pass, not once per use.
+        // One lookup per pass. `DockBadgePath` caches the installation key.
         let badgeLabel = self.badgeLabel
         Button(action: primaryAction) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,

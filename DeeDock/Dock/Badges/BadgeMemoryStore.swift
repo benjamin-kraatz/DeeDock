@@ -27,6 +27,7 @@ final class BadgeMemoryStore {
             } catch { requiresReset = true; storageFailed = true }
         }
         if document.active != nil { document.active?.incomplete = true }
+        rekeyInstallations()
         synchronize(session: session, at: date, allowStart: false)
     }
 
@@ -41,6 +42,8 @@ final class BadgeMemoryStore {
     /// Called for actual snapshots, including unavailable scans. Identical samples do not persist.
     func observe(_ observations: [String: BadgeObservation], session: FocusSession?, at date: Date = .now, scanStarted: Date? = nil) {
         synchronize(session: session, at: date)
+        // Join a resolved scan onto the saved spelling before a missing key is stored as unknown.
+        let observations = matchedObservations(observations)
         let previous = current
         if current != observations { current = observations }
         guard !requiresReset else { return }
@@ -193,6 +196,93 @@ final class BadgeMemoryStore {
         document = BadgeMemoryDocument(lastSessionID: session?.id)
         requiresReset = false; storageFailed = false
         defaults.removeObject(forKey: Self.key)
+    }
+
+    /// Moves symlink and firmlink history onto the resolved path once.
+    ///
+    /// Case-only spellings keep the stored key, so a relaunch does not append `.unknown` for the
+    /// old path or open a second row under a lowercased name. Live `current` values move with
+    /// the records; they are not saved.
+    private func rekeyInstallations() {
+        guard !requiresReset else { return }
+        let before = document
+        document.apps = rekeyed(document.apps, merge: { mergeApps($0, $1) })
+        if var active = document.active {
+            active.rows = rekeyed(active.rows, merge: { mergeRows($0, $1) })
+            active.excludedPaths = rekeyed(active.excludedPaths)
+            document.active = active
+        }
+        for index in document.digests.indices {
+            document.digests[index].rows = rekeyed(document.digests[index].rows, merge: { mergeRows($0, $1) })
+            document.digests[index].excludedPaths = rekeyed(document.digests[index].excludedPaths)
+        }
+        if document != before { persist() }
+        let remapped = matchedObservations(current)
+        if remapped != current { current = remapped }
+    }
+
+    private func rekeyed<Value>(_ records: [String: Value], merge: (Value, Value) -> Value) -> [String: Value] {
+        var groups: [String: [(String, Value)]] = [:]
+        for (path, value) in records {
+            groups[DockBadgePath.key(for: URL(fileURLWithPath: path)), default: []].append((path, value))
+        }
+        var result: [String: Value] = [:]
+        for (identity, entries) in groups {
+            let ordered = entries.sorted { $0.0 < $1.0 }
+            let destination = DockBadgePath.preferredStorageKey(identity: identity, stored: ordered.map(\.0))
+            let combined = ordered.dropFirst().reduce(ordered[0].1) { merge($0, $1.1) }
+            result[destination] = result[destination].map { merge($0, combined) } ?? combined
+        }
+        return result
+    }
+
+    private func rekeyed(_ paths: Set<String>) -> Set<String> {
+        var groups: [String: [String]] = [:]
+        for path in paths {
+            groups[DockBadgePath.key(for: URL(fileURLWithPath: path)), default: []].append(path)
+        }
+        return Set(groups.map { DockBadgePath.preferredStorageKey(identity: $0.key, stored: $0.value) })
+    }
+
+    /// Keeps a checked baseline when two saved spellings collapse. Does not invent `.unknown`.
+    private func mergeApps(_ first: BadgeAppMemory, _ second: BadgeAppMemory) -> BadgeAppMemory {
+        let (primary, secondary) = first.checked == nil && second.checked != nil ? (second, first) : (first, second)
+        var result = primary
+        if result.checked == nil { result.checked = secondary.checked }
+        if result.changes.isEmpty { result.changes = secondary.changes }
+        if secondary.touched > result.touched { result.touched = secondary.touched }
+        return result
+    }
+
+    private func mergeRows(_ first: BadgeDigestRow, _ second: BadgeDigestRow) -> BadgeDigestRow {
+        second.changes > first.changes ? second : first
+    }
+
+    /// Uses the stored spelling when a scan names the same installation.
+    private func matchedObservations(_ observations: [String: BadgeObservation]) -> [String: BadgeObservation] {
+        let stored = storedPaths()
+        var matched: [String: BadgeObservation] = [:]
+        var conflicted: Set<String> = []
+        for (path, value) in observations {
+            let target = stored.first { DockBadgePath.sameInstallation($0, path) } ?? path
+            if let existing = matched[target], existing != value { conflicted.insert(target) }
+            matched[target] = value
+        }
+        for path in conflicted { matched[path] = .unknown }
+        return matched
+    }
+
+    private func storedPaths() -> [String] {
+        var paths = Set(document.apps.keys)
+        if let active = document.active {
+            paths.formUnion(active.rows.keys)
+            paths.formUnion(active.excludedPaths)
+        }
+        for digest in document.digests {
+            paths.formUnion(digest.rows.keys)
+            paths.formUnion(digest.excludedPaths)
+        }
+        return Array(paths)
     }
 
     private func prune(at date: Date) {
