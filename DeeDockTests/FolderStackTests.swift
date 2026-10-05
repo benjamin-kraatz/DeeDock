@@ -100,6 +100,39 @@ struct FolderStackTests {
         #expect(try DockPinImporter.kind(of: link) == .other)
     }
 
+    @Test("A folder listing is visible before file icons, and a stale fill does not replace it")
+    @MainActor func listingPublishesBeforeFileIcons() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try Data().write(to: root.appendingPathComponent("b.txt"))
+        try Data().write(to: root.appendingPathComponent("a.txt"))
+        let gate = IconGate()
+        let state = FolderStackState(
+            folder: FolderReference(url: root, name: "Root", bookmarkData: Data()),
+            resolveFileIcon: { _ in await gate.next() }
+        )
+        defer { gate.unblock(); state.stop() }
+        state.start()
+
+        await waitUntil { state.entries.map(\.reference.name) == ["a.txt", "b.txt"] && gate.count == 1 }
+        let first = try #require(gate.image(at: 0))
+        #expect(state.entries.allSatisfy { $0.icon !== first })
+
+        state.reload()
+        await waitUntil { gate.count == 2 }
+        gate.releaseOne()
+        await waitUntil { gate.returned == 1 }
+        let second = try #require(gate.image(at: 1))
+        #expect(state.entries.map(\.reference.name) == ["a.txt", "b.txt"])
+        #expect(state.entries.allSatisfy { $0.icon !== first && $0.icon !== second })
+
+        gate.unblock()
+        await waitUntil { state.entries.last?.icon === gate.image(at: 2) }
+        #expect(state.entries.map(\.reference.name) == ["a.txt", "b.txt"])
+        #expect(state.entries.first?.icon === second)
+        #expect(state.entries.last?.icon === gate.image(at: 2))
+    }
+
     @Test("A failed presentation save restores the previous mode and remains retryable")
     @MainActor func presentationRollback() {
         let folder = FolderReference(url: URL(fileURLWithPath: "/Fixtures"), name: "Fixtures", bookmarkData: Data())
@@ -326,6 +359,13 @@ struct FolderStackTests {
         }
     }
 
+    private func waitUntil(attempts: Int = 200, _ predicate: () -> Bool) async {
+        for _ in 0..<attempts {
+            if predicate() { return }
+            await Task.yield()
+        }
+    }
+
     private func temporaryDirectory() throws -> URL {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -381,5 +421,33 @@ struct FolderStackTests {
         append32(dataSize)
         data.append(contentsOf: repeatElement(0, count: Int(dataSize)))
         return data
+    }
+}
+
+/// Suspends file-icon lookups so a listing can publish, and a cancelled fill can be released on its own.
+@MainActor private final class IconGate {
+    private var blocked = true
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+    private var images: [NSImage] = []
+    private(set) var returned = 0
+    var count: Int { images.count }
+    func image(at index: Int) -> NSImage? { images.indices.contains(index) ? images[index] : nil }
+
+    func next() async -> NSImage {
+        let image = NSImage(size: NSSize(width: 4, height: 4))
+        images.append(image)
+        await withCheckedContinuation { continuation in
+            if blocked { waiters.append(continuation) } else { continuation.resume() }
+        }
+        returned += 1
+        return image
+    }
+
+    func releaseOne() { if !waiters.isEmpty { waiters.removeFirst().resume() } }
+
+    func unblock() {
+        blocked = false
+        waiters.forEach { $0.resume() }
+        waiters.removeAll()
     }
 }
