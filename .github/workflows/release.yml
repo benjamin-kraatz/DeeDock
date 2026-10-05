@@ -11,16 +11,18 @@
 #   archive (xcode-27) only for intent=ship, after watch succeeds.
 #     Archive, Developer ID export, notarytool+staple, zip, generate_appcast.
 #   draft (ubuntu-latest) only for intent=ship, after archive.
-#     Draft GitHub Release from artifacts. No checkout. No Mac. No gh
-#     on xcode-27. gh uses GH_REPO / --repo instead of a local .git.
+#     Draft GitHub Release from artifacts. Checks out the repo only to
+#     read docs/releases/<version>-github.md for the English body. No Mac.
+#     No gh on xcode-27. gh uses GH_REPO / --repo instead of a local .git.
 #   remind-on-failure (ubuntu-latest) if any of those fail.
 #
 # Nara and other bots do not dispatch this workflow, bump versions on
 # feature work, hold Sparkle or signing secrets, or publish GitHub Latest.
-# Version bumps and bilingual notes land in a release-prep PR that Esi
-# merges before she dispatches. On failure, Esi opens a high-priority
-# Linear issue on project or label release-pipeline and SendToAgent-pings
-# Nara with the failure blob. Do not add Bot-Nara on that issue.
+# Version bumps, German Sparkle notes, and the English GitHub notes file
+# land in a release-prep PR that Esi merges before she dispatches. On
+# failure, Esi opens a high-priority Linear issue on project or label
+# release-pipeline and SendToAgent-pings Nara with the failure blob. Do not
+# add Bot-Nara on that issue.
 # Bot-Nara stays on feature tickets only.
 #
 # ship does not mark the release Latest unless publish_latest is true.
@@ -97,6 +99,8 @@ jobs:
       release_tag: ${{ steps.versions.outputs.release_tag }}
       notes_path: ${{ steps.notes.outputs.notes_path }}
       has_english: ${{ steps.notes.outputs.has_english }}
+      github_notes_path: ${{ steps.notes.outputs.github_notes_path }}
+      has_github_notes: ${{ steps.notes.outputs.has_github_notes }}
       comic_path: ${{ steps.comic.outputs.comic_path }}
       has_comic: ${{ steps.comic.outputs.has_comic }}
       comic_panel_count: ${{ steps.comic.outputs.comic_panel_count }}
@@ -157,27 +161,37 @@ jobs:
           require_secret POSTHOG_PROJECT_TOKEN "$HAS_POSTHOG_PROJECT_TOKEN"
           echo "secrets_missing=$missing" >> "$GITHUB_OUTPUT"
 
-      - name: Locate bilingual Sparkle notes
+      - name: Locate Sparkle notes and GitHub release notes
         id: notes
         env:
           MARKETING_VERSION: ${{ steps.versions.outputs.marketing_version }}
         run: |
           set -eu
           notes="docs/releases/${MARKETING_VERSION}.md"
+          github="docs/releases/${MARKETING_VERSION}-github.md"
           if [ -f "$notes" ]; then
             echo "Found $notes"
             echo "notes_path=$notes" >> "$GITHUB_OUTPUT"
             if grep -Eq '^## English$' "$notes"; then
-              echo "English section is present for the GitHub Release body."
+              echo "Sparkle notes still contain ## English. That section is optional."
               echo "has_english=true" >> "$GITHUB_OUTPUT"
             else
-              echo "Warning: $notes has no ## English heading. Sparkle notes must be bilingual German and English."
+              echo "Sparkle notes have no ## English section. German-only notes are expected."
               echo "has_english=false" >> "$GITHUB_OUTPUT"
             fi
           else
             echo "Warning: $notes is missing. Add it before a real ship."
             echo "notes_path=" >> "$GITHUB_OUTPUT"
             echo "has_english=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -s "$github" ]; then
+            echo "Found $github"
+            echo "github_notes_path=$github" >> "$GITHUB_OUTPUT"
+            echo "has_github_notes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Warning: $github is missing or empty."
+            echo "github_notes_path=" >> "$GITHUB_OUTPUT"
+            echo "has_github_notes=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Locate What’s New comic
@@ -213,6 +227,7 @@ jobs:
           SECRETS_MISSING: ${{ steps.secrets.outputs.secrets_missing }}
           NOTES_PATH: ${{ steps.notes.outputs.notes_path }}
           HAS_ENGLISH: ${{ steps.notes.outputs.has_english }}
+          HAS_GITHUB_NOTES: ${{ steps.notes.outputs.has_github_notes }}
           MARKETING_VERSION: ${{ steps.versions.outputs.marketing_version }}
         run: |
           set -eu
@@ -224,8 +239,9 @@ jobs:
           if [ -z "${NOTES_PATH:-}" ]; then
             echo "ship needs docs/releases/${MARKETING_VERSION}.md before the Mac job starts."
             failed=1
-          elif [ "$HAS_ENGLISH" != "true" ]; then
-            echo "ship needs an ## English section in docs/releases/${MARKETING_VERSION}.md."
+          fi
+          if [ "$HAS_GITHUB_NOTES" != "true" ] && [ "$HAS_ENGLISH" != "true" ]; then
+            echo "ship needs docs/releases/${MARKETING_VERSION}-github.md, or an ## English section in the Sparkle notes."
             failed=1
           fi
           if [ "$failed" -ne 0 ]; then
@@ -483,7 +499,7 @@ jobs:
             exit 1
           fi
 
-      - name: Stage bilingual Sparkle notes
+      - name: Stage Sparkle notes
         env:
           NOTES_PATH: ${{ needs.watch.outputs.notes_path }}
         run: |
@@ -598,6 +614,7 @@ jobs:
           BUILD_NUMBER: ${{ needs.watch.outputs.build_number }}
           RELEASE_TAG: ${{ needs.watch.outputs.release_tag }}
           HAS_ENGLISH: ${{ needs.watch.outputs.has_english }}
+          HAS_GITHUB_NOTES: ${{ needs.watch.outputs.has_github_notes }}
         run: |
           set -eu
           {
@@ -605,6 +622,7 @@ jobs:
             echo "build_number=$BUILD_NUMBER"
             echo "release_tag=$RELEASE_TAG"
             echo "has_english=$HAS_ENGLISH"
+            echo "has_github_notes=$HAS_GITHUB_NOTES"
             echo "has_comic=${HAS_COMIC:-false}"
             echo "git_sha=$GITHUB_SHA"
           } > "$UPDATE_DIR/version-metadata.txt"
@@ -680,6 +698,9 @@ jobs:
           name: ddock-sparkle
           path: ${{ runner.temp }}/ddock-sparkle
 
+      - name: Checkout GitHub release notes
+        uses: actions/checkout@v4
+
       - name: Open a draft GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -687,26 +708,29 @@ jobs:
           MARKETING_VERSION: ${{ needs.watch.outputs.marketing_version }}
           BUILD_NUMBER: ${{ needs.watch.outputs.build_number }}
           RELEASE_TAG: ${{ needs.watch.outputs.release_tag }}
-          HAS_ENGLISH: ${{ needs.watch.outputs.has_english }}
           ARTIFACT_DIR: ${{ runner.temp }}/ddock-sparkle
         run: |
           set -eu
           body="$RUNNER_TEMP/github-release-body.md"
-          ARTIFACT_DIR="$ARTIFACT_DIR" HAS_ENGLISH="$HAS_ENGLISH" \
+          ARTIFACT_DIR="$ARTIFACT_DIR" \
             MARKETING_VERSION="$MARKETING_VERSION" BUILD_NUMBER="$BUILD_NUMBER" \
             BODY="$body" python3 - <<'PY'
           import os
           from pathlib import Path
           notes = Path(os.environ["ARTIFACT_DIR"]) / "DDock.md"
-          has_english = os.environ.get("HAS_ENGLISH") == "true"
           marketing = os.environ["MARKETING_VERSION"]
           build = os.environ["BUILD_NUMBER"]
+          github = Path("docs/releases") / f"{marketing}-github.md"
           fallback = (
               f"DDock {marketing}, build {build}.\n\n"
               "Draft from the Release workflow. This is not GitHub Latest.\n"
           )
           text = ""
-          if notes.is_file() and has_english:
+          if github.is_file():
+              text = github.read_text().strip()
+              if text:
+                  print(f"GitHub Release body from {github}")
+          if not text and notes.is_file():
               source = notes.read_text()
               marker = None
               for line in source.splitlines():
@@ -714,10 +738,13 @@ jobs:
                       marker = line
                       break
               if marker is not None:
-                  text = source.split(marker, 1)[1].lstrip("\n").strip() + "\n"
-          if not text.strip():
-              text = fallback
-          Path(os.environ["BODY"]).write_text(text)
+                  text = source.split(marker, 1)[1].lstrip("\n").strip()
+                  if text:
+                      print("GitHub Release body from the ## English section of DDock.md")
+          if not text:
+              print("GitHub Release body fell back to the stub.")
+              text = fallback.strip()
+          Path(os.environ["BODY"]).write_text(text + "\n")
           PY
           assets=(
             "$ARTIFACT_DIR/DDock.zip"

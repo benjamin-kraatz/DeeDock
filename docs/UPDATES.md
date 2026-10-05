@@ -10,13 +10,13 @@ DOKK ships only as a notarized Developer ID download. There is no App Store or T
 
 Esi is the release captain. Esi alone dispatches the [Release workflow](../.github/workflows/release.yml) from **Actions → Release → Run workflow**. The workflow has no `schedule`, push, or pull_request trigger. If Esi wants a nightly watch, that is her routine, not a GitHub cron.
 
-Nara and other bots do not dispatch Release, bump `MARKETING_VERSION` or `CURRENT_PROJECT_VERSION` on feature work, hold Sparkle or signing secrets, or publish GitHub Latest. Version bumps and bilingual notes belong in a separate release-prep PR. Esi merges that PR before she dispatches.
+Nara and other bots do not dispatch Release, bump `MARKETING_VERSION` or `CURRENT_PROJECT_VERSION` on feature work, hold Sparkle or signing secrets, or publish GitHub Latest. Version bumps, German Sparkle notes, and the English GitHub notes file belong in a separate release-prep PR. Esi merges that PR before she dispatches.
 
 `intent=watch` is an optional dry-run on `ubuntu-latest`. It prints the version, secret presence, and notes check. It does not start `xcode-27`.
 
 `intent=ship` preflights on Linux, then archives on `xcode-27`, then opens a draft GitHub Release back on `ubuntu-latest`. It does not publish Latest unless Esi sets `publish_latest`. The first smoke path stays draft-only. The [manual archive path](#prepare-the-release) stays valid.
 
-GitHub Release body is English only. Sparkle release notes are bilingual German and English. See [Release notes](#release-notes).
+GitHub Release body is English only, from `docs/releases/<MARKETING_VERSION>-github.md`. Sparkle release notes are German only, from `docs/releases/<MARKETING_VERSION>.md`. See [Release notes](#release-notes).
 
 ## Custom update panel
 
@@ -102,7 +102,7 @@ xcrun stapler validate "$EXPORTED_APP"
 
 Inspect `appcast.xml`. Its enclosure must name the version-specific HTTPS download, include an EdDSA signature, and declare the intended build number, minimum macOS version, and supported architecture. The ZIP must contain only `DOKK.app` at its root. This procedure signs the archive; it does not enable optional appcast signing.
 
-Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. When `docs/releases/<MARKETING_VERSION>.md` exists, copy it beside the ZIP as `DDock.md` before `generate_appcast`, and upload that `DDock.md` with the draft. When `docs/releases/<MARKETING_VERSION>-comic.md` is on the shipped commit, the Release workflow also stages it as `DDock-comic.md`, copies each `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` as a flat `panel-0N.png`, and uploads those files on the same draft. The staged comic rewrites `assets/<ver>/panel-0N.png` links to `panel-0N.png` so the Update window can load art next to `DDock-comic.md`. A missing comic file is skipped and the notes-only ship still succeeds. Write the GitHub Release body in English only. Sparkle notes stay bilingual German and English. 0.4.1 has no comic package.
+Create a draft GitHub release with `DDock.zip` and `appcast.xml` as assets. When `docs/releases/<MARKETING_VERSION>.md` exists, copy it beside the ZIP as `DDock.md` before `generate_appcast`, and upload that `DDock.md` with the draft. When `docs/releases/<MARKETING_VERSION>-comic.md` is on the shipped commit, the Release workflow also stages it as `DDock-comic.md`, copies each `docs/releases/assets/<MARKETING_VERSION>/panel-0N.png` as a flat `panel-0N.png`, and uploads those files on the same draft. The staged comic rewrites `assets/<ver>/panel-0N.png` links to `panel-0N.png` so the Update window can load art next to `DDock-comic.md`. A missing comic file is skipped and the notes-only ship still succeeds. The GitHub Release body comes from `docs/releases/<MARKETING_VERSION>-github.md` and stays English only. That file is not uploaded as a Sparkle asset. Sparkle notes stay the German file, staged as `DDock.md`. 0.4.1 has no comic package.
 
 The Release workflow stops at that draft. Leave `publish_latest` off until Benn confirms a Latest cut. Verify both assets before anyone marks the release as Latest. Every subsequent stable Latest release must carry `appcast.xml`; otherwise installed apps lose their feed. Do not mark a prerelease build as Latest. Keep older releases and their version-specific asset URLs intact.
 
@@ -132,31 +132,33 @@ Compilation and bundle inspection do not establish these runtime behaviors. `int
 
 Keep two publications separate.
 
-**GitHub Release body.** English only. Esi pastes or generates this when opening the draft. Do not put the German text in the GitHub body.
-
-**Sparkle notes.** Bilingual German and English. The source file is `docs/releases/<MARKETING_VERSION>.md`, matching the existing `docs/releases/0.2.0.md` convention. New files use this shape:
+**Sparkle notes.** German only. The source file is `docs/releases/<MARKETING_VERSION>.md`. The in-app update window shows this file. New files use this shape:
 
 ```markdown
-DDock 0.2.1, Build 18, benötigt macOS 27 und einen Mac mit Apple Silicon.
+DOKK 0.13.6, Build 47.
 
-## Neue Funktionen
+## Verbesserungen
 
-- German notes first, using the same heading style as 0.2.0.
+- German notes, using the same heading style as 0.13.5.
+```
 
-## English
+Do not add an `## English` section to a new Sparkle file.
 
-DDock 0.2.1, Build 18, requires macOS 27 and an Apple Silicon Mac.
+**GitHub Release body.** English only. The source file is `docs/releases/<MARKETING_VERSION>-github.md`. It covers the same changes as the German notes. The Release workflow reads it into the draft body. It is not staged as `DDock.md` and is not uploaded next to the Sparkle assets.
 
-### New features
+```markdown
+DOKK 0.13.6, Build 47.
+
+### Improvements
 
 - English notes that cover the same changes.
 ```
 
-`generate_appcast` embeds a `.md` file whose base name matches the archive. Copy the version file to the staging folder as `DDock.md` next to `DDock.zip`. Sparkle 2.9.6 accepts Markdown. The in-app window parses headings, lists, and HTTPS links and does not load remote styling.
+`generate_appcast` embeds a `.md` file whose base name matches the archive. Copy the German version file to the staging folder as `DDock.md` next to `DDock.zip`. Sparkle 2.9.6 accepts Markdown. The in-app window parses headings, lists, and HTTPS links and does not load remote styling.
 
 A What’s New comic is optional and is not part of 0.4.1. Author it as `docs/releases/<MARKETING_VERSION>-comic.md` using [COMIC-TEMPLATE.md](releases/COMIC-TEMPLATE.md) on a later release-prep PR. Keep the 0.5.0 Focus, Compost, and Gossip comic on that version. Do not attach it to a 0.4.x draft. When that file is present, the Release workflow uploads `DDock-comic.md` and the matching `panel-0N.png` files onto the GitHub Release next to `DDock.md`. See [What’s New comics](releases/COMIC-README.md) for the asset names.
 
-Existing `docs/releases/0.2.0.md` is German only. Add an `## English` section on the next version. Do not rewrite older published notes.
+Older published notes stay as they were published. Do not rewrite them. A Sparkle file that still has an `## English` section can satisfy ship when `docs/releases/<MARKETING_VERSION>-github.md` is missing. The draft job uses that section only in that case.
 
 ## Release pipeline
 
@@ -164,11 +166,11 @@ The [Release workflow](../.github/workflows/release.yml) is `workflow_dispatch` 
 
 Esi dispatches it. She chooses `intent=watch` for a dry-run, or `intent=ship` after the release-prep PR is on `main`. Leave **publish_latest** unchecked.
 
-Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` only in `Configuration/App.xcconfig` and adds bilingual notes at `docs/releases/<MARKETING_VERSION>.md`. Confirm `DeeDock.xcodeproj/project.pbxproj` target build settings inherit those keys instead of repeating them. Esi merges that PR before she dispatches. Feature work does not bump those versions.
+Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` only in `Configuration/App.xcconfig`, adds German Sparkle notes at `docs/releases/<MARKETING_VERSION>.md`, and adds the English GitHub body at `docs/releases/<MARKETING_VERSION>-github.md`. Confirm `DeeDock.xcodeproj/project.pbxproj` target build settings inherit those keys instead of repeating them. Esi merges that PR before she dispatches. Feature work does not bump those versions.
 
-**watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the seven secrets by name, checks `docs/releases/<MARKETING_VERSION>.md` for an `## English` section, and reports whether `docs/releases/<MARKETING_VERSION>-comic.md` and any `panel-0N.png` files exist. A missing comic does not fail watch or ship. It does not archive, import a certificate, or start `xcode-27`.
+**watch** (`ubuntu-latest`). Every dispatch runs this job. `intent=watch` stops here. It reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `Configuration/App.xcconfig`, reports the seven secrets by name, requires `docs/releases/<MARKETING_VERSION>.md` for ship, and reports `has_github_notes` for `docs/releases/<MARKETING_VERSION>-github.md`. It also reports whether `docs/releases/<MARKETING_VERSION>-comic.md` and any `panel-0N.png` files exist. Ship fails when the German notes file is missing. Ship also fails when `-github.md` is missing, unless the Sparkle notes still contain `## English`. A missing comic does not fail watch or ship. It does not archive, import a certificate, or start `xcode-27`.
 
-**archive** (`xcode-27`). `intent=ship` only, after watch succeeds. Watch fails first if a secret or the bilingual notes file is missing, so the Mac job does not start. Then, in order:
+**archive** (`xcode-27`). `intent=ship` only, after watch succeeds. Watch fails first if a secret is missing, the German Sparkle notes file is missing, or neither `-github.md` nor an `## English` section is present, so the Mac job does not start. Then, in order:
 
 1. Confirm the image has Xcode 27 and the macOS 27 SDK.
 2. Resolve Sparkle tools from the pinned 2.9.6 package (`generate_appcast` under the cloned `artifacts/sparkle` tree).
@@ -176,12 +178,12 @@ Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETIN
 4. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime.
 5. Export with a generated Developer ID options plist, then `xcrun notarytool submit ... --apple-id --password --team-id --wait`, then `stapler staple`. Nested Sparkle code stays signed. The job does not weaken hardened runtime.
 6. Verify `codesign --deep --strict` and `stapler validate`.
-7. Build `DDock.zip` with `ditto`, copy bilingual notes to `DDock.md`, copy a What’s New comic to `DDock-comic.md` plus flat `panel-0N.png` files when that comic exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`.
+7. Build `DDock.zip` with `ditto`, copy the German notes to `DDock.md`, copy a What’s New comic to `DDock-comic.md` plus flat `panel-0N.png` files when that comic exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`. Do not stage `-github.md` in that directory.
 8. Upload `DDock.zip`, `appcast.xml`, `DDock.md`, version metadata, and any staged comic files as a workflow artifact.
 
 Do not run those archive steps in parallel.
 
-**draft** (`ubuntu-latest`). After archive. Downloads the artifacts and opens a draft GitHub Release for `v<MARKETING_VERSION>` with an English-only body. Upload `DDock.zip`, `appcast.xml`, and `DDock.md`. When `DDock-comic.md` and `panel-0N.png` are in the artifact, upload those too. The job refuses to overwrite a published or Latest release. `xcode-27` does not call `gh`.
+**draft** (`ubuntu-latest`). After archive. Downloads the artifacts, checks out the repo, and opens a draft GitHub Release for `v<MARKETING_VERSION>`. The body is `docs/releases/<MARKETING_VERSION>-github.md` when that file is present. If it is absent, the job extracts `## English` from the staged `DDock.md`. Otherwise it uses the existing stub. Upload `DDock.zip`, `appcast.xml`, and `DDock.md`. Do not upload `-github.md`. When `DDock-comic.md` and `panel-0N.png` are in the artifact, upload those too. The job refuses to overwrite a published or Latest release. `xcode-27` does not call `gh`.
 
 `publish_latest` defaults to false. Turn it on only after Benn confirms a Latest cut. The first smoke path must stay a draft.
 
