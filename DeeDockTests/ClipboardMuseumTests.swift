@@ -199,6 +199,38 @@ struct ClipboardMuseumTests {
         #expect(!kept.isEmpty)
     }
 
+    @Test("A relaunch after a failed save keeps the last catalog's files and drops the orphan")
+    func relaunchAfterFailedSaveKeepsCatalogFiles() throws {
+        let (store, repository) = collecting()
+        defer {
+            var catalog = repository.documentURL
+            var writable = URLResourceValues()
+            writable.isUserImmutable = false
+            try? catalog.setResourceValues(writable)
+            try? repository.removeAll()
+        }
+        let image = try #require(store.accession(ClipboardCapture(payload: .image(png: Data([1, 2, 3]), width: 1, height: 1))))
+        let imageURL = try #require(store.imageURL(for: image))
+        // User-immutable blocks replacing the catalog. The sealed blob can still be written beside it.
+        var catalog = repository.documentURL
+        var frozen = URLResourceValues()
+        frozen.isUserImmutable = true
+        try catalog.setResourceValues(frozen)
+        store.redact(image.id)
+        let sealedName = try #require(store.exhibit(image.id)?.sealedName)
+        let sealed = try repository.readSealed(named: sealedName)
+        #expect(store.storageFailed)
+        #expect(!sealed.isEmpty)
+        let relaunched = ClipboardMuseumStore(repository: repository, vault: store.vault)
+        relaunched.start()
+        let restored = try #require(relaunched.exhibit(image.id))
+        #expect(!relaunched.requiresReset)
+        #expect(restored.imageName == image.imageName)
+        #expect(restored.sealedName == nil)
+        #expect(FileManager.default.fileExists(atPath: imageURL.path))
+        #expect((try? repository.readSealed(named: sealedName)) == nil)
+    }
+
     @Test("Remove and clear delete files and keep catalog numbers unique")
     func removeClear() throws {
         let (store, repository) = collecting()

@@ -207,8 +207,9 @@ final class ClipboardMuseumStore {
         persist()
     }
 
-    /// Deletes every exhibit and file. Preferences and the next catalog number stay, so
-    /// accession numbers are never reused.
+    /// Removes every exhibit. Their files are deleted after the catalog save succeeds. A failed
+    /// save keeps those files until a later successful save or launch. Preferences and the next
+    /// catalog number stay, so accession numbers are never reused.
     func clear() {
         guard !requiresReset else { return }
         document.exhibits = []
