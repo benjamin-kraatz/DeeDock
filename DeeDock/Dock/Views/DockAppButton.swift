@@ -148,20 +148,20 @@ struct DockAppButton: View {
         )
         .accessibilityActions {
             if interaction?.openBadgeMemory != nil {
-                Button(.badgeMemoryDetails) { interaction?.openBadgeMemory?(item) }
+                Button(.badgeMemoryDetails) { Analytics.performing(.voiceOver) { interaction?.openBadgeMemory?(item) } }
             }
             if item.isAvailable {
-                Button(.actionOpenFiles) { interaction?.openFiles?(item) }
-                Button(.applicationMenuShowInFinder) { interaction?.performApplicationMenuAction?(.showInFinder, item) }
+                Button(.actionOpenFiles) { Analytics.performing(.voiceOver) { interaction?.openFiles?(item) } }
+                Button(.applicationMenuShowInFinder) { menuAction(.showInFinder) }
             }
             if item.isRunning {
                 let allHidden = accessibilityAllHidden
                 Button(allHidden ? .applicationMenuShow : .applicationMenuHide) {
-                    interaction?.performApplicationMenuAction?(.setHidden(!allHidden), item)
+                    menuAction(.setHidden(!allHidden))
                     accessibilityAllHidden = !allHidden
                 }
-                Button(.applicationMenuBringAllToFront) { interaction?.performApplicationMenuAction?(.bringAllToFront, item) }
-                Button(.applicationMenuQuit) { interaction?.performApplicationMenuAction?(.quit, item) }
+                Button(.applicationMenuBringAllToFront) { menuAction(.bringAllToFront) }
+                Button(.applicationMenuQuit) { menuAction(.quit) }
             }
             ForEach(accessibilityWindows) { window in
                 Button(.applicationMenuOpenWindow(
@@ -171,7 +171,7 @@ struct DockAppButton: View {
                     )
                 )) {
                     accessibilityDiscoveryID = nil
-                    interaction?.performApplicationMenuAction?(.selectWindow(window.token), item)
+                    menuAction(.selectWindow(window.token))
                 }
             }
             if item.isFavorite, interaction?.sims?.isEnabled == true {
@@ -203,6 +203,11 @@ struct DockAppButton: View {
         }
         .modifier(QuarantineItemModifier(id: item.id, url: item.resolvedURL ?? item.reference.url,
                                          name: item.reference.name, eligible: item.isFavorite))
+    }
+
+    /// A context-menu action reached through VoiceOver's actions rotor.
+    private func menuAction(_ action: ApplicationMenuAction) {
+        Analytics.performing(.voiceOver) { interaction?.performApplicationMenuAction?(action, item) }
     }
 
     private func accessibilityStatus(badgeLabel: String?) -> Text {

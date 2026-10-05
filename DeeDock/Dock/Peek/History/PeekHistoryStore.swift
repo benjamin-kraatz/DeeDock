@@ -54,6 +54,7 @@ final class PeekHistoryStore {
     func setEnabled(_ value: Bool) {
         guard !busy, !unreadable else { return }
         invalidateRecognition()
+        Analytics.shared.featureSettingChanged(.peekHistoryEnabled, from: AnalyticsValue(enabled), to: AnalyticsValue(value))
         enabled = value
         defaults?.set(value, forKey: Self.enabledKey)
     }

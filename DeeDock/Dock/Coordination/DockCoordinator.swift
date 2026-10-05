@@ -126,6 +126,8 @@ final class DockCoordinator {
     @ObservationIgnored private var lastExternalApplication: NSRunningApplication?
     @ObservationIgnored private var started = false
     @ObservationIgnored private var reconciling = false
+    /// The displays last reported to analytics; nil until the launch arrangement is known.
+    @ObservationIgnored private var reportedDisplayIDs: Set<String>?
     @ObservationIgnored private var occupancySuspended = false
 
     init(windowAccess: WindowAccessController, screenCapture: ScreenCaptureAccessController) {
@@ -251,6 +253,7 @@ final class DockCoordinator {
         appMelt.compareWindows = { [weak self] pair, windows in
             guard let self else { return }
             if pair.comparison == nil { pair.comparison = FusionCoordinator(shelf: self.shelf) }
+            Analytics.track(.toolOpened(.fusion, trigger: .automatic))
             pair.comparison?.show(pair: windows)
         }
         appMelt.readDockApplication = { [weak self] in self?.dragging.meltApplication(from: $0) }
@@ -334,6 +337,7 @@ final class DockCoordinator {
             return dragging.isDragging || appMelt.pairs.contains { $0.isDragging || $0.busy }
         }
         windowPeeks.addToFusion = { [weak self] window, panel, keyboard in
+            Analytics.track(.toolOpened(.fusion, trigger: keyboard ? .keyboard : .click))
             self?.fusion.show(from: panel, keyboard: keyboard, matching: window)
         }
         fusion.restoreDockFocus = { [weak self] panel in
@@ -455,7 +459,9 @@ final class DockCoordinator {
         }
         reconciling = true
         defer { reconciling = false }
+        let knownProfiles = Set(profiles.document.profiles.keys)
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
+        reportDisplayChange(displays, knownProfiles: knownProfiles)
         patchBay.reconcile()
         atmosphere.update(displays: displays)
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
@@ -581,7 +587,11 @@ final class DockCoordinator {
             }
             panel.interaction.performApplicationMenuAction = { [weak self, weak panel] action, item in
                 guard let self, let panel, panels[display.id] === panel else { return }
+                // Read before the asynchronous completion, after which the ambient trigger is gone.
+                let trigger = Analytics.trigger()
                 applicationMenus.perform(action, for: item) { [weak self, weak panel] error in
+                    Analytics.track(.appMenuAction(AnalyticsAppMenuAction(action),
+                                                   outcome: error == nil ? .succeeded : .failed, trigger: trigger))
                     guard let self, let panel, panels[display.id] === panel else { return }
                     if let error { panel.store.errorMessage = error }
                     else if action.activatesApplication { panel.store.applicationOpened?() }
@@ -762,6 +772,22 @@ final class DockCoordinator {
     }
 
     /// Only connected enabled desktop surfaces have a live zone to outline.
+    /// Reports a connected or disconnected display. The first arrangement after launch is the
+    /// baseline, and reconciles that leave the set of displays unchanged send nothing.
+    private func reportDisplayChange(_ displays: [DisplaySnapshot], knownProfiles: Set<String>) {
+        let ids = Set(displays.map(\.id))
+        defer { reportedDisplayIDs = ids }
+        guard let previous = reportedDisplayIDs, previous != ids else { return }
+        let enabled = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
+        Analytics.track(.displaysChanged(
+            connected: ids.subtracting(previous).count, disconnected: previous.subtracting(ids).count,
+            newProfileCount: Set(profiles.document.profiles.keys).subtracting(knownProfiles).count,
+            displayCount: displays.count,
+            externalDisplayCount: displays.count { CGDisplayIsBuiltin($0.runtimeID) == 0 },
+            dockCount: enabled.count))
+        Analytics.shared.contextDidChange()
+    }
+
     func showZone(for id: String) {
         guard let geometry = panels[id]?.geometry else { return }
         zonePreview.show(displayID: id, geometry: geometry)
@@ -783,9 +809,12 @@ final class DockCoordinator {
                         return
                     }
                     windowPeeks.showKeyboard(item, on: panel, documents: documents)
-                } else { panel.store.openDocuments(documents, with: reference) }
+                } else { panel.store.openDocuments(documents, with: reference, source: .picker) }
             },
             cancelled: { [weak self, weak panel] in
+                if !routeThroughPeek {
+                    Analytics.track(.documentsOpened(.picker, fileCount: 0, fileType: nil, outcome: .canceled))
+                }
                 guard let self, let panel, self.panels[id] === panel, NSApp.isActive else { return }
                 if let selection {
                     self.endFocus(restore: false)
@@ -885,6 +914,7 @@ final class DockCoordinator {
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
         endFocus(restore: false)
+        Analytics.track(.toolOpened(.badgeMemory, trigger: Analytics.trigger()))
         badgeMemory.synchronize(session: focusSession.session)
         badgeMemoryWindow.show(path: path, digest: digest, returningTo: lastExternalApplication)
     }
@@ -930,7 +960,7 @@ final class DockCoordinator {
                     shelves.openReference(id, reveal: reveal, completion: completion)
                 }, completion: { [weak panel] in panel?.launcher.didOpen?() })
             case .shortcut(let id):
-                guard actionTiles.run(id) else {
+                guard actionTiles.run(id, source: .launcher) else {
                     search.actionError = String(localized: .unifiedShortcutUnavailable); return
                 }
                 // Keep completion or failure visible. The action owner enforces one run per UUID.

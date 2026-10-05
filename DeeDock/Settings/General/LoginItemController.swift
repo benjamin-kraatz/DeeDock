@@ -93,6 +93,10 @@ final class LoginItemController {
             self.errorMessage = failure
             self.pendingOperation = nil
             self.task = nil
+            Analytics.track(.loginItemChanged(AnalyticsLoginItemOperation(operation),
+                                              outcome: failure == nil ? .succeeded : .failed,
+                                              status: AnalyticsLoginItem(self.status)))
+            Analytics.shared.contextDidChange()
         }
         task = work
         return work

@@ -59,6 +59,7 @@ final class ClipboardMuseumStore {
     /// Turning redaction on also veils exhibits already flagged as sensitive.
     func setRedactSecrets(_ enabled: Bool) {
         guard !requiresReset, document.redactSecrets != enabled else { return }
+        Analytics.shared.featureSettingChanged(.clipboardRedactSecrets, from: AnalyticsValue(!enabled), to: AnalyticsValue(enabled))
         document.redactSecrets = enabled
         if enabled {
             for index in document.exhibits.indices
@@ -71,6 +72,7 @@ final class ClipboardMuseumStore {
 
     func setCuratorEnabled(_ enabled: Bool) {
         guard !requiresReset, document.curatorEnabled != enabled else { return }
+        Analytics.shared.featureSettingChanged(.clipboardCuratorEnabled, from: AnalyticsValue(!enabled), to: AnalyticsValue(enabled))
         document.curatorEnabled = enabled
         persist()
     }

@@ -152,6 +152,7 @@ final class BadgeMemoryStore {
     /// Disabling stops collection immediately. Enabling applies to the next newly started session.
     func setCollectFocus(_ enabled: Bool) {
         guard !requiresReset else { return }
+        Analytics.shared.featureSettingChanged(.badgeMemoryCollectFocus, from: AnalyticsValue(document.collectFocus), to: AnalyticsValue(enabled))
         document.collectFocus = enabled
         if !enabled, var active = document.active {
             active.ended = .now; active.incomplete = true; active.excludedPaths = []

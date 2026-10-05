@@ -12,13 +12,20 @@ final class WindowAccessController {
         status = service.status
     }
 
+    /// Reads the status macOS reports. A change seen while DOKK runs is reported to analytics,
+    /// which also refreshes the permission properties registered on every event.
     func refresh() {
         guard !stopped else { return }
+        let previous = status
         status = service.status
+        guard status != previous else { return }
+        Analytics.track(.permissionChanged(.accessibility, status: AnalyticsPermissionStatus(status)))
+        Analytics.shared.contextDidChange()
     }
 
     func requestAccess() {
         guard !stopped, status != .enabled else { return }
+        Analytics.track(.permissionRequested(.accessibility))
         service.requestAccess()
         refresh()
     }
