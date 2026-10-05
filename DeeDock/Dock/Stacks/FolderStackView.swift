@@ -165,6 +165,8 @@ struct FolderStackView: View {
                                              spacing: FolderStackGridMetrics.columnSpacing)], spacing: 14) {
                     ForEach(state.visibleEntries) { entry in item(entry, grid: true) }
                 }
+                // The grid's own width, after padding and any legacy scroller gutter.
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { state.gridContentWidth = $0 }
                 .padding(FolderStackGridMetrics.horizontalPadding)
                 .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: visibleIDs)
             }

@@ -196,6 +196,8 @@ struct ShelfPanelView: View {
                             gridItem(entry).transition(itemTransition)
                         }
                     }
+                    // The grid's own width, after padding and any legacy scroller gutter.
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { state.gridContentWidth = $0 }
                 } else {
                     LazyVStack(spacing: 2) {
                         ForEach(state.entries) { entry in

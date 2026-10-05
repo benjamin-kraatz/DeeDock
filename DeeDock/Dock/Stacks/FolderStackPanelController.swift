@@ -158,6 +158,7 @@ final class FolderStackPanelController {
         case 36, 76:
             state.openSelection()
         case 125, 126:
+            // Filtered results stay in the same adaptive grid, so Up and Down keep the row stride.
             moveSelection(by: arrowStep(event.keyCode))
         default:
             return false
@@ -175,20 +176,10 @@ final class FolderStackPanelController {
         return true
     }
 
-    /// Grid arrows follow the columns that fit this panel. List arrows stay one item and wrap.
+    /// Grid arrows follow the columns the grid laid out. List arrows stay one item and wrap.
     private func arrowStep(_ keyCode: UInt16) -> Int {
-        let columns = state.presentation == .grid ? gridColumns : 1
+        let columns = state.presentation == .grid ? state.gridColumnCount : 1
         return AdaptiveGridLayout.gridStep(keyCode: keyCode, columns: columns) ?? 0
-    }
-
-    private var gridColumns: Int {
-        let pointer = state.chrome.edge.isVertical ? DockPopoverGeometry.pointerDepth : 0
-        return AdaptiveGridLayout.columnCount(
-            panelWidth: popover.panelWidth,
-            minimum: FolderStackGridMetrics.minimumCell,
-            spacing: FolderStackGridMetrics.columnSpacing,
-            horizontalPadding: FolderStackGridMetrics.horizontalPadding,
-            pointerInset: pointer)
     }
 
     /// Grid movement stops on the first and last item. List movement keeps its wrap.

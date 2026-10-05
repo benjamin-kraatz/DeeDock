@@ -22,8 +22,8 @@ nonisolated enum ShelfGridMetrics {
 /// Column count of a `LazyVGrid` that uses one adaptive column, and the index arrows land on.
 ///
 /// SwiftUI picks the largest `n` such that `n * minimum + (n - 1) * spacing` still fits the
-/// width offered to the grid. Up and Down move by that `n`, so the selection follows the row
-/// on screen instead of a fixed stride.
+/// width the grid was laid out in. Callers pass that measured width, so padding, the side-dock
+/// pointer, and a legacy scroller gutter are already gone. Up and Down move by that `n`.
 nonisolated enum AdaptiveGridLayout {
     /// Columns that fit in `width` points.
     static func columnCount(width: CGFloat, minimum: CGFloat, spacing: CGFloat) -> Int {
@@ -36,15 +36,6 @@ nonisolated enum AdaptiveGridLayout {
             count += 1
         }
         return count
-    }
-
-    /// Columns inside a dock popover of `panelWidth`.
-    ///
-    /// Side docks spend `pointerInset` on the pointer. `horizontalPadding` is the grid inset
-    /// on each side, so the grid is narrower than the panel.
-    static func columnCount(panelWidth: CGFloat, minimum: CGFloat, spacing: CGFloat,
-                            horizontalPadding: CGFloat, pointerInset: CGFloat) -> Int {
-        columnCount(width: panelWidth - pointerInset - horizontalPadding * 2, minimum: minimum, spacing: spacing)
     }
 
     /// Left, right, up, and down (`123`, `124`, `125`, `126`). Horizontal steps are one cell.

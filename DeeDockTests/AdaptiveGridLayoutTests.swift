@@ -2,29 +2,34 @@ import AppKit
 import Testing
 @testable import DeeDock
 
+/// About the width of a regular legacy scroller. Wider than the Shelf ideal grid's 6 pt of slack.
+nonisolated private enum GridKeyboardFixture {
+    static let legacyGutter: CGFloat = 15
+}
+
 @MainActor
 struct AdaptiveGridLayoutTests {
     @Test("A folder grid is five columns at the ideal width and two at the minimum", arguments: [
         (DockPopoverGeometry.idealSize.width, CGFloat(0), 5),
         (DockPopoverGeometry.minimumSize.width, CGFloat(0), 2),
-        (DockPopoverGeometry.idealSize.width, DockPopoverGeometry.pointerDepth, 5),
-        (DockPopoverGeometry.minimumSize.width, DockPopoverGeometry.pointerDepth, 2),
-        // Just wide enough for five columns on a bottom dock; the side-dock pointer drops it to four.
+        // 490 pt is an exact five-column fit; a legacy gutter drops it to four.
         (CGFloat(490), CGFloat(0), 5),
-        (CGFloat(490), DockPopoverGeometry.pointerDepth, 4),
+        (CGFloat(490), GridKeyboardFixture.legacyGutter, 4),
     ])
-    func folderColumnCounts(panel: CGFloat, pointer: CGFloat, columns: Int) {
-        #expect(folderColumns(panel: panel, pointer: pointer) == columns)
+    func folderColumnCounts(panel: CGFloat, gutter: CGFloat, columns: Int) {
+        let width = gridWidth(panel: panel, padding: FolderStackGridMetrics.horizontalPadding, gutter: gutter)
+        #expect(folderColumns(width: width) == columns)
     }
 
     @Test("A Shelf grid is four columns at its ideal width and two at the minimum", arguments: [
         (ShelfGridMetrics.idealPanelWidth, CGFloat(0), 4),
         (DockPopoverGeometry.minimumSize.width, CGFloat(0), 2),
-        (ShelfGridMetrics.idealPanelWidth, DockPopoverGeometry.pointerDepth, 3),
-        (DockPopoverGeometry.minimumSize.width, DockPopoverGeometry.pointerDepth, 2),
+        // Ideal Shelf content has 6 pt of slack. A ~15 pt legacy gutter leaves three columns.
+        (ShelfGridMetrics.idealPanelWidth, GridKeyboardFixture.legacyGutter, 3),
     ])
-    func shelfColumnCounts(panel: CGFloat, pointer: CGFloat, columns: Int) {
-        #expect(shelfColumns(panel: panel, pointer: pointer) == columns)
+    func shelfColumnCounts(panel: CGFloat, gutter: CGFloat, columns: Int) {
+        let width = gridWidth(panel: panel, padding: ShelfGridMetrics.horizontalPadding, gutter: gutter)
+        #expect(shelfColumns(width: width) == columns)
     }
 
     @Test("Column count is the largest row that still fits, including an exact fit")
@@ -54,7 +59,7 @@ struct AdaptiveGridLayoutTests {
         #expect(AdaptiveGridLayout.clampedIndex(current: 6, count: 7, delta: 1) == 6)
     }
 
-    @Test("Folder grid keys follow the panel width and stop at the ends")
+    @Test("Folder grid keys follow the laid-out width and stop at the ends")
     func folderGridKeys() throws {
         let narrow = folderState(count: 7)
         try move(narrow, key: 125, panel: DockPopoverGeometry.minimumSize.width)
@@ -91,7 +96,7 @@ struct AdaptiveGridLayoutTests {
         #expect(index(state) == 2)
     }
 
-    @Test("Shelf grid keys follow the panel width and stop at the ends")
+    @Test("Shelf grid keys follow the laid-out width and stop at the ends")
     func shelfGridKeys() throws {
         let narrow = shelfState(count: 6)
         try move(narrow, key: 125, panel: DockPopoverGeometry.minimumSize.width)
@@ -111,6 +116,17 @@ struct AdaptiveGridLayoutTests {
         #expect(index(wide) == 0)
         try move(wide, key: 123, panel: ShelfGridMetrics.idealPanelWidth)
         #expect(index(wide) == 0)
+    }
+
+    @Test("A legacy gutter makes Shelf Down move by three columns")
+    func shelfGutterStride() throws {
+        let state = shelfState(count: 8)
+        let width = gridWidth(panel: ShelfGridMetrics.idealPanelWidth, padding: ShelfGridMetrics.horizontalPadding,
+                              gutter: GridKeyboardFixture.legacyGutter)
+        state.gridContentWidth = width
+        #expect(state.gridColumnCount == 3)
+        try move(state, key: 125, width: width)
+        #expect(index(state) == 3)
     }
 
     @Test("A Shelf arrow on the last item collapses a multiple selection without wrapping")
@@ -134,28 +150,39 @@ struct AdaptiveGridLayoutTests {
         #expect(index(state) == 2)
     }
 
-    private func folderColumns(panel: CGFloat, pointer: CGFloat) -> Int {
-        AdaptiveGridLayout.columnCount(
-            panelWidth: panel, minimum: FolderStackGridMetrics.minimumCell,
-            spacing: FolderStackGridMetrics.columnSpacing,
-            horizontalPadding: FolderStackGridMetrics.horizontalPadding, pointerInset: pointer)
+    /// Width the grid is offered once padding and an optional gutter are gone. The views measure this.
+    private func gridWidth(panel: CGFloat, padding: CGFloat, gutter: CGFloat = 0) -> CGFloat {
+        panel - padding * 2 - gutter
     }
 
-    private func shelfColumns(panel: CGFloat, pointer: CGFloat) -> Int {
-        AdaptiveGridLayout.columnCount(
-            panelWidth: panel, minimum: ShelfGridMetrics.minimumCell,
-            spacing: ShelfGridMetrics.columnSpacing,
-            horizontalPadding: ShelfGridMetrics.horizontalPadding, pointerInset: pointer)
+    private func folderColumns(width: CGFloat) -> Int {
+        AdaptiveGridLayout.columnCount(width: width, minimum: FolderStackGridMetrics.minimumCell,
+                                       spacing: FolderStackGridMetrics.columnSpacing)
     }
 
-    /// The same step `FolderStackPanelController` applies for an arrow in a grid.
+    private func shelfColumns(width: CGFloat) -> Int {
+        AdaptiveGridLayout.columnCount(width: width, minimum: ShelfGridMetrics.minimumCell,
+                                       spacing: ShelfGridMetrics.columnSpacing)
+    }
+
+    /// The same step the panel applies once the grid has reported `panel`'s content width.
     private func move(_ state: FolderStackState, key: UInt16, panel: CGFloat) throws {
-        let step = try #require(AdaptiveGridLayout.gridStep(keyCode: key, columns: folderColumns(panel: panel, pointer: 0)))
+        try move(state, key: key, width: gridWidth(panel: panel, padding: FolderStackGridMetrics.horizontalPadding))
+    }
+
+    private func move(_ state: FolderStackState, key: UInt16, width: CGFloat) throws {
+        state.gridContentWidth = width
+        let step = try #require(AdaptiveGridLayout.gridStep(keyCode: key, columns: state.gridColumnCount))
         state.selectClamped(by: step)
     }
 
     private func move(_ state: ShelfPanelState, key: UInt16, panel: CGFloat) throws {
-        let step = try #require(AdaptiveGridLayout.gridStep(keyCode: key, columns: shelfColumns(panel: panel, pointer: 0)))
+        try move(state, key: key, width: gridWidth(panel: panel, padding: ShelfGridMetrics.horizontalPadding))
+    }
+
+    private func move(_ state: ShelfPanelState, key: UInt16, width: CGFloat) throws {
+        state.gridContentWidth = width
+        let step = try #require(AdaptiveGridLayout.gridStep(keyCode: key, columns: state.gridColumnCount))
         state.selectClamped(by: step)
     }
 

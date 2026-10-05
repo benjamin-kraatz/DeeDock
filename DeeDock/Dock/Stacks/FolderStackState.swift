@@ -67,6 +67,15 @@ final class FolderStackState {
     var presentation: FolderStackPresentation
     var selectedID: String?
     var presentationFocused = false
+    /// Laid-out width of the icon grid. Keyboard strides read this, not the panel frame, so a
+    /// legacy scroller gutter is already subtracted. Zero until the first layout pass.
+    @ObservationIgnored var gridContentWidth: CGFloat = 0
+
+    /// Columns that fit `gridContentWidth`. One until the grid has been measured.
+    var gridColumnCount: Int {
+        AdaptiveGridLayout.columnCount(width: gridContentWidth, minimum: FolderStackGridMetrics.minimumCell,
+                                       spacing: FolderStackGridMetrics.columnSpacing)
+    }
     var chrome = DockPopoverChrome(edge: .bottom, attachment: DockPopoverGeometry.idealSize.width / 2)
     @ObservationIgnored var stageOnShelf: ((FolderStackEntryReference) -> Void)?
     @ObservationIgnored var openEntry: ((FolderStackEntryReference) -> Void)?

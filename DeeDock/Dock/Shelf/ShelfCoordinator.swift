@@ -411,26 +411,15 @@ final class ShelfCoordinator {
         return true
     }
 
-    /// Grid arrows follow the columns that fit this panel and stop at the ends.
+    /// Grid arrows follow the columns the grid laid out and stop at the ends.
     /// List and Smart keep one-item Up and Down, including the wrap, and leave Left and Right alone.
     private func moveSelection(keyCode: UInt16) -> Bool {
         guard let state else { return false }
         let grid = state.presentation == .grid && state.sort != .smart
         if !grid, keyCode == 123 || keyCode == 124 { return false }
-        let columns = grid ? gridColumns : 1
+        let columns = grid ? state.gridColumnCount : 1
         guard let step = AdaptiveGridLayout.gridStep(keyCode: keyCode, columns: columns) else { return false }
         if grid { state.selectClamped(by: step) } else { state.select(by: step) }
         return true
-    }
-
-    private var gridColumns: Int {
-        guard let state, let controller else { return 1 }
-        let pointer = state.chrome.edge.isVertical ? DockPopoverGeometry.pointerDepth : 0
-        return AdaptiveGridLayout.columnCount(
-            panelWidth: controller.panelWidth,
-            minimum: ShelfGridMetrics.minimumCell,
-            spacing: ShelfGridMetrics.columnSpacing,
-            horizontalPadding: ShelfGridMetrics.horizontalPadding,
-            pointerInset: pointer)
     }
 }

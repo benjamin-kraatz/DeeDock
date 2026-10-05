@@ -39,6 +39,15 @@ final class ShelfPanelState {
     /// Not observed: every visible row writes here on each scroll frame, and only event-time hit
     /// testing and sweeps read it. Observing it would re-render the whole list per row per frame.
     @ObservationIgnored var rowFrames: [UUID: CGRect] = [:]
+    /// Laid-out width of the icon grid. Keyboard strides read this, not the panel frame, so a
+    /// legacy scroller gutter is already subtracted. Zero until the first layout pass.
+    @ObservationIgnored var gridContentWidth: CGFloat = 0
+
+    /// Columns that fit `gridContentWidth`. One until the grid has been measured.
+    var gridColumnCount: Int {
+        AdaptiveGridLayout.columnCount(width: gridContentWidth, minimum: ShelfGridMetrics.minimumCell,
+                                       spacing: ShelfGridMetrics.columnSpacing)
+    }
     var preview: DockFilePreviewItem?
     var error: String?
     var showingCompost = false
