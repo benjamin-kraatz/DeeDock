@@ -2,36 +2,29 @@ import AppKit
 import Testing
 @testable import DeeDock
 
-/// Widths the adaptive grids actually use, paired with the column count those widths produce.
-nonisolated private struct GridWidth: Sendable {
-    let panel: CGFloat
-    let pointer: CGFloat
-    let columns: Int
-}
-
 @MainActor
 struct AdaptiveGridLayoutTests {
     @Test("A folder grid is five columns at the ideal width and two at the minimum", arguments: [
-        GridWidth(panel: DockPopoverGeometry.idealSize.width, pointer: 0, columns: 5),
-        GridWidth(panel: DockPopoverGeometry.minimumSize.width, pointer: 0, columns: 2),
-        GridWidth(panel: DockPopoverGeometry.idealSize.width, pointer: DockPopoverGeometry.pointerDepth, columns: 5),
-        GridWidth(panel: DockPopoverGeometry.minimumSize.width, pointer: DockPopoverGeometry.pointerDepth, columns: 2),
+        (DockPopoverGeometry.idealSize.width, CGFloat(0), 5),
+        (DockPopoverGeometry.minimumSize.width, CGFloat(0), 2),
+        (DockPopoverGeometry.idealSize.width, DockPopoverGeometry.pointerDepth, 5),
+        (DockPopoverGeometry.minimumSize.width, DockPopoverGeometry.pointerDepth, 2),
         // Just wide enough for five columns on a bottom dock; the side-dock pointer drops it to four.
-        GridWidth(panel: 490, pointer: 0, columns: 5),
-        GridWidth(panel: 490, pointer: DockPopoverGeometry.pointerDepth, columns: 4),
+        (CGFloat(490), CGFloat(0), 5),
+        (CGFloat(490), DockPopoverGeometry.pointerDepth, 4),
     ])
-    func folderColumns(_ width: GridWidth) {
-        #expect(folderColumns(panel: width.panel, pointer: width.pointer) == width.columns)
+    func folderColumnCounts(panel: CGFloat, pointer: CGFloat, columns: Int) {
+        #expect(folderColumns(panel: panel, pointer: pointer) == columns)
     }
 
     @Test("A Shelf grid is four columns at its ideal width and two at the minimum", arguments: [
-        GridWidth(panel: ShelfGridMetrics.idealPanelWidth, pointer: 0, columns: 4),
-        GridWidth(panel: DockPopoverGeometry.minimumSize.width, pointer: 0, columns: 2),
-        GridWidth(panel: ShelfGridMetrics.idealPanelWidth, pointer: DockPopoverGeometry.pointerDepth, columns: 3),
-        GridWidth(panel: DockPopoverGeometry.minimumSize.width, pointer: DockPopoverGeometry.pointerDepth, columns: 2),
+        (ShelfGridMetrics.idealPanelWidth, CGFloat(0), 4),
+        (DockPopoverGeometry.minimumSize.width, CGFloat(0), 2),
+        (ShelfGridMetrics.idealPanelWidth, DockPopoverGeometry.pointerDepth, 3),
+        (DockPopoverGeometry.minimumSize.width, DockPopoverGeometry.pointerDepth, 2),
     ])
-    func shelfColumns(_ width: GridWidth) {
-        #expect(shelfColumns(panel: width.panel, pointer: width.pointer) == width.columns)
+    func shelfColumnCounts(panel: CGFloat, pointer: CGFloat, columns: Int) {
+        #expect(shelfColumns(panel: panel, pointer: pointer) == columns)
     }
 
     @Test("Column count is the largest row that still fits, including an exact fit")
