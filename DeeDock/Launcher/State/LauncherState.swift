@@ -130,6 +130,8 @@ final class LauncherState {
     @ObservationIgnored private var robiTask: Task<Void, Never>?
     @ObservationIgnored private var robiGeneration = UUID()
     @ObservationIgnored private var presentationGeneration = UUID()
+    /// When the current presentation began, for `launcher_closed`. Nil while closed.
+    @ObservationIgnored private var presentedAt: Date?
     @ObservationIgnored private var icons: [String: NSImage] = [:]
     @ObservationIgnored private let iconProvider: ((LauncherApplication) -> NSImage)?
 
@@ -242,6 +244,7 @@ final class LauncherState {
 
     func begin(pins: [ApplicationReference], foregroundID: String? = nil) {
         presentationGeneration = UUID()
+        presentedAt = Date()
         search.begin()
         fileActions.resetForPresentation()
         fileActions.didOpen = { [weak self] in self?.didOpen?() }
@@ -252,6 +255,10 @@ final class LauncherState {
     }
 
     func end() {
+        if let presentedAt {
+            Analytics.track(.launcherClosed(duration: Date().timeIntervalSince(presentedAt), hadQuery: !query.isEmpty))
+            self.presentedAt = nil
+        }
         suggestions.end()
         presentationGeneration = UUID()
         search.stop()

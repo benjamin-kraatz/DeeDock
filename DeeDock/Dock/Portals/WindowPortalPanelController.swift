@@ -160,6 +160,9 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         let elapsed = started.duration(to: .now)
         Logger(subsystem: Bundle.main.bundleIdentifier ?? "DeeDock", category: "WindowPortal").info(
             "Portal closed: frames=\(self.state.captures), captureMilliseconds=\(self.state.captureMilliseconds), elapsed=\(String(describing: elapsed), privacy: .public)")
+        Analytics.track(.portalClosed(
+            duration: Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18,
+            frameCount: state.captures, frozen: state.frozen, cropped: state.crop != NormalizedWindowRegion()))
         clearPixels()
         state.freeze = nil
         state.editCrop = nil
@@ -263,6 +266,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         freezeFirstFrame = false
         if state.frozen { state.frozen = false; state.userPaused = false }
         else { state.userPaused.toggle() }
+        Analytics.track(.portal(state.userPaused ? .paused : .resumed, outcome: nil))
         requestTask?.cancel()
         epoch = UUID()
         state.phase = state.needsReselection ? .reselect : (state.userPaused ? .userPaused : .connecting)
@@ -275,6 +279,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         state.frozen = true
         state.userPaused = false
         state.phase = .frozen
+        Analytics.track(.portal(.frozen, outcome: nil))
     }
 
     /// Writes what the portal is showing to a file the user names. The frame never leaves memory
@@ -284,6 +289,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
               let visible = WindowPortalExport.visibleFrame(of: image, viewport: state.viewport),
               let data = WindowPortalExport.png(visible) else {
             state.exportFailed = true
+            Analytics.track(.portal(.frameSaved, outcome: .failed))
             return
         }
         state.exportFailed = false
@@ -293,10 +299,15 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         savePanel.nameFieldStringValue = WindowPortalExport.suggestedFilename(source: state.sourceName, at: .now)
         savePanel.beginSheetModal(for: panel) { [weak self] response in
             MainActor.assumeIsolated {
-                guard let self, response == .OK, let url = savePanel.url else { return }
+                guard let self, response == .OK, let url = savePanel.url else {
+                    Analytics.track(.portal(.frameSaved, outcome: .canceled))
+                    return
+                }
                 do {
                     try data.write(to: url, options: .atomic)
+                    Analytics.track(.portal(.frameSaved, outcome: .succeeded))
                 } catch {
+                    Analytics.track(.portal(.frameSaved, outcome: .failed))
                     Logger(subsystem: Bundle.main.bundleIdentifier ?? "DeeDock", category: "WindowPortal")
                         .error("Portal frame not saved: \(error.localizedDescription, privacy: .public)")
                     self.state.exportFailed = true
@@ -312,6 +323,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
         guard state.image != nil, !suspended else { return }
         invalidateCapture()
         state.editingCrop = true
+        Analytics.track(.portal(.cropOpened, outcome: nil))
         if !state.frozen, !state.needsReselection { state.phase = .paused }
     }
 
@@ -341,6 +353,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
                   application?.isTerminated == false else {
                 if !closed, !Task.isCancelled, application?.isTerminated == false {
                     state.jumpFailed = true
+                    Analytics.track(.portal(.jumped, outcome: .failed))
                     _ = application?.activate(options: [])
                 }
                 jumpTask = nil
@@ -369,6 +382,7 @@ final class WindowPortalPanelController: NSObject, NSWindowDelegate {
                 return
             }
             state.jumpFailed = !selected
+            Analytics.track(.portal(.jumped, outcome: selected ? .succeeded : .failed))
             if !selected { _ = application?.activate(options: []) }
             jumpTask = nil
         }

@@ -184,8 +184,19 @@ final class Analytics {
     /// Edits to the same setting within a couple of seconds, such as a slider drag, become one
     /// `setting_changed` event from the first old value to the last new value.
     func settingsChanged(from old: Any, to new: Any, area: AnalyticsSettingArea, display: AnalyticsDisplayRole? = nil) {
+        enqueue(AnalyticsSettingChange.changes(from: old, to: new), area: area, display: display)
+    }
+
+    /// Reports one app-wide feature preference that lives outside the reflected settings models,
+    /// with the same folding of quick consecutive edits. Nothing is sent when the value is unchanged.
+    func featureSettingChanged(_ setting: AnalyticsFeatureSetting, from old: AnalyticsValue, to new: AnalyticsValue) {
+        guard old != new else { return }
+        enqueue([AnalyticsSettingChange(setting, from: old, to: new)], area: .features, display: nil)
+    }
+
+    private func enqueue(_ changes: [AnalyticsSettingChange], area: AnalyticsSettingArea, display: AnalyticsDisplayRole?) {
         guard acceptsEvents else { return }
-        for change in AnalyticsSettingChange.changes(from: old, to: new) {
+        for change in changes {
             let key = "\(area.rawValue).\(display?.rawValue ?? "").\(change.identity)"
             let merged = settingChanges[key].map { change.following($0.change) } ?? change
             settingChanges[key] = PendingSettingChange(change: merged, area: area, display: display)

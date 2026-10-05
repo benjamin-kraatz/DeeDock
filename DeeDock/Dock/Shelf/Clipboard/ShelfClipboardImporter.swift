@@ -25,10 +25,15 @@ final class ShelfClipboardImporter {
             report(error as? ShelfClipboardFailure == .changed ? .shelfPasteChanged : .shelfPasteUnavailable)
             return
         }
+        let trigger = Analytics.trigger()
+        let countBefore = shelf.items.count
         task = Task { [self] in
             // This task owns the import until any rollback completes, including during shutdown.
             defer { task = nil }
             let failures = await importSnapshot(snapshot)
+            // Approximate if the Shelf changed elsewhere meanwhile; it never names an item.
+            Analytics.track(.shelf(.pasted, itemCount: max(0, shelf.items.count - countBefore),
+                                   source: .clipboard, trigger: trigger))
             if !failures.isEmpty { report(.shelfPasteFailed(details: failures.joined(separator: "\n"))) }
         }
     }

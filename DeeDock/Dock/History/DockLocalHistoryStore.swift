@@ -52,6 +52,7 @@ final class DockLocalHistoryStore {
 
     func setRecordingEnabled(_ enabled: Bool) {
         guard !requiresReset, document.recordingEnabled != enabled else { return }
+        Analytics.shared.featureSettingChanged(.localHistoryRecording, from: AnalyticsValue(!enabled), to: AnalyticsValue(enabled))
         document.recordingEnabled = enabled
         persist()
     }
@@ -59,6 +60,7 @@ final class DockLocalHistoryStore {
     /// Turns historical pin preview on or off. Off is the default, including for older documents.
     func setReplayEnabled(_ enabled: Bool) {
         guard !requiresReset, document.replayEnabled != enabled else { return }
+        Analytics.shared.featureSettingChanged(.localHistoryReplay, from: AnalyticsValue(!enabled), to: AnalyticsValue(enabled))
         document.replayEnabled = enabled
         persist()
         replayEnabledDidChange?()

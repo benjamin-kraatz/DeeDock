@@ -6,6 +6,11 @@ extension AnalyticsEvent {
         switch self {
         case .settingChanged: "setting_changed"
         case .usageSummary: "usage_summary"
+        case .settingsViewed: "settings_viewed"
+        case .permissionRequested: "permission_requested"
+        case .permissionChanged: "permission_changed"
+        case .loginItemChanged: "login_item_changed"
+        case .displaysChanged: "displays_changed"
         case .onboardingStepReached: "onboarding_step_reached"
         case .onboardingStepSkipped: "onboarding_step_skipped"
         case .onboardingFinished: "onboarding_finished"
@@ -26,6 +31,12 @@ extension AnalyticsEvent {
         case .watchStarted: "watch_started"
         case .watchDetected: "watch_detected"
         case .watchEnded: "watch_ended"
+        case .portal: "portal"
+        case .portalClosed: "portal_closed"
+        case .fileHandoff: "file_handoff"
+        case .windowSearchActivated: "window_search_activated"
+        case .windowSearchClosed: "window_search_closed"
+        case .fusion: "fusion"
         case .launcherOpened: "launcher_opened"
         case .launcherSearched: "launcher_searched"
         case .launcherResultActivated: "launcher_result_activated"
@@ -33,6 +44,10 @@ extension AnalyticsEvent {
         case .launcherToolOpened: "launcher_tool_opened"
         case .launcherFileAction: "launcher_file_action"
         case .launcherAssistantAsked: "launcher_assistant_asked"
+        case .launcherClosed: "launcher_closed"
+        case .launcherSuggestionsShown: "launcher_suggestions_shown"
+        case .launcherSuggestionFeedback: "launcher_suggestion_feedback"
+        case .launcherSuggestionPromptAnswered: "launcher_suggestion_prompt_answered"
         case .modeSwitched: "mode_switched"
         case .modeEdited: "mode_edited"
         case .workspacePrepared: "workspace_prepared"
@@ -46,6 +61,10 @@ extension AnalyticsEvent {
         case .drive: "drive"
         case .driveEjected: "drive_ejected"
         case .pinChanged: "pin_changed"
+        case .appMenuAction: "app_menu_action"
+        case .documentsOpened: "documents_opened"
+        case .shortcutRun: "shortcut_run"
+        case .shortcutTile: "shortcut_tile"
         case .appMelt: "app_melt"
         case .patchBay: "patch_bay"
         case .clipboardMuseum: "clipboard_museum"
@@ -65,6 +84,19 @@ extension AnalyticsEvent {
             change.properties.merging(["area": .init(area), "display_role": display.map(AnalyticsValue.init)])
         case let .usageSummary(properties):
             properties
+        case let .settingsViewed(section, page, via, display):
+            ["section": .init(section), "page": page.map(AnalyticsValue.init), "via": .init(via),
+             "display_role": display.map(AnalyticsValue.init)]
+        case let .permissionRequested(permission):
+            ["permission": .init(permission)]
+        case let .permissionChanged(permission, status):
+            ["permission": .init(permission), "status": .init(status)]
+        case let .loginItemChanged(operation, outcome, status):
+            ["operation": .init(operation), "outcome": .init(outcome), "status": .init(status)]
+        case let .displaysChanged(connected, disconnected, newProfileCount, displayCount, externalDisplayCount, dockCount):
+            ["connected": .init(connected), "disconnected": .init(disconnected), "new_profile_count": .init(newProfileCount),
+             "display_count": .init(displayCount), "external_display_count": .init(externalDisplayCount),
+             "dock_count": .init(dockCount)]
         case let .onboardingStepReached(step, index):
             ["step": .init(step), "step_index": .init(index)]
         case let .onboardingStepSkipped(step):
@@ -107,6 +139,23 @@ extension AnalyticsEvent {
             ["detection": .init(detection), "duration": .init(duration), "check_count": .init(checkCount)]
         case let .watchEnded(end, duration, checkCount):
             ["reason": .init(end), "duration": .init(duration), "check_count": .init(checkCount)]
+        case let .portal(action, outcome):
+            ["action": .init(action), "outcome": outcome.map(AnalyticsValue.init)]
+        case let .portalClosed(duration, frameCount, frozen, cropped):
+            ["duration": .init(duration), "frame_count": .init(frameCount), "frozen": .init(frozen),
+             "cropped": .init(cropped)]
+        case let .fileHandoff(action, fileCount, exactWindow, outcome):
+            ["action": .init(action), "file_count": .init(fileCount), "exact_window": .init(exactWindow),
+             "outcome": .init(outcome)]
+        case let .windowSearchActivated(evidence, scope, queryLength, resultCount, outcome):
+            ["evidence": .init(evidence), "scope": .init(scope), "query_length": .init(queryLength),
+             "result_count": .init(resultCount), "outcome": .init(outcome)]
+        case let .windowSearchClosed(scope, queryLength, resultCount, activated, duration):
+            ["scope": .init(scope), "query_length": .init(queryLength), "result_count": .init(resultCount),
+             "activated": .init(activated), "duration": .init(duration)]
+        case let .fusion(step, outcome, failure, operation, duration):
+            ["step": .init(step), "outcome": .init(outcome), "failure": failure.map(AnalyticsValue.init),
+             "operation": operation.map(AnalyticsValue.init), "duration": .init(duration)]
         case let .launcherOpened(source, fileCount):
             ["source": .init(source), "file_count": .init(fileCount)]
         case let .launcherSearched(queryLength, resultCount, kind):
@@ -122,10 +171,18 @@ extension AnalyticsEvent {
              "file_type": fileType.map(AnalyticsValue.init), "status": .init(status)]
         case let .launcherAssistantAsked(queryLength, resultCount, outcome):
             ["query_length": .init(queryLength), "result_count": .init(resultCount), "outcome": .init(outcome)]
+        case let .launcherClosed(duration, hadQuery):
+            ["duration": .init(duration), "had_query": .init(hadQuery)]
+        case let .launcherSuggestionsShown(count):
+            ["count": .init(count)]
+        case let .launcherSuggestionFeedback(feedback):
+            ["feedback": .init(feedback)]
+        case let .launcherSuggestionPromptAnswered(answer):
+            ["answer": .init(answer)]
         case let .modeSwitched(source, modeCount):
             ["source": .init(source), "mode_count": .init(modeCount)]
-        case let .modeEdited(edit, modeCount):
-            ["action": .init(edit), "mode_count": .init(modeCount)]
+        case let .modeEdited(edit, modeCount, stepCount):
+            ["action": .init(edit), "mode_count": .init(modeCount), "step_count": stepCount.map(AnalyticsValue.init)]
         case let .workspacePrepared(stepCount, completedStepCount, outcome, duration):
             ["step_count": .init(stepCount), "completed_step_count": .init(completedStepCount),
              "outcome": .init(outcome), "duration": .init(duration)]
@@ -145,6 +202,16 @@ extension AnalyticsEvent {
              "blocker_count": .init(blockerCount), "trigger": .init(trigger)]
         case let .pinChanged(action, kind, count, source):
             ["action": .init(action), "kind": .init(kind), "count": .init(count), "source": .init(source)]
+        case let .appMenuAction(action, outcome, trigger):
+            ["action": .init(action), "outcome": .init(outcome), "trigger": .init(trigger)]
+        case let .documentsOpened(source, fileCount, fileType, outcome):
+            ["source": .init(source), "file_count": .init(fileCount), "file_type": fileType.map(AnalyticsValue.init),
+             "outcome": .init(outcome)]
+        case let .shortcutRun(source, fileCount, outcome, duration):
+            ["source": .init(source), "file_count": .init(fileCount), "outcome": .init(outcome),
+             "duration": .init(duration)]
+        case let .shortcutTile(action, tileCount):
+            ["action": .init(action), "tile_count": .init(tileCount)]
         case let .appMelt(action, pairCount, outcome):
             ["action": .init(action), "pair_count": .init(pairCount), "outcome": .init(outcome)]
         case let .patchBay(action, cableCount, outcome):

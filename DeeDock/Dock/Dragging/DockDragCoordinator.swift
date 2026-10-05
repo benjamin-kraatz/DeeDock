@@ -281,7 +281,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         }
         if let (id, actionID) = actionDestination, id == displayID,
            info.draggingSourceOperationMask.contains(.copy), let files = payload.stageableItems,
-           panels[id]?.store.actions?.run(actionID, files: files) == true {
+           panels[id]?.store.actions?.run(actionID, files: files, source: .drop) == true {
             completion.committed = true
             cancel()
             return true
@@ -329,7 +329,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 if let chooseDocumentDestination { chooseDocumentDestination(documents, item, panel) }
                 else { panel.store.errorMessage = .fileRouteDestinationUnavailable }
             } else {
-                panel.store.openDocuments(documents, with: item.reference)
+                panel.store.openDocuments(documents, with: item.reference, source: .drop)
             }
             cancel()
             return true

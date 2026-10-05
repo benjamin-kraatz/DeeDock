@@ -67,11 +67,11 @@ private struct LauncherToolButton: View {
     }
 
     private func open() {
+        Analytics.track(.launcherToolOpened(tool))
         if tool == .systemSettingsClone {
             state.close?()
-            openWindow.openSystemSettingsClone()
+            Analytics.performing(.launcher) { openWindow.openSystemSettingsClone() }
         } else {
-            Analytics.track(.launcherToolOpened(tool))
             state.openTool?(tool)
         }
     }
