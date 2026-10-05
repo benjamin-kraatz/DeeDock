@@ -26,7 +26,8 @@ actor MeltFolderSync {
     func preview(source: URL, destination: URL) throws -> MeltSyncPlan {
         let source = source.resolvingSymlinksInPath().standardizedFileURL
         let destination = destination.resolvingSymlinksInPath().standardizedFileURL
-        guard !contains(source, destination), !contains(destination, source) else { throw MeltFinderError.overlapping }
+        guard !destination.isSameOrDescendant(of: source),
+              !source.isSameOrDescendant(of: destination) else { throw MeltFinderError.overlapping }
         guard try kind(source) == .typeDirectory, try kind(destination) == .typeDirectory else { throw MeltFinderError.unsupported }
         let sourceIdentity = try identity(source)
         let destinationIdentity = try identity(destination)
@@ -143,12 +144,9 @@ actor MeltFolderSync {
     }
 
     private func validatePath(_ url: URL, root: URL) throws {
-        guard contains(root, url), url != root,
+        guard url.isSameOrDescendant(of: root), url != root,
               root.resolvingSymlinksInPath().standardizedFileURL == root,
               url.resolvingSymlinksInPath().standardizedFileURL == url.standardizedFileURL else { throw MeltFinderError.changed }
-    }
-    private func contains(_ parent: URL, _ child: URL) -> Bool {
-        parent == child || child.path.hasPrefix(parent.path.hasSuffix("/") ? parent.path : parent.path + "/")
     }
     private func identity(_ url: URL) throws -> String {
         let attributes = try files.attributesOfItem(atPath: url.path)
