@@ -34,15 +34,38 @@ nonisolated struct FocusSession: Codable, Equatable, Identifiable, Sendable {
     func showsHours(at date: Date) -> Bool { displaySeconds(at: date) >= 3_600 }
 
     /// Remaining time in words for VoiceOver, in the current locale, for the same whole seconds as ``timeLabel(at:)``.
+    ///
+    /// The dock reads this about once a second. The formatters are built once; a finished session uses a separate one so zero still spells out seconds.
     func spokenRemaining(at date: Date) -> String {
         let seconds = displaySeconds(at: date)
+        let formatter = seconds == 0 ? Self.spokenZero : Self.spokenDuration
+        return Self.spell(seconds, with: formatter) ?? timeLabel(at: date)
+    }
+
+    /// Same spelling as ``spokenRemaining(at:)`` for a chosen locale. Tests pin `en_US` here and leave the shared formatters unchanged.
+    func spokenRemaining(at date: Date, locale: Locale, calendar: Calendar) -> String {
+        let seconds = displaySeconds(at: date)
+        let formatter = Self.makeSpokenFormatter(zero: seconds == 0, locale: locale, calendar: calendar)
+        return Self.spell(seconds, with: formatter) ?? timeLabel(at: date)
+    }
+
+    private static let spokenDuration: DateComponentsFormatter = makeSpokenFormatter(zero: false)
+    private static let spokenZero: DateComponentsFormatter = makeSpokenFormatter(zero: true)
+
+    private static func makeSpokenFormatter(zero: Bool, locale: Locale? = nil, calendar: Calendar? = nil) -> DateComponentsFormatter {
         let formatter = DateComponentsFormatter()
         formatter.unitsStyle = .spellOut
-        formatter.allowedUnits = seconds == 0 ? [.second] : [.hour, .minute, .second]
-        formatter.zeroFormattingBehavior = seconds == 0 ? .pad : .dropAll
+        formatter.allowedUnits = zero ? [.second] : [.hour, .minute, .second]
+        formatter.zeroFormattingBehavior = zero ? .pad : .dropAll
+        formatter.locale = locale
+        formatter.calendar = calendar
+        return formatter
+    }
+
+    private static func spell(_ seconds: Int, with formatter: DateComponentsFormatter) -> String? {
         let spoken = formatter.string(from: TimeInterval(seconds))
-        if let spoken, !spoken.isEmpty { return spoken }
-        return timeLabel(at: date)
+        guard let spoken, !spoken.isEmpty else { return nil }
+        return spoken
     }
 
     /// Whole seconds still to run, rounded up so a visible second is not dropped early.
