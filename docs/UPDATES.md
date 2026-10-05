@@ -208,7 +208,7 @@ Sparkle EdDSA private key. The matching public key is `SPARKLE_PUBLIC_ED_KEY` in
 
 - [ ] `SPARKLE_PRIVATE_ED_KEY`
 
-PostHog analytics. `Local.xcconfig` is git-ignored, so this secret is the only source of the token on CI. The archive step fails if the built `Info.plist` has no `phc_` token. The optional repository variable `POSTHOG_HOST` overrides the default `https://eu.i.posthog.com`:
+PostHog analytics. `Local.xcconfig` is git-ignored, so this secret is the only source of the token on CI. The archive step fails if the built `Info.plist` has no `phc_` token. The optional repository variable `POSTHOG_HOST` overrides the default `https://clavicula.sebastian-kraatz.de`:
 
 - [ ] `POSTHOG_PROJECT_TOKEN`
 

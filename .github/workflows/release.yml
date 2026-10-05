@@ -31,7 +31,7 @@
 # DEVELOPER_ID_APPLICATION_CERTIFICATE,
 # DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD, SPARKLE_PRIVATE_ED_KEY,
 # and POSTHOG_PROJECT_TOKEN. The optional repository variable POSTHOG_HOST
-# overrides the EU ingestion host.
+# overrides the default ingestion host.
 # Notarization uses Apple ID plus app-specific password plus team ID.
 # Do not add App Store Connect API keys. DOKK ships only as a direct download.
 #
@@ -356,7 +356,7 @@ jobs:
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
-          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://clavicula.sebastian-kraatz.de' }}
         run: |
           set -eu
           archive="$RUNNER_TEMP/DDock.xcarchive"

@@ -5,5 +5,5 @@
 POSTHOG_PROJECT_TOKEN = phc_your_project_token
 
 // The ingestion host. `//` starts a comment in xcconfig files, so write the URL with `/$()/`
-// in place of `//`. This line resolves to https://eu.i.posthog.com.
-POSTHOG_HOST = https:/$()/eu.i.posthog.com
+// in place of `//`. This line resolves to https://clavicula.sebastian-kraatz.de.
+POSTHOG_HOST = https:/$()/clavicula.sebastian-kraatz.de

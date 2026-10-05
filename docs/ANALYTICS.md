@@ -78,8 +78,8 @@ process, not the build. Builds made in Xcode take both settings from a local xcc
 
 1. Copy `Configuration/Local.xcconfig.example` to `Configuration/Local.xcconfig`.
 2. Set `POSTHOG_PROJECT_TOKEN` to the project token (it starts with `phc_`).
-3. Leave `POSTHOG_HOST` as it is for the EU cloud. `//` starts a comment in an xcconfig file, so
-   the URL is written `https:/$()/eu.i.posthog.com`.
+3. Leave `POSTHOG_HOST` as it is. `//` starts a comment in an xcconfig file, so
+   the URL is written `https:/$()/clavicula.sebastian-kraatz.de`.
 4. Clean the build folder once, so Info.plist is regenerated.
 
 `Local.xcconfig` is git-ignored. `App.xcconfig` includes it with `#include?`, so a checkout
@@ -97,7 +97,7 @@ configuration sends only while the debug-menu switch is on.
 
 The Release workflow passes both settings to `xcodebuild archive` as arguments. The token comes
 from the `POSTHOG_PROJECT_TOKEN` repository secret. The host comes from the `POSTHOG_HOST`
-repository variable and falls back to `https://eu.i.posthog.com`. The archive step fails when
+repository variable and falls back to `https://clavicula.sebastian-kraatz.de`. The archive step fails when
 the built `Info.plist` lacks a `phc_` token or an `https` host, so a release can no longer ship
 with analytics silently off.
 
