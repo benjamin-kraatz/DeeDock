@@ -98,7 +98,7 @@ Each direct app-level drop or **Open Files…** picker confirmation submits its 
 
 ## Folder stacks
 
-Click a pinned folder to open one transient stack inward from its dock icon. Only one stack can be open across all displays. The header shows the Finder folder name and a per-pin Grid/List/Smart choice. Grid and List sort visible children by localized name. Smart uses Apple Intelligence on file metadata to build a grouped list without reading file contents. It organizes the 60 most recently modified children and keeps any remainder in More Items.
+Click a pinned folder to open one transient stack inward from its dock icon. The folder is resolved and its directory watch starts before the panel appears, so a volume that does not respond cannot freeze the dock. Closing the stack during that wait leaves the panel hidden. Only one stack can be open across all displays. The header shows the Finder folder name and a per-pin Grid/List/Smart choice. Grid and List sort visible children by localized name. Smart uses Apple Intelligence on file metadata to build a grouped list without reading file contents. It organizes the 60 most recently modified children and keeps any remainder in More Items.
 
 The stack shows the current folder's immediate children. Click a child to select it, then press Space for Quick Look without opening an app. Space or Escape closes the preview; arrow keys switch the preview to another child. Double-click or press Return to open a file, package, or alias. Opening a subfolder browses it inside the same stack. Use Back or Delete to return to its parent. The context menu also provides Quick Look and Show in Finder.
 

@@ -231,6 +231,64 @@ struct ClipboardMuseumTests {
         #expect((try? repository.readSealed(named: sealedName)) == nil)
     }
 
+    @Test("A failed seal or vault write keeps the exhibit and its image")
+    func failedSealKeepsPlainImage() throws {
+        // Seal and the vault write share one failure path. A throwing key stands in for a locked
+        // Keychain or a declined prompt, which is what used to shred the only copy.
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ClipboardMuseumTests-\(UUID().uuidString)", isDirectory: true)
+        let repository = ClipboardMuseumRepository(directory: directory)
+        defer { try? repository.removeAll() }
+        let store = ClipboardMuseumStore(repository: repository,
+                                         vault: ClipboardMuseumVault(key: { throw CocoaError(.coderInvalidValue) }))
+        store.start()
+        store.setCaptureEnabled(true)
+        let png = Data([1, 2, 3])
+        let image = try #require(store.accession(ClipboardCapture(payload: .image(png: png, width: 1, height: 1))))
+        let imageURL = try #require(store.imageURL(for: image))
+        let note = try #require(store.accession(text(token)))
+        store.redact(image.id)
+        let kept = try #require(store.exhibit(image.id))
+        #expect(store.storageFailed)
+        #expect(!kept.isRedacted)
+        #expect(kept.imageName == image.imageName)
+        #expect(kept.sealedName == nil)
+        #expect(store.imageData(for: kept) == png)
+        #expect(FileManager.default.fileExists(atPath: imageURL.path))
+        let plain = try #require(store.exhibit(note.id))
+        #expect(plain.text == token)
+        #expect(plain.sealedName == nil)
+        #expect(!plain.isRedacted)
+        store.setCaptureEnabled(false)
+        #expect(store.exhibit(image.id)?.imageName == image.imageName)
+        #expect(FileManager.default.fileExists(atPath: imageURL.path))
+        let saved = try #require(try repository.load())
+        #expect(saved.exhibits.first { $0.id == image.id }?.imageName == image.imageName)
+        #expect(saved.exhibits.first { $0.id == image.id }?.sealedName == nil)
+        #expect(saved.exhibits.first { $0.id == note.id }?.text == token)
+    }
+
+    @Test("A successful redact seal removes the plain image copy")
+    func successfulSealRemovesPlainImage() throws {
+        let (store, repository) = collecting()
+        defer { try? repository.removeAll() }
+        let png = Data([4, 5, 6])
+        let image = try #require(store.accession(ClipboardCapture(payload: .image(png: png, width: 2, height: 2))))
+        let imageURL = try #require(store.imageURL(for: image))
+        store.redact(image.id)
+        let sealed = try #require(store.exhibit(image.id))
+        let sealedName = try #require(sealed.sealedName)
+        #expect(sealed.isSealed)
+        #expect(sealed.imageName == nil)
+        #expect(!store.storageFailed)
+        #expect(!FileManager.default.fileExists(atPath: imageURL.path))
+        #expect(store.reveal(image.id)?.image == png)
+        let saved = try #require(try repository.load())
+        #expect(saved.exhibits.first?.imageName == nil)
+        #expect(saved.exhibits.first?.sealedName == sealedName)
+        #expect(!(try repository.readSealed(named: sealedName)).isEmpty)
+    }
+
     @Test("Remove and clear delete files and keep catalog numbers unique")
     func removeClear() throws {
         let (store, repository) = collecting()
@@ -315,5 +373,31 @@ struct ClipboardMuseumTests {
         }
         #expect(capture.payload == .link(URL(string: "https://example.com/a")!))
         #expect(ClipboardMuseumReader.link("see https://example.com") == nil)
+    }
+
+    @Test("The pixel cap uses division so hostile dimensions cannot overflow")
+    func pixelCapAvoidsOverflow() {
+        let cap = ClipboardMuseumLimits.maximumImagePixels
+        #expect(ClipboardImageEncoder.fitsPixelCap(width: cap, height: 1))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: cap + 1, height: 1))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: 0, height: 8))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: 8, height: 0))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: -1, height: 8))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: Int.max, height: Int.max))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: Int.max, height: 2))
+    }
+
+    @Test("A hostile or empty image header is refused, and a one-pixel image is kept")
+    func imageHeaderGuard() throws {
+        // IHDR only. Declared size is UInt32.max by UInt32.max; the file is a few dozen bytes.
+        let bomb = try #require(Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUv//////////CAIAAABdlLlpAAAAAElFTkSuQmCC"))
+        let zeroWidth = try #require(Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAAAAAAICAIAAABYumkoAAAAAElFTkSuQmCC"))
+        let pixel = try #require(Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"))
+        #expect(ClipboardImageEncoder.png(from: bomb) == nil)
+        #expect(ClipboardImageEncoder.png(from: zeroWidth) == nil)
+        #expect(ClipboardImageEncoder.png(from: Data()) == nil)
+        let encoded = try #require(ClipboardImageEncoder.png(from: pixel))
+        #expect(encoded.width == 1 && encoded.height == 1)
+        #expect(encoded.data.count < 1_024)
     }
 }

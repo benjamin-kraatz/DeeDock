@@ -15,23 +15,6 @@ struct DockLocalHistoryTests {
         .application(DisplayFixtures.app(id))
     }
 
-    /// Waits until `condition` holds or `limit` passes. A fixed sleep longer than the dwell is
-    /// not enough when parallel suites keep the main actor busy. The deadline is wall time, so
-    /// this loop can resume after a stall and observe it before an already-due dwell task runs.
-    private func waitUntil(within limit: Duration = .seconds(15), _ condition: () -> Bool) async throws {
-        let deadline = ContinuousClock.now + limit
-        while !condition() {
-            try await Task.sleep(for: .milliseconds(10))
-            if condition() { return }
-            if ContinuousClock.now >= deadline { break }
-        }
-        var turns = 0
-        while !condition(), turns < 200 {
-            await Task.yield()
-            turns += 1
-        }
-    }
-
     @Test("Pin add, remove, and move are recorded; presentation-only writes are not")
     func pinMutations() throws {
         let safari = pin("safari")
@@ -448,16 +431,25 @@ struct DockLocalHistoryTests {
         timeline.nudge(by: -1)
         #expect(applied.isEmpty)
         #expect(!timeline.replayPending)
-        try await Task.sleep(for: .milliseconds(80))
-        #expect(applied.isEmpty)
         #expect(!timeline.isReplayingPins)
 
         history.setReplayEnabled(true)
         timeline.begin(on: "display.primary", currentPins: current, archive: history.pinArchive)
-        timeline.update(progress: 0)
-        #expect(applied.isEmpty)
-        #expect(timeline.replayPending)
-        try await waitUntil { !applied.isEmpty }
+        // The 25 ms dwell task runs only after this test suspends. A main-actor poll
+        // can stay queued ahead of that task until a wall-clock wait gives up.
+        await confirmation("preview applies after the dwell") { confirm in
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                timeline.applyPreview = { _, pins in
+                    applied.append(pins.map(\.id))
+                    confirm()
+                    continuation.resume()
+                }
+                timeline.update(progress: 0)
+                #expect(applied.isEmpty)
+                #expect(timeline.replayPending)
+            }
+        }
+        timeline.applyPreview = { _, pins in applied.append(pins.map(\.id)) }
         #expect(applied == [[pin("one").id]])
         #expect(timeline.isReplayingPins)
 
@@ -468,8 +460,8 @@ struct DockLocalHistoryTests {
         applied = []
         timeline.update(progress: 0)
         timeline.update(progress: 1)
-        try await Task.sleep(for: .milliseconds(80))
         #expect(applied.isEmpty)
+        #expect(!timeline.replayPending)
 
         timeline.end()
         #expect(cleared == 1)

@@ -73,6 +73,13 @@ struct VolumeTests {
         #expect(VolumeScanner.mounts().allSatisfy { $0.url.path.hasPrefix("/Volumes/") })
     }
 
+    @Test("Volume reads run on their queue, not the caller's actor")
+    func volumeReadsStayOffTheCaller() async {
+        #expect(!VolumeReads.isCurrent)
+        let current = await VolumeReads.run { VolumeReads.isCurrent }
+        #expect(current)
+    }
+
     @Test("A refused folder listing is told apart by cause; other errors are not access denials")
     func accessDenial() {
         func refusal(_ code: Int32) -> NSError {

@@ -5,6 +5,8 @@ nonisolated final class FolderResourceAccess: @unchecked Sendable {
     let url: URL
     let bookmarkIsStale: Bool
     private let scoped: Bool
+    /// Stack opens resolve on `VolumeReads`, so the matching stop runs there too.
+    private let releaseOnVolumeReads: Bool
     private let stopAccess: (URL) -> Void
 
     init(_ reference: FolderReference,
@@ -17,13 +19,23 @@ nonisolated final class FolderResourceAccess: @unchecked Sendable {
         url = (resolved ?? reference.url).standardizedFileURL
         bookmarkIsStale = stale
         scoped = startAccess(url)
+        releaseOnVolumeReads = scoped && VolumeReads.isCurrent
         self.stopAccess = stopAccess
     }
 
+    /// `fileExists` can stall on a wedged volume. Stack opens call this from `VolumeReads`.
     var isAvailable: Bool {
         var isDirectory: ObjCBool = false
         return FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) && isDirectory.boolValue
     }
 
-    deinit { if scoped { stopAccess(url) } }
+    deinit {
+        guard scoped else { return }
+        if releaseOnVolumeReads {
+            let url = url
+            VolumeReads.enqueue { url.stopAccessingSecurityScopedResource() }
+        } else {
+            stopAccess(url)
+        }
+    }
 }
