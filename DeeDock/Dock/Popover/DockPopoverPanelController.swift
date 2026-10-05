@@ -53,6 +53,8 @@ final class DockPopoverPanelController<Content: View> {
     var closed: ((Bool) -> Void)?
     /// Returns true when the feature consumed the key event.
     var keyHandler: ((NSEvent) -> Bool)?
+    /// Placed panel width in points. Adaptive grids derive their column count from it.
+    var panelWidth: CGFloat { placement.frame.width }
 
     /// - Parameters:
     ///   - chromeChanged: Receives the resolved chrome before the content is built, and again on

@@ -551,6 +551,18 @@ final class FolderStackState {
         if preview != nil { preview = nil; previewSelection() }
     }
 
+    /// Moves by `distance` and stops on the first or last visible item.
+    /// A step that would leave the listing does nothing, so a live preview stays put.
+    func selectClamped(by distance: Int) {
+        let navigable = displayedEntries
+        guard !navigable.isEmpty else { return }
+        let current = selectedID.flatMap { id in navigable.firstIndex { $0.id == id } } ?? 0
+        let index = AdaptiveGridLayout.clampedIndex(current: current, count: navigable.count, delta: distance)
+        guard navigable[index].id != selectedID else { return }
+        selectedID = navigable[index].id
+        if preview != nil { preview = nil; previewSelection() }
+    }
+
     func openSelection() {
         guard let entry = entries.first(where: { $0.id == selectedID }) else { return }
         Analytics.performing(.keyboard) { openEntry?(entry.reference) }

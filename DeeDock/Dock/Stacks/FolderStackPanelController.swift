@@ -138,14 +138,8 @@ final class FolderStackPanelController {
             choosePresentation(by: -1)
         case 124 where state.presentationFocused:
             choosePresentation(by: 1)
-        case 123:
-            state.select(by: -1)
-        case 124:
-            state.select(by: 1)
-        case 125:
-            state.select(by: state.presentation == .grid ? 5 : 1)
-        case 126:
-            state.select(by: state.presentation == .grid ? -5 : -1)
+        case 123, 124, 125, 126:
+            moveSelection(by: arrowStep(event.keyCode))
         default:
             return beginTypeAhead(event)
         }
@@ -163,10 +157,8 @@ final class FolderStackPanelController {
             state.focusSearch(false)
         case 36, 76:
             state.openSelection()
-        case 125:
-            state.select(by: 1)
-        case 126:
-            state.select(by: -1)
+        case 125, 126:
+            moveSelection(by: arrowStep(event.keyCode))
         default:
             return false
         }
@@ -181,6 +173,28 @@ final class FolderStackPanelController {
         else { return false }
         state.beginTypeAhead(characters)
         return true
+    }
+
+    /// Grid arrows follow the columns that fit this panel. List arrows stay one item and wrap.
+    private func arrowStep(_ keyCode: UInt16) -> Int {
+        let columns = state.presentation == .grid ? gridColumns : 1
+        return AdaptiveGridLayout.gridStep(keyCode: keyCode, columns: columns) ?? 0
+    }
+
+    private var gridColumns: Int {
+        let pointer = state.chrome.edge.isVertical ? DockPopoverGeometry.pointerDepth : 0
+        return AdaptiveGridLayout.columnCount(
+            panelWidth: popover.panelWidth,
+            minimum: FolderStackGridMetrics.minimumCell,
+            spacing: FolderStackGridMetrics.columnSpacing,
+            horizontalPadding: FolderStackGridMetrics.horizontalPadding,
+            pointerInset: pointer)
+    }
+
+    /// Grid movement stops on the first and last item. List movement keeps its wrap.
+    private func moveSelection(by delta: Int) {
+        if state.presentation == .grid { state.selectClamped(by: delta) }
+        else { state.select(by: delta) }
     }
 
     private func choosePresentation(by distance: Int) {

@@ -245,6 +245,18 @@ final class ShelfPanelState {
         selection = [next]
     }
 
+    /// Moves the keyboard anchor by `distance` and stops on the first or last item.
+    /// An arrow that cannot move still collapses a multiple selection to that edge item.
+    func selectClamped(by distance: Int) {
+        let navigable = order
+        guard !navigable.isEmpty else { return }
+        let current = anchorID.flatMap { navigable.firstIndex(of: $0) } ?? 0
+        let next = navigable[AdaptiveGridLayout.clampedIndex(current: current, count: navigable.count, delta: distance)]
+        guard next != anchorID || selection != [next] else { return }
+        anchorID = next
+        selection = [next]
+    }
+
     func selectAll() { selection = Set(order) }
 
     // MARK: - Commands
