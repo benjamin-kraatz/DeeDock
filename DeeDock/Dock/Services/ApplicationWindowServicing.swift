@@ -1,5 +1,6 @@
 import ApplicationServices
 import AppKit
+import Dispatch
 import Security
 import Synchronization
 
@@ -24,11 +25,36 @@ protocol ApplicationWindowServicing: Actor {
 }
 
 /// Public AX window access with bounded cross-process messaging.
+///
+/// `copy`, `set`, `prepareElement`, and `performNativeAction` can block until
+/// `messagingTimeout` (0.25s, or 1s during App Fusion). Attribute-name copies
+/// and the App Fusion drag write can block for the same reason. `axQueue` is
+/// this actor's executor, so those calls run on one private serial queue.
+/// A stall holds this service's queue. The cooperative pool would hold one of
+/// the few threads every task in the app shares, which is why `DockBadgeReader`
+/// keeps its AX copies on a private queue.
+///
+/// `AXUIElement` is not `Sendable`. Handles stay on `axQueue` because isolated
+/// methods resume there. Each actor job hops once. The helpers stay synchronous,
+/// so a window walk cannot interleave with `discard` or selection.
+/// Calling `sync` on `axQueue` from this actor deadlocks, because the method
+/// is already running on that queue.
+///
+/// App Fusion observation still passes the element reference to the main run
+/// loop for notification registration. That path does not copy attributes.
 actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
     struct Handle {
         let element: AXUIElement
         let processIdentifier: pid_t
         let launchDate: Date?
+    }
+
+    /// Private serial executor for this service's Accessibility IPC.
+    private nonisolated let axQueue = DispatchSerialQueue(label: "DeeDock.WindowAccessibility")
+
+    /// Schedules isolated methods on `axQueue`.
+    nonisolated var unownedExecutor: UnownedSerialExecutor {
+        axQueue.asUnownedSerialExecutor()
     }
 
     // App Fusion owns these exact handles only for an active pointer gesture.

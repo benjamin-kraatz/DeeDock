@@ -16,7 +16,7 @@ the 0.11.0 release preparation and merge; they were incorporated before committi
 | --- | --- | --- |
 | `WindowPeekEnlargeTests` and `WindowMarkupTests` | 29 tests passed after correcting two expectations | Settings migration, geometry, hold regions, stow paths, destination choice, document operations, and filenames. Does not prove native pointer handling or file delivery. |
 | `DockVisibilityTests`, `WindowPeekTests`, `WindowPeekSplitTests`, and `WindowPortalExportTests` | 25 tests passed | Model and geometry coverage. Does not prove animation quality, OS window behavior, or capture permissions. |
-| `DockLocalHistoryTests/replayDwellAndGate()` | Passed once | The September 11 intermittent timing failure remains unresolved. One pass does not clear a flake. |
+| `DockLocalHistoryTests/replayDwellAndGate()` | Resolved ([DEE-113](https://linear.app/d-zwei/issue/DEE-113)) | The test keeps a 25 ms dwell and suspends until `applyPreview` runs. It no longer treats a 2 s main-actor poll as success. |
 | `FolderStackTests/mediaHeaders()` | Failed | WAV duration is still unavailable on this OS build. CoreMedia reports underlying error `-17770`. |
 | Installed app and Settings | Opened and inspected | German Settings lists the built-in display and two external displays. This does not prove unplug, replug, scaling, or rearrangement behavior. |
 | Launcher close and reopen | Passed in the current browse layout on one dock | The accessibility scroll value remained `0.4845446950710108` across Back to Dock and reopen. |
@@ -90,6 +90,6 @@ migration behavior still matters.
 ## Confirmed follow-up for the stability pass
 
 - WAV duration loading still fails on this macOS build. Investigate the reader and platform fallback without hiding the failing expectation.
-- Pin-replay timing remains a historical intermittent failure. Replace timing assumptions only after diagnosing scheduling and cancellation behavior.
+- Pin-replay timing was a historical intermittent failure. [DEE-113](https://linear.app/d-zwei/issue/DEE-113) resumes `replayDwellAndGate()` from `applyPreview` instead of a wall-clock poll.
 
 The broader stability pass has not started. Native acceptance remains open as listed above.
