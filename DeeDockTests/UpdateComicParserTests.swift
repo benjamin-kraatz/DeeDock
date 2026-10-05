@@ -239,7 +239,7 @@ struct UpdateComicParserTests {
         let directory = containmentComponents(documentURL.deletingLastPathComponent())
         let image = containmentComponents(url)
         guard image.count > directory.count else { return false }
-        return zip(directory, image).allSatisfy { $0 == $1 }
+        return zip(directory, image).allSatisfy { $0.0 == $0.1 }
     }
 
     private static func containmentComponents(_ url: URL) -> [String] {

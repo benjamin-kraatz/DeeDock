@@ -84,7 +84,7 @@ nonisolated enum UpdateComicResourcePolicy {
         guard directory.count > 1, image.count > directory.count,
               !directory.contains(".."), !image.contains(".."),
               !directory.contains("."), !image.contains(".") else { return false }
-        return zip(directory, image).allSatisfy { $0 == $1 }
+        return zip(directory, image).allSatisfy { $0.0 == $0.1 }
     }
 
     /// Standardized, symlink-resolved components of a file URL.
