@@ -16,6 +16,14 @@ soap bubbles stay first-class.
 The slices below remain the record of how those features were built. Hands-on checks that
 assume they stay on after launch no longer apply.
 
+## DEE-86 product name
+
+For the week around 14 February, 21 July, 22 August, and 14 November, interface copy says
+BIG DIKK. The week is that date and the three days on either side, in the local Gregorian
+calendar. The on-disk app name stays `DOKK.app`. Unit tests cover the window and the
+replacement. They were not run in this environment, and the app was not launched, so the
+menu bar, About panel, and wordmark were not checked on a Mac.
+
 ## DEE-83 external volumes
 
 Implemented on `feature/dee-83`. Mounted USB sticks, SD cards, and external disks get tiles

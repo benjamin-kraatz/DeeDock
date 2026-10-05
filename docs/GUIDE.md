@@ -31,6 +31,10 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 
 DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK; dedicated coexistence controls are future work.
 
+### BIG DIKK
+
+For the week around 14 February, 21 July, 22 August, and 14 November, DOKK calls itself BIG DIKK. The week is that date and the three days on either side, in the Mac's local time. Menus, settings, About, release notes, and the menu-bar wordmark use BIG DIKK. The app file stays `DOKK.app`, and folders such as Pictures/DOKK Markups keep their names. A launch keeps the name it started with.
+
 ### First launch
 
 The first time DOKK runs, a tour opens over the desktop. The docks are already live behind it, so every page describes something you can see. Seven pages: what DOKK is, a guide to hiding the macOS Dock, placement, running indicators, auto-hide, one dock per display, and a closing page with the launch-at-login toggle.

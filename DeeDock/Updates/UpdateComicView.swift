@@ -28,7 +28,7 @@ struct UpdateComicView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             if !comic.title.isEmpty {
-                Text(verbatim: comic.title)
+                Text(verbatim: ProductAlias.applying(to: comic.title))
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(UpdateComicPalette.ink)
                     .accessibilityAddTraits(.isHeader)
@@ -85,8 +85,10 @@ struct UpdateComicPanelView: View {
 
     private var topicLine: String {
         let number = panel.id
-        if !panel.german.topic.isEmpty { return "\(number) / \(panel.german.topic)" }
-        return "\(number) / \(panel.english.topic)"
+        if !panel.german.topic.isEmpty {
+            return ProductAlias.applying(to: "\(number) / \(panel.german.topic)")
+        }
+        return ProductAlias.applying(to: "\(number) / \(panel.english.topic)")
     }
 }
 
@@ -102,8 +104,8 @@ struct UpdateComicArtworkView: View {
                     .interpolation(.high)
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
-                    .accessibilityLabel(Text(verbatim: panel.german.alt))
-                    .accessibilityValue(Text(verbatim: panel.english.alt))
+                    .accessibilityLabel(Text(verbatim: ProductAlias.applying(to: panel.german.alt)))
+                    .accessibilityValue(Text(verbatim: ProductAlias.applying(to: panel.english.alt)))
             } else {
                 ZStack {
                     UpdateComicPalette.paper
@@ -133,11 +135,11 @@ struct UpdateComicCopyView: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(UpdateComicPalette.ink.opacity(0.64))
                 .textCase(.uppercase)
-            Text(verbatim: copy.title)
+            Text(verbatim: ProductAlias.applying(to: copy.title))
                 .font(.headline)
                 .foregroundStyle(UpdateComicPalette.ink)
             if !copy.speech.isEmpty {
-                Text(verbatim: copy.speech)
+                Text(verbatim: ProductAlias.applying(to: copy.speech))
                     .font(.callout)
                     .foregroundStyle(UpdateComicPalette.ink)
                     .padding(.horizontal, 10)
@@ -146,7 +148,7 @@ struct UpdateComicCopyView: View {
                     .background(speechFill, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
             if !copy.caption.isEmpty {
-                Text(verbatim: copy.caption)
+                Text(verbatim: ProductAlias.applying(to: copy.caption))
                     .font(.body)
                     .foregroundStyle(UpdateComicPalette.ink.opacity(0.92))
                     .fixedSize(horizontal: false, vertical: true)

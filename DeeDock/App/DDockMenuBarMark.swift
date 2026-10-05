@@ -14,9 +14,29 @@ enum DDockMenuBarMark {
     /// Same letter height as before the tracking change; the extra is only as wide as the lockup.
     /// Aspect matches the cropped `DDockWordmark` viewBox so AppKit's SVG size cannot pad the sides.
     private static let wordmarkAspect: CGFloat = 388 / 59
-    private static let wordmark = template(named: "DDockWordmark",
-                                          size: NSSize(width: 12 * wordmarkAspect, height: 18),
-                                          aspect: wordmarkAspect)
+    /// The logotype spells DOKK. During an alias week the menu bar draws the longer name instead.
+    private static let wordmark: NSImage = ProductAlias.presentsFestiveName
+        ? festiveWordmark()
+        : template(named: "DDockWordmark",
+                   size: NSSize(width: 12 * wordmarkAspect, height: 18),
+                   aspect: wordmarkAspect)
+
+    /// Template text for the alias. The letter spacing of the DOKK logotype has no room for a second word.
+    private static func festiveWordmark() -> NSImage {
+        let font = NSFont.systemFont(ofSize: 13, weight: .heavy)
+        let text = NSAttributedString(string: ProductAlias.festive, attributes: [
+            .font: font,
+            .foregroundColor: NSColor.black,
+        ])
+        let bounds = text.size()
+        let size = NSSize(width: ceil(bounds.width) + 2, height: 18)
+        let image = NSImage(size: size, flipped: false) { rect in
+            text.draw(at: NSPoint(x: 1, y: (rect.height - bounds.height) / 2))
+            return true
+        }
+        image.isTemplate = true
+        return image
+    }
 
     private static func template(named name: String, size: NSSize, aspect: CGFloat? = nil) -> NSImage {
         let source = NSImage(named: name)
