@@ -142,11 +142,11 @@ nonisolated final class ProductAliasBundle: Bundle, @unchecked Sendable {
     }
 
     override var infoDictionary: [String: Any]? {
-        ProductAlias.renamingDisplayedNames(super.infoDictionary, active: ProductAlias.presentsFestiveName)
+        ProductAlias.renamingDisplayedNames(in: super.infoDictionary, active: ProductAlias.presentsFestiveName)
     }
 
     override var localizedInfoDictionary: [String: Any]? {
-        ProductAlias.renamingDisplayedNames(super.localizedInfoDictionary, active: ProductAlias.presentsFestiveName)
+        ProductAlias.renamingDisplayedNames(in: super.localizedInfoDictionary, active: ProductAlias.presentsFestiveName)
     }
 
     override func object(forInfoDictionaryKey key: String) -> Any? {
