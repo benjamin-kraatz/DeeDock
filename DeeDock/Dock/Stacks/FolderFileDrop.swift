@@ -44,17 +44,27 @@ enum FolderFileDrop {
                 let target = destination.resolvingSymlinksInPath().standardizedFileURL
                 var completed = 0
                 do {
-                    var names = Set<String>()
+                    var reserved: [String] = []
                     // Validate every destination before copying. FileManager still refuses a
                     // collision that races this check, so existing content is never replaced.
+                    // Reserved names use the destination volume's case rule, the same one
+                    // containment reads from `volumeSupportsCaseSensitiveNames`. On a
+                    // case-insensitive volume, Notes.txt and notes.txt are one file, and the
+                    // batch has to fail before the first move removes a source.
+                    let caseSensitive = target.volumeReportsCaseSensitiveNames
                     for source in sources.urls {
                         let canonical = source.resolvingSymlinksInPath().standardizedFileURL
-                        let output = target.appendingPathComponent(source.lastPathComponent)
+                        let name = source.lastPathComponent
+                        let output = target.appendingPathComponent(name)
+                        let claimed = reserved.contains { existing in
+                            caseSensitive ? existing == name : existing.caseInsensitiveCompare(name) == .orderedSame
+                        }
                         guard !target.isSameOrDescendant(of: canonical),
-                              names.insert(source.lastPathComponent).inserted,
+                              !claimed,
                               !manager.fileExists(atPath: output.path) else {
                             throw CocoaError(.fileWriteFileExists)
                         }
+                        reserved.append(name)
                     }
                     for source in sources.urls {
                         let output = target.appendingPathComponent(source.lastPathComponent)

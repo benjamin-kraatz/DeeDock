@@ -2717,7 +2717,9 @@ Disarming restores the ordinary dock without changing pins or visibility prefere
 Marked items stay at their original positions.
 Clicking a marked item outside stamp mode shows a nonactivating glass notice for 2.2 seconds.
 It leaves the mark intact. Release requires stamp mode, including release from Settings. Saved flags apply across displays and Dock Modes to matching
-item identities or file URLs. A removed pin's flag remains releasable from Settings.
+item identities or file URLs. A saved file URL also matches a symlink to that file and any
+descendant. Matching resolves symlinks and follows the volume's case-sensitive names rule.
+A removed pin's flag remains releasable from Settings.
 
 The stamp follows the pointer across panel headers, menus, and other apps while armed.
 A red forbidden badge and reduced stamp opacity indicate that the pointer is not over a
