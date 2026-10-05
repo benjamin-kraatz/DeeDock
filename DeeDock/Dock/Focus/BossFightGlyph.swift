@@ -18,12 +18,22 @@ struct BossFightGlyph: View {
                         Capsule().fill(.white).frame(width: geometry.size.width * session.fraction(at: date))
                     }
                 }.frame(height: max(2, size * 0.065))
-                Text(verbatim: session.timeLabel(at: date))
-                    .font(.system(size: size * 0.2, weight: .semibold)).monospacedDigit()
+                countdown
             }
             .foregroundStyle(.white).padding(size * 0.12)
         }
         .accessibilityHidden(true)
+    }
+
+    /// `MM:SS` fits the padded width at this size. `H:MM:SS` scales down so it stays inside the portrait.
+    @ViewBuilder private var countdown: some View {
+        let label = Text(verbatim: session.timeLabel(at: date))
+            .font(.system(size: size * 0.2, weight: .semibold)).monospacedDigit()
+        if session.showsHours(at: date) {
+            label.lineLimit(1).minimumScaleFactor(0.6)
+        } else {
+            label
+        }
     }
 }
 
@@ -57,5 +67,17 @@ struct BossFightVictoryGlyph: View {
         duration: 1500, remainingWhenPaused: 750, deadline: nil, phase: .paused),
         date: Date(timeIntervalSince1970: 0), size: 64)
         .frame(width: 64, height: 64).padding()
+}
+#Preview("Boss timer, over an hour") {
+    HStack(spacing: 16) {
+        BossFightGlyph(session: FocusSession(id: UUID(), modeID: UUID(), modeName: "Writing",
+            duration: 10_800, remainingWhenPaused: 5_405, deadline: nil, phase: .paused),
+            date: Date(timeIntervalSince1970: 0), size: 48)
+            .frame(width: 48, height: 48)
+        BossFightGlyph(session: FocusSession(id: UUID(), modeID: UUID(), modeName: "Writing",
+            duration: 10_800, remainingWhenPaused: 5_405, deadline: nil, phase: .paused),
+            date: Date(timeIntervalSince1970: 0), size: 32)
+            .frame(width: 32, height: 32)
+    }.padding()
 }
 #endif

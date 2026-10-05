@@ -19,9 +19,63 @@ nonisolated struct FocusSession: Codable, Equatable, Identifiable, Sendable {
         }
     }
     func fraction(at date: Date) -> Double { min(1, max(0, remaining(at: date) / max(1, duration))) }
+
+    /// Countdown text. Under an hour this is `MM:SS`. At an hour or more it is `H:MM:SS`, with the hour unpadded.
     func timeLabel(at date: Date) -> String {
-        let seconds = Int(ceil(remaining(at: date)))
-        return String(format: "%02d:%02d", seconds / 60, seconds % 60)
+        let seconds = displaySeconds(at: date)
+        let hours = seconds / 3_600
+        let minutes = (seconds % 3_600) / 60
+        let remainder = seconds % 60
+        if hours > 0 { return String(format: "%d:%02d:%02d", hours, minutes, remainder) }
+        return String(format: "%02d:%02d", minutes, remainder)
+    }
+
+    /// Whether ``timeLabel(at:)`` includes an hour. Glyphs use this to scale only the longer string.
+    func showsHours(at date: Date) -> Bool { displaySeconds(at: date) >= 3_600 }
+
+    /// Remaining time in words for VoiceOver, in the current locale, for the same whole seconds as ``timeLabel(at:)``.
+    ///
+    /// The dock reads this about once a second. The formatters are built once; a finished session uses a separate one so zero still spells out seconds.
+    func spokenRemaining(at date: Date) -> String {
+        let seconds = displaySeconds(at: date)
+        let formatter = seconds == 0 ? Self.spokenZero : Self.spokenDuration
+        return Self.spell(seconds, with: formatter) ?? timeLabel(at: date)
+    }
+
+    /// Same spelling as ``spokenRemaining(at:)`` for a chosen locale. Tests pin `en_US` here and leave the shared formatters unchanged.
+    func spokenRemaining(at date: Date, locale: Locale, calendar: Calendar) -> String {
+        let seconds = displaySeconds(at: date)
+        let formatter = Self.makeSpokenFormatter(zero: seconds == 0, locale: locale, calendar: calendar)
+        return Self.spell(seconds, with: formatter) ?? timeLabel(at: date)
+    }
+
+    private static let spokenDuration: DateComponentsFormatter = makeSpokenFormatter(zero: false)
+    private static let spokenZero: DateComponentsFormatter = makeSpokenFormatter(zero: true)
+
+    private static func makeSpokenFormatter(zero: Bool, locale: Locale? = nil, calendar: Calendar? = nil) -> DateComponentsFormatter {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .spellOut
+        formatter.allowedUnits = zero ? [.second] : [.hour, .minute, .second]
+        formatter.zeroFormattingBehavior = zero ? .pad : .dropAll
+        // `DateComponentsFormatter` has no `locale`. The calendar carries it. Leave the calendar unset
+        // on the shared formatters so VoiceOver follows the user's current locale.
+        if locale != nil || calendar != nil {
+            var resolved = calendar ?? Calendar(identifier: .gregorian)
+            if let locale { resolved.locale = locale }
+            formatter.calendar = resolved
+        }
+        return formatter
+    }
+
+    private static func spell(_ seconds: Int, with formatter: DateComponentsFormatter) -> String? {
+        let spoken = formatter.string(from: TimeInterval(seconds))
+        guard let spoken, !spoken.isEmpty else { return nil }
+        return spoken
+    }
+
+    /// Whole seconds still to run, rounded up so a visible second is not dropped early.
+    private func displaySeconds(at date: Date) -> Int {
+        Int(ceil(remaining(at: date)))
     }
     var isValid: Bool {
         !modeName.isEmpty && duration.isFinite && (60...86400).contains(duration)

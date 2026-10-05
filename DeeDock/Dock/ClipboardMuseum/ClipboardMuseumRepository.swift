@@ -82,8 +82,13 @@ nonisolated struct ClipboardMuseumRepository: Sendable {
         try? FileManager.default.removeItem(at: vaultURL.appendingPathComponent(name))
     }
 
-    /// Deletes files no exhibit references, such as one written just before a crash.
-    func prune(keepingImages images: Set<String>, sealed: Set<String>) {
+    /// Deletes image and vault files `document` does not name.
+    ///
+    /// Call only after `document` is the catalog on disk. A file written for a save that never
+    /// landed stays until the next successful save or the next launch.
+    func prune(keeping document: ClipboardMuseumDocument) {
+        let images = Set(document.exhibits.compactMap(\.imageName))
+        let sealed = Set(document.exhibits.compactMap(\.sealedName))
         let manager = FileManager.default
         for name in (try? manager.contentsOfDirectory(atPath: imagesURL.path)) ?? []
         where Self.isImageName(name) && !images.contains(name) {
