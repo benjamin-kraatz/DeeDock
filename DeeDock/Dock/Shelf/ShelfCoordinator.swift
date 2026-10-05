@@ -247,6 +247,7 @@ final class ShelfCoordinator {
             state?.report(String(localized: .shelfUnavailableItems)) { [weak self] in self?.reload() }
             return
         }
+        Analytics.track(.shelf(.previewed, itemCount: 1, source: nil, trigger: Analytics.trigger()))
         state?.preview = DockFilePreviewItem(url: access.url, leases: [access])
     }
 
@@ -257,6 +258,7 @@ final class ShelfCoordinator {
             return
         }
         defer { withExtendedLifetime(resolved) {} }
+        Analytics.track(.shelf(.revealed, itemCount: resolved.count, source: nil, trigger: Analytics.trigger()))
         NSWorkspace.shared.activateFileViewerSelecting(resolved.map(\.url))
         close(returnFocus: false)
     }
@@ -298,6 +300,7 @@ final class ShelfCoordinator {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.writeObjects(resolved.map { $0.url as NSURL })
+        Analytics.track(.shelf(.copied, itemCount: resolved.count, source: nil, trigger: Analytics.trigger()))
     }
 
     private func report(_ error: any Error) {

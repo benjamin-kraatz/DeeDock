@@ -292,7 +292,7 @@ final class LauncherFileActionState {
             fail(String(localized: .unifiedShortcutUnavailable), token: token)
             return
         }
-        let started = actionsController.run(id, files: access) { [weak self] in
+        let started = actionsController.run(id, files: access, source: .launcherFiles) { [weak self] in
             guard let self, operationGeneration == token, context.generation == contextGeneration else { return }
             switch actionsController.statuses[id] ?? .idle {
             case .succeeded: status = .completed

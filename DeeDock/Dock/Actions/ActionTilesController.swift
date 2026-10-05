@@ -71,38 +71,52 @@ final class ActionTilesController {
 
     func pin(_ tile: ActionTile) {
         guard !requiresReset, tiles.count < 30, !tiles.contains(where: { $0.id == tile.id }) else { return }
-        save(tiles + [tile])
+        save(tiles + [tile], reporting: .pinned)
     }
     func unpin(_ id: UUID) {
         guard !requiresReset, runs[id] == nil else { return }
-        save(tiles.filter { $0.id != id })
+        save(tiles.filter { $0.id != id }, reporting: .unpinned)
     }
     func move(_ id: UUID, by distance: Int) {
         guard !requiresReset, let index = tiles.firstIndex(where: { $0.id == id }) else { return }
         let target = index + distance
         guard tiles.indices.contains(target) else { return }
-        var next = tiles; next.swapAt(index, target); save(next)
+        var next = tiles; next.swapAt(index, target); save(next, reporting: .moved)
     }
-    func reset() { requiresReset = false; save([]) }
+    func reset() { requiresReset = false; save([], reporting: .reset) }
     func setAcceptsFiles(_ id: UUID, _ value: Bool) {
         guard !requiresReset, let index = tiles.firstIndex(where: { $0.id == id }) else { return }
         var next = tiles
         next[index].acceptsFiles = value
-        save(next)
+        save(next, reporting: value ? .acceptsFilesOn : .acceptsFilesOff)
     }
 
-    private func save(_ next: [ActionTile]) {
+    private func save(_ next: [ActionTile], reporting action: AnalyticsShortcutTileAction) {
         do {
             let data = try JSONEncoder().encode(ActionTilesDocument(tiles: next))
             defaults.set(data, forKey: Self.key)
             tiles = next; error = nil; changed?()
+            Analytics.track(.shortcutTile(action, tileCount: next.count))
         } catch { self.error = String(localized: .actionsStorageFailed) }
     }
 
     /// Runs only after a click, keyboard action, or accepted drop. No uncertain run is retried.
+    /// `source` says where the run started; the outcome is reported when the Shortcut finishes.
     @discardableResult
-    func run(_ id: UUID, files: DocumentResourceAccess? = nil, finished: (() -> Void)? = nil) -> Bool {
-        tiles.contains(where: { $0.id == id }) && start(id, files: files) { _ in finished?() }
+    func run(_ id: UUID, files: DocumentResourceAccess? = nil, source: AnalyticsShortcutSource,
+             finished: (() -> Void)? = nil) -> Bool {
+        guard tiles.contains(where: { $0.id == id }) else { return false }
+        let startedAt = Date()
+        let fileCount = files?.urls.count ?? 0
+        return start(id, files: files) { result in
+            let outcome: AnalyticsOutcome = switch result {
+            case .success: .succeeded
+            case .failure(let error): error is CancellationError ? .canceled : .failed
+            }
+            Analytics.track(.shortcutRun(source, fileCount: fileCount, outcome: outcome,
+                                         duration: Date().timeIntervalSince(startedAt)))
+            finished?()
+        }
     }
 
     /// One explicit run of a configured Shortcut ID. The Shortcut need not be pinned.

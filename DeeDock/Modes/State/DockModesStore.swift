@@ -199,6 +199,7 @@ final class DockModesStore {
         proposed.modes.append(saved)
         guard commit(proposed) else { return false }
         sessionDisplays[saved.id] = draft.sessionDisplays
+        Analytics.track(.modeEdited(.snapshotSaved, modeCount: modes.count, stepCount: saved.recipe.steps.count))
         return true
     }
 
@@ -226,7 +227,9 @@ final class DockModesStore {
         var proposed = document
         guard let index = proposed.modes.firstIndex(where: { $0.id == id }) else { return false }
         proposed.modes[index].name = name
-        return commit(proposed)
+        guard commit(proposed) else { return false }
+        Analytics.track(.modeEdited(.renamed, modeCount: modes.count))
+        return true
     }
 
     @discardableResult
@@ -235,7 +238,9 @@ final class DockModesStore {
               document.modes.indices.contains(index + distance) else { return false }
         var proposed = document
         proposed.modes.swapAt(index, index + distance)
-        return commit(proposed)
+        guard commit(proposed) else { return false }
+        Analytics.track(.modeEdited(.reordered, modeCount: modes.count))
+        return true
     }
 
     /// Replaces the mode's recipe. Source files and Shortcuts are never deleted.
@@ -245,7 +250,10 @@ final class DockModesStore {
         var proposed = document
         guard let index = proposed.modes.firstIndex(where: { $0.id == id }) else { return false }
         proposed.modes[index].recipe = recipe.sanitized
-        return commit(proposed)
+        guard commit(proposed) else { return false }
+        Analytics.track(.modeEdited(.recipeUpdated, modeCount: modes.count,
+                                    stepCount: proposed.modes[index].recipe.steps.count))
+        return true
     }
 
     @discardableResult

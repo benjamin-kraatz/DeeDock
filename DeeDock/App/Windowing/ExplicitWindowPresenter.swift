@@ -23,6 +23,7 @@ final class ExplicitWindowPresenter {
 
     /// Starts a request before SwiftUI creates or reuses the singleton Settings scene.
     func openSettings(using openWindow: OpenWindowAction, source: String) {
+        Analytics.track(.toolOpened(.settings, trigger: Analytics.trigger()))
         begin(source: source)
         awaitingSettings = true
         if let settingsWindow {
@@ -40,6 +41,7 @@ final class ExplicitWindowPresenter {
 
     /// Starts a request before SwiftUI creates or reuses the System Settings Clone scene.
     func openSystemSettingsClone(using openWindow: OpenWindowAction, source: String) {
+        Analytics.track(.toolOpened(.systemSettingsClone, trigger: Analytics.trigger()))
         begin(source: source)
         awaitingClone = true
         if let cloneWindow {

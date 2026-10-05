@@ -581,6 +581,7 @@ final class DockStore {
     func open(_ item: DockItem) {
         guard !QuarantineStampController.shared.armed else { return }
         if item.isFavorite { pinWeather?.recordUse(item.id) }
+        Analytics.count(.appActivated(Analytics.trigger()))
         let token = session.token
         let modeID = profiles.modes.activeMode.id
         let isPatchBaySource = item.isFavorite && !isPreviewingTimeline
@@ -595,11 +596,16 @@ final class DockStore {
     }
 
     /// Captures this panel's session, not its mutable selection or display index.
-    func openDocuments(_ documents: DocumentResourceAccess, with reference: ApplicationReference) {
+    func openDocuments(_ documents: DocumentResourceAccess, with reference: ApplicationReference,
+                       source: AnalyticsDocumentSource) {
         guard !QuarantineStampController.shared.armed else { return }
         if persistedPins.contains(where: { $0.id == reference.id }) { pinWeather?.recordUse(reference.id) }
         let token = session.token
+        let fileCount = documents.urls.count
+        let fileType = AnalyticsFileType.common(of: documents.urls)
         catalog.openDocuments(documents, with: reference) { [weak self] error in
+            Analytics.track(.documentsOpened(source, fileCount: fileCount, fileType: fileType,
+                                             outcome: error == nil ? .succeeded : .failed))
             guard let self, session.accepts(token) else { return }
             if let error { errorMessage = error }
             else { applicationOpened?() }
@@ -629,7 +635,7 @@ final class DockStore {
         case .melt(let pair, _): appMelt?.restore(pair)
         case .launcher: openLauncher?()
         case .focus: openFocusSession?()
-        case .action(let item): actions?.run(item.tile.id)
+        case .action(let item): actions?.run(item.tile.id, source: .keyboard)
         case .app(let item): open(item)
         case .folder(let folder): openFolder?(folder, keyboardFocus)
         case .group: sections.toggle()

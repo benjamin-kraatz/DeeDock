@@ -11,7 +11,7 @@ struct DockActionButton: View {
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
     var body: some View {
-        Button { interaction.actionTiles?.run(item.tile.id) } label: {
+        Button { interaction.actionTiles?.run(item.tile.id, source: .tile) } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
                                  available: true, running: false, launching: false,
                                  keyboardSelected: selected,

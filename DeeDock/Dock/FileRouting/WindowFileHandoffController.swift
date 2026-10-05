@@ -49,6 +49,8 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
     private var task: Task<Void, Never>?
     private var actionID: UUID?
     private var discoveryID: UUID?
+    /// Whether the drop targeted one window rather than the app. Reported with each step.
+    private var exactWindow = false
     private let menus: ApplicationMenuController
     private let applications: any ApplicationServicing
     private var generation = UUID()
@@ -62,6 +64,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
               exactWindow: Bool, discoveryID: UUID?, visibleFrame: CGRect) {
         stop()
         self.discoveryID = discoveryID
+        self.exactWindow = exactWindow
         let title = window.map {
             ApplicationContextMenuProjection.windowTitle($0, untitled: String(localized: .applicationMenuUntitledWindow))
         }
@@ -112,6 +115,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
             state.valid = valid
             state.status = valid ? .ready : .invalid
             task = nil
+            report(.shown, outcome: valid ? .succeeded : .failed)
         }
     }
 
@@ -128,14 +132,17 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
                 state.busy = false
                 state.status = error.map(WindowFileHandoffStatus.actionFailed) ?? .activated
                 actionID = nil
+                report(.activated, outcome: error == nil ? .succeeded : .failed)
             }
         } else {
             guard let app = processes.first(where: { !$0.isTerminated }), app.activate(options: []) else {
                 state.activationAvailable = false
                 state.status = .appUnavailable
+                report(.activated, outcome: .failed)
                 return
             }
             state.status = .activated
+            report(.activated, outcome: .succeeded)
         }
     }
 
@@ -144,6 +151,7 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
         NSPasteboard.general.clearContents()
         let written = NSPasteboard.general.writeObjects(state.documents.urls.map { $0 as NSURL })
         state.status = written ? .copied : .copyFailed
+        report(.copied, outcome: written ? .succeeded : .failed)
     }
 
     private func open(_ reference: ApplicationReference) {
@@ -174,7 +182,14 @@ final class WindowFileHandoffController: NSObject, NSWindowDelegate {
             state.failures = failures
             state.status = .openResult(submitted: submitted, total: documents.urls.count)
             task = nil
+            report(.opened, outcome: submitted == documents.urls.count ? .succeeded : submitted == 0 ? .failed : .partial)
         }
+    }
+
+    /// Counts and outcomes only. The files, the app, and the window title are never reported.
+    private func report(_ action: AnalyticsFileHandoffAction, outcome: AnalyticsOutcome) {
+        Analytics.track(.fileHandoff(action, fileCount: state?.documents.urls.count ?? 0, exactWindow: exactWindow,
+                                     outcome: outcome))
     }
 
     func windowWillClose(_ notification: Notification) { stop() }
