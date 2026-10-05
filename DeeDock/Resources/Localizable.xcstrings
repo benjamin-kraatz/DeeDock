@@ -5341,7 +5341,7 @@
       }
     },
     "bossFightTimeRemaining" : {
-      "comment" : "Accessible timer value; argument is the remaining time formatted as minutes:seconds.",
+      "comment" : "Accessible timer value; argument is the remaining time spoken in words.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {

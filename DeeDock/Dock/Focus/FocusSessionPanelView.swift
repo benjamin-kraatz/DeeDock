@@ -14,6 +14,8 @@ struct FocusSessionPanelView: View {
     let close: () -> Void
     var forceOpaqueBackground = false
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    /// Stable start for the one-second timeline. Recreating the schedule from `.now` on each accessibility refresh would skip ticks.
+    @State private var timelineAnchor = Date()
 
     var body: some View {
         ScrollView {
@@ -27,7 +29,7 @@ struct FocusSessionPanelView: View {
                 if let session = controller.session {
                     Text(verbatim: session.modeName).font(.title2.bold()).lineLimit(2)
                     if session.phase == .running {
-                        TimelineView(.periodic(from: .now, by: 1)) { context in time(session, date: context.date) }
+                        TimelineView(.periodic(from: timelineAnchor, by: 1)) { context in time(session, date: context.date) }
                     } else { time(session, date: .now) }
                     if controller.bossVictoryID != nil {
                         Text(.bossFightVictory).font(.headline)
@@ -71,11 +73,12 @@ struct FocusSessionPanelView: View {
         }
     }
 
+    /// VoiceOver reads the same whole seconds as the digits, spelled out. The visible label stays numeric.
     private func timerLabel(_ session: FocusSession, date: Date) -> Text {
-        guard controller.bossFight.enabled else { return Text(verbatim: session.timeLabel(at: date)) }
+        guard controller.bossFight.enabled else { return Text(verbatim: session.spokenRemaining(at: date)) }
         return session.phase == .completed
             ? Text(.focusCompleted)
-            : Text(.bossFightTimeRemaining(session.timeLabel(at: date)))
+            : Text(.bossFightTimeRemaining(session.spokenRemaining(at: date)))
     }
 }
 
