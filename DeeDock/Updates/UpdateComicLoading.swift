@@ -4,7 +4,9 @@ import Foundation
 ///
 /// Remote fetches start only at GitHub Releases, the releases index of the GitHub API, or
 /// `raw.githubusercontent.com` for `benjamin-kraatz/DeeDock`. Redirects may continue onto `githubusercontent.com`
-/// hosts so a release asset can resolve. Local `file` URLs are for previews and tests.
+/// hosts so a release asset can resolve. A local comic document is for previews and tests.
+/// A remote comic never accepts a `file` image. A local comic accepts one only when the
+/// standardized, symlink-resolved path stays inside that document's directory.
 nonisolated enum UpdateComicResourcePolicy {
     nonisolated static let githubOwner = "benjamin-kraatz"
     nonisolated static let githubRepository = "DeeDock"
@@ -23,7 +25,10 @@ nonisolated enum UpdateComicResourcePolicy {
         return URL(string: "https://github.com/\(githubOwner)/\(githubRepository)/releases/download/v\(version)/\(notesMarkdownName)")
     }
 
-    /// Accepts an explicit first-hop URL the app chose, or a local file.
+    /// Accepts an explicit first-hop URL the app chose, or a credential-free local file.
+    ///
+    /// File URLs here are the comic document itself. Panel images go through `imageCandidates`,
+    /// which drops every `file` URL for a remote comic and keeps a local one inside that comic's directory.
     nonisolated static func allowsInitial(_ url: URL) -> Bool {
         if url.isFileURL { return url.user == nil && url.password == nil }
         return allowsGitHubSource(url)
@@ -44,6 +49,9 @@ nonisolated enum UpdateComicResourcePolicy {
     }
 
     /// Relative art path against the comic document, plus a same-directory `panel-0N.png` fallback.
+    ///
+    /// A remote document keeps the GitHub allowlist and drops every `file` URL, including an absolute
+    /// `file` image that ignores this base. A local document keeps a `file` image only inside its directory.
     nonisolated static func imageCandidates(path: String, documentURL: URL) -> [URL] {
         let trimmed = path.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
@@ -58,9 +66,36 @@ nonisolated enum UpdateComicResourcePolicy {
         }
         var seen = Set<String>()
         return candidates.filter { url in
-            guard allowsInitial(url), seen.insert(url.absoluteString).inserted else { return false }
+            guard allowsImage(url, documentURL: documentURL),
+                  seen.insert(url.absoluteString).inserted else { return false }
             return true
         }
+    }
+
+    /// Remote images use `allowsInitial`. File images require a local comic and directory containment.
+    nonisolated private static func allowsImage(_ url: URL, documentURL: URL) -> Bool {
+        guard url.isFileURL else { return allowsInitial(url) }
+        guard documentURL.isFileURL, url.user == nil, url.password == nil else { return false }
+        if let host = url.host?.lowercased(), !host.isEmpty, host != "localhost" { return false }
+        let directory = containmentComponents(of: documentURL.deletingLastPathComponent())
+        let image = containmentComponents(of: url)
+        // Whole components, so `/comic-evil` is not inside `/comic`. A leftover `..` fails closed.
+        // The filesystem root would otherwise contain every absolute path.
+        guard directory.count > 1, image.count > directory.count,
+              !directory.contains(".."), !image.contains(".."),
+              !directory.contains("."), !image.contains(".") else { return false }
+        return zip(directory, image).allSatisfy { $0 == $1 }
+    }
+
+    /// Standardized, symlink-resolved components of a file URL.
+    ///
+    /// Symlinks are resolved before standardization so a link inside the comic directory cannot
+    /// point at a path that leaves it. An empty trailing component is dropped so a directory URL
+    /// and its no-slash form share one prefix.
+    nonisolated private static func containmentComponents(of url: URL) -> [String] {
+        var components = url.resolvingSymlinksInPath().standardizedFileURL.pathComponents
+        if components.last?.isEmpty == true { components.removeLast() }
+        return components
     }
 
     nonisolated static func isPanelFilename(_ name: String) -> Bool {
