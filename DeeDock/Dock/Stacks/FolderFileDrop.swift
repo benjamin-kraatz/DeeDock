@@ -50,8 +50,7 @@ enum FolderFileDrop {
                     for source in sources.urls {
                         let canonical = source.resolvingSymlinksInPath().standardizedFileURL
                         let output = target.appendingPathComponent(source.lastPathComponent)
-                        guard target != canonical,
-                              !target.path.hasPrefix(canonical.path + "/"),
+                        guard !target.isSameOrDescendant(of: canonical),
                               names.insert(source.lastPathComponent).inserted,
                               !manager.fileExists(atPath: output.path) else {
                             throw CocoaError(.fileWriteFileExists)
