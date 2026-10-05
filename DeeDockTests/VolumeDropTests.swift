@@ -2,8 +2,9 @@ import Foundation
 import Testing
 @testable import DeeDock
 
-/// File drops onto a drive: copy keeps the source, Shift-move removes it, and existing files on the
-/// drive are never replaced.
+/// File drops onto a drive: copy keeps the source, Shift-move removes it, and an existing destination
+/// name refuses the whole batch before anything is written. On a case-insensitive volume, two names
+/// in one batch that differ only by case count as that clash.
 @MainActor
 struct VolumeDropTests {
     private func temporaryDirectory() throws -> URL {
@@ -53,5 +54,40 @@ struct VolumeDropTests {
         #expect(await transfer([file], to: drive, move: true) != nil)
         #expect(FileManager.default.fileExists(atPath: file.path))
         #expect(try Data(contentsOf: drive.appendingPathComponent("report.pdf")) == Data("old".utf8))
+    }
+
+    @Test("Case-only names in one batch follow the volume, and a clash moves nothing")
+    func caseOnlyNamesInOneBatch() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        // Separate directories: a case-insensitive volume cannot hold both names in one folder.
+        let upperDir = root.appendingPathComponent("upper")
+        let lowerDir = root.appendingPathComponent("lower")
+        let drive = root.appendingPathComponent("drive")
+        for directory in [upperDir, lowerDir, drive] {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        let notes = upperDir.appendingPathComponent("Notes.txt")
+        let notesLower = lowerDir.appendingPathComponent("notes.txt")
+        try Data("U".utf8).write(to: notes)
+        try Data("L".utf8).write(to: notesLower)
+        let sensitive = (try? drive.resourceValues(forKeys: [.volumeSupportsCaseSensitiveNamesKey]))?
+            .volumeSupportsCaseSensitiveNames == true
+
+        let error = await transfer([notes, notesLower], to: drive, move: true)
+
+        if sensitive {
+            #expect(error == nil)
+            #expect(!FileManager.default.fileExists(atPath: notes.path))
+            #expect(!FileManager.default.fileExists(atPath: notesLower.path))
+            #expect(try Data(contentsOf: drive.appendingPathComponent("Notes.txt")) == Data("U".utf8))
+            #expect(try Data(contentsOf: drive.appendingPathComponent("notes.txt")) == Data("L".utf8))
+        } else {
+            #expect(error != nil)
+            #expect(try Data(contentsOf: notes) == Data("U".utf8))
+            #expect(try Data(contentsOf: notesLower) == Data("L".utf8))
+            #expect(!FileManager.default.fileExists(atPath: drive.appendingPathComponent("Notes.txt").path))
+            #expect(!FileManager.default.fileExists(atPath: drive.appendingPathComponent("notes.txt").path))
+        }
     }
 }
