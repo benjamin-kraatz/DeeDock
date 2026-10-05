@@ -57,8 +57,13 @@ nonisolated struct FocusSession: Codable, Equatable, Identifiable, Sendable {
         formatter.unitsStyle = .spellOut
         formatter.allowedUnits = zero ? [.second] : [.hour, .minute, .second]
         formatter.zeroFormattingBehavior = zero ? .pad : .dropAll
-        formatter.locale = locale
-        formatter.calendar = calendar
+        // `DateComponentsFormatter` has no `locale`. The calendar carries it. Leave the calendar unset
+        // on the shared formatters so VoiceOver follows the user's current locale.
+        if locale != nil || calendar != nil {
+            var resolved = calendar ?? Calendar(identifier: .gregorian)
+            if let locale { resolved.locale = locale }
+            formatter.calendar = resolved
+        }
         return formatter
     }
 
