@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import DeeDock
 
-/// Folder containment after symlink resolution. Each test uses its own temporary directory.
+/// Folder containment. Resolving tests use a temporary directory. The lexical test does not.
 nonisolated struct FileURLContainmentTests {
     private func makeRoot() throws -> URL {
         let root = FileManager.default.temporaryDirectory
@@ -52,6 +52,19 @@ nonisolated struct FileURLContainmentTests {
         #expect(!sibling.isSameOrDescendant(of: folder))
         #expect(!folder.isSameOrDescendant(of: sibling))
         #expect(!child.isSameOrDescendant(of: sibling))
+    }
+
+    @Test("Lexical containment folds case, keeps /a/bc outside /a/b, and accepts a trailing slash")
+    func lexicalContainment() {
+        let folder = URL(fileURLWithPath: "/a/b", isDirectory: true)
+        let slashed = URL(fileURLWithPath: "/a/b/", isDirectory: true)
+        let otherCase = URL(fileURLWithPath: "/A/B", isDirectory: true)
+        let sibling = URL(fileURLWithPath: "/a/bc", isDirectory: true)
+        #expect(slashed.isSameOrDescendant(of: folder, resolvingSymlinks: false))
+        #expect(folder.isSameOrDescendant(of: slashed, resolvingSymlinks: false))
+        #expect(otherCase.isSameOrDescendant(of: folder, resolvingSymlinks: false))
+        #expect(!sibling.isSameOrDescendant(of: folder, resolvingSymlinks: false))
+        #expect(!folder.isSameOrDescendant(of: sibling, resolvingSymlinks: false))
     }
 
     @Test("A symlink resolves to the same folder as its target")

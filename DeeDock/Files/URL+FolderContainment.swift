@@ -3,17 +3,43 @@ import Foundation
 nonisolated extension URL {
     /// Whether this file URL is `folder` or a descendant of it.
     ///
-    /// Both URLs are symlink-resolved, then standardized. The check walks path components, so
-    /// `/a/bc` is not inside `/a/b`. Components follow the folder volume's
-    /// `volumeSupportsCaseSensitiveNames`, reading the nearest existing parent when the path
-    /// itself is missing. If that resource cannot be read at all, comparison folds case, matching
-    /// the default APFS volume.
-    func isSameOrDescendant(of folder: URL) -> Bool {
-        let child = resolvingSymlinksInPath().standardizedFileURL.folderContainmentComponents
-        let parentURL = folder.resolvingSymlinksInPath().standardizedFileURL
-        let parent = parentURL.folderContainmentComponents
+    /// The check walks path components, so `/a/bc` is not inside `/a/b`.
+    ///
+    /// - Parameter resolvingSymlinks: When `true` (the default), both URLs are symlink-resolved,
+    ///   then standardized, and components follow the folder volume's
+    ///   `volumeSupportsCaseSensitiveNames`. A missing path uses the nearest existing parent.
+    ///   If that resource cannot be read, comparison folds case, matching the default APFS volume.
+    ///   When `false`, components are standardized lexically and compared without case. That path
+    ///   does not call `standardizedFileURL`, resolve symlinks, or read volume attributes.
+    ///   `standardizedFileURL` can still consult the file system for `..` and a `/private` prefix.
+    ///   `close(within:)` uses the lexical path on the main thread while a volume is unmounting.
+    func isSameOrDescendant(of folder: URL, resolvingSymlinks: Bool = true) -> Bool {
+        if resolvingSymlinks {
+            let parentURL = folder.resolvingSymlinksInPath().standardizedFileURL
+            return Self.components(resolvingSymlinksInPath().standardizedFileURL.folderContainmentComponents,
+                                    havePrefix: parentURL.folderContainmentComponents,
+                                    caseSensitive: parentURL.volumeReportsCaseSensitiveNames)
+        }
+        return Self.components(lexicalFolderContainmentComponents,
+                                havePrefix: folder.lexicalFolderContainmentComponents,
+                                caseSensitive: false)
+    }
+
+    /// Drops `.` and empty pieces and collapses `..` using only the URL string.
+    private var lexicalFolderContainmentComponents: [String] {
+        var components: [String] = []
+        for component in pathComponents where component != "." && !component.isEmpty {
+            if component == ".." {
+                if components.count > 1 { components.removeLast() }
+                continue
+            }
+            components.append(component)
+        }
+        return components
+    }
+
+    private static func components(_ child: [String], havePrefix parent: [String], caseSensitive: Bool) -> Bool {
         guard child.count >= parent.count else { return false }
-        let caseSensitive = parentURL.volumeReportsCaseSensitiveNames
         return zip(parent, child).allSatisfy { lhs, rhs in
             caseSensitive ? lhs == rhs : lhs.caseInsensitiveCompare(rhs) == .orderedSame
         }
