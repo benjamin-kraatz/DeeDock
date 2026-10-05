@@ -151,7 +151,15 @@ nonisolated enum VolumeScanner {
 /// that stalls only the read; on the cooperative pool it would hold one of the few threads every
 /// task in the app shares.
 nonisolated enum VolumeReads {
-    private static let queue = DispatchQueue(label: "DeeDock.VolumeReads", qos: .utility, attributes: .concurrent)
+    private static let token = DispatchSpecificKey<UInt8>()
+    private static let queue: DispatchQueue = {
+        let queue = DispatchQueue(label: "DeeDock.VolumeReads", qos: .utility, attributes: .concurrent)
+        queue.setSpecific(key: token, value: 1)
+        return queue
+    }()
+
+    /// True while a `run` closure is executing. Scope started there is released on this queue.
+    static var isCurrent: Bool { DispatchQueue.getSpecific(key: token) == 1 }
 
     /// Returns `read`'s result. Cancelling the caller does not interrupt a read in progress.
     static func run<Value: Sendable>(qos: DispatchQoS = .utility,
@@ -159,5 +167,10 @@ nonisolated enum VolumeReads {
         await withCheckedContinuation { continuation in
             queue.async(qos: qos) { continuation.resume(returning: read()) }
         }
+    }
+
+    /// Schedules `work` on the volume-read queue without waiting for it.
+    static func enqueue(_ work: @escaping @Sendable () -> Void) {
+        queue.async(execute: work)
     }
 }

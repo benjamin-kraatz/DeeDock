@@ -8,6 +8,11 @@ final class FolderStackPanelController {
     let state: FolderStackState
     private let popover: DockPopoverPanelController<FolderStackView>
     private let keyboard: Bool
+    private var reveal: Task<Void, Never>?
+    private var itemOpen: Task<Void, Never>?
+    private var dismissed = false
+    /// Runs after the window is ordered front, so a cancelled open is not treated as shown.
+    var appeared: (() -> Void)?
     var closed: ((Bool) -> Void)? {
         get { popover.closed }
         set { popover.closed = newValue }
@@ -23,7 +28,13 @@ final class FolderStackPanelController {
         } content: {
             FolderStackView(state: state, keyboard: keyboard)
         }
-        popover.willClose = { [weak state] in state?.stop() }
+        popover.willClose = { [weak self] in
+            guard let self else { return }
+            dismissed = true
+            reveal?.cancel()
+            itemOpen?.cancel()
+            state.stop()
+        }
         popover.enableFileDrops()
         popover.dragEntered = { [weak state] info in
             guard let state, state.preview == nil else { return [] }
@@ -44,9 +55,22 @@ final class FolderStackPanelController {
     }
 
     func show() {
-        if keyboard { state.selectedID = state.entries.first?.id }
-        popover.show()
+        dismissed = false
         state.start()
+        reveal?.cancel()
+        reveal = Task { [weak self] in
+            guard let self else { return }
+            // The window stays hidden until bookmark resolution, the directory check, and the
+            // watch have returned. A close during that wait must not order the panel front.
+            guard await state.waitUntilOpen(), !Task.isCancelled, !dismissed else {
+                if !dismissed { close(returnFocus: false) }
+                return
+            }
+            if keyboard { state.selectedID = state.entries.first?.id }
+            popover.show()
+            appeared?()
+            appeared = nil
+        }
     }
 
     func update(_ anchor: DockPopoverAnchor) { popover.update(anchor) }
@@ -62,16 +86,27 @@ final class FolderStackPanelController {
             state.report(String(localized: .quarantineBlocked)) { }
             return
         }
-        guard FileManager.default.fileExists(atPath: entry.url.path) else {
-            state.report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.open(entry) }
-            return
+        let path = entry.url.path
+        let trigger = Analytics.trigger()
+        itemOpen?.cancel()
+        itemOpen = Task { [weak self] in
+            let exists = await VolumeReads.run { FileManager.default.fileExists(atPath: path) }
+            guard let self, !Task.isCancelled else { return }
+            guard exists else {
+                state.report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.open(entry) }
+                return
+            }
+            self.finishOpen(entry, trigger: trigger)
         }
+    }
+
+    private func finishOpen(_ entry: FolderStackEntryReference, trigger: AnalyticsTrigger) {
         if entry.isFolder {
-            Analytics.track(.stackItemOpened(fileType: .folder, isFolder: true, trigger: Analytics.trigger()))
+            Analytics.track(.stackItemOpened(fileType: .folder, isFolder: true, trigger: trigger))
             state.navigate(to: entry.url)
         } else if NSWorkspace.shared.open(entry.url) {
             Analytics.track(.stackItemOpened(fileType: AnalyticsFileType(url: entry.url), isFolder: false,
-                                             trigger: Analytics.trigger()))
+                                             trigger: trigger))
             close(returnFocus: false)
         } else {
             state.report(String(localized: .folderStackOpenFailed(itemName: entry.name))) { [weak self] in self?.open(entry) }

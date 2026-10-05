@@ -2,6 +2,15 @@ import AppKit
 import Observation
 import UniformTypeIdentifiers
 
+/// Bookmark resolution, the directory check, and the directory watch for one stack open.
+/// All three can block in the kernel, so this is built on `VolumeReads`.
+nonisolated private struct FolderStackOpening: Sendable {
+    let access: FolderResourceAccess
+    let isDirectory: Bool
+    let monitor: FolderDirectoryMonitor?
+    let refreshedBookmark: Data?
+}
+
 @MainActor @Observable
 final class FolderStackState {
     let folder: FolderReference
@@ -69,7 +78,15 @@ final class FolderStackState {
     @ObservationIgnored private var metricsTask: Task<Void, Never>?
     @ObservationIgnored private var mediaTask: Task<Void, Never>?
     @ObservationIgnored private var debounceTask: Task<Void, Never>?
+    @ObservationIgnored private var openTask: Task<Bool, Never>?
+    @ObservationIgnored private var monitorTask: Task<Void, Never>?
+    @ObservationIgnored private var previewTask: Task<Void, Never>?
     @ObservationIgnored private var monitor: FolderDirectoryMonitor?
+    /// Distinguishes a directory-watch install from a listing reload. `reload` changes `generation`.
+    @ObservationIgnored private var monitorToken = UUID()
+    @ObservationIgnored private var pendingDrop: PendingDrop?
+    /// Persists a refreshed security-scoped bookmark. False aborts the open before the panel appears.
+    @ObservationIgnored var bookmarkRefresh: ((Data) -> Bool)?
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var semanticGeneration = UUID()
     @ObservationIgnored private var semanticTask: Task<Void, Never>?
@@ -100,21 +117,76 @@ final class FolderStackState {
     }
 
     func start() {
+        openTask?.cancel()
+        openTask = Task { [weak self] in await self?.openRoot() ?? false }
+    }
+
+    /// Waits for ``start()``. False when that open was cancelled or the refreshed bookmark could not be saved.
+    func waitUntilOpen() async -> Bool {
+        await openTask?.value ?? false
+    }
+
+    /// Resolves the bookmark, checks the directory, and creates the watch on `VolumeReads`.
+    /// The panel stays hidden until this returns. A close during the read discards the watch.
+    private func openRoot() async -> Bool {
+        guard !Task.isCancelled else { return false }
+        let token = UUID()
+        generation = token
         loadTask?.cancel(); loadTask = nil
         metricsTask?.cancel(); metricsTask = nil
         mediaTask?.cancel(); mediaTask = nil
+        previewTask?.cancel(); previewTask = nil
+        monitorTask?.cancel(); monitorTask = nil
+        monitorToken = UUID()
         monitor?.stop(); monitor = nil
         access = nil
-        let access = FolderResourceAccess(folder)
-        self.access = access
-        guard access.isAvailable else {
-            report(String(localized: .folderStackUnavailable)) { [weak self] in self?.start() }
-            return
+        let folder = folder
+        let changed = watchHandler()
+        let opened = await VolumeReads.run { Self.opening(folder, changed: changed) }
+        guard !Task.isCancelled, generation == token else {
+            opened.monitor?.stop()
+            return false
         }
-        directory = access.url
+        if let bookmark = opened.refreshedBookmark {
+            let saved = bookmarkRefresh?(bookmark) ?? true
+            guard !Task.isCancelled, generation == token else {
+                opened.monitor?.stop()
+                return false
+            }
+            guard saved else {
+                opened.monitor?.stop()
+                flushPendingDrop(available: false)
+                return false
+            }
+        }
+        access = opened.access
+        guard opened.isDirectory else {
+            loading = false
+            flushPendingDrop(available: false)
+            report(String(localized: .folderStackUnavailable)) { [weak self] in self?.start() }
+            return true
+        }
+        directory = opened.access.url
         history = []
-        installMonitor(for: directory)
+        monitor = opened.monitor
         reload()
+        flushPendingDrop(available: true)
+        return true
+    }
+
+    /// Runs on `VolumeReads`. Security scope starts there with the bookmark resolution.
+    nonisolated private static func opening(_ folder: FolderReference,
+                                            changed: @escaping @Sendable () -> Void) -> FolderStackOpening {
+        let access = FolderResourceAccess(folder)
+        guard access.isAvailable else {
+            return FolderStackOpening(access: access, isDirectory: false, monitor: nil, refreshedBookmark: nil)
+        }
+        let refreshed = access.bookmarkIsStale ? try? access.url.bookmarkData(
+            options: [.withSecurityScope, .securityScopeAllowOnlyReadAccess],
+            includingResourceValuesForKeys: nil, relativeTo: nil) : nil
+        return FolderStackOpening(access: access, isDirectory: true,
+                                  monitor: FolderDirectoryMonitor(url: access.url, changed: changed),
+                                  refreshedBookmark: refreshed)
     }
 
     func reload() {
@@ -246,6 +318,7 @@ final class FolderStackState {
         // A query belongs to the listing it was typed against, never to the folder opened next.
         query = ""
         searchFocused = false
+        previewTask?.cancel()
         debounceTask?.cancel()
         cancelSemanticOrganization(clearError: true)
         installMonitor(for: url)
@@ -266,12 +339,20 @@ final class FolderStackState {
     }
 
     private func showPreview(_ entry: FolderStackEntryReference, access: FolderResourceAccess) {
-        guard FileManager.default.fileExists(atPath: entry.url.path) else {
-            report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.reload() }
-            return
+        let path = entry.url.path
+        let token = generation
+        let trigger = Analytics.trigger()
+        previewTask?.cancel()
+        previewTask = Task { [weak self] in
+            let exists = await VolumeReads.run { FileManager.default.fileExists(atPath: path) }
+            guard let self, !Task.isCancelled, generation == token else { return }
+            guard exists else {
+                report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.reload() }
+                return
+            }
+            preview = DockFilePreviewItem(url: entry.url, leases: [access])
+            Analytics.track(.stackQuickLook(fileType: AnalyticsFileType(url: entry.url), trigger: trigger))
         }
-        preview = DockFilePreviewItem(url: entry.url, leases: [access])
-        Analytics.track(.stackQuickLook(fileType: AnalyticsFileType(url: entry.url), trigger: Analytics.trigger()))
     }
 
     /// What a drop here does: copy, or move with Shift in a volume stack. Empty while busy.
@@ -296,17 +377,50 @@ final class FolderStackState {
     func receive(_ info: NSDraggingInfo, into url: URL? = nil, target: AnalyticsDropTarget = .stack) -> Bool {
         let operation = dropOperation(info)
         dropTargetChanged(nil, destination: "")
-        guard !operation.isEmpty, let urls = FolderFileDrop.urls(info), let access else { return false }
+        guard !operation.isEmpty, let urls = FolderFileDrop.urls(info) else { return false }
         let destination = url ?? directory
         guard destination == rootURL || destination == directory || history.contains(destination) || entries.contains(where: {
             $0.reference.url == destination && $0.reference.isFolder
         }) else { return false }
+        guard let access else {
+            // A tile drop arrives in the same turn as `start`, before the volume read returns.
+            guard openTask != nil else { return false }
+            pendingDrop = PendingDrop(urls: urls, destination: destination, move: operation == .move, target: target)
+            receivedDrop = true
+            return true
+        }
+        beginCopy(urls, to: destination, move: operation == .move, target: target, access: access)
+        return true
+    }
+
+    private struct PendingDrop {
+        let urls: [URL]
+        let destination: URL
+        let move: Bool
+        let target: AnalyticsDropTarget
+    }
+
+    /// A drop queued before the folder was resolved copies into the resolved root, not the stale path.
+    private func flushPendingDrop(available: Bool) {
+        guard let pending = pendingDrop else { return }
+        pendingDrop = nil
+        guard available, let access else {
+            copyFailed?(String(localized: .folderStackUnavailable))
+            return
+        }
+        let destination = pending.destination.standardizedFileURL == folder.url.standardizedFileURL
+            ? access.url : pending.destination
+        beginCopy(pending.urls, to: destination, move: pending.move, target: pending.target, access: access)
+    }
+
+    private func beginCopy(_ urls: [URL], to destination: URL, move: Bool, target: AnalyticsDropTarget,
+                           access: FolderResourceAccess) {
         receivedDrop = true
         copying = true
         let failure = copyFailed
         let fileType = AnalyticsFileType.common(of: urls)
-        FolderFileDrop.copy(urls, to: destination, lease: access, move: operation == .move) { [weak self] error in
-            Analytics.track(.stackDrop(operation == .move ? .move : .copy, itemCount: urls.count, fileType: fileType,
+        FolderFileDrop.copy(urls, to: destination, lease: access, move: move) { [weak self] error in
+            Analytics.track(.stackDrop(move ? .move : .copy, itemCount: urls.count, fileType: fileType,
                                        target: target, outcome: error == nil ? .succeeded : .failed))
             self?.copying = false
             self?.reload()
@@ -315,7 +429,6 @@ final class FolderStackState {
                 self?.report(error) { [weak self] in self?.reload() }
             }
         }
-        return true
     }
 
     /// Reorders loaded metadata without reloading icons or losing the selected file.
@@ -518,10 +631,28 @@ final class FolderStackState {
         }
     }
 
+    private func watchHandler() -> @Sendable () -> Void {
+        { [weak self] in
+            Task { @MainActor [weak self] in self?.scheduleReload() }
+        }
+    }
+
+    /// `open` on the watched path can stall, so the descriptor is created on `VolumeReads`.
     private func installMonitor(for url: URL) {
         monitor?.stop()
-        monitor = FolderDirectoryMonitor(url: url) { [weak self] in
-            Task { @MainActor [weak self] in self?.scheduleReload() }
+        monitor = nil
+        monitorToken = UUID()
+        let token = monitorToken
+        let changed = watchHandler()
+        monitorTask?.cancel()
+        monitorTask = Task { [weak self] in
+            let installed = await VolumeReads.run { FolderDirectoryMonitor(url: url, changed: changed) }
+            guard let self, !Task.isCancelled, monitorToken == token else {
+                installed?.stop()
+                return
+            }
+            monitor?.stop()
+            monitor = installed
         }
     }
 
@@ -640,16 +771,22 @@ final class FolderStackState {
 
     func stop() {
         generation = UUID()
+        monitorToken = UUID()
+        openTask?.cancel(); openTask = nil
         loadTask?.cancel(); loadTask = nil
         metricsTask?.cancel(); metricsTask = nil
         mediaTask?.cancel(); mediaTask = nil
+        previewTask?.cancel(); previewTask = nil
         debounceTask?.cancel(); debounceTask = nil
+        monitorTask?.cancel(); monitorTask = nil
         monitor?.stop(); monitor = nil
+        pendingDrop = nil
         cancelSemanticOrganization(clearError: true)
         access = nil
         retryAction = nil
         preview = nil
         copyFailed = nil
+        bookmarkRefresh = nil
         sortChanged = nil
         openEntry = nil; stageOnShelf = nil; presentationChanged = nil; dragCompleted = nil
     }

@@ -100,6 +100,18 @@ struct FolderStackTests {
         #expect(try DockPinImporter.kind(of: link) == .other)
     }
 
+    @Test("Stopping an open before it resumes does not publish a listing")
+    @MainActor func stopBeforeOpenPublishesNothing() async throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let state = FolderStackState(folder: FolderReference(url: root, name: "Root", bookmarkData: Data()))
+        state.start()
+        state.stop()
+        await waitUntil { !state.entries.isEmpty || state.error != nil }
+        #expect(state.entries.isEmpty)
+        #expect(state.error == nil)
+    }
+
     @Test("A folder listing is visible before file icons, and a stale fill does not replace it")
     @MainActor func listingPublishesBeforeFileIcons() async throws {
         let root = try temporaryDirectory()
