@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import UniformTypeIdentifiers
 
 @MainActor @Observable
 final class FolderStackState {
@@ -74,17 +75,21 @@ final class FolderStackState {
     @ObservationIgnored private var semanticTask: Task<Void, Never>?
     @ObservationIgnored private let organizer: any SemanticStackOrganizing
     @ObservationIgnored private let mediaCache: FolderStackMediaCache
+    /// Per-file icon lookup. Tests pass a loader that suspends; production asks `NSWorkspace`.
+    @ObservationIgnored private let resolveFileIcon: @MainActor (String) async -> NSImage
 
     init(folder: FolderReference, entries: [FolderStackEntry] = [], loading: Bool = false,
          error: String? = nil, accessDenial: FolderStackAccessDenial? = nil,
          sort: FolderStackSort = .alphabetical,
          organizer: any SemanticStackOrganizing = UnavailableSemanticStackOrganizer(),
-         mediaCache: FolderStackMediaCache = .shared) {
+         mediaCache: FolderStackMediaCache = .shared,
+         resolveFileIcon: (@MainActor (String) async -> NSImage)? = nil) {
         self.sort = sort
         self.folder = folder
         directory = folder.url
         self.organizer = organizer
         self.mediaCache = mediaCache
+        self.resolveFileIcon = resolveFileIcon ?? Self.workspaceIcon
         presentation = folder.presentation
         self.entries = entries.sorted { sort.precedes($0.reference, $1.reference) }
         self.loading = loading
@@ -138,12 +143,10 @@ final class FolderStackState {
                 )
                 guard !Task.isCancelled, generation == token else { return }
                 entries = references.map { reference in
-                    let icon = NSWorkspace.shared.icon(forFile: reference.url.path)
-                    icon.size = NSSize(width: 128, height: 128)
                     let contents = cacheHits[reference.id]
                     return FolderStackEntry(
                         reference: contents.map(reference.withContents) ?? reference,
-                        icon: icon
+                        icon: Self.placeholderIcon(for: reference)
                     )
                 }
                 entries.sort { self.sort.precedes($0.reference, $1.reference) }
@@ -156,11 +159,69 @@ final class FolderStackState {
                 refreshSemanticOrganization()
                 refreshContentsMetrics()
                 enrichMedia(from: references, access: access, token: token)
+                await fillIcons(token: token)
             case .failure(let error):
                 report(error.localizedDescription) { [weak self] in self?.reload() }
                 accessDenial = FolderStackAccessDenial(error)
             }
+            // A reload already replaced `loadTask`. Clearing it here would drop that newer listing.
+            guard !Task.isCancelled, generation == token else { return }
             loadTask = nil
+        }
+    }
+
+    /// Point size requested from `NSWorkspace` so a filled icon matches the previous listing.
+    private static let iconSize = NSSize(width: 128, height: 128)
+    /// File-icon lookups between yields. Small enough that clicks, drags, and drawing can run.
+    private static let iconBatchSize = 16
+    /// One sized type icon per UTI. Copying leaves the workspace's shared image unchanged.
+    private static var placeholderIcons: [String: NSImage] = [:]
+
+    /// Default `icon(forFile:)` lookup. The loader type is async so tests can suspend; this call does not.
+    private static func workspaceIcon(_ path: String) async -> NSImage {
+        let icon = NSWorkspace.shared.icon(forFile: path)
+        icon.size = iconSize
+        return icon
+    }
+
+    /// A folder or UTI icon. `icon(forFile:)` is the per-child lookup that stalls a large stack.
+    private static func placeholderIcon(for reference: FolderStackEntryReference) -> NSImage {
+        let key = reference.isFolder ? UTType.folder.identifier : (reference.contentType ?? UTType.item.identifier)
+        if let cached = placeholderIcons[key] { return cached }
+        let type = reference.isFolder ? UTType.folder : (reference.contentType.flatMap { UTType($0) } ?? .item)
+        let icon = (NSWorkspace.shared.icon(for: type).copy() as? NSImage) ?? NSImage(size: iconSize)
+        icon.size = iconSize
+        placeholderIcons[key] = icon
+        return icon
+    }
+
+    /// Fills file icons after the listing is already visible.
+    ///
+    /// The lookup stays on the main actor: `NSImage` is not `Sendable`, so doing it off-main would
+    /// still hop back to publish. Each batch yields so the dock can draw and take clicks. `stop()`
+    /// and `reload()` cancel this task and change `generation`; a stale batch returns without writing.
+    private func fillIcons(token: UUID) async {
+        guard !entries.isEmpty else { return }
+        await Task.yield()
+        guard !Task.isCancelled, generation == token else { return }
+        let pending = entries.map { (id: $0.id, path: $0.reference.url.path) }
+        var offset = 0
+        while offset < pending.count {
+            guard !Task.isCancelled, generation == token else { return }
+            let end = min(offset + Self.iconBatchSize, pending.count)
+            var icons: [String: NSImage] = [:]
+            icons.reserveCapacity(end - offset)
+            for item in pending[offset..<end] {
+                guard !Task.isCancelled, generation == token else { return }
+                icons[item.id] = await resolveFileIcon(item.path)
+            }
+            guard !Task.isCancelled, generation == token else { return }
+            entries = entries.map { entry in
+                guard let icon = icons[entry.id] else { return entry }
+                return FolderStackEntry(reference: entry.reference, icon: icon)
+            }
+            offset = end
+            if offset < pending.count { await Task.yield() }
         }
     }
 

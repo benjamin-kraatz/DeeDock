@@ -84,6 +84,7 @@ final class DiscoveryController {
     }
 
     func setEnabled(_ enabled: Bool) {
+        Analytics.shared.featureSettingChanged(.discoveryEnabled, from: AnalyticsValue(engine.enabled), to: AnalyticsValue(enabled))
         engine.setEnabled(enabled)
         closePanel()
         refresh()

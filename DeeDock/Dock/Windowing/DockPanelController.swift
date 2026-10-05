@@ -654,7 +654,7 @@ final class DockPanelController {
             dockWindow: geometry?.windowFrame ?? origin,
             pins: store.pins.compactMap(\.application), previousApplication: previousApplication)
         Analytics.track(.launcherOpened(files != nil ? .fileDrop : store.keyboardFocus ? .keyboard : .tile,
-                                        fileCount: 0))
+                                        fileCount: files?.inputs.count ?? 0))
         if let files { launcher.adoptFiles(files) }
     }
 

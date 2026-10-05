@@ -191,8 +191,10 @@ final class FusionState {
         guard !isBusy, let draft, draft.isValid, savedURL == nil else { return }
         error = nil
         activity = .saving
+        let startedAt = Date()
         task = Task { [weak self] in
             guard let self else { return }
+            defer { report(.save, failure: savedURL == nil ? .saveFailed : nil, operation: nil, since: startedAt) }
             do {
                 let url = try await artifacts.write(draft)
                 do {
@@ -278,20 +280,29 @@ final class FusionState {
         attempt = id
         self.activity = activity
         error = nil
+        let step: AnalyticsFusionStep = activity == .generating ? .generate : .capture
+        let reportedOperation = activity == .generating ? self.operation : nil
+        let startedAt = Date()
         task = Task { [weak self] in
             await previous?.value
             guard let self, !Task.isCancelled, attempt == id else { return }
-            do { try await operation() }
+            do {
+                try await operation()
+                report(step, failure: nil, operation: reportedOperation, since: startedAt)
+            }
             catch is CancellationError { }
             catch {
                 guard !Task.isCancelled, attempt == id else { return }
+                let failure: FusionFailure
                 if let capture = error as? WindowContextCaptureError {
-                    self.error = (capture == .permissionRequired ? FusionFailure.captureDenied : .captureFailed).localizedDescription
-                } else if let failure = error as? FusionFailure {
-                    self.error = failure.localizedDescription
+                    failure = capture == .permissionRequired ? .captureDenied : .captureFailed
+                } else if let fusionFailure = error as? FusionFailure {
+                    failure = fusionFailure
                 } else {
-                    self.error = (activity == .generating ? FusionFailure.invalidOutput : .captureFailed).localizedDescription
+                    failure = activity == .generating ? .invalidOutput : .captureFailed
                 }
+                self.error = failure.localizedDescription
+                report(step, failure: failure, operation: reportedOperation, since: startedAt)
             }
             guard !Task.isCancelled, attempt == id else { return }
             self.activity = nil
@@ -303,7 +314,16 @@ final class FusionState {
             guard let self, !Task.isCancelled, attempt == id else { return }
             cancelWork()
             error = FusionFailure.timeout.localizedDescription
+            report(step, failure: .timeout, operation: reportedOperation, since: startedAt)
         }
+    }
+
+    /// One finished step. Cancelled work is not reported; captured text never leaves this type.
+    private func report(_ step: AnalyticsFusionStep, failure: FusionFailure?, operation: FusionOperation?,
+                        since startedAt: Date) {
+        Analytics.track(.fusion(step, outcome: failure == nil ? .succeeded : .failed,
+                                failure: failure.map(AnalyticsFusionFailure.init), operation: operation,
+                                duration: Date().timeIntervalSince(startedAt)))
     }
 }
 

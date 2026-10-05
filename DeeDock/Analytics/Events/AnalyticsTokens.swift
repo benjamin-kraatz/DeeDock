@@ -31,3 +31,4 @@ extension UpdatePhase: AnalyticsToken {}
 extension UpdateAction: AnalyticsToken {}
 extension UpdateOffer.Stage: AnalyticsToken {}
 extension UpdateIslandAnnouncement.Kind: AnalyticsToken {}
+extension SettingsPage: AnalyticsToken {}

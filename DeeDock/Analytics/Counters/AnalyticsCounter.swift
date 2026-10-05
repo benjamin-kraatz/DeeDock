@@ -20,6 +20,8 @@ enum AnalyticsCounter: Hashable {
     case appActivated(AnalyticsTrigger)
     /// A soap-bubble burst played.
     case soapBubbleBurst
+    /// A collapsed app group was expanded or collapsed by click, keyboard, or VoiceOver.
+    case dockGroupToggled(expanded: Bool)
 
     /// The property name in `usage_summary`.
     var key: String {
@@ -31,6 +33,7 @@ enum AnalyticsCounter: Hashable {
         case .dragToEjectArmed: "drag_to_eject_armed"
         case let .appActivated(trigger): "app_activated_\(trigger.rawValue)"
         case .soapBubbleBurst: "soap_bubble_burst"
+        case let .dockGroupToggled(expanded): expanded ? "dock_group_expanded" : "dock_group_collapsed"
         }
     }
 }

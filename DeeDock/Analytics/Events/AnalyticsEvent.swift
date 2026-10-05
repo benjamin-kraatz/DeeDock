@@ -13,6 +13,18 @@ enum AnalyticsEvent {
     case settingChanged(AnalyticsSettingChange, area: AnalyticsSettingArea, display: AnalyticsDisplayRole?)
     /// Counter totals and per-display counts, sent about once a day and at quit.
     case usageSummary(AnalyticsProperties)
+    /// A Settings section or page came on screen. `page` is nil for a section's overview.
+    case settingsViewed(AnalyticsSettingsSection, page: SettingsPage?, via: AnalyticsSettingsNavigation,
+                        display: AnalyticsDisplayRole?)
+
+    // App, permissions, and displays
+    case permissionRequested(AnalyticsPermission)
+    /// macOS reported a different status than DOKK last saw while running.
+    case permissionChanged(AnalyticsPermission, status: AnalyticsPermissionStatus)
+    case loginItemChanged(AnalyticsLoginItemOperation, outcome: AnalyticsOutcome, status: AnalyticsLoginItem)
+    /// Displays were connected or disconnected. The counts describe the arrangement afterwards.
+    case displaysChanged(connected: Int, disconnected: Int, newProfileCount: Int, displayCount: Int,
+                         externalDisplayCount: Int, dockCount: Int)
 
     // Onboarding
     case onboardingStepReached(OnboardingStep, index: Int)
@@ -44,6 +56,17 @@ enum AnalyticsEvent {
                       hasRegion: Bool)
     case watchDetected(AnalyticsWatchDetection, duration: Double, checkCount: Int)
     case watchEnded(AnalyticsWatchEnd, duration: Double, checkCount: Int)
+    case portal(AnalyticsPortalAction, outcome: AnalyticsOutcome?)
+    case portalClosed(duration: Double, frameCount: Int, frozen: Bool, cropped: Bool)
+    case fileHandoff(AnalyticsFileHandoffAction, fileCount: Int, exactWindow: Bool, outcome: AnalyticsOutcome)
+
+    // Window Search and Fusion
+    case windowSearchActivated(AnalyticsWindowSearchEvidence, scope: WindowSearchScope, queryLength: Int,
+                               resultCount: Int, outcome: AnalyticsOutcome)
+    case windowSearchClosed(scope: WindowSearchScope, queryLength: Int, resultCount: Int, activated: Bool,
+                            duration: Double)
+    case fusion(AnalyticsFusionStep, outcome: AnalyticsOutcome, failure: AnalyticsFusionFailure?,
+                operation: FusionOperation?, duration: Double)
 
     // Launcher
     case launcherOpened(AnalyticsLauncherSource, fileCount: Int)
@@ -54,10 +77,15 @@ enum AnalyticsEvent {
     case launcherFileAction(LauncherFileActionKind, inputCount: Int, source: LauncherFileSource,
                             fileType: AnalyticsFileType?, status: AnalyticsFileOperationStatus)
     case launcherAssistantAsked(queryLength: Int, resultCount: Int, outcome: AnalyticsOutcome)
+    /// The Launcher closed. `hadQuery` is whether search text was present at that moment.
+    case launcherClosed(duration: Double, hadQuery: Bool)
+    case launcherSuggestionsShown(count: Int)
+    case launcherSuggestionFeedback(AnalyticsSuggestionFeedback)
+    case launcherSuggestionPromptAnswered(AnalyticsSuggestionPromptAnswer)
 
     // Dock Modes
     case modeSwitched(AnalyticsModeSource, modeCount: Int)
-    case modeEdited(AnalyticsModeEdit, modeCount: Int)
+    case modeEdited(AnalyticsModeEdit, modeCount: Int, stepCount: Int? = nil)
     case workspacePrepared(stepCount: Int, completedStepCount: Int, outcome: AnalyticsRecipeOutcome, duration: Double)
     case workspaceRecipeStarted
     case workspaceRecipeCompleted
@@ -72,6 +100,14 @@ enum AnalyticsEvent {
     case driveEjected(VolumeKind, outcome: AnalyticsEjectOutcome, forced: Bool, blockerCount: Int,
                       trigger: AnalyticsTrigger)
     case pinChanged(AnalyticsPinAction, kind: AnalyticsPinKind, count: Int, source: AnalyticsPinSource)
+
+    // App tiles
+    case appMenuAction(AnalyticsAppMenuAction, outcome: AnalyticsOutcome, trigger: AnalyticsTrigger)
+    /// Documents were handed to an app from its tile. A cancelled picker reports `canceled`.
+    case documentsOpened(AnalyticsDocumentSource, fileCount: Int, fileType: AnalyticsFileType?,
+                         outcome: AnalyticsOutcome)
+    case shortcutRun(AnalyticsShortcutSource, fileCount: Int, outcome: AnalyticsOutcome, duration: Double)
+    case shortcutTile(AnalyticsShortcutTileAction, tileCount: Int)
 
     // Tools and personality features
     case appMelt(AnalyticsAppMeltAction, pairCount: Int, outcome: AnalyticsOutcome)
