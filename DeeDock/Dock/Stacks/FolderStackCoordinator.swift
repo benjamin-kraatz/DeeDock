@@ -144,10 +144,7 @@ final class FolderStackCoordinator {
     /// Closes the stack when it shows `url` or anything inside it. Its directory watcher holds the
     /// folder open, which would make an unmount of that volume fail.
     func close(within url: URL) {
-        let root = url.standardizedFileURL.path
-        guard let folderURL else { return }
-        let path = folderURL.path
-        guard path == root || path.hasPrefix(root.hasSuffix("/") ? root : root + "/") else { return }
+        guard let folderURL, folderURL.isSameOrDescendant(of: url) else { return }
         close(returnFocus: false)
     }
 
