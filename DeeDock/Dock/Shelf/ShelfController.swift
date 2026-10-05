@@ -90,6 +90,7 @@ final class ShelfController {
         let previous = sort
         sort = value
         do { try commit(items) } catch { sort = previous; throw error }
+        Analytics.shared.featureSettingChanged(.shelfSort, from: AnalyticsValue(previous), to: AnalyticsValue(value))
     }
 
     func setPresentation(_ value: ShelfPresentation) throws {
@@ -97,6 +98,8 @@ final class ShelfController {
         let previous = presentation
         presentation = value
         do { try commit(items) } catch { presentation = previous; throw error }
+        Analytics.shared.featureSettingChanged(.shelfPresentation, from: AnalyticsValue(previous),
+                                               to: AnalyticsValue(value))
     }
 
     // MARK: - Editing
@@ -188,10 +191,13 @@ final class ShelfController {
 
     /// Applies a visible rule and its first aging pass in one persisted update.
     func setCompostPolicy(_ policy: ShelfCompostPolicy) throws {
+        let previous = compostPolicy
         var next = document(items)
         next.compostPolicy = policy
         next.compostAgedItems(at: now())
         try commit(next)
+        Analytics.shared.featureSettingChanged(.shelfCompostDays, from: AnalyticsValue(previous.rawValue),
+                                               to: AnalyticsValue(policy.rawValue))
     }
 
     /// Restores even unavailable files as references. A full Shelf leaves the archive untouched.

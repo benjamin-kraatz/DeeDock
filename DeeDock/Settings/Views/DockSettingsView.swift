@@ -31,6 +31,7 @@ struct DockSettingsView: View {
             SettingsSidebar(selection: Binding(get: { selection }, set: {
                 path = []
                 selection = $0
+                report($0, page: nil, via: .sidebar)
             }), searchText: $searchText, profiles: profiles)
                 .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 300)
         } detail: {
@@ -91,7 +92,7 @@ struct DockSettingsView: View {
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 760, idealWidth: 880, minHeight: 560, idealHeight: 680)
         .onChange(of: profiles.document.profiles.keys.sorted()) { _, ids in
-            if case .display(let id) = selection, !ids.contains(id) { select(.dock) }
+            if case .display(let id) = selection, !ids.contains(id) { select(.dock, reporting: false) }
         }
     }
 
@@ -147,7 +148,21 @@ struct DockSettingsView: View {
         }
     }
 
-    private func open(_ page: SettingsPage) { path.append(page) }
+    private func open(_ page: SettingsPage) {
+        path.append(page)
+        report(selection, page: page, via: .overview)
+    }
+
+    /// Which part of Settings people visit. A display is reported by role, never by name.
+    private func report(_ section: SettingsSection?, page: SettingsPage?, via: AnalyticsSettingsNavigation) {
+        guard let section else { return }
+        // A remembered display that is not connected has no role, so it is sent without one.
+        var display: AnalyticsDisplayRole?
+        if case .display(let id) = section {
+            display = profiles.displays.first { $0.id == id }.map { $0.isPrimary ? .main : .secondary }
+        }
+        Analytics.track(.settingsViewed(AnalyticsSettingsSection(section), page: page, via: via, display: display))
+    }
 
     /// A page the build or this machine cannot offer is left out of its overview entirely.
     private func isAvailable(_ page: SettingsPage) -> Bool {
@@ -199,11 +214,12 @@ struct DockSettingsView: View {
     }
 
     /// A request from outside the window always lands where it was asked for, never mid-navigation.
-    private func select(_ section: SettingsSection, page: SettingsPage? = nil) {
+    private func select(_ section: SettingsSection, page: SettingsPage? = nil, reporting: Bool = true) {
         searchText = ""
         selection = section
         // Set both together so external requests can open a specific destination.
         path = page.map { [$0] } ?? []
+        if reporting { report(section, page: page, via: .request) }
     }
 
     private func updateDisplayIndicator(active: Bool? = nil) {

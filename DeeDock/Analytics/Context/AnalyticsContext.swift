@@ -43,6 +43,8 @@ struct AnalyticsContextInputs {
     var sharedSettings: DockSettings = .defaults
     var modeCount = 1
     var loginItem: LoginItemStatus = .unknown
+    var accessibility: AnalyticsPermissionStatus = .unavailable
+    var screenRecording: AnalyticsPermissionStatus = .unavailable
     /// Whether the macOS Dock has released its desktop space.
     var systemDockHidden = false
     /// Nil in builds that do not update themselves.
@@ -68,6 +70,8 @@ enum AnalyticsContext {
             "dock_mode_count": AnalyticsValue(inputs.modeCount),
             "system_dock_hidden": AnalyticsValue(inputs.systemDockHidden),
             "login_item": AnalyticsValue(AnalyticsLoginItem(inputs.loginItem)),
+            "accessibility_access": AnalyticsValue(inputs.accessibility),
+            "screen_recording_access": AnalyticsValue(inputs.screenRecording),
             "updates_check_automatically": inputs.updates.map { AnalyticsValue($0.checksAutomatically) },
             "updates_install_automatically": inputs.updates.map { AnalyticsValue($0.installsAutomatically) },
             "updates_install_when_idle": inputs.updates.map { AnalyticsValue($0.installsWhenIdle) },

@@ -107,12 +107,14 @@ final class LauncherSuggestionsStore {
     func setEnabled(_ value: Bool) {
         guard !value || !storageUnavailable else { return }
         guard value != enabled else { return }
+        Analytics.shared.featureSettingChanged(.launcherSuggestionsEnabled, from: AnalyticsValue(enabled), to: AnalyticsValue(value))
         enabled = value
         invalidate(); savePreferences()
     }
 
     func setPaused(_ value: Bool) {
         guard value != paused else { return }
+        Analytics.shared.featureSettingChanged(.launcherSuggestionsPaused, from: AnalyticsValue(paused), to: AnalyticsValue(value))
         paused = value
         invalidate(); savePreferences()
     }
@@ -181,7 +183,10 @@ final class LauncherSuggestionsStore {
     }
 #endif
 
-    func setPromptsEnabled(_ value: Bool) { promptsEnabled = value; savePreferences() }
+    func setPromptsEnabled(_ value: Bool) {
+        Analytics.shared.featureSettingChanged(.launcherSuggestionPromptsEnabled, from: AnalyticsValue(promptsEnabled), to: AnalyticsValue(value))
+        promptsEnabled = value; savePreferences()
+    }
     func suppressPrompts() { setPromptsEnabled(false) }
 
     func exclude(appID: String) {
@@ -275,6 +280,7 @@ final class LauncherSuggestionsStore {
         guard canSuggest(appID: appID, snapshot: snapshot), contextIsEligible(snapshot.context) else { return }
         document.feedback.append(.init(date: now, appID: appID, kind: kind, context: snapshot.context, modelVersion: snapshot.modelVersion))
         persist()
+        Analytics.track(.launcherSuggestionFeedback(AnalyticsSuggestionFeedback(kind)))
     }
 
     func recordImpression(snapshot: LauncherSuggestionSnapshot, appIDs: [String]) {
@@ -286,6 +292,7 @@ final class LauncherSuggestionsStore {
         document.impressions.append(.init(id: snapshot.id, date: now, appIDs: ids, context: snapshot.context, modelVersion: snapshot.modelVersion))
         promptRevision &+= 1
         persist()
+        Analytics.track(.launcherSuggestionsShown(count: ids.count))
     }
 
     var shouldPrompt: Bool {
@@ -300,6 +307,7 @@ final class LauncherSuggestionsStore {
         guard isActive else { return }
         document.promptAnswers.append(.init(date: Date(), useful: useful))
         promptRevision &+= 1; persist()
+        Analytics.track(.launcherSuggestionPromptAnswered(AnalyticsSuggestionPromptAnswer(useful)))
     }
 
     func beginSession(foregroundID: String?, runningIDs: [String], now: Date = Date()) {

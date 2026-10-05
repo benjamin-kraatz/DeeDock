@@ -35,7 +35,7 @@ struct DockDocumentRequestTests {
         let reference = dock.items[0].reference
         var access: DocumentResourceAccess? = DocumentResourceAccess([URL(fileURLWithPath: "/fixture/document")])
         weak var lease = access
-        dock.openDocuments(access!, with: reference)
+        dock.openDocuments(access!, with: reference, source: .drop)
         access = nil
         await service.waitForRequests(1)
         dock.stop()
@@ -88,7 +88,7 @@ struct DockDocumentRequestTests {
         let service = DocumentFixtureService()
         let catalog = ApplicationCatalog(service: service)
         let dock = makeDock(catalog)
-        dock.openDocuments(DocumentResourceAccess([URL(fileURLWithPath: "/fixture/document")]), with: dock.items[0].reference)
+        dock.openDocuments(DocumentResourceAccess([URL(fileURLWithPath: "/fixture/document")]), with: dock.items[0].reference, source: .drop)
         await service.waitForRequests(1)
         service.finishAll()
         await service.waitForReturns(1)

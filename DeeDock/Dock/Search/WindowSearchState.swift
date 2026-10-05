@@ -35,6 +35,8 @@ final class WindowSearchState {
     @ObservationIgnored private var imageResults: [WindowSearchResult] = []
     @ObservationIgnored private var capturedSources: [CGWindowID: WindowSearchSource] = [:]
     @ObservationIgnored private var stopped = false
+    @ObservationIgnored private let openedAt = Date()
+    @ObservationIgnored private var activatedResult = false
 
     init(capsules: SessionCapsuleController) { self.capsules = capsules }
 
@@ -177,6 +179,7 @@ final class WindowSearchState {
     func activate(_ result: WindowSearchResult) {
         if let id = result.capsuleID {
             openedCapsule = capsules.capsules.first { $0.id == id }
+            reportActivation(result, succeeded: openedCapsule != nil)
             if openedCapsule == nil { message = .windowSearchStale; rank() }
             return
         }
@@ -189,9 +192,11 @@ final class WindowSearchState {
             do {
                 try await service.activate(source)
                 guard accepts(generation) else { return }
+                reportActivation(result, succeeded: true)
                 activated?()
             } catch {
                 guard accepts(generation) else { return }
+                reportActivation(result, succeeded: false)
                 busy = false; message = .windowSearchStale
                 // Selection consumes an AX session; refresh before another exact-window attempt.
             }
@@ -205,10 +210,23 @@ final class WindowSearchState {
     }
 
     func stop() {
+        if !stopped {
+            Analytics.track(.windowSearchClosed(scope: scope, queryLength: query.count, resultCount: results.count,
+                                                activated: activatedResult,
+                                                duration: Date().timeIntervalSince(openedAt)))
+        }
         stopped = true; clearCaptured(); ranking?.cancel(); ranking = nil; results = []; sources = []
         openedCapsule = nil; query = ""; close = nil; activated = nil
         let service = service
         Task { await service.stop() }
+    }
+
+    /// Reports why the chosen result matched and how specific the search was, never its text.
+    private func reportActivation(_ result: WindowSearchResult, succeeded: Bool) {
+        if succeeded { activatedResult = true }
+        Analytics.track(.windowSearchActivated(AnalyticsWindowSearchEvidence(result.evidence), scope: scope,
+                                               queryLength: query.count, resultCount: results.count,
+                                               outcome: succeeded ? .succeeded : .failed))
     }
 
     private func setDeadline() {

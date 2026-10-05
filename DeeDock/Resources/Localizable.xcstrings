@@ -688,19 +688,19 @@
       }
     },
     "analyticsCollectedSystem" : {
-      "comment" : "List item: usage data includes the macOS version, the Mac model, and display resolutions.",
+      "comment" : "List item: usage data includes the macOS version, the Mac model, display resolutions, and whether the app has the Accessibility and Screen Recording permissions. Use the System Settings names for both permissions.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS-Version, Mac-Modell und Displaygrößen"
+            "value" : "macOS-Version, Mac-Modell, Displaygrößen und ob DOKK Zugriff auf Bedienungshilfen und Bildschirmaufnahme hat"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS version, Mac model, and display sizes"
+            "value" : "macOS version, Mac model, display sizes, and whether DOKK has Accessibility and Screen Recording access"
           }
         }
       }

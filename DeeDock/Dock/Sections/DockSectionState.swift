@@ -28,6 +28,7 @@ final class DockSectionState {
         guard visibility.collapsedGroup != nil else { return }
         cancelDwell()
         expanded.toggle()
+        Analytics.count(.dockGroupToggled(expanded: expanded))
         didChange?()
     }
 

@@ -20,7 +20,7 @@ struct ActionTilesSettingsCard: View {
                     if controller.statuses[tile.id]?.busy == true {
                         Button(.actionCancel) { controller.cancel(tile.id) }
                     } else {
-                        Button(.actionsRun) { controller.run(tile.id) }
+                        Button(.actionsRun) { controller.run(tile.id, source: .settings) }
                     }
                     SettingsMoreMenu {
                         Toggle(isOn: Binding(get: { tile.acceptsFiles },
