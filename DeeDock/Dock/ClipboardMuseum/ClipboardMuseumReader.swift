@@ -94,17 +94,18 @@ nonisolated enum ClipboardImageEncoder {
     /// Runs ImageIO without touching AppKit, so it is safe off the main actor.
     ///
     /// - Returns: PNG bytes and pixel size after downsampling to
-    ///   ``ClipboardMuseumLimits/maximumImageDimension``, or nil for unreadable or oversized images.
+    ///   ``ClipboardMuseumLimits/maximumImageDimension``, or nil when the header is missing,
+    ///   non-positive, oversized, or the image cannot be read.
     static func png(from data: Data) -> (data: Data, width: Int, height: Int)? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil), CGImageSourceGetCount(source) > 0 else {
             return nil
         }
-        // Read the header before decoding so a huge frame is refused without allocating it.
-        if let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
-           let width = (properties[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue,
-           let height = (properties[kCGImagePropertyPixelHeight] as? NSNumber)?.intValue {
-            guard width > 0, height > 0, width * height <= ClipboardMuseumLimits.maximumImagePixels else { return nil }
-        }
+        // Refuse before thumbnail creation. Division matches ShelfClipboardArtifacts.write:
+        // width * height traps when each header dimension fits in Int but the product does not.
+        guard let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let width = (properties[kCGImagePropertyPixelWidth] as? NSNumber)?.intValue,
+              let height = (properties[kCGImagePropertyPixelHeight] as? NSNumber)?.intValue,
+              fitsPixelCap(width: width, height: height) else { return nil }
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
@@ -120,5 +121,14 @@ nonisolated enum ClipboardImageEncoder {
         CGImageDestinationAddImage(destination, image, nil)
         guard CGImageDestinationFinalize(destination) else { return nil }
         return (output as Data, image.width, image.height)
+    }
+
+    /// True when both dimensions are positive and their area is within
+    /// ``ClipboardMuseumLimits/maximumImagePixels``.
+    ///
+    /// `height` is checked before the division. A zero height would trap, and multiplying
+    /// the two `Int` values traps when each fits but the product does not.
+    static func fitsPixelCap(width: Int, height: Int) -> Bool {
+        width > 0 && height > 0 && width <= ClipboardMuseumLimits.maximumImagePixels / height
     }
 }
