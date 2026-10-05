@@ -6,7 +6,7 @@ Discovery suggests unused capabilities using local signals. **Settings → Featu
 
 `DiscoveryProposal.catalog` owns each recipe's signal, threshold, calm interval, localized copy, destination, and snooze interval. v0 ships one recipe: three observed clipboard changes followed by at least five seconds without another observed change suggest Clipboard Museum.
 
-The queue is FIFO and deduplicated by proposal ID. Only its first proposal is considered, so a snoozed or uncalm head also holds later entries. The first presentation can happen as soon as its calm window and native gates permit it. Each actual presentation starts a 69-second cadence. Subsequent opportunities occur at 69-second intervals; blocked slots are skipped, and delayed timer delivery never produces a catch-up burst. Actual presentation time restarts the cadence so timer delays cannot shorten minimum spacing. These intervals are lower bounds, subject to main-run-loop delivery.
+The queue is FIFO and deduplicated by proposal ID. `advance` presents the first entry that is past its snooze and whose calm interval has elapsed. A snoozed entry stays in the queue and becomes eligible again when the snooze ends. The first presentation can happen as soon as its calm window and native gates permit it. Each actual presentation starts a 69-second cadence. An advance that shows nothing leaves that cadence where it is. Presentation time restarts the cadence, so a late timer keeps the 69-second minimum and does not release a catch-up burst. These intervals are lower bounds, subject to main-run-loop delivery.
 
 There is one panel globally, with caps of two presentations per process session and three per local calendar day. Daily counts and the most recent presentation time persist across launches. The queue and signal counts do not persist. Disabling Discovery clears pending signals and the queue while retaining usage, dismissals, snoozes, and caps.
 
@@ -34,7 +34,7 @@ File-drop tips for Throw or Window Peek, heavy-use Launcher tips, Modes tips, an
 
 - With an unused Museum and capture off, copy three separate items. Confirm no callout before five seconds after the last observed change. Confirm the CTA opens Museum without enabling capture.
 - Snooze, dismiss forever, open Museum independently, and toggle Discovery. Confirm persistence across relaunch and no stacked panels.
-- With a second injected catalog recipe, confirm FIFO ordering, blocked 69-second slots, minimum presentation spacing, and session and daily caps. No second production recipe is enabled merely for validation.
+- With a second injected catalog recipe, confirm the first eligible tip shows, a snoozed tip keeps its queue place, a refused advance leaves the 69-second slot in place, and session and daily caps still hold. No second production recipe is enabled merely for validation.
 - Exercise drag, menus, sheets, file pickers, Focus Sessions, sleep, screen lock, Spaces, fullscreen windows, and monitor removal while a proposal is queued and visible.
 - Check German copy, keyboard access and Escape, VoiceOver, Reduce Transparency, and display layouts with negative origins. Confirm presentation does not steal focus.
 
