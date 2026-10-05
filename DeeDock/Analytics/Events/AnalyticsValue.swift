@@ -232,7 +232,8 @@ extension Optional: AnalyticsOptional {
 
 // MARK: - Setting changes
 
-/// One changed setting, produced only by comparing two versions of a settings model.
+/// One changed setting, produced by comparing two versions of a settings model or, for a
+/// preference outside those models, from an ``AnalyticsFeatureSetting`` key.
 nonisolated struct AnalyticsSettingChange: Equatable, Sendable {
     /// The reflected property name, such as `icon_size` or `behavior_auto_hide`.
     fileprivate let key: String
@@ -242,6 +243,17 @@ nonisolated struct AnalyticsSettingChange: Equatable, Sendable {
 
     /// Identifies the setting when consecutive edits are folded into one event.
     var identity: String { key }
+
+    private init(key: String, oldValue: AnalyticsValue?, newValue: AnalyticsValue?) {
+        self.key = key
+        self.oldValue = oldValue
+        self.newValue = newValue
+    }
+
+    /// A change to one feature preference. The key is a closed token, so no text can pass here.
+    init(_ setting: AnalyticsFeatureSetting, from oldValue: AnalyticsValue, to newValue: AnalyticsValue) {
+        self.init(key: setting.rawValue, oldValue: oldValue, newValue: newValue)
+    }
 
     var properties: AnalyticsProperties {
         ["key": AnalyticsValue(token: key), "old_value": oldValue, "new_value": newValue]

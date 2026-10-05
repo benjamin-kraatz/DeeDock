@@ -29,6 +29,8 @@ extension DeeDockDelegate {
         inputs.sharedSettings = profiles.effectiveDefaultSettings
         inputs.modeCount = profiles.modes.modes.count
         inputs.loginItem = loginItems.status
+        inputs.accessibility = AnalyticsPermissionStatus(windowAccess.status)
+        inputs.screenRecording = AnalyticsPermissionStatus(screenCapture.status)
         inputs.systemDockHidden = SystemDockReservation.reservedEdge(
             in: NSScreen.screens.map { ($0.frame, $0.visibleFrame) }) == nil
         inputs.updates = AnalyticsContextInputs.Updates(

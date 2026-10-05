@@ -65,7 +65,11 @@ struct AppMeltSetupView: View {
                 if state.accessEnabled {
                     Label(.meltAccessGranted, systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                 } else {
-                    Button(.meltEnableAccess) { SystemWindowAccessService().requestAccess(); state.refreshAccess() }
+                    Button(.meltEnableAccess) {
+                        Analytics.track(.permissionRequested(.accessibility))
+                        SystemWindowAccessService().requestAccess()
+                        state.refreshAccess()
+                    }
                 }
                 Spacer()
                 Button(.meltLaunch) { state.launchAndRefresh() }

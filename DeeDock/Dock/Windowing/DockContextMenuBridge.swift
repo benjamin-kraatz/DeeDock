@@ -230,7 +230,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         @objc private func showBadgeMemory() {
             guard let item else { return }
             let action = interaction?.openBadgeMemory
-            DispatchQueue.main.async { action?(item) }
+            DispatchQueue.main.async { Analytics.performing(.menu) { action?(item) } }
         }
 
         @objc private func startMelt() {
@@ -244,7 +244,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         @objc private func openFiles() {
             guard let item, item.isAvailable else { return }
             let action = interaction?.openFiles
-            DispatchQueue.main.async { action?(item) }
+            DispatchQueue.main.async { Analytics.performing(.menu) { action?(item) } }
         }
 
         @objc private func showInFinder() { perform(.showInFinder) }
@@ -263,7 +263,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         private func perform(_ action: ApplicationMenuAction) {
             guard let item else { return }
             let handler = interaction?.performApplicationMenuAction
-            DispatchQueue.main.async { handler?(action, item) }
+            DispatchQueue.main.async { Analytics.performing(.menu) { handler?(action, item) } }
         }
 
         @objc private func changePin() { Analytics.performing(.menu) { togglePin?() } }
@@ -272,7 +272,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         @objc private func copyPinToDisplay(_ sender: NSMenuItem) {
             if let item, let id = sender.representedObject as? String { interaction?.copyPin?(.application(item.reference), id) }
         }
-        @objc private func showSettings() { openSettings?() }
+        @objc private func showSettings() { Analytics.performing(.menu) { openSettings?() } }
 
         @objc private func feedSims() { careSims(.feed) }
         @objc private func cheerSims() { careSims(.cheer) }
