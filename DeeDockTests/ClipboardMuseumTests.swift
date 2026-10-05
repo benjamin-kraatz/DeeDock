@@ -374,4 +374,30 @@ struct ClipboardMuseumTests {
         #expect(capture.payload == .link(URL(string: "https://example.com/a")!))
         #expect(ClipboardMuseumReader.link("see https://example.com") == nil)
     }
+
+    @Test("The pixel cap uses division so hostile dimensions cannot overflow")
+    func pixelCapAvoidsOverflow() {
+        let cap = ClipboardMuseumLimits.maximumImagePixels
+        #expect(ClipboardImageEncoder.fitsPixelCap(width: cap, height: 1))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: cap + 1, height: 1))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: 0, height: 8))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: 8, height: 0))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: -1, height: 8))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: Int.max, height: Int.max))
+        #expect(!ClipboardImageEncoder.fitsPixelCap(width: Int.max, height: 2))
+    }
+
+    @Test("A hostile or empty image header is refused, and a one-pixel image is kept")
+    func imageHeaderGuard() throws {
+        // IHDR only. Declared size is UInt32.max by UInt32.max; the file is a few dozen bytes.
+        let bomb = try #require(Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUv//////////CAIAAABdlLlpAAAAAElFTkSuQmCC"))
+        let zeroWidth = try #require(Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAAAAAAICAIAAABYumkoAAAAAElFTkSuQmCC"))
+        let pixel = try #require(Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"))
+        #expect(ClipboardImageEncoder.png(from: bomb) == nil)
+        #expect(ClipboardImageEncoder.png(from: zeroWidth) == nil)
+        #expect(ClipboardImageEncoder.png(from: Data()) == nil)
+        let encoded = try #require(ClipboardImageEncoder.png(from: pixel))
+        #expect(encoded.width == 1 && encoded.height == 1)
+        #expect(encoded.data.count < 1_024)
+    }
 }

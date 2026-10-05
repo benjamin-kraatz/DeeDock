@@ -2,6 +2,15 @@ import AppKit
 import Observation
 import UniformTypeIdentifiers
 
+/// Bookmark resolution, the directory check, and the directory watch for one stack open.
+/// Built on `VolumeReads` because each of those calls can block in the kernel.
+nonisolated private struct FolderStackOpening: Sendable {
+    let access: FolderResourceAccess
+    let isDirectory: Bool
+    let monitor: FolderDirectoryMonitor?
+    let refreshedBookmark: Data?
+}
+
 @MainActor @Observable
 final class FolderStackState {
     let folder: FolderReference
@@ -69,7 +78,19 @@ final class FolderStackState {
     @ObservationIgnored private var metricsTask: Task<Void, Never>?
     @ObservationIgnored private var mediaTask: Task<Void, Never>?
     @ObservationIgnored private var debounceTask: Task<Void, Never>?
+    @ObservationIgnored private var openTask: Task<Bool, Never>?
+    @ObservationIgnored private var monitorTask: Task<Void, Never>?
+    @ObservationIgnored private var previewTask: Task<Void, Never>?
     @ObservationIgnored private var monitor: FolderDirectoryMonitor?
+    /// Distinguishes a directory-watch install from a listing reload. `reload` changes `generation`.
+    @ObservationIgnored private var monitorToken = UUID()
+    @ObservationIgnored private var pendingDrop: PendingDrop?
+    /// Set by `stop` so a cancelled open can still copy a drop without publishing the panel.
+    @ObservationIgnored private var stopped = false
+    /// Suspends after the volume read and before publish. Tests close the stack in that window.
+    @ObservationIgnored var pauseOpen: (() async -> Void)?
+    /// Persists a refreshed security-scoped bookmark. False aborts the open before the panel appears.
+    @ObservationIgnored var bookmarkRefresh: ((Data) -> Bool)?
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var semanticGeneration = UUID()
     @ObservationIgnored private var semanticTask: Task<Void, Never>?
@@ -100,21 +121,74 @@ final class FolderStackState {
     }
 
     func start() {
-        loadTask?.cancel(); loadTask = nil
-        metricsTask?.cancel(); metricsTask = nil
-        mediaTask?.cancel(); mediaTask = nil
-        monitor?.stop(); monitor = nil
-        access = nil
-        let access = FolderResourceAccess(folder)
-        self.access = access
-        guard access.isAvailable else {
-            report(String(localized: .folderStackUnavailable)) { [weak self] in self?.start() }
-            return
+        stopped = false
+        openTask?.cancel()
+        openTask = Task { [weak self] in await self?.openRoot() ?? false }
+    }
+
+    /// Waits for ``start()``. False when that open was cancelled or the refreshed bookmark could not be saved.
+    func waitUntilOpen() async -> Bool {
+        await openTask?.value ?? false
+    }
+
+    /// Resolves the folder on `VolumeReads`. The panel stays hidden until this returns.
+    /// A close during the read still copies an accepted drop and does not publish the listing.
+    private func openRoot() async -> Bool {
+        let shelved = Task.isCancelled || stopped
+        guard !shelved || pendingDrop != nil else { return false }
+        let token = UUID()
+        if !shelved {
+            generation = token
+            loadTask?.cancel(); loadTask = nil
+            metricsTask?.cancel(); metricsTask = nil
+            mediaTask?.cancel(); mediaTask = nil
+            previewTask?.cancel(); previewTask = nil
+            monitorTask?.cancel(); monitorTask = nil
+            monitorToken = UUID()
+            monitor?.stop(); monitor = nil
+            access = nil
         }
-        directory = access.url
+        let folder = folder
+        let changed = watchHandler()
+        let opened = await VolumeReads.run { Self.opening(folder, changed: changed) }
+        if let pauseOpen { await pauseOpen() }
+        var closed = shelved || Task.isCancelled || stopped || generation != token
+        if !closed, let bookmark = opened.refreshedBookmark {
+            let saved = bookmarkRefresh?(bookmark) ?? true
+            closed = !saved || Task.isCancelled || stopped || generation != token
+        }
+        guard !closed else {
+            opened.monitor?.stop()
+            deliverPendingDrop(opened, listing: false)
+            return false
+        }
+        access = opened.access
+        guard opened.isDirectory else {
+            loading = false
+            deliverPendingDrop(opened, listing: false)
+            report(String(localized: .folderStackUnavailable)) { [weak self] in self?.start() }
+            return true
+        }
+        directory = opened.access.url
         history = []
-        installMonitor(for: directory)
+        monitor = opened.monitor
         reload()
+        deliverPendingDrop(opened, listing: true)
+        return true
+    }
+
+    nonisolated private static func opening(_ folder: FolderReference,
+                                            changed: @escaping @Sendable () -> Void) -> FolderStackOpening {
+        let access = FolderResourceAccess(folder)
+        guard access.isAvailable else {
+            return FolderStackOpening(access: access, isDirectory: false, monitor: nil, refreshedBookmark: nil)
+        }
+        let refreshed = access.bookmarkIsStale ? try? access.url.bookmarkData(
+            options: [.withSecurityScope, .securityScopeAllowOnlyReadAccess],
+            includingResourceValuesForKeys: nil, relativeTo: nil) : nil
+        return FolderStackOpening(access: access, isDirectory: true,
+                                  monitor: FolderDirectoryMonitor(url: access.url, changed: changed),
+                                  refreshedBookmark: refreshed)
     }
 
     func reload() {
@@ -246,6 +320,7 @@ final class FolderStackState {
         // A query belongs to the listing it was typed against, never to the folder opened next.
         query = ""
         searchFocused = false
+        previewTask?.cancel()
         debounceTask?.cancel()
         cancelSemanticOrganization(clearError: true)
         installMonitor(for: url)
@@ -266,12 +341,20 @@ final class FolderStackState {
     }
 
     private func showPreview(_ entry: FolderStackEntryReference, access: FolderResourceAccess) {
-        guard FileManager.default.fileExists(atPath: entry.url.path) else {
-            report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.reload() }
-            return
+        let path = entry.url.path
+        let trigger = Analytics.trigger()
+        previewTask?.cancel()
+        previewTask = Task { [weak self] in
+            let exists = await VolumeReads.run { FileManager.default.fileExists(atPath: path) }
+            // `reload` replaces `generation` but must not drop this preview. Navigation cancels the task.
+            guard let self, !Task.isCancelled else { return }
+            guard exists else {
+                report(String(localized: .folderStackItemUnavailable(itemName: entry.name))) { [weak self] in self?.reload() }
+                return
+            }
+            preview = DockFilePreviewItem(url: entry.url, leases: [access])
+            Analytics.track(.stackQuickLook(fileType: AnalyticsFileType(url: entry.url), trigger: trigger))
         }
-        preview = DockFilePreviewItem(url: entry.url, leases: [access])
-        Analytics.track(.stackQuickLook(fileType: AnalyticsFileType(url: entry.url), trigger: Analytics.trigger()))
     }
 
     /// What a drop here does: copy, or move with Shift in a volume stack. Empty while busy.
@@ -296,26 +379,69 @@ final class FolderStackState {
     func receive(_ info: NSDraggingInfo, into url: URL? = nil, target: AnalyticsDropTarget = .stack) -> Bool {
         let operation = dropOperation(info)
         dropTargetChanged(nil, destination: "")
-        guard !operation.isEmpty, let urls = FolderFileDrop.urls(info), let access else { return false }
-        let destination = url ?? directory
+        guard !operation.isEmpty, let urls = FolderFileDrop.urls(info) else { return false }
+        return accept(urls, into: url ?? directory, move: operation == .move, target: target)
+    }
+
+    /// Accepts a file drop without an `NSDraggingInfo`. A tile drop can arrive before the folder resolves.
+    func accept(_ urls: [URL], into destination: URL, move: Bool, target: AnalyticsDropTarget) -> Bool {
         guard destination == rootURL || destination == directory || history.contains(destination) || entries.contains(where: {
             $0.reference.url == destination && $0.reference.isFolder
         }) else { return false }
+        if let access {
+            beginCopy(urls, to: destination, move: move, target: target, access: access)
+            return true
+        }
+        guard !stopped, openTask != nil else { return false }
+        pendingDrop = PendingDrop(urls: urls, destination: destination, move: move, target: target, failed: copyFailed)
+        receivedDrop = true
+        return true
+    }
+
+    private struct PendingDrop {
+        let urls: [URL]
+        let destination: URL
+        let move: Bool
+        let target: AnalyticsDropTarget
+        /// Captured at accept time. `stop` clears `copyFailed` while the volume read is still running.
+        let failed: ((String) -> Void)?
+    }
+
+    /// Copies into the resolved root. `listing` is false when the panel will not appear.
+    private func deliverPendingDrop(_ opened: FolderStackOpening, listing: Bool) {
+        guard let pending = pendingDrop else { return }
+        pendingDrop = nil
+        guard opened.isDirectory else {
+            pending.failed?(String(localized: .folderStackUnavailable))
+            return
+        }
+        let destination = pending.destination.standardizedFileURL == folder.url.standardizedFileURL
+            ? opened.access.url : pending.destination
+        beginCopy(pending.urls, to: destination, move: pending.move, target: pending.target,
+                  access: opened.access, listing: listing, failed: pending.failed)
+    }
+
+    private func beginCopy(_ urls: [URL], to destination: URL, move: Bool, target: AnalyticsDropTarget,
+                           access: FolderResourceAccess, listing: Bool = true,
+                           failed: ((String) -> Void)? = nil) {
         receivedDrop = true
         copying = true
-        let failure = copyFailed
+        let failure = failed ?? copyFailed
         let fileType = AnalyticsFileType.common(of: urls)
-        FolderFileDrop.copy(urls, to: destination, lease: access, move: operation == .move) { [weak self] error in
-            Analytics.track(.stackDrop(operation == .move ? .move : .copy, itemCount: urls.count, fileType: fileType,
+        FolderFileDrop.copy(urls, to: destination, lease: access, move: move) { [weak self] error in
+            Analytics.track(.stackDrop(move ? .move : .copy, itemCount: urls.count, fileType: fileType,
                                        target: target, outcome: error == nil ? .succeeded : .failed))
             self?.copying = false
+            guard listing, self?.stopped == false else {
+                if let error { failure?(error) }
+                return
+            }
             self?.reload()
             if let error {
                 failure?(error)
                 self?.report(error) { [weak self] in self?.reload() }
             }
         }
-        return true
     }
 
     /// Reorders loaded metadata without reloading icons or losing the selected file.
@@ -518,10 +644,28 @@ final class FolderStackState {
         }
     }
 
+    private func watchHandler() -> @Sendable () -> Void {
+        { [weak self] in
+            Task { @MainActor [weak self] in self?.scheduleReload() }
+        }
+    }
+
+    /// `open` on the watched path can stall, so the descriptor is created on `VolumeReads`.
     private func installMonitor(for url: URL) {
         monitor?.stop()
-        monitor = FolderDirectoryMonitor(url: url) { [weak self] in
-            Task { @MainActor [weak self] in self?.scheduleReload() }
+        monitor = nil
+        monitorToken = UUID()
+        let token = monitorToken
+        let changed = watchHandler()
+        monitorTask?.cancel()
+        monitorTask = Task { [weak self] in
+            let installed = await VolumeReads.run { FolderDirectoryMonitor(url: url, changed: changed) }
+            guard let self, !Task.isCancelled, monitorToken == token else {
+                installed?.stop()
+                return
+            }
+            monitor?.stop()
+            monitor = installed
         }
     }
 
@@ -639,17 +783,23 @@ final class FolderStackState {
     }
 
     func stop() {
+        stopped = true
         generation = UUID()
+        monitorToken = UUID()
+        openTask?.cancel()
         loadTask?.cancel(); loadTask = nil
         metricsTask?.cancel(); metricsTask = nil
         mediaTask?.cancel(); mediaTask = nil
+        previewTask?.cancel(); previewTask = nil
         debounceTask?.cancel(); debounceTask = nil
+        monitorTask?.cancel(); monitorTask = nil
         monitor?.stop(); monitor = nil
         cancelSemanticOrganization(clearError: true)
         access = nil
         retryAction = nil
         preview = nil
         copyFailed = nil
+        bookmarkRefresh = nil
         sortChanged = nil
         openEntry = nil; stageOnShelf = nil; presentationChanged = nil; dragCompleted = nil
     }

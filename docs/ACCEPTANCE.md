@@ -2717,7 +2717,9 @@ Disarming restores the ordinary dock without changing pins or visibility prefere
 Marked items stay at their original positions.
 Clicking a marked item outside stamp mode shows a nonactivating glass notice for 2.2 seconds.
 It leaves the mark intact. Release requires stamp mode, including release from Settings. Saved flags apply across displays and Dock Modes to matching
-item identities or file URLs. A removed pin's flag remains releasable from Settings.
+item identities or file URLs. A saved file URL also matches a symlink to that file and any
+descendant. Matching resolves symlinks and follows the volume's case-sensitive names rule.
+A removed pin's flag remains releasable from Settings.
 
 The stamp follows the pointer across panel headers, menus, and other apps while armed.
 A red forbidden badge and reduced stamp opacity indicate that the pointer is not over a
@@ -3009,3 +3011,9 @@ exercised configuration. The delay was estimated, and the dock edge, display, an
 setting were not recorded. The user separately confirmed that Peek dismisses when the pointer
 moves away, closing that check for the exercised configuration. Other configurations and the
 remaining failure and accessibility scenarios above are still open.
+
+## Opening a folder or volume stack (DEE-103)
+
+Bookmark resolution, the directory check, and the directory monitor (`open` with `O_EVTONLY`) run on `VolumeReads` before the stack panel is ordered front. A close while that read is in flight stops the monitor and does not show the panel. Quick Look and Open check that the item exists on the same queue. A listing reload does not cancel Quick Look. A drop on the tile is accepted in the click turn and copied after the folder resolves, including when the stack closes during that wait. Child icon batching is unchanged.
+
+Not compiled in this environment (no Xcode). The new stop-before-publish test was not run.
