@@ -9,7 +9,7 @@ import ApplicationServices
 actor DockBadgeReader {
     private let session = BadgeAXSession()
 
-    /// Returns a complete snapshot keyed by standardized application URL.
+    /// Returns a complete snapshot keyed by canonical application path.
     ///
     /// Without Accessibility trust or a running Dock, the snapshot is empty because no badge can
     /// be observed. Returns `nil` when a scan throws, such as a 0.15 s child timeout, so the
@@ -85,7 +85,8 @@ private nonisolated final class BadgeAXSession: @unchecked Sendable {
                 guard let rawURL = try value(item, kAXURLAttribute) else { continue }
                 let url = (rawURL as? URL) ?? (rawURL as? String).flatMap(URL.init(string:))
                 guard let url, url.isFileURL else { continue }
-                let path = url.standardizedFileURL.path
+                // Same queue as the AX copies. Resolving the path must not move this pass off the queue.
+                let path = DockBadgePath.key(for: url)
                 let observation = try badgeValue(item)
                 // Multiple Dock items for one installation must agree. Never sum process badges.
                 if let previous = result[path], previous != observation { result[path] = .unknown }

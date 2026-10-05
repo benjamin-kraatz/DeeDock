@@ -17,7 +17,7 @@ The single `DockBadgeReader` reads system Dock items through Accessibility. Bloc
 | Other nonempty string, including `99+` | Text badge | Unavailable |
 | Missing item, unsupported attribute, permission loss, or scans failing for 15 seconds | Unknown | Unavailable |
 
-The reader keys observations by standardized installation path, matching DEE-10. A process restart at the same path keeps the explicit baseline. Multiple system Dock items for the same installation must agree; conflicting observations become unknown. Counts are never summed across processes. Moving an installation creates another identity. Source activation uses the recorded application URL and reports an error if opening fails.
+The reader keys observations by canonical installation path, the same key the tile uses. Symlinks are resolved, and case is folded unless the volume reports case-sensitive names. A process restart at the same installation keeps the explicit baseline. Multiple system Dock items for the same installation must agree; conflicting observations become unknown. Counts are never summed across processes. Moving an installation creates another identity. Source activation uses the recorded application URL and reports an error if opening fails.
 
 Numeric deltas are net changes. For a checked value of 37, observations of 41, 35 and an explicit clear show +4, -2 and -37. None proves how many messages arrived or were read. Unknown and text observations preserve the baseline but suspend numeric comparison. A later reliable numeric value can be compared with that same explicit baseline. Counts larger than Int64 and formatted values such as `1,000` remain text.
 

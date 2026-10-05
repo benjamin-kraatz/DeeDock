@@ -573,7 +573,7 @@ final class DockCoordinator {
                 self.openFiles(for: item, on: panel)
             }
             panel.interaction.openBadgeMemory = { [weak self] item in
-                self?.showBadgeMemory(path: (item.resolvedURL ?? item.reference.url).standardizedFileURL.path)
+                self?.showBadgeMemory(path: DockBadgePath.key(for: item.resolvedURL ?? item.reference.url))
             }
             panel.interaction.applicationMenuSnapshot = { [weak self] item in
                 self?.applicationMenus.snapshot(for: item)
