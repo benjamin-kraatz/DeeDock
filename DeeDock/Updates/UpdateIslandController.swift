@@ -12,6 +12,7 @@ import SwiftUI
 final class UpdateIslandController {
     private let presentation: UpdatePresentation
     private let awareness: UpdateAwarenessStore
+    private let analytics: UpdateAnalytics
     private let action: (UpdateAction, UUID) -> Void
     private let close: () -> Void
     /// Dock activity that should keep a callout away. The panel ignores it.
@@ -24,6 +25,9 @@ final class UpdateIslandController {
     private var panel: UpdateIslandPanel?
     /// State of the open island. Nil exactly when `panel` is nil.
     private var model: UpdateIslandModel?
+    /// The callout last reported as shown. Re-presenting it after a display change or a busy
+    /// dock is not reported again.
+    private var reportedCallout: UpdateIslandAnnouncement?
     /// An island that is animating out, and the task that closes it afterwards.
     private var departing: (panel: UpdateIslandPanel, close: Task<Void, Never>)?
 
@@ -33,10 +37,11 @@ final class UpdateIslandController {
     /// - Parameters:
     ///   - action: A panel button, with the callback generation it was rendered for.
     ///   - close: The panel's close button or Escape. The driver applies its phase policy.
-    init(presentation: UpdatePresentation, awareness: UpdateAwarenessStore,
+    init(presentation: UpdatePresentation, awareness: UpdateAwarenessStore, analytics: UpdateAnalytics,
          action: @escaping (UpdateAction, UUID) -> Void, close: @escaping () -> Void) {
         self.presentation = presentation
         self.awareness = awareness
+        self.analytics = analytics
         self.action = action
         self.close = close
     }
@@ -98,7 +103,12 @@ final class UpdateIslandController {
 
     private func refresh() {
         if model?.content == .panel { return }
-        guard let announcement, !isBlocked() else {
+        guard let announcement else {
+            reportedCallout = nil
+            closePanel()
+            return
+        }
+        guard !isBlocked() else {
             closePanel()
             return
         }
@@ -106,6 +116,10 @@ final class UpdateIslandController {
         guard panel == nil, let screen = targetScreen() ?? NSScreen.main else { return }
         show(.callout(announcement), on: screen)
         panel?.orderFrontRegardless()
+        if reportedCallout != announcement {
+            reportedCallout = announcement
+            analytics.callout(.shown, kind: announcement.kind)
+        }
     }
 
     /// A waiting offer outranks the installed notice, which a newer offer clears anyway.
@@ -193,6 +207,7 @@ final class UpdateIslandController {
 
     private func openCallout() {
         guard case .callout(let announcement) = model?.content else { return }
+        analytics.callout(.opened, kind: announcement.kind)
         if announcement.kind == .installed {
             awareness.noteInstalledCalloutSeen()
             openWhatsNew()
@@ -208,6 +223,7 @@ final class UpdateIslandController {
 
     private func dismissCallout() {
         guard case .callout(let announcement) = model?.content else { return }
+        analytics.callout(.dismissed, kind: announcement.kind)
         if announcement.kind == .installed { awareness.noteInstalledCalloutSeen() } else { awareness.dismiss() }
         dismissPanel()
     }

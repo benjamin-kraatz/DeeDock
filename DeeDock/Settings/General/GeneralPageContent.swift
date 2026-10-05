@@ -43,7 +43,7 @@ struct GeneralPageContent: View {
                                setAutomaticallyChecks: updater.setAutomaticallyChecksForUpdates,
                                setAutomaticallyInstalls: updater.setAutomaticallyInstallsUpdates,
                                setInstallWhenIdle: updater.setInstallWhenIdle,
-                               check: updater.checkForUpdates)
+                               check: { updater.checkForUpdates(source: .settings) })
         } else {
             AppAboutCard(version: AppVersionInfo.current.settingsValue)
         }

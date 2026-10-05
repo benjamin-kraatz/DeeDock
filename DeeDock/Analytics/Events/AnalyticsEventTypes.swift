@@ -201,7 +201,7 @@ nonisolated enum AnalyticsPinSource: String, AnalyticsToken {
 
 /// Which settings model a change belongs to.
 nonisolated enum AnalyticsSettingArea: String, AnalyticsToken {
-    case sharedDock = "shared_dock", display, atmosphere, menuBar = "menu_bar"
+    case sharedDock = "shared_dock", display, atmosphere, menuBar = "menu_bar", updates
 }
 
 nonisolated enum AnalyticsDisplayRole: String, AnalyticsToken {

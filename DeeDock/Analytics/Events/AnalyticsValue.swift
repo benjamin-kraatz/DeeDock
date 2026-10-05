@@ -3,8 +3,8 @@ import Foundation
 /// Marks an enum whose raw values may leave the device as analytics property values.
 ///
 /// Conform only enums whose cases are compile-time constants. A type that wraps arbitrary text,
-/// such as an app name or a path, must never conform: this protocol and ``AnalyticsFileType``
-/// are the only ways text becomes an ``AnalyticsValue``.
+/// such as an app name or a path, must never conform: this protocol, ``AnalyticsFileType``, and
+/// ``AnalyticsVersion`` are the only ways text becomes an ``AnalyticsValue``.
 nonisolated protocol AnalyticsToken: RawRepresentable where RawValue == String {}
 
 /// One analytics property value: a Bool, an exact number, or an enum token.
@@ -24,6 +24,7 @@ nonisolated struct AnalyticsValue: Equatable, Sendable {
     init(_ value: Double) { storage = .double(value.isFinite ? value : 0) }
     init<Token: AnalyticsToken>(_ token: Token) { storage = .token(token.rawValue) }
     init(_ fileType: AnalyticsFileType) { storage = .token(fileType.identifier) }
+    init(_ version: AnalyticsVersion) { storage = .token(version.text) }
     fileprivate init(token: String) { storage = .token(token) }
 
     /// The JSON-compatible form handed to the backend.

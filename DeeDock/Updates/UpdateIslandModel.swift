@@ -3,7 +3,7 @@ import Observation
 
 /// What a compact island announces.
 struct UpdateIslandAnnouncement: Equatable {
-    enum Kind: Equatable {
+    enum Kind: String, Equatable {
         /// A scheduled offer that needs the user to download or approve it.
         case available
         /// A silently downloaded offer that idle install has not reached yet.

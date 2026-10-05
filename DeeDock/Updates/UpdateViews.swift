@@ -8,12 +8,14 @@ extension EnvironmentValues {
 /// Both menus use the same observable availability and pending-update state.
 struct CheckForUpdatesButton: View {
     let updater: AppUpdater
+    /// Which menu hosts the button, reported to analytics.
+    let source: AnalyticsUpdateSource
 
     var body: some View {
         if updater.showsInstalledNotice {
-            Button(action: updater.showWhatsNew) { Text(.updatesInstalledMenu) }
+            Button { updater.showWhatsNew(source: source) } label: { Text(.updatesInstalledMenu) }
         } else {
-            Button(action: updater.checkForUpdates) {
+            Button { updater.checkForUpdates(source: source) } label: {
                 Text(updater.updateAvailable ? .updatesAvailable : updater.updateInProgress ? .updatesShowProgress : .updatesCheck)
             }
             .disabled(!updater.canCheckForUpdates)
