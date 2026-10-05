@@ -1,0 +1,102 @@
+# Debug build and DeeDockTests on the same Mac image that ships.
+#
+# pull_request and push to main, plus workflow_dispatch. No schedule.
+# Separate from Release. Do not sign, notarize, or read repository secrets.
+# POSTHOG_PROJECT_TOKEN stays empty, so analytics stay a no-op.
+#
+# Runner: xcode-27, Benn's Mac image. The Release archive job uses the same
+# label. Xcode selection below is that job's discovery step: highest
+# installed Xcode, which must be major 27. It does not hardcode an app path.
+#
+# No Actions cache. This runner keeps a disk between jobs, and a restored
+# DerivedData can reuse a signed or stale product. Each job uses a fresh
+# derived data directory under RUNNER_TEMP.
+
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+# A new push to a PR cancels the previous run for that PR. Pushes to main
+# share one group, so a newer main commit cancels the older one.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: xcode-27
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 27
+        run: |
+          set -eu
+          echo "sw_vers:"
+          sw_vers
+          echo "Installed Xcode apps:"
+          ls -d /Applications/Xcode*.app 2>/dev/null || echo "No /Applications/Xcode*.app entries."
+          selected=""
+          highest_major=0
+          highest_app=""
+          for app in /Applications/Xcode*.app; do
+            [ -d "$app" ] || continue
+            version="$(defaults read "$app/Contents/Info" CFBundleShortVersionString 2>/dev/null || true)"
+            major="${version%%.*}"
+            echo "$app version=${version:-unknown}"
+            case "$major" in
+              ''|*[!0-9]*) continue ;;
+            esac
+            if [ "$major" -gt "$highest_major" ]; then
+              highest_major="$major"
+              highest_app="$app"
+            fi
+          done
+          if [ -n "$highest_app" ]; then
+            sudo xcode-select -s "$highest_app"
+            selected="$highest_app"
+          fi
+          echo "xcode-select -p: $(xcode-select -p)"
+          xcodebuild -version
+          sdk="$(xcrun --sdk macosx --show-sdk-version 2>/dev/null || true)"
+          echo "macosx SDK=$sdk selected=$selected"
+          sdk_major="${sdk%%.*}"
+          if [ "$highest_major" -lt 27 ] || [ "${sdk_major:-0}" -lt 27 ]; then
+            echo "DDock builds need Xcode 27 and the macOS 27 SDK."
+            echo "This xcode-27 runner reports Xcode major=$highest_major macosx SDK=$sdk."
+            echo "The image labeled xcode-27 did not provide that toolchain. Tell Esi and Benn."
+            exit 1
+          fi
+
+      - name: Build and test
+        env:
+          DERIVED_DATA_PATH: ${{ runner.temp }}/DerivedData
+          RESULT_BUNDLE_PATH: ${{ runner.temp }}/DeeDock.xcresult
+        run: |
+          set -eu
+          set -o pipefail
+          ./scripts/build-and-test.sh 2>&1 | tee "${RUNNER_TEMP}/xcodebuild.log"
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-and-test-results
+          path: |
+            ${{ runner.temp }}/DeeDock.xcresult
+            ${{ runner.temp }}/xcodebuild.log
+          if-no-files-found: warn
+          retention-days: 14
