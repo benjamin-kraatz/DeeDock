@@ -102,7 +102,8 @@ struct BadgeScanRetentionTests {
         let suite = "BadgeSleep.\(UUID().uuidString)"
         let (store, defaults) = try memory(suite)
         defer { defaults.removePersistentDomain(forName: suite) }
-        let base = Date()
+        // Pause marks the gap at wall-clock time. The session has to have started before that.
+        let base = Date().addingTimeInterval(-60)
         let session = collecting(store, base: base)
         let history = store.document.apps[mail]?.changes.map(\.value)
         let controller = DockBadgeController(memory: store)
