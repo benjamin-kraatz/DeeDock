@@ -16,11 +16,19 @@ struct DockLocalHistoryTests {
     }
 
     /// Waits until `condition` holds or `limit` passes. A fixed sleep longer than the dwell is
-    /// not enough when parallel suites keep the main actor busy.
-    private func waitUntil(within limit: Duration = .seconds(2), _ condition: () -> Bool) async throws {
+    /// not enough when parallel suites keep the main actor busy. The deadline is wall time, so
+    /// this loop can resume after a stall and observe it before an already-due dwell task runs.
+    private func waitUntil(within limit: Duration = .seconds(15), _ condition: () -> Bool) async throws {
         let deadline = ContinuousClock.now + limit
-        while !condition(), ContinuousClock.now < deadline {
+        while !condition() {
             try await Task.sleep(for: .milliseconds(10))
+            if condition() { return }
+            if ContinuousClock.now >= deadline { break }
+        }
+        var turns = 0
+        while !condition(), turns < 200 {
+            await Task.yield()
+            turns += 1
         }
     }
 
