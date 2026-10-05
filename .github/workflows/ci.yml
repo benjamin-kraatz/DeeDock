@@ -98,14 +98,14 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/ci-cache/source-packages
-          key: spm-sources-v1-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          key: spm-sources-v2-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
       - name: Restore SPM dependency products
         id: spm-products
         uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/ci-cache/spm-products
-          key: spm-products-v1-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ hashFiles('scripts/build-and-test.sh') }}
+          key: spm-products-v2-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ hashFiles('scripts/build-and-test.sh') }}
 
       - name: Build and test
         env:

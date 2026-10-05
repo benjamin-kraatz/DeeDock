@@ -44,11 +44,11 @@ is_app_owned_product() {
 
 # Drop DOKK and DeeDockTests outputs after a package-product restore.
 # DerivedData for those targets stays uncached; deleting the leftovers
-# forces this job to compile and link them again.
+# forces this job to compile and link them again. PIFCache and the
+# package task database stay, so unchanged package compiles can be skipped.
 strip_app_products() {
   rm -rf \
     "$derived/Build/Intermediates.noindex/DeeDock.build" \
-    "$derived/Build/Intermediates.noindex/XCBuildData/PIFCache" \
     "$derived/Build/Products/Debug/DOKK.app" \
     "$derived/Build/Products/Debug/DOKK.app.dSYM" \
     "$derived/Build/Products/Debug/DeeDockTests.xctest" \
@@ -64,8 +64,8 @@ strip_app_products() {
 }
 
 # Copy cached package intermediates and products into this job's DerivedData.
-# The build database keeps absolute paths, so CI restores it at the same
-# DerivedData path. PIFCache is removed so the project model is read again.
+# The build database stores absolute paths and output timestamps, so the
+# copy preserves times and lands at the same DerivedData path.
 seed_spm_products() {
   cache="${SPM_PRODUCTS_CACHE_PATH:-}"
   [ -n "$cache" ] || return 0
@@ -73,7 +73,7 @@ seed_spm_products() {
     echo "Seeding SPM build products from $cache"
     rm -rf "$derived/Build"
     mkdir -p "$derived"
-    cp -R "$cache/Build" "$derived/"
+    cp -pR "$cache/Build" "$derived/"
   else
     echo "SPM build products cache is empty"
   fi
@@ -96,14 +96,13 @@ export_spm_products() {
       case "$base" in
         DeeDock.build) continue ;;
       esac
-      cp -R "$dir" "$cache/Build/Intermediates.noindex/"
+      cp -pR "$dir" "$cache/Build/Intermediates.noindex/"
     done
     if [ -d "$intermediates/GeneratedModuleMaps" ]; then
-      cp -R "$intermediates/GeneratedModuleMaps" "$cache/Build/Intermediates.noindex/"
+      cp -pR "$intermediates/GeneratedModuleMaps" "$cache/Build/Intermediates.noindex/"
     fi
     if [ -d "$intermediates/XCBuildData" ]; then
-      cp -R "$intermediates/XCBuildData" "$cache/Build/Intermediates.noindex/"
-      rm -rf "$cache/Build/Intermediates.noindex/XCBuildData/PIFCache"
+      cp -pR "$intermediates/XCBuildData" "$cache/Build/Intermediates.noindex/"
     fi
   fi
 
@@ -115,7 +114,7 @@ export_spm_products() {
       if is_app_owned_product "$base"; then
         continue
       fi
-      cp -R "$item" "$cache/Build/Products/Debug/"
+      cp -pR "$item" "$cache/Build/Products/Debug/"
     done
   fi
 
