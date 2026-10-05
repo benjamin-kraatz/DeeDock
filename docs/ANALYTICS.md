@@ -6,9 +6,10 @@ and the rules for adding to it. It is linked from Settings › General › Priva
 
 ## What is never collected
 
-These are prohibited in every product event, property, and person property. There is one
-exception, [Apple Intelligence observability](#apple-intelligence-observability), which sends
-prompt and answer text and is described below.
+These are prohibited in every product event, property, and person property. There are two
+exceptions, [Apple Intelligence observability](#apple-intelligence-observability), which sends
+prompt and answer text, and [surveys](#surveys), which send what a person chose or typed in
+answer to a survey. Both are described below.
 
 - App names and bundle IDs. This is the rule most likely to be broken by accident, because almost
   everything in a dock is named after an app.
@@ -37,9 +38,9 @@ Settings that hold a path, such as the markup folder, are reported only as "set"
 - Property keys written in source must be string literals (`StaticString`).
 - `PostHogAnalyticsBackend.swift` is the only file that imports the SDK.
 
-Two channels sit outside this guard and take free-form text: `Analytics.captureAI` and
-`Analytics.log`. Both are described below. Do not add callers that pass anything but literals to
-`Analytics.log`.
+Three channels sit outside this guard and take free-form text: `Analytics.captureAI`,
+`Analytics.captureSurvey`, and `Analytics.log`. All are described below. Do not add callers that
+pass anything but literals to `Analytics.log`.
 
 When you add an event: add a case to `AnalyticsEvent`, map it in `AnalyticsEvent+Record.swift`,
 and add it to the tables below. If a value you want to send is text, it does not belong in
@@ -407,6 +408,37 @@ prompt or answer contains:
 These events pass the same consent gate as everything else. The Privacy card and the tour say
 that Apple Intelligence requests and answers are shared in full. Setting `capturesContent` to
 `false` keeps latency and span names and drops the text.
+
+## Surveys
+
+posthog-ios renders surveys on iOS only; on macOS the survey code is not compiled. DOKK therefore
+uses PostHog surveys of type **API**: it fetches their definitions and draws them itself.
+
+- Definitions come from `GET <POSTHOG_HOST>/api/surveys/?token=<project token>`
+  (`PostHogSurveySource`), through the same proxy as ingestion. They are requested only while
+  events are being collected, at most every six hours, or every 30 minutes after a failure
+  (`AnalyticsSurveyCatalog`).
+- A survey is offered only if DOKK can honor all of it. Surveys with a linked or targeting flag,
+  link questions, or an "Other" choice with a text field are skipped. PostHog's own
+  `internal_targeting_flag_key` is ignored, because DOKK records answered iterations locally
+  (`launcher.suggestions.survey.seen.v1`).
+- Branching follows PostHog's rules (`AnalyticsSurveyFlow`). Choice order is shuffled once per
+  submission when the author asks.
+- Events match what posthog-ios 3.89.0 sends: `survey shown`, `survey sent`, and
+  `survey dismissed`, with `$survey_id`, `$survey_name`, `$survey_iteration`,
+  `$survey_iteration_start_date`, `$survey_questions`, `$survey_response_<question id>`,
+  `$survey_submission_id`, and `$survey_completed` or `$survey_partially_completed`. When the
+  survey has partial responses enabled, each answer is sent as it is given, under one submission
+  ID. No `$set` person properties are sent. `AnalyticsSurveyRecord` builds the payloads.
+- The responses are text: the chosen option, and for open questions whatever the person typed,
+  trimmed and cut to the author's maximum length. Typed answers can contain anything, including
+  app names.
+- Survey events pass the same consent gate as everything else. The Settings "recently sent" list
+  shows them by name only.
+
+| Survey | Where | Shown when |
+| --- | --- | --- |
+| App Recommendations Survey (`01a10ae5-3be4-0000-cb04-a670009cadbf`) | Below the Launcher's suggestions | Suggestions on, the feedback-question switch on, at least ten presentations over seven days, 30 days since the last feedback question, this iteration not yet answered or closed |
 
 ## Logs
 

@@ -147,9 +147,13 @@ Each suggestion has contextual menu and accessibility actions:
 
 Ignoring a suggestion is not negative feedback. Actual foreground transitions teach the predictor regardless of which app launched or activated the target.
 
-An optional inline question appears after at least seven days and ten suggestion presentations.
-Answering or dismissing it suppresses the question for 30 days. **Don't ask again** turns off these prompts in Settings.
-Section-level answers are aggregate feedback. They do not assign a negative label to every suggested app.
+An optional survey card appears below the suggestions after at least seven days and ten suggestion presentations.
+It is the PostHog survey "App Recommendations Survey" (ID `01a10ae5-3be4-0000-cb04-a670009cadbf`), which DOKK fetches and draws
+itself because posthog-ios renders surveys on iOS only. The card appears only while usage-data sharing is on, since that is where
+the answers go. See [Surveys](ANALYTICS.md#surveys) for what is sent.
+Finishing or closing the survey suppresses feedback questions for 30 days, and that survey iteration is never offered again.
+After closing it, the card offers **Don't ask about suggestions**, which turns off the same Settings switch.
+Survey answers are aggregate feedback. They do not label any suggested app, and they do not change local learning.
 
 Pause and disable stop observation, predictions, and pending ranking work immediately. Existing history remains subject to expiry.
 **Reset learned suggestions** removes behavioral history, soft feedback, impressions, and pending results.
@@ -160,7 +164,8 @@ Reset preserves deliberate exclusions, the feedback-prompt preference, and the e
 One recorder receives application-wide Workspace notifications. The history stores bundle identifiers, event times, foreground and recent apps,
 running-app identifiers, recency metadata, local hour and weekday, and the Dock Mode identifier.
 It also stores suggestion impressions and explicit feedback with the original context and predictor version.
-It stores no document names, paths, URLs, titles, images, keystrokes, or app content. The feature has no upload, account, or sync service.
+It stores no document names, paths, URLs, titles, images, keystrokes, or app content. Learning has no upload, account, or sync service;
+only answers to the optional survey leave the Mac, through usage analytics.
 
 Only an activation sustained for three seconds becomes a training target. Launch and termination events supply context.
 The first five seconds of an observation session do not create targets. Startup snapshots cannot reconstruct missing activity.

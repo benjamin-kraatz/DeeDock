@@ -108,6 +108,8 @@ final class LauncherState {
     var selectedID: LauncherBrowseID?
     var navigationColumns = 1
     var keyboardNavigationActive = false
+    /// The survey's answer field has keyboard focus, so arrows and Escape belong to it.
+    var surveyTextFocused = false
     private var initialPinnedIDs: Set<String> = []
     var pinnedIDs: Set<String> { dockStore.map { Set($0.pins.compactMap { $0.application?.id }) } ?? initialPinnedIDs }
     var pinDestinations: [DockPinDestination] { dockStore?.pinDestinations ?? [] }

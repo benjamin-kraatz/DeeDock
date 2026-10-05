@@ -1,9 +1,13 @@
 import SwiftUI
 
 /// Uses the same app controls as browsing, with separate selection identities and contextual feedback.
+/// The App Recommendations survey appears below the apps when the store is ready to ask.
 struct LauncherSuggestedSection: View {
     let state: LauncherState
     let columns: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var survey: LauncherSuggestionSurvey { state.catalog.suggestionSurvey }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -17,12 +21,25 @@ struct LauncherSuggestedSection: View {
             } else {
                 LazyVStack(spacing: 0) { applications }
             }
-            if state.catalog.suggestions.shouldPrompt {
-                LauncherSuggestionPrompt(store: state.catalog.suggestions)
+            if survey.isPresented {
+                LauncherSurveyCard(survey: survey) { state.surveyTextFocused = $0 }
+                    .padding(.top, 8)
+                    .transition(LauncherSurveyMotion(reduceMotion: reduceMotion).card)
             }
         }
-        .onAppear { state.recordSuggestionImpression() }
-        .onChange(of: state.contentVisible) { _, _ in state.recordSuggestionImpression() }
+        .animation(LauncherSurveyMotion(reduceMotion: reduceMotion).morph, value: survey.isPresented)
+        .task(id: state.catalog.suggestions.shouldPrompt) { await survey.prepare() }
+        .onAppear {
+            state.recordSuggestionImpression()
+            if state.contentVisible { survey.presented() }
+        }
+        .onChange(of: state.contentVisible) { _, visible in
+            state.recordSuggestionImpression()
+            if visible { survey.presented() }
+        }
+        .onChange(of: survey.isPresented) { _, presented in
+            if presented, state.contentVisible { survey.presented() }
+        }
         .onChange(of: state.suggestedApplications.map(\.id)) { _, _ in state.recordSuggestionImpression() }
     }
 
@@ -47,40 +64,6 @@ struct LauncherSuggestionActions: View {
         }
         Button { state.catalog.suggestions.exclude(appID: application.id) } label: {
             Label { Text(.launcherSuggestionsExclude) } icon: { Image(systemName: "nosign") }
-        }
-    }
-}
-
-/// Aggregate responses do not label individual applications as good or bad targets.
-private struct LauncherSuggestionPrompt: View {
-    let store: LauncherSuggestionsStore
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(.launcherSuggestionsPrompt).font(.callout)
-            ViewThatFits(in: .horizontal) {
-                HStack { answers; preferences }
-                VStack(alignment: .leading) {
-                    HStack { answers }
-                    HStack { preferences }
-                }
-            }
-            .controlSize(.small)
-        }
-        .padding(.horizontal, 12)
-    }
-
-    private var answers: some View {
-        Group {
-            Button(.launcherSuggestionsYes) { store.answerPrompt(true) }
-            Button(.launcherSuggestionsNo) { store.answerPrompt(false) }
-        }
-    }
-
-    private var preferences: some View {
-        Group {
-            Button(.launcherSuggestionsDismiss) { store.answerPrompt(nil) }
-            Button(.launcherSuggestionsDontAsk) { store.suppressPrompts() }
         }
     }
 }

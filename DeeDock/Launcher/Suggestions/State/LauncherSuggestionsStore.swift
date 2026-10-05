@@ -21,6 +21,9 @@ final class LauncherSuggestionsStore {
     var debugSource: LauncherSuggestionDebugSource { debugController.source }
     var syntheticConfiguration: LauncherSuggestionSyntheticConfiguration { debugController.configuration }
     var syntheticPlayback: LauncherSuggestionSyntheticPlayback? { debugController.playback }
+    /// Fills the launcher's Suggestions section with random apps, so the section and the survey
+    /// below it can be checked without learned history. See ``LauncherState/suggestedApplications``.
+    private(set) var debugRandomSuggestions = false
 
 #endif
     private(set) var engineBusy = false
@@ -72,6 +75,7 @@ final class LauncherSuggestionsStore {
 #if DEBUG
         if let value = defaults?.string(forKey: "launcher.suggestions.debugEngine.v1"),
            let selected = LauncherSuggestionEngine(rawValue: value) { engine = selected }
+        debugRandomSuggestions = defaults?.bool(forKey: "launcher.suggestions.debugRandom.v1") ?? false
         if let data = defaults?.data(forKey: "launcher.suggestions.debugTuning.v1"),
            let stored = try? JSONDecoder().decode(LauncherSuggestionTuning.self, from: data) {
             tuning = stored.clamped
@@ -154,6 +158,11 @@ final class LauncherSuggestionsStore {
     func stepSyntheticHistory() async { await debugController.play(all: false, tuning: tuning, seedURL: coreMLSeedURL) }
     func runSyntheticHistory() async { await debugController.play(all: true, tuning: tuning, seedURL: coreMLSeedURL) }
     func resetSyntheticPlayback() { debugController.restart(tuning: tuning, seedURL: coreMLSeedURL) }
+
+    func setDebugRandomSuggestions(_ value: Bool) {
+        debugRandomSuggestions = value
+        defaults?.set(value, forKey: "launcher.suggestions.debugRandom.v1")
+    }
 
     func resetTuning() { setTuning(LauncherSuggestionTuning()) }
     func clearDebugSnapshot() { debugController.cancel() }

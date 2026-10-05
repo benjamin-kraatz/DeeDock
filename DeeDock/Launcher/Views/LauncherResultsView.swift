@@ -75,7 +75,7 @@ struct LauncherResultsView: View {
                 if let id { proxy.scrollTo(id, anchor: .center) }
             }
             .task(id: state.suggestionAvailabilityKey) {
-                await state.suggestions.updateAvailability(applications: state.library.applications)
+                await state.suggestions.updateAvailability(applications: state.library.applications, store: state.catalog.suggestions)
             }
             .onChange(of: groups.flatMap(\.applications).map(\.id)) { _, ids in
                 if case .application(let selected) = state.selectedID, !ids.contains(selected) {

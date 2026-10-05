@@ -101,6 +101,7 @@ final class DockCoordinator {
     @ObservationIgnored private lazy var badgeMemoryWindow = BadgeMemoryWindowController(memory: badges.memory)
     @ObservationIgnored private let catalog: ApplicationCatalog
     var launcherSuggestions: LauncherSuggestionsStore { catalog.suggestions }
+    var suggestionSurvey: LauncherSuggestionSurvey { catalog.suggestionSurvey }
     var launcherApplications: [LauncherApplication] { catalog.launcherLibrary.applications }
     var recipeApplications: any ApplicationServicing { catalog.service }
     @ObservationIgnored private let trash = TrashController()
@@ -135,7 +136,8 @@ final class DockCoordinator {
         patchBay = PatchBayController(profiles: profiles)
         let applicationService = ApplicationService()
         catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory(),
-                                     suggestions: LauncherSuggestionsStore(), launcherFavorites: LauncherFavorites())
+                                     suggestions: LauncherSuggestionsStore(), launcherFavorites: LauncherFavorites(),
+                                     surveyDefaults: .standard)
         recipes = WorkspaceRecipeCoordinator(applications: catalog.service, actions: actionTiles)
         let menus = ApplicationMenuController(
             access: windowAccess,

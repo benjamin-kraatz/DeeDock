@@ -11,4 +11,9 @@ nonisolated enum AnalyticsBackendFactory {
         NoOpAnalyticsBackend()
         #endif
     }
+
+    /// PostHog's survey endpoint when the bundle carries credentials.
+    static func liveSurveys() -> (any AnalyticsSurveySource)? {
+        PostHogSurveySource(credentials: AnalyticsCredentials())
+    }
 }
