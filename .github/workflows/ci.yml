@@ -14,10 +14,11 @@
 #
 # actions/cache stores SPM checkouts only. Key: Package.resolved, runner
 # OS and architecture, and the selected Xcode version. No restore-key
-# prefix. Compiled package products are not cached: restoring them skipped
-# PostHog, libwebp, and PLCrashReporter, but DeeDock's own compile stayed
-# about three minutes and the warm job was slower than compiling the
-# packages again.
+# prefix. Compiled package products are not cached. Restoring them skipped
+# PostHog, libwebp, and PLCrashReporter, but those compiles are about
+# 20-30s. DeeDock's own compile is 2-4 minutes on this 3-core runner, so
+# the cache does not bring the job near 2 minutes. XCBuildData also embeds
+# absolute paths, and a stale copy can rebuild the wrong app outputs.
 
 name: CI
 
