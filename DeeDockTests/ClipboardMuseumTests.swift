@@ -190,7 +190,7 @@ struct ClipboardMuseumTests {
         #expect(!sealed.isEmpty)
         try FileManager.default.removeItem(at: repository.documentURL)
         store.setCaptureEnabled(false)
-        let saved = try #require(repository.load())
+        let saved = try #require(try repository.load())
         #expect(!store.storageFailed)
         #expect(saved.exhibits.first?.imageName == nil)
         #expect(saved.exhibits.first?.sealedName == sealedName)
