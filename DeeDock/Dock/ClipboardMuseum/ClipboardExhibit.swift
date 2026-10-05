@@ -58,7 +58,7 @@ nonisolated struct ClipboardExhibit: Codable, Equatable, Identifiable, Sendable 
     var imageLabels: [String]? = nil
     /// Text Vision read from an image. Searchable, and checked for secrets like copied text.
     var recognizedText: String? = nil
-    /// Encrypted content of a redacted exhibit. Nil after Shred, or if sealing failed.
+    /// Encrypted content of a redacted exhibit. Nil while the exhibit is plain, and nil again after Shred.
     var sealedName: String? = nil
     /// Set by "Not a Secret"; the detector no longer flags this exhibit.
     var trusted: Bool? = nil
