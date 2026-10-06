@@ -1183,8 +1183,7 @@
       "Google Chrome",
       "Google Chrome Canary",
       "Google Chrome Beta",
-      "Google Chrome Dev",
-      "Chrome Remote Desktop"
+      "Google Chrome Dev"
     ]
   },
   {
@@ -1304,6 +1303,13 @@
     "names": [
       "HBO Max"
     ]
+  },
+  {
+    "icon": "simple-icons:heliumbrowser",
+    "bundleIDs": [
+      "net.imput.helium"
+    ],
+    "names": []
   },
   {
     "icon": "simple-icons:helm",
@@ -1537,20 +1543,10 @@
   {
     "icon": "simple-icons:jetbrains",
     "bundleIDs": [
-      "com.jetbrains.toolbox",
-      "com.jetbrains.fleet",
-      "com.jetbrains.dataspell",
-      "com.jetbrains.rustrover",
-      "com.jetbrains.aqua",
-      "com.jetbrains.writerside"
+      "com.jetbrains.toolbox"
     ],
     "names": [
-      "JetBrains Toolbox",
-      "Fleet",
-      "DataSpell",
-      "RustRover",
-      "Aqua",
-      "Writerside"
+      "JetBrains Toolbox"
     ]
   },
   {
@@ -1692,13 +1688,9 @@
   },
   {
     "icon": "simple-icons:kubernetes",
-    "bundleIDs": [
-      "com.electron.open-lens"
-    ],
+    "bundleIDs": [],
     "names": [
-      "Kubernetes",
-      "OpenLens",
-      "K9s"
+      "Kubernetes"
     ]
   },
   {
@@ -2089,11 +2081,9 @@
   {
     "icon": "simple-icons:mullvad",
     "bundleIDs": [
-      "org.mozilla.mullvadbrowser",
       "net.mullvad.vpn"
     ],
     "names": [
-      "Mullvad Browser",
       "Mullvad VPN"
     ]
   },
@@ -2396,8 +2386,7 @@
   {
     "icon": "simple-icons:perplexity",
     "bundleIDs": [
-      "ai.perplexity.macv3",
-      "ai.perplexity.comet"
+      "ai.perplexity.macv3"
     ],
     "names": [
       "Perplexity"
@@ -2460,13 +2449,11 @@
   {
     "icon": "simple-icons:plex",
     "bundleIDs": [
-      "tv.plex.plexamp",
       "tv.plex.desktop",
       "com.plexapp.plexmediaserver"
     ],
     "names": [
       "Plex",
-      "Plexamp",
       "Plex Media Server"
     ]
   },
@@ -3090,12 +3077,10 @@
     "icon": "simple-icons:sublimetext",
     "bundleIDs": [
       "com.sublimetext.4",
-      "com.sublimetext.3",
-      "com.sublimemerge"
+      "com.sublimetext.3"
     ],
     "names": [
-      "Sublime Text",
-      "Sublime Merge"
+      "Sublime Text"
     ]
   },
   {
