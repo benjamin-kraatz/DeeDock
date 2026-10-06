@@ -7,10 +7,11 @@ import Observation
 /// or the offer is installed or skipped. After that, this process stays quiet for the same
 /// offer identity. A later identity or a new launch can show them again.
 ///
-/// A silently downloaded ("staged") offer shows the badge and pip at once but holds its
-/// callout back while idle install can still take care of it. An automatic install leaves a
-/// persisted record, so the next launch can say that DOKK was updated until the user
-/// acknowledges it or a newer offer arrives.
+/// A silently downloaded ("staged") offer shows the badge and pip at once. Its callout waits
+/// while idle install can still take care of it, unless the offer was found by a background
+/// check: that callout appears as soon as the download is ready and does not activate DOKK.
+/// An automatic install leaves a persisted record, so the next launch can say that DOKK was
+/// updated until the user acknowledges it or a newer offer arrives.
 @MainActor
 @Observable
 final class UpdateAwarenessStore {
@@ -31,6 +32,11 @@ final class UpdateAwarenessStore {
     private(set) var installWhenIdle: Bool
     /// Version DOKK ran before an automatic install that has not been acknowledged yet.
     private(set) var installedFromVersion: String?
+    /// Build identity of an update found by a background check, until that download is staged
+    /// or the check ends without one.
+    private var pendingBackgroundIdentity: String?
+    /// The current staged offer was found in the background, so its callout is not held back.
+    private var releaseStagedCallout = false
     /// The post-install callout and dock pip show once per automatic install.
     private(set) var showsInstalledCallout = false
     private var dismissedIdentities: Set<String> = []
@@ -93,18 +99,42 @@ final class UpdateAwarenessStore {
         if changed {
             idleInstallAttempted = false
             stagedSince = nil
+            releaseStagedCallout = false
         }
         acknowledgeInstalled()
         if userInitiated {
+            pendingBackgroundIdentity = nil
             acknowledge()
             return
         }
         showsIndicators = !dismissedIdentities.contains(identity)
     }
 
+    /// Remembers a background find until its silent download is staged.
+    ///
+    /// Sparkle's automatic driver never calls the user driver, so this is the only signal that
+    /// the find should raise the callout once the download is ready. A manual check does not
+    /// come through here.
+    func noteBackgroundDiscovery(identity: String) {
+        pendingBackgroundIdentity = identity
+    }
+
+    /// Drops a background find that did not become a staged offer.
+    func discardPendingBackgroundDiscovery() {
+        pendingBackgroundIdentity = nil
+    }
+
     /// Records an offer Sparkle downloaded silently. The badge and pip show at once. The
     /// callout follows `showsCallout(now:)`.
+    ///
+    /// A download that matches ``noteBackgroundDiscovery(identity:)`` shows its callout now.
+    /// Any other staged offer still waits out `calloutPatience` while idle install is on.
     func noteStagedOffer(identity: String, version: String, now: Date = Date()) {
+        let releaseNow = pendingBackgroundIdentity == identity
+        pendingBackgroundIdentity = nil
+        if offerIdentity != identity {
+            releaseStagedCallout = false
+        }
         if offerIdentity != identity || stagedSince == nil {
             idleInstallAttempted = false
             stagedSince = now
@@ -113,12 +143,17 @@ final class UpdateAwarenessStore {
         offerVersion = version
         acknowledgeInstalled()
         showsIndicators = !dismissedIdentities.contains(identity)
+        if releaseNow, showsIndicators { releaseStagedCallout = true }
     }
 
-    /// Whether the waiting-offer callout should be up. A staged offer stays quiet while idle
+    /// Whether the waiting-offer callout should be up.
+    ///
+    /// An offer that still needs the user, or a background find whose download is ready, shows
+    /// at once. A staged offer that did not come from a background find stays quiet while idle
     /// install is on and has had less than `calloutPatience` to run.
     func showsCallout(now: Date = Date()) -> Bool {
         guard showsIndicators, offerVersion != nil, !windowIsOpen else { return false }
+        if releaseStagedCallout { return true }
         guard let stagedSince, installWhenIdle else { return true }
         return now.timeIntervalSince(stagedSince) >= Self.calloutPatience
     }
@@ -160,6 +195,8 @@ final class UpdateAwarenessStore {
         stagedSince = nil
         windowIsOpen = false
         idleInstallAttempted = false
+        pendingBackgroundIdentity = nil
+        releaseStagedCallout = false
     }
 
     func markIdleInstallAttempted() {
@@ -199,6 +236,7 @@ final class UpdateAwarenessStore {
     private func acknowledge() {
         if let offerIdentity { dismissedIdentities.insert(offerIdentity) }
         showsIndicators = false
+        releaseStagedCallout = false
     }
 }
 

@@ -184,11 +184,14 @@ waits until no dock has been used for 10 minutes and blocks on pin drag, an open
 the Update window, a file picker, a dock popover, Window Peek, or menu tracking. One attempt;
 otherwise install-on-quit.
 
-Automatic checks are on by default and hourly. A silently downloaded update is adopted through
-Sparkle's `willInstallUpdateOnQuit` delegate hook and waits at the ready screen. Its badge and
-update tile show at once; its callout waits two hours unless idle install is off. After an automatic
-install the menu-bar badge and **Latest Version Installed…** stay until opened, with a one-time
-callout, and the update tile. The window then lists the notes of every version since the previous one.
+Automatic checks are on by default. Sparkle 2.9.6 will not schedule them more often than
+hourly, and a longer interval saved in user defaults is rewritten to one hour at launch. A
+silently downloaded update is adopted through Sparkle's `willInstallUpdateOnQuit` delegate hook
+and waits at the ready screen. Its badge and update tile show at once. A background find shows
+the callout when that download is ready, without activating DOKK. A staged offer with no
+background find still waits two hours unless idle install is off. After an automatic install the
+menu-bar badge and **Latest Version Installed…** stay until opened, with a one-time callout, and
+the update tile. The window then lists the notes of every version since the previous one.
 
 Validation: English and German strings are in the catalog. Model tests cover dismiss policy,
 cold discovery, staged-offer callout timing, the installed notice, the changelog version
@@ -206,8 +209,9 @@ placement, or relaunch.
 - Enable idle install in Settings and on the ready screen. Confirm it does not run while
   dragging a pin, while the Focus panel is open, or while the Update window is up. Confirm
   one relaunch when idle, and install-on-quit if idle never comes.
-- Let an hourly check download an update silently. Confirm the badge and update tile without a
-  callout, the ready screen from the menu, and one relaunch after 10 minutes without dock use.
+- Let an hourly check download an update silently. Confirm the callout appears when the download
+  is ready and does not activate DOKK, plus the badge, the update tile, the ready screen from the
+  menu, and one relaunch after 10 minutes without dock use.
 - After that relaunch, confirm the callout, the update tile, the menu-bar badge, and **Latest Version
   Installed…**. Open it and confirm the notes since the previous version, that the notice
   clears, and that **Check for Updates…** starts a new check.
