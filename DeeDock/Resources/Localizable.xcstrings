@@ -18765,6 +18765,24 @@
         }
       }
     },
+    "launcherCompactSearchPrompt" : {
+      "comment" : "Placeholder in the compact Launcher's search field, which finds apps only.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search apps"
+          }
+        }
+      }
+    },
     "launcherDiscovering" : {
       "comment" : "Initial discovery placeholder.",
       "extractionState" : "manual",
@@ -32789,6 +32807,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Place the launcher at either end of the dock or right after a pinned app. You can also drag it along the dock."
+          }
+        }
+      }
+    },
+    "settingsLauncherStyle" : {
+      "comment" : "Appearance card title for choosing how the Launcher opens, and the accessibility label of its style picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launcher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launcher"
+          }
+        }
+      }
+    },
+    "settingsLauncherStyleCompact" : {
+      "comment" : "Launcher style: a small app grid that opens above the dock's Launcher tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kompakt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact"
+          }
+        }
+      }
+    },
+    "settingsLauncherStyleFull" : {
+      "comment" : "Launcher style: the dock grows into the full Launcher with suggestions, tools, and file actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vollständig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full"
+          }
+        }
+      }
+    },
+    "settingsLauncherStyleHelp" : {
+      "comment" : "Explains the two Launcher styles, that file drops always use the full Launcher, and the per-display override.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vollständig lässt das Dock zum durchsuchbaren Launcher mit Vorschlägen, Werkzeugen und Dateiaktionen wachsen. Kompakt öffnet ein kleines App-Raster über der Launcher-Kachel, das Dock bleibt an seinem Platz. Abgelegte Dateien öffnen immer den vollständigen Launcher. Jedes Display kann den Stil selbst wählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full grows the dock into a searchable Launcher with suggestions, tools, and file actions. Compact opens a small app grid above the Launcher tile and leaves the dock in place. Dropped files always open the full Launcher. Each display can choose its own style."
           }
         }
       }

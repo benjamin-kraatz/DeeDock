@@ -38,6 +38,8 @@ final class DockInteraction {
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
     /// Per-display artwork style. Tiles look up line glyphs only while this is `line`.
     var iconStyle: DockIconStyle = .native
+    /// True while the compact Launcher is open above this dock, so the Launcher tile stays lit.
+    var compactLauncherOpen = false
     /// The saved preference for animated running indicators. Only Stardust uses it.
     var animateIndicators = DockSettings.defaults.animateIndicators
     /// Whether this panel currently paints anything. A hidden dock schedules no indicator

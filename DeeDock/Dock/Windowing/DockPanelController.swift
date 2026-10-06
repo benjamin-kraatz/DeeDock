@@ -10,6 +10,8 @@ final class DockPanelController {
     private let panel: DockPanel
     let launcher: LauncherState
     private let launcherPresentation: LauncherPresentationController
+    /// The open compact Launcher, if any. Each opening builds a new single-use controller.
+    private var compactLauncher: CompactLauncherController?
     var launcherWillOpen: (() -> NSRunningApplication?)?
     private(set) var geometry: DockPresentationGeometry?
     private var mouseHeld = false
@@ -56,12 +58,7 @@ final class DockPanelController {
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
         panel.acceptsMouseMovedEvents = true; panel.becomesKeyOnlyIfNeeded = true
         panel.contentView = DockHostingView(rootView: DockView(launcher: launcher, store: store, interaction: interaction, visibility: visibility))
-        launcherPresentation.didClose = { [weak self] in
-            guard let self, !stopped else { return }
-            panel.setFrame(geometry?.windowFrame ?? .zero, display: true)
-            mouseHeld = false
-            updatePointer(); present()
-        }
+        launcherPresentation.didClose = { [weak self] in self?.launcherDidClose() }
         store.openLauncher = { [weak self] in self?.openLauncher() }
         interaction.applicationCatalog = store.launcherCatalog
         interaction.openLauncher = store.openLauncher
@@ -90,7 +87,8 @@ final class DockPanelController {
         panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
         panel.resignedKey = { [weak self] in
             guard let self else { return }
-            if launcher.isPresented { launcherPresentation.noteWindowResignedKey() }
+            // The compact Launcher is its own key window, so the dock resigning key is expected there.
+            if launcher.isPresented { if compactLauncher == nil { launcherPresentation.noteWindowResignedKey() } }
             else { resignedFocus?() }
         }
         interaction.idleFade.refreshInput = { [weak self] in self?.updatePointer() }
@@ -124,7 +122,7 @@ final class DockPanelController {
         guard !stopped else { return }
         if let previous = lastDisplay, previous != display || lastSettings != settings || resetVisibility { invalidateDrag?() }
         if launcher.isPresented, resetVisibility || lastDisplay != display || lastSettings != settings {
-            launcherPresentation.close(animated: false, restoreFocus: false)
+            closeActiveLauncher(animated: false, restoreFocus: false)
         }
         let edgeChanged = lastSettings?.edge != settings.edge
         let axisChanged = lastSettings?.edge.isVertical != settings.edge.isVertical
@@ -191,6 +189,8 @@ final class DockPanelController {
         launcherPresentation.origin = restingDragBounds
         if launcher.isPresented {
             // Catalog changes may resize the resting dock, but must not collapse the launcher.
+            // The compact Launcher follows its tile instead.
+            if let compactLauncher, let anchor = popoverAnchor(for: .launcher) { compactLauncher.update(anchor) }
         } else if animateSectionChange && !visibility.reduceMotion && visibility.exposesContent {
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.18
@@ -522,6 +522,8 @@ final class DockPanelController {
 
     /// Held while any dock popover (a folder stack or the Shelf) is showing over this display.
     func holdPopover(_ held: Bool) {
+        // Another dock popover took over; the compact Launcher is one too, so it steps aside.
+        if held, compactLauncher != nil { closeActiveLauncher(animated: false, restoreFocus: false) }
         if held { exclusiveInteractionBegan?() }
         popoverHeld = held
         if held { visibility.showImmediately(); interaction.tooltips.clear() }
@@ -638,9 +640,10 @@ final class DockPanelController {
     func openLauncher(files: LauncherFileAdoption? = nil) {
         guard !stopped, let display = lastDisplay, let settings = lastSettings else { return }
         if launcher.isPresented {
-            if let files { launcher.adoptFiles(files) }
-            else { launcherPresentation.close() }
-            return
+            guard let files else { closeActiveLauncher(); return }
+            // Only the full Launcher offers file actions, so a drop replaces an open compact grid.
+            guard compactLauncher != nil else { launcher.adoptFiles(files); return }
+            closeActiveLauncher(animated: false, restoreFocus: false)
         }
         let origin = restingDragBounds
         let previousApplication = launcherWillOpen?() ?? NSWorkspace.shared.frontmostApplication
@@ -648,6 +651,12 @@ final class DockPanelController {
         visibility.showImmediately()
         interaction.tooltips.clear()
         interaction.suppressTooltips = true
+        let trigger: AnalyticsLauncherSource = files != nil ? .fileDrop : store.keyboardFocus ? .keyboard : .tile
+        if files == nil, settings.launcherStyle == .compact, let anchor = popoverAnchor(for: .launcher) {
+            openCompactLauncher(anchor: anchor, previousApplication: previousApplication)
+            Analytics.track(.launcherOpened(trigger, fileCount: 0))
+            return
+        }
         interaction.exposesContent = false
         interaction.idleFade.update(interacting: true, fullyVisible: true)
         visibility.update(activation: false, retained: true, held: true)
@@ -655,12 +664,43 @@ final class DockPanelController {
             target: LauncherGeometry.frame(visibleFrame: display.visibleFrame, origin: origin, edge: settings.edge),
             dockWindow: geometry?.windowFrame ?? origin,
             pins: store.pins.compactMap(\.application), previousApplication: previousApplication)
-        Analytics.track(.launcherOpened(files != nil ? .fileDrop : store.keyboardFocus ? .keyboard : .tile,
-                                        fileCount: files?.inputs.count ?? 0))
+        Analytics.track(.launcherOpened(trigger, fileCount: files?.inputs.count ?? 0))
         if let files { launcher.adoptFiles(files) }
     }
 
-    func closeLauncher() { launcherPresentation.close(animated: false, restoreFocus: false) }
+    /// Opens the compact grid above the Launcher tile. The dock stays in place and revealed beneath it.
+    private func openCompactLauncher(anchor: DockPopoverAnchor, previousApplication: NSRunningApplication?) {
+        interaction.idleFade.update(interacting: true, fullyVisible: true)
+        visibility.update(activation: false, retained: true, held: true)
+        interaction.compactLauncherOpen = true
+        let controller = CompactLauncherController(launcher: launcher, anchor: anchor,
+                                                   pins: store.pins.compactMap(\.application),
+                                                   previousApplication: previousApplication)
+        controller.didClose = { [weak self] in
+            guard let self else { return }
+            compactLauncher = nil
+            interaction.compactLauncherOpen = false
+            launcherDidClose()
+        }
+        compactLauncher = controller
+        controller.show()
+    }
+
+    /// Closes whichever Launcher style is open. The compact grid always animates through its popover.
+    private func closeActiveLauncher(animated: Bool = true, restoreFocus: Bool = true) {
+        if let compactLauncher { compactLauncher.close(restoreFocus: restoreFocus) }
+        else { launcherPresentation.close(animated: animated, restoreFocus: restoreFocus) }
+    }
+
+    /// Returns the dock to its resting frame and input handling after either Launcher style closes.
+    private func launcherDidClose() {
+        guard !stopped else { return }
+        panel.setFrame(geometry?.windowFrame ?? .zero, display: true)
+        mouseHeld = false
+        updatePointer(); present()
+    }
+
+    func closeLauncher() { closeActiveLauncher(animated: false, restoreFocus: false) }
 
     func owns(_ window: NSWindow?) -> Bool { window === panel }
     /// Rebuilds the panel envelope after timeline browsing starts or ends so the glance card fits.
@@ -670,7 +710,7 @@ final class DockPanelController {
     }
 
     func focus() {
-        launcherPresentation.close(animated: false, restoreFocus: false)
+        closeActiveLauncher(animated: false, restoreFocus: false)
         store.keyboardFocus = true
         visibility.showImmediately()
         panel.acceptsKeyboardFocus = true
@@ -756,13 +796,14 @@ final class DockPanelController {
     }
     /// Sleep cancels the idle deadline; the next display refresh resumes normal input handling.
     func suspendIdleFading() {
-        launcherPresentation.close(animated: false, restoreFocus: false)
+        closeActiveLauncher(animated: false, restoreFocus: false)
         idleSuspended = true
         interaction.suppressTooltips = true; interaction.tooltips.clear()
         interaction.idleFade.reset()
     }
 
     func stop() {
+        compactLauncher?.didClose = nil; compactLauncher?.close(restoreFocus: false); compactLauncher = nil
         launcherPresentation.stop(); launcherWillOpen = nil; interaction.openLauncher = nil
         invalidateDrag?(); invalidateDrag = nil
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()

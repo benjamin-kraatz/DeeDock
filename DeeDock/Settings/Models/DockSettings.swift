@@ -115,6 +115,9 @@ struct DockSettings: Codable, Equatable {
     /// `iconStyle` is `.line`, so turning Line off restores native Launcher artwork without rewriting
     /// this preference.
     var launcherLineIcons: Bool = true
+    /// The full, dock-morphing Launcher or the compact grid above the Launcher tile. Independent of
+    /// ``launcherLineIcons``. Documents saved before this key decode as `.full`.
+    var launcherStyle: LauncherStyle = .full
     /// Whether Stardust twinkles. Drawn styles are always still, and Reduce Motion
     /// overrides this without rewriting the saved preference.
     var animateIndicators: Bool = true
@@ -192,7 +195,7 @@ extension DockSettings {
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case windowMarkupFormat, windowMarkupSearchEngine, windowMarkupFolder
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, launcherStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -252,6 +255,7 @@ extension DockSettings {
             ? try values.decode(RunningIndicatorStyle.self, forKey: .runningIndicatorStyle) : .dot
         iconStyle = try values.decodeIfPresent(DockIconStyle.self, forKey: .iconStyle) ?? .native
         launcherLineIcons = try values.decodeIfPresent(Bool.self, forKey: .launcherLineIcons) ?? true
+        launcherStyle = try values.decodeIfPresent(LauncherStyle.self, forKey: .launcherStyle) ?? .full
         animateIndicators = values.contains(.animateIndicators)
             ? try values.decode(Bool.self, forKey: .animateIndicators) : true
         launchAnimation = values.contains(.launchAnimation)

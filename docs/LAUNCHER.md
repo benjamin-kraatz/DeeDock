@@ -2,6 +2,23 @@
 
 Optional [app suggestions](LAUNCHER-SUGGESTIONS.md) appear above ordinary results for an empty query after explicit opt-in.
 
+## Compact style
+
+With **Launcher style** set to **Compact** in Appearance, the tile opens a small app grid in a dock
+popover above it instead of expanding the dock. The grid uses the same app results, opening,
+history, context menu, and line icons as the full Launcher, but skips window discovery and
+suggestion prediction because it shows neither. It starts from the default browse options.
+
+The search field keeps focus. Down enters the grid at the first app, the arrows then move by tile or
+row, and Return opens the selected app, or the first match when nothing is selected. Escape first
+leaves the grid, then clears the query, then closes and reactivates the previous app. Opening an app,
+an outside click, a click on the dock, or another app taking focus closes it without reactivating
+anything. Another dock popover opening also closes it. A file drop on the tile replaces the
+compact grid with the full Launcher, which owns file actions. The panel keeps one size while it is
+open, and the Launcher tile's line glyph keeps glowing until it closes.
+
+The rest of this page describes the full Launcher.
+
 The permanent **App Launcher** tile expands its dock window into a panel on the same display.
 **Back to dock** and Escape reverse the transition. An outside click closes the panel without
 reactivating the previous app. Reduce Motion disables the window animation, and Reduce

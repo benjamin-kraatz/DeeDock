@@ -141,6 +141,7 @@ enum AnalyticsContext {
          "dock_indicator_style": AnalyticsValue(settings.runningIndicatorStyle),
          "dock_icon_style": AnalyticsValue(settings.iconStyle),
          "dock_launcher_line_icons": AnalyticsValue(settings.launcherLineIcons),
+         "dock_launcher_style": AnalyticsValue(settings.launcherStyle),
          "dock_tooltip_preset": AnalyticsValue(settings.tooltipPreset),
          "dock_launch_animation": AnalyticsValue(settings.launchAnimation),
          "dock_show_background": AnalyticsValue(settings.showBackground),

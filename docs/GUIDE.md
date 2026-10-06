@@ -292,6 +292,12 @@ Shortcut, or copy them into a chosen folder. See the [launcher reference](LAUNCH
 for controls and discovery limits, and the [acceptance notes](ACCEPTANCE.md#dee-8-app-launcher)
 for validation status.
 
+**Settings → Dock → Appearance → Launcher** chooses **Full**, described above, or **Compact**: a
+small app grid with a search field that opens above the Launcher tile and leaves the dock in place.
+The compact grid shows apps only, without suggestions, tools, Robi, or mixed search. Dropping files
+on the tile always opens the full Launcher. **Line icons in Launcher** applies to both styles. Each
+display can override the style.
+
 ### Launcher position
 
 The launcher sits at the far left of a horizontal dock, or the top of a vertical one, by default.
@@ -392,6 +398,7 @@ Choose **Settings…** from the menu-bar item or app menu (⌘, while DOKK is ac
 | Edge distance | 0–300 points | 8 |
 | Position relative to | Usable desktop / Screen edge | Usable desktop |
 | App Launcher position | Far end left or top / after any pin / far end right or bottom | Far left or top |
+| Launcher style | Full / Compact | Full |
 
 Numeric controls support sliders and locale-aware typed values. Invalid drafts never enter layout calculations; leaving the field restores the last accepted value. **Restore Defaults** on the Defaults page resets shared configuration only and preserves display overrides, visibility, and pins. Unreadable saved settings are left intact and reported in Settings; Restore Defaults explicitly replaces them.
 
