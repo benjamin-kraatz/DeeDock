@@ -25,7 +25,7 @@ final class CompactLauncherController {
         launcher.begin(pins: pins, foregroundID: self.previousApplication?.bundleIdentifier, style: .compact)
         // `clickFocus` routes key-downs through `keyHandler` before the search field's editor sees them.
         popover = DockPopoverPanelController(anchor: anchor, keyboard: true, clickFocus: true, activates: true,
-                                             ideal: CompactLauncherLayout.idealSize) { chrome in
+                                             windowShadow: false, ideal: CompactLauncherLayout.idealSize) { chrome in
             model.chrome = chrome
         } content: {
             CompactLauncherView(model: model)

@@ -65,11 +65,13 @@ final class DockPopoverPanelController<Content: View> {
     /// - Parameters:
     ///   - activates: Activates DOKK through ``ExplicitWindowPresenter`` when shown, so a text field
     ///     gets ordinary field-editor focus. Implies `keyboard`.
+    ///   - windowShadow: Whether AppKit draws the window shadow. Liquid Glass content draws its own,
+    ///     and AppKit would outline the whole rectangular window around it, so glass panels pass false.
     ///   - chromeChanged: Receives the resolved chrome before the content is built, and again on
     ///     every re-anchor, so the content view can draw its pointer in the right place.
     ///   - content: Built once, after the initial chrome has been published.
     init(anchor: DockPopoverAnchor, keyboard: Bool, clickFocus: Bool = false, activates: Bool = false,
-         ideal: CGSize = DockPopoverGeometry.idealSize,
+         windowShadow: Bool = true, ideal: CGSize = DockPopoverGeometry.idealSize,
          chromeChanged: @escaping (DockPopoverChrome) -> Void, content: () -> Content) {
         self.keyboard = keyboard || activates
         self.clickFocus = clickFocus
@@ -82,7 +84,7 @@ final class DockPopoverPanelController<Content: View> {
                                  backing: .buffered, defer: false)
         panel.isOpaque = false
         panel.backgroundColor = .clear
-        panel.hasShadow = true
+        panel.hasShadow = windowShadow
         panel.level = .popUpMenu
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
