@@ -47,7 +47,9 @@ final class SystemDockTuckController {
     @ObservationIgnored private let repository: SystemDockTuckRepository
     @ObservationIgnored private var record = SystemDockTuckRecord()
     @ObservationIgnored private var started = false
-    @ObservationIgnored private var followTask: Task<Void, Never>?
+    /// The pending orientation change, readable so tests can await it instead of guessing
+    /// how long the pause takes on a busy main actor.
+    @ObservationIgnored private(set) var followTask: Task<Void, Never>?
     @ObservationIgnored private var powerOffObserver: NSObjectProtocol?
     /// Logout, restart, and shutdown still restore the values, but restarting the Dock inside
     /// an ending session only produces a flash; the next login reads the restored values.

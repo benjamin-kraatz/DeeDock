@@ -3089,7 +3089,7 @@ They restored their own previous values (automatic hiding on, size 45) by writin
 - an unreadable record
 - semantic comparison
 
-**The tests were compiled but not run**, following `AGENTS.md`. The app was not launched and the real `com.apple.dock` domain was not written during implementation. Previews were not rendered.
+The tests were not run locally, following `AGENTS.md`. The pull request's CI job ran the full suite: 621 tests in 88 suites. Its only failure was the edge-following test, which had slept 1.2 seconds and expected the 0.8-second pause to have finished. On a busy runner the queued main-actor work had not run yet. Both edge-following tests now await the controller's pending task instead of the clock, and the second also requires that the task was scheduled. The re-run result is recorded on the pull request. The app was not launched and the real `com.apple.dock` domain was not written during implementation. Previews were not rendered.
 
 ### Tuck-away hands-on acceptance
 

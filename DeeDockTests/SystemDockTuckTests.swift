@@ -121,7 +121,8 @@ struct SystemDockTuckTests {
         tuck.mainDockEdge = .bottom
         tuck.tuckAway()
         tuck.mainDockEdge = .left
-        try await Task.sleep(for: .milliseconds(1_200))
+        let follow = try #require(tuck.followTask)
+        await follow.value
         expectTucked(service, "right")
         #expect(service.restartCount == 2)
         tuck.restore()
@@ -137,7 +138,8 @@ struct SystemDockTuckTests {
         tuck.tuckAway()
         service.stored[.orientation] = "bottom"
         tuck.mainDockEdge = .left
-        try await Task.sleep(for: .milliseconds(1_200))
+        let follow = try #require(tuck.followTask)
+        await follow.value
         #expect(service.stored[.orientation] as? String == "bottom")
         #expect(service.restartCount == 1)
     }
