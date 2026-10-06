@@ -14,6 +14,9 @@ final class LauncherState {
     var history: LauncherHistory { catalog.launcherHistory }
     var isPresented = false
     var contentVisible = false
+    /// Whether application tiles draw line glyphs, set by the owning dock from its Appearance
+    /// settings. Apps without a glyph keep their native icon.
+    var usesLineIcons = false
     /// The native glass animation's destination. Reversing it preserves the current velocity.
     var expanded = false
     /// Native animation completion, scoped by the presentation controller to this opening.

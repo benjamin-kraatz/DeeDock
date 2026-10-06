@@ -52,4 +52,22 @@ import Testing
         overrides.iconStyle = .line
         #expect(overrides.resolving(.defaults).iconStyle == .line)
     }
+
+    @Test("Launcher line icons follow Line by default and inherit per display")
+    func launcherLineIconsPersistence() throws {
+        var object = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(DockSettings.defaults)) as? [String: Any])
+        object.removeValue(forKey: "launcherLineIcons")
+        let legacy = try JSONSerialization.data(withJSONObject: object)
+        #expect(try JSONDecoder().decode(DockSettings.self, from: legacy).launcherLineIcons)
+
+        var shared = DockSettings.defaults
+        shared.launcherLineIcons = false
+        #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(shared)).launcherLineIcons == false)
+        var overrides = DockSettingsOverrides()
+        #expect(overrides.resolving(shared).launcherLineIcons == false)
+        overrides.launcherLineIcons = true
+        #expect(overrides.resolving(shared).launcherLineIcons)
+        let decoded = try JSONDecoder().decode(DockSettingsOverrides.self, from: JSONEncoder().encode(overrides))
+        #expect(decoded.launcherLineIcons == true)
+    }
 }

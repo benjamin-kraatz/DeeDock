@@ -32200,19 +32200,19 @@
       }
     },
     "settingsIconStyleHelp" : {
-      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow, and per-display override.",
+      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow, the optional Launcher toggle, and per-display override.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig. Jedes Display kann den Stil selbst wählen."
+            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig. Auch der Launcher kann sie verwenden. Jedes Display kann den Stil selbst wählen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow. Each display can choose its own style."
+            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow. The Launcher can use them too. Each display can choose its own style."
           }
         }
       }
@@ -32735,6 +32735,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Top"
+          }
+        }
+      }
+    },
+    "settingsLauncherLineIcons" : {
+      "comment" : "Appearance toggle under Icon style that also draws line glyphs in this dock's Launcher. Unavailable while the native icon style is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strichsymbole auch im Launcher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line icons in Launcher"
           }
         }
       }

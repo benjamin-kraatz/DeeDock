@@ -10,6 +10,7 @@ struct AppearanceSettingsPane: View {
     @Binding var cornerRadius: Double
     @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
     @Binding var iconStyle: DockIconStyle
+    @Binding var launcherLineIcons: Bool
     @Binding var animateIndicators: Bool
     @Binding var launchAnimation: DockLaunchAnimation
 
@@ -27,6 +28,9 @@ struct AppearanceSettingsPane: View {
             SettingsCard(title: .settingsIconStyle, footnote: .settingsIconStyleHelp) {
                 DockIconStylePicker(selection: $iconStyle)
                     .settingsOverride(overrideContext, field: .iconStyle)
+                SettingsToggleRow(title: .settingsLauncherLineIcons, isOn: $launcherLineIcons)
+                    .disabled(iconStyle != .line)
+                    .settingsOverride(overrideContext, field: .launcherLineIcons)
             }
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,
@@ -68,10 +72,12 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var cornerRadius: Double = 22
     @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .stardust
     @Previewable @State var iconStyle: DockIconStyle = .native
+    @Previewable @State var launcherLineIcons = true
     @Previewable @State var animate = true
     ScrollView {
         AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,
-                               runningIndicatorStyle: $indicator, iconStyle: $iconStyle, animateIndicators: $animate,
+                               runningIndicatorStyle: $indicator, iconStyle: $iconStyle,
+                               launcherLineIcons: $launcherLineIcons, animateIndicators: $animate,
                                launchAnimation: .constant(DockSettings.defaults.launchAnimation))
             .padding(24)
     }

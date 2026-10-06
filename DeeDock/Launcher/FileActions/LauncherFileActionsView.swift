@@ -92,6 +92,8 @@ private struct LauncherFileActionRow: View {
     let launcher: LauncherState
     private var state: LauncherFileActionState { launcher.fileActions }
     private var selected: Bool { state.selectedID == item.id }
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var icon: NSImage?
     private var shortcutStatus: ActionTileStatus? {
         guard case .shortcut(let id) = item.id else { return nil }
@@ -104,7 +106,12 @@ private struct LauncherFileActionRow: View {
         } label: {
             HStack(spacing: 12) {
                 Group {
-                    if let icon {
+                    if let application = item.application,
+                       let lineIcon = launcher.lineIcon(for: application, artwork: icon) {
+                        DockLineIconArtwork(icon: lineIcon, size: 34, hovered: selected,
+                                            reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
+                                            color: .primary)
+                    } else if let icon {
                         Image(nsImage: icon).resizable().scaledToFit()
                     } else {
                         Image(systemName: item.symbol).font(.title2)

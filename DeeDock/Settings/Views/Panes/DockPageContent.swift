@@ -38,6 +38,7 @@ struct DockPageContent: View {
                                        cornerRadius: binding(\.cornerRadius),
                                        runningIndicatorStyle: binding(\.runningIndicatorStyle),
                                        iconStyle: binding(\.iconStyle),
+                                       launcherLineIcons: binding(\.launcherLineIcons),
                                        animateIndicators: binding(\.animateIndicators),
                                        launchAnimation: binding(\.launchAnimation),
                                        overrideContext: override)

@@ -64,7 +64,8 @@ struct DockLineIcon {
 
 /// A line glyph over a soft colored glow that fades in on hover.
 ///
-/// The glow is drawn outside the tile's square and never takes hit-testing, so it cannot change the
+/// The dock always draws white on its dark glass; the Launcher passes `.primary` so glyphs stay
+/// legible on light glass too. The glow is drawn outside the tile's square and never takes hit-testing, so it cannot change the
 /// button region or click-through geometry. Reduce Transparency replaces the blurred glow with a
 /// brighter glyph; Reduce Motion shows and hides it without a fade.
 struct DockLineIconArtwork: View {
@@ -73,12 +74,13 @@ struct DockLineIconArtwork: View {
     let hovered: Bool
     let reduceMotion: Bool
     let reduceTransparency: Bool
+    var color: Color = .white
 
     private var glowing: Bool { hovered && !reduceTransparency }
 
     var body: some View {
         LineIconArtwork(glyph: icon.glyph, size: size,
-                        color: .white.opacity(hovered || reduceTransparency ? 1 : 0.92))
+                        color: color.opacity(hovered || reduceTransparency ? 1 : 0.92))
             // At rest a faint dark edge keeps white lines legible on light wallpapers seen through the glass.
             .shadow(color: glowing ? .white.opacity(0.55) : .black.opacity(0.35),
                     radius: glowing ? size * 0.06 : max(0.5, size * 0.015))
