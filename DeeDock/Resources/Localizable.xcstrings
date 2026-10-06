@@ -31066,19 +31066,19 @@
       }
     },
     "settingsBehaviorKeywords" : {
-      "comment" : "Space-separated search synonyms for auto-hide, activation dimensions, and animations.",
+      "comment" : "Space-separated search synonyms for auto-hide, activation dimensions, animations, and tucking away the macOS Dock.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "automatisch ausblenden einblenden Aktivierungszone Länge Tiefe Breite Höhe Versatz Verzögerung Animation Dauer Vorschau Rand App Sichtbarkeit angeheftet laufend einklappen ausklappen Bereiche"
+            "value" : "automatisch ausblenden einblenden Aktivierungszone Länge Tiefe Breite Höhe Versatz Verzögerung Animation Dauer Vorschau Rand App Sichtbarkeit angeheftet laufend einklappen ausklappen Bereiche macOS System-Dock wegräumen ausblenden wiederherstellen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "auto hide reveal activation zone length depth width height offset delay animation duration preview edge app visibility hide pinned running collapse expand sections"
+            "value" : "auto hide reveal activation zone length depth width height offset delay animation duration preview edge app visibility hide pinned running collapse expand sections macOS system Dock tuck away hide restore"
           }
         }
       }
@@ -35723,6 +35723,258 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Soap bubbles"
+          }
+        }
+      }
+    },
+    "systemDockRestoreAction" : {
+      "comment" : "Button that puts the person's own macOS Dock settings back after DOKK tucked it away.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS-Dock wiederherstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore macOS Dock"
+          }
+        }
+      }
+    },
+    "systemDockRestoreActionHint" : {
+      "comment" : "VoiceOver hint for the Restore macOS Dock button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellt deine eigenen Einstellungen des macOS-Docks wieder her und startet das Dock neu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puts back your own macOS Dock settings and restarts the Dock."
+          }
+        }
+      }
+    },
+    "systemDockRestoreFailed" : {
+      "comment" : "Error when DOKK could not put the person's macOS Dock settings back. 'Desktop & Dock' is Apple's System Settings pane; use Apple's translation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK konnte die Einstellungen des macOS-Docks nicht wiederherstellen. Versuche es erneut oder deaktiviere das automatische Ausblenden in den Systemeinstellungen unter „Schreibtisch & Dock“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK couldn’t restore the macOS Dock’s settings. Try again, or turn off automatic hiding in System Settings → Desktop & Dock."
+          }
+        }
+      }
+    },
+    "systemDockTuckAction" : {
+      "comment" : "Button that hides the macOS Dock, shrinks it, and moves it to the side by changing its settings. Shown in Settings and on the tour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS-Dock wegräumen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuck Away macOS Dock"
+          }
+        }
+      }
+    },
+    "systemDockTuckActionHint" : {
+      "comment" : "VoiceOver hint for the Tuck Away macOS Dock button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändert die Einstellungen des macOS-Docks und startet es neu. Beim Beenden von DOKK werden sie zurückgesetzt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changes the macOS Dock’s settings and restarts it. Quitting DOKK puts them back."
+          }
+        }
+      }
+    },
+    "systemDockTuckFailedManaged" : {
+      "comment" : "Error when a configuration profile from the person's organization controls the macOS Dock settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Organisation verwaltet die Einstellungen des macOS-Docks, daher kann DOKK sie nicht ändern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your organization manages the macOS Dock’s settings, so DOKK can’t change them."
+          }
+        }
+      }
+    },
+    "systemDockTuckFailedSnapshot" : {
+      "comment" : "Error when DOKK could not save the macOS Dock's current settings before changing them; nothing was changed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK konnte die aktuellen Einstellungen des macOS-Docks nicht sichern und hat sie daher nicht geändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK couldn’t save the macOS Dock’s current settings, so it left them unchanged."
+          }
+        }
+      }
+    },
+    "systemDockTuckFailedWrite" : {
+      "comment" : "Error when macOS did not accept DOKK's change to the macOS Dock settings; DOKK put back what it could.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK konnte die Einstellungen des macOS-Docks nicht ändern. Deine Einstellungen wurden wiederhergestellt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK couldn’t change the macOS Dock’s settings. Your settings were put back."
+          }
+        }
+      }
+    },
+    "systemDockTuckFootnote" : {
+      "comment" : "Footnote under the macOS Dock card explaining what tucking away does and how to get the Dock back.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blendet das macOS-Dock aus, macht es so klein wie möglich und verschiebt es auf die Seite, die DOKK nicht nutzt. Beim Beenden von DOKK werden deine Einstellungen wiederhergestellt, beim nächsten Start räumt DOKK es wieder weg. Das macOS-Dock startet dabei jedes Mal kurz neu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hides the macOS Dock, makes it as small as possible, and moves it to the side away from DOKK. Quitting DOKK puts your settings back, and DOKK tucks it away again the next time it starts. The macOS Dock restarts briefly each time."
+          }
+        }
+      }
+    },
+    "systemDockTuckStatusLeft" : {
+      "comment" : "Status in the macOS Dock card while DOKK keeps the system Dock tucked away on the left edge of the screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am linken Rand weggeräumt. Halte den Zeiger 10 Sekunden dort, um es hervorzuholen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tucked away on the left edge. Rest the pointer there for 10 seconds to bring it out."
+          }
+        }
+      }
+    },
+    "systemDockTuckStatusOff" : {
+      "comment" : "Status in the macOS Dock card when DOKK has not changed the system Dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das macOS-Dock nutzt deine eigenen Einstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The macOS Dock uses your own settings."
+          }
+        }
+      }
+    },
+    "systemDockTuckStatusPending" : {
+      "comment" : "Status in the macOS Dock card when DOKK's changes are still in place but the switch is off, for example after a restore failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Änderungen von DOKK am macOS-Dock sind noch aktiv."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK’s changes to the macOS Dock are still in place."
+          }
+        }
+      }
+    },
+    "systemDockTuckStatusRight" : {
+      "comment" : "Status in the macOS Dock card while DOKK keeps the system Dock tucked away on the right edge of the screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am rechten Rand weggeräumt. Halte den Zeiger 10 Sekunden dort, um es hervorzuholen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tucked away on the right edge. Rest the pointer there for 10 seconds to bring it out."
+          }
+        }
+      }
+    },
+    "systemDockTuckTitle" : {
+      "comment" : "Heading of the Settings → Behavior card that tucks the macOS Dock away. 'macOS Dock' is the system Dock, not DOKK.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS-Dock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS Dock"
           }
         }
       }

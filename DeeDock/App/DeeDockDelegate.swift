@@ -13,7 +13,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let loginItems = LoginItemController(service: SystemLoginItemService())
     let menuBarIcon = MenuBarIconController()
     private(set) lazy var onboarding = OnboardingWindowController(
-        loginItems: loginItems, settings: coordinator.settings)
+        loginItems: loginItems, settings: coordinator.settings, systemDockTuck: coordinator.systemDockTuck)
     /// Reapplies the alias if SwiftUI rebuilds the application menu.
     private var productAliasObserver: NSObjectProtocol?
 
@@ -80,6 +80,8 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         if let productAliasObserver {
             NotificationCenter.default.removeObserver(productAliasObserver)
         }
+        // First, so the macOS Dock comes back even if a later teardown step misbehaves.
+        coordinator.systemDockTuck.restoreForTermination()
         updater.stop()
         AppDockPresence.shared.stop()
         onboarding.stop()
