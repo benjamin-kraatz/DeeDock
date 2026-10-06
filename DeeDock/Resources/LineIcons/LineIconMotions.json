@@ -19,10 +19,37 @@
       ]
     },
     "simple-icons:cursor": {
-      "about": "Flips once like a coin.",
-      "duration": 0.8,
+      "about": "Blinks like a text cursor: the dark facet drops out twice while the cube tilts.",
+      "duration": 1.0,
       "tracks": [
-        {"turn": [[0, 0], [1, 360]]}
+        {"parts": ["f1"], "scale": [[0.12, 1], [0.15, 0, "linear"], [0.36, 0], [0.39, 1, "linear"], [0.58, 1], [0.61, 0, "linear"], [0.82, 0], [0.85, 1, "linear"]], "anchor": [12, 14.6]},
+        {"rotate": [[0, 0], [0.3, -7, "out"], [0.7, -7], [0.95, 0]]}
+      ]
+    },
+    "custom:waterfox": {
+      "about": "The waves roll through the fox while it tilts its head.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.55, 1]]},
+        {"parts": ["s2"], "draw": [[0.15, 0], [0.7, 1]]},
+        {"rotate": [[0, 0], [0.3, -6, "out"], [0.7, -6], [0.92, 0]], "anchor": [12, 21.5]}
+      ]
+    },
+    "simple-icons:zenbrowser": {
+      "about": "Breathes: the rings swell outward one after another, like a ripple on still water.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f4", "f5"], "scale": [[0, 1], [0.2, 1.22, "out"], [0.55, 1, "back"]]},
+        {"parts": ["f2", "f3"], "scale": [[0.15, 1], [0.35, 1.12, "out"], [0.7, 1, "back"]]},
+        {"parts": ["f0", "f1"], "scale": [[0.3, 1], [0.5, 1.05, "out"], [0.85, 1, "back"]]}
+      ]
+    },
+    "simple-icons:heliumbrowser": {
+      "about": "Lighter than air: floats up with a slow sway and drifts back down.",
+      "duration": 1.0,
+      "tracks": [
+        {"y": [[0, 0], [0.4, -2.6, "out"], [0.75, 0.4], [1, 0]]},
+        {"rotate": [[0, 0], [0.25, -7, "out"], [0.6, 5], [0.9, 0]]}
       ]
     },
     "custom:chatgpt": {
