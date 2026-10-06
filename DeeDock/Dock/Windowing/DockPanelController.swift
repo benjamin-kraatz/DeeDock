@@ -190,7 +190,7 @@ final class DockPanelController {
         if launcher.isPresented {
             // Catalog changes may resize the resting dock, but must not collapse the launcher.
             // The compact Launcher follows its tile instead.
-            if let compactLauncher, let anchor = popoverAnchor(for: .launcher) { compactLauncher.update(anchor) }
+            if let compactLauncher, let anchor = restingLauncherAnchor() { compactLauncher.update(anchor) }
         } else if animateSectionChange && !visibility.reduceMotion && visibility.exposesContent {
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.18
@@ -652,7 +652,7 @@ final class DockPanelController {
         interaction.tooltips.clear()
         interaction.suppressTooltips = true
         let trigger: AnalyticsLauncherSource = files != nil ? .fileDrop : store.keyboardFocus ? .keyboard : .tile
-        if files == nil, settings.launcherStyle == .compact, let anchor = popoverAnchor(for: .launcher) {
+        if files == nil, settings.launcherStyle == .compact, let anchor = restingLauncherAnchor() {
             openCompactLauncher(anchor: anchor, previousApplication: previousApplication)
             Analytics.track(.launcherOpened(trigger, fileCount: 0))
             return
@@ -684,6 +684,21 @@ final class DockPanelController {
         }
         compactLauncher = controller
         controller.show()
+    }
+
+    /// The Launcher tile at rest, in screen space.
+    ///
+    /// The live tile frame is magnified while the pointer is over it and moves back once the
+    /// Launcher opens and clears the pointer, so the compact Launcher's pointer aims at the
+    /// resting layout instead. Nil when this dock has no Launcher tile.
+    private func restingLauncherAnchor() -> DockPopoverAnchor? {
+        guard let display = lastDisplay, let settings = lastSettings,
+              let index = store.entries.firstIndex(where: \.isLauncher),
+              index < baseLayout.restingCenters.count else { return nil }
+        let along = baseLayout.restingCenters[index] - interaction.scrollOffset
+        let icon = baseLayout.iconFrame(centerAlong: along, size: baseLayout.iconSize)
+        return DockPopoverAnchor(icon: DockEdge.screenRect(icon, in: baseRestingFrame), edge: settings.edge,
+                                 visibleFrame: display.visibleFrame)
     }
 
     /// Closes whichever Launcher style is open. The compact grid always animates through its popover.

@@ -15,7 +15,10 @@ leaves the grid, then clears the query, then closes and reactivates the previous
 an outside click, a click on the dock, or another app taking focus closes it without reactivating
 anything. Another dock popover opening also closes it. A file drop on the tile replaces the
 compact grid with the full Launcher, which owns file actions. The panel keeps one size while it is
-open, and the Launcher tile's line glyph keeps glowing until it closes.
+open, and the Launcher tile's line glyph keeps glowing until it closes. It draws Liquid Glass with a
+soft pointer aimed at the tile's resting position, so magnification under the click cannot offset
+it; Reduce Transparency uses an opaque background. The grid is leading-aligned at a fixed width,
+so an always-visible scroller sits in the trailing gutter instead of shifting the tiles.
 
 The rest of this page describes the full Launcher.
 

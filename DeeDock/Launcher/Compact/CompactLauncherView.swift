@@ -13,7 +13,7 @@ struct CompactLauncherView: View {
                 .padding(.horizontal, CompactLauncherLayout.padding)
             CompactLauncherGrid(model: model)
         }
-        .dockPopoverChrome(model.chrome, opaque: reduceTransparency)
+        .compactLauncherChrome(model.chrome, opaque: reduceTransparency)
         .onAppear { searchFocused = true }
         // Arrow keys and Return go through the controller, so the field can keep focus throughout.
         .onChange(of: searchFocused) { _, focused in if !focused { searchFocused = true } }
@@ -46,8 +46,12 @@ private struct CompactLauncherGrid: View {
                                 .id(application.id)
                         }
                     }
-                    .padding(.horizontal, CompactLauncherLayout.padding)
+                    // Leading-aligned at a fixed width: an always-visible scroller takes its width
+                    // from the trailing gutter, so the grid never shifts when results stop scrolling.
+                    .frame(width: CompactLauncherLayout.gridWidth)
+                    .padding(.leading, CompactLauncherLayout.padding)
                     .padding(.bottom, CompactLauncherLayout.padding)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .scrollIndicators(.automatic)
                 .onChange(of: model.selectedID) { _, id in

@@ -14,11 +14,17 @@ nonisolated enum CompactLauncherLayout {
     static let padding: CGFloat = 16
     static let headerHeight: CGFloat = 52
 
+    /// The grid's own width, without the side padding.
+    static var gridWidth: CGFloat {
+        CGFloat(columns) * tileWidth + CGFloat(columns - 1) * spacing
+    }
+
     /// The panel size handed to ``DockPopoverGeometry``, pointer included. The geometry still
-    /// shrinks it to fit small screens.
+    /// shrinks it to fit small screens. The trailing padding doubles as the gutter for an
+    /// always-visible scroller, which is at most this wide.
     static var idealSize: CGSize {
-        let columns = CGFloat(columns), rows = CGFloat(visibleRows)
-        let width = columns * tileWidth + (columns - 1) * spacing + padding * 2
+        let rows = CGFloat(visibleRows)
+        let width = gridWidth + padding * 2
         let grid = rows * tileHeight + (rows - 1) * spacing
         return CGSize(width: width, height: headerHeight + grid + padding * 2 + DockPopoverGeometry.pointerDepth)
     }
