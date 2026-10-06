@@ -134,6 +134,7 @@ final class DockPanelController {
         lastDisplay = display; lastSettings = settings
         store.sections.configure(settings.appVisibility)
         store.configureShelf(settings.showShelf)
+        store.configureNotificationFeed(settings.showNotificationFeed)
         store.configureLauncherPosition(settings.launcherPosition)
         store.configureSessionCapsules(settings.showSessionCapsules)
         store.configureTrash(settings.showTrash)
@@ -832,6 +833,8 @@ final class DockPanelController {
         interaction.canMoveVolume = nil; interaction.moveVolume = nil
         interaction.openFocusSession = nil
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
+        interaction.openNotificationFeed = nil; interaction.notificationFeed = nil
+        interaction.clearNotificationFeed = nil; interaction.prepareNotificationFeedSettings = nil
         interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil
         interaction.windowPeekHoverChanged = nil; interaction.openWindowPeek = nil
         interaction.removePin = nil; interaction.setFolderPresentation = nil

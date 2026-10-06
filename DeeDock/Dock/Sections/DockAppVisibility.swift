@@ -26,7 +26,7 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case launcher, focus, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, volume(String), update, trash
+    case launcher, focus, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, notificationFeed, volume(String), update, trash
     var hitID: String {
         switch self {
         case .melt(let id): "melt:\(id.uuidString)"
@@ -39,6 +39,7 @@ enum DockEntryID: Hashable {
         case .sessionCapsule(let id): "session-capsule:\(id.uuidString)"
         case .sessionCapsules: "session-capsules"
         case .shelf: "shelf"
+        case .notificationFeed: "notification-feed"
         case .volume(let id): "volume:\(id)"
         case .update: "update"
         case .trash: "trash"
@@ -69,6 +70,7 @@ enum DockSectionProjection {
                         actions: [ActionDockItem] = [], focus: FocusDockItem? = nil,
                         sessionCapsules: [SessionCapsuleDockItem] = [],
                         capsules: CapsuleDockItem? = nil, shelf: ShelfDockItem? = nil,
+                        notificationFeed: NotificationFeedDockItem? = nil,
                         volumes: [VolumeDockItem] = [], update: UpdateDockItem? = nil,
                         trash: TrashDockItem? = nil) -> [DockRenderSlot] {
         let pinned: [DockRenderSlot]
@@ -98,7 +100,8 @@ enum DockSectionProjection {
         // where the system Dock kept removable media.
         return applications + actions.map(DockRenderSlot.action) + (focus.map { [.focus($0)] } ?? []) + sessionCapsules.map(DockRenderSlot.sessionCapsule)
             + (capsules.map { [.sessionCapsules($0)] } ?? [])
-            + (shelf.map { [.shelf($0)] } ?? []) + volumes.map(DockRenderSlot.volume)
+            + (shelf.map { [.shelf($0)] } ?? [])
+            + (notificationFeed.map { [.notificationFeed($0)] } ?? []) + volumes.map(DockRenderSlot.volume)
             + (update.map { [.update($0)] } ?? []) + (trash.map { [.trash($0)] } ?? [])
     }
 

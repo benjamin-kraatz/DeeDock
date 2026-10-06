@@ -18,6 +18,8 @@ answer to a survey. Both are described below.
 - Launcher and search query text.
 - Names a person typed: Dock Modes, watches and watch presets, Shortcuts, drives, displays.
 - Clipboard contents.
+- Notification text: titles, subtitles, bodies, and the names of the apps that sent them. The
+  notification feed reports counts only, and nothing when a notification arrives.
 - Apple Intelligence prompts and output.
 - Error message strings. Failures are reported as enum codes.
 - Display names and serial numbers.
@@ -171,7 +173,7 @@ Registered with the SDK's `register`, so every event carries them.
 | `dock_launcher_style` | `full` or `compact` |
 | `dock_show_background`, `dock_fade_when_idle` | |
 | `window_peek_enabled`, `window_peek_layout` | |
-| `show_shelf`, `show_trash`, `show_session_capsules`, `show_volumes`, `soap_bubble_effects` | |
+| `show_shelf`, `show_trash`, `show_session_capsules`, `show_notification_feed`, `show_volumes`, `soap_bubble_effects` | |
 
 The marketing version, build number, and macOS version come from the SDK's default properties.
 
@@ -344,7 +346,9 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 | `patch_bay` | `action`, `cable_count`, `outcome` |
 | `clipboard_museum` | `action`, `kind`, `item_count` |
 | `clipboard_capture_enabled` | none |
-| `discovery_callout` | `callout`, `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `notification_feed_opened` | `entry_count` (entries in the feed), `unread_count` (entries that arrived since it was last opened), `trigger` |
+| `notification_feed_closed` | `entry_count` (entries left when it closed), `duration`, `cleared` (Clear All was used while it was open) |
 | `tool_opened` | `tool` (`window_search`, `local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
 | `focus_dock_entered` | `trigger` |
 | `focus_dock_command` | `command` |
@@ -352,6 +356,10 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 
 Atmosphere has no events of its own. Its settings are reported through `setting_changed` with
 `area = atmosphere`.
+
+Turning the notification feed on or off is `setting_changed` with `key = showNotificationFeed`.
+The feed sends no event when a notification arrives, and none of its events carry text or app
+names. `opened` for the `notificationFeed` callout means the person turned the feed on from it.
 
 ### App, permissions, and displays
 

@@ -5,6 +5,12 @@ see [Acceptance gaps](ACCEPTANCE-GAPS.md). The sections below preserve the evide
 implementation slice. Statements such as "tests were not run" describe that slice's original
 validation, unless a later dated result supersedes them.
 
+## DEE-115 notification feed
+
+Implemented on `feat/notification-panel`. An opt-in Notification Feed reads NotificationCenter banners through Accessibility and collects them in memory. A movable bell tile shows an unread badge and opens a popover. Settings → Features → Notification Feed holds the switch, the Accessibility row, and a transparency note. A launch-announced Discovery tip offers **Turn On**. Analytics send counts on open and close and the toggle through `setting_changed`, never text, app names, or arrivals. See [Notification feed](NOTIFICATION-FEED.md) for the design and the hands-on checks still required.
+
+Validation on 2026-10-06: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dokk-build/DerivedData CODE_SIGNING_ALLOWED=NO build` succeeded. New unit tests in `NotificationFeedTests.swift` and `DiscoveryEngineTests.swift` were compiled with `build-for-testing` and not run. The app was not launched. No banner was read through the shipped code, and previews were not rendered. Compilation does not establish native acceptance.
+
 ## Deprecated personality features
 
 Dock Sims (including AI icon rumours), Focus breathing, Focus debt, Pin weather / icon rust,

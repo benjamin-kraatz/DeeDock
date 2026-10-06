@@ -38,7 +38,7 @@ DOKK works without special permissions. A few features need one, and DOKK asks o
 
 | Permission | Used by |
 | --- | --- |
-| Accessibility | Window lists in app menus, Window Peek window selection, App Fusion, app badges, and resuming Session Capsules |
+| Accessibility | Window lists in app menus, Window Peek window selection, App Fusion, app badges, the Notification Feed, and resuming Session Capsules |
 | Screen Recording | Window Peek thumbnails and features that capture window contents, such as Session Capsules, markup, and window search. Also secondary docks that show only the apps with windows on their display |
 | Automation for Finder | Opening and emptying the Trash, and App Fusion folder navigation |
 

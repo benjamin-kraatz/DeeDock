@@ -32,6 +32,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case drives
     case capsules
     case badges
+    case notificationFeed
     case windowPeek
     case focusSessions
     case patchBay
@@ -72,7 +73,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
-        case .shelfAndTrash, .drives, .capsules, .badges, .windowPeek,
+        case .shelfAndTrash, .drives, .capsules, .badges, .notificationFeed, .windowPeek,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
              .discovery, .quarantine: .features
@@ -106,6 +107,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .drives: .settingsVolumes
         case .capsules: .settingsCapsules
         case .badges: .appBadgesTitle
+        case .notificationFeed: .notificationFeedName
         case .windowPeek: .windowPeekTitle
         case .focusSessions: .focusTitle
         case .focusBreathing: .focusBreathingTitle
@@ -143,6 +145,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .drives: .settingsFeatureDrivesSubtitle
         case .capsules: .settingsFeatureCapsulesSubtitle
         case .badges: .settingsFeatureBadgesSubtitle
+        case .notificationFeed: .settingsFeatureNotificationFeedSubtitle
         case .windowPeek: .settingsFeaturePeekSubtitle
         case .focusSessions: .settingsFeatureFocusSubtitle
         case .focusBreathing: .settingsFeatureFocusBreathingSubtitle
@@ -182,6 +185,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .drives: .symbol("externaldrive.fill")
         case .capsules: .symbol("capsule.portrait.fill")
         case .badges: .symbol("app.badge.fill")
+        case .notificationFeed: .symbol("bell.badge.fill")
         case .windowPeek: .symbol("macwindow.on.rectangle")
         case .focusSessions: .symbol("timer")
         case .focusBreathing: .symbol("wind")
@@ -219,6 +223,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .drives: Color(red: 0.42, green: 0.48, blue: 0.58)
         case .capsules: Color(red: 0.16, green: 0.62, blue: 0.80)
         case .badges: Color(red: 0.88, green: 0.24, blue: 0.28)
+        case .notificationFeed: Color(red: 0.86, green: 0.56, blue: 0.10)
         case .windowPeek: Color(red: 0.24, green: 0.50, blue: 0.94)
         case .focusSessions: Color(red: 0.92, green: 0.38, blue: 0.24)
         case .focusBreathing: Color(red: 0.18, green: 0.62, blue: 0.58)
@@ -256,6 +261,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .drives: [Color(red: 0.66, green: 0.71, blue: 0.79), Color(red: 0.30, green: 0.35, blue: 0.44)]
         case .capsules: [Color(red: 0.40, green: 0.82, blue: 0.96), Color(red: 0.08, green: 0.50, blue: 0.72)]
         case .badges: [Color(red: 1.0, green: 0.44, blue: 0.42), Color(red: 0.80, green: 0.14, blue: 0.20)]
+        case .notificationFeed: [Color(red: 1.0, green: 0.80, blue: 0.32), Color(red: 0.90, green: 0.52, blue: 0.06)]
         case .windowPeek: [Color(red: 0.44, green: 0.68, blue: 1.0), Color(red: 0.14, green: 0.36, blue: 0.88)]
         case .focusSessions: [Color(red: 1.0, green: 0.58, blue: 0.34), Color(red: 0.84, green: 0.24, blue: 0.16)]
         case .focusBreathing: [Color(red: 0.46, green: 0.86, blue: 0.80), Color(red: 0.10, green: 0.50, blue: 0.48)]
@@ -288,6 +294,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .magneticEdges: .settingsMagneticEdgesKeywords
         case .sims: .simsSettingsKeywords
         case .discovery: .discoverySettingsHelp
+        case .notificationFeed: .notificationFeedSettingsKeywords
         case .soapBubbles: .soapBubblesSettingsKeywords
         case .focusBreathing: .focusBreathingHelp
         case .focusDebt: .focusDebtHelp

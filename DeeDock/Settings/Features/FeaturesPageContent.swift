@@ -44,6 +44,10 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
             }
+        case .notificationFeed:
+            NotificationFeedSettingsCard(isOn: source.binding(\.showNotificationFeed),
+                                         windowAccess: context.windowAccess,
+                                         feed: context.coordinator?.notificationFeed, locked: locked)
         case .windowPeek:
             // Permissions stay usable on their own page even when unreadable settings block edits.
             WindowPeekSettingsPane(source: source, persistentSettingsDisabled: locked)

@@ -39,6 +39,8 @@ final class DockStore {
     @ObservationIgnored var copyPin: ((DockPin, String) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    /// Opens or closes the notification feed popover on this display.
+    @ObservationIgnored var openNotificationFeed: (() -> Void)?
     @ObservationIgnored var openUpdate: ((UpdateDockItem) -> Void)?
     /// Opens a volume's contents as a stack. The flag is true for keyboard activation.
     @ObservationIgnored var openVolume: ((VolumeDockItem, Bool) -> Void)?
@@ -65,6 +67,7 @@ final class DockStore {
     @ObservationIgnored private var showsTrash = true
     @ObservationIgnored private var updateTile: UpdateDockItem?
     @ObservationIgnored private var showsShelf = true
+    @ObservationIgnored private var showsNotificationFeed = false
     @ObservationIgnored private var volumeVisibility = VolumeVisibility.hidden
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
@@ -228,13 +231,14 @@ final class DockStore {
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
+                                                  notificationFeed: showsNotificationFeed ? NotificationFeedDockItem() : nil,
                                                   volumes: volumes?.dockItems.filter { volumeVisibility.includes($0.kind) } ?? [],
                                                   update: updateTile,
                                                   trash: showsTrash ? trash?.item : nil)
         content.insert(contentsOf: pairs.flatMap { pair in pair.applicationIDs.indices.map { DockRenderSlot.melt(pair, $0) } },
                        at: content.firstIndex(where: \.isUtility) ?? content.count)
         let downloads = DockRenderSlot.folder(DownloadsDockItem.item(displayID: displayID))
-        let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.volume != nil || $0.trash != nil } ?? content.count
+        let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.notificationFeed != nil || $0.volume != nil || $0.trash != nil } ?? content.count
         content.insert(downloads, at: insertion)
         let order = utilityOrder
         let positions = content.indices.filter { content[$0].movableUtilityID != nil }
@@ -254,7 +258,9 @@ final class DockStore {
 
     private var utilityOrderKey: String { "dockUtilityOrder.\(displayID)" }
     private var utilityOrder: [String] {
-        let defaults = ["folder:\(DownloadsDockItem.id.uuidString)", "session-capsules", "shelf"]
+        // A tile added later is appended, so a saved order keeps its existing arrangement.
+        let defaults = ["folder:\(DownloadsDockItem.id.uuidString)", "session-capsules", "shelf",
+                        DockEntryID.notificationFeed.hitID]
         let saved = UserDefaults.standard.stringArray(forKey: utilityOrderKey) ?? []
         var seen = Set<String>()
         return (saved + defaults).filter { defaults.contains($0) && seen.insert($0).inserted }
@@ -302,6 +308,12 @@ final class DockStore {
     func configureShelf(_ visible: Bool) {
         guard showsShelf != visible else { return }
         showsShelf = visible
+        refreshEntries()
+    }
+
+    func configureNotificationFeed(_ visible: Bool) {
+        guard showsNotificationFeed != visible else { return }
+        showsNotificationFeed = visible
         refreshEntries()
     }
 
@@ -642,6 +654,7 @@ final class DockStore {
         case .sessionCapsule(let item): openSessionCapsule?(item.capsuleID)
         case .sessionCapsules: openSessionCapsules?()
         case .shelf: openShelf?()
+        case .notificationFeed: openNotificationFeed?()
         case .update(let item): openUpdate?(item)
         case .volume(let item): openVolume?(item, keyboardFocus)
         case .trash: openTrash()
@@ -653,5 +666,5 @@ final class DockStore {
     func stop() {
         if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
         stampObserver = nil
-        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

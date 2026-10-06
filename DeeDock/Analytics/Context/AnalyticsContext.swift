@@ -157,6 +157,7 @@ enum AnalyticsContext {
          "show_shelf": AnalyticsValue(settings.showShelf),
          "show_trash": AnalyticsValue(settings.showTrash),
          "show_session_capsules": AnalyticsValue(settings.showSessionCapsules),
+         "show_notification_feed": AnalyticsValue(settings.showNotificationFeed),
          "show_volumes": AnalyticsValue(settings.showVolumes),
          "soap_bubble_effects": AnalyticsValue(settings.soapBubbleEffects)]
     }

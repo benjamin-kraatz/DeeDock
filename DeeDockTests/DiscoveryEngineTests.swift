@@ -105,6 +105,38 @@ struct DiscoveryEngineTests {
         #expect(engine.advance(at: due.addingTimeInterval(5), canPresent: true)?.id == "waiting")
     }
 
+    @Test("A launch announcement waits for calm, snoozes until a later launch, and stops once used")
+    func launchAnnouncement() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let feed = try #require(DiscoveryProposal.catalog.first { $0.destination == .notificationFeed })
+        #expect(feed.signal == .launched)
+        let start = Date(timeIntervalSinceReferenceDate: 60_000)
+
+        let engine = DiscoveryEngine(defaults: defaults, catalog: [feed])
+        engine.record(.launched, at: start)
+        #expect(engine.advance(at: start, canPresent: true) == nil)
+        let calm = start.addingTimeInterval(feed.calmInterval)
+        #expect(engine.advance(at: calm, canPresent: true)?.id == feed.id)
+        engine.finish(forever: false, at: calm)
+        // The launch signal is spent. Nothing returns in this session.
+        #expect(engine.advance(at: calm.addingTimeInterval(feed.snoozeInterval), canPresent: true) == nil)
+
+        // A relaunch inside the snooze queues it but does not show it.
+        let relaunch = calm.addingTimeInterval(3600)
+        let second = DiscoveryEngine(defaults: defaults, catalog: [feed])
+        second.record(.launched, at: relaunch)
+        #expect(second.advance(at: relaunch.addingTimeInterval(feed.calmInterval), canPresent: true) == nil)
+
+        // After the snooze, a launch shows it again, unless the feed was turned on.
+        let later = calm.addingTimeInterval(feed.snoozeInterval + 1)
+        let third = DiscoveryEngine(defaults: defaults, catalog: [feed])
+        third.record(.launched, at: later)
+        third.markUsed(.notificationFeed)
+        #expect(third.queue.isEmpty)
+        #expect(third.advance(at: later.addingTimeInterval(feed.calmInterval), canPresent: true) == nil)
+    }
+
     private func proposal(
         id: String,
         threshold: Int,

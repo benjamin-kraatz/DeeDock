@@ -20,7 +20,7 @@ nonisolated struct LineIconGlyph: Equatable, @unchecked Sendable {
 
 /// Dock tiles that are not applications but still get a line glyph.
 nonisolated enum LineIconTile: String, CaseIterable, Sendable {
-    case launcher, trash, trashFull, folder, shelf, sessionCapsules
+    case launcher, trash, trashFull, folder, shelf, sessionCapsules, notificationFeed
     case volume, volumeRemovable, volumeNetwork, volumeDiskImage
 }
 
