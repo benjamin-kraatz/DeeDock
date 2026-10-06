@@ -75,6 +75,7 @@ extension AnalyticsEvent {
         case .focusDockCommand: "focus_dock_command"
         case .focusSession: "focus_session"
         case let .update(event, _): event.name
+        case .applicationUpdated: "Application updated"
         }
     }
 
@@ -233,6 +234,13 @@ extension AnalyticsEvent {
             ["action": .init(action)]
         case let .update(event, facts):
             facts.properties.merging(event.properties)
+        case let .applicationUpdated(change):
+            ["previous_version": AnalyticsVersion(change.previous.version).map(AnalyticsValue.init),
+             "version": AnalyticsVersion(change.current.version).map(AnalyticsValue.init),
+             "previous_build": AnalyticsVersion.build(change.previous.build).map(AnalyticsValue.init),
+             "build": AnalyticsVersion.build(change.current.build).map(AnalyticsValue.init),
+             "update_source": change.updateSource.map(AnalyticsValue.init),
+             "channel": change.channel.map(AnalyticsValue.init)]
         }
     }
 

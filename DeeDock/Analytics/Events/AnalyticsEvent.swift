@@ -7,7 +7,8 @@ import Foundation
 /// names, bundle IDs, paths, window titles, queries, and user-entered names out by construction. `docs/ANALYTICS.md` lists every event with its properties and must
 /// be updated together with this enum.
 ///
-/// Events PostHog captures by itself (app opened, installed, updated) have no case here.
+/// `Application Opened`, `Application Installed`, and `Application Backgrounded` are the SDK's.
+/// ``applicationUpdated(_:)`` is DOKK's, sent on the launch after a version or build change.
 enum AnalyticsEvent {
     // Settings and periodic reporting
     case settingChanged(AnalyticsSettingChange, area: AnalyticsSettingArea, display: AnalyticsDisplayRole?)
@@ -125,4 +126,6 @@ enum AnalyticsEvent {
     // Updates
     /// One step of the update flow, with the versions, settings, and phase it happened in.
     case update(AnalyticsUpdateEvent, AnalyticsUpdateFacts)
+    /// The first launch after the marketing version or the build changed.
+    case applicationUpdated(ApplicationUpdateLaunch.Change)
 }

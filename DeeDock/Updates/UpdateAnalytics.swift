@@ -29,6 +29,8 @@ final class UpdateAnalytics {
     }
 
     private let send: (AnalyticsEvent) -> Void
+    /// Nil reads ``Analytics/acceptsEvents`` at launch. Tests pass a fixed value.
+    private let analyticsEnabledOverride: Bool?
     private let defaults: UserDefaults
     private let now: () -> Date
     private let currentVersion: String
@@ -55,11 +57,15 @@ final class UpdateAnalytics {
     /// - Parameters:
     ///   - currentVersion: The running marketing version. Nil reads version and build from the bundle.
     ///   - currentBuild: The running build, used only with an explicit `currentVersion`.
+    ///   - analyticsEnabled: Whether `Application updated` may be handed over. Nil reads
+    ///     ``Analytics/acceptsEvents`` when the launch is reported. The version is stored either way.
     ///   - send: Receives each event. Nil sends through ``Analytics/track(_:)``; tests pass a recorder.
     init(defaults: UserDefaults = .standard, currentVersion: String? = nil, currentBuild: String? = nil,
-         now: @escaping () -> Date = Date.init, send: ((AnalyticsEvent) -> Void)? = nil) {
+         now: @escaping () -> Date = Date.init, analyticsEnabled: Bool? = nil,
+         send: ((AnalyticsEvent) -> Void)? = nil) {
         self.defaults = defaults
         self.now = now
+        self.analyticsEnabledOverride = analyticsEnabled
         self.send = send ?? { Analytics.track($0) }
         self.currentVersion = currentVersion ?? AppVersionInfo.current.version
         self.currentBuild = currentVersion == nil ? AppVersionInfo.current.build : currentBuild
@@ -68,27 +74,57 @@ final class UpdateAnalytics {
     // MARK: - Launch and termination
 
     /// Reports an install that finished or failed since the last launch, then records this one.
-    /// Call once at launch. The first launch ever reports nothing; PostHog's own
-    /// `Application Installed` covers it.
+    ///
+    /// Call once at launch. The first launch stores the version and sends no `Application updated`.
+    /// A later launch sends it only when the version or build changed and analytics is accepting
+    /// events. The stored version is written after that hand-off, so a crash before the hand-off
+    /// is reported again on the next launch.
     func reportLaunch() {
         let previous = UpdateLaunchRecord.load(from: defaults)
-        if let pending = UpdatePendingInstallRecord.load(from: defaults) {
+        let pending = UpdatePendingInstallRecord.load(from: defaults)
+        // The marker belongs to the offered target only. Any other launch drops it.
+        let updateSource: ApplicationUpdateSource?
+        if let pending {
             let path = AnalyticsUpdateInstallPath(rawValue: pending.path) ?? .automatic
             let duration = now().timeIntervalSince(pending.startedAt)
-            if pending.isSameBuild(version: currentVersion, build: currentBuild) {
-                emit(.installFailed(path: path, offerVersion: AnalyticsVersion(pending.offerVersion),
-                                    offerBuild: AnalyticsVersion.build(pending.offerBuild), duration: duration))
-            } else {
+            if pending.matchesTarget(version: currentVersion, build: currentBuild) {
+                updateSource = pending.updateSource.flatMap(ApplicationUpdateSource.init(rawValue:))
                 emit(.installed(path: path, previousVersion: AnalyticsVersion(pending.fromVersion),
                                 previousBuild: AnalyticsVersion.build(pending.fromBuild),
                                 offerVersion: AnalyticsVersion(pending.offerVersion),
                                 offerBuild: AnalyticsVersion.build(pending.offerBuild), duration: duration))
+            } else if pending.isSameBuild(version: currentVersion, build: currentBuild),
+                      pending.offerVersion != nil, pending.offerBuild != nil {
+                // Still the build that started the install, and the offer was a different build.
+                // A cancelled attempt never reaches here: `aborted` already removed the record.
+                updateSource = nil
+                emit(.installFailed(path: path, offerVersion: AnalyticsVersion(pending.offerVersion),
+                                    offerBuild: AnalyticsVersion.build(pending.offerBuild), duration: duration))
+            } else {
+                updateSource = nil
+                if let previous, previous.version != currentVersion || previous.build != currentBuild {
+                    emit(.installed(path: .manual, previousVersion: AnalyticsVersion(previous.version),
+                                    previousBuild: AnalyticsVersion.build(previous.build),
+                                    offerVersion: nil, offerBuild: nil, duration: nil))
+                }
             }
             UpdatePendingInstallRecord.clear(in: defaults)
-        } else if let previous, previous.version != currentVersion || previous.build != currentBuild {
-            emit(.installed(path: .manual, previousVersion: AnalyticsVersion(previous.version),
-                            previousBuild: AnalyticsVersion.build(previous.build),
-                            offerVersion: nil, offerBuild: nil, duration: nil))
+        } else {
+            updateSource = nil
+            if let previous, previous.version != currentVersion || previous.build != currentBuild {
+                emit(.installed(path: .manual, previousVersion: AnalyticsVersion(previous.version),
+                                previousBuild: AnalyticsVersion.build(previous.build),
+                                offerVersion: nil, offerBuild: nil, duration: nil))
+            }
+        }
+        if let change = ApplicationUpdateLaunch.change(
+            from: previous.map { .init(version: $0.version, build: $0.build) },
+            to: .init(version: currentVersion, build: currentBuild),
+            analyticsEnabled: analyticsEnabledOverride ?? Analytics.shared.acceptsEvents,
+            updateSource: updateSource,
+            channel: AnalyticsChannel.current
+        ) {
+            send(.applicationUpdated(change))
         }
         UpdateLaunchRecord(version: currentVersion, build: currentBuild).save(to: defaults)
     }
@@ -185,10 +221,17 @@ final class UpdateAnalytics {
         beginInstall(path: installPath ?? .automatic)
     }
 
-    /// Every error that ends a Sparkle cycle except "no update", which ``notFound(_:)`` reports.
+    /// Every error that ends a Sparkle cycle except "no update" and a cancelled installer prompt.
+    /// "No update" is reported by ``notFound(_:)``.
+    ///
+    /// The pending record is written before the authorization dialog, so every abort removes it,
+    /// including "no update" and Sparkle `4007`. A cancelled attempt must not be read on a later launch.
     func aborted(_ error: Error) {
+        UpdatePendingInstallRecord.clear(in: defaults)
         let error = Self.error(error)
-        guard !(error.domain == .sparkle && error.code == Int(SUError.noUpdateError.rawValue)) else { return }
+        // "No update" and a cancelled installer prompt share this callback with real failures.
+        // Leaving them out keeps `update_failed` usable as a success-rate denominator.
+        guard !Self.isExcludedFailure(error) else { return }
         emit(.failed(stage: stage, check: check, error: error))
     }
 
@@ -266,7 +309,9 @@ final class UpdateAnalytics {
         installReported = true
         UpdatePendingInstallRecord(fromVersion: currentVersion, fromBuild: currentBuild,
                                    offerVersion: offerIdentity.version, offerBuild: offerIdentity.build,
-                                   path: path.rawValue, startedAt: now())
+                                   path: path.rawValue,
+                                   updateSource: check.flatMap { ApplicationUpdateSource($0)?.rawValue },
+                                   startedAt: now())
             .save(to: defaults)
         emit(.installStarted(path: path, silent: !interactive, waited: elapsed(since: readyAt)))
     }
@@ -322,6 +367,13 @@ final class UpdateAnalytics {
         case .hardwareDoesNotSupportARM64: return .hardwareUnsupported
         default: return .unknown
         }
+    }
+
+    /// "No update" and the person cancelling the installer's authorization prompt.
+    private static func isExcludedFailure(_ error: AnalyticsUpdateError) -> Bool {
+        guard error.domain == .sparkle else { return false }
+        return error.code == Int(SUError.noUpdateError.rawValue)
+            || error.code == Int(SUError.installationCanceledError.rawValue)
     }
 
     /// Keeps the codes and drops the message, which may contain paths or URLs.

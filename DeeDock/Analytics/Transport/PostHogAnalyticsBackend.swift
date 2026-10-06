@@ -8,8 +8,9 @@ import PostHog
 /// ``AnalyticsBackendFactory`` then falls back to the no-op backend.
 ///
 /// The SDK's payloads are left alone: default properties such as `$device_name` stay, and no
-/// sanitizer is installed. The SDK's own lifecycle events (`Application Installed`,
-/// `Application Updated`, `Application Opened`) are relied on instead of DOKK events.
+/// sanitizer is installed. The SDK still sends `Application Installed`, `Application Opened`,
+/// and `Application Backgrounded`. DOKK sends `Application updated` itself: the SDK compares
+/// the build only and writes that build before capture, so a lost capture is never retried.
 ///
 /// Autocapture is left at what the SDK offers on macOS, which today is lifecycle events only.
 /// Element autocapture and session replay are compiled for iOS and Mac Catalyst only. If a later
