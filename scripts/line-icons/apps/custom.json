@@ -1,4 +1,5 @@
 [
+  {"icon": "custom:launcher", "bundleIDs": ["de.benjaminkraatz.DeeDock", "de.benjaminkraatz.DeeDock.dev"], "names": ["DOKK", "DeeDock"]},
   {"icon": "custom:finder", "bundleIDs": ["com.apple.finder"], "names": ["Finder"]},
   {"icon": "custom:chatgpt", "bundleIDs": ["com.openai.chat", "com.openai.codex"], "names": ["ChatGPT", "Codex"]},
   {"icon": "custom:microsoft-word", "bundleIDs": ["com.microsoft.Word"], "names": ["Microsoft Word"]},

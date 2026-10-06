@@ -1,11 +1,20 @@
 [
   {
+    "icon": "simple-icons:1panel",
+    "bundleIDs": [],
+    "names": [
+      "1Panel"
+    ]
+  },
+  {
     "icon": "simple-icons:1password",
     "bundleIDs": [
-      "com.1password.1password"
+      "com.1password.1password",
+      "com.agilebits.onepassword7"
     ],
     "names": [
-      "1Password"
+      "1Password",
+      "1Password 7"
     ]
   },
   {
@@ -47,9 +56,40 @@
   },
   {
     "icon": "simple-icons:alacritty",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.alacritty"
+    ],
     "names": [
       "Alacritty"
+    ]
+  },
+  {
+    "icon": "simple-icons:alfred",
+    "bundleIDs": [
+      "com.runningwithcrayons.Alfred",
+      "com.runningwithcrayons.Alfred-Preferences"
+    ],
+    "names": [
+      "Alfred",
+      "Alfred 5",
+      "Alfred 4"
+    ]
+  },
+  {
+    "icon": "simple-icons:anaconda",
+    "bundleIDs": [],
+    "names": [
+      "Anaconda-Navigator",
+      "Anaconda Navigator"
+    ]
+  },
+  {
+    "icon": "simple-icons:android",
+    "bundleIDs": [
+      "com.google.android.mtpviewer"
+    ],
+    "names": [
+      "Android File Transfer"
     ]
   },
   {
@@ -64,10 +104,20 @@
   {
     "icon": "simple-icons:anki",
     "bundleIDs": [
-      "net.ankiweb.anki"
+      "net.ankiweb.anki",
+      "net.ankiweb.dtop"
     ],
     "names": [
       "Anki"
+    ]
+  },
+  {
+    "icon": "simple-icons:anthropic",
+    "bundleIDs": [
+      "com.anthropic.claude-code-url-handler"
+    ],
+    "names": [
+      "Claude Code URL Handler"
     ]
   },
   {
@@ -103,6 +153,13 @@
     ]
   },
   {
+    "icon": "simple-icons:applemusic",
+    "bundleIDs": [],
+    "names": [
+      "Apple Music"
+    ]
+  },
+  {
     "icon": "simple-icons:arc",
     "bundleIDs": [
       "company.thebrowser.Browser"
@@ -112,10 +169,37 @@
     ]
   },
   {
+    "icon": "simple-icons:arduino",
+    "bundleIDs": [
+      "cc.arduino.IDE2",
+      "cc.arduino.Arduino"
+    ],
+    "names": [
+      "Arduino IDE",
+      "Arduino"
+    ]
+  },
+  {
     "icon": "simple-icons:asana",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.electron.asana"
+    ],
     "names": [
       "Asana"
+    ]
+  },
+  {
+    "icon": "simple-icons:asus",
+    "bundleIDs": [],
+    "names": [
+      "ASUS"
+    ]
+  },
+  {
+    "icon": "simple-icons:atlassian",
+    "bundleIDs": [],
+    "names": [
+      "Atlassian"
     ]
   },
   {
@@ -128,6 +212,64 @@
     ]
   },
   {
+    "icon": "simple-icons:audible",
+    "bundleIDs": [],
+    "names": [
+      "Audible"
+    ]
+  },
+  {
+    "icon": "simple-icons:autodesk",
+    "bundleIDs": [
+      "com.autodesk.fusion360"
+    ],
+    "names": [
+      "Autodesk Fusion",
+      "Autodesk Fusion 360"
+    ]
+  },
+  {
+    "icon": "simple-icons:autodeskmaya",
+    "bundleIDs": [
+      "com.autodesk.Maya"
+    ],
+    "names": [
+      "Maya"
+    ]
+  },
+  {
+    "icon": "simple-icons:avast",
+    "bundleIDs": [],
+    "names": [
+      "Avast Security"
+    ]
+  },
+  {
+    "icon": "simple-icons:backblaze",
+    "bundleIDs": [
+      "com.backblaze.bzbmenu"
+    ],
+    "names": [
+      "Backblaze"
+    ]
+  },
+  {
+    "icon": "simple-icons:bambulab",
+    "bundleIDs": [
+      "com.bambulab.bambu-studio"
+    ],
+    "names": [
+      "Bambu Studio"
+    ]
+  },
+  {
+    "icon": "simple-icons:bandcamp",
+    "bundleIDs": [],
+    "names": [
+      "Bandcamp"
+    ]
+  },
+  {
     "icon": "simple-icons:basecamp",
     "bundleIDs": [],
     "names": [
@@ -135,10 +277,26 @@
     ]
   },
   {
+    "icon": "simple-icons:battledotnet",
+    "bundleIDs": [
+      "net.battle.app"
+    ],
+    "names": [
+      "Battle.net"
+    ]
+  },
+  {
     "icon": "simple-icons:beekeeperstudio",
     "bundleIDs": [],
     "names": [
       "Beekeeper Studio"
+    ]
+  },
+  {
+    "icon": "simple-icons:behance",
+    "bundleIDs": [],
+    "names": [
+      "Behance"
     ]
   },
   {
@@ -150,9 +308,20 @@
   },
   {
     "icon": "simple-icons:binance",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.binance.BinanceDesktop"
+    ],
     "names": [
       "Binance"
+    ]
+  },
+  {
+    "icon": "simple-icons:bitcoin",
+    "bundleIDs": [
+      "org.bitcoinfoundation.Bitcoin-Qt"
+    ],
+    "names": [
+      "Bitcoin Core"
     ]
   },
   {
@@ -165,8 +334,28 @@
     ]
   },
   {
-    "icon": "simple-icons:blender",
+    "icon": "simple-icons:bitwig",
+    "bundleIDs": [
+      "com.bitwig.BitwigStudio"
+    ],
+    "names": [
+      "Bitwig Studio"
+    ]
+  },
+  {
+    "icon": "simple-icons:blackmagicdesign",
     "bundleIDs": [],
+    "names": [
+      "Blackmagic Proxy Generator",
+      "Blackmagic RAW Player",
+      "Blackmagic Desktop Video Setup"
+    ]
+  },
+  {
+    "icon": "simple-icons:blender",
+    "bundleIDs": [
+      "org.blenderfoundation.blender"
+    ],
     "names": [
       "Blender"
     ]
@@ -179,8 +368,44 @@
     ]
   },
   {
-    "icon": "simple-icons:bruno",
+    "icon": "simple-icons:bluesky",
     "bundleIDs": [],
+    "names": [
+      "Bluesky"
+    ]
+  },
+  {
+    "icon": "simple-icons:bose",
+    "bundleIDs": [],
+    "names": [
+      "Bose Updater"
+    ]
+  },
+  {
+    "icon": "simple-icons:box",
+    "bundleIDs": [
+      "com.box.desktop"
+    ],
+    "names": [
+      "Box Drive"
+    ]
+  },
+  {
+    "icon": "simple-icons:brave",
+    "bundleIDs": [
+      "com.brave.Browser",
+      "com.brave.Browser.beta",
+      "com.brave.Browser.nightly"
+    ],
+    "names": [
+      "Brave Browser"
+    ]
+  },
+  {
+    "icon": "simple-icons:bruno",
+    "bundleIDs": [
+      "com.usebruno.app"
+    ],
     "names": [
       "Bruno"
     ]
@@ -188,10 +413,20 @@
   {
     "icon": "simple-icons:burpsuite",
     "bundleIDs": [
-      "com.install4j.6592-1155-2163-3973.70"
+      "com.install4j.6592-1155-2163-3973.70",
+      "com.portswigger.burp.StartBurp"
     ],
     "names": [
-      "Burp Suite"
+      "Burp Suite",
+      "Burp Suite Community Edition",
+      "Burp Suite Professional"
+    ]
+  },
+  {
+    "icon": "simple-icons:castbox",
+    "bundleIDs": [],
+    "names": [
+      "Castbox"
     ]
   },
   {
@@ -201,6 +436,17 @@
     ],
     "names": [
       "Charles"
+    ]
+  },
+  {
+    "icon": "simple-icons:cinema4d",
+    "bundleIDs": [
+      "com.maxon.cinema4d",
+      "net.maxon.app-manager"
+    ],
+    "names": [
+      "Cinema 4D",
+      "Maxon App"
     ]
   },
   {
@@ -214,7 +460,9 @@
   },
   {
     "icon": "simple-icons:clickup",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.clickup.desktop-app"
+    ],
     "names": [
       "ClickUp"
     ]
@@ -238,10 +486,26 @@
     ]
   },
   {
+    "icon": "simple-icons:cloudflare",
+    "bundleIDs": [
+      "com.cloudflare.1dot1dot1dot1.macos"
+    ],
+    "names": [
+      "Cloudflare WARP"
+    ]
+  },
+  {
     "icon": "simple-icons:cmake",
     "bundleIDs": [],
     "names": [
       "CMake"
+    ]
+  },
+  {
+    "icon": "simple-icons:coda",
+    "bundleIDs": [],
+    "names": [
+      "Coda"
     ]
   },
   {
@@ -252,8 +516,47 @@
     ]
   },
   {
-    "icon": "simple-icons:cryptomator",
+    "icon": "simple-icons:codesandbox",
     "bundleIDs": [],
+    "names": [
+      "CodeSandbox"
+    ]
+  },
+  {
+    "icon": "simple-icons:confluence",
+    "bundleIDs": [],
+    "names": [
+      "Confluence"
+    ]
+  },
+  {
+    "icon": "simple-icons:corsair",
+    "bundleIDs": [
+      "com.corsair.cue.4"
+    ],
+    "names": [
+      "Corsair iCUE"
+    ]
+  },
+  {
+    "icon": "simple-icons:craftcms",
+    "bundleIDs": [],
+    "names": [
+      "Craft CMS"
+    ]
+  },
+  {
+    "icon": "simple-icons:crunchyroll",
+    "bundleIDs": [],
+    "names": [
+      "Crunchyroll"
+    ]
+  },
+  {
+    "icon": "simple-icons:cryptomator",
+    "bundleIDs": [
+      "org.cryptomator"
+    ],
     "names": [
       "Cryptomator"
     ]
@@ -269,9 +572,34 @@
   },
   {
     "icon": "simple-icons:cursor",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.todesktop.230313mzl4w4u92"
+    ],
     "names": [
       "Cursor"
+    ]
+  },
+  {
+    "icon": "simple-icons:dash",
+    "bundleIDs": [
+      "com.kapeli.dashdoc"
+    ],
+    "names": []
+  },
+  {
+    "icon": "simple-icons:dashlane",
+    "bundleIDs": [
+      "com.dashlane.dashlanephonefinal"
+    ],
+    "names": [
+      "Dashlane"
+    ]
+  },
+  {
+    "icon": "simple-icons:datadog",
+    "bundleIDs": [],
+    "names": [
+      "Datadog"
     ]
   },
   {
@@ -281,6 +609,18 @@
     ],
     "names": [
       "DataGrip"
+    ]
+  },
+  {
+    "icon": "simple-icons:davinciresolve",
+    "bundleIDs": [
+      "com.blackmagic-design.DaVinciResolve",
+      "com.blackmagic-design.DaVinciResolveLite",
+      "com.blackmagic-design.DaVinciResolveStudio"
+    ],
+    "names": [
+      "DaVinci Resolve",
+      "DaVinci Resolve Studio"
     ]
   },
   {
@@ -304,10 +644,26 @@
     ]
   },
   {
-    "icon": "simple-icons:deezer",
+    "icon": "simple-icons:deepseek",
     "bundleIDs": [],
     "names": [
+      "DeepSeek"
+    ]
+  },
+  {
+    "icon": "simple-icons:deezer",
+    "bundleIDs": [
+      "com.deezer.deezer-desktop"
+    ],
+    "names": [
       "Deezer"
+    ]
+  },
+  {
+    "icon": "simple-icons:dell",
+    "bundleIDs": [],
+    "names": [
+      "Dell Display Manager"
     ]
   },
   {
@@ -318,12 +674,47 @@
     ]
   },
   {
-    "icon": "simple-icons:discord",
+    "icon": "simple-icons:devdotto",
+    "bundleIDs": [],
+    "names": [
+      "DEV"
+    ]
+  },
+  {
+    "icon": "simple-icons:diagramsdotnet",
     "bundleIDs": [
-      "com.hnc.Discord"
+      "com.jgraph.drawio.desktop"
     ],
     "names": [
-      "Discord"
+      "draw.io"
+    ]
+  },
+  {
+    "icon": "simple-icons:digitalocean",
+    "bundleIDs": [],
+    "names": [
+      "DigitalOcean"
+    ]
+  },
+  {
+    "icon": "simple-icons:discord",
+    "bundleIDs": [
+      "com.hnc.Discord",
+      "com.hnc.DiscordPTB",
+      "com.hnc.DiscordCanary"
+    ],
+    "names": [
+      "Discord",
+      "Discord PTB",
+      "Discord Canary"
+    ]
+  },
+  {
+    "icon": "simple-icons:dji",
+    "bundleIDs": [],
+    "names": [
+      "DJI Assistant 2",
+      "DJI Fly"
     ]
   },
   {
@@ -353,6 +744,13 @@
     ]
   },
   {
+    "icon": "simple-icons:dribbble",
+    "bundleIDs": [],
+    "names": [
+      "Dribbble"
+    ]
+  },
+  {
     "icon": "simple-icons:dropbox",
     "bundleIDs": [
       "com.getdropbox.dropbox"
@@ -363,9 +761,18 @@
   },
   {
     "icon": "simple-icons:duckduckgo",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.duckduckgo.macos.browser"
+    ],
     "names": [
       "DuckDuckGo"
+    ]
+  },
+  {
+    "icon": "simple-icons:duolingo",
+    "bundleIDs": [],
+    "names": [
+      "Duolingo"
     ]
   },
   {
@@ -408,9 +815,24 @@
   },
   {
     "icon": "simple-icons:element",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "im.riot.app"
+    ],
     "names": [
       "Element"
+    ]
+  },
+  {
+    "icon": "simple-icons:elgato",
+    "bundleIDs": [
+      "com.elgato.StreamDeck",
+      "com.elgato.CameraHub"
+    ],
+    "names": [
+      "Elgato Stream Deck",
+      "Stream Deck",
+      "Elgato Camera Hub",
+      "Camera Hub"
     ]
   },
   {
@@ -428,12 +850,52 @@
     ]
   },
   {
+    "icon": "simple-icons:epicgames",
+    "bundleIDs": [
+      "com.epicgames.EpicGamesLauncher"
+    ],
+    "names": [
+      "Epic Games Launcher"
+    ]
+  },
+  {
+    "icon": "simple-icons:epson",
+    "bundleIDs": [],
+    "names": [
+      "Epson Scan 2",
+      "Epson Printer Utility"
+    ]
+  },
+  {
     "icon": "simple-icons:evernote",
     "bundleIDs": [
       "com.evernote.Evernote"
     ],
     "names": [
       "Evernote"
+    ]
+  },
+  {
+    "icon": "simple-icons:excalidraw",
+    "bundleIDs": [],
+    "names": [
+      "Excalidraw"
+    ]
+  },
+  {
+    "icon": "simple-icons:expressvpn",
+    "bundleIDs": [
+      "com.expressvpn.ExpressVPN"
+    ],
+    "names": [
+      "ExpressVPN"
+    ]
+  },
+  {
+    "icon": "simple-icons:facebook",
+    "bundleIDs": [],
+    "names": [
+      "Facebook"
     ]
   },
   {
@@ -451,10 +913,21 @@
     ]
   },
   {
-    "icon": "simple-icons:figma",
+    "icon": "simple-icons:feedly",
     "bundleIDs": [],
     "names": [
-      "Figma"
+      "Feedly"
+    ]
+  },
+  {
+    "icon": "simple-icons:figma",
+    "bundleIDs": [
+      "com.figma.Desktop",
+      "com.figma.Desktop.beta"
+    ],
+    "names": [
+      "Figma",
+      "Figma Beta"
     ]
   },
   {
@@ -462,6 +935,15 @@
     "bundleIDs": [],
     "names": [
       "Filen"
+    ]
+  },
+  {
+    "icon": "simple-icons:filezilla",
+    "bundleIDs": [
+      "org.filezilla-project.filezilla.app"
+    ],
+    "names": [
+      "FileZilla"
     ]
   },
   {
@@ -481,10 +963,28 @@
     ]
   },
   {
+    "icon": "simple-icons:firefoxbrowser",
+    "bundleIDs": [
+      "org.mozilla.firefoxdeveloperedition",
+      "org.mozilla.nightly"
+    ],
+    "names": [
+      "Firefox Developer Edition",
+      "Firefox Nightly"
+    ]
+  },
+  {
     "icon": "simple-icons:floorp",
     "bundleIDs": [],
     "names": [
       "Floorp"
+    ]
+  },
+  {
+    "icon": "simple-icons:flydotio",
+    "bundleIDs": [],
+    "names": [
+      "Fly.io"
     ]
   },
   {
@@ -517,7 +1017,9 @@
   },
   {
     "icon": "simple-icons:framer",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.framer.electron"
+    ],
     "names": [
       "Framer"
     ]
@@ -539,6 +1041,32 @@
     ]
   },
   {
+    "icon": "simple-icons:fujifilm",
+    "bundleIDs": [],
+    "names": [
+      "FUJIFILM X Webcam",
+      "X RAW STUDIO"
+    ]
+  },
+  {
+    "icon": "simple-icons:gamemaker",
+    "bundleIDs": [
+      "com.yoyogames.gms2"
+    ],
+    "names": [
+      "GameMaker"
+    ]
+  },
+  {
+    "icon": "simple-icons:garmin",
+    "bundleIDs": [
+      "com.garmin.renu.client"
+    ],
+    "names": [
+      "Garmin Express"
+    ]
+  },
+  {
     "icon": "simple-icons:ghostty",
     "bundleIDs": [
       "com.mitchellh.ghostty"
@@ -549,9 +1077,21 @@
   },
   {
     "icon": "simple-icons:gimp",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.gimp.gimp-2.10",
+      "org.gimp.gimp"
+    ],
     "names": [
       "GIMP"
+    ]
+  },
+  {
+    "icon": "simple-icons:github",
+    "bundleIDs": [
+      "com.github.GitHubClient"
+    ],
+    "names": [
+      "GitHub Desktop"
     ]
   },
   {
@@ -571,12 +1111,44 @@
     ]
   },
   {
+    "icon": "simple-icons:gmail",
+    "bundleIDs": [],
+    "names": [
+      "Gmail"
+    ]
+  },
+  {
+    "icon": "simple-icons:godotengine",
+    "bundleIDs": [
+      "org.godotengine.godot"
+    ],
+    "names": [
+      "Godot"
+    ]
+  },
+  {
+    "icon": "simple-icons:gogdotcom",
+    "bundleIDs": [
+      "com.gog.galaxy"
+    ],
+    "names": [
+      "GOG Galaxy"
+    ]
+  },
+  {
     "icon": "simple-icons:goland",
     "bundleIDs": [
       "com.jetbrains.goland"
     ],
     "names": [
       "GoLand"
+    ]
+  },
+  {
+    "icon": "simple-icons:goodreads",
+    "bundleIDs": [],
+    "names": [
+      "Goodreads"
     ]
   },
   {
@@ -587,10 +1159,105 @@
     ]
   },
   {
-    "icon": "simple-icons:googlechrome",
+    "icon": "simple-icons:googlecalendar",
     "bundleIDs": [],
     "names": [
-      "Google Chrome"
+      "Google Calendar"
+    ]
+  },
+  {
+    "icon": "simple-icons:googlechat",
+    "bundleIDs": [],
+    "names": [
+      "Google Chat"
+    ]
+  },
+  {
+    "icon": "simple-icons:googlechrome",
+    "bundleIDs": [
+      "com.google.Chrome.canary",
+      "com.google.Chrome.beta",
+      "com.google.Chrome.dev"
+    ],
+    "names": [
+      "Google Chrome",
+      "Google Chrome Canary",
+      "Google Chrome Beta",
+      "Google Chrome Dev",
+      "Chrome Remote Desktop"
+    ]
+  },
+  {
+    "icon": "simple-icons:googlecloud",
+    "bundleIDs": [],
+    "names": [
+      "Google Cloud SDK"
+    ]
+  },
+  {
+    "icon": "simple-icons:googledocs",
+    "bundleIDs": [
+      "com.google.drivefs.shortcuts.docs"
+    ],
+    "names": [
+      "Google Docs"
+    ]
+  },
+  {
+    "icon": "simple-icons:googledrive",
+    "bundleIDs": [
+      "com.google.drivefs"
+    ],
+    "names": [
+      "Google Drive"
+    ]
+  },
+  {
+    "icon": "simple-icons:googleearth",
+    "bundleIDs": [
+      "com.Google.GoogleEarthPro"
+    ],
+    "names": [
+      "Google Earth Pro"
+    ]
+  },
+  {
+    "icon": "simple-icons:googlegemini",
+    "bundleIDs": [
+      "com.google.GeminiMacOS"
+    ],
+    "names": []
+  },
+  {
+    "icon": "simple-icons:googlemeet",
+    "bundleIDs": [],
+    "names": [
+      "Google Meet"
+    ]
+  },
+  {
+    "icon": "simple-icons:googlesheets",
+    "bundleIDs": [
+      "com.google.drivefs.shortcuts.sheets"
+    ],
+    "names": [
+      "Google Sheets"
+    ]
+  },
+  {
+    "icon": "simple-icons:googleslides",
+    "bundleIDs": [
+      "com.google.drivefs.shortcuts.slides"
+    ],
+    "names": [
+      "Google Slides"
+    ]
+  },
+  {
+    "icon": "simple-icons:googletranslate",
+    "bundleIDs": [],
+    "names": [
+      "Google Translate"
     ]
   },
   {
@@ -601,10 +1268,57 @@
     ]
   },
   {
+    "icon": "simple-icons:grafana",
+    "bundleIDs": [],
+    "names": [
+      "Grafana"
+    ]
+  },
+  {
+    "icon": "simple-icons:grammarly",
+    "bundleIDs": [
+      "com.grammarly.ProjectLlama"
+    ],
+    "names": [
+      "Grammarly Desktop",
+      "Grammarly for Safari"
+    ]
+  },
+  {
     "icon": "simple-icons:guilded",
     "bundleIDs": [],
     "names": [
       "Guilded"
+    ]
+  },
+  {
+    "icon": "simple-icons:hashnode",
+    "bundleIDs": [],
+    "names": [
+      "Hashnode"
+    ]
+  },
+  {
+    "icon": "simple-icons:hbo",
+    "bundleIDs": [],
+    "names": [
+      "HBO Max"
+    ]
+  },
+  {
+    "icon": "simple-icons:helm",
+    "bundleIDs": [],
+    "names": [
+      "Helm"
+    ]
+  },
+  {
+    "icon": "simple-icons:heroicgameslauncher",
+    "bundleIDs": [
+      "com.heroicgameslauncher.hgl"
+    ],
+    "names": [
+      "Heroic"
     ]
   },
   {
@@ -636,6 +1350,13 @@
     ]
   },
   {
+    "icon": "simple-icons:homebridge",
+    "bundleIDs": [],
+    "names": [
+      "Homebridge"
+    ]
+  },
+  {
     "icon": "simple-icons:hoppscotch",
     "bundleIDs": [
       "io.hoppscotch.desktop"
@@ -645,17 +1366,60 @@
     ]
   },
   {
-    "icon": "simple-icons:httpie",
+    "icon": "simple-icons:houdini",
     "bundleIDs": [],
+    "names": [
+      "Houdini",
+      "Houdini FX"
+    ]
+  },
+  {
+    "icon": "simple-icons:hp",
+    "bundleIDs": [
+      "com.hp.HPSmart"
+    ],
+    "names": [
+      "HP Smart",
+      "HP Easy Scan"
+    ]
+  },
+  {
+    "icon": "simple-icons:httpie",
+    "bundleIDs": [
+      "io.httpie.desktop"
+    ],
     "names": [
       "HTTPie"
     ]
   },
   {
-    "icon": "simple-icons:hyper",
+    "icon": "simple-icons:huggingface",
     "bundleIDs": [],
     "names": [
+      "HuggingChat"
+    ]
+  },
+  {
+    "icon": "simple-icons:hyper",
+    "bundleIDs": [
+      "co.zeit.hyper"
+    ],
+    "names": [
       "Hyper"
+    ]
+  },
+  {
+    "icon": "simple-icons:icloud",
+    "bundleIDs": [],
+    "names": [
+      "iCloud"
+    ]
+  },
+  {
+    "icon": "simple-icons:iconify",
+    "bundleIDs": [],
+    "names": [
+      "Iconify"
     ]
   },
   {
@@ -673,6 +1437,13 @@
     ]
   },
   {
+    "icon": "simple-icons:infuse",
+    "bundleIDs": [],
+    "names": [
+      "Infuse"
+    ]
+  },
+  {
     "icon": "simple-icons:inkdrop",
     "bundleIDs": [],
     "names": [
@@ -681,26 +1452,66 @@
   },
   {
     "icon": "simple-icons:inkscape",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.inkscape.Inkscape"
+    ],
     "names": [
       "Inkscape"
     ]
   },
   {
     "icon": "simple-icons:insomnia",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.insomnia.app"
+    ],
     "names": [
       "Insomnia"
+    ]
+  },
+  {
+    "icon": "simple-icons:insta360",
+    "bundleIDs": [
+      "com.insta360.studio"
+    ],
+    "names": [
+      "Insta360 Studio"
+    ]
+  },
+  {
+    "icon": "simple-icons:instagram",
+    "bundleIDs": [],
+    "names": [
+      "Instagram"
+    ]
+  },
+  {
+    "icon": "simple-icons:instapaper",
+    "bundleIDs": [],
+    "names": [
+      "Instapaper"
     ]
   },
   {
     "icon": "simple-icons:intellijidea",
     "bundleIDs": [
       "com.jetbrains.intellij",
-      "com.jetbrains.intellij-EAP"
+      "com.jetbrains.intellij-EAP",
+      "com.jetbrains.intellij.ce"
     ],
     "names": [
-      "IntelliJ IDEA"
+      "IntelliJ IDEA",
+      "IntelliJ IDEA CE",
+      "IntelliJ IDEA Ultimate",
+      "IntelliJ IDEA Community Edition"
+    ]
+  },
+  {
+    "icon": "simple-icons:itchdotio",
+    "bundleIDs": [
+      "io.itch.mac"
+    ],
+    "names": [
+      "itch"
     ]
   },
   {
@@ -715,9 +1526,38 @@
   },
   {
     "icon": "simple-icons:jellyfin",
+    "bundleIDs": [
+      "org.jellyfin.JellyfinMediaPlayer"
+    ],
+    "names": [
+      "Jellyfin",
+      "Jellyfin Media Player"
+    ]
+  },
+  {
+    "icon": "simple-icons:jetbrains",
+    "bundleIDs": [
+      "com.jetbrains.toolbox",
+      "com.jetbrains.fleet",
+      "com.jetbrains.dataspell",
+      "com.jetbrains.rustrover",
+      "com.jetbrains.aqua",
+      "com.jetbrains.writerside"
+    ],
+    "names": [
+      "JetBrains Toolbox",
+      "Fleet",
+      "DataSpell",
+      "RustRover",
+      "Aqua",
+      "Writerside"
+    ]
+  },
+  {
+    "icon": "simple-icons:jira",
     "bundleIDs": [],
     "names": [
-      "Jellyfin"
+      "Jira"
     ]
   },
   {
@@ -729,9 +1569,21 @@
   },
   {
     "icon": "simple-icons:joplin",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "net.cozic.joplin-desktop"
+    ],
     "names": [
       "Joplin"
+    ]
+  },
+  {
+    "icon": "simple-icons:jupyter",
+    "bundleIDs": [
+      "org.jupyter.jupyterlab-desktop"
+    ],
+    "names": [
+      "JupyterLab",
+      "Jupyter Notebook"
     ]
   },
   {
@@ -750,7 +1602,9 @@
   },
   {
     "icon": "simple-icons:kdenlive",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.kde.kdenlive"
+    ],
     "names": [
       "kdenlive"
     ]
@@ -765,6 +1619,13 @@
     ]
   },
   {
+    "icon": "simple-icons:keeper",
+    "bundleIDs": [],
+    "names": [
+      "Keeper Password Manager"
+    ]
+  },
+  {
     "icon": "simple-icons:keeweb",
     "bundleIDs": [],
     "names": [
@@ -773,9 +1634,27 @@
   },
   {
     "icon": "simple-icons:keybase",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "keybase.Electron"
+    ],
     "names": [
       "Keybase"
+    ]
+  },
+  {
+    "icon": "simple-icons:khanacademy",
+    "bundleIDs": [],
+    "names": [
+      "Khan Academy"
+    ]
+  },
+  {
+    "icon": "simple-icons:kicad",
+    "bundleIDs": [
+      "org.kicad.kicad"
+    ],
+    "names": [
+      "KiCad"
     ]
   },
   {
@@ -794,17 +1673,32 @@
   },
   {
     "icon": "simple-icons:kodi",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.xbmc.kodi"
+    ],
     "names": [
       "Kodi"
     ]
   },
   {
     "icon": "simple-icons:krita",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.krita"
+    ],
     "names": [
       "Krita",
       "krita"
+    ]
+  },
+  {
+    "icon": "simple-icons:kubernetes",
+    "bundleIDs": [
+      "com.electron.open-lens"
+    ],
+    "names": [
+      "Kubernetes",
+      "OpenLens",
+      "K9s"
     ]
   },
   {
@@ -812,6 +1706,16 @@
     "bundleIDs": [],
     "names": [
       "Langflow "
+    ]
+  },
+  {
+    "icon": "simple-icons:languagetool",
+    "bundleIDs": [
+      "org.languagetool.desktop"
+    ],
+    "names": [
+      "LanguageTool",
+      "LanguageTool for Desktop"
     ]
   },
   {
@@ -830,9 +1734,22 @@
   },
   {
     "icon": "simple-icons:lastpass",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.lastpass.LastPass"
+    ],
     "names": [
       "LastPass"
+    ]
+  },
+  {
+    "icon": "simple-icons:latex",
+    "bundleIDs": [
+      "TeXShop",
+      "texstudio"
+    ],
+    "names": [
+      "TeXShop",
+      "TeXstudio"
     ]
   },
   {
@@ -844,21 +1761,34 @@
   },
   {
     "icon": "simple-icons:lens",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.electron.kontena-lens"
+    ],
     "names": [
       "Lens"
     ]
   },
   {
-    "icon": "simple-icons:libreoffice",
+    "icon": "simple-icons:lg",
     "bundleIDs": [],
+    "names": [
+      "LG Calibration Studio"
+    ]
+  },
+  {
+    "icon": "simple-icons:libreoffice",
+    "bundleIDs": [
+      "org.libreoffice.script"
+    ],
     "names": [
       "LibreOffice"
     ]
   },
   {
     "icon": "simple-icons:librewolf",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.mozilla.librewolf"
+    ],
     "names": [
       "LibreWolf"
     ]
@@ -871,8 +1801,17 @@
     ]
   },
   {
+    "icon": "simple-icons:line",
+    "bundleIDs": [
+      "jp.naver.line.mac"
+    ],
+    "names": []
+  },
+  {
     "icon": "simple-icons:linear",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.linear"
+    ],
     "names": [
       "Linear"
     ]
@@ -885,19 +1824,19 @@
     ]
   },
   {
+    "icon": "simple-icons:lmms",
+    "bundleIDs": [],
+    "names": [
+      "LMMS"
+    ]
+  },
+  {
     "icon": "simple-icons:lmstudio",
     "bundleIDs": [
       "ai.elementlabs.lmstudio"
     ],
     "names": [
       "LM Studio"
-    ]
-  },
-  {
-    "icon": "simple-icons:lmms",
-    "bundleIDs": [],
-    "names": [
-      "LMMS"
     ]
   },
   {
@@ -916,14 +1855,18 @@
   },
   {
     "icon": "simple-icons:logseq",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.electron.logseq"
+    ],
     "names": [
       "Logseq"
     ]
   },
   {
     "icon": "simple-icons:loom",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.loom.desktop"
+    ],
     "names": [
       "Loom"
     ]
@@ -949,10 +1892,24 @@
     ]
   },
   {
+    "icon": "simple-icons:lottiefiles",
+    "bundleIDs": [],
+    "names": [
+      "LottieFiles"
+    ]
+  },
+  {
     "icon": "simple-icons:luanti",
     "bundleIDs": [],
     "names": [
       "luanti"
+    ]
+  },
+  {
+    "icon": "simple-icons:lucid",
+    "bundleIDs": [],
+    "names": [
+      "Lucidchart"
     ]
   },
   {
@@ -977,15 +1934,66 @@
     ]
   },
   {
+    "icon": "simple-icons:malwarebytes",
+    "bundleIDs": [
+      "com.malwarebytes.mbam.frontend.application"
+    ],
+    "names": [
+      "Malwarebytes"
+    ]
+  },
+  {
+    "icon": "simple-icons:mastodon",
+    "bundleIDs": [
+      "com.ivory.mac",
+      "com.thomasricouard.IceCubesApp"
+    ],
+    "names": [
+      "Mastodon",
+      "Ivory",
+      "Ice Cubes"
+    ]
+  },
+  {
     "icon": "simple-icons:mattermost",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "Mattermost.Desktop"
+    ],
     "names": [
       "Mattermost"
     ]
   },
   {
-    "icon": "simple-icons:messenger",
+    "icon": "simple-icons:mega",
+    "bundleIDs": [
+      "mega.mac"
+    ],
+    "names": [
+      "MEGAsync"
+    ]
+  },
+  {
+    "icon": "simple-icons:mendeley",
+    "bundleIDs": [
+      "com.elsevier.mendeley"
+    ],
+    "names": [
+      "Mendeley Reference Manager"
+    ]
+  },
+  {
+    "icon": "simple-icons:mermaid",
     "bundleIDs": [],
+    "names": [
+      "Mermaid Chart"
+    ]
+  },
+  {
+    "icon": "simple-icons:messenger",
+    "bundleIDs": [
+      "com.facebook.archon.developerID",
+      "com.facebook.archon"
+    ],
     "names": [
       "Messenger"
     ]
@@ -1022,23 +2030,71 @@
   },
   {
     "icon": "simple-icons:miro",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.electron.realtimeboard"
+    ],
     "names": [
       "Miro"
     ]
   },
   {
-    "icon": "simple-icons:mongodb",
+    "icon": "simple-icons:mistralai",
     "bundleIDs": [],
     "names": [
-      "MongoDB"
+      "Le Chat"
+    ]
+  },
+  {
+    "icon": "simple-icons:mixcloud",
+    "bundleIDs": [],
+    "names": [
+      "Mixcloud"
+    ]
+  },
+  {
+    "icon": "simple-icons:modrinth",
+    "bundleIDs": [
+      "com.modrinth.theseus"
+    ],
+    "names": [
+      "Modrinth App"
+    ]
+  },
+  {
+    "icon": "simple-icons:mongodb",
+    "bundleIDs": [
+      "com.mongodb.compass"
+    ],
+    "names": [
+      "MongoDB",
+      "MongoDB Compass"
     ]
   },
   {
     "icon": "simple-icons:mpv",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "io.mpv"
+    ],
     "names": [
       "mpv"
+    ]
+  },
+  {
+    "icon": "simple-icons:mubi",
+    "bundleIDs": [],
+    "names": [
+      "MUBI"
+    ]
+  },
+  {
+    "icon": "simple-icons:mullvad",
+    "bundleIDs": [
+      "org.mozilla.mullvadbrowser",
+      "net.mullvad.vpn"
+    ],
+    "names": [
+      "Mullvad Browser",
+      "Mullvad VPN"
     ]
   },
   {
@@ -1056,6 +2112,31 @@
     ]
   },
   {
+    "icon": "simple-icons:musicbrainz",
+    "bundleIDs": [
+      "org.musicbrainz.Picard"
+    ],
+    "names": [
+      "MusicBrainz Picard"
+    ]
+  },
+  {
+    "icon": "simple-icons:mysql",
+    "bundleIDs": [
+      "com.oracle.workbench.MySQLWorkbench"
+    ],
+    "names": [
+      "MySQL Workbench"
+    ]
+  },
+  {
+    "icon": "simple-icons:n26",
+    "bundleIDs": [],
+    "names": [
+      "N26"
+    ]
+  },
+  {
     "icon": "simple-icons:nano",
     "bundleIDs": [],
     "names": [
@@ -1070,6 +2151,54 @@
     ]
   },
   {
+    "icon": "simple-icons:netlify",
+    "bundleIDs": [],
+    "names": [
+      "Netlify"
+    ]
+  },
+  {
+    "icon": "simple-icons:newrelic",
+    "bundleIDs": [],
+    "names": [
+      "New Relic"
+    ]
+  },
+  {
+    "icon": "simple-icons:nextcloud",
+    "bundleIDs": [
+      "com.nextcloud.desktopclient"
+    ],
+    "names": [
+      "Nextcloud"
+    ]
+  },
+  {
+    "icon": "simple-icons:nikon",
+    "bundleIDs": [],
+    "names": [
+      "NX Studio",
+      "Nikon Webcam Utility"
+    ]
+  },
+  {
+    "icon": "simple-icons:nordvpn",
+    "bundleIDs": [
+      "com.nordvpn.macos",
+      "com.nordvpn.osx"
+    ],
+    "names": [
+      "NordVPN"
+    ]
+  },
+  {
+    "icon": "simple-icons:norton",
+    "bundleIDs": [],
+    "names": [
+      "Norton 360"
+    ]
+  },
+  {
     "icon": "simple-icons:notesnook",
     "bundleIDs": [],
     "names": [
@@ -1078,9 +2207,13 @@
   },
   {
     "icon": "simple-icons:notion",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.cron.electron"
+    ],
     "names": [
-      "Notion"
+      "Notion",
+      "Notion Calendar",
+      "Notion Mail"
     ]
   },
   {
@@ -1098,10 +2231,31 @@
     ]
   },
   {
+    "icon": "simple-icons:nvidia",
+    "bundleIDs": [
+      "com.nvidia.gfnpc.mall"
+    ],
+    "names": [
+      "GeForce NOW"
+    ]
+  },
+  {
     "icon": "simple-icons:obsidian",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "md.obsidian"
+    ],
     "names": [
       "Obsidian"
+    ]
+  },
+  {
+    "icon": "simple-icons:obsstudio",
+    "bundleIDs": [
+      "com.obsproject.obs-studio"
+    ],
+    "names": [
+      "OBS",
+      "OBS Studio"
     ]
   },
   {
@@ -1115,7 +2269,9 @@
   },
   {
     "icon": "simple-icons:onlyoffice",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "asc.onlyoffice.ONLYOFFICE"
+    ],
     "names": [
       "ONLYOFFICE"
     ]
@@ -1137,6 +2293,15 @@
     ]
   },
   {
+    "icon": "simple-icons:openvpn",
+    "bundleIDs": [
+      "org.openvpn.client.app"
+    ],
+    "names": [
+      "OpenVPN Connect"
+    ]
+  },
+  {
     "icon": "simple-icons:opera",
     "bundleIDs": [
       "com.operasoftware.Opera"
@@ -1147,9 +2312,18 @@
   },
   {
     "icon": "simple-icons:operagx",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.operasoftware.OperaGX"
+    ],
     "names": [
       "Opera GX"
+    ]
+  },
+  {
+    "icon": "simple-icons:opsgenie",
+    "bundleIDs": [],
+    "names": [
+      "Opsgenie"
     ]
   },
   {
@@ -1169,6 +2343,27 @@
     ]
   },
   {
+    "icon": "simple-icons:overcast",
+    "bundleIDs": [],
+    "names": [
+      "Overcast"
+    ]
+  },
+  {
+    "icon": "simple-icons:overleaf",
+    "bundleIDs": [],
+    "names": [
+      "Overleaf"
+    ]
+  },
+  {
+    "icon": "simple-icons:pagerduty",
+    "bundleIDs": [],
+    "names": [
+      "PagerDuty"
+    ]
+  },
+  {
     "icon": "simple-icons:pandora",
     "bundleIDs": [
       "com.pandora.desktop"
@@ -1185,12 +2380,44 @@
     ]
   },
   {
+    "icon": "simple-icons:peloton",
+    "bundleIDs": [],
+    "names": [
+      "Peloton"
+    ]
+  },
+  {
+    "icon": "simple-icons:penpot",
+    "bundleIDs": [],
+    "names": [
+      "Penpot"
+    ]
+  },
+  {
     "icon": "simple-icons:perplexity",
     "bundleIDs": [
-      "ai.perplexity.macv3"
+      "ai.perplexity.macv3",
+      "ai.perplexity.comet"
     ],
     "names": [
       "Perplexity"
+    ]
+  },
+  {
+    "icon": "simple-icons:pexels",
+    "bundleIDs": [],
+    "names": [
+      "Pexels"
+    ]
+  },
+  {
+    "icon": "simple-icons:philipshue",
+    "bundleIDs": [
+      "com.lighting.huesync"
+    ],
+    "names": [
+      "Hue Sync",
+      "Philips Hue Sync"
     ]
   },
   {
@@ -1203,10 +2430,44 @@
     ]
   },
   {
-    "icon": "simple-icons:plex",
+    "icon": "simple-icons:pinterest",
     "bundleIDs": [],
     "names": [
-      "Plex"
+      "Pinterest"
+    ]
+  },
+  {
+    "icon": "simple-icons:pioneerdj",
+    "bundleIDs": [
+      "com.pioneerdj.rekordboxdj"
+    ],
+    "names": [
+      "rekordbox",
+      "rekordbox 7",
+      "rekordbox 6"
+    ]
+  },
+  {
+    "icon": "simple-icons:playstation",
+    "bundleIDs": [
+      "com.playstation.RemotePlay"
+    ],
+    "names": [
+      "PS Remote Play",
+      "PlayStation Remote Play"
+    ]
+  },
+  {
+    "icon": "simple-icons:plex",
+    "bundleIDs": [
+      "tv.plex.plexamp",
+      "tv.plex.desktop",
+      "com.plexapp.plexmediaserver"
+    ],
+    "names": [
+      "Plex",
+      "Plexamp",
+      "Plex Media Server"
     ]
   },
   {
@@ -1217,10 +2478,43 @@
     ]
   },
   {
+    "icon": "simple-icons:podman",
+    "bundleIDs": [
+      "io.podman_desktop.PodmanDesktop"
+    ],
+    "names": [
+      "Podman Desktop"
+    ]
+  },
+  {
     "icon": "simple-icons:poe",
     "bundleIDs": [],
     "names": [
       "Poe"
+    ]
+  },
+  {
+    "icon": "simple-icons:postgresql",
+    "bundleIDs": [
+      "at.eggerapps.Postico",
+      "at.eggerapps.Postico2",
+      "org.pgadmin.pgadmin4",
+      "com.postgresapp.Postgres2"
+    ],
+    "names": [
+      "Postico",
+      "Postico 2",
+      "pgAdmin 4",
+      "Postgres"
+    ]
+  },
+  {
+    "icon": "simple-icons:posthog",
+    "bundleIDs": [
+      "com.posthog.array"
+    ],
+    "names": [
+      "PostHog"
     ]
   },
   {
@@ -1240,15 +2534,42 @@
     ]
   },
   {
-    "icon": "simple-icons:protondrive",
+    "icon": "simple-icons:producthunt",
     "bundleIDs": [],
+    "names": [
+      "Product Hunt"
+    ]
+  },
+  {
+    "icon": "simple-icons:proton",
+    "bundleIDs": [
+      "me.proton.pass.electron"
+    ],
+    "names": [
+      "Proton Pass"
+    ]
+  },
+  {
+    "icon": "simple-icons:protoncalendar",
+    "bundleIDs": [],
+    "names": [
+      "Proton Calendar"
+    ]
+  },
+  {
+    "icon": "simple-icons:protondrive",
+    "bundleIDs": [
+      "ch.protonmail.drive"
+    ],
     "names": [
       "Proton Drive"
     ]
   },
   {
     "icon": "simple-icons:protonmail",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "ch.protonmail.desktop"
+    ],
     "names": [
       "Proton Mail"
     ]
@@ -1259,7 +2580,15 @@
       "ch.protonvpn.mac"
     ],
     "names": [
-      "ProtonVPN"
+      "ProtonVPN",
+      "Proton VPN"
+    ]
+  },
+  {
+    "icon": "simple-icons:proxmox",
+    "bundleIDs": [],
+    "names": [
+      "Proxmox"
     ]
   },
   {
@@ -1272,15 +2601,31 @@
   {
     "icon": "simple-icons:pycharm",
     "bundleIDs": [
-      "com.jetbrains.pycharm"
+      "com.jetbrains.pycharm",
+      "com.jetbrains.pycharm.ce"
     ],
     "names": [
-      "PyCharm"
+      "PyCharm",
+      "PyCharm CE",
+      "PyCharm Community Edition",
+      "PyCharm Professional Edition"
+    ]
+  },
+  {
+    "icon": "simple-icons:python",
+    "bundleIDs": [
+      "org.python.PythonLauncher",
+      "org.python.IDLE"
+    ],
+    "names": [
+      "Python Launcher"
     ]
   },
   {
     "icon": "simple-icons:qbittorrent",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.qbittorrent.qBittorrent"
+    ],
     "names": [
       "qBittorrent",
       "qbittorrent"
@@ -1294,6 +2639,13 @@
     "names": [
       "QQ"
     ]
+  },
+  {
+    "icon": "simple-icons:r",
+    "bundleIDs": [
+      "org.R-project.R"
+    ],
+    "names": []
   },
   {
     "icon": "simple-icons:rabbitmq",
@@ -1310,6 +2662,24 @@
     ]
   },
   {
+    "icon": "simple-icons:rancher",
+    "bundleIDs": [
+      "io.rancherdesktop.app"
+    ],
+    "names": [
+      "Rancher Desktop"
+    ]
+  },
+  {
+    "icon": "simple-icons:raspberrypi",
+    "bundleIDs": [
+      "org.raspberrypi.imagingutility"
+    ],
+    "names": [
+      "Raspberry Pi Imager"
+    ]
+  },
+  {
     "icon": "simple-icons:raycast",
     "bundleIDs": [
       "com.raycast.macos"
@@ -1319,10 +2689,30 @@
     ]
   },
   {
-    "icon": "simple-icons:redis",
+    "icon": "simple-icons:razer",
+    "bundleIDs": [
+      "com.razer.rzupdater"
+    ],
+    "names": [
+      "Razer Synapse"
+    ]
+  },
+  {
+    "icon": "simple-icons:reddit",
     "bundleIDs": [],
     "names": [
-      "Redis"
+      "Reddit"
+    ]
+  },
+  {
+    "icon": "simple-icons:redis",
+    "bundleIDs": [
+      "org.RedisLabs.RedisInsight-V2"
+    ],
+    "names": [
+      "Redis",
+      "Redis Insight",
+      "RedisInsight"
     ]
   },
   {
@@ -1350,7 +2740,9 @@
   },
   {
     "icon": "simple-icons:retroarch",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.libretro.dist.RetroArch"
+    ],
     "names": [
       "RetroArch"
     ]
@@ -1412,6 +2804,16 @@
     ]
   },
   {
+    "icon": "simple-icons:rstudioide",
+    "bundleIDs": [
+      "org.rstudio.RStudio",
+      "com.rstudio.desktop"
+    ],
+    "names": [
+      "RStudio"
+    ]
+  },
+  {
     "icon": "simple-icons:rubymine",
     "bundleIDs": [
       "com.jetbrains.rubymine"
@@ -1430,17 +2832,60 @@
     ]
   },
   {
-    "icon": "simple-icons:session",
+    "icon": "simple-icons:samsung",
+    "bundleIDs": [
+      "com.samsung.SamsungMagician"
+    ],
+    "names": [
+      "Samsung Magician",
+      "Smart Switch",
+      "Samsung DeX"
+    ]
+  },
+  {
+    "icon": "simple-icons:seagate",
     "bundleIDs": [],
+    "names": [
+      "Seagate Toolkit"
+    ]
+  },
+  {
+    "icon": "simple-icons:sentry",
+    "bundleIDs": [],
+    "names": [
+      "Sentry"
+    ]
+  },
+  {
+    "icon": "simple-icons:session",
+    "bundleIDs": [
+      "com.loki-project.messenger-desktop"
+    ],
     "names": [
       "Session"
     ]
   },
   {
     "icon": "simple-icons:setapp",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.setapp.DesktopClient"
+    ],
     "names": [
       "Setapp"
+    ]
+  },
+  {
+    "icon": "simple-icons:shazam",
+    "bundleIDs": [],
+    "names": [
+      "Shazam"
+    ]
+  },
+  {
+    "icon": "simple-icons:shopify",
+    "bundleIDs": [],
+    "names": [
+      "Shopify"
     ]
   },
   {
@@ -1452,7 +2897,9 @@
   },
   {
     "icon": "simple-icons:signal",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.whispersystems.signal-desktop"
+    ],
     "names": [
       "Signal"
     ]
@@ -1480,9 +2927,28 @@
   },
   {
     "icon": "simple-icons:sketch",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.bohemiancoding.sketch3"
+    ],
     "names": [
       "Sketch"
+    ]
+  },
+  {
+    "icon": "simple-icons:sketchup",
+    "bundleIDs": [
+      "com.sketchup.SketchUp.2024",
+      "com.sketchup.SketchUp.2025"
+    ],
+    "names": [
+      "SketchUp"
+    ]
+  },
+  {
+    "icon": "simple-icons:snapchat",
+    "bundleIDs": [],
+    "names": [
+      "Snapchat"
     ]
   },
   {
@@ -1495,10 +2961,27 @@
   {
     "icon": "simple-icons:sonos",
     "bundleIDs": [
-      "com.sonos.macController2"
+      "com.sonos.macController2",
+      "com.sonos.macController"
     ],
     "names": [
-      "Sonos"
+      "Sonos",
+      "Sonos S1 Controller"
+    ]
+  },
+  {
+    "icon": "simple-icons:sony",
+    "bundleIDs": [],
+    "names": [
+      "Imaging Edge Webcam",
+      "Imaging Edge Desktop"
+    ]
+  },
+  {
+    "icon": "simple-icons:soundcloud",
+    "bundleIDs": [],
+    "names": [
+      "SoundCloud"
     ]
   },
   {
@@ -1511,6 +2994,15 @@
     ]
   },
   {
+    "icon": "simple-icons:speedtest",
+    "bundleIDs": [
+      "com.ookla.speedtest-macos"
+    ],
+    "names": [
+      "Speedtest"
+    ]
+  },
+  {
     "icon": "simple-icons:spotify",
     "bundleIDs": [
       "com.spotify.client"
@@ -1520,12 +3012,62 @@
     ]
   },
   {
+    "icon": "simple-icons:sqlite",
+    "bundleIDs": [
+      "net.sourceforge.sqlitebrowser"
+    ],
+    "names": [
+      "DB Browser for SQLite"
+    ]
+  },
+  {
+    "icon": "simple-icons:stackblitz",
+    "bundleIDs": [],
+    "names": [
+      "StackBlitz"
+    ]
+  },
+  {
+    "icon": "simple-icons:stackoverflow",
+    "bundleIDs": [],
+    "names": [
+      "Stack Overflow"
+    ]
+  },
+  {
+    "icon": "simple-icons:statuspage",
+    "bundleIDs": [],
+    "names": [
+      "Statuspage"
+    ]
+  },
+  {
     "icon": "simple-icons:steam",
     "bundleIDs": [
       "com.valvesoftware.steam"
     ],
     "names": [
       "Steam"
+    ]
+  },
+  {
+    "icon": "simple-icons:steelseries",
+    "bundleIDs": [
+      "com.steelseries.gg.client"
+    ],
+    "names": [
+      "SteelSeries GG",
+      "SteelSeries Engine 3"
+    ]
+  },
+  {
+    "icon": "simple-icons:streamlabs",
+    "bundleIDs": [
+      "com.streamlabs.slobs"
+    ],
+    "names": [
+      "Streamlabs Desktop",
+      "Streamlabs OBS"
     ]
   },
   {
@@ -1547,10 +3089,13 @@
   {
     "icon": "simple-icons:sublimetext",
     "bundleIDs": [
-      "com.sublimetext.4"
+      "com.sublimetext.4",
+      "com.sublimetext.3",
+      "com.sublimemerge"
     ],
     "names": [
-      "Sublime Text"
+      "Sublime Text",
+      "Sublime Merge"
     ]
   },
   {
@@ -1561,6 +3106,13 @@
     ]
   },
   {
+    "icon": "simple-icons:supabase",
+    "bundleIDs": [],
+    "names": [
+      "Supabase"
+    ]
+  },
+  {
     "icon": "simple-icons:surfshark",
     "bundleIDs": [],
     "names": [
@@ -1568,10 +3120,38 @@
     ]
   },
   {
-    "icon": "simple-icons:syncthing",
+    "icon": "simple-icons:swift",
     "bundleIDs": [],
     "names": [
+      "Swift Playground"
+    ]
+  },
+  {
+    "icon": "simple-icons:syncthing",
+    "bundleIDs": [
+      "com.github.xor-gate.syncthing-macosx"
+    ],
+    "names": [
       "Syncthing"
+    ]
+  },
+  {
+    "icon": "simple-icons:synology",
+    "bundleIDs": [
+      "com.synology.SynologyDrive"
+    ],
+    "names": [
+      "Synology Drive Client"
+    ]
+  },
+  {
+    "icon": "simple-icons:tailscale",
+    "bundleIDs": [
+      "io.tailscale.ipn.macsys",
+      "io.tailscale.ipn.macos"
+    ],
+    "names": [
+      "Tailscale"
     ]
   },
   {
@@ -1582,19 +3162,40 @@
     ]
   },
   {
-    "icon": "simple-icons:telegram",
+    "icon": "simple-icons:teamviewer",
     "bundleIDs": [
-      "ru.keepcoder.Telegram"
+      "com.teamviewer.TeamViewer"
     ],
     "names": [
-      "Telegram"
+      "TeamViewer"
+    ]
+  },
+  {
+    "icon": "simple-icons:telegram",
+    "bundleIDs": [
+      "ru.keepcoder.Telegram",
+      "com.tdesktop.Telegram",
+      "org.telegram.desktop"
+    ],
+    "names": [
+      "Telegram",
+      "Telegram Desktop"
     ]
   },
   {
     "icon": "simple-icons:termius",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.termius-dmg.mac"
+    ],
     "names": [
       "Termius"
+    ]
+  },
+  {
+    "icon": "simple-icons:terraform",
+    "bundleIDs": [],
+    "names": [
+      "Terraform"
     ]
   },
   {
@@ -1605,8 +3206,19 @@
     ]
   },
   {
+    "icon": "simple-icons:things",
+    "bundleIDs": [
+      "com.culturedcode.ThingsMac"
+    ],
+    "names": [
+      "Things 3"
+    ]
+  },
+  {
     "icon": "simple-icons:threema",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "ch.threema.threema-desktop"
+    ],
     "names": [
       "Threema"
     ]
@@ -1622,28 +3234,43 @@
   },
   {
     "icon": "simple-icons:ticktick",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.TickTick.task.mac"
+    ],
     "names": [
       "TickTick"
     ]
   },
   {
     "icon": "simple-icons:tidal",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.tidal.desktop"
+    ],
     "names": [
       "TIDAL"
     ]
   },
   {
-    "icon": "simple-icons:todoist",
+    "icon": "simple-icons:tiktok",
     "bundleIDs": [],
+    "names": [
+      "TikTok"
+    ]
+  },
+  {
+    "icon": "simple-icons:todoist",
+    "bundleIDs": [
+      "com.todoist.mac.Todoist"
+    ],
     "names": [
       "Todoist"
     ]
   },
   {
     "icon": "simple-icons:torbrowser",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.torproject.torbrowser"
+    ],
     "names": [
       "Tor Browser"
     ]
@@ -1675,9 +3302,20 @@
   },
   {
     "icon": "simple-icons:transmission",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.m0k.transmission"
+    ],
     "names": [
       "Transmission"
+    ]
+  },
+  {
+    "icon": "simple-icons:trello",
+    "bundleIDs": [
+      "com.atlassian.trello"
+    ],
+    "names": [
+      "Trello"
     ]
   },
   {
@@ -1688,10 +3326,118 @@
     ]
   },
   {
-    "icon": "simple-icons:viber",
+    "icon": "simple-icons:trezor",
+    "bundleIDs": [
+      "io.trezor.TrezorSuite"
+    ],
+    "names": [
+      "Trezor Suite"
+    ]
+  },
+  {
+    "icon": "simple-icons:truenas",
     "bundleIDs": [],
     "names": [
+      "TrueNAS"
+    ]
+  },
+  {
+    "icon": "simple-icons:tumblr",
+    "bundleIDs": [],
+    "names": [
+      "Tumblr"
+    ]
+  },
+  {
+    "icon": "simple-icons:tuta",
+    "bundleIDs": [
+      "de.tutao.tutanota"
+    ],
+    "names": [
+      "Tuta Mail",
+      "Tutanota"
+    ]
+  },
+  {
+    "icon": "simple-icons:twitch",
+    "bundleIDs": [],
+    "names": [
+      "Twitch"
+    ]
+  },
+  {
+    "icon": "simple-icons:ubiquiti",
+    "bundleIDs": [
+      "com.ubnt.UniFi"
+    ],
+    "names": [
+      "UniFi",
+      "UniFi Network"
+    ]
+  },
+  {
+    "icon": "simple-icons:ubisoft",
+    "bundleIDs": [
+      "com.ubisoft.uplay"
+    ],
+    "names": [
+      "Ubisoft Connect"
+    ]
+  },
+  {
+    "icon": "simple-icons:unity",
+    "bundleIDs": [
+      "com.unity3d.unityhub",
+      "com.unity3d.UnityEditor5.x"
+    ],
+    "names": [
+      "Unity Hub"
+    ]
+  },
+  {
+    "icon": "simple-icons:unraid",
+    "bundleIDs": [],
+    "names": [
+      "Unraid"
+    ]
+  },
+  {
+    "icon": "simple-icons:unrealengine",
+    "bundleIDs": [],
+    "names": [
+      "Unreal Engine"
+    ]
+  },
+  {
+    "icon": "simple-icons:unsplash",
+    "bundleIDs": [],
+    "names": [
+      "Unsplash"
+    ]
+  },
+  {
+    "icon": "simple-icons:vercel",
+    "bundleIDs": [],
+    "names": [
+      "Vercel"
+    ]
+  },
+  {
+    "icon": "simple-icons:viber",
+    "bundleIDs": [
+      "com.viber.osx"
+    ],
+    "names": [
       "Viber"
+    ]
+  },
+  {
+    "icon": "simple-icons:virtualbox",
+    "bundleIDs": [
+      "org.virtualbox.app.VirtualBox"
+    ],
+    "names": [
+      "VirtualBox"
     ]
   },
   {
@@ -1718,6 +3464,34 @@
     ]
   },
   {
+    "icon": "simple-icons:vlcmediaplayer",
+    "bundleIDs": [
+      "org.videolan.vlc"
+    ],
+    "names": [
+      "VLC"
+    ]
+  },
+  {
+    "icon": "simple-icons:vmware",
+    "bundleIDs": [
+      "com.vmware.fusion"
+    ],
+    "names": [
+      "VMware Fusion"
+    ]
+  },
+  {
+    "icon": "simple-icons:wacom",
+    "bundleIDs": [
+      "com.wacom.WacomCenter"
+    ],
+    "names": [
+      "Wacom Center",
+      "Wacom Desktop Center"
+    ]
+  },
+  {
     "icon": "simple-icons:wakatime",
     "bundleIDs": [],
     "names": [
@@ -1726,16 +3500,27 @@
   },
   {
     "icon": "simple-icons:warp",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "dev.warp.Warp-Stable"
+    ],
     "names": [
       "Warp"
     ]
   },
   {
     "icon": "simple-icons:webex",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "Cisco-Systems.Spark"
+    ],
     "names": [
       "Webex"
+    ]
+  },
+  {
+    "icon": "simple-icons:webflow",
+    "bundleIDs": [],
+    "names": [
+      "Webflow"
     ]
   },
   {
@@ -1758,7 +3543,9 @@
   },
   {
     "icon": "simple-icons:wezterm",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "com.github.wez.wezterm"
+    ],
     "names": [
       "WezTerm"
     ]
@@ -1767,17 +3554,66 @@
     "icon": "simple-icons:whatsapp",
     "bundleIDs": [
       "net.whatsapp.WhatsApp",
-      "net.whatsapp.WhatsApp-sparkle-progress"
+      "net.whatsapp.WhatsApp-sparkle-progress",
+      "desktop.WhatsApp"
     ],
     "names": [
       "WhatsApp"
     ]
   },
   {
+    "icon": "simple-icons:windsurf",
+    "bundleIDs": [
+      "com.exafunction.windsurf"
+    ],
+    "names": [
+      "Windsurf"
+    ]
+  },
+  {
+    "icon": "simple-icons:wire",
+    "bundleIDs": [
+      "com.wearezeta.zclient.mac"
+    ],
+    "names": []
+  },
+  {
+    "icon": "simple-icons:wireguard",
+    "bundleIDs": [
+      "com.wireguard.macos"
+    ],
+    "names": [
+      "WireGuard"
+    ]
+  },
+  {
     "icon": "simple-icons:wireshark",
-    "bundleIDs": [],
+    "bundleIDs": [
+      "org.wireshark.Wireshark"
+    ],
     "names": [
       "Wireshark"
+    ]
+  },
+  {
+    "icon": "simple-icons:wolfram",
+    "bundleIDs": [
+      "com.wolfram.Mathematica"
+    ],
+    "names": [
+      "Wolfram",
+      "Mathematica",
+      "Wolfram Mathematica"
+    ]
+  },
+  {
+    "icon": "simple-icons:wordpress",
+    "bundleIDs": [
+      "com.automattic.studio"
+    ],
+    "names": [
+      "WordPress",
+      "WordPress.com Studio"
     ]
   },
   {
@@ -1788,10 +3624,45 @@
     ]
   },
   {
+    "icon": "simple-icons:youtube",
+    "bundleIDs": [],
+    "names": [
+      "YouTube"
+    ]
+  },
+  {
+    "icon": "simple-icons:youtubemusic",
+    "bundleIDs": [],
+    "names": [
+      "YouTube Music"
+    ]
+  },
+  {
     "icon": "simple-icons:zalo",
     "bundleIDs": [],
     "names": [
       "Zalo"
+    ]
+  },
+  {
+    "icon": "simple-icons:zedindustries",
+    "bundleIDs": [
+      "dev.zed.Zed",
+      "dev.zed.Zed-Preview"
+    ],
+    "names": [
+      "Zed",
+      "Zed Preview"
+    ]
+  },
+  {
+    "icon": "simple-icons:zenbrowser",
+    "bundleIDs": [
+      "app.zen-browser.zen"
+    ],
+    "names": [
+      "Zen",
+      "Zen Browser"
     ]
   },
   {
@@ -1809,7 +3680,8 @@
       "us.zoom.xos"
     ],
     "names": [
-      "zoom.us"
+      "zoom.us",
+      "Zoom"
     ]
   },
   {
