@@ -13,7 +13,7 @@ struct DockView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
-        if launcher.isPresented {
+        if launcher.isPresented, launcher.presentationStyle == .full {
             LauncherLiquidGlass(
                 state: launcher,
                 dock: AnyView(dock(drawsBackground: false).allowsHitTesting(false).accessibilityHidden(true)),

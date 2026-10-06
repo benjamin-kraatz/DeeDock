@@ -141,6 +141,7 @@ struct DockSurfaceView: View {
                         menuTracking: menuTracking,
                         accessibilityFocus: accessibilityFocus
                     )
+                    .environment(\.dockTileHovered, slot.target != nil && hoveredID == slot.target)
                     .onHover { inside in
                         if inside {
                             hoveredID = slot.target

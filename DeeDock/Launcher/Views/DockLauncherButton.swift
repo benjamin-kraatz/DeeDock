@@ -29,10 +29,13 @@ struct DockLauncherButton: View {
                     idleFraction: interaction.idleFade.fraction,
                     reduceTransparency: reduceTransparency
                 ).icons,
-                artworkAnimation: interaction.idleFade.animation
+                artworkAnimation: interaction.idleFade.animation,
+                lineIcon: interaction.lineIcon(for: .launcher)
             ) {
                 LauncherTileArtwork(size: size)
             }
+            // The compact Launcher points at this tile, so its line glyph keeps glowing while open.
+            .transformEnvironment(\.dockTileHovered) { $0 = $0 || interaction.compactLauncherOpen }
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

@@ -6,15 +6,15 @@ private enum LauncherPreviewData {
     static func state(
         list: Bool = false,
         empty: Bool = false,
-        grouping: LauncherGrouping = .none
-    )
-        -> LauncherState
-    {
-        let names = [
+        grouping: LauncherGrouping = .none,
+        names: [String] = [
             "Atlas", "Calendar", "Code Studio", "Music", "Notes",
             "Photo Library", "Terminal",
             "An Application With a Particularly Long Name",
         ]
+    )
+        -> LauncherState
+    {
         let applications = names.enumerated().map { index, name in
             LauncherApplication(
                 reference: ApplicationReference(
@@ -45,6 +45,13 @@ private enum LauncherPreviewData {
         state.isPresented = true
         state.contentVisible = true
         if empty { state.query = "No matching app" }
+        return state
+    }
+
+    /// Real app names resolve through the bundled glyph catalog; Atlas has no glyph and keeps its icon.
+    static func lineIconState(list: Bool = false) -> LauncherState {
+        let state = state(list: list, names: ["Safari", "Calendar", "Music", "Notes", "Terminal", "Xcode", "Atlas"])
+        state.usesLineIcons = true
         return state
     }
 
@@ -117,6 +124,16 @@ private struct LauncherTransitionPreview: View {
         width: 900,
         height: 640
     )
+}
+
+#Preview("Launcher grid, line icons, dark") {
+    LauncherView(state: LauncherPreviewData.lineIconState()).frame(width: 900, height: 640)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Launcher list, line icons, light") {
+    LauncherView(state: LauncherPreviewData.lineIconState(list: true)).frame(width: 720, height: 540)
+        .preferredColorScheme(.light)
 }
 
 #Preview("Dock to launcher transition") {

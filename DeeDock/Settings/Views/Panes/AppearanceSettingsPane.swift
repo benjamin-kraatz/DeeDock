@@ -9,6 +9,9 @@ struct AppearanceSettingsPane: View {
     @Binding var itemSpacing: Double
     @Binding var cornerRadius: Double
     @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
+    @Binding var iconStyle: DockIconStyle
+    @Binding var launcherLineIcons: Bool
+    @Binding var launcherStyle: LauncherStyle
     @Binding var animateIndicators: Bool
     @Binding var launchAnimation: DockLaunchAnimation
 
@@ -22,6 +25,17 @@ struct AppearanceSettingsPane: View {
                                   minimumSymbol: "square", maximumSymbol: "capsule",
                                   defaultValue: DockSettings.defaults.cornerRadius)
                     .settingsOverride(overrideContext, field: .cornerRadius)
+            }
+            SettingsCard(title: .settingsIconStyle, footnote: .settingsIconStyleHelp) {
+                DockIconStylePicker(selection: $iconStyle)
+                    .settingsOverride(overrideContext, field: .iconStyle)
+            }
+            SettingsCard(title: .settingsLauncherStyle, footnote: .settingsLauncherStyleHelp) {
+                LauncherStylePicker(selection: $launcherStyle)
+                    .settingsOverride(overrideContext, field: .launcherStyle)
+                SettingsToggleRow(title: .settingsLauncherLineIcons, isOn: $launcherLineIcons)
+                    .disabled(iconStyle != .line)
+                    .settingsOverride(overrideContext, field: .launcherLineIcons)
             }
             SettingsCard(title: .settingsCardIcons, footnote: .settingsAppearanceHelp) {
                 SettingsSliderRow(title: .settingsIconSize, unit: .settingsPoints,
@@ -62,10 +76,16 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var itemSpacing: Double = 4
     @Previewable @State var cornerRadius: Double = 22
     @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .stardust
+    @Previewable @State var iconStyle: DockIconStyle = .native
+    @Previewable @State var launcherLineIcons = true
+    @Previewable @State var launcherStyle: LauncherStyle = .compact
     @Previewable @State var animate = true
     ScrollView {
         AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,
-                               runningIndicatorStyle: $indicator, animateIndicators: $animate, launchAnimation: .constant(DockSettings.defaults.launchAnimation))
+                               runningIndicatorStyle: $indicator, iconStyle: $iconStyle,
+                               launcherLineIcons: $launcherLineIcons, launcherStyle: $launcherStyle,
+                               animateIndicators: $animate,
+                               launchAnimation: .constant(DockSettings.defaults.launchAnimation))
             .padding(24)
     }
     .tint(SettingsPage.appearance.tint)

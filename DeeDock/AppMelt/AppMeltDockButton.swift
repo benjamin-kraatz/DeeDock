@@ -17,7 +17,10 @@ struct AppMeltDockButton: View {
                 available: true, running: !pair.minimized, launching: pair.showsOperationProgress, keyboardSelected: selected,
                 artworkOpacity: DockAppearanceOpacity(settings: interaction.idleFade.settings,
                     idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons,
-                artworkAnimation: interaction.idleFade.animation) {
+                artworkAnimation: interaction.idleFade.animation,
+                lineIcon: interaction.lineIcon(named: pair.names[memberIndex],
+                                               bundleIdentifier: pair.applicationIDs[memberIndex],
+                                               artwork: pair.icons[memberIndex])) {
                 Image(nsImage: pair.icons[memberIndex]).resizable()
                     .frame(width: size, height: size)
                     .overlay(alignment: .bottomTrailing) {

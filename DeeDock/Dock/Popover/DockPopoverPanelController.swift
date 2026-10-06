@@ -4,8 +4,13 @@ import SwiftUI
 private final class DockPopoverPanel: NSPanel {
     var acceptsKeyboardFocus = false
     var keyboardHandler: ((NSEvent) -> Bool)?
+    var resignedKey: (() -> Void)?
     override var canBecomeKey: Bool { acceptsKeyboardFocus }
     override var canBecomeMain: Bool { false }
+    override func resignKey() {
+        super.resignKey()
+        resignedKey?()
+    }
     override func keyDown(with event: NSEvent) {
         if keyboardHandler?(event) != true { super.keyDown(with: event) }
     }
@@ -22,6 +27,7 @@ final class DockPopoverPanelController<Content: View> {
     private let panel: DockPopoverPanel
     private let keyboard: Bool
     private let clickFocus: Bool
+    private let activates: Bool
     private let reduceMotion: Bool
     private let ideal: CGSize
     private let chromeChanged: (DockPopoverChrome) -> Void
@@ -53,15 +59,23 @@ final class DockPopoverPanelController<Content: View> {
     var closed: ((Bool) -> Void)?
     /// Returns true when the feature consumed the key event.
     var keyHandler: ((NSEvent) -> Bool)?
+    /// Called when the panel stops being key, for features that close once focus moves elsewhere.
+    var resignedKey: (() -> Void)?
 
     /// - Parameters:
+    ///   - activates: Activates DOKK through ``ExplicitWindowPresenter`` when shown, so a text field
+    ///     gets ordinary field-editor focus. Implies `keyboard`.
+    ///   - windowShadow: Whether AppKit draws the window shadow. Liquid Glass content draws its own,
+    ///     and AppKit would outline the whole rectangular window around it, so glass panels pass false.
     ///   - chromeChanged: Receives the resolved chrome before the content is built, and again on
     ///     every re-anchor, so the content view can draw its pointer in the right place.
     ///   - content: Built once, after the initial chrome has been published.
-    init(anchor: DockPopoverAnchor, keyboard: Bool, clickFocus: Bool = false, ideal: CGSize = DockPopoverGeometry.idealSize,
+    init(anchor: DockPopoverAnchor, keyboard: Bool, clickFocus: Bool = false, activates: Bool = false,
+         windowShadow: Bool = true, ideal: CGSize = DockPopoverGeometry.idealSize,
          chromeChanged: @escaping (DockPopoverChrome) -> Void, content: () -> Content) {
-        self.keyboard = keyboard
+        self.keyboard = keyboard || activates
         self.clickFocus = clickFocus
+        self.activates = activates
         self.ideal = ideal
         self.chromeChanged = chromeChanged
         reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
@@ -70,17 +84,18 @@ final class DockPopoverPanelController<Content: View> {
                                  backing: .buffered, defer: false)
         panel.isOpaque = false
         panel.backgroundColor = .clear
-        panel.hasShadow = true
+        panel.hasShadow = windowShadow
         panel.level = .popUpMenu
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
-        panel.acceptsKeyboardFocus = keyboard
+        panel.acceptsKeyboardFocus = keyboard || activates
         chromeChanged(placement.chrome)
         let hosting = DockHostingView(rootView: content())
         self.hosting = hosting
         panel.contentView = hosting
         panel.keyboardHandler = { [weak self] in self?.keyHandler?($0) ?? false }
+        panel.resignedKey = { [weak self] in self?.resignedKey?() }
         panel.setFrame(placement.frame, display: false)
     }
 
@@ -101,7 +116,8 @@ final class DockPopoverPanelController<Content: View> {
                 panel.animator().setFrame(placement.frame, display: true)
             }
         }
-        if keyboard { panel.makeKeyAndOrderFront(nil) }
+        if activates { ExplicitWindowPresenter.shared.present(panel) }
+        else if keyboard { panel.makeKeyAndOrderFront(nil) }
     }
 
     /// Follows its dock tile when the dock moves, resizes, or scrolls.
@@ -124,8 +140,11 @@ final class DockPopoverPanelController<Content: View> {
         willClose?()
         willClose = nil
         canDismissForOutsideClick = nil
+        if activates { ExplicitWindowPresenter.shared.cancel(panel) }
         panel.keyboardHandler = nil
+        panel.resignedKey = nil
         keyHandler = nil
+        resignedKey = nil
         let callback = closed
         closed = nil
         callback?(returnFocus)

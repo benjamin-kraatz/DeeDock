@@ -25,7 +25,8 @@ struct DockVolumeButton: View {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction.layout.edge,
                 available: !item.isEjecting, running: false, launching: false,
                 keyboardSelected: selected, artworkOpacity: artworkOpacity,
-                artworkAnimation: interaction.idleFade.animation)
+                artworkAnimation: interaction.idleFade.animation,
+                lineIcon: interaction.lineIcon(for: LineIconTile(volume: item.kind), artwork: item.icon))
                 .overlay {
                     if interaction.volumeTargetID == item.id {
                         DockDocumentHighlight(emphasized: interaction.springEmphasized).allowsHitTesting(false)

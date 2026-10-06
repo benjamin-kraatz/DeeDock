@@ -1,0 +1,14 @@
+{
+  "launcher": "custom:launcher",
+  "trash": "lucide:trash",
+  "trashFull": "lucide:trash-2",
+  "folder": "lucide:folder",
+  "shelf": "lucide:inbox",
+  "sessionCapsules": "lucide:layers",
+  "volume": "lucide:hard-drive",
+  "volumeRemovable": "lucide:usb",
+  "volumeNetwork": "lucide:server",
+  "volumeDiskImage": "lucide:disc",
+  "update": "lucide:circle-arrow-down",
+  "focus": "lucide:target"
+}

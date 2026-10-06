@@ -4,8 +4,13 @@ import SwiftUI
 ///
 /// Most tiles draw an `NSImage`, but Session Capsules draw a vector mark, so the artwork is generic
 /// and the `icon:` initializer is the convenience for the common case.
+///
+/// A non-nil `lineIcon` replaces the artwork with a white glyph that glows while the tile is hovered
+/// or keyboard-selected. Tiles pass one only when their dock uses ``DockIconStyle/line``.
 struct DockIconPresentation<Artwork: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.dockTileHovered) private var hovered
     @Environment(\.pinWeatherSample) private var pinWeatherSample
     let artwork: Artwork
     let size: CGFloat
@@ -28,6 +33,7 @@ struct DockIconPresentation<Artwork: View>: View {
     var launchAnimation = DockSettings.defaults.launchAnimation
     var launchRequest: Date? = nil
     var launchMotionEnabled = true
+    var lineIcon: DockLineIcon? = nil
 
     init(size: CGFloat, edge: DockEdge, available: Bool, running: Bool, launching: Bool,
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
@@ -35,7 +41,7 @@ struct DockIconPresentation<Artwork: View>: View {
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
          badgeStyle: DockAppBadge.Style = .dot,
          launchAnimation: DockLaunchAnimation = DockSettings.defaults.launchAnimation,
-         launchRequest: Date? = nil, launchMotionEnabled: Bool = true,
+         launchRequest: Date? = nil, launchMotionEnabled: Bool = true, lineIcon: DockLineIcon? = nil,
          @ViewBuilder artwork: () -> Artwork) {
         self.artwork = artwork()
         self.size = size
@@ -54,6 +60,16 @@ struct DockIconPresentation<Artwork: View>: View {
         self.launchAnimation = launchAnimation
         self.launchRequest = launchRequest
         self.launchMotionEnabled = launchMotionEnabled
+        self.lineIcon = lineIcon
+    }
+
+    @ViewBuilder private var styledArtwork: some View {
+        if let lineIcon {
+            DockLineIconArtwork(icon: lineIcon, size: size, hovered: hovered || keyboardSelected,
+                                reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
+        } else {
+            artwork
+        }
     }
 
     var body: some View {
@@ -63,7 +79,7 @@ struct DockIconPresentation<Artwork: View>: View {
         let marker = edge.point(CGPoint(x: size / 2,
             y: size + DockGeometry.indicatorSpacing + DockGeometry.indicatorSize / 2), depth: depth)
         ZStack(alignment: .topLeading) {
-            artwork
+            styledArtwork
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
                 .modifier(PinWeatherChrome(sample: pinWeatherSample))
@@ -110,13 +126,14 @@ extension DockIconPresentation where Artwork == Image {
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
          badgeStyle: DockAppBadge.Style = .dot,
          launchAnimation: DockLaunchAnimation = DockSettings.defaults.launchAnimation,
-         launchRequest: Date? = nil, launchMotionEnabled: Bool = true) {
+         launchRequest: Date? = nil, launchMotionEnabled: Bool = true, lineIcon: DockLineIcon? = nil) {
         self.init(size: size, edge: edge, available: available, running: running, launching: launching,
                   keyboardSelected: keyboardSelected, runningIndicatorStyle: runningIndicatorStyle,
                   indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
                   artworkOpacity: artworkOpacity, artworkAnimation: artworkAnimation, badgeLabel: badgeLabel,
                   badgeStyle: badgeStyle,
-                  launchAnimation: launchAnimation, launchRequest: launchRequest, launchMotionEnabled: launchMotionEnabled) {
+                  launchAnimation: launchAnimation, launchRequest: launchRequest, launchMotionEnabled: launchMotionEnabled,
+                  lineIcon: lineIcon) {
             Image(nsImage: icon).resizable().interpolation(.high)
         }
     }

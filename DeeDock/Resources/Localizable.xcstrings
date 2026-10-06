@@ -18765,6 +18765,24 @@
         }
       }
     },
+    "launcherCompactSearchPrompt" : {
+      "comment" : "Placeholder in the compact Launcher's search field, which finds apps only.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search apps"
+          }
+        }
+      }
+    },
     "launcherDiscovering" : {
       "comment" : "Initial discovery placeholder.",
       "extractionState" : "manual",
@@ -30579,6 +30597,42 @@
         }
       }
     },
+    "settingsAcknowledgementsLucideDescription" : {
+      "comment" : "Acknowledgements row subtitle. Line is the icon style name. ISC is the license name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strichsymbole für den Symbolstil Linie. ISC-Lizenz."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line glyphs for the Line icon style. ISC license."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsLucideTitle" : {
+      "comment" : "Acknowledgements row title. Lucide is the icon set's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucide"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucide"
+          }
+        }
+      }
+    },
     "settingsAcknowledgementsShowLicense" : {
       "comment" : "Disclosure label that reveals the full, untranslated license text.",
       "extractionState" : "manual",
@@ -30593,6 +30647,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "License"
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsSimpleIconsDescription" : {
+      "comment" : "Acknowledgements row subtitle. Line is the icon style name. CC0 is the license name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markenzeichen für den Symbolstil Linie. CC0 1.0."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brand marks for the Line icon style. CC0 1.0."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsSimpleIconsTitle" : {
+      "comment" : "Acknowledgements row title. Simple Icons is the icon set's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simple Icons"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simple Icons"
           }
         }
       }
@@ -32109,6 +32199,78 @@
         }
       }
     },
+    "settingsIconStyle" : {
+      "comment" : "Appearance card title for choosing native app artwork or white line glyphs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbolstil"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon style"
+          }
+        }
+      }
+    },
+    "settingsIconStyleHelp" : {
+      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow, the optional Launcher toggle, and per-display override.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig. Auch der Launcher kann sie verwenden. Jedes Display kann den Stil selbst wählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow. The Launcher can use them too. Each display can choose its own style."
+          }
+        }
+      }
+    },
+    "settingsIconStyleLine" : {
+      "comment" : "Icon style choice that draws white line glyphs. Line is the name of the style.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line"
+          }
+        }
+      }
+    },
+    "settingsIconStyleNative" : {
+      "comment" : "Icon style choice that draws the artwork macOS provides for each app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Symbole"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App icons"
+          }
+        }
+      }
+    },
     "settingsIndicatorBar" : {
       "comment" : "Short line running-app marker option, oriented along the dock edge.",
       "extractionState" : "manual",
@@ -32595,6 +32757,24 @@
         }
       }
     },
+    "settingsLauncherLineIcons" : {
+      "comment" : "Appearance toggle under Icon style that also draws line glyphs in this dock's Launcher. Unavailable while the native icon style is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strichsymbole auch im Launcher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line icons in Launcher"
+          }
+        }
+      }
+    },
     "settingsLauncherPosition" : {
       "comment" : "Launcher placement setting; directions refer to physical dock ends.",
       "extractionState" : "manual",
@@ -32627,6 +32807,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Place the launcher at either end of the dock or right after a pinned app. You can also drag it along the dock."
+          }
+        }
+      }
+    },
+    "settingsLauncherStyle" : {
+      "comment" : "Appearance card title for choosing how the Launcher opens, and the accessibility label of its style picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launcher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launcher"
+          }
+        }
+      }
+    },
+    "settingsLauncherStyleCompact" : {
+      "comment" : "Launcher style: a small app grid that opens above the dock's Launcher tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kompakt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact"
+          }
+        }
+      }
+    },
+    "settingsLauncherStyleFull" : {
+      "comment" : "Launcher style: the dock grows into the full Launcher with suggestions, tools, and file actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vollständig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full"
+          }
+        }
+      }
+    },
+    "settingsLauncherStyleHelp" : {
+      "comment" : "Explains the two Launcher styles, that file drops always use the full Launcher, and the per-display override.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vollständig lässt das Dock zum durchsuchbaren Launcher mit Vorschlägen, Werkzeugen und Dateiaktionen wachsen. Kompakt öffnet ein kleines App-Raster über der Launcher-Kachel, das Dock bleibt an seinem Platz. Abgelegte Dateien öffnen immer den vollständigen Launcher. Jedes Display kann den Stil selbst wählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full grows the dock into a searchable Launcher with suggestions, tools, and file actions. Compact opens a small app grid above the Launcher tile and leaves the dock in place. Dropped files always open the full Launcher. Each display can choose its own style."
           }
         }
       }

@@ -26,7 +26,8 @@ struct DockFolderButton: View {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction.layout.edge,
                                  available: item.isAvailable, running: false, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
-                                 artworkAnimation: interaction.idleFade.animation)
+                                 artworkAnimation: interaction.idleFade.animation,
+                                 lineIcon: interaction.lineIcon(for: .folder))
                 .environment(\.pinWeatherSample, pinWeatherSample)
                 .overlay(alignment: .bottomTrailing) {
                     Image(systemName: "square.stack.3d.up.fill")

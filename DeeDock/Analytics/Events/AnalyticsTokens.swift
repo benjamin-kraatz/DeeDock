@@ -6,6 +6,8 @@ extension DockEdge: AnalyticsToken {}
 extension DockSettings.Alignment: AnalyticsToken {}
 extension DockSettings.PositionReference: AnalyticsToken {}
 extension DockSettings.RunningIndicatorStyle: AnalyticsToken {}
+extension DockIconStyle: AnalyticsToken {}
+extension LauncherStyle: AnalyticsToken {}
 extension DockBehaviorSettings.ActivationLocation: AnalyticsToken {}
 extension DockAnimationStyle: AnalyticsToken {}
 extension DockTooltipPreset: AnalyticsToken {}

@@ -98,6 +98,8 @@ struct LauncherResultButton: View {
     /// Mixed search retains typed membership and action guards; ordinary browsing uses its existing owner directly.
     var searchResult: LauncherSearchResult? = nil
     var isSuggestion = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var icon: NSImage?
     @State private var hovered = false
     @State private var hoveredBadge: Badge?
@@ -213,7 +215,11 @@ struct LauncherResultButton: View {
     private func artwork(size: CGFloat) -> some View {
         ZStack(alignment: .bottom) {
             Group {
-                if let icon {
+                if let lineIcon = state.lineIcon(for: application, artwork: icon) {
+                    DockLineIconArtwork(icon: lineIcon, size: size, hovered: hovered || selected,
+                                        reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
+                                        color: .primary)
+                } else if let icon {
                     Image(nsImage: icon).resizable().scaledToFit()
                 } else {
                     Image(systemName: "app.dashed").resizable().scaledToFit()

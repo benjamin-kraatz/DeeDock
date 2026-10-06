@@ -165,6 +165,8 @@ Registered with the SDK's `register`, so every event carries them.
 | `dock_icon_size`, `dock_magnification` | exact |
 | `dock_auto_hide`, `dock_activation_location`, `dock_animation_style` | |
 | `dock_indicator_style`, `dock_tooltip_preset`, `dock_launch_animation` | |
+| `dock_icon_style`, `dock_launcher_line_icons` | `native` or `line`; Bool, effective only with `line` |
+| `dock_launcher_style` | `full` or `compact` |
 | `dock_show_background`, `dock_fade_when_idle` | |
 | `window_peek_enabled`, `window_peek_layout` | |
 | `show_shelf`, `show_trash`, `show_session_capsules`, `show_volumes`, `soap_bubble_effects` | |

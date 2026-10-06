@@ -62,6 +62,8 @@ private struct LauncherMixedResultRow: View {
     let launcher: LauncherState
     private var state: LauncherSearchState { launcher.search }
     private var selected: Bool { state.selectedID == result.id }
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var appIcon: NSImage?
     private var shortcutStatus: ActionTileStatus? {
         guard case .shortcut(let id) = result.id else { return nil }
@@ -74,7 +76,12 @@ private struct LauncherMixedResultRow: View {
         } label: {
             HStack(spacing: 12) {
                 Group {
-                    if let appIcon {
+                    if let application = result.application,
+                       let lineIcon = launcher.lineIcon(for: application, artwork: appIcon) {
+                        DockLineIconArtwork(icon: lineIcon, size: 34, hovered: selected,
+                                            reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
+                                            color: .primary)
+                    } else if let appIcon {
                         Image(nsImage: appIcon).resizable().scaledToFit()
                     } else {
                         Image(systemName: result.kind.symbol).font(.title2)

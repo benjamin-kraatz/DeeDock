@@ -14,6 +14,12 @@ final class LauncherState {
     var history: LauncherHistory { catalog.launcherHistory }
     var isPresented = false
     var contentVisible = false
+    /// Whether application tiles draw line glyphs, set by the owning dock from its Appearance
+    /// settings. Apps without a glyph keep their native icon.
+    var usesLineIcons = false
+    /// The style of the current presentation, set by ``begin(pins:foregroundID:style:)``. Only the
+    /// full Launcher morphs the dock, so the dock view reads this together with ``isPresented``.
+    private(set) var presentationStyle: LauncherStyle = .full
     /// The native glass animation's destination. Reversing it preserves the current velocity.
     var expanded = false
     /// Native animation completion, scoped by the presentation controller to this opening.
@@ -242,15 +248,22 @@ final class LauncherState {
         return value
     }
 
-    func begin(pins: [ApplicationReference], foregroundID: String? = nil) {
+    /// Starts a presentation in `style`.
+    ///
+    /// The compact grid shows only apps, so it skips window discovery and suggestion prediction and
+    /// starts with the default browse options instead of the full Launcher's session choices.
+    func begin(pins: [ApplicationReference], foregroundID: String? = nil, style: LauncherStyle = .full) {
         presentationGeneration = UUID()
         presentedAt = Date()
-        search.begin()
+        presentationStyle = style
+        if style == .full { search.begin() } else { resetBrowseOptions() }
         fileActions.resetForPresentation()
         fileActions.didOpen = { [weak self] in self?.didOpen?() }
         initialPinnedIDs = Set(pins.map(\.id))
         query = ""; error = nil; selectedID = nil
-        suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
+        if style == .full {
+            suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
+        }
         library.acquire(owner, extraURLs: pins.map(\.url) + catalog.running.map(\.url) + history.visits.values.map { $0.reference.url })
     }
 
