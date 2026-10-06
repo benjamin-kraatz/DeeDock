@@ -23,7 +23,8 @@ struct DockTrashButton: View {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction.layout.edge,
                 available: item.state != .unavailable, running: false, launching: false,
                 keyboardSelected: selected, artworkOpacity: artworkOpacity,
-                artworkAnimation: interaction.idleFade.animation)
+                artworkAnimation: interaction.idleFade.animation,
+                lineIcon: interaction.lineIcon(for: item.state == .full ? .trashFull : .trash))
                 .overlay {
                     if interaction.trashTargeted {
                         DockDocumentHighlight(emphasized: false).allowsHitTesting(false)

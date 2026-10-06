@@ -18,6 +18,18 @@ struct DockSampleView: View {
     private var reduceTransparency: Bool { reduceTransparencyOverride ?? systemReduceTransparency }
     private let symbols = ["safari", "envelope.fill", "music.note", "camera.fill", "terminal.fill", "gearshape.fill"]
     private let colors: [Color] = [.blue, .cyan, .pink, .orange, .gray, .indigo]
+    /// Apple apps matching the symbols above, whose catalog glyphs stand in under the Line style.
+    private static let lineSamples = ["Safari", "Mail", "Music", "Photo Booth", "Terminal", "System Settings"].map {
+        URL(fileURLWithPath: "/Applications/\($0).app")
+    }
+    private static let lineBundleIdentifiers = ["com.apple.Safari", "com.apple.mail", "com.apple.Music",
+                                                "com.apple.PhotoBooth", "com.apple.Terminal", "com.apple.systempreferences"]
+
+    private func lineGlyph(_ index: Int) -> LineIconGlyph? {
+        guard appearanceSettings.iconStyle == .line else { return nil }
+        let sample = index % Self.lineSamples.count
+        return LineIconCatalog.shared.glyph(bundleIdentifier: Self.lineBundleIdentifiers[sample], url: Self.lineSamples[sample])
+    }
 
     var body: some View {
         let opacity = DockAppearanceOpacity(settings: appearanceSettings, idleFraction: idleFraction, reduceTransparency: reduceTransparency)
@@ -32,15 +44,24 @@ struct DockSampleView: View {
                 .frame(width: glass.width, height: glass.height).position(x: glass.midX, y: glass.midY)
             ForEach(centers.indices, id: \.self) { index in
                 let rect = layout.iconFrame(centerAlong: centers[index], size: sizes[index])
-                RoundedRectangle(cornerRadius: sizes[index] * 0.2)
-                    .fill(colors[index % colors.count].gradient)
-                    .overlay {
-                        Image(systemName: symbols[index % symbols.count])
-                            .font(.system(size: sizes[index] * 0.4, weight: .medium)).foregroundStyle(.white)
+                Group {
+                    if let glyph = lineGlyph(index) {
+                        // The magnified sample stands for the hovered tile, so it shows the glow.
+                        DockLineIconArtwork(icon: DockLineIcon(glyph: glyph), size: sizes[index],
+                                            hovered: magnified && pointerAlong == nil && index == 2,
+                                            reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
+                    } else {
+                        RoundedRectangle(cornerRadius: sizes[index] * 0.2)
+                            .fill(colors[index % colors.count].gradient)
+                            .overlay {
+                                Image(systemName: symbols[index % symbols.count])
+                                    .font(.system(size: sizes[index] * 0.4, weight: .medium)).foregroundStyle(.white)
+                            }
+                            // Application artwork carries its own transparent margin. Samples keep one
+                            // so icon decorations sit where they would on a real tile.
+                            .padding(sizes[index] * 0.08)
                     }
-                    // Application artwork carries its own transparent margin. Samples keep one
-                    // so icon decorations sit where they would on a real tile.
-                    .padding(sizes[index] * 0.08)
+                }
                     .frame(width: rect.width, height: rect.height)
                     .modifier(DockIconIndicator(style: runningIndicatorStyle,
                                                 running: index.isMultiple(of: 2), size: sizes[index],

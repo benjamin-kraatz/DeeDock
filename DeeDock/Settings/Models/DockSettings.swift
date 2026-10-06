@@ -109,6 +109,8 @@ struct DockSettings: Codable, Equatable {
     var windowMarkupFolder: String? = nil
     var tooltipPreset: DockTooltipPreset = .classic
     var runningIndicatorStyle: RunningIndicatorStyle = .dot
+    /// Native app artwork or white line glyphs. Documents saved before this key decode as native.
+    var iconStyle: DockIconStyle = .native
     /// Whether Stardust twinkles. Drawn styles are always still, and Reduce Motion
     /// overrides this without rewriting the saved preference.
     var animateIndicators: Bool = true
@@ -186,7 +188,7 @@ extension DockSettings {
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case windowMarkupFormat, windowMarkupSearchEngine, windowMarkupFolder
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -244,6 +246,7 @@ extension DockSettings {
         cornerRadius = values.contains(.cornerRadius) ? try values.decode(Double.self, forKey: .cornerRadius) : 22
         runningIndicatorStyle = values.contains(.runningIndicatorStyle)
             ? try values.decode(RunningIndicatorStyle.self, forKey: .runningIndicatorStyle) : .dot
+        iconStyle = try values.decodeIfPresent(DockIconStyle.self, forKey: .iconStyle) ?? .native
         animateIndicators = values.contains(.animateIndicators)
             ? try values.decode(Bool.self, forKey: .animateIndicators) : true
         launchAnimation = values.contains(.launchAnimation)

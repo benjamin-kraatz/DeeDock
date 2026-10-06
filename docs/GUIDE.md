@@ -52,6 +52,7 @@ The illustrations use production code, not artwork. Placement runs the same `Doc
 ## Use the dock
 
 - Click an icon to open or activate its application. Click the foreground application's icon to hide all of its windows; click again to show and activate it.
+- In Appearance, choose **App icons** or **Line**. Line draws a white glyph for each known app and for DOKK's own tiles, and a colored glow while the pointer is over one. An app with no glyph keeps the icon macOS provides. Each display can override the choice. Reduce Transparency drops the glow and draws the glyph brighter; Reduce Motion shows it without a fade.
 - Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Target Lock, Orbit, Stardust, Power Badge, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
 - **Animate indicators** switches Stardust motion on. It is on by default, honours Reduce Motion, and stops while a dock is hidden or has faded out.
 - Neon, Aura, and the withdrawn Metal styles (Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, Glitch) load as Dot, rather than failing to load.

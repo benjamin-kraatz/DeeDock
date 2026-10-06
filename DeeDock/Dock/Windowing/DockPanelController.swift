@@ -146,6 +146,7 @@ final class DockPanelController {
         interaction.retainHitRegions(exposedIDs)
         accessibilityIDs.formIntersection(exposedIDs)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
+        interaction.iconStyle = settings.iconStyle
         interaction.animateIndicators = settings.animateIndicators
         interaction.launchAnimation = settings.launchAnimation
         interaction.showAppBadgeCounts = settings.showAppBadgeCounts

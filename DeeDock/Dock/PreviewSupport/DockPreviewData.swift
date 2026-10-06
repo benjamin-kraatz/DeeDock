@@ -69,6 +69,7 @@ struct DockPreviewContent: View {
         }
         _sections = State(initialValue: sections)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
+        interaction.iconStyle = settings.iconStyle
         interaction.showAppBadgeCounts = settings.showAppBadgeCounts
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
                                                   availableLength: availableLength, settings: settings)

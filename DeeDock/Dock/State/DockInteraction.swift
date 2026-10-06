@@ -36,6 +36,8 @@ final class DockInteraction {
     let idleFade = DockIdleFadeController()
     /// Per-display running marker appearance, separate from layout and keyboard focus.
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
+    /// Per-display artwork style. Tiles look up line glyphs only while this is `line`.
+    var iconStyle: DockIconStyle = .native
     /// The saved preference for animated running indicators. Only Stardust uses it.
     var animateIndicators = DockSettings.defaults.animateIndicators
     /// Whether this panel currently paints anything. A hidden dock schedules no indicator

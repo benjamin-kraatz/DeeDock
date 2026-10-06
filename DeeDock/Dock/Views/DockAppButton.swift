@@ -65,7 +65,8 @@ struct DockAppButton: View {
                                  badgeStyle: interaction?.showAppBadgeCounts == true ? .count : .dot,
                                  launchAnimation: interaction?.launchAnimation ?? DockSettings.defaults.launchAnimation,
                                  launchRequest: interaction?.applicationCatalog?.launchAnimationRequests[item.id],
-                                 launchMotionEnabled: interaction.map { $0.exposesContent && $0.idleFade.fraction == 0 } ?? true)
+                                 launchMotionEnabled: interaction.map { $0.exposesContent && $0.idleFade.fraction == 0 } ?? true,
+                                 lineIcon: interaction?.lineIcon(for: item.reference, artwork: item.icon))
                 .environment(\.pinWeatherSample, pinWeatherSample)
                 .overlay {
                     if interaction?.documentTargetID == item.id {

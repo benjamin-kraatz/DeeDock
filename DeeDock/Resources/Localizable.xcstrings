@@ -30579,6 +30579,42 @@
         }
       }
     },
+    "settingsAcknowledgementsLucideDescription" : {
+      "comment" : "Acknowledgements row subtitle. Line is the icon style name. ISC is the license name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strichsymbole für den Symbolstil Linie. ISC-Lizenz."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line glyphs for the Line icon style. ISC license."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsLucideTitle" : {
+      "comment" : "Acknowledgements row title. Lucide is the icon set's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucide"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucide"
+          }
+        }
+      }
+    },
     "settingsAcknowledgementsShowLicense" : {
       "comment" : "Disclosure label that reveals the full, untranslated license text.",
       "extractionState" : "manual",
@@ -30593,6 +30629,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "License"
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsSimpleIconsDescription" : {
+      "comment" : "Acknowledgements row subtitle. Line is the icon style name. CC0 is the license name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markenzeichen für den Symbolstil Linie. CC0 1.0."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brand marks for the Line icon style. CC0 1.0."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsSimpleIconsTitle" : {
+      "comment" : "Acknowledgements row title. Simple Icons is the icon set's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simple Icons"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simple Icons"
           }
         }
       }
@@ -32105,6 +32177,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Icon size"
+          }
+        }
+      }
+    },
+    "settingsIconStyle" : {
+      "comment" : "Appearance card title for choosing native app artwork or white line glyphs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbolstil"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon style"
+          }
+        }
+      }
+    },
+    "settingsIconStyleHelp" : {
+      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow, and per-display override.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig. Jedes Display kann den Stil selbst wählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow. Each display can choose its own style."
+          }
+        }
+      }
+    },
+    "settingsIconStyleLine" : {
+      "comment" : "Icon style choice that draws white line glyphs. Line is the name of the style.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line"
+          }
+        }
+      }
+    },
+    "settingsIconStyleNative" : {
+      "comment" : "Icon style choice that draws the artwork macOS provides for each app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Symbole"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App icons"
           }
         }
       }

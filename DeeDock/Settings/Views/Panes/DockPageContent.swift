@@ -37,6 +37,7 @@ struct DockPageContent: View {
                                        itemSpacing: binding(\.itemSpacing),
                                        cornerRadius: binding(\.cornerRadius),
                                        runningIndicatorStyle: binding(\.runningIndicatorStyle),
+                                       iconStyle: binding(\.iconStyle),
                                        animateIndicators: binding(\.animateIndicators),
                                        launchAnimation: binding(\.launchAnimation),
                                        overrideContext: override)

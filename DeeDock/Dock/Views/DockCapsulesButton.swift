@@ -21,7 +21,8 @@ struct DockCapsulesButton: View {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
                                  available: true, running: false, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
-                                 artworkAnimation: interaction.idleFade.animation) {
+                                 artworkAnimation: interaction.idleFade.animation,
+                                 lineIcon: interaction.lineIcon(for: .sessionCapsules)) {
                 CapsuleGlyph(size: size)
             }
                 .overlay(alignment: .topTrailing) {

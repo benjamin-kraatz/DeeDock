@@ -35,7 +35,8 @@ struct DockShelfButton: View {
                 launching: false,
                 keyboardSelected: selected,
                 artworkOpacity: artworkOpacity,
-                artworkAnimation: interaction.idleFade.animation
+                artworkAnimation: interaction.idleFade.animation,
+                lineIcon: interaction.lineIcon(for: .shelf)
             )
             .overlay(alignment: .topTrailing) {
                 if !item.isEmpty { badge }

@@ -29,7 +29,8 @@ struct DockLauncherButton: View {
                     idleFraction: interaction.idleFade.fraction,
                     reduceTransparency: reduceTransparency
                 ).icons,
-                artworkAnimation: interaction.idleFade.animation
+                artworkAnimation: interaction.idleFade.animation,
+                lineIcon: interaction.lineIcon(for: .launcher)
             ) {
                 LauncherTileArtwork(size: size)
             }

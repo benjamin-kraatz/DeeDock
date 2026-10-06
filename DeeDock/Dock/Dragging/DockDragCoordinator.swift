@@ -150,6 +150,17 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         update(at: NSEvent.mouseLocation)
     }
 
+    /// Line style carries the white glyph instead of the app's artwork. Tiles without a glyph keep `fallback`.
+    private func dragIcon(for pin: DockPin, fallback: NSImage, side: CGFloat, panel: DockPanelController) -> NSImage {
+        guard panel.interaction.iconStyle == .line else { return fallback }
+        let line: DockLineIcon? = switch pin {
+        case .application(let reference): panel.interaction.lineIcon(for: reference, artwork: fallback)
+        case .folder: panel.interaction.lineIcon(for: .folder)
+        }
+        guard let line, let image = LineIconArtwork.image(glyph: line.glyph, size: side) else { return fallback }
+        return image
+    }
+
     private func begin(pin: DockPin, icon: NSImage, from displayID: String, view: NSView, event: NSEvent) {
         guard let panel = panels[displayID], panel.store.canEditPins else { return }
         cancel()
@@ -162,7 +173,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         let dragItem = NSDraggingItem(pasteboardWriter: pasteboard)
         let dimension = min(view.bounds.width, view.bounds.height)
         rememberDragImage(size: CGSize(width: dimension, height: dimension), in: view)
-        dragItem.setDraggingFrame(dragImageBaseFrame, contents: icon)
+        dragItem.setDraggingFrame(dragImageBaseFrame, contents: dragIcon(for: pin, fallback: icon, side: dimension, panel: panel))
         installMonitor()
         nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)
         nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
