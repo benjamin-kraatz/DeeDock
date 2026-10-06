@@ -84,7 +84,8 @@ struct SystemDockTuckSettingsCard: View {
     var body: some View {
         SystemDockTuckCard(isOn: controller.isOn, tucked: controller.tuckedOrientation, dokkEdge: dokkEdge,
                            failure: controller.failure?.message,
-                           tuckAway: controller.tuckAway, restore: controller.restore,
+                           tuckAway: { controller.tuckAway(source: .settings) },
+                           restore: { controller.restore(source: .settings) },
                            dismissFailure: controller.dismissFailure)
     }
 }

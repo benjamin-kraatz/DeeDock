@@ -33,6 +33,8 @@ extension DeeDockDelegate {
         inputs.screenRecording = AnalyticsPermissionStatus(screenCapture.status)
         inputs.systemDockHidden = SystemDockReservation.reservedEdge(
             in: NSScreen.screens.map { ($0.frame, $0.visibleFrame) }) == nil
+        inputs.systemDockTuck = coordinator.systemDockTuck.isOn
+        inputs.systemDockTuckedSide = coordinator.systemDockTuck.tuckedOrientation
         inputs.updates = AnalyticsContextInputs.Updates(
             checksAutomatically: updater.automaticallyChecksForUpdates,
             installsAutomatically: updater.automaticallyInstallsUpdates,

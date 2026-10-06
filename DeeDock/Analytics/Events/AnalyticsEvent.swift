@@ -26,6 +26,11 @@ enum AnalyticsEvent {
     /// Displays were connected or disconnected. The counts describe the arrangement afterwards.
     case displaysChanged(connected: Int, disconnected: Int, newProfileCount: Int, displayCount: Int,
                          externalDisplayCount: Int, dockCount: Int)
+    /// The macOS Dock switch acted. `side` is where the Dock is afterwards while DOKK's values
+    /// are in place; `keptCount` is how many of the person's own changes a restore left alone.
+    case systemDockTuck(AnalyticsSystemDockTuckAction, source: AnalyticsSystemDockTuckSource,
+                        outcome: AnalyticsOutcome, failure: AnalyticsSystemDockTuckFailure?,
+                        side: SystemDockOrientation?, dockRestarted: Bool, keptCount: Int)
 
     // Onboarding
     case onboardingStepReached(OnboardingStep, index: Int)

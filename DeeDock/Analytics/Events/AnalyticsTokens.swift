@@ -16,6 +16,7 @@ extension WindowPeekLayout: AnalyticsToken {}
 extension WindowPeekStyle: AnalyticsToken {}
 extension WindowPeekSize: AnalyticsToken {}
 extension OnboardingStep: AnalyticsToken {}
+extension SystemDockOrientation: AnalyticsToken {}
 extension FolderStackPresentation: AnalyticsToken {}
 extension FolderStackSort: AnalyticsToken {}
 extension ShelfSort: AnalyticsToken {}

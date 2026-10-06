@@ -13,6 +13,10 @@ import Observation
 ///   in System Settings meanwhile is theirs to keep.
 /// - A failed write rolls back what it can. Whatever remains is still covered by the snapshot,
 ///   and the Restore button stays available while a snapshot exists.
+///
+/// Analytics: every action sends one `system_dock_tuck` event. A click also sends
+/// `setting_changed` for `system_dock_tuck` when the switch flips. Launch and edge-following
+/// actions report only when they wrote something or failed, so an ordinary launch stays quiet.
 @MainActor @Observable
 final class SystemDockTuckController {
     enum Failure: Equatable {
@@ -26,6 +30,23 @@ final class SystemDockTuckController {
             case .restore: .systemDockRestoreFailed
             }
         }
+
+        var analytics: AnalyticsSystemDockTuckFailure {
+            switch self {
+            case .managed: .managed
+            case .snapshot: .snapshot
+            case .write: .write
+            case .restore: .restore
+            }
+        }
+    }
+
+    /// What one action did, collected while it runs and reported when it ends.
+    private struct Trace {
+        var restarted = false
+        /// Keys a restore left alone because the person changed them.
+        var kept = 0
+        var failure: Failure?
     }
 
     /// The person's choice; it stays on across quits.
@@ -57,6 +78,9 @@ final class SystemDockTuckController {
     /// Held while DOKK's values are in place, so macOS asks DOKK to quit (and restore) instead
     /// of killing it at logout.
     @ObservationIgnored private var suddenTerminationDisabled = false
+    @ObservationIgnored private var trace = Trace()
+    @ObservationIgnored private let track: (AnalyticsEvent) -> Void
+    @ObservationIgnored private let settingChanged: (_ from: Bool, _ to: Bool) -> Void
 
     /// Constructing the controller reads DOKK's record, and the Dock's values only when that
     /// record is unreadable. It writes nothing; `start()` acts on the record.
@@ -64,9 +88,16 @@ final class SystemDockTuckController {
     /// - Parameters:
     ///   - service: the Dock's preferences; nil uses the live `com.apple.dock` domain.
     ///   - repository: where the record lives; nil uses standard user defaults.
-    init(service: SystemDockPreferencesServicing? = nil, repository: SystemDockTuckRepository? = nil) {
+    ///   - track: receives each `system_dock_tuck` event; nil sends it to PostHog.
+    ///   - settingChanged: receives a click's switch change; nil reports `setting_changed`.
+    init(service: SystemDockPreferencesServicing? = nil, repository: SystemDockTuckRepository? = nil,
+         track: ((AnalyticsEvent) -> Void)? = nil, settingChanged: ((Bool, Bool) -> Void)? = nil) {
         self.service = service ?? SystemDockPreferences()
         self.repository = repository ?? SystemDockTuckRepository()
+        self.track = track ?? { Analytics.track($0) }
+        self.settingChanged = settingChanged ?? { old, new in
+            Analytics.shared.featureSettingChanged(.systemDockTuck, from: AnalyticsValue(old), to: AnalyticsValue(new))
+        }
         loadRecord()
     }
 
@@ -84,9 +115,11 @@ final class SystemDockTuckController {
             forName: NSWorkspace.willPowerOffNotification, object: nil, queue: .main
         ) { [weak self] _ in MainActor.assumeIsolated { self?.sessionEnding = true } }
         if record.isOn {
-            apply(SystemDockOrientation.avoiding(mainDockEdge))
+            perform(.reapplyOnLaunch, source: .automatic, reportsUnchanged: false) {
+                apply(SystemDockOrientation.avoiding(mainDockEdge))
+            }
         } else if record.snapshot != nil {
-            restoreValues(keepingSwitch: false)
+            perform(.resumeRestore, source: .automatic) { restoreValues(keepingSwitch: false) }
         }
     }
 
@@ -100,24 +133,27 @@ final class SystemDockTuckController {
     }
 
     /// Turns the switch on and tucks the Dock away.
-    func tuckAway() {
+    /// - Parameter source: where the click happened, for analytics.
+    func tuckAway(source: AnalyticsSystemDockTuckSource = .settings) {
         failure = nil
-        apply(SystemDockOrientation.avoiding(mainDockEdge))
+        perform(.tuckAway, source: source) { apply(SystemDockOrientation.avoiding(mainDockEdge)) }
     }
 
     /// Turns the switch off and puts the person's values back.
-    func restore() {
+    /// - Parameter source: where the click happened, for analytics.
+    func restore(source: AnalyticsSystemDockTuckSource = .settings) {
         failure = nil
         followTask?.cancel()
-        restoreValues(keepingSwitch: false)
+        perform(.restore, source: source) { restoreValues(keepingSwitch: false) }
     }
 
     /// Puts the person's values back on quit while keeping the switch on for the next launch.
-    /// Synchronous, because the process ends when `applicationWillTerminate` returns.
+    /// Synchronous, because the process ends when `applicationWillTerminate` returns. Its event
+    /// is queued before `Analytics.stop()` flushes at quit.
     func restoreForTermination() {
         followTask?.cancel()
         guard record.snapshot != nil else { return }
-        restoreValues(keepingSwitch: true)
+        perform(.restoreOnQuit, source: .automatic) { restoreValues(keepingSwitch: true) }
     }
 
     func dismissFailure() { failure = nil }
@@ -163,6 +199,8 @@ final class SystemDockTuckController {
             }
             guard persisted else {
                 restoreValues(keepingSwitch: false)
+                // The rollback skips keys whose write never landed; they are not the person's.
+                trace.kept = 0
                 return fail(.write, turningOff: false)
             }
             restartDockUnlessSessionEnding()
@@ -179,7 +217,7 @@ final class SystemDockTuckController {
             try? await Task.sleep(for: .milliseconds(800))
             guard !Task.isCancelled, let self else { return }
             followTask = nil
-            followOrientation()
+            perform(.followEdge, source: .automatic, reportsUnchanged: false) { self.followOrientation() }
         }
     }
 
@@ -222,7 +260,10 @@ final class SystemDockTuckController {
         for key in SystemDockKey.allCases {
             let written = SystemDockTuckPlan.value(for: key, orientation: snapshot.orientation)
             // Changed by the person since DOKK wrote it: theirs to keep.
-            guard written.matches(service.value(for: key)) else { continue }
+            guard written.matches(service.value(for: key)) else {
+                trace.kept += 1
+                continue
+            }
             let original = snapshot.original(for: key)
             service.setValue(original, for: key)
             if !written.matches(original) { changed = true }
@@ -244,6 +285,28 @@ final class SystemDockTuckController {
     private func restartDockUnlessSessionEnding() {
         guard !sessionEnding else { return }
         service.restartDock()
+        trace.restarted = true
+    }
+
+    /// Runs one action and reports it.
+    ///
+    /// - Parameter reportsUnchanged: false for follow-through that usually finds nothing to do,
+    ///   which then reports only when it restarted the Dock or failed.
+    private func perform(_ action: AnalyticsSystemDockTuckAction, source: AnalyticsSystemDockTuckSource,
+                         reportsUnchanged: Bool = true, _ body: () -> Void) {
+        trace = Trace()
+        let wasOn = record.isOn
+        body()
+        if source != .automatic, wasOn != record.isOn { settingChanged(wasOn, record.isOn) }
+        guard reportsUnchanged || trace.restarted || trace.failure != nil else { return }
+        let outcome: AnalyticsOutcome = switch trace.failure {
+        case nil: .succeeded
+        case .managed?: .blocked
+        case _?: .failed
+        }
+        track(.systemDockTuck(action, source: source, outcome: outcome, failure: trace.failure?.analytics,
+                              side: record.snapshot?.orientation, dockRestarted: trace.restarted,
+                              keptCount: trace.kept))
     }
 
     private func fail(_ failure: Failure, turningOff: Bool) {
@@ -252,6 +315,7 @@ final class SystemDockTuckController {
             repository.save(record)
         }
         self.failure = failure
+        trace.failure = failure
         publish()
     }
 
@@ -274,8 +338,11 @@ final class SystemDockTuckController {
     }
 
     private func publish() {
+        let changed = isOn != record.isOn || tuckedOrientation != record.snapshot?.orientation
         isOn = record.isOn
         tuckedOrientation = record.snapshot?.orientation
+        // Every event carries the switch and the side; launch and quit change them without a click.
+        if changed { Analytics.shared.contextDidChange() }
         if record.snapshot != nil, !suddenTerminationDisabled {
             ProcessInfo.processInfo.disableSuddenTermination()
             suddenTerminationDisabled = true

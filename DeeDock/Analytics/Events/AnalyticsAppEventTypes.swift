@@ -71,6 +71,37 @@ nonisolated enum AnalyticsLoginItemOperation: String, AnalyticsToken {
     }
 }
 
+/// What the macOS Dock switch did. The launch, quit, and edge-following actions are DOKK's own
+/// follow-through on the switch, not a click.
+nonisolated enum AnalyticsSystemDockTuckAction: String, AnalyticsToken {
+    case tuckAway = "tuck_away", restore
+    /// The switch was on at launch and DOKK changed the Dock to match it.
+    case reapplyOnLaunch = "reapply_on_launch"
+    /// The switch was off at launch, but DOKK's values were still in place, for example after a
+    /// failed restore or an unreadable record.
+    case resumeRestore = "resume_restore"
+    case restoreOnQuit = "restore_on_quit"
+    /// DOKK's main dock moved onto or off the left edge, so the macOS Dock changed sides.
+    case followEdge = "follow_edge"
+}
+
+/// Where a macOS Dock switch action started.
+nonisolated enum AnalyticsSystemDockTuckSource: String, AnalyticsToken {
+    case settings, onboarding, automatic
+}
+
+/// Why a macOS Dock switch action did not complete.
+nonisolated enum AnalyticsSystemDockTuckFailure: String, AnalyticsToken {
+    /// A configuration profile forces the Dock's settings; nothing was written.
+    case managed
+    /// The previous values could not be saved; nothing was written.
+    case snapshot
+    /// macOS rejected the write; DOKK rolled back what it could.
+    case write
+    /// The previous values could not be written back; Restore stays available.
+    case restore
+}
+
 /// An item chosen from an app tile's context menu. Pin, Badge Memory, and App Melt items report
 /// through their own events.
 nonisolated enum AnalyticsAppMenuAction: String, AnalyticsToken {

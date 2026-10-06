@@ -47,6 +47,10 @@ struct AnalyticsContextInputs {
     var screenRecording: AnalyticsPermissionStatus = .unavailable
     /// Whether the macOS Dock has released its desktop space.
     var systemDockHidden = false
+    /// Whether the macOS Dock switch is on.
+    var systemDockTuck = false
+    /// The side DOKK put the macOS Dock on, or nil while DOKK's values are not in place.
+    var systemDockTuckedSide: SystemDockOrientation?
     /// Nil in builds that do not update themselves.
     var updates: Updates?
 
@@ -69,6 +73,8 @@ enum AnalyticsContext {
             "dock_count": AnalyticsValue(inputs.displays.count(where: \.hostsDock)),
             "dock_mode_count": AnalyticsValue(inputs.modeCount),
             "system_dock_hidden": AnalyticsValue(inputs.systemDockHidden),
+            "system_dock_tuck": AnalyticsValue(inputs.systemDockTuck),
+            "system_dock_tucked_side": inputs.systemDockTuckedSide.map { AnalyticsValue($0) },
             "login_item": AnalyticsValue(AnalyticsLoginItem(inputs.loginItem)),
             "accessibility_access": AnalyticsValue(inputs.accessibility),
             "screen_recording_access": AnalyticsValue(inputs.screenRecording),

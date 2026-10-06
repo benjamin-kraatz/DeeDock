@@ -120,4 +120,7 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     case shelfPresentation = "shelf_presentation"
     /// Days after which unused Shelf items move to compost; 0 is off.
     case shelfCompostDays = "shelf_compost_days"
+    /// The macOS Dock switch, changed by a click in Settings or the tour. Quit and launch
+    /// follow-through is reported by `system_dock_tuck`, not here.
+    case systemDockTuck = "system_dock_tuck"
 }

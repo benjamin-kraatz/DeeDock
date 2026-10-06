@@ -194,6 +194,90 @@ struct SystemDockTuckTests {
     }
 }
 
+/// What reaches PostHog: one `system_dock_tuck` per action, `setting_changed` only for clicks,
+/// and quiet launches when nothing had to change.
+@Suite("macOS Dock switch analytics")
+@MainActor
+struct SystemDockTuckAnalyticsTests {
+    private let defaults = scratchDefaults()
+    private var events: [AnalyticsEvent] { recorder.events }
+    private let recorder = Recorder()
+
+    @MainActor final class Recorder {
+        var events: [AnalyticsEvent] = []
+        var settingChanges: [(Bool, Bool)] = []
+    }
+
+    private func controller(_ service: InMemorySystemDockPreferences) -> SystemDockTuckController {
+        let recorder = recorder
+        return SystemDockTuckController(service: service, repository: SystemDockTuckRepository(defaults: defaults),
+                                        track: { recorder.events.append($0) },
+                                        settingChanged: { recorder.settingChanges.append(($0, $1)) })
+    }
+
+    @Test("A click reports the action with its source and side, and the switch change")
+    func clickReports() throws {
+        let tuck = controller(InMemorySystemDockPreferences())
+        tuck.tuckAway(source: .onboarding)
+        let record = try #require(events.count == 1 ? events.first : nil).record
+        #expect(record.name == "system_dock_tuck")
+        #expect(record.properties["action"] == AnalyticsValue(AnalyticsSystemDockTuckAction.tuckAway))
+        #expect(record.properties["source"] == AnalyticsValue(AnalyticsSystemDockTuckSource.onboarding))
+        #expect(record.properties["outcome"] == AnalyticsValue(AnalyticsOutcome.succeeded))
+        #expect(record.properties["side"] == AnalyticsValue(SystemDockOrientation.left))
+        #expect(record.properties["dock_restarted"] == AnalyticsValue(true))
+        #expect(recorder.settingChanges.count == 1)
+        #expect(recorder.settingChanges.first.map { !$0.0 && $0.1 } == true)
+    }
+
+    @Test("A restore reports how many of the person's own changes it kept")
+    func restoreReportsKept() throws {
+        let service = InMemorySystemDockPreferences([.tileSize: 45])
+        let tuck = controller(service)
+        tuck.tuckAway()
+        service.stored[.tileSize] = 30
+        tuck.restore()
+        let record = try #require(events.last).record
+        #expect(record.properties["action"] == AnalyticsValue(AnalyticsSystemDockTuckAction.restore))
+        #expect(record.properties["kept_count"] == AnalyticsValue(1))
+        #expect(record.properties["side"] == nil)
+        #expect(recorder.settingChanges.count == 2)
+    }
+
+    @Test("Quit reports restore_on_quit as automatic and leaves the switch unchanged")
+    func quitReports() throws {
+        let tuck = controller(InMemorySystemDockPreferences())
+        tuck.tuckAway()
+        tuck.restoreForTermination()
+        let record = try #require(events.last).record
+        #expect(record.properties["action"] == AnalyticsValue(AnalyticsSystemDockTuckAction.restoreOnQuit))
+        #expect(record.properties["source"] == AnalyticsValue(AnalyticsSystemDockTuckSource.automatic))
+        #expect(recorder.settingChanges.count == 1)
+    }
+
+    @Test("A launch that finds the Dock already tucked away sends nothing")
+    func quietLaunch() {
+        let service = InMemorySystemDockPreferences()
+        controller(service).tuckAway()
+        let before = events.count
+        let relaunched = controller(service)
+        relaunched.start()
+        defer { relaunched.stop() }
+        #expect(events.count == before)
+    }
+
+    @Test("Managed settings report a blocked outcome with its reason")
+    func managedReports() throws {
+        let service = InMemorySystemDockPreferences()
+        service.managedKeys = [.tileSize]
+        controller(service).tuckAway()
+        let record = try #require(events.count == 1 ? events.first : nil).record
+        #expect(record.properties["outcome"] == AnalyticsValue(AnalyticsOutcome.blocked))
+        #expect(record.properties["failure"] == AnalyticsValue(AnalyticsSystemDockTuckFailure.managed))
+        #expect(recorder.settingChanges.isEmpty)
+    }
+}
+
 /// Each test gets its own preferences, so one test's record never leaks into another.
 @MainActor
 private func scratchDefaults() -> UserDefaults {

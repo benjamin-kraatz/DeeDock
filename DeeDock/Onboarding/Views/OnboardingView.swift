@@ -103,8 +103,8 @@ struct OnboardingView: View {
                                           isTucked: systemDockTuck?.isTucked,
                                           failure: systemDockTuck?.failure?.message,
                                           openSettings: systemDock.openDesktopAndDockSettings,
-                                          tuckAway: { systemDockTuck?.tuckAway() },
-                                          restore: { systemDockTuck?.restore() })
+                                          tuckAway: { systemDockTuck?.tuckAway(source: .onboarding) },
+                                          restore: { systemDockTuck?.restore(source: .onboarding) })
             }
         case .placement:
             standard(step, prompt: .onboardingPlacementPrompt) {

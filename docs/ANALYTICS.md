@@ -158,6 +158,8 @@ Registered with the SDK's `register`, so every event carries them.
 | `dock_count` | displays that host a dock |
 | `dock_mode_count` | exact |
 | `system_dock_hidden` | whether the macOS Dock has released its desktop space |
+| `system_dock_tuck` | whether the [macOS Dock switch](GUIDE.md#tuck-away-the-macos-dock) is on |
+| `system_dock_tucked_side` | `left` or `right` while DOKK's values are in place; absent otherwise, including after the quit-time restore |
 | `login_item` | `not_registered`, `enabled`, `requires_approval`, `not_found`, `unknown` |
 | `accessibility_access`, `screen_recording_access` | `enabled`, `not_enabled`, `unavailable` |
 | `updates_check_automatically`, `updates_install_automatically`, `updates_install_when_idle` | Bool |
@@ -209,8 +211,9 @@ Preferences kept outside those models are reported with `area = features` and a 
 `AnalyticsFeatureSetting`: `discovery_enabled`, `launcher_suggestions_enabled`,
 `launcher_suggestions_paused`, `launcher_suggestion_prompts_enabled`, `clipboard_redact_secrets`,
 `clipboard_curator_enabled`, `local_history_recording`, `local_history_replay`,
-`peek_history_enabled`, `badge_memory_collect_focus`, `shelf_sort`, `shelf_presentation`, and
-`shelf_compost_days` (0 is off). They are not part of the person profile, so a person who never
+`peek_history_enabled`, `badge_memory_collect_focus`, `shelf_sort`, `shelf_presentation`,
+`shelf_compost_days` (0 is off), and `system_dock_tuck` (only for a click in Settings or the tour,
+not for the restore at quit or the re-tuck at launch). They are not part of the person profile, so a person who never
 changed one is on its default.
 
 `settings_viewed` with `via = request` means a menu item, a dock tile, or another feature opened
@@ -357,10 +360,17 @@ Atmosphere has no events of its own. Its settings are reported through `setting_
 | `permission_requested` | `permission` (`accessibility`, `screen_recording`). DOKK asked macOS to prompt. |
 | `permission_changed` | `permission`, `status` (`enabled`, `not_enabled`, `unavailable`). The status macOS reports differs from the one DOKK last read while running. A change made while DOKK was not running only shows in the registered context. |
 | `login_item_changed` | `operation` (`register`, `unregister`, `cancel_request`), `outcome`, `status` (as `login_item`) |
+| `system_dock_tuck` | `action` (`tuck_away`, `restore`, `reapply_on_launch`, `resume_restore`, `restore_on_quit`, `follow_edge`), `source` (`settings`, `onboarding`, `automatic`), `outcome` (`succeeded`, `failed`, `blocked`), `failure` (`managed`, `snapshot`, `write`, `restore`), `side` (`left`, `right`; absent once restored), `dock_restarted`, `kept_count` (settings a restore left alone because the person changed them) |
 | `displays_changed` | `connected`, `disconnected`, `new_profile_count` (displays DOKK had never seen), `display_count`, `external_display_count`, `dock_count`. The arrangement at launch is not reported. |
 
 `displays_changed` carries the new counts itself, because the registered context is refreshed a
 second later.
+
+`system_dock_tuck` is sent once per action of the macOS Dock switch. `reapply_on_launch` and
+`follow_edge` are sent only when they rewrote the Dock's settings or failed, so an ordinary launch
+with the switch on sends nothing. `restore_on_quit` is queued before analytics flushes at quit;
+`dock_restarted` is false when the session was ending. The Dock's own values are never sent, only
+the switch, the side, and the outcome.
 
 ### Updates
 
