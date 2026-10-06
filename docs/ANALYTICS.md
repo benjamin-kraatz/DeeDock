@@ -113,10 +113,13 @@ happen in PostHog-side middleware.
 - Default properties stay as the SDK sets them, including `$app_version`, `$app_build`,
   `$os_version`, `$device_model`, `$device_name` (the Mac model's marketing name), `$locale`,
   `$timezone`, and screen size.
-- Lifecycle events: `Application Installed`, `Application Updated`, `Application Opened`,
+- Lifecycle events from the SDK: `Application Installed`, `Application Opened`,
   `Application Backgrounded`. DOKK sends no events of its own for these, and none for
-  "active today". `Application Updated` only says that the version changed. DOKK's
-  [update events](#updates) describe how the update got there and what went wrong.
+  "active today".
+- `Application updated` is sent by DOKK on the first launch after the marketing version or
+  the build changes. See [Updates](#updates). The SDK's own `Application Updated` compares
+  the build number only and stores that build before it captures, so a capture that does
+  not leave the device is never retried. Dashboards should use DOKK's event.
 - Session replay is off. It does not exist for macOS in the SDK.
 - Crash autocapture is on (`errorTrackingConfig.autoCapture`). A crash is sent as an
   `$exception` event with its stack trace on the next launch.
@@ -363,8 +366,9 @@ The update flow is reported from three places: Sparkle's delegate (`UpdateEngine
 which sees every cycle including scheduled checks and silent downloads; the custom user driver,
 which sees what a person is shown and chooses; and the update island's callouts.
 `UpdateAnalytics` (`DeeDock/Updates/UpdateAnalytics.swift`) turns them into these events.
+`Application updated` is separate: it carries only the properties in its row.
 
-Every update event also carries:
+Every `update_*` event also carries:
 
 | Property | Value |
 | --- | --- |
@@ -396,6 +400,7 @@ after a change. An event sent in between would otherwise carry the old value.
 | `update_install_started` | `path` (`user`, `idle`, `on_quit`, `automatic`), `silent`, `waited` seconds since ready |
 | `update_install_waiting_for_quit` | none. The installer waits for DOKK to quit and termination was refused. |
 | `update_installed` | `path` (as above, or `manual` when DOKK did not start the install), `previous_version`, `previous_build`, `offer_version`, `offer_build`, `duration` from install start to this launch |
+| `Application updated` | `previous_version`, `version`, `previous_build`, `build`. `update_source` (`automatic` for a scheduled check, `manual` for a check a person started) only when that check was known before relaunch. `channel` (`direct` or `debug`), the same value as the registered context. Sent on the first launch whose version or build differs from the one stored last time. The first install sends nothing and only stores the version. With sharing off, the version is stored and the event is not sent. |
 | `update_install_failed` | `path`, `offer_version`, `offer_build`, `duration`. DOKK started an install and the next launch still runs the old build. |
 | `update_failed` | `stage` (`startup`, `check`, `download`, `extract`, `install`), `check`, error codes |
 | `update_release_notes_failed` | `reason` (`download`, `decode`, `render`, `whats_new`), error codes when there is an error |
@@ -413,9 +418,13 @@ Notes for dashboards:
 
 - `update_failed` is the one event to count failures. `update_download_finished` with
   `outcome = failed` and `update_cycle_finished` with `outcome = failed` describe the same error
-  from the download step and the end of the cycle.
-- "No update" is not a failure. It is `update_not_found` and ends the cycle with
-  `outcome = no_update`.
+  from the download step and the end of the cycle. A cancelled installer prompt
+  (`installationCanceled`, Sparkle `4007`) is not a failure: Sparkle delivers it through the
+  same abort callback, and DOKK drops it.
+- `Application updated` counts a successful version or build change. Pair it with
+  `update_failed` for a success rate. It does not replace `update_installed`, which still
+  carries the install path, the offer, and the duration.
+- "No update" is `update_not_found` and ends the cycle with `outcome = no_update`.
 - `update_installed` and `update_install_failed` are sent on the first launch after the install,
   so they carry the new build's `current_version`. A record written right before the install
   (`analytics.updates.pending-install.v1`) connects the two launches. A version change without

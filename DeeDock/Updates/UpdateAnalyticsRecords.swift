@@ -2,8 +2,10 @@ import Foundation
 
 /// The version and build of the last launch, so the next one can tell that DOKK changed.
 ///
-/// Kept apart from ``UpdateInstallRecord``, which drives the What's New notice and is
-/// cleared when the person reads it.
+/// Stored in the defaults of the running bundle, so a Dev build (`de.benjaminkraatz.DeeDock.dev`)
+/// and a Release build do not see each other's last launch. Kept apart from
+/// ``UpdateInstallRecord``, which drives the What's New notice and is cleared when the person
+/// reads it.
 nonisolated struct UpdateLaunchRecord: Codable, Equatable, Sendable {
     static let key = "analytics.updates.last-launch.v1"
 
@@ -34,6 +36,8 @@ nonisolated struct UpdatePendingInstallRecord: Codable, Equatable, Sendable {
     var offerBuild: String?
     /// Raw value of ``AnalyticsUpdateInstallPath``.
     var path: String
+    /// Raw value of ``ApplicationUpdateSource``, when the check that started this install was known.
+    var updateSource: String? = nil
     var startedAt: Date
 
     /// Whether the running build is the one that started this install.

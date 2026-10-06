@@ -313,7 +313,10 @@ final class Analytics {
 
     /// Whether events are worth keeping: either they can be sent now, or a new user may still
     /// see the notice during this launch.
-    private var acceptsEvents: Bool { isConfigured && buildMaySend && consent.record.sharingEnabled }
+    ///
+    /// ``UpdateAnalytics`` reads this before `Application updated`. A launch that cannot send
+    /// still records the version and does not hand the event over.
+    var acceptsEvents: Bool { isConfigured && buildMaySend && consent.record.sharingEnabled }
 
     private func activateIfAllowed() {
         guard !backendStarted, isConfigured, buildMaySend, consent.allowsCollection else { return }
