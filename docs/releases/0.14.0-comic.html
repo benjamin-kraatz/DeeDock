@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DDock 0.14.0 What’s New</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f1e6;
+    --ink: #2a2754;
+    --lilac: #c9b8e0;
+    --mint: #b7dcc8;
+    --coral: #f2b6a8;
+    --rule: #d8d0c4;
+  }
+  html { background: var(--paper); color: var(--ink); }
+  body {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding: 2rem 1.25rem 4rem;
+    font: 1.05rem/1.5 "Source Serif 4", "Iowan Old Style", Palatino, serif;
+  }
+  h1 { font-size: 1.6rem; font-weight: 600; margin: 0 0 0.35rem; }
+  h2 { font-size: 1.15rem; font-weight: 600; margin: 0 0 0.75rem; }
+  p { margin: 0.4rem 0; }
+  a { color: var(--ink); }
+  .lede { margin-bottom: 2rem; }
+  .panel {
+    border: 2px solid var(--ink);
+    border-radius: 1rem;
+    padding: 1rem 1rem 1.15rem;
+    margin: 0 0 1.5rem;
+    background: #fffdf8;
+  }
+  .art {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.6rem;
+    margin-bottom: 1rem;
+    background: var(--paper);
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.25rem;
+  }
+  @media (max-width: 640px) {
+    .cols { grid-template-columns: 1fr; }
+  }
+  .lang { min-width: 0; }
+  .lang h3 {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 0.4rem;
+    color: #5c5878;
+  }
+  .title { font-weight: 650; margin: 0 0 0.35rem; }
+  .speech {
+    margin: 0 0 0.45rem;
+    padding: 0.45rem 0.65rem;
+    background: var(--lilac);
+    border-radius: 0.7rem;
+  }
+  .caption { margin: 0; }
+  .mint { background: var(--mint); }
+  .coral { background: var(--coral); }
+</style>
+</head>
+<body>
+<h1>DDock 0.14.0 What’s New</h1>
+<p class="lede"><strong>Weiße Ruhe</strong> / <strong>Quiet lines</strong>. Review preview for <a href="0.14.0.md">0.14.0.md</a>. Art is shared. Copy is selectable. German left, English right. Google Fonts (Source Serif 4) are for this static file only. The native Update window does not load this stylesheet.</p>
+
+<article class="panel">
+<h2>01 / Linie</h2>
+<img class="art" src="assets/0.14.0/panel-01.png" alt="Bunte lächelnde Kacheln rutschen von einem Dock, und weiße Strichsymbole bleiben. Ein Zeiger lässt eines farbig leuchten. / Colorful smiling tiles slide off a dock, and white line glyphs remain. A pointer makes one of them glow.">
+<div class="cols">
+  <div class="lang">
+    <h3>Deutsch</h3>
+    <p class="title">Ruhige Striche</p>
+    <p class="speech">Schau, ich leuchte.</p>
+    <p class="caption">Bekannte Apps werden weiße Strichsymbole. Eine ohne Symbol behält ihr Icon. Zeigen und die Tastatur lassen es farbig leuchten.</p>
+  </div>
+  <div class="lang">
+    <h3>English</h3>
+    <p class="title">Calm lines</p>
+    <p class="speech">Watch me glow.</p>
+    <p class="caption">Known apps become white line glyphs. One without a glyph keeps its icon. Hover and the keyboard make it glow.</p>
+  </div>
+</div>
+</article>
+
+<article class="panel">
+<h2>02 / Kompakt</h2>
+<img class="art" src="assets/0.14.0/panel-02.png" alt="Eine Karte mit leerem Suchbalken, Lupe und sechs weißen Strichsymbolen schwebt über einer runden lächelnden Dock-Kachel, und eine Spitze zeigt auf genau diese Kachel. / A card with an empty search bar, a magnifying glass, and six white line glyphs floats above one round smiling dock tile, and a tail points straight at that tile.">
+<div class="cols">
+  <div class="lang">
+    <h3>Deutsch</h3>
+    <p class="title">Kleines Raster</p>
+    <p class="speech mint">Ich bleibe klein.</p>
+    <p class="caption">Eine kleine Karte mit leerem Suchbalken und weißen Strichsymbolen sitzt über einer Kachel. Eine Spitze zeigt auf sie. Das Dock bleibt stehen.</p>
+  </div>
+  <div class="lang">
+    <h3>English</h3>
+    <p class="title">A small grid</p>
+    <p class="speech mint">I stay small.</p>
+    <p class="caption">A small card with an empty search bar and white line glyphs sits above one tile. A tail points at that tile. The dock stays put.</p>
+  </div>
+</div>
+</article>
+
+<article class="panel">
+<h2>03 / Wegräumen</h2>
+<img class="art" src="assets/0.14.0/panel-03.png" alt="In einem Bildschirmrahmen bleibt unten ein Dock aus weißen Strichen, während ein dünner bunter Streifen am linken Rand hervorschaut und eine ziffernlose Uhr mit zwei Zeigern daneben wartet. / Inside a screen frame, a dock of white line glyphs stays along the bottom, while a thin colorful strip peeks from the left edge and a blank clock with two hands waits beside it.">
+<div class="cols">
+  <div class="lang">
+    <h3>Deutsch</h3>
+    <p class="title">An die Seite</p>
+    <p class="speech coral">Ich warte am Rand.</p>
+    <p class="caption">Ein dünner bunter Streifen rutscht in den linken Rand eines Bildschirms. Eine Uhr ohne Ziffern wartet daneben. Das große Dock mit weißen Strichen bleibt unten.</p>
+  </div>
+  <div class="lang">
+    <h3>English</h3>
+    <p class="title">Off to the side</p>
+    <p class="speech coral">I wait at the edge.</p>
+    <p class="caption">A thin colorful strip slides into the left edge of a screen. A blank clock waits beside it. The large dock of white lines stays along the bottom.</p>
+  </div>
+</div>
+</article>
+</body>
+</html>
