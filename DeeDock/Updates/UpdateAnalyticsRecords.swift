@@ -23,16 +23,20 @@ nonisolated struct UpdateLaunchRecord: Codable, Equatable, Sendable {
     }
 }
 
-/// An install DOKK started, written right before the app bundle may be replaced.
+/// An install DOKK started, written before the authorization dialog.
 ///
-/// The next launch reads it once: a different build means the install completed, the same
-/// build means it did not. Either way it is then removed.
+/// The next launch reads it once and removes it. ``UpdateAnalytics/aborted(_:)`` also removes
+/// it for every abort, including a cancelled authorization prompt, so a cancelled attempt
+/// cannot label a later install. `update_source` is used only when this launch's version and
+/// build equal the offered target.
 nonisolated struct UpdatePendingInstallRecord: Codable, Equatable, Sendable {
     static let key = "analytics.updates.pending-install.v1"
 
     var fromVersion: String
     var fromBuild: String?
+    /// Marketing version Sparkle offered for this install.
     var offerVersion: String?
+    /// Build Sparkle offered for this install.
     var offerBuild: String?
     /// Raw value of ``AnalyticsUpdateInstallPath``.
     var path: String
@@ -43,6 +47,11 @@ nonisolated struct UpdatePendingInstallRecord: Codable, Equatable, Sendable {
     /// Whether the running build is the one that started this install.
     func isSameBuild(version: String, build: String?) -> Bool {
         fromVersion == version && fromBuild == build
+    }
+
+    /// Whether `version` and `build` are the offered target. A missing offer never matches.
+    func matchesTarget(version: String, build: String?) -> Bool {
+        offerVersion != nil && offerBuild != nil && offerVersion == version && offerBuild == build
     }
 
     static func load(from defaults: UserDefaults) -> UpdatePendingInstallRecord? {

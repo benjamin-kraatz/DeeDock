@@ -400,8 +400,8 @@ after a change. An event sent in between would otherwise carry the old value.
 | `update_install_started` | `path` (`user`, `idle`, `on_quit`, `automatic`), `silent`, `waited` seconds since ready |
 | `update_install_waiting_for_quit` | none. The installer waits for DOKK to quit and termination was refused. |
 | `update_installed` | `path` (as above, or `manual` when DOKK did not start the install), `previous_version`, `previous_build`, `offer_version`, `offer_build`, `duration` from install start to this launch |
-| `Application updated` | `previous_version`, `version`, `previous_build`, `build`. `update_source` (`automatic` for a scheduled check, `manual` for a check a person started) only when that check was known before relaunch. `channel` (`direct` or `debug`), the same value as the registered context. Sent on the first launch whose version or build differs from the one stored last time. The first install sends nothing and only stores the version. With sharing off, the version is stored and the event is not sent. |
-| `update_install_failed` | `path`, `offer_version`, `offer_build`, `duration`. DOKK started an install and the next launch still runs the old build. |
+| `Application updated` | `previous_version`, `version`, `previous_build`, `build`. `update_source` (`automatic` for a scheduled check, `manual` for a check a person started) only when this launch's version and build equal the offered target stored with the install. `channel` (`direct` or `debug`), the same value as the registered context. Sent on the first launch whose version or build differs from the one stored last time. The first install sends nothing and only stores the version. With sharing off, the version is stored and the event is not sent. |
+| `update_install_failed` | `path`, `offer_version`, `offer_build`, `duration`. DOKK started an install of a different build, the record was not cleared by an abort, and the next launch still runs the old build. |
 | `update_failed` | `stage` (`startup`, `check`, `download`, `extract`, `install`), `check`, error codes |
 | `update_release_notes_failed` | `reason` (`download`, `decode`, `render`, `whats_new`), error codes when there is an error |
 | `update_cycle_finished` | `check`, `outcome` (`completed`, `no_update`, `canceled`, `failed`), `duration`, error codes |
@@ -420,14 +420,18 @@ Notes for dashboards:
   `outcome = failed` and `update_cycle_finished` with `outcome = failed` describe the same error
   from the download step and the end of the cycle. A cancelled installer prompt
   (`installationCanceled`, Sparkle `4007`) is not a failure: Sparkle delivers it through the
-  same abort callback, and DOKK drops it.
+  same abort callback, and DOKK drops it. That abort also deletes the pending-install record,
+  so a cancelled prompt is not reported later as `update_install_failed`.
 - `Application updated` counts a successful version or build change. Pair it with
   `update_failed` for a success rate. It does not replace `update_installed`, which still
   carries the install path, the offer, and the duration.
 - "No update" is `update_not_found` and ends the cycle with `outcome = no_update`.
 - `update_installed` and `update_install_failed` are sent on the first launch after the install,
   so they carry the new build's `current_version`. A record written right before the install
-  (`analytics.updates.pending-install.v1`) connects the two launches. A version change without
+  (`analytics.updates.pending-install.v1`) connects the two launches and is consumed once.
+  `update_source` is attached only when the running version and build equal the offered
+  target. A launch still on the old build, with a concrete different target, sends
+  `update_install_failed`. Any other launch drops the record. A version change without
   that record is reported as `path = manual`.
 - An update left for "Install on Quit", a resumed install that was not skipped, or a silent
   download DOKK still holds, is reported as

@@ -179,6 +179,68 @@ struct UpdateAnalyticsTests {
         #expect(!events.map(\.record.name).contains("Application updated"))
     }
 
+    @Test("A cancelled install does not label a later manual build or report install_failed")
+    func cancelledInstallDoesNotLeak() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        UpdateLaunchRecord(version: "0.13.4", build: "45").save(to: defaults)
+        var events: [AnalyticsEvent] = []
+        let analytics = UpdateAnalytics(defaults: defaults, currentVersion: "0.13.4", currentBuild: "45",
+                                        analyticsEnabled: true, send: { events.append($0) })
+        analytics.checkStarted(.updates)
+        analytics.installStarted(SUAppcastItem.empty())
+        #expect(UpdatePendingInstallRecord.load(from: defaults)?.updateSource == ApplicationUpdateSource.manual.rawValue)
+
+        analytics.aborted(NSError(domain: SUSparkleErrorDomain, code: Int(SUError.installationCanceledError.rawValue)))
+        #expect(UpdatePendingInstallRecord.load(from: defaults) == nil)
+        #expect(!events.map(\.record.name).contains("update_failed"))
+        #expect(!events.map(\.record.name).contains("update_install_failed"))
+
+        events.removeAll()
+        UpdateAnalytics(defaults: defaults, currentVersion: "0.13.4", currentBuild: "45",
+                        analyticsEnabled: true, send: { events.append($0) })
+            .reportLaunch()
+        #expect(events.isEmpty)
+
+        UpdateAnalytics(defaults: defaults, currentVersion: "0.13.6", currentBuild: "47",
+                        analyticsEnabled: true, send: { events.append($0) })
+            .reportLaunch()
+        #expect(!events.map(\.record.name).contains("update_install_failed"))
+        let record = try #require(events.map(\.record).first { $0.name == "Application updated" })
+        #expect(record.properties["update_source"] == nil)
+        #expect(record.properties["version"] == AnalyticsValue(try #require(AnalyticsVersion("0.13.6"))))
+    }
+
+    @Test("A pending install for a different target is cleared and does not supply update_source")
+    func mismatchedTargetClearsPendingRecord() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        UpdateLaunchRecord(version: "0.13.4", build: "45").save(to: defaults)
+        UpdatePendingInstallRecord(fromVersion: "0.13.4", fromBuild: "45", offerVersion: "0.13.5",
+                                   offerBuild: "46", path: AnalyticsUpdateInstallPath.automatic.rawValue,
+                                   updateSource: ApplicationUpdateSource.automatic.rawValue,
+                                   startedAt: Date(timeIntervalSinceReferenceDate: 1_000))
+            .save(to: defaults)
+        var events: [AnalyticsEvent] = []
+        UpdateAnalytics(defaults: defaults, currentVersion: "0.13.6", currentBuild: "47",
+                        analyticsEnabled: true, send: { events.append($0) })
+            .reportLaunch()
+
+        #expect(UpdatePendingInstallRecord.load(from: defaults) == nil)
+        #expect(!events.map(\.record.name).contains("update_install_failed"))
+        let installed = try #require(events.map(\.record).first { $0.name == "update_installed" })
+        #expect(installed.properties["path"] == AnalyticsValue(AnalyticsUpdateInstallPath.manual))
+        let updated = try #require(events.map(\.record).first { $0.name == "Application updated" })
+        #expect(updated.properties["update_source"] == nil)
+        #expect(updated.properties["version"] == AnalyticsValue(try #require(AnalyticsVersion("0.13.6"))))
+
+        events.removeAll()
+        UpdateAnalytics(defaults: defaults, currentVersion: "0.13.6", currentBuild: "47",
+                        analyticsEnabled: true, send: { events.append($0) })
+            .reportLaunch()
+        #expect(events.isEmpty)
+    }
+
     @Test("A build-only change sends Application updated, and the first install does not")
     func buildOnlyAndFirstInstall() throws {
         let (defaults, suite) = try isolatedDefaults()

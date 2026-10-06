@@ -17,7 +17,7 @@ nonisolated struct ApplicationUpdateLaunch: Equatable, Sendable {
     struct Change: Equatable, Sendable {
         var previous: Snapshot
         var current: Snapshot
-        /// Set only when the install that produced this launch recorded how its check started.
+        /// Set only when this launch's version and build are the offered target of that install.
         var updateSource: ApplicationUpdateSource?
         /// The build channel (`direct` or `debug`). Nil leaves the property off the event.
         var channel: AnalyticsChannel?

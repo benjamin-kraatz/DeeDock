@@ -82,28 +82,40 @@ final class UpdateAnalytics {
     func reportLaunch() {
         let previous = UpdateLaunchRecord.load(from: defaults)
         let pending = UpdatePendingInstallRecord.load(from: defaults)
+        // The marker belongs to the offered target only. Any other launch drops it.
+        let updateSource: ApplicationUpdateSource?
         if let pending {
             let path = AnalyticsUpdateInstallPath(rawValue: pending.path) ?? .automatic
             let duration = now().timeIntervalSince(pending.startedAt)
-            if pending.isSameBuild(version: currentVersion, build: currentBuild) {
-                emit(.installFailed(path: path, offerVersion: AnalyticsVersion(pending.offerVersion),
-                                    offerBuild: AnalyticsVersion.build(pending.offerBuild), duration: duration))
-            } else {
+            if pending.matchesTarget(version: currentVersion, build: currentBuild) {
+                updateSource = pending.updateSource.flatMap(ApplicationUpdateSource.init(rawValue:))
                 emit(.installed(path: path, previousVersion: AnalyticsVersion(pending.fromVersion),
                                 previousBuild: AnalyticsVersion.build(pending.fromBuild),
                                 offerVersion: AnalyticsVersion(pending.offerVersion),
                                 offerBuild: AnalyticsVersion.build(pending.offerBuild), duration: duration))
+            } else if pending.isSameBuild(version: currentVersion, build: currentBuild),
+                      pending.offerVersion != nil, pending.offerBuild != nil {
+                // Still the build that started the install, and the offer was a different build.
+                // A cancelled attempt never reaches here: `aborted` already removed the record.
+                updateSource = nil
+                emit(.installFailed(path: path, offerVersion: AnalyticsVersion(pending.offerVersion),
+                                    offerBuild: AnalyticsVersion.build(pending.offerBuild), duration: duration))
+            } else {
+                updateSource = nil
+                if let previous, previous.version != currentVersion || previous.build != currentBuild {
+                    emit(.installed(path: .manual, previousVersion: AnalyticsVersion(previous.version),
+                                    previousBuild: AnalyticsVersion.build(previous.build),
+                                    offerVersion: nil, offerBuild: nil, duration: nil))
+                }
             }
             UpdatePendingInstallRecord.clear(in: defaults)
-        } else if let previous, previous.version != currentVersion || previous.build != currentBuild {
-            emit(.installed(path: .manual, previousVersion: AnalyticsVersion(previous.version),
-                            previousBuild: AnalyticsVersion.build(previous.build),
-                            offerVersion: nil, offerBuild: nil, duration: nil))
-        }
-        // A failed install keeps the old build, so its marker must not label a later change.
-        let updateSource = pending.flatMap { record -> ApplicationUpdateSource? in
-            guard !record.isSameBuild(version: currentVersion, build: currentBuild) else { return nil }
-            return record.updateSource.flatMap(ApplicationUpdateSource.init(rawValue:))
+        } else {
+            updateSource = nil
+            if let previous, previous.version != currentVersion || previous.build != currentBuild {
+                emit(.installed(path: .manual, previousVersion: AnalyticsVersion(previous.version),
+                                previousBuild: AnalyticsVersion.build(previous.build),
+                                offerVersion: nil, offerBuild: nil, duration: nil))
+            }
         }
         if let change = ApplicationUpdateLaunch.change(
             from: previous.map { .init(version: $0.version, build: $0.build) },
@@ -211,7 +223,11 @@ final class UpdateAnalytics {
 
     /// Every error that ends a Sparkle cycle except "no update" and a cancelled installer prompt.
     /// "No update" is reported by ``notFound(_:)``.
+    ///
+    /// The pending record is written before the authorization dialog, so every abort removes it,
+    /// including "no update" and Sparkle `4007`. A cancelled attempt must not be read on a later launch.
     func aborted(_ error: Error) {
+        UpdatePendingInstallRecord.clear(in: defaults)
         let error = Self.error(error)
         // "No update" and a cancelled installer prompt share this callback with real failures.
         // Leaving them out keeps `update_failed` usable as a success-rate denominator.
