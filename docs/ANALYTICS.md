@@ -286,7 +286,7 @@ from App Melt.
 
 | Event | Properties |
 | --- | --- |
-| `launcher_opened` | `source`, `file_count` (the files handed over with a drop or from the Shelf, else 0) |
+| `launcher_opened` | `source`, `file_count` (the files handed over with a drop or from the Shelf, else 0), `style` (`full` or `compact`; the Launcher that opened, so a file drop reports `full` under a compact setting) |
 | `launcher_closed` | `duration`, `had_query` (search text present when it closed) |
 | `launcher_searched` | `query_length`, `result_count`, `kind`. Never the text. |
 | `launcher_result_activated` | `kind`, `reveal`, `trigger` |

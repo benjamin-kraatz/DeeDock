@@ -654,7 +654,7 @@ final class DockPanelController {
         let trigger: AnalyticsLauncherSource = files != nil ? .fileDrop : store.keyboardFocus ? .keyboard : .tile
         if files == nil, settings.launcherStyle == .compact, let anchor = restingLauncherAnchor() {
             openCompactLauncher(anchor: anchor, previousApplication: previousApplication)
-            Analytics.track(.launcherOpened(trigger, fileCount: 0))
+            Analytics.track(.launcherOpened(trigger, fileCount: 0, style: .compact))
             return
         }
         interaction.exposesContent = false
@@ -664,7 +664,7 @@ final class DockPanelController {
             target: LauncherGeometry.frame(visibleFrame: display.visibleFrame, origin: origin, edge: settings.edge),
             dockWindow: geometry?.windowFrame ?? origin,
             pins: store.pins.compactMap(\.application), previousApplication: previousApplication)
-        Analytics.track(.launcherOpened(trigger, fileCount: files?.inputs.count ?? 0))
+        Analytics.track(.launcherOpened(trigger, fileCount: files?.inputs.count ?? 0, style: .full))
         if let files { launcher.adoptFiles(files) }
     }
 

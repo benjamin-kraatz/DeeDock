@@ -11,6 +11,7 @@ extension AnalyticsEvent {
         case .permissionChanged: "permission_changed"
         case .loginItemChanged: "login_item_changed"
         case .displaysChanged: "displays_changed"
+        case .systemDockTuck: "system_dock_tuck"
         case .onboardingStepReached: "onboarding_step_reached"
         case .onboardingStepSkipped: "onboarding_step_skipped"
         case .onboardingFinished: "onboarding_finished"
@@ -98,6 +99,10 @@ extension AnalyticsEvent {
             ["connected": .init(connected), "disconnected": .init(disconnected), "new_profile_count": .init(newProfileCount),
              "display_count": .init(displayCount), "external_display_count": .init(externalDisplayCount),
              "dock_count": .init(dockCount)]
+        case let .systemDockTuck(action, source, outcome, failure, side, dockRestarted, keptCount):
+            ["action": .init(action), "source": .init(source), "outcome": .init(outcome),
+             "failure": failure.map(AnalyticsValue.init), "side": side.map(AnalyticsValue.init),
+             "dock_restarted": .init(dockRestarted), "kept_count": .init(keptCount)]
         case let .onboardingStepReached(step, index):
             ["step": .init(step), "step_index": .init(index)]
         case let .onboardingStepSkipped(step):
@@ -157,8 +162,8 @@ extension AnalyticsEvent {
         case let .fusion(step, outcome, failure, operation, duration):
             ["step": .init(step), "outcome": .init(outcome), "failure": failure.map(AnalyticsValue.init),
              "operation": operation.map(AnalyticsValue.init), "duration": .init(duration)]
-        case let .launcherOpened(source, fileCount):
-            ["source": .init(source), "file_count": .init(fileCount)]
+        case let .launcherOpened(source, fileCount, style):
+            ["source": .init(source), "file_count": .init(fileCount), "style": .init(style)]
         case let .launcherSearched(queryLength, resultCount, kind):
             ["query_length": .init(queryLength), "result_count": .init(resultCount), "kind": .init(kind)]
         case let .launcherResultActivated(kind, reveal, trigger):
