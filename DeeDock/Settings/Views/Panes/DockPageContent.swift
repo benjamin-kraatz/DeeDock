@@ -27,7 +27,20 @@ struct DockPageContent: View {
         Dictionary(context.profiles.pinLists.values.joined().map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
     }
 
+    /// The main display's edge, which decides the macOS Dock's side; it does not depend on the
+    /// display being edited, because the macOS Dock has one position for the whole Mac.
+    private var mainDisplayEdge: DockEdge {
+        let profiles = context.profiles
+        guard let id = profiles.displays.first(where: \.isPrimary)?.id else { return context.store.value.edge }
+        return profiles.effectiveSettings(for: id).edge
+    }
+
     var body: some View {
+        // Outside the locked group: restoring the macOS Dock must work even when dock
+        // settings are unreadable.
+        if page == .behavior, let tuck = context.coordinator?.systemDockTuck {
+            SystemDockTuckSettingsCard(controller: tuck, dokkEdge: mainDisplayEdge)
+        }
         Group {
             switch page {
             case .appearance:

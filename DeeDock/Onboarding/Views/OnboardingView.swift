@@ -10,8 +10,11 @@ struct OnboardingView: View {
     let systemDock: SystemDockMonitor
     let loginItems: LoginItemController
     /// Shared dock defaults. The tour reads the current edge so the placement page opens on
-    /// what a person already has, and that page is the only thing in the tour that writes.
+    /// what a person already has. Besides the macOS Dock switch, that page is the only thing in
+    /// the tour that writes.
     let settings: DockSettingsStore
+    /// The one-click macOS Dock switch, shared with Settings. Nil hides its button.
+    var systemDockTuck: SystemDockTuckController? = nil
     /// Runs beside the system Settings link so the completed tour can close itself.
     var settingsSelected: () -> Void = {}
     /// Ends the tour, which the owning window controller turns into a close.
@@ -97,7 +100,11 @@ struct OnboardingView: View {
                 }
                 heading(step, includeSummary: false)
                 OnboardingSystemDockGuide(reservesSpace: systemDock.reservesSpace,
-                                          openSettings: systemDock.openDesktopAndDockSettings)
+                                          isTucked: systemDockTuck?.isTucked,
+                                          failure: systemDockTuck?.failure?.message,
+                                          openSettings: systemDock.openDesktopAndDockSettings,
+                                          tuckAway: { systemDockTuck?.tuckAway() },
+                                          restore: { systemDockTuck?.restore() })
             }
         case .placement:
             standard(step, prompt: .onboardingPlacementPrompt) {
@@ -192,6 +199,7 @@ enum OnboardingPreview {
         return OnboardingView(store: store, systemDock: monitor(reservesSpace: reservesSpace),
                               loginItems: LoginItemPreview.controller(),
                               settings: DockSettingsStore(repository: nil),
+                              systemDockTuck: SystemDockTuckPreview.controller(),
                               reduceMotionOverride: reduceMotion,
                               reduceTransparencyOverride: reduceTransparency)
             .frame(width: OnboardingWindowMetrics.size.width, height: OnboardingWindowMetrics.size.height)

@@ -1073,7 +1073,7 @@ Adds a seven-page tour shown once on first launch, reopenable from the menu-bar 
 
 The tour is presented after `coordinator.start()`, so the real docks exist behind it. `OnboardingRepository` stores `{ completedVersion }` under `onboarding.v1`. Reaching the end, opening Settings from the last page, and closing the window all record completion; reopening from a menu never rewrites the record. Unlike the settings repositories, an unreadable record is treated as already completed rather than surfaced as an error, so a stray byte cannot make the tour reappear on every launch. Reading never rewrites the stored bytes.
 
-One page writes a setting, through the existing `DockSettingsStore.update`: placement sets `edge`. It does not touch per-display overrides and goes through the same validation and save path as Settings. Every other page changes nothing. The writing page carries a prompt line and pointer affordances and the others carry neither, which is the tour's only signal of which is which.
+One page writes a setting, through the existing `DockSettingsStore.update`: placement sets `edge`. (Since 2026-10-06 the macOS Dock page can also write `com.apple.dock`, but only through the [tuck-away switch](#tuck-away-the-macos-dock).) It does not touch per-display overrides and goes through the same validation and save path as Settings. Every other page changes nothing. The writing page carries a prompt line and pointer affordances and the others carry neither, which is the tour's only signal of which is which.
 
 An interactive running-indicator gallery was built and then removed at the user's direction. Showing six apps each wearing a different marker asked a person to choose a global style by clicking an individual app, a mapping with no meaning, and it depicted a dock no screen can produce. The page is a demonstration again: one coherent dock cross-fading between styles.
 
@@ -1083,7 +1083,7 @@ Each page runs at most one ambient task, started by `.task` and cancelled by Swi
 
 ### System Dock detection
 
-`SystemDockReservation` compares each screen's `frame` and `visibleFrame` and reports the non-top edge whose inset exceeds one point. The top inset is excluded because the menu bar and notch always reserve it. This is a deliberate limitation, not a shortcut: an App Sandbox cannot read `com.apple.dock`, so the switch itself is unreadable, and `AGENTS.md` forbids writing it. The status is therefore worded as reserved space rather than as the state of a preference. Turning on automatic hiding releases the band and clears the status; moving the Dock to another edge does not, which is correct.
+`SystemDockReservation` compares each screen's `frame` and `visibleFrame` and reports the non-top edge whose inset exceeds one point. The top inset is excluded because the menu bar and notch always reserve it. When this page was built, the app ran in the App Sandbox, which cannot read `com.apple.dock`. App Sandbox has since been turned off (`ENABLE_APP_SANDBOX = NO`, see `docs/DEVELOPMENT.md`), so the preferences are now readable. The measurement stays because it reports what a person actually sees, whatever the stored values say. The status is therefore worded as reserved space rather than as the state of a preference. Writing `com.apple.dock` is allowed only through the explicit, reversible [Tuck away the macOS Dock](#tuck-away-the-macos-dock) switch. Turning on automatic hiding releases the band and clears the status; moving the Dock to another edge does not, which is correct.
 
 ### API limitation
 
@@ -1103,7 +1103,7 @@ Layout was inspected by the user at several points during implementation and cor
 
 - Delete `onboarding.v1` and launch. Confirm the window is centered and focused, the docks are already visible behind it, and every page animates.
 - Walk forward and back through all seven pages. Confirm the slide direction reverses, only the visible page animates, and closing part-way through does not re-present the tour on the next launch.
-- On the macOS Dock page, confirm the status reads as reserving space, open Desktop & Dock from the button, turn on automatic hiding, and confirm the status clears without returning to DeeDock. Turn it off and confirm it returns. Confirm Skip works and that nothing in `com.apple.dock` changed.
+- On the macOS Dock page, confirm the status reads as reserving space, open Desktop & Dock from the button, turn on automatic hiding, and confirm the status clears without returning to DeeDock. Turn it off and confirm it returns. Confirm Skip works, and that nothing in `com.apple.dock` changed unless **Tuck Away macOS Dock** was clicked.
 - Click each placement handle and confirm the real docks move to that edge. Confirm a display with an existing edge override keeps its own value. Confirm no other page changes anything when clicked.
 - Open Settings from the last page and confirm the tour closes and Settings opens. Reopen the tour from the menu-bar item and the app menu, and confirm a second window is never created.
 - Enable Launch at Login from the last page and confirm the state matches Settings → General afterwards, including a pending approval.
@@ -3017,3 +3017,86 @@ remaining failure and accessibility scenarios above are still open.
 Bookmark resolution, the directory check, and the directory monitor (`open` with `O_EVTONLY`) run on `VolumeReads` before the stack panel is ordered front. A close while that read is in flight stops the monitor and does not show the panel. Quick Look and Open check that the item exists on the same queue. A listing reload does not cancel Quick Look. A drop on the tile is accepted in the click turn and copied after the folder resolves, including when the stack closes during that wait. Child icon batching is unchanged.
 
 Not compiled in this environment (no Xcode). The new stop-before-publish test was not run.
+
+## Tuck away the macOS Dock
+
+Designed on 2026-10-06 and implemented the same day on `feat/bye-system-dock`. The [guide](GUIDE.md#tuck-away-the-macos-dock) describes the behavior people see.
+
+### Agreed behavior
+
+- A single app-wide switch, **Tuck Away macOS Dock** / **Restore macOS Dock**. It appears at the top of **Settings → Behavior**, for shared defaults and every display with no per-display override, and on the tour's macOS Dock page. **Restore Defaults** leaves it alone.
+- Tucking away writes four `com.apple.dock` keys and restarts the Dock: `autohide` = true, `autohide-delay` = 10.0 seconds, `tilesize` = 16, and `orientation` = `left`, or `right` when DOKK's resolved edge on the main display is left. The user chose 10 seconds over the commonly cited 1000 so the Dock stays reachable by hovering, even after DOKK is deleted.
+- Restoring writes back each key's previous value with its original type, deletes keys that were absent before, and restarts the Dock. A key whose current value no longer matches what DOKK wrote was changed by the person and is left as it is.
+- A normal quit restores the Dock, including quit-to-update and logout. The switch stays on, and the next launch tucks the Dock away again.
+- A change of DOKK's main-display edge that flips the target orientation (onto or off the left edge) rewrites `orientation` after an 0.8-second pause and restarts the Dock once. No other edit restarts it, and a position the person chose themselves is left alone.
+
+### Sources
+
+`DeeDock/SystemDock` holds the feature:
+
+- `Models/SystemDockTuck.swift`: keys, orientation rule, the plan's target values, semantic value comparison, the snapshot, and the persisted record.
+- `Services/SystemDockPreferences.swift`: the `SystemDockPreferencesServicing` protocol and the live CFPreferences implementation. `Services/InMemorySystemDockPreferences.swift` is a DEBUG-only double for previews and tests.
+- `Persistence/SystemDockTuckRepository.swift`: the record under `systemDockTuck.v1`, separate from dock settings.
+- `State/SystemDockTuckController.swift`: launch reconciliation, tuck, restore, quit restore, edge following, and failure reporting.
+- `Views/SystemDockTuckCard.swift` and `Views/SystemDockTuckDiagram.swift`: the Settings card and its animated screen diagram.
+
+`DockCoordinator` owns the controller, feeds it the main display's resolved edge from `refreshPanels`, starts it after the first display reconcile, and stops it. `DeeDockDelegate.applicationWillTerminate` calls `restoreForTermination()` first, before other teardown. `DockPageContent` places the card outside the group that unreadable settings disable. `OnboardingSystemDockGuide` gained the tuck/restore button and an inline failure line. Fourteen strings were added in English and German; Behavior's search keywords now include macOS Dock, tuck, and restore.
+
+### Design notes
+
+- DOKK is not sandboxed (`ENABLE_APP_SANDBOX = NO` in every configuration), so `CFPreferencesCopyAppValue` / `CFPreferencesSetAppValue` with `CFPreferencesAppSynchronize` on `com.apple.dock` work without an entitlement. This goes through `cfprefsd` like `defaults write`; DOKK does not shell out to `defaults`. Every apply and restore synchronizes first, so it compares against fresh values.
+- The Dock reads these keys only at startup, so each change ends by sending SIGTERM to the `com.apple.dock` process, which is what `killall Dock` does. launchd relaunches it. A change that alters nothing does not restart the Dock, so a relaunch after a crash is silent.
+- The snapshot is saved before the first write and cleared only after a restore persisted. Each previous value is archived as property-list data, so `autohide = 1` comes back as the integer 1, not as a boolean. The snapshot survives a crash. A launch with the switch on keeps the original snapshot, and a launch with the switch off finishes the restore.
+- After writing, the controller reads the values back. If `cfprefsd` rejected the write or the values did not stick, it restores what it can and reports the failure. Any snapshot that remains keeps **Restore macOS Dock** available. Keys forced by a configuration profile (`CFPreferencesAppValueIsForced`) are refused before anything is written.
+- While DOKK's values are in place, the controller disables sudden termination, so logout asks DOKK to quit and restore instead of killing it. `NSWorkspace.willPowerOffNotification` suppresses the Dock restart while the session ends; the values are still written for the next login.
+- An unreadable record is not overwritten until the next action. If the Dock still carries DOKK's values in that case, the controller treats the macOS defaults as the previous values and the launch restores them, which errs toward a visible Dock.
+- `DockBadgeController` looks up the Dock's process identifier on every scan, so badge mirroring recovers after the restart without new code. A brief blink of unknown badge state is expected.
+- `AGENTS.md` forbids changing system Dock preferences to make development easier and requires any coexistence flow to be explicit and reversible. This switch writes only after a deliberate click and restores on quit and on demand.
+
+### API limitations
+
+`autohide-delay`, `tilesize`, and `orientation` are undocumented `com.apple.dock` keys. The user confirmed by hand on this macOS 27 Mac that they behave as intended. Terminating the Dock closes Mission Control, Launchpad, and open Dock menus. ⌥⌘D and keyboard focus on the Dock (⌃F3) can still show the macOS Dock while it is tucked away; that is intended, not a defect. A crash, force quit, or deleting DOKK skips the quit-time restore; the guide lists the Terminal commands.
+
+### Manual probe before implementation
+
+The user tested the effect with these commands and reported that it worked perfectly:
+
+```sh
+defaults write com.apple.dock autohide -bool true
+defaults write com.apple.dock autohide-delay -float 10
+defaults write com.apple.dock tilesize -int 16
+defaults write com.apple.dock orientation -string left
+killall Dock
+```
+
+They restored their own previous values (automatic hiding on, size 45) by writing those back and deleting `autohide-delay` and `orientation`. That is the same rule the controller applies.
+
+### Validation status
+
+`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dokk-tuck-build CODE_SIGNING_ALLOWED=NO build-for-testing` returned **TEST BUILD SUCCEEDED**, compiling the app and the test target. No new warnings came from the changed files. The string catalog round-trips byte-identically through the script that added the keys.
+
+`DeeDockTests/SystemDockTuckTests.swift` adds thirteen tests against the in-memory double:
+- tucking from macOS defaults
+- exact-type restore and deletion of absent keys
+- keeping a change the person made
+- quit and relaunch
+- crash recovery without a restart
+- finishing an interrupted restore
+- the left-edge rule
+- edge following and respecting a person's own position
+- managed settings
+- a rejected write
+- an unreadable record
+- semantic comparison
+
+The tests were not run locally, following `AGENTS.md`. The pull request's CI job ran the full suite: 621 tests in 88 suites. Its only failure was the edge-following test, which had slept 1.2 seconds and expected the 0.8-second pause to have finished. On a busy runner the queued main-actor work had not run yet. Both edge-following tests now await the controller's pending task instead of the clock, and the second also requires that the task was scheduled. The re-run result is recorded on the pull request. The app was not launched and the real `com.apple.dock` domain was not written during implementation. Previews were not rendered.
+
+### Tuck-away hands-on acceptance
+
+- With the macOS Dock at the bottom and visible, tuck it away from Settings and from the tour. Confirm the restart, the left edge, 16-point icons, and a reveal after about 10 seconds of hovering.
+- Put DOKK's main-display dock on the left edge and confirm the macOS Dock moves right. Move DOKK back to the bottom and confirm the Dock returns left with one restart. Change other settings and confirm the Dock doesn't restart.
+- Restore from Settings and confirm the previous values return, including keys that were absent (`defaults read com.apple.dock <key>` reports the key missing). Repeat with automatic hiding already on and a custom size beforehand.
+- While the Dock is tucked away, change its size in System Settings, then restore. Confirm the new size is kept.
+- Quit DOKK normally and confirm the Dock comes back. Relaunch and confirm it is tucked away again. Repeat with an update relaunch and a logout/login.
+- Force-quit DOKK while the Dock is tucked away. Relaunch with the switch on, then with it off, and confirm the Dock ends in the matching state.
+- Check badge mirroring after each restart, multiple displays, full-screen Spaces, VoiceOver labels and hints for the button and status, Reduce Motion in the diagram, and German text length.

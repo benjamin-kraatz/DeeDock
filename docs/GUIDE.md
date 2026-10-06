@@ -29,7 +29,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 
 ## Get started
 
-DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK; dedicated coexistence controls are future work.
+DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK. [Tuck away the macOS Dock](#tuck-away-the-macos-dock) moves it out of the way with one click.
 
 ### BIG DIKK
 
@@ -41,11 +41,13 @@ The first time DOKK runs, a tour opens over the desktop. The docks are already l
 
 Closing the window counts as finishing. The tour does not reappear on the next launch, whether you completed it or dismissed it on the first page. Choose **Welcome to DOKK** from the menu-bar item or the app menu to see it again; reopening never changes what is stored.
 
-One page changes a setting; the rest only demonstrate. **Put it where you want it** lets you click a screen edge, which sets **Edge** in shared defaults and moves the docks immediately. It writes shared defaults only and leaves per-display overrides alone, so a display already overriding that control keeps its own value, and the change is reversible in Settings.
+Two pages can change something; the rest only demonstrate. The macOS Dock page can tuck the Dock away (see below). **Put it where you want it** lets you click a screen edge, which sets **Edge** in shared defaults and moves the docks immediately. It writes shared defaults only and leaves per-display overrides alone, so a display already overriding that control keeps its own value, and the change is reversible in Settings.
 
 That page carries a prompt line under its illustration and its handles respond to the pointer. The prompt is the only signal that a page is interactive; pages without one do nothing when clicked.
 
-The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. DOKK never writes the system Dock's preferences; the page asks and then observes. The reading compares each screen's full and visible frames instead of reading the Dock's preferences. Turning on *Automatically hide and show the Dock* releases the space and clears the status. Moving the Dock to another edge does not. The page can be skipped.
+The macOS Dock page opens **System Settings → Desktop & Dock** and reports whether the Dock is still holding desktop space, updating as you change it. The reading compares each screen's full and visible frames, so it reports what you see rather than a stored preference. Turning on *Automatically hide and show the Dock* releases the space and clears the status. Moving the Dock to another edge does not. The page can be skipped.
+
+The same page offers **Tuck Away macOS Dock**, the one-click switch described in [Tuck away the macOS Dock](#tuck-away-the-macos-dock), next to the System Settings button. It is the only way DOKK writes the macOS Dock's preferences, and it does so only when you click it. Once the Dock is tucked away, the button becomes **Restore macOS Dock**. If you skip the page, nothing changes.
 
 The illustrations use production code, not artwork. Placement runs the same `DockPlacement` calculation as a real dock, the running indicators are drawn by `DockIconIndicator` and `DockRunningIndicator`, and the auto-hide page is driven by the real `DockVisibilityController`. Reduce Motion holds a single frame on every page and cross-fades between them instead of sliding; Reduce Transparency uses opaque backgrounds. Only the visible page animates.
 
@@ -541,7 +543,44 @@ On side docks, slides move outward through the selected edge; lift and bounce mo
 
 Reveal reverses the selected hiding sequence. **Play Preview** runs an inert sample; selecting a style does not repeatedly trigger live docks. A zero duration makes transitions instant. Reduce Motion replaces movement, scaling, and wipes with a fade lasting at most 0.10 seconds, including in previews. Glass remains fixed-thickness during hover, and visibility effects use a separate presentation transform and clipping envelope.
 
-Auto-hide does not inspect overlapping app windows, use pressure gestures, modify the system Dock, or request permissions. Screen-edge triggering may also reveal the system Dock. Runtime acceptance for these interactions is still pending.
+Auto-hide does not inspect overlapping app windows, use pressure gestures, modify the system Dock, or request permissions. Screen-edge triggering may also reveal the system Dock unless it is [tucked away](#tuck-away-the-macos-dock). Runtime acceptance for these interactions is still pending.
+
+### Tuck away the macOS Dock
+
+DOKK can move the macOS Dock out of the way for you. Click **Tuck Away macOS Dock** in **Settings → Behavior** or on the tour's macOS Dock page. DOKK changes four of the Dock's own settings and restarts the Dock, which takes about a second:
+
+| Dock setting | `com.apple.dock` key | Value while tucked away |
+| --- | --- | --- |
+| Automatically hide and show the Dock | `autohide` | On |
+| Delay before the Dock appears | `autohide-delay` | 10 seconds |
+| Size | `tilesize` | 16 points, the smallest macOS allows |
+| Position on screen | `orientation` | Left, or Right when DOKK's dock on the main display sits on the left edge |
+
+The macOS Dock is still there. Rest the pointer on its edge for 10 seconds and it slides out. The delay is long enough that it never appears by accident and short enough that you can always reach it, even when DOKK isn't running. ⌥⌘D, the macOS shortcut that turns automatic hiding off and on, also still works.
+
+Click **Restore macOS Dock** to bring it back. DOKK writes back the values you had before, removes the settings that weren't set before so macOS uses its own defaults again, and restarts the Dock. If you changed one of the four settings yourself in System Settings while the Dock was tucked away, DOKK keeps your change.
+
+The switch applies to the whole Mac. It appears at the top of Behavior for shared defaults and for every display, has no per-display override, and **Restore Defaults** doesn't change it. It stays usable when dock settings can't be read, so Restore always works. A small diagram shows where the macOS Dock sits next to DOKK's dock, and the status line says which edge it's tucked away on. Search Settings for *macOS Dock*, *tuck*, or *restore* to find it.
+
+**Quitting DOKK restores the macOS Dock**, so you're never left without a dock. This includes quitting to install an update and logging out. The switch stays on: the next time DOKK starts, it tucks the Dock away again, which restarts the Dock a second time. At login, the macOS Dock can appear briefly before DOKK starts.
+
+When you move DOKK's dock on the main display onto or off the left edge, the macOS Dock switches sides to stay out of its way. That is the only change that restarts the Dock while DOKK keeps running.
+
+If DOKK crashes or is force-quit, it can't restore anything, so the Dock stays tucked away. The next launch picks up where it left off: it keeps the Dock tucked away if the switch is on and restores it if the switch is off. DOKK keeps a note of your previous values in its own preferences until a restore succeeds, so a crash never loses them. If that note itself can't be read and the Dock still has DOKK's values, the next launch returns those four settings to the macOS defaults, so the Dock is visible again. If you delete DOKK while the Dock is tucked away, rest the pointer on the Dock's edge for 10 seconds, turn off automatic hiding in **System Settings → Desktop & Dock**, or run this in Terminal:
+
+```sh
+defaults delete com.apple.dock autohide-delay
+defaults delete com.apple.dock tilesize
+defaults delete com.apple.dock orientation
+defaults delete com.apple.dock autohide
+killall Dock
+```
+
+These commands return the four settings to the macOS defaults, which aren't necessarily the values you had before.
+
+If your organization manages the Dock with a configuration profile, DOKK says so and changes nothing. If macOS rejects a change, DOKK puts back what it wrote and reports it.
+
+Restarting the Dock closes Mission Control, Launchpad, and any open Dock menu, and the screen flickers briefly. DOKK's app badges can blink while the Dock comes back. No permission is needed. Apple doesn't document these keys, so a future macOS version could ignore them.
 
 ### Launch at login
 

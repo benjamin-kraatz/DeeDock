@@ -11,7 +11,7 @@ A native replacement for the macOS Dock. It looks and behaves like the Dock you 
 2. Unzip it and move `DOKK.app` to your Applications folder.
 3. Open DOKK.
 
-DOKK requires macOS 27. It runs from the menu bar, and a short tour opens on first launch. The tour shows you where to hide the macOS Dock in System Settings. DOKK never changes the system Dock's settings itself.
+DOKK requires macOS 27. It runs from the menu bar, and a short tour opens on first launch. The tour can tuck the macOS Dock away in one click, or show you where to hide it in System Settings. DOKK changes the macOS Dock's settings only when you click **Tuck Away macOS Dock**, puts them back when it quits, and offers **Restore macOS Dock** in **Settings → Behavior**.
 
 DOKK updates itself. Choose **Check for Updates…** from its menu, or turn on automatic updates in **Settings → General**.
 

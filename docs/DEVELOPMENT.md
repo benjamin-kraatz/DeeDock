@@ -24,7 +24,7 @@ These are product goals, not a finished feature specification. Exact options, ra
 - Consistent behavior across display arrangements, scaling, Spaces, full-screen apps, and sleep/wake.
 - Keyboard access, VoiceOver labels, and respect for Reduce Motion and Reduce Transparency.
 - Low idle resource use and smooth pointer interaction. Performance claims require measurement.
-- A clear way to quit and return to the system Dock. Coexistence and replacement behavior need an explicit design.
+- A clear way to quit and return to the system Dock. The explicit, reversible coexistence switch is [Tuck away the macOS Dock](GUIDE.md#tuck-away-the-macos-dock); a full replacement flow still needs its own design.
 
 ## Technical direction
 

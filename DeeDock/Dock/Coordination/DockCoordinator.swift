@@ -24,6 +24,8 @@ final class DockCoordinator {
     let discovery = DiscoveryController()
     let zonePreview = DockZonePreviewController()
     let displayIndicator = DisplaySelectionIndicatorController()
+    /// The macOS Dock switch. Quitting restores it through the app delegate, not `stop()`.
+    let systemDockTuck = SystemDockTuckController()
     /// One-shot navigation consumed by Settings, including when its window is first created.
     var settingsDisplayRequest: String?
     /// One-shot route used by Window Peek's permission fallback.
@@ -404,6 +406,9 @@ final class DockCoordinator {
         searchShortcutAvailable = searchShortcut.start { [weak self] in self?.searchWindows() }
         scheduleShelfSemanticWarmup()
         displayService.start()
+        // After the first reconcile, so the macOS Dock is placed away from the real dock.
+        systemDockTuck.mainDockEdge = mainDockEdge
+        systemDockTuck.start()
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
         ) { [weak self] _ in MainActor.assumeIsolated { self?.refreshPanels(resetVisibility: true) } }
@@ -725,8 +730,14 @@ final class DockCoordinator {
         volumes.configure(readsShares: settings.value.showNetworkVolumes)
     }
 
+    /// DOKK's resolved edge on the main display, or nil when that display shows no dock.
+    private var mainDockEdge: DockEdge? {
+        enabledDisplays.first(where: \.isPrimary).map { profiles.effectiveSettings(for: $0.id).edge }
+    }
+
     private func refreshPanels(resetVisibility: Bool = false) {
         guard started else { return }
+        systemDockTuck.mainDockEdge = mainDockEdge
         // If the primary dock is disabled, keep the remaining docks complete.
         let satelliteMode = settings.value.secondaryDisplayAppsOnly
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
@@ -1025,6 +1036,7 @@ final class DockCoordinator {
     }
 
     func stop() {
+        systemDockTuck.stop()
         discovery.stop()
         clipboardMuseum.didUse = nil
         atmosphere.stop()

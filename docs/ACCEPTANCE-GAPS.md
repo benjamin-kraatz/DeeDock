@@ -59,6 +59,7 @@ These groups remain open. Passing model tests closes only the matching automated
 | Files and local history | Shelf and Compost restoration, folder details and cloud placeholders, Clipboard Museum, Capsules, timeline replay, badge history, recipes, and Shortcut actions. |
 | Appearance and accessibility | VoiceOver operation, Reduce Motion and Reduce Transparency in native windows, light/dark contrast, magnification, launch animations, indicators, and Atmosphere. |
 | Onboarding and updates | First-launch paths, login-item behavior, update discovery, idle-install gates, and relaunch. Release publishing remains Esi's responsibility. |
+| macOS Dock tuck-away | The user's manual `defaults` probe passed before implementation. The built switch still needs Settings and tour use, quit/relaunch, update relaunch, logout/login, force quit, edge following, and badge recovery after Dock restarts. See [checklist](ACCEPTANCE.md#tuck-away-hands-on-acceptance). |
 | Resource use and teardown | Measured idle CPU and memory, capture shutdown, observer and task cleanup, and repeated lifecycle transitions. No performance acceptance was established by these tests. |
 
 The native UI tool can inspect and click Settings and Launcher controls. Opening DOKK's application

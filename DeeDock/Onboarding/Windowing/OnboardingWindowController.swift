@@ -19,6 +19,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     private let systemDock = SystemDockMonitor()
     private let loginItems: LoginItemController
     private let settings: DockSettingsStore
+    private let systemDockTuck: SystemDockTuckController?
     private var window: NSWindow?
 
     /// - Parameters:
@@ -26,11 +27,14 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     ///     request Settings shows afterwards.
     ///   - settings: the application's shared dock defaults, so the placement page moves the
     ///     real docks rather than a copy of them.
+    ///   - systemDockTuck: the application's macOS Dock switch, so tucking the Dock away here
+    ///     is the same state Settings shows and quitting restores.
     init(store: OnboardingStore? = nil, loginItems: LoginItemController,
-         settings: DockSettingsStore) {
+         settings: DockSettingsStore, systemDockTuck: SystemDockTuckController? = nil) {
         self.store = store ?? OnboardingStore()
         self.loginItems = loginItems
         self.settings = settings
+        self.systemDockTuck = systemDockTuck
     }
 
     /// Shows the tour only on a launch where it has not yet been completed or dismissed.
@@ -81,7 +85,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         window.delegate = self
         window.contentView = NSHostingView(rootView:
             OnboardingView(store: store, systemDock: systemDock, loginItems: loginItems,
-                           settings: settings,
+                           settings: settings, systemDockTuck: systemDockTuck,
                            settingsSelected: { [weak self] in
                                Task { @MainActor in
                                    await Task.yield()
