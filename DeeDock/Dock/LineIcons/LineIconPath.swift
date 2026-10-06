@@ -56,12 +56,12 @@ nonisolated enum LineIconPath {
         return drewSomething ? path.copy() : nil
     }
 
-    private enum Token {
+    private nonisolated enum Token {
         case command(Character)
         case number(CGFloat)
     }
 
-    private struct Tokens {
+    private nonisolated struct Tokens {
         private let characters: [Character]
         private var index = 0
 

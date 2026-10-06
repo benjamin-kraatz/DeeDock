@@ -1,4 +1,5 @@
 import AppKit
+import Foundation
 
 extension DockInteraction {
     /// The line glyph for an application tile, glowing in the app's own colors, or nil when this

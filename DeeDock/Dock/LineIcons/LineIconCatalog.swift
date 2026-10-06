@@ -38,8 +38,8 @@ nonisolated final class LineIconCatalog: Sendable {
         Bundle.main.url(forResource: "LineIcons", withExtension: "json").flatMap { try? Data(contentsOf: $0) }
     }
 
-    private struct Document: Decodable {
-        struct Paths: Decodable {
+    private nonisolated struct Document: Decodable, Sendable {
+        nonisolated struct Paths: Decodable, Sendable {
             var stroke: [String]?
             var fill: [String]?
         }
@@ -49,7 +49,7 @@ nonisolated final class LineIconCatalog: Sendable {
         var tiles: [String: String] = [:]
     }
 
-    private struct State {
+    private nonisolated struct State: Sendable {
         var document: Document?
         /// Nil records a reference whose paths failed to parse, so it is not retried on every lookup.
         var glyphs: [String: LineIconGlyph?] = [:]

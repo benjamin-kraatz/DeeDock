@@ -1,4 +1,5 @@
 import AppKit
+import CoreGraphics
 import SwiftUI
 
 /// Draws a catalog glyph as clean white line art, centered in a tile-sized square.
