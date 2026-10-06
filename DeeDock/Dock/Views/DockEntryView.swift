@@ -131,6 +131,16 @@ struct DockEntryView: View {
                 }
             )
             .modifier(DockTileArrivalBounce(hitID: DockEntryID.shelf.hitID, interaction: interaction))
+        case .notificationFeed:
+            DockNotificationFeedButton(
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.notificationFeed.hitID, $0)
+                }
+            )
         case .volume(let item):
             DockVolumeButton(
                 item: item,

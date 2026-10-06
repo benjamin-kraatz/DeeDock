@@ -78,6 +78,11 @@ struct DockSettingsView: View {
             coordinator?.settingsDrivesRequest = false
             select(.extras, page: .drives)
         }
+        .onChange(of: coordinator?.settingsNotificationFeedRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsNotificationFeedRequest = false
+            select(.extras, page: .notificationFeed)
+        }
         .onChange(of: coordinator?.settingsFeaturesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false
@@ -183,6 +188,7 @@ struct DockSettingsView: View {
         case .drives: isOn = value.showVolumes
         case .capsules: isOn = value.showSessionCapsules
         case .badges: isOn = value.showAppBadges
+        case .notificationFeed: isOn = value.showNotificationFeed
         case .windowPeek: isOn = value.windowPeekEnabled
         case .magneticEdges: isOn = value.magneticEdges
         case .soapBubbles: isOn = value.soapBubbleEffects

@@ -10002,6 +10002,60 @@
         }
       }
     },
+    "discoveryNotificationFeedMessage" : {
+      "comment" : "Discovery callout text announcing the notification feed. Informational about privacy, not a warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Banner verschwinden nach wenigen Sekunden. DOKK kann sie in einer Kachel für den Mitteilungsverlauf im Dock aufbewahren. Der Text bleibt auf diesem Mac und wird nirgendwohin gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Banners vanish after a few seconds. DOKK can keep them in a Notification Feed tile on your dock. The text stays on this Mac and is never sent anywhere."
+          }
+        }
+      }
+    },
+    "discoveryNotificationFeedTitle" : {
+      "comment" : "Discovery callout title announcing the notification feed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verpasste Mitteilungen nachlesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catch up on missed notifications"
+          }
+        }
+      }
+    },
+    "discoveryNotificationFeedTurnOn" : {
+      "comment" : "Discovery callout button that turns the notification feed on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einschalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn On"
+          }
+        }
+      }
+    },
     "discoverySettingsHelp" : {
       "comment" : "Discovery settings explanation and privacy scope.",
       "extractionState" : "manual",
@@ -24822,6 +24876,594 @@
         }
       }
     },
+    "notificationFeedClear" : {
+      "comment" : "Command that removes every collected notification from the feed. Used in the tile menu, as a VoiceOver action, and in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Notifications"
+          }
+        }
+      }
+    },
+    "notificationFeedClearAll" : {
+      "comment" : "Short button in the popover header that removes every collected notification.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear All"
+          }
+        }
+      }
+    },
+    "notificationFeedCopy" : {
+      "comment" : "Row action that copies the notification's title, subtitle, and text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Text"
+          }
+        }
+      }
+    },
+    "notificationFeedEmptyMessage" : {
+      "comment" : "Explains what the empty feed will show and which notifications it cannot see.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Banner, die macOS ab jetzt anzeigt, landen hier. Mitteilungen, die ein Fokus zurückhält oder die bei gesperrtem Bildschirm eintreffen, erscheinen nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Banners that macOS shows from now on collect here. Notifications held back by a Focus, or arriving while the screen is locked, don’t appear."
+          }
+        }
+      }
+    },
+    "notificationFeedEmptyTitle" : {
+      "comment" : "Title of the popover before any notification was collected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Mitteilungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Notifications Yet"
+          }
+        }
+      }
+    },
+    "notificationFeedEntryCount" : {
+      "comment" : "Popover subtitle. The number is how many notifications the feed holds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Mitteilung"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Mitteilungen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld notification"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld notifications"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "notificationFeedListening" : {
+      "comment" : "Settings status row while the feed is collecting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungsbanner werden gesammelt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collecting notification banners."
+          }
+        }
+      }
+    },
+    "notificationFeedName" : {
+      "comment" : "Feature name, used for the dock tile, its tooltip, and the Settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungsverlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notification Feed"
+          }
+        }
+      }
+    },
+    "notificationFeedNeedsAccessMessage" : {
+      "comment" : "Explains why the feed needs Accessibility access and where to grant it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK liest Mitteilungsbanner über die Bedienungshilfen. Erlaube den Zugriff in den Einstellungen, um mit dem Sammeln zu beginnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK reads notification banners through Accessibility. Allow access in Settings to start collecting."
+          }
+        }
+      }
+    },
+    "notificationFeedNeedsAccessTitle" : {
+      "comment" : "Title in the empty feed when DOKK has no Accessibility access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf Bedienungshilfen nötig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility Access Needed"
+          }
+        }
+      }
+    },
+    "notificationFeedNewMarker" : {
+      "comment" : "VoiceOver value for a notification that arrived since the feed was last opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New"
+          }
+        }
+      }
+    },
+    "notificationFeedNoUnread" : {
+      "comment" : "VoiceOver value for the notification feed tile when nothing arrived since it was last opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine neuen Mitteilungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No new notifications"
+          }
+        }
+      }
+    },
+    "notificationFeedOpen" : {
+      "comment" : "Context menu command on the notification feed tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungsverlauf öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Notification Feed"
+          }
+        }
+      }
+    },
+    "notificationFeedOpenApp" : {
+      "comment" : "Row action that opens the app that sent the notification.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open App"
+          }
+        }
+      }
+    },
+    "notificationFeedOpenAppHelp" : {
+      "comment" : "Tooltip on a notification row whose sending app is known.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicken, um die App zu öffnen, die diese Mitteilung gesendet hat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click to open the app that sent this notification"
+          }
+        }
+      }
+    },
+    "notificationFeedOpenHint" : {
+      "comment" : "VoiceOver hint for the notification feed tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt die Mitteilungsbanner, die DOKK gesammelt hat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the notification banners collected while DOKK was running"
+          }
+        }
+      }
+    },
+    "notificationFeedOpenSettings" : {
+      "comment" : "Button in the empty feed that opens the notification feed's Settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        }
+      }
+    },
+    "notificationFeedPermission" : {
+      "comment" : "Settings status row while the feed is on but Accessibility access is missing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube den Zugriff über die Bedienungshilfen, um Mitteilungsbanner zu lesen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Accessibility access to read notification banners."
+          }
+        }
+      }
+    },
+    "notificationFeedPrivacyFootnote" : {
+      "comment" : "One-line footer in the popover describing where collected notifications are kept.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur im Arbeitsspeicher dieses Macs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept in memory on this Mac only"
+          }
+        }
+      }
+    },
+    "notificationFeedPrivacyNote" : {
+      "comment" : "Transparency note in Settings about how DOKK handles notification text. Informational, not a warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solange der Verlauf eingeschaltet ist, liest DOKK den Text von Mitteilungsbannern über die Bedienungshilfen, um ihn hier anzuzeigen. Der Text bleibt im Arbeitsspeicher dieses Macs. DOKK speichert ihn nie auf der Festplatte, protokolliert ihn nicht und sendet ihn nirgendwohin, auch nicht mit den Nutzungsdaten. Wenn du den Verlauf ausschaltest oder DOKK beendest, wird er gelöscht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While the feed is on, DOKK reads the text of notification banners through Accessibility to show it here. The text stays in memory on this Mac. DOKK never saves it to disk, logs it, or sends it anywhere, and usage analytics never include it. Turning the feed off or quitting DOKK clears it."
+          }
+        }
+      }
+    },
+    "notificationFeedRemove" : {
+      "comment" : "Removes one notification from the feed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "notificationFeedSettingsHelp" : {
+      "comment" : "Settings card footnote: what the feed collects and which notifications it cannot see.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sammelt die Mitteilungsbanner, die macOS anzeigt, während DOKK läuft, damit du sie auch nach dem Ausblenden lesen kannst. Erfasst werden nur Banner, die auf dem Bildschirm erscheinen: Mitteilungen, die ein Fokus zurückhält, die keine Banner zeigen sollen oder die bei gesperrtem Bildschirm eintreffen, fehlen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collects the notification banners macOS shows while DOKK is running, so you can read them after they disappear. Only banners that appear on screen are collected: notifications held back by a Focus, set to show no banners, or arriving while the screen is locked are missing."
+          }
+        }
+      }
+    },
+    "notificationFeedSettingsKeywords" : {
+      "comment" : "Search terms that find the notification feed page in Settings. Comma-separated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen, Banner, Hinweise, verpasst, Verlauf, Mitteilungszentrale"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "notifications, banners, alerts, missed, history, notification center"
+          }
+        }
+      }
+    },
+    "notificationFeedSystemSender" : {
+      "comment" : "Sender shown for a macOS system alert, which names no app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        }
+      }
+    },
+    "notificationFeedTitle" : {
+      "comment" : "Heading of the notification feed popover.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        }
+      }
+    },
+    "notificationFeedToggle" : {
+      "comment" : "Settings switch that turns the notification feed on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen sammeln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collect notifications"
+          }
+        }
+      }
+    },
+    "notificationFeedToggleHelp" : {
+      "comment" : "Subtitle of the notification feed switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardmäßig aus. Fügt neben der Ablage eine Kachel für den Mitteilungsverlauf hinzu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off by default. Adds a Notification Feed tile next to the Shelf."
+          }
+        }
+      }
+    },
+    "notificationFeedUnread" : {
+      "comment" : "VoiceOver value for the notification feed tile. The number counts notifications that arrived since the feed was last opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld neue Mitteilung"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld neue Mitteilungen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new notification"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new notifications"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "notificationFeedWaitingMessage" : {
+      "comment" : "Explains the waiting status in the empty feed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK beginnt zu sammeln, sobald die Mitteilungszentrale von macOS antwortet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK starts collecting as soon as macOS Notification Center responds."
+          }
+        }
+      }
+    },
+    "notificationFeedWaitingTitle" : {
+      "comment" : "Feed status while macOS Notification Center is not running or not answering.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warten auf die Mitteilungszentrale"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for Notification Center"
+          }
+        }
+      }
+    },
     "onboardingAnalyticsSummary" : {
       "comment" : "Body of the tour page about usage data. 'Settings › General › Privacy' is the path in DOKK's Settings window.",
       "extractionState" : "manual",
@@ -31889,6 +32531,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Align pins and stacks to edges and neighbors while dragging."
+          }
+        }
+      }
+    },
+    "settingsFeatureNotificationFeedSubtitle" : {
+      "comment" : "Subtitle of the notification feed row on the Features overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verpasste Mitteilungsbanner nachlesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catch up on notification banners you missed"
           }
         }
       }

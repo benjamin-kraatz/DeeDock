@@ -63,6 +63,9 @@ struct DockSettings: Codable, Equatable {
     var showAppBadgeCounts: Bool = false
     /// Whether each display dock includes the trailing Shelf tile.
     var showShelf: Bool = true
+    /// Whether DOKK collects notification banners and shows the notification feed tile.
+    /// Off by default; reading banners needs Accessibility access. Shared across displays.
+    var showNotificationFeed: Bool = false
     /// Where the App Launcher tile sits. Documents saved before this key keep their
     /// `launcherAtStart` choice as `start` or `end`.
     var launcherPosition: LauncherDockPosition = .start
@@ -190,7 +193,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges, showAppBadgeCounts
-        case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
+        case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showNotificationFeed, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
         case showVolumes, showDiskImages, showNetworkVolumes, showTimeMachineVolumes, confirmBeforeEjectingDisks
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
@@ -220,6 +223,7 @@ extension DockSettings {
         showAppBadges = try values.decodeIfPresent(Bool.self, forKey: .showAppBadges) ?? false
         showAppBadgeCounts = try values.decodeIfPresent(Bool.self, forKey: .showAppBadgeCounts) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
+        showNotificationFeed = try values.decodeIfPresent(Bool.self, forKey: .showNotificationFeed) ?? false
         let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
         launcherPosition = try values.decodeIfPresent(LauncherDockPosition.self, forKey: .launcherPosition)
             ?? LauncherDockPosition(legacyAtStart: legacy.decodeIfPresent(Bool.self, forKey: .launcherAtStart) ?? true)

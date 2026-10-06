@@ -21,6 +21,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Action Tiles](#action-tiles)
 - [App Launcher](#app-launcher)
 - [App badges](#app-badges)
+- [Notification Feed](#notification-feed)
 - [Atmosphere](#atmosphere)
 - [DOKK Discovery](#dokk-discovery)
 - [Settings](#settings)
@@ -123,7 +124,7 @@ The folder stack header has a Sort by menu with Recency, Alphabetical, and Size.
 
 Downloads appears to the left of Capsules and Shelf by default. Click it to browse the Downloads folder in a stack, or use its context menu to open it in Finder and choose grid or list presentation.
 
-Drag Downloads, Capsules, or Shelf within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display, independently of Dock Modes. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder the three tiles.
+Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display, independently of Dock Modes. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
 
 Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
 
@@ -335,6 +336,24 @@ AX reads run outside the main actor and do not depend on pointer movement or ani
 
 Click an app badge, choose **Badge details** from its context menu, or press **B** in Focus Dock to review observed changes. **Mark checked** explicitly sets the comparison baseline; opening an app leaves it unchanged. Optional Focus Session collection provides a digest of net badge changes. History, baseline and digest deletion controls are available in **Settings → Features → App badges → Review badge history**. See [Badge memory](BADGE_MEMORY.md) for retention limits and observation gaps.
 
+## Notification Feed
+
+The Notification Feed keeps the notification banners macOS shows, so you can read them after they disappear. It is off by default. Turn it on in **Settings → Features → Notification Feed → Collect notifications**, then allow Accessibility access with the **Enable** button in that card. DOKK asks macOS for access only when you click **Enable**. The first launch of a version with the feed also shows a DOKK Discovery tip with a **Turn On** button. Turning it on there opens the same Settings page when access is still missing.
+
+A bell tile appears after Shelf on every dock. Its red badge counts what arrived since you last opened the feed, and the bell rings once when a banner arrives (Reduce Motion skips the ring). Click the tile to open the feed. Each entry shows the sending app, how long ago it arrived, and the title, subtitle, and text the banner showed. Click an entry to open the sending app. Its context menu also offers **Copy Text** and **Remove**. **Clear All** empties the feed. With the feed open, the arrow keys select an entry, Return opens its app, Delete removes it, Command-C copies its text, Command-Delete clears the feed, and Escape closes it. Right-click the tile to open, clear, or reach Settings.
+
+What the feed can see:
+
+- Only banners that appear on screen. Notifications held back by a Focus, apps whose banner style is None, and notifications that arrive while the screen is locked never reach the feed.
+- Notifications that were on screen before you turned the feed on are collected only if their banner is still showing.
+- Opening the macOS Notification Center sidebar does not add its older notifications.
+- macOS gives DOKK the sending app's display name and no app identity. When the name matches exactly one installed app, the entry shows its icon and opens it. Otherwise the entry shows a placeholder and opens nothing. System alerts, such as an app asking to send notifications, are listed under System.
+- An entry cannot reopen the notification itself, and removing an entry does not remove the notification from Notification Center.
+
+The feed reads notification text while it is on. That text stays in memory on this Mac. DOKK never writes it to disk, logs it, or sends it anywhere, and usage analytics never include it. The feed keeps the 100 most recent entries. Turning the feed off or quitting DOKK clears it. Reading pauses during sleep, display sleep, and when another user is active, and the feed keeps its entries across those pauses.
+
+The feed depends on how macOS draws its banners, which Apple does not document. A macOS update can change that. If it does, the feed stays empty rather than showing wrong entries. See [Notification feed](NOTIFICATION-FEED.md) for the measurements behind it and what still needs hands-on checking.
+
 ## Atmosphere
 
 **Settings → Atmosphere** adds optional ambient light to every drawable display, independently
@@ -361,7 +380,7 @@ See [Atmosphere acceptance](ACCEPTANCE.md#dee-73-atmosphere) for runtime limitat
 
 ## DOKK Discovery
 
-**DOKK Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+**DOKK Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 ## Settings
 

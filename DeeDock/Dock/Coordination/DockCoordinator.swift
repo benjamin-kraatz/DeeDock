@@ -1,4 +1,5 @@
 import AppKit
+import ApplicationServices
 import Observation
 
 /// Application lifetime owner for display reconciliation, global pointer events, and exclusive keyboard focus.
@@ -9,6 +10,8 @@ final class DockCoordinator {
     let localHistory = DockLocalHistoryStore()
     let pinWeather = PinWeatherStore()
     let clipboardMuseum = ClipboardMuseumController()
+    /// Collected notification banners, shared by every display's feed tile and Settings.
+    let notificationFeed = NotificationFeedController()
     let sims = DockSimsStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
@@ -34,6 +37,8 @@ final class DockCoordinator {
     var settingsModesRequest = false
     /// One-shot route opened from a drive tile's Manage Drives command.
     var settingsDrivesRequest = false
+    /// One-shot route to the notification feed page, from its tile, popover, or Discovery.
+    var settingsNotificationFeedRequest = false
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
@@ -96,6 +101,7 @@ final class DockCoordinator {
     let appMelt = AppMeltController()
     @ObservationIgnored private let fusion: FusionCoordinator
     @ObservationIgnored private let sessionCapsules: SessionCapsuleCoordinator
+    @ObservationIgnored private let notificationFeedPopover: NotificationFeedCoordinator
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     private let badges = DockBadgeController()
@@ -162,6 +168,8 @@ final class DockCoordinator {
         shelves = ShelfCoordinator(shelf: shelf, presenter: popovers, organizer: semanticStacks)
         sessionCapsules = SessionCapsuleCoordinator(capsules: capsules, presenter: popovers,
                                                     screenCapture: screenCapture)
+        notificationFeedPopover = NotificationFeedCoordinator(feed: notificationFeed, presenter: popovers,
+                                                              catalog: catalog)
         let shelf = self.shelf
         shelfSemanticWarmup = ShelfSemanticWarmupController(organizer: semanticStacks) {
             let items = shelf.ordered
@@ -219,6 +227,13 @@ final class DockCoordinator {
         if clipboardMuseum.store.captureEnabled || !clipboardMuseum.store.exhibits.isEmpty {
             discovery.markUsed(.clipboardMuseum)
         }
+        // Someone who already turned the feed on needs no announcement.
+        if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
+        notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
+        notificationFeedPopover.keyboardDismissed = { [weak self] displayID in
+            guard let self, focusedID == displayID else { return }
+            endFocus(restore: false)
+        }
         discovery.interactionBlocked = { [weak self] in
             guard let self else { return true }
             return !canSwitchModes || popovers.isOpen || focusedID != nil || focusSession.isActive
@@ -232,7 +247,14 @@ final class DockCoordinator {
             return screens.first { $0.frame.contains(NSEvent.mouseLocation) } ?? screens.first
         }
         discovery.openDestination = { [weak self] destination in
-            switch destination { case .clipboardMuseum: self?.showClipboardMuseum() }
+            guard let self else { return .none }
+            switch destination {
+            case .clipboardMuseum:
+                showClipboardMuseum()
+                return .none
+            case .notificationFeed:
+                return enableNotificationFeedFromDiscovery()
+            }
         }
         discovery.start()
         sims.start()
@@ -387,6 +409,7 @@ final class DockCoordinator {
             reconcile(profiles.displays, resetVisibility: false)
         }
         settings.settingsDidChange = { [weak self] in
+            if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
             self?.configureVolumeReads()
             self?.scheduleShelfSemanticWarmup()
             self?.refreshPanels()
@@ -478,6 +501,7 @@ final class DockCoordinator {
             volumeDock.cards.close(for: id)
             focusPopover.close(for: id)
             sessionCapsules.close(for: id, returnFocus: false)
+            notificationFeedPopover.close(for: id)
             if focusedID == id { endFocus(restore: true) }
             if timeline.displayID == id { timeline.end() }
             panels.removeValue(forKey: id)?.stop()
@@ -514,7 +538,8 @@ final class DockCoordinator {
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
-                   !sessionCapsules.isOpen, !focusPopover.isOpen, !modePicker.isKeyboardActive {
+                   !sessionCapsules.isOpen, !focusPopover.isOpen, !notificationFeedPopover.isOpen,
+                   !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
             }
@@ -669,6 +694,18 @@ final class DockCoordinator {
                 shelves.toggle(on: panel, keyboard: false)
             }
             panel.interaction.clearShelf = { [weak panel] in panel?.store.clearShelf() }
+            store.openNotificationFeed = { [weak self, weak panel] in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                notificationFeedPopover.toggle(on: panel, keyboard: panel.store.keyboardFocus)
+            }
+            panel.interaction.openNotificationFeed = { [weak self, weak panel] in
+                guard let self, let panel, panels[display.id] === panel else { return }
+                notificationFeedPopover.toggle(on: panel, keyboard: false)
+            }
+            panel.interaction.clearNotificationFeed = { [weak self] in self?.notificationFeedPopover.clear() }
+            panel.interaction.prepareNotificationFeedSettings = { [weak self] in
+                self?.settingsNotificationFeedRequest = true
+            }
             panel.interaction.canPasteToShelf = { [weak self] in
                 self?.shelves.canPaste == true
             }
@@ -742,11 +779,14 @@ final class DockCoordinator {
         let satelliteMode = settings.value.secondaryDisplayAppsOnly
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
         badges.configure(enabled: settings.value.showAppBadges && !enabledDisplays.isEmpty)
+        notificationFeed.configure(enabled: settings.value.showNotificationFeed && !enabledDisplays.isEmpty)
+        if !settings.value.showNotificationFeed { notificationFeedPopover.close() }
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)
         dragging.applyMagneticPinHiding()
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
+            panel.interaction.notificationFeed = notificationFeed
             panel.interaction.sims = sims
             panel.interaction.updateAwareness = updateAwareness
             panel.store.configureUpdateTile(updateAwareness?.dockItem)
@@ -762,6 +802,7 @@ final class DockCoordinator {
         volumeDock.cards.refresh()
         focusPopover.reanchor()
         sessionCapsules.reanchor()
+        notificationFeedPopover.reanchor()
         windowPeeks.refresh()
         if let id = zonePreview.displayID {
             if let geometry = panels[id]?.geometry { zonePreview.update(geometry) }
@@ -930,6 +971,17 @@ final class DockCoordinator {
         badgeMemoryWindow.show(path: path, digest: digest, returningTo: lastExternalApplication)
     }
 
+    /// The Discovery callout's Turn On, which is the person's explicit opt-in.
+    ///
+    /// Nothing prompts from here. When Accessibility access is missing, or the settings could not be
+    /// saved, Settings opens on the feed's page, where the Enable button asks macOS for access.
+    private func enableNotificationFeedFromDiscovery() -> DiscoveryProposal.FollowUp {
+        settings.update(\.showNotificationFeed, to: true)
+        guard !settings.value.showNotificationFeed || !AXIsProcessTrusted() else { return .none }
+        settingsNotificationFeedRequest = true
+        return .openSettings
+    }
+
     /// Called only from a menu command or Settings. Never opened by hover or a clipboard change.
     func showClipboardMuseum() {
         popovers.closeAll()
@@ -1055,6 +1107,7 @@ final class DockCoordinator {
         settingsFeaturesRequest = false
         settingsModesRequest = false
         settingsDrivesRequest = false
+        settingsNotificationFeedRequest = false
         filePicker.stop()
         dragging.stop()
         folderStacks.stop()
@@ -1070,6 +1123,7 @@ final class DockCoordinator {
         appMelt.stop()
         fusion.stop()
         sessionCapsules.stop()
+        notificationFeedPopover.stop()
         shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
@@ -1090,6 +1144,7 @@ final class DockCoordinator {
         panels.removeAll()
         enabledDisplays = []
         badges.stop()
+        notificationFeed.stop()
         badgeMemoryWindow.stop()
         clipboardMuseum.stop()
         badges.focusSession = nil

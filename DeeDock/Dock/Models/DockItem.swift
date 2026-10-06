@@ -44,6 +44,12 @@ struct ShelfDockItem: Identifiable {
 }
 
 /// A snapshot of the shared Session Capsules collection used by every display dock.
+/// The notification feed tile. Its unread count is read from the feed store by the tile itself, so
+/// an arriving notification redraws one badge instead of rebuilding every dock.
+struct NotificationFeedDockItem: Identifiable, Equatable {
+    var id: String { DockEntryID.notificationFeed.hitID }
+}
+
 struct CapsuleDockItem: Identifiable {
     let count: Int
     let icon: NSImage

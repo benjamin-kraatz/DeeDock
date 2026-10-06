@@ -4,14 +4,16 @@ import SwiftUI
 struct DiscoveryCalloutView: View {
     let proposal: DiscoveryProposal
     let reduceTransparency: Bool
-    let open: () -> Void
+    /// Handles the primary button. Settings opens here because only a view has `openWindow`.
+    let open: () -> DiscoveryProposal.FollowUp
     let snooze: () -> Void
     let dismiss: () -> Void
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 12) {
-                Image(systemName: "building.columns.fill")
+                Image(systemName: proposal.symbol)
                     .font(.title).foregroundStyle(.tint)
                     .frame(width: 48, height: 48)
                     .background(.tint.opacity(0.12), in: .rect(cornerRadius: 12))
@@ -23,7 +25,10 @@ struct DiscoveryCalloutView: View {
             }
             Text(proposal.message).font(.body).fixedSize(horizontal: false, vertical: true)
             HStack {
-                Button(proposal.action, action: open).buttonStyle(.borderedProminent)
+                Button(proposal.action) {
+                    if open() == .openSettings { openWindow.openDockSettings() }
+                }
+                .buttonStyle(.borderedProminent)
                 Button(.discoverySnooze, action: snooze).buttonStyle(.bordered)
             }
             Button(.discoveryDismiss, action: dismiss)
@@ -42,13 +47,26 @@ struct DiscoveryCalloutView: View {
 
 #Preview("Discovery") {
     DiscoveryCalloutView(proposal: DiscoveryProposal.catalog[0], reduceTransparency: false,
-                         open: {}, snooze: {}, dismiss: {})
+                         open: { .none }, snooze: {}, dismiss: {})
         .padding()
+}
+
+#Preview("Notification feed announcement") {
+    DiscoveryCalloutView(proposal: DiscoveryProposal.catalog[1], reduceTransparency: false,
+                         open: { .none }, snooze: {}, dismiss: {})
+        .padding()
+}
+
+#Preview("Notification feed announcement, German dark") {
+    DiscoveryCalloutView(proposal: DiscoveryProposal.catalog[1], reduceTransparency: false,
+                         open: { .none }, snooze: {}, dismiss: {})
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.dark).padding()
 }
 
 #Preview("Discovery, German opaque") {
     DiscoveryCalloutView(proposal: DiscoveryProposal.catalog[0], reduceTransparency: true,
-                         open: {}, snooze: {}, dismiss: {})
+                         open: { .none }, snooze: {}, dismiss: {})
         .environment(\.locale, Locale(identifier: "de"))
         .preferredColorScheme(.dark).padding()
 }

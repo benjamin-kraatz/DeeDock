@@ -19,6 +19,7 @@ struct DockUtilityMoveModifier: ViewModifier {
                             if let folder = slot.folder { interaction.openFolder?(folder, false) }
                             else if slot.isLauncher { interaction.openLauncher?() }
                             else if slot.shelf != nil { interaction.openShelf?() }
+                            else if slot.notificationFeed != nil { interaction.openNotificationFeed?() }
                             else { interaction.openSessionCapsules?() }
                         },
                         begin: { view, event in interaction.beginUtilityDrag?(slot, view, event) },

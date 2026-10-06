@@ -19,6 +19,8 @@ final class DockInteraction {
     var dockModes: DockModesStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
+    /// Shared notification feed. The tile reads its unread count here. Nil in previews.
+    var notificationFeed: NotificationFeedController?
     /// When true, notification badges draw their count. Off draws a red dot.
     /// VoiceOver still reads the count from the badge label.
     var showAppBadgeCounts = false
@@ -75,6 +77,10 @@ final class DockInteraction {
     @ObservationIgnored var openTrash: (() -> Void)?
     @ObservationIgnored var emptyTrash: (() -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
+    @ObservationIgnored var openNotificationFeed: (() -> Void)?
+    @ObservationIgnored var clearNotificationFeed: (() -> Void)?
+    /// Routes the next Settings window to the notification feed page.
+    @ObservationIgnored var prepareNotificationFeedSettings: (() -> Void)?
     @ObservationIgnored var openUpdate: ((UpdateDockItem) -> Void)?
     /// Opens a volume's contents as a stack.
     @ObservationIgnored var openVolume: ((VolumeDockItem) -> Void)?

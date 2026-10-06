@@ -122,6 +122,10 @@ enum AnalyticsEvent {
     case patchBay(AnalyticsPatchBayAction, cableCount: Int, outcome: AnalyticsOutcome?)
     case clipboardMuseum(AnalyticsClipboardMuseumAction, kind: ClipboardExhibitKind?, itemCount: Int?)
     case clipboardCaptureEnabled
+    /// The notification feed opened. Counts only: never notification text or app names.
+    case notificationFeedOpened(entryCount: Int, unreadCount: Int, trigger: AnalyticsTrigger)
+    /// The notification feed closed, with how many entries it held then.
+    case notificationFeedClosed(entryCount: Int, duration: Double, cleared: Bool)
     case discoveryCallout(DiscoveryProposal.Destination, action: AnalyticsDiscoveryAction)
     case toolOpened(AnalyticsTool, trigger: AnalyticsTrigger)
 

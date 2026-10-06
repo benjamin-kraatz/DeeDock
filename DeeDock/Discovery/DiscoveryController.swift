@@ -7,7 +7,8 @@ final class DiscoveryController {
     let engine = DiscoveryEngine()
     var interactionBlocked: () -> Bool = { true }
     var targetScreen: () -> NSScreen? = { nil }
-    var openDestination: (DiscoveryProposal.Destination) -> Void = { _ in }
+    /// Handles the callout's primary button. Returns what the callout must still do itself.
+    var openDestination: (DiscoveryProposal.Destination) -> DiscoveryProposal.FollowUp = { _ in .none }
     private let watcher = ClipboardMuseumWatcher(pasteboard: .general)
     private var timer: Timer?
     private var panel: DiscoveryPanel?
@@ -60,6 +61,8 @@ final class DiscoveryController {
             })
         }
         let appCenter = NotificationCenter.default
+        // One launch signal per process, so a snoozed announcement waits for a later launch.
+        engine.record(.launched, at: .now)
         appObservers.append(appCenter.addObserver(forName: NSMenu.didBeginTrackingNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.menuDepth += 1; self?.finish() }
         })
@@ -157,10 +160,10 @@ final class DiscoveryController {
         let view = NSHostingView(rootView: DiscoveryCalloutView(proposal: proposal,
             reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency,
             open: { [weak self] in
-                guard let self else { return }
+                guard let self else { return .none }
                 Analytics.track(.discoveryCallout(proposal.destination, action: .opened))
                 markUsed(proposal.destination)
-                openDestination(proposal.destination)
+                return openDestination(proposal.destination)
             }, snooze: { [weak self] in
                 Analytics.track(.discoveryCallout(proposal.destination, action: .snoozed))
                 self?.finish()
