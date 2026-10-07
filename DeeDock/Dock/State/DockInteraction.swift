@@ -57,11 +57,15 @@ final class DockInteraction {
     var dragSourceID: String?
     var dragMessage: LocalizedStringResource?
     var documentTargetID: String?
-    /// The tile whose context menu is open, which the surface spotlights; nil while no menu tracks.
+    /// The tile the surface spotlights for an open context menu. It follows ``contextMenuTracking``
+    /// once the main thread is free to animate; see ``contextMenuTrackingChanged(_:target:)``.
     var contextMenuTarget: DockEntryID?
+    /// The tile whose context menu is open right now; nil while no menu tracks.
+    @ObservationIgnored var contextMenuTracking: DockEntryID?
     /// SwiftUI offset (y down) that carries ``contextMenuTarget`` out from under its menu.
-    /// Set just before a tile's menu opens and read only while that tile owns the menu.
-    var contextMenuOffset = CGSize.zero
+    /// Set just before a tile's menu opens. Not observed: the tile hops when ``contextMenuTarget``
+    /// changes, so setting this alone need not redraw the dock.
+    @ObservationIgnored var contextMenuOffset = CGSize.zero
     var trashTargeted = false
     var shelfTargeted = false
     /// The volume tile a file drag is over, which highlights to show it will receive the drop.
