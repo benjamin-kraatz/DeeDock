@@ -151,7 +151,14 @@ struct DockSurfaceView: View {
                     )
                     .modifier(DockContextMenuSpotlight(
                         role: menuTarget == nil ? .none : (menuTarget == slot.target ? .owner : .receded),
-                        edge: layout.edge,
+                        offset: menuTarget == slot.target
+                            ? DockContextMenuPlacement.clamp(
+                                interaction.contextMenuOffset, frame: frame,
+                                // Content clips at the canvas; leave room for the owner's growth.
+                                within: CGRect(origin: .zero, size: layout.canvasSize).insetBy(
+                                    dx: frame.width * (DockContextMenuSpotlight.scale - 1) / 2,
+                                    dy: frame.height * (DockContextMenuSpotlight.scale - 1) / 2))
+                            : .zero,
                         reduceMotion: reduceMotion,
                         reduceTransparency: reduceTransparency
                     ))
@@ -200,7 +207,8 @@ struct DockSurfaceView: View {
                 frames: interaction.renderedFrames,
                 hovered: hoveredID,
                 selected: keyboardFocus ? selectedTarget : nil,
-                enabled: showsLabel,
+                // The hopped owner sits where its label would; the menu already names the tile.
+                enabled: showsLabel && menuTarget == nil,
                 layout: layout,
                 viewport: viewport,
                 interaction: interaction,

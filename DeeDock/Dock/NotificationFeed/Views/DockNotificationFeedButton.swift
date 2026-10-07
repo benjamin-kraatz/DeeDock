@@ -119,7 +119,7 @@ private struct NotificationFeedContextMenuBridge: NSViewRepresentable {
             menu.addItem(.separator())
             add(.actionSettings, action: #selector(settings), symbol: "gear", to: menu)
             trackedMenu = menu
-            menu.popUp(besideDockTile: self, edge: interaction?.layout.edge, event: event)
+            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event)
             tracking?(false)
             trackedMenu = nil
         }
