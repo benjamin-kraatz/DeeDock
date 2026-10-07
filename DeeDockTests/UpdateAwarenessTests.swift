@@ -34,6 +34,53 @@ struct UpdateAwarenessTests {
         #expect(store.showsCallout(now: staged.addingTimeInterval(UpdateAwarenessStore.calloutPatience)))
     }
 
+    @Test("A background find shows the ready callout as soon as its silent download is staged")
+    func backgroundDiscoveryReleasesStagedCallout() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = UpdateAwarenessStore(defaults: defaults)
+        let staged = Date(timeIntervalSinceReferenceDate: 1_000)
+        store.noteBackgroundDiscovery(identity: "42")
+        store.noteStagedOffer(identity: "42", version: "0.14.0", now: staged)
+        #expect(store.showsCallout(now: staged))
+        #expect(store.showsIndicators)
+        store.discardPendingBackgroundDiscovery()
+        #expect(store.showsCallout(now: staged))
+    }
+
+    @Test("Ending a background find before the download is staged keeps the two-hour wait")
+    func discardedBackgroundDiscoveryKeepsPatience() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = UpdateAwarenessStore(defaults: defaults)
+        let staged = Date(timeIntervalSinceReferenceDate: 1_000)
+        store.noteBackgroundDiscovery(identity: "42")
+        store.discardPendingBackgroundDiscovery()
+        store.noteStagedOffer(identity: "42", version: "0.14.0", now: staged)
+        #expect(!store.showsCallout(now: staged))
+        #expect(store.showsCallout(now: staged.addingTimeInterval(UpdateAwarenessStore.calloutPatience)))
+    }
+
+    @Test("A background find does not release a different staged offer")
+    func backgroundDiscoveryDoesNotReleaseOtherOffer() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = UpdateAwarenessStore(defaults: defaults)
+        let staged = Date(timeIntervalSinceReferenceDate: 1_000)
+        store.noteBackgroundDiscovery(identity: "41")
+        store.noteStagedOffer(identity: "42", version: "0.14.0", now: staged)
+        #expect(!store.showsCallout(now: staged))
+        #expect(store.showsCallout(now: staged.addingTimeInterval(UpdateAwarenessStore.calloutPatience)))
+    }
+
+    @Test("Automatic checks use Sparkle's one-hour floor and leave a disabled interval alone")
+    func enforcedUpdateCheckInterval() {
+        #expect(AppUpdater.enforcedUpdateCheckInterval(current: 86_400) == 3_600)
+        #expect(AppUpdater.enforcedUpdateCheckInterval(current: 1_800) == 3_600)
+        #expect(AppUpdater.enforcedUpdateCheckInterval(current: 3_600) == nil)
+        #expect(AppUpdater.enforcedUpdateCheckInterval(current: 0) == nil)
+    }
+
     @Test("A staged offer calls out at once when idle install is off")
     func stagedOfferWithoutIdleInstall() throws {
         let (defaults, suite) = try isolatedDefaults()
