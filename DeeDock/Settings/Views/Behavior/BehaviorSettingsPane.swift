@@ -22,6 +22,7 @@ struct BehaviorSettingsPane: View {
                 }
                 BehaviorActivationControls(source: source)
             }
+            BehaviorApproachIndicatorCard(source: source, previewReduceMotion: previewReduceMotion)
             SettingsCard(title: .behaviorTiming, footnote: .behaviorTimingHelp) {
                 BehaviorTimingControls(source: source)
             }

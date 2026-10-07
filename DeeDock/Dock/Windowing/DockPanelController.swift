@@ -8,6 +8,8 @@ final class DockPanelController {
     let visibility: DockVisibilityController
     let interaction = DockInteraction()
     private let panel: DockPanel
+    /// Edge glow shown while the pointer nears this dock's activation zone and the dock is hidden.
+    private let approach = DockApproachIndicatorController()
     let launcher: LauncherState
     private let launcherPresentation: LauncherPresentationController
     /// The open compact Launcher, if any. Each opening builds a new single-use controller.
@@ -205,6 +207,11 @@ final class DockPanelController {
         }
         visibility.configure(settings.behavior, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
                              geometryChanged: changed || resetVisibility || edgeChanged)
+        approach.configure(enabled: settings.behavior.autoHide && settings.behavior.approachIndicator,
+                           settings: settings.behavior, screenFrame: display.frame, zone: updated.activation.zone,
+                           edge: settings.edge, runtimeID: display.runtimeID,
+                           reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
+                           reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
     }
 
     /// Native events and animation samples share top-left content coordinates after inverse transformation.
@@ -213,6 +220,7 @@ final class DockPanelController {
         if launcher.isPresented {
             panel.ignoresMouseEvents = false
             interaction.setPointer(nil)
+            approach.hide()
             return
         }
         let local = panel.convertPoint(fromScreen: NSEvent.mouseLocation)
@@ -259,6 +267,9 @@ final class DockPanelController {
         visibility.update(activation: activationHovered,
                           retained: inside || geometry.activation.retention.contains(NSEvent.mouseLocation),
                           held: held)
+        // Only a dock that is still hidden invites the approach glow; any reveal fades it out.
+        approach.update(pointer: NSEvent.mouseLocation,
+                        armed: visibility.phase == .hidden || visibility.phase == .revealDelay)
         // The activation zone also restores idle opacity, including when auto-hide is off.
         // Keep fading suspended while hovered, even when the artwork is fully transparent.
         interaction.idleFade.update(interacting: inside || activationHovered || held,
@@ -816,6 +827,7 @@ final class DockPanelController {
     func suspendIdleFading() {
         closeActiveLauncher(animated: false, restoreFocus: false)
         idleSuspended = true
+        approach.hide()
         interaction.suppressTooltips = true; interaction.tooltips.clear()
         interaction.idleFade.reset()
     }
@@ -824,6 +836,7 @@ final class DockPanelController {
         compactLauncher?.didClose = nil; compactLauncher?.close(restoreFocus: false); compactLauncher = nil
         launcherPresentation.stop(); launcherWillOpen = nil; interaction.openLauncher = nil
         invalidateDrag?(); invalidateDrag = nil
+        approach.stop()
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.openBadgeMemory = nil

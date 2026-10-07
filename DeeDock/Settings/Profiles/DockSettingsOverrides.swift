@@ -11,6 +11,7 @@ enum DockSettingField: String, CaseIterable, Codable {
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
     case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
+    case approachIndicator, approachColor
 
     case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
 
@@ -53,6 +54,8 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .hideDelay: \.behavior.hideDelay
         case .animationStyle: \.behavior.animationStyle
         case .animationDuration: \.behavior.animationDuration
+        case .approachIndicator: \.behavior.approachIndicator
+        case .approachColor: \.behavior.approachColor
         }
     }
 }
@@ -97,12 +100,15 @@ struct DockSettingsOverrides: Codable, Equatable {
     var hideDelay: Double?
     var animationStyle: DockAnimationStyle?
     var animationDuration: Double?
+    var approachIndicator: Bool?
+    var approachColor: DockBehaviorSettings.ApproachColor?
 
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case launcherPosition, appVisibility, tooltipPreset
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, launcherStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
+        case approachIndicator, approachColor
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
         case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
     }
@@ -169,6 +175,8 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.behavior.hideDelay = hideDelay ?? defaults.behavior.hideDelay
         result.behavior.animationStyle = animationStyle ?? defaults.behavior.animationStyle
         result.behavior.animationDuration = animationDuration ?? defaults.behavior.animationDuration
+        result.behavior.approachIndicator = approachIndicator ?? defaults.behavior.approachIndicator
+        result.behavior.approachColor = approachColor ?? defaults.behavior.approachColor
         return result
     }
 
@@ -211,6 +219,8 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .hideDelay: hideDelay != nil
         case .animationStyle: animationStyle != nil
         case .animationDuration: animationDuration != nil
+        case .approachIndicator: approachIndicator != nil
+        case .approachColor: approachColor != nil
         }
     }
 
@@ -253,6 +263,8 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .hideDelay: hideDelay = value?.behavior.hideDelay
         case .animationStyle: animationStyle = value?.behavior.animationStyle
         case .animationDuration: animationDuration = value?.behavior.animationDuration
+        case .approachIndicator: approachIndicator = value?.behavior.approachIndicator
+        case .approachColor: approachColor = value?.behavior.approachColor
         }
     }
 }
@@ -317,6 +329,8 @@ extension DockSettingsOverrides {
         hideDelay = try values.decodeIfPresent(Double.self, forKey: .hideDelay)
         animationStyle = try values.decodeIfPresent(DockAnimationStyle.self, forKey: .animationStyle)
         animationDuration = try values.decodeIfPresent(Double.self, forKey: .animationDuration)
+        approachIndicator = try values.decodeIfPresent(Bool.self, forKey: .approachIndicator)
+        approachColor = try values.decodeIfPresent(DockBehaviorSettings.ApproachColor.self, forKey: .approachColor)
         edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : nil
     }
 }
