@@ -7,6 +7,10 @@ import SwiftUI
 ///
 /// A non-nil `lineIcon` replaces the artwork with a white glyph that glows while the tile is hovered
 /// or keyboard-selected. Tiles pass one only when their dock uses ``DockIconStyle/line``.
+///
+/// A line tile with a badge source (a non-nil `badgeAttention`) draws ``DockBadgeRing`` instead of
+/// the corner badge: the ring shows while the badge is news, and the glyph plays its motion as
+/// the news arrives.
 struct DockIconPresentation<Artwork: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -30,6 +34,8 @@ struct DockIconPresentation<Artwork: View>: View {
     var artworkAnimation: Animation? = nil
     var badgeLabel: String? = nil
     var badgeStyle: DockAppBadge.Style = .dot
+    /// Whether the badge is news; nil for a tile without a badge source. Read only by line tiles.
+    var badgeAttention: Bool? = nil
     var launchAnimation = DockSettings.defaults.launchAnimation
     var launchRequest: Date? = nil
     var launchMotionEnabled = true
@@ -39,7 +45,7 @@ struct DockIconPresentation<Artwork: View>: View {
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
-         badgeStyle: DockAppBadge.Style = .dot,
+         badgeStyle: DockAppBadge.Style = .dot, badgeAttention: Bool? = nil,
          launchAnimation: DockLaunchAnimation = DockSettings.defaults.launchAnimation,
          launchRequest: Date? = nil, launchMotionEnabled: Bool = true, lineIcon: DockLineIcon? = nil,
          @ViewBuilder artwork: () -> Artwork) {
@@ -57,16 +63,21 @@ struct DockIconPresentation<Artwork: View>: View {
         self.artworkAnimation = artworkAnimation
         self.badgeLabel = badgeLabel
         self.badgeStyle = badgeStyle
+        self.badgeAttention = badgeAttention
         self.launchAnimation = launchAnimation
         self.launchRequest = launchRequest
         self.launchMotionEnabled = launchMotionEnabled
         self.lineIcon = lineIcon
     }
 
+    /// Line tiles announce badges with a ring rather than the corner mark.
+    private var showsBadgeRing: Bool { lineIcon != nil && badgeAttention != nil }
+
     @ViewBuilder private var styledArtwork: some View {
         if let lineIcon {
             DockLineIconArtwork(icon: lineIcon, size: size, hovered: hovered || keyboardSelected,
-                                reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
+                                reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
+                                attention: badgeAttention == true ? badgeLabel ?? "" : nil)
         } else {
             artwork
         }
@@ -85,6 +96,14 @@ struct DockIconPresentation<Artwork: View>: View {
                 .modifier(PinWeatherChrome(sample: pinWeatherSample))
                 .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size,
                                             variant: indicatorVariant, animated: indicatorAnimated))
+                .overlay {
+                    // Inside the launch motion and idle fade, so the ring moves and fades with its glyph.
+                    if showsBadgeRing {
+                        DockBadgeRing(active: badgeAttention == true, size: size,
+                                      highlighted: hovered || keyboardSelected,
+                                      reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
+                    }
+                }
                 .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                 .modifier(DockLaunchMotion(style: launchAnimation, request: launchRequest, busy: launching,
                                            enabled: launchMotionEnabled, edge: edge, size: size))
@@ -103,7 +122,7 @@ struct DockIconPresentation<Artwork: View>: View {
                     }
                 }
                 .overlay(alignment: .topTrailing) {
-                    if let badgeLabel {
+                    if let badgeLabel, !showsBadgeRing {
                         DockAppBadge(label: badgeLabel, iconSize: size, style: badgeStyle)
                             .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                     }
@@ -124,14 +143,14 @@ extension DockIconPresentation where Artwork == Image {
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
-         badgeStyle: DockAppBadge.Style = .dot,
+         badgeStyle: DockAppBadge.Style = .dot, badgeAttention: Bool? = nil,
          launchAnimation: DockLaunchAnimation = DockSettings.defaults.launchAnimation,
          launchRequest: Date? = nil, launchMotionEnabled: Bool = true, lineIcon: DockLineIcon? = nil) {
         self.init(size: size, edge: edge, available: available, running: running, launching: launching,
                   keyboardSelected: keyboardSelected, runningIndicatorStyle: runningIndicatorStyle,
                   indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
                   artworkOpacity: artworkOpacity, artworkAnimation: artworkAnimation, badgeLabel: badgeLabel,
-                  badgeStyle: badgeStyle,
+                  badgeStyle: badgeStyle, badgeAttention: badgeAttention,
                   launchAnimation: launchAnimation, launchRequest: launchRequest, launchMotionEnabled: launchMotionEnabled,
                   lineIcon: lineIcon) {
             Image(nsImage: icon).resizable().interpolation(.high)

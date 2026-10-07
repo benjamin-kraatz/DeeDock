@@ -32,7 +32,8 @@ struct DockTooltipsOverlay: View {
                 let frame = DockTooltipGeometry.frame(size: measuredSize, icon: iconFrame, dock: dock, region: region,
                                                       edge: layout.edge, placement: interaction.tooltipPreset.placement)
                 DockTooltipArtwork(name: slot.name, icon: slot.icon, preset: interaction.tooltipPreset,
-                    edge: layout.edge, maximumWidth: max(1, region.width - 16), reduceTransparency: reduceTransparency)
+                    edge: layout.edge, maximumWidth: max(1, region.width - 16), reduceTransparency: reduceTransparency,
+                    badge: DockTooltipBadge(slot: slot, interaction: interaction))
                     .onGeometryChange(for: CGSize.self) { $0.size } action: {
                         if measuredSize != $0 { measuredSize = $0 }
                     }
@@ -50,6 +51,11 @@ struct DockTooltipsOverlay: View {
         .animation(interaction.tooltipPreset.animation(reduceMotion: reduceMotion), value: interaction.tooltips.visible)
         .onChange(of: request, initial: true) { _, value in interaction.tooltips.update(value) }
         .onChange(of: interaction.tooltips.revision) { _, _ in interaction.tooltips.update(request) }
+        .onChange(of: interaction.tooltips.visible) { _, target in
+            guard let target, let slot = slots.first(where: { $0.target == target }),
+                  let badge = DockTooltipBadge(slot: slot, interaction: interaction), badge.summary != nil else { return }
+            Analytics.count(.badgeDetailShown(banner: badge.banner != nil))
+        }
         .onDisappear { interaction.tooltips.clear() }
     }
 }

@@ -5,6 +5,8 @@ import Observation
 @MainActor @Observable
 final class DockBadgeController {
     let memory: BadgeMemoryStore
+    /// Which of the presented badges are news. Line icon docks draw those as a red ring.
+    let attention: BadgeAttentionStore
     @ObservationIgnored var focusSession: (() -> FocusSession?)?
     private(set) var labels: [String: String] = [:]
     @ObservationIgnored private var worker: Task<Void, Never>?
@@ -17,11 +19,16 @@ final class DockBadgeController {
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var workerSession: UUID?
     @ObservationIgnored private var retention = BadgeScanRetention()
+    /// Badges that were news after the last real scan, for counting arrivals. Nil until the first
+    /// scan after enabling, which only seeds it, so standing badges are not counted at each launch.
+    /// Pausing keeps it, so waking does not count them either.
+    @ObservationIgnored private var newKeys: Set<String>?
 
     /// `nil` uses standard defaults. The store is created in this body because a default
     /// argument is type-checked outside the main actor.
-    init(memory: BadgeMemoryStore? = nil) {
+    init(memory: BadgeMemoryStore? = nil, attention: BadgeAttentionStore? = nil) {
         self.memory = memory ?? BadgeMemoryStore()
+        self.attention = attention ?? BadgeAttentionStore()
     }
 
     /// Starts observation only for an enabled feature with at least one configured Dock.
@@ -37,6 +44,11 @@ final class DockBadgeController {
         let center = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.didLaunchApplicationNotification, NSWorkspace.didTerminateApplicationNotification] {
             observe(center, name) { $0.continuation?.yield(()) }
+        }
+        // Bringing an app to the front, by any route, counts as looking at its badge.
+        observe(center, NSWorkspace.didActivateApplicationNotification) { controller in
+            guard let key = Self.frontmostKey() else { return }
+            controller.attention.acknowledge(key: key, label: controller.labels[key], via: .activation)
         }
         observeSuspension(center, sleep: NSWorkspace.willSleepNotification,
                           wake: NSWorkspace.didWakeNotification, reason: .systemSleep)
@@ -146,8 +158,27 @@ final class DockBadgeController {
             }
         case .update(let snapshot):
             memory.observe(snapshot, session: focusSession?(), scanStarted: scanStarted)
+            // Only a real scan may forget acknowledgements; a retained snapshot is not an observation.
+            attention.reconcile(snapshot, frontmost: Self.frontmostKey())
             publish(snapshot)
+            countAttention()
         }
+    }
+
+    /// Counts badges that became news, and news the app took away before anyone acknowledged it.
+    private func countAttention() {
+        let current = Set(labels.filter { attention.isNew(key: $0.key, label: $0.value) }.keys)
+        defer { newKeys = current }
+        guard let previous = newKeys else { return }
+        for _ in current.subtracting(previous) { Analytics.count(.badgeNew) }
+        for key in previous.subtracting(current) where labels[key] == nil {
+            Analytics.count(.badgeClearedWhileNew)
+        }
+    }
+
+    /// The badge key of the frontmost application.
+    private static func frontmostKey() -> String? {
+        NSWorkspace.shared.frontmostApplication?.bundleURL.map(DockBadgePath.key(for:))
     }
 
     private func publish(_ snapshot: [String: BadgeObservation]) {
@@ -158,6 +189,7 @@ final class DockBadgeController {
     /// Releases workspace/AX observation and clears presentation state.
     func stop() {
         enabled = false
+        newKeys = nil
         suspensionReasons = []
         pause()
         for (center, token) in observers { center.removeObserver(token) }

@@ -1803,6 +1803,84 @@
         }
       }
     },
+    "appBadgeNewAccessibility" : {
+      "comment" : "VoiceOver app value when a Line icon dock marks the badge as new with a red ring. First argument is running status; second is unmodified badge text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(status)@, neues Mitteilungskennzeichen: %(badge)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(status)@, new badge: %(badge)@"
+          }
+        }
+      }
+    },
+    "tooltipBadgeNew" : {
+      "comment" : "Shown after an app's name in a Line icon dock's hover label when its badge is new but has no count, such as a dot.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New"
+          }
+        }
+      }
+    },
+    "tooltipBadgeNewCount" : {
+      "comment" : "Shown after an app's name in a Line icon dock's hover label. The number is the app's badge count, or for the notification feed tile, the notifications that arrived since it was last opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld neu"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld neu"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "appBadgeCountsHelp" : {
       "comment" : "Subtitle under the badge-count switch. VoiceOver still speaks the count when this is off.",
       "extractionState" : "manual",

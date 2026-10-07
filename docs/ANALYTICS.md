@@ -234,8 +234,16 @@ launches, and reset when sent:
 | `app_activated_<trigger>` | app tile activations, including the context menu's Open (`menu`) and Return in the focused dock (`keyboard`) |
 | `soap_bubble_burst` | bursts played |
 | `dock_group_expanded`, `dock_group_collapsed` | a collapsed app group opened or closed by click, keyboard, or VoiceOver |
+| `badge_new` | an app badge became new: it appeared, or its count rose past the one last acknowledged. Line icon docks show this as the red ring; the count does not depend on icon style |
+| `badge_acknowledged_dock_click`, `badge_acknowledged_activation`, `badge_acknowledged_frontmost` | a new badge was acknowledged by clicking its dock tile, by bringing its app to the front another way, or by arriving while its app was already frontmost |
+| `badge_cleared_while_new` | the app removed a new badge before it was acknowledged in DOKK, for example after it was read on another device |
+| `badge_detail_shown`, `badge_detail_shown_with_banner` | a Line dock label showed a badge count, without or with the newest notification banner under it |
 
 Magnification itself is not tracked. Its settings are.
+
+Badge counters are plain counts. They never include the badge text, the app, or the banner.
+Comparing `badge_acknowledged_dock_click` with the other acknowledgement routes across
+`dock_icon_style` shows whether the Line ring sends people to the dock.
 
 ### Onboarding
 

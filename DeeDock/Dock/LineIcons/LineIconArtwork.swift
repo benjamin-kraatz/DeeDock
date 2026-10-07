@@ -94,6 +94,10 @@ struct DockLineIcon {
 /// A tile that appears already highlighted, such as the Launcher's top result, glows without
 /// playing; otherwise every keystroke of a search would set the first result moving.
 ///
+/// The motion also plays once whenever ``attention`` changes to a new non-nil value, which is how a
+/// badge arriving on the tile is announced. The dock's motion setting and Reduce Motion apply to
+/// that play as well.
+///
 /// The dock always draws white on its dark glass; the Launcher passes `.primary` so glyphs stay
 /// legible on light glass too. The glow is drawn outside the tile's square and never takes hit-testing, so it cannot change the
 /// button region or click-through geometry. Reduce Transparency replaces the blurred glow with a
@@ -106,6 +110,8 @@ struct DockLineIconArtwork: View {
     let reduceMotion: Bool
     let reduceTransparency: Bool
     var color: Color = .white
+    /// Changes when news arrives on the tile, such as a higher badge count; nil while there is none.
+    var attention: String? = nil
 
     /// How long the highlight must rest on a tile before its motion plays, so a sweep along the
     /// dock does not set every glyph off.
@@ -123,8 +129,12 @@ struct DockLineIconArtwork: View {
 
     private var glowing: Bool { hovered && !reduceTransparency }
 
+    private var motion: LineIconMotion? {
+        reduceMotion || !icon.motion.playsOnHover ? nil : LineIconMotionLibrary.shared.motion(for: icon.glyph)
+    }
+
     var body: some View {
-        let motion = reduceMotion || !icon.motion.playsOnHover ? nil : LineIconMotionLibrary.shared.motion(for: icon.glyph)
+        let motion = self.motion
         // Progress rests at 1 and each play runs it from 0 back to 1, so the animator hands the
         // artwork its resting value whenever nothing is playing.
         KeyframeAnimator(initialValue: 1.0, trigger: plays) { progress in
@@ -155,10 +165,19 @@ struct DockLineIconArtwork: View {
         .task(id: highlightBegan) {
             guard highlightBegan != nil, let motion else { return }
             try? await Task.sleep(for: Self.hoverDwell)
-            guard !Task.isCancelled, Date.now >= playingUntil else { return }
-            playingUntil = Date.now.addingTimeInterval(motion.duration)
-            plays += 1
+            guard !Task.isCancelled else { return }
+            play(motion)
         }
+        .onChange(of: attention) { _, news in
+            guard news != nil, let motion else { return }
+            play(motion)
+        }
+    }
+
+    private func play(_ motion: LineIconMotion) {
+        guard Date.now >= playingUntil else { return }
+        playingUntil = Date.now.addingTimeInterval(motion.duration)
+        plays += 1
     }
 }
 

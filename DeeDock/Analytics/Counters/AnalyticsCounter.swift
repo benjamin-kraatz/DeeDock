@@ -22,6 +22,15 @@ enum AnalyticsCounter: Hashable {
     case soapBubbleBurst
     /// A collapsed app group was expanded or collapsed by click, keyboard, or VoiceOver.
     case dockGroupToggled(expanded: Bool)
+    /// An app badge became news: it appeared, or its count rose past the acknowledged one.
+    /// Line icon docks draw this as the red ring; the count is the same for every icon style.
+    case badgeNew
+    /// A badge that was news was acknowledged, and how.
+    case badgeAcknowledged(AnalyticsBadgeAcknowledgement)
+    /// The app removed a badge that was still news, before anyone acknowledged it in DOKK.
+    case badgeClearedWhileNew
+    /// A Line dock label showed a badge's count, with or without the newest banner under it.
+    case badgeDetailShown(banner: Bool)
 
     /// The property name in `usage_summary`.
     var key: String {
@@ -34,6 +43,20 @@ enum AnalyticsCounter: Hashable {
         case let .appActivated(trigger): "app_activated_\(trigger.rawValue)"
         case .soapBubbleBurst: "soap_bubble_burst"
         case let .dockGroupToggled(expanded): expanded ? "dock_group_expanded" : "dock_group_collapsed"
+        case .badgeNew: "badge_new"
+        case let .badgeAcknowledged(route): "badge_acknowledged_\(route.rawValue)"
+        case .badgeClearedWhileNew: "badge_cleared_while_new"
+        case let .badgeDetailShown(banner): banner ? "badge_detail_shown_with_banner" : "badge_detail_shown"
         }
     }
+}
+
+/// How a badge that was news came to be acknowledged.
+enum AnalyticsBadgeAcknowledgement: String {
+    /// Its dock tile was clicked.
+    case dockClick = "dock_click"
+    /// Its app was brought to the front some other way, such as Command-Tab.
+    case activation
+    /// It arrived while its app was already frontmost.
+    case frontmost
 }
