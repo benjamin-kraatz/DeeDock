@@ -537,10 +537,18 @@ Choose **Behavior** under Defaults or a display to configure automatic hiding. E
 | Reveal delay | 0–2 seconds | 0.10 |
 | Hide delay | 0–5 seconds | 0.40 |
 | Animation duration | 0–1 second | 0.20 |
+| Approach indicator | On / Off | Off |
+| Approach color | Contrast with wallpaper / Accent color | Contrast with wallpaper |
 
 A dock-position zone starts at the resting glass outer edge; a screen-edge zone starts at the selected physical display edge. Length follows the dock axis and depth extends inward. Dock length follows the resting glass, independently of hover magnification. Geometry fits to the current display without rewriting requested dimensions. The Settings diagram illustrates the zone and the safe approach area. **Show Zone** draws a click-through outline for 10 seconds on the selected connected, enabled desktop display. It updates during edits and closes with Settings or a changed selection.
 
 Resting the pointer in the zone starts the reveal delay; leaving cancels it. The revealed dock stays visible while the pointer is over it or in the connecting approach area, and while you use a mouse button, its context menu, keyboard focus, or VoiceOver focus. After interaction ends and the pointer leaves, the hide delay begins. Re-entering cancels the delay or reverses an ongoing hide. Trigger and approach areas never capture clicks.
+
+#### Approach indicator
+
+Turn on **Glow as the pointer approaches** under **Approach Indicator** to see where a hidden dock will appear. A soft glow rises from the screen edge once the pointer is within 200 points of the activation zone's inner side, and within 120 points of either end. It strengthens as you get closer, then surges over the last few dozen points: each step nearer brightens and widens it more than the one before, with a hot spot under the pointer at the zone. It follows the pointer along the edge, tapers softly at both ends instead of stopping in a line, and fades out over the reveal animation as soon as the dock starts to appear. It only shows while auto-hide has the dock hidden.
+
+**Contrast with wallpaper** draws a light glow on a dark wallpaper and a shadow on a light one, judged from the strip of wallpaper next to the dock edge. macOS posts no wallpaper-change notice, so DOKK re-reads it when an approach begins, at most every 10 seconds. **Accent color** uses the system accent. Reduce Motion keeps the glow's size fixed and changes only its opacity; Reduce Transparency replaces the translucent glow with a solid bar along the zone. The glow is click-through, never takes focus, and does not appear in full-screen Spaces, matching the dock panel.
 
 **Focus Dock** reveals its target immediately and preserves existing keyboard navigation. Hidden docks have no invisible click targets or accessibility elements. A launch error reveals only its initiating dock and holds it until dismissed; pending launches alone do not prevent hiding.
 

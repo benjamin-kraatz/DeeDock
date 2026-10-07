@@ -1821,6 +1821,132 @@
         }
       }
     },
+    "behaviorApproachColor" : {
+      "comment" : "Picker label choosing the approach glow's color.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        }
+      }
+    },
+    "behaviorApproachColorAccent" : {
+      "comment" : "Approach glow color option: the system accent color.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akzentfarbe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accent color"
+          }
+        }
+      }
+    },
+    "behaviorApproachColorAutomatic" : {
+      "comment" : "Approach glow color option: a light glow on dark wallpapers and a shadow on light ones.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrast zum Hintergrundbild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrast with wallpaper"
+          }
+        }
+      }
+    },
+    "behaviorApproachIndicator" : {
+      "comment" : "Heading for the card that configures the glow shown at the screen edge as the pointer nears a hidden dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annäherungsanzeige"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approach Indicator"
+          }
+        }
+      }
+    },
+    "behaviorApproachIndicatorHelp" : {
+      "comment" : "Footnote explaining when the approach glow appears, how it grows, and when it disappears.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solange das Dock versteckt ist, steigt ein sanftes Leuchten vom Bildschirmrand auf, wenn sich der Zeiger der Aktivierungszone nähert. Es wird stärker, je näher du kommst, und verblasst, sobald das Dock erscheint."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While the dock is hidden, a soft glow rises from the screen edge as the pointer nears the activation zone. It grows stronger the closer you get and fades as the dock appears."
+          }
+        }
+      }
+    },
+    "behaviorApproachIndicatorNeedsAutoHide" : {
+      "comment" : "Footnote shown when auto-hide is off: the approach glow only works with a hidden dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Annäherungsanzeige erscheint nur, wenn „Automatisch verstecken“ aktiviert ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The approach indicator appears only when Automatically hide is on."
+          }
+        }
+      }
+    },
+    "behaviorApproachIndicatorToggle" : {
+      "comment" : "Toggle that turns the screen-edge approach glow on or off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leuchten bei Annäherung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glow as the pointer approaches"
+          }
+        }
+      }
+    },
     "tooltipBadgeNew" : {
       "comment" : "Shown after an app's name in a Line icon dock's hover label when its badge is new but has no count, such as a dot.",
       "extractionState" : "manual",
