@@ -160,12 +160,14 @@
         {"parts": ["s3", "s4"], "y": [[0, 0], [0.3, -1, "out"], [0.55, -1], [0.75, 0, "in"]]}
       ]
     },
-    "lucide:trash-2": {
-      "about": "The lid lifts on its hinge, then drops and rattles.",
-      "duration": 0.8,
+    "custom:trash-full": {
+      "about": "A crumpled ball spins in and bounces, knocking the sheet aside as the can squashes.",
+      "duration": 0.95,
       "tracks": [
-        {"parts": ["s3", "s4"], "rotate": [[0, 0], [0.3, 20, "out"], [0.55, 20], [0.75, 0, "in"], [0.84, 4, "out"], [0.93, 0, "in"]], "anchor": [21, 6]},
-        {"parts": ["s3", "s4"], "y": [[0, 0], [0.3, -1, "out"], [0.55, -1], [0.75, 0, "in"]]}
+        {"parts": ["s5", "s6"], "rotate": [[0, -120], [0.3, 0, "out"]], "anchor": [15.7, 3.7]},
+        {"parts": ["s5", "s6"], "y": [[0, -8], [0.3, 0, "in"], [0.42, -1.3, "out"], [0.54, 0, "in"]]},
+        {"parts": ["s4"], "rotate": [[0.28, 0], [0.38, -11, "out"], [0.56, 6], [0.72, -2.5], [0.86, 0]], "anchor": [8.2, 6]},
+        {"scaleY": [[0.28, 1], [0.36, 0.93, "out"], [0.54, 1, "back"]], "anchor": [12, 22]}
       ]
     },
     "lucide:layers": {

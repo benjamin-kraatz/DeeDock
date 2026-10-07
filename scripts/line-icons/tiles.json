@@ -1,7 +1,7 @@
 {
   "launcher": "custom:launcher",
   "trash": "lucide:trash",
-  "trashFull": "lucide:trash-2",
+  "trashFull": "custom:trash-full",
   "folder": "lucide:folder",
   "shelf": "lucide:inbox",
   "notificationFeed": "lucide:bell",
