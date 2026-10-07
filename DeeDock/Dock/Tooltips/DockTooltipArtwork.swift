@@ -8,6 +8,8 @@ struct DockTooltipArtwork: View {
     var edge: DockEdge = .bottom
     var maximumWidth: CGFloat = 240
     var reduceTransparency = false
+    /// A Line dock's badge detail: a count beside the name and the latest banner under it.
+    var badge: DockTooltipBadge? = nil
     @Environment(\.colorScheme) private var colorScheme
 
     private var capsule: Bool { [.glassPill, .accent, .trailingPill, .dockCaption].contains(preset) }
@@ -27,11 +29,29 @@ struct DockTooltipArtwork: View {
             HStack(spacing: 6) {
                 if preset == .nameCard, let icon { Image(nsImage: icon).resizable().frame(width: 24, height: 24) }
                 if preset == .leadingTag { Capsule().fill(.tint).frame(width: 3, height: 16) }
-                Text(verbatim: name)
-                    .font(.system(size: fontSize, weight: fontSize == 14 ? .semibold : .medium))
-                    .lineLimit(preset == .nameCard ? 2 : 1)
-                    .foregroundStyle(preset == .accent ? accentText : .primary)
-                    .shadow(color: preset == .plain ? (colorScheme == .dark ? Color.black : Color.white) : .clear, radius: 2)
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 4) {
+                        Text(verbatim: name)
+                            .font(.system(size: fontSize, weight: fontSize == 14 ? .semibold : .medium))
+                            .lineLimit(preset == .nameCard ? 2 : 1)
+                            .foregroundStyle(preset == .accent ? accentText : .primary)
+                        if let summary = badge?.summary {
+                            Text(verbatim: "· \(summary)")
+                                .font(.system(size: fontSize, weight: .medium))
+                                .lineLimit(1)
+                                .foregroundStyle(summaryStyle)
+                                .layoutPriority(1)
+                        }
+                    }
+                    if let banner = badge?.banner {
+                        Text(verbatim: banner)
+                            .font(.system(size: max(10, fontSize - 1)))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .foregroundStyle(preset == .accent ? accentText.opacity(0.8) : .secondary)
+                    }
+                }
+                .shadow(color: preset == .plain ? (colorScheme == .dark ? Color.black : Color.white) : .clear, radius: 2)
                 if preset == .trailingTag { Capsule().fill(.tint).frame(width: 3, height: 16) }
             }
             .padding(.horizontal, [.compact, .leadingOutline].contains(preset) ? 6 : 10)
@@ -52,6 +72,12 @@ struct DockTooltipArtwork: View {
             .allowsHitTesting(false)
             .accessibilityHidden(true)
         }
+    }
+
+    /// Red while the badge is news, like the ring; quiet once seen. The accent fill keeps its own contrast.
+    private var summaryStyle: Color {
+        if preset == .accent { return accentText }
+        return badge?.isNew == true ? Color(nsColor: .systemRed) : .secondary
     }
 
     @ViewBuilder private var background: some View {

@@ -46,15 +46,21 @@ struct DockAppButton: View {
         return weather.sample(for: item.id)
     }
 
-    private var badgeLabel: String? {
-        guard item.isAvailable else { return nil }
-        return interaction?.badges?.labels[DockBadgePath.key(for: item.resolvedURL ?? item.reference.url)]
-    }
+    private var badgeKey: String { DockBadgePath.key(for: item.resolvedURL ?? item.reference.url) }
 
     var body: some View {
         // One lookup per pass. `DockBadgePath` caches the installation key.
-        let badgeLabel = self.badgeLabel
-        Button(action: primaryAction) {
+        let badgeKey = self.badgeKey
+        let badgeLabel = item.isAvailable ? interaction?.badges?.labels[badgeKey] : nil
+        let badgeAttention = interaction?.badges.map { $0.attention.isNew(key: badgeKey, label: badgeLabel) }
+        let lineIcon = interaction?.lineIcon(for: item.reference, artwork: item.icon)
+        // Clicking the tile acknowledges its badge, which clears a line tile's ring. Activation
+        // does too, but an app that is already frontmost does not activate again.
+        let activate = {
+            interaction?.badges?.attention.acknowledge(key: badgeKey, label: badgeLabel, via: .dockClick)
+            primaryAction()
+        }
+        Button(action: activate) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
                                  available: item.isAvailable, running: item.isRunning,
                                  launching: isLaunching, keyboardSelected: isKeyboardSelected,
@@ -63,10 +69,11 @@ struct DockAppButton: View {
                                  artworkOpacity: artworkOpacity, artworkAnimation: interaction?.idleFade.animation,
                                  badgeLabel: badgeLabel,
                                  badgeStyle: interaction?.showAppBadgeCounts == true ? .count : .dot,
+                                 badgeAttention: badgeAttention,
                                  launchAnimation: interaction?.launchAnimation ?? DockSettings.defaults.launchAnimation,
                                  launchRequest: interaction?.applicationCatalog?.launchAnimationRequests[item.id],
                                  launchMotionEnabled: interaction.map { $0.exposesContent && $0.idleFade.fraction == 0 } ?? true,
-                                 lineIcon: interaction?.lineIcon(for: item.reference, artwork: item.icon))
+                                 lineIcon: lineIcon)
                 .environment(\.pinWeatherSample, pinWeatherSample)
                 .overlay {
                     if interaction?.documentTargetID == item.id {
@@ -97,7 +104,7 @@ struct DockAppButton: View {
                 DockDragSourceView(
                     item: item,
                     enabled: !isLaunching,
-                    primaryAction: primaryAction,
+                    primaryAction: activate,
                     begin: begin,
                     tracking: { interaction.sourceTrackingChanged?($0) }
                 )
@@ -117,7 +124,8 @@ struct DockAppButton: View {
             )
         }
         .overlay(alignment: .topTrailing) {
-            if badgeLabel != nil, interaction?.openBadgeMemory != nil {
+            // A line tile's ring has no corner mark to click; Badge details stays in its menu.
+            if badgeLabel != nil, lineIcon == nil, interaction?.openBadgeMemory != nil {
                 Button { interaction?.openBadgeMemory?(item) } label: {
                     Color.clear.frame(width: max(20, size * 0.85), height: max(20, size * 0.35))
                         .contentShape(.rect)
@@ -141,7 +149,8 @@ struct DockAppButton: View {
             cancelAccessibilityWindowDiscovery()
         }
         .accessibilityLabel(Text(verbatim: item.reference.name))
-        .accessibilityValue(accessibilityStatus(badgeLabel: badgeLabel))
+        .accessibilityValue(accessibilityStatus(badgeLabel: badgeLabel,
+                                                newBadge: lineIcon != nil && badgeAttention == true))
         .accessibilityHint(Text(.appOpenHint))
         .accessibilityAction(
             named: Text(item.isFavorite ? .actionUnpin : .actionPin),
@@ -211,7 +220,8 @@ struct DockAppButton: View {
         Analytics.performing(.voiceOver) { interaction?.performApplicationMenuAction?(action, item) }
     }
 
-    private func accessibilityStatus(badgeLabel: String?) -> Text {
+    /// - Parameter newBadge: True when a line tile's ring marks the badge as news, so VoiceOver says so too.
+    private func accessibilityStatus(badgeLabel: String?, newBadge: Bool) -> Text {
         let status = String(localized: item.isAvailable
             ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusNotRunning)
             : .appStatusUnavailable)
@@ -219,11 +229,13 @@ struct DockAppButton: View {
             String(localized: $0.mood(at: .now).title)
         }
         if let badgeLabel {
-            let badge = String(localized: .appBadgeAccessibility(status: status, badge: badgeLabel))
+            let badge = String(localized: newBadge
+                ? .appBadgeNewAccessibility(status: status, badge: badgeLabel)
+                : .appBadgeAccessibility(status: status, badge: badgeLabel))
             if let mood {
                 return Text(verbatim: "\(badge), \(String(localized: .simsMoodAccessibility(mood: mood)))")
             }
-            return Text(.appBadgeAccessibility(status: status, badge: badgeLabel))
+            return Text(verbatim: badge)
         }
         if let mood {
             return Text(verbatim: "\(status), \(String(localized: .simsMoodAccessibility(mood: mood)))")

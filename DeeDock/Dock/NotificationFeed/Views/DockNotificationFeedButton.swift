@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The notification feed tile. Clicking opens the feed; the red badge counts what arrived since
-/// it was last opened.
+/// it was last opened. A Line icon dock draws a red ring instead, which clears as the feed opens.
 ///
 /// The count comes straight from the shared store, so an arriving notification redraws this tile
 /// alone. Hover never opens the feed and nothing here takes focus by itself.
@@ -35,7 +35,7 @@ struct DockNotificationFeedButton: View {
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation,
                                  badgeLabel: unreadCount > 0 ? Self.badgeLabel(unreadCount) : nil,
-                                 badgeStyle: .count,
+                                 badgeStyle: .count, badgeAttention: unreadCount > 0,
                                  lineIcon: interaction.lineIcon(for: .notificationFeed)) {
                 NotificationFeedGlyph(size: size, ring: ring, reduceMotion: reduceMotion)
             }
