@@ -15,6 +15,11 @@ struct DockContextMenuSpotlight: ViewModifier {
         case receded
     }
 
+    /// How far the owner rises toward the screen, in points. Menu placement clears it.
+    static let lift: CGFloat = 5
+    /// The owner's growth, anchored at the dock edge. Menu placement clears it.
+    static let scale: CGFloat = 1.06
+
     let role: Role
     let edge: DockEdge
     let reduceMotion: Bool
@@ -34,11 +39,11 @@ struct DockContextMenuSpotlight: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        let lift = edge.offset(CGSize(width: 0, height: lifted ? -5 : 0))
+        let lift = edge.offset(CGSize(width: 0, height: lifted ? -Self.lift : 0))
         let receded = role == .receded
         content
             .animation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.3, dampingFraction: 0.7)) {
-                $0.scaleEffect(lifted ? 1.06 : 1, anchor: anchor)
+                $0.scaleEffect(lifted ? Self.scale : 1, anchor: anchor)
                     .offset(lift)
                     .saturation(receded ? 0.45 : 1)
                     .brightness(receded && reduceTransparency ? -0.25 : 0)
