@@ -7,6 +7,7 @@ extension DockSettings.Alignment: AnalyticsToken {}
 extension DockSettings.PositionReference: AnalyticsToken {}
 extension DockSettings.RunningIndicatorStyle: AnalyticsToken {}
 extension DockIconStyle: AnalyticsToken {}
+extension LineIconMotionPlayback: AnalyticsToken {}
 extension LauncherStyle: AnalyticsToken {}
 extension DockBehaviorSettings.ActivationLocation: AnalyticsToken {}
 extension DockAnimationStyle: AnalyticsToken {}

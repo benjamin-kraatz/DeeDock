@@ -84,6 +84,8 @@ enum DockLineGlow {
 struct DockLineIcon {
     let glyph: LineIconGlyph
     var glow: DockLineGlow = .spectrum
+    /// The owning dock's motion setting; `.off` keeps the glyph still.
+    var motion: LineIconMotionPlayback = .hover
 }
 
 /// A line glyph over a soft colored glow that fades in on hover, playing the glyph's motion once
@@ -95,7 +97,8 @@ struct DockLineIcon {
 /// The dock always draws white on its dark glass; the Launcher passes `.primary` so glyphs stay
 /// legible on light glass too. The glow is drawn outside the tile's square and never takes hit-testing, so it cannot change the
 /// button region or click-through geometry. Reduce Transparency replaces the blurred glow with a
-/// brighter glyph; Reduce Motion shows and hides it without a fade and keeps the glyph still.
+/// brighter glyph; Reduce Motion shows and hides it without a fade and keeps the glyph still, as
+/// does the dock's own motion setting carried in ``DockLineIcon/motion``.
 struct DockLineIconArtwork: View {
     let icon: DockLineIcon
     let size: CGFloat
@@ -121,7 +124,7 @@ struct DockLineIconArtwork: View {
     private var glowing: Bool { hovered && !reduceTransparency }
 
     var body: some View {
-        let motion = reduceMotion ? nil : LineIconMotionLibrary.shared.motion(for: icon.glyph)
+        let motion = reduceMotion || !icon.motion.playsOnHover ? nil : LineIconMotionLibrary.shared.motion(for: icon.glyph)
         // Progress rests at 1 and each play runs it from 0 back to 1, so the animator hands the
         // artwork its resting value whenever nothing is playing.
         KeyframeAnimator(initialValue: 1.0, trigger: plays) { progress in
@@ -210,6 +213,9 @@ extension LineIconArtwork {
                             size: 64, hovered: true, reduceMotion: false, reduceTransparency: false)
         DockLineIconArtwork(icon: DockLineIcon(glyph: glyph), size: 48, hovered: true,
                             reduceMotion: true, reduceTransparency: true)
+        // Motion switched off in Settings: glows on hover, never moves.
+        DockLineIconArtwork(icon: DockLineIcon(glyph: glyph, motion: .off), size: 48, hovered: true,
+                            reduceMotion: false, reduceTransparency: false)
     }
     .padding(40)
     .background(.black)

@@ -83,7 +83,7 @@ Fallbacks cannot name parts, because they apply to glyphs of any shape. Use `"st
 
 ## When a motion plays
 
-`DockLineIconArtwork` plays the motion once when its tile becomes highlighted and stays so for 70 ms. Highlighted means the pointer is over the tile or the keyboard selection is on it. A hover that arrives while a play is running lets it finish. A tile that appears already highlighted does not play. Reduce Motion turns the motions off.
+`DockLineIconArtwork` plays the motion once when its tile becomes highlighted and stays so for 70 ms. Highlighted means the pointer is over the tile or the keyboard selection is on it. A hover that arrives while a play is running lets it finish. A tile that appears already highlighted does not play. Reduce Motion turns the motions off, and so does switching **Animate icons on hover** off in Appearance, which `DockSettings.lineIconMotion` stores as a trigger (`off` or `hover`) so a launch trigger can be added without migrating saved settings.
 
 The dock, the Launcher, and the Open With list all draw through `DockLineIconArtwork`, so a motion shows up in each.
 

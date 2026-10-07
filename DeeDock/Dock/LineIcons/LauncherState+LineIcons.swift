@@ -8,6 +8,6 @@ extension LauncherState {
     ///   to the shared spectrum glow.
     func lineIcon(for application: LauncherApplication, artwork: NSImage?) -> DockLineIcon? {
         guard usesLineIcons, let glyph = LineIconCatalog.shared.glyph(for: application.reference) else { return nil }
-        return DockLineIcon(glyph: glyph, glow: artwork.map(DockLineGlow.artwork) ?? .spectrum)
+        return DockLineIcon(glyph: glyph, glow: artwork.map(DockLineGlow.artwork) ?? .spectrum, motion: lineIconMotion)
     }
 }

@@ -11,6 +11,7 @@ struct AppearanceSettingsPane: View {
     @Binding var runningIndicatorStyle: DockSettings.RunningIndicatorStyle
     @Binding var iconStyle: DockIconStyle
     @Binding var launcherLineIcons: Bool
+    @Binding var lineIconMotion: LineIconMotionPlayback
     @Binding var launcherStyle: LauncherStyle
     @Binding var animateIndicators: Bool
     @Binding var launchAnimation: DockLaunchAnimation
@@ -29,6 +30,13 @@ struct AppearanceSettingsPane: View {
             SettingsCard(title: .settingsIconStyle, footnote: .settingsIconStyleHelp) {
                 DockIconStylePicker(selection: $iconStyle)
                     .settingsOverride(overrideContext, field: .iconStyle)
+                // One switch for every glyph. The stored value is a trigger, so a launch trigger
+                // can join later as a picker without touching saved settings.
+                SettingsToggleRow(title: .settingsLineIconMotion,
+                                  isOn: Binding(get: { lineIconMotion.playsOnHover },
+                                                set: { lineIconMotion = $0 ? .hover : .off }))
+                    .disabled(iconStyle != .line)
+                    .settingsOverride(overrideContext, field: .lineIconMotion)
             }
             SettingsCard(title: .settingsLauncherStyle, footnote: .settingsLauncherStyleHelp) {
                 LauncherStylePicker(selection: $launcherStyle)
@@ -78,12 +86,14 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var indicator: DockSettings.RunningIndicatorStyle = .stardust
     @Previewable @State var iconStyle: DockIconStyle = .native
     @Previewable @State var launcherLineIcons = true
+    @Previewable @State var lineIconMotion: LineIconMotionPlayback = .hover
     @Previewable @State var launcherStyle: LauncherStyle = .compact
     @Previewable @State var animate = true
     ScrollView {
         AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,
                                runningIndicatorStyle: $indicator, iconStyle: $iconStyle,
-                               launcherLineIcons: $launcherLineIcons, launcherStyle: $launcherStyle,
+                               launcherLineIcons: $launcherLineIcons, lineIconMotion: $lineIconMotion,
+                               launcherStyle: $launcherStyle,
                                animateIndicators: $animate,
                                launchAnimation: .constant(DockSettings.defaults.launchAnimation))
             .padding(24)
