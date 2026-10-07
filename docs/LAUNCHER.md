@@ -6,11 +6,16 @@ Optional [app suggestions](LAUNCHER-SUGGESTIONS.md) appear above ordinary result
 
 With **Launcher style** set to **Compact** in Appearance, the tile opens a small app grid in a dock
 popover above it instead of expanding the dock. The grid uses the same app results, opening,
-history, context menu, and line icons as the full Launcher, but skips window discovery and
-suggestion prediction because it shows neither. It starts from the default browse options.
+history, context menu, and line icons as the full Launcher, but skips window discovery because it
+shows no windows. It starts from the default browse options. With an empty query and
+[suggestions](LAUNCHER-SUGGESTIONS.md) on, up to three suggested apps lead the grid in a Suggested row
+with the same feedback actions as the full Launcher. The row slides in when the prediction
+arrives (Reduce Motion shows it at once). The survey card appears only in the full Launcher, because
+the compact search field keeps focus and its answer field could not take it.
 
-The search field keeps focus. Down enters the grid at the first app, the arrows then move by tile or
-row, and Return opens the selected app, or the first match when nothing is selected. Escape first
+The search field keeps focus. Down enters the grid at the first tile, a suggestion when the
+Suggested row shows, the arrows then move by tile or row, keeping the column between the Suggested
+row and the grid, and Return opens the selected app, or the first tile when nothing is selected. Escape first
 leaves the grid, then clears the query, then closes and reactivates the previous app. Opening an app,
 an outside click, a click on the dock, or another app taking focus closes it without reactivating
 anything. Another dock popover opening also closes it. A file drop on the tile replaces the

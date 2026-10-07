@@ -252,8 +252,8 @@ final class LauncherState {
 
     /// Starts a presentation in `style`.
     ///
-    /// The compact grid shows only apps, so it skips window discovery and suggestion prediction and
-    /// starts with the default browse options instead of the full Launcher's session choices.
+    /// Both styles predict suggestions. The compact grid shows only apps, so it skips window discovery
+    /// and starts with the default browse options instead of the full Launcher's session choices.
     func begin(pins: [ApplicationReference], foregroundID: String? = nil, style: LauncherStyle = .full) {
         presentationGeneration = UUID()
         presentedAt = Date()
@@ -263,9 +263,7 @@ final class LauncherState {
         fileActions.didOpen = { [weak self] in self?.didOpen?() }
         initialPinnedIDs = Set(pins.map(\.id))
         query = ""; error = nil; selectedID = nil
-        if style == .full {
-            suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
-        }
+        suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
         library.acquire(owner, extraURLs: pins.map(\.url) + catalog.running.map(\.url) + history.visits.values.map { $0.reference.url })
     }
 

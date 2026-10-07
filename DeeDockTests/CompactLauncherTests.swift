@@ -4,30 +4,63 @@ import Testing
 
 @MainActor
 struct CompactLauncherTests {
-    private func model(appCount: Int) -> CompactLauncherModel {
+    /// - Parameter suggested: Indexes of apps to rank as suggestions, in order, from an in-memory store.
+    private func model(appCount: Int, suggested: [Int] = []) -> CompactLauncherModel {
         let applications = (0..<appCount).map { index in
             LauncherApplication(reference: ApplicationReference(bundleIdentifier: "example.app\(index)",
                 url: URL(fileURLWithPath: "/Applications/App \(String(format: "%02d", index)).app"),
                 name: "App \(String(format: "%02d", index))"))
         }
+        let store = LauncherSuggestionsStore(directory: nil, defaults: nil)
+        store.setEnabled(!suggested.isEmpty)
         let catalog = ApplicationCatalog(service: ApplicationService(),
-                                         launcherLibrary: LauncherLibrary(applications: applications))
-        return CompactLauncherModel(launcher: LauncherState(catalog: catalog))
+                                         launcherLibrary: LauncherLibrary(applications: applications), suggestions: store)
+        let launcher = LauncherState(catalog: catalog)
+        if !suggested.isEmpty {
+            // Without `begin`, the launcher keeps the full style; six grid columns allow the same three suggestions.
+            launcher.navigationColumns = CompactLauncherLayout.columns
+            let date = Date()
+            launcher.suggestions.installPreview(LauncherSuggestionSnapshot(
+                context: LauncherSuggestionContext(date: date, foregroundID: "example.source", modeID: nil),
+                modelVersion: "test", rankedIDs: suggested.map { applications[$0].id },
+                createdAt: date, generation: store.revision))
+        }
+        return CompactLauncherModel(launcher: launcher)
     }
 
     @Test("Arrow navigation enters at the first app, moves by rows, and stops at both ends")
     func navigationStaysInBounds() {
         let model = model(appCount: 8)
-        let ids = model.results.map(\.id)
+        let ids = model.results.map { LauncherBrowseID.application($0.id) }
+        let columns = CompactLauncherLayout.columns
         #expect(!model.navigating)
         model.move(by: 0)
         #expect(model.selectedID == ids[0])
-        model.move(by: CompactLauncherLayout.columns)
-        #expect(model.selectedID == ids[CompactLauncherLayout.columns])
-        model.move(by: CompactLauncherLayout.columns)
-        #expect(model.selectedID == ids.last)
+        model.move(by: columns - 1)
+        model.move(by: columns)
+        #expect(model.selectedID == ids.last, "Down keeps the column, clamped to the short last row")
+        model.move(by: columns)
+        #expect(model.selectedID == ids.last, "Down on the last row stays put")
         model.move(by: -100)
         #expect(model.selectedID == ids.first)
+    }
+
+    @Test("Suggestions lead navigation with their own identity, and vertical moves keep the column")
+    func suggestedRowNavigation() throws {
+        let model = model(appCount: 8, suggested: [3, 5])
+        let apps = model.results.map(\.id)
+        let suggested = model.suggestions.map(\.id)
+        try #require(suggested == [apps[3], apps[5]])
+        model.move(by: 0)
+        #expect(model.selectedID == .suggested(apps[3]))
+        model.move(by: 1)
+        #expect(model.selectedID == .suggested(apps[5]))
+        model.move(by: CompactLauncherLayout.columns)
+        #expect(model.selectedID == .application(apps[1]))
+        model.move(by: -CompactLauncherLayout.columns)
+        #expect(model.selectedID == .suggested(apps[5]))
+        model.query = "App"
+        #expect(model.suggestions.isEmpty)
     }
 
     @Test("Typing clears the grid selection, and a query with no matches leaves nothing to select")

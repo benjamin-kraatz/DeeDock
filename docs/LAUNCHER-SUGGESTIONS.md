@@ -126,6 +126,7 @@ or exported, and the generator, session, controls, and playback metrics are comp
 
 An empty query can show a **Suggested** section below the search controls and above ordinary app results.
 Grid layout shows up to three apps in one row, reducing the count for narrow windows. List layout shows up to three rows.
+The [compact Launcher](LAUNCHER.md#compact-style) shows up to three apps in a row above its grid.
 An app can appear in both Suggested and ordinary results. Each occurrence has a separate selection identity.
 Arrow keys move through both sections, and Return opens or activates the selected app through the existing application service.
 
@@ -147,7 +148,7 @@ Each suggestion has contextual menu and accessibility actions:
 
 Ignoring a suggestion is not negative feedback. Actual foreground transitions teach the predictor regardless of which app launched or activated the target.
 
-An optional survey card appears below the suggestions after at least seven days and ten suggestion presentations.
+An optional survey card appears below the suggestions in the full Launcher after at least seven days and ten suggestion presentations.
 It is the PostHog survey "App Recommendations Survey" (ID `01a10ae5-3be4-0000-cb04-a670009cadbf`), which DOKK fetches and draws
 itself because posthog-ios renders surveys on iOS only. The card appears only while usage-data sharing is on, since that is where
 the answers go. See [Surveys](ANALYTICS.md#surveys) for what is sent.

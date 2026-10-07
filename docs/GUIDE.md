@@ -297,7 +297,8 @@ for validation status.
 
 **Settings → Dock → Appearance → Launcher** chooses **Full**, described above, or **Compact**: a
 small app grid with a search field that opens above the Launcher tile and leaves the dock in place.
-The compact grid shows apps only, without suggestions, tools, Robi, or mixed search. Dropping files
+The compact grid shows apps only, with the same Suggested row above them when suggestions are on,
+but without tools, Robi, or mixed search. Dropping files
 on the tile always opens the full Launcher. **Line icons in Launcher** applies to both styles. Each
 display can override the style.
 
