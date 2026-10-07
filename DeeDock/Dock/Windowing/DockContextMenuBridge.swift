@@ -72,7 +72,8 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 }
             }
 
-            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event)
+            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event,
+                                  beginTracking: { tracking?(true) })
             finishTracking()
             let chooser = meltChooser
             meltChooser = nil

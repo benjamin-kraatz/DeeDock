@@ -149,6 +149,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.windowMarkupSearchEngine = defaults.windowMarkupSearchEngine
         result.windowMarkupFolder = defaults.windowMarkupFolder
         result.soapBubbleEffects = defaults.soapBubbleEffects
+        result.contextMenuReveal = defaults.contextMenuReveal
         result.showAppBadgeCounts = defaults.showAppBadgeCounts
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground

@@ -151,6 +151,7 @@ final class DockPanelController {
         launcher.lineIconMotion = settings.lineIconMotion
         interaction.animateIndicators = settings.animateIndicators
         interaction.launchAnimation = settings.launchAnimation
+        interaction.contextMenuReveal = settings.contextMenuReveal
         interaction.showAppBadgeCounts = settings.showAppBadgeCounts
         interaction.soapBubbles.isEnabled = settings.soapBubbleEffects
         if !settings.soapBubbleEffects || NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {

@@ -126,6 +126,9 @@ struct FeaturesPageContent: View {
                                   isOn: source.binding(\.soapBubbleEffects))
             }
             .disabled(locked)
+        case .contextMenus:
+            ContextMenuSettingsCard(selection: source.binding(\.contextMenuReveal))
+                .disabled(locked)
         default:
             EmptyView()
         }

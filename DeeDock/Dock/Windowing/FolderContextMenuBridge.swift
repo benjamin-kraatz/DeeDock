@@ -64,7 +64,8 @@ struct FolderContextMenuBridge: NSViewRepresentable {
             add(.actionSettings, action: #selector(settings), symbol: "gear", to: menu)
             menu.autoenablesItems = false
             trackedMenu = menu
-            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event)
+            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event,
+                                  beginTracking: { tracking?(true) })
             tracking?(false); trackedMenu = nil
         }
 

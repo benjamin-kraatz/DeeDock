@@ -159,6 +159,7 @@ struct DockSurfaceView: View {
                                     dx: frame.width * (DockContextMenuSpotlight.scale - 1) / 2,
                                     dy: frame.height * (DockContextMenuSpotlight.scale - 1) / 2))
                             : .zero,
+                        reveal: interaction.contextMenuReveal,
                         reduceMotion: reduceMotion,
                         reduceTransparency: reduceTransparency
                     ))

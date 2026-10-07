@@ -9858,6 +9858,186 @@
         }
       }
     },
+    "contextMenuRevealLabel" : {
+      "comment" : "Accessibility label for the gallery of context menu icon motions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbolbewegung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon motion"
+          }
+        }
+      }
+    },
+    "contextMenuRevealOff" : {
+      "comment" : "Context menu style where the icon does not move.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "contextMenuRevealOffHelp" : {
+      "comment" : "Explains the Off context menu style under its preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Symbol bleibt an seinem Platz, und das Menü kann es verdecken."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The icon stays in place, and the menu may cover it."
+          }
+        }
+      }
+    },
+    "contextMenuRevealPopOut" : {
+      "comment" : "Context menu style where the menu opens at once and the icon pops up beside it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herausspringen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pop out"
+          }
+        }
+      }
+    },
+    "contextMenuRevealPopOutHelp" : {
+      "comment" : "Explains the Pop out context menu style under its preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Menü öffnet sofort, und das Symbol springt daneben hervor."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The menu opens at once, and the icon pops up beside it."
+          }
+        }
+      }
+    },
+    "contextMenuRevealSlideOut" : {
+      "comment" : "Context menu style where the icon slides aside before the menu opens.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herausgleiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide out"
+          }
+        }
+      }
+    },
+    "contextMenuRevealSlideOutHelp" : {
+      "comment" : "Explains the Slide out context menu style under its preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Symbol gleitet zur Seite, und das Menü öffnet einen Moment später."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The icon slides clear, and the menu opens a moment later."
+          }
+        }
+      }
+    },
+    "contextMenusSettingsHelp" : {
+      "comment" : "Footnote on the context menu settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gilt für alle Docks. Das Symbol, auf das du rechtsklickst, rückt neben sein Menü, damit das Menü es nie verdeckt, und die anderen Symbole werden abgedunkelt. Mit „Bewegung reduzieren“ blendet das Symbol stattdessen neben dem Menü ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies to every dock. The icon you right-click moves next to its menu so the menu never hides it, and the other icons dim. With Reduce Motion, the icon fades in beside the menu instead of traveling there."
+          }
+        }
+      }
+    },
+    "contextMenusSettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the context menu settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontextmenü Rechtsklick Control-Klick Sekundärklick Symbol herausspringen gleiten Bewegung Animation Menü"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "context menu right click control click secondary click icon pop slide motion animation menu"
+          }
+        }
+      }
+    },
+    "contextMenusTitle" : {
+      "comment" : "Feature name for how a dock icon moves while its context menu is open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontextmenüs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Context menus"
+          }
+        }
+      }
+    },
     "discoveryDebugHelp" : {
       "comment" : "Debug-only callout trigger explanation.",
       "extractionState" : "manual",
@@ -32423,6 +32603,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Browse what you copied, like pieces in a gallery."
+          }
+        }
+      }
+    },
+    "settingsFeatureContextMenusSubtitle" : {
+      "comment" : "Description of the context menu feature on the Features settings overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie ein Symbol unter seinem Menü hervorkommt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How an icon steps out from under its menu."
           }
         }
       }

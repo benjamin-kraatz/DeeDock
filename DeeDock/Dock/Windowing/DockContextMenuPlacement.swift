@@ -62,16 +62,20 @@ enum DockContextMenuPlacement {
 }
 
 extension NSMenu {
-    /// Opens this menu at the pointer for a dock tile, first publishing where the tile should hop.
+    /// Opens this menu at the pointer for a dock tile, first publishing where the tile should go.
     ///
-    /// Returns when tracking ends. The hop is published before the menu opens, so it is in place
-    /// when the tile's tracking callback marks it as the menu's owner.
+    /// Returns when tracking ends. The destination is published before the tile becomes the menu's
+    /// owner. With Slide Out, the tile becomes the owner here and the menu waits
+    /// ``DockContextMenuReveal/slideLead`` so the slide plays before the menu covers it.
     /// - Parameters:
     ///   - tile: The menu bridge view, which covers the tile's resting frame.
     ///   - interaction: The tile's dock; nil leaves the tile in place.
     ///   - event: The context click.
+    ///   - beginTracking: Reports the menu as open. The delegate's `menuWillOpen` reports it again,
+    ///     which owners must tolerate.
     @MainActor
-    func popUpContextMenu(forDockTile tile: NSView, interaction: DockInteraction?, event: NSEvent) {
+    func popUpContextMenu(forDockTile tile: NSView, interaction: DockInteraction?, event: NSEvent,
+                          beginTracking: () -> Void) {
         if let interaction, let window = tile.window, let screen = window.screen {
             let frame = window.convertToScreen(tile.convert(tile.bounds, to: nil))
             let pointer = window.convertPoint(toScreen: event.locationInWindow)
@@ -79,6 +83,18 @@ extension NSMenu {
                                                                   screen: screen.visibleFrame)
             let hopped = DockContextMenuPlacement.hoppedFrame(tile: frame, menu: menu, edge: interaction.layout.edge)
             interaction.contextMenuOffset = DockContextMenuPlacement.offset(from: frame, to: hopped)
+            let reveal = interaction.contextMenuReveal.effective(
+                reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
+            if reveal == .slideOut {
+                beginTracking()
+                // Event-tracking mode keeps SwiftUI drawing and common-mode timers firing, but it
+                // dispatches no events and no main-queue work, the same isolation NSMenu's own
+                // tracking has. The click's mouse-up stays queued for the menu.
+                let deadline = Date(timeIntervalSinceNow: DockContextMenuReveal.slideLead)
+                while Date() < deadline {
+                    RunLoop.current.run(mode: .eventTracking, before: deadline)
+                }
+            }
         }
         NSMenu.popUpContextMenu(self, with: event, for: tile)
     }

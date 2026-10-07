@@ -49,7 +49,8 @@ struct VolumeContextMenuBridge: NSViewRepresentable {
             add(.volumeHideFromDock, action: #selector(hide), symbol: "eye.slash", to: menu)
             add(.volumeManageDrives, action: #selector(settings), symbol: "gear", to: menu)
             trackedMenu = menu
-            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event)
+            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event,
+                                  beginTracking: { tracking?(true) })
             tracking?(false)
             trackedMenu = nil
         }

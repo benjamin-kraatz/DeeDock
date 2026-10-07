@@ -273,7 +273,8 @@ private struct ShelfContextMenuBridge: NSViewRepresentable {
                 to: menu
             )
             trackedMenu = menu
-            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event)
+            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event,
+                                  beginTracking: { tracking?(true) })
             trackedMenu = nil
         }
 
