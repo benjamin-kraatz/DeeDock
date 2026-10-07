@@ -151,8 +151,6 @@ struct DockSurfaceView: View {
                     )
                     .modifier(DockContextMenuSpotlight(
                         role: menuTarget == nil ? .none : (menuTarget == slot.target ? .owner : .receded),
-                        edge: layout.edge,
-                        reduceMotion: reduceMotion,
                         reduceTransparency: reduceTransparency
                     ))
                     // A menu owner keeps its line-icon glow after the pointer moves onto the menu.
@@ -200,7 +198,8 @@ struct DockSurfaceView: View {
                 frames: interaction.renderedFrames,
                 hovered: hoveredID,
                 selected: keyboardFocus ? selectedTarget : nil,
-                enabled: showsLabel,
+                // The open menu already names its tile.
+                enabled: showsLabel && menuTarget == nil,
                 layout: layout,
                 viewport: viewport,
                 interaction: interaction,
