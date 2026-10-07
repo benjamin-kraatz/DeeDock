@@ -70,4 +70,23 @@ import Testing
         let decoded = try JSONDecoder().decode(DockSettingsOverrides.self, from: JSONEncoder().encode(overrides))
         #expect(decoded.launcherLineIcons == true)
     }
+
+    @Test("Line icon motion plays on hover by default, persists, and inherits per display")
+    func lineIconMotionPersistence() throws {
+        var object = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(DockSettings.defaults)) as? [String: Any])
+        object.removeValue(forKey: "lineIconMotion")
+        let legacy = try JSONSerialization.data(withJSONObject: object)
+        #expect(try JSONDecoder().decode(DockSettings.self, from: legacy).lineIconMotion == .hover)
+
+        var shared = DockSettings.defaults
+        shared.lineIconMotion = .off
+        #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(shared)).lineIconMotion == .off)
+        var overrides = DockSettingsOverrides()
+        #expect(overrides.resolving(shared).lineIconMotion == .off)
+        overrides.set(.lineIconMotion, from: .defaults)
+        #expect(overrides.contains(.lineIconMotion))
+        #expect(overrides.resolving(shared).lineIconMotion == .hover)
+        let decoded = try JSONDecoder().decode(DockSettingsOverrides.self, from: JSONEncoder().encode(overrides))
+        #expect(decoded.lineIconMotion == .hover)
+    }
 }

@@ -11,6 +11,19 @@ nonisolated struct LineIconGlyph: Equatable, @unchecked Sendable {
     let id: String
     let stroke: CGPath?
     let fill: CGPath?
+    /// The subpaths of `stroke` in catalog order, so a ``LineIconMotion`` can move each on its own.
+    let strokeParts: [CGPath]
+    /// The subpaths of `fill` in catalog order. A cutout is its own part; it stays a cutout only
+    /// while it remains inside the part it is cut from.
+    let fillParts: [CGPath]
+
+    init(id: String, stroke: CGPath?, fill: CGPath?) {
+        self.id = id
+        self.stroke = stroke
+        self.fill = fill
+        strokeParts = stroke.map(LineIconPath.subpaths) ?? []
+        fillParts = fill.map(LineIconPath.subpaths) ?? []
+    }
 
     /// Brand marks fill their whole box and read heavier than strokes, so they draw slightly smaller.
     var isFilledMark: Bool { stroke == nil }

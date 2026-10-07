@@ -1,0 +1,1865 @@
+{
+  "source": "Hand-written choreographies for the Line icon style. Format: docs/LINE-ICON-MOTIONS.md. Preview: scripts/line-icons/motion-gallery.py.",
+  "motions": {
+    "custom:launcher": {
+      "about": "The ring redraws while the dot ducks and springs back.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0, 0], [0.62, 1]]},
+        {"parts": ["f0"], "scale": [[0, 1], [0.28, 0.45], [0.74, 1, "back"]]}
+      ]
+    },
+    "custom:grok-bot": {
+      "about": "Glances to the side, leans after its eyes, then blinks twice.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s1", "s2"], "x": [[0, 0], [0.15, 1.5, "out"], [0.4, 1.5], [0.55, 0]]},
+        {"parts": ["s1", "s2"], "scaleY": [[0.6, 1], [0.66, 0.1, "in"], [0.73, 1, "out"], [0.8, 1], [0.86, 0.1, "in"], [0.93, 1, "out"]], "anchor": [12.7, 12.45]},
+        {"rotate": [[0, 0], [0.15, 4, "out"], [0.4, 4], [0.55, 0]], "anchor": [12, 19.5]}
+      ]
+    },
+    "simple-icons:cursor": {
+      "about": "Blinks like a text cursor: the dark facet drops out twice while the cube tilts.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0.12, 1], [0.15, 0, "linear"], [0.36, 0], [0.39, 1, "linear"], [0.58, 1], [0.61, 0, "linear"], [0.82, 0], [0.85, 1, "linear"]], "anchor": [12, 14.6]},
+        {"rotate": [[0, 0], [0.3, -7, "out"], [0.7, -7], [0.95, 0]]}
+      ]
+    },
+    "custom:waterfox": {
+      "about": "The waves roll through the fox while it tilts its head.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.55, 1]]},
+        {"parts": ["s2"], "draw": [[0.15, 0], [0.7, 1]]},
+        {"rotate": [[0, 0], [0.3, -6, "out"], [0.7, -6], [0.92, 0]], "anchor": [12, 21.5]}
+      ]
+    },
+    "simple-icons:zenbrowser": {
+      "about": "Breathes: the rings swell outward one after another, like a ripple on still water.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f4", "f5"], "scale": [[0, 1], [0.2, 1.22, "out"], [0.55, 1, "back"]]},
+        {"parts": ["f2", "f3"], "scale": [[0.15, 1], [0.35, 1.12, "out"], [0.7, 1, "back"]]},
+        {"parts": ["f0", "f1"], "scale": [[0.3, 1], [0.5, 1.05, "out"], [0.85, 1, "back"]]}
+      ]
+    },
+    "simple-icons:heliumbrowser": {
+      "about": "Lighter than air: floats up with a slow sway and drifts back down.",
+      "duration": 1.0,
+      "tracks": [
+        {"y": [[0, 0], [0.4, -2.6, "out"], [0.75, 0.4], [1, 0]]},
+        {"rotate": [[0, 0], [0.25, -7, "out"], [0.6, 5], [0.9, 0]]}
+      ]
+    },
+    "custom:chatgpt": {
+      "about": "Spins one full turn.",
+      "duration": 0.9,
+      "tracks": [
+        {"rotate": [[0, 0], [1, 360]], "anchor": [12, 11.6]}
+      ]
+    },
+    "lucide:hammer": {
+      "about": "Winds up, strikes, and rebounds.",
+      "duration": 0.7,
+      "tracks": [
+        {"rotate": [[0, 0], [0.3, -22, "out"], [0.48, 10, "in"], [0.62, -4, "out"], [0.82, 0]], "anchor": [4, 20]}
+      ]
+    },
+    "custom:t3-code": {
+      "about": "Writes itself: the bar, the stem, then the 3.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0, 0], [0.22, 1, "out"]]},
+        {"parts": ["s1"], "draw": [[0.15, 0], [0.45, 1]]},
+        {"parts": ["s2"], "draw": [[0.35, 0], [0.95, 1]]}
+      ]
+    },
+    "simple-icons:claude": {
+      "about": "Twists and tightens, then blooms back open.",
+      "duration": 0.9,
+      "tracks": [
+        {"rotate": [[0, 0], [0.3, -40, "out"], [0.85, 0, "back"]]},
+        {"scale": [[0, 1], [0.3, 0.8, "out"], [0.7, 1.08, "out"], [0.95, 1]]}
+      ]
+    },
+    "simple-icons:ghostty": {
+      "about": "Floats up with a sway while its prompt cursor blinks.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f2"], "scale": [[0.18, 1], [0.22, 0, "linear"], [0.4, 0], [0.44, 1, "linear"], [0.6, 1], [0.64, 0, "linear"], [0.8, 0], [0.84, 1, "linear"]], "anchor": [15.85, 9.6]},
+        {"y": [[0, 0], [0.3, -2, "out"], [0.6, 0.6], [0.8, -0.4], [1, 0]]},
+        {"rotate": [[0, 0], [0.3, -5, "out"], [0.6, 4], [0.85, 0]]}
+      ]
+    },
+    "simple-icons:linear": {
+      "about": "The stripes fold away and pop back out one by one.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f0"], "scale": [[0, 1], [0.18, 0.94, "out"], [0.45, 1, "back"]], "anchor": [13.5, 10.5]},
+        {"parts": ["f1"], "scale": [[0, 1], [0.15, 0, "in"], [0.28, 0], [0.55, 1, "back"]], "anchor": [9.65, 14.35]},
+        {"parts": ["f2"], "scale": [[0, 1], [0.15, 0, "in"], [0.4, 0], [0.67, 1, "back"]], "anchor": [7.4, 16.6]},
+        {"parts": ["f3"], "scale": [[0, 1], [0.15, 0, "in"], [0.52, 0], [0.8, 1, "back"]], "anchor": [5.05, 18.95]}
+      ]
+    },
+    "custom:finder": {
+      "about": "Tilts its head, blinks twice, and smiles wider.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["s2", "s3"], "scaleY": [[0.12, 1], [0.19, 0.1, "in"], [0.28, 1, "out"], [0.4, 1], [0.47, 0.1, "in"], [0.56, 1, "out"]], "anchor": [12, 8.75]},
+        {"parts": ["s4"], "scaleY": [[0, 1], [0.3, 1.8, "out"], [0.7, 1.8], [0.9, 1]], "anchor": [12, 16]},
+        {"rotate": [[0, 0], [0.3, -6, "out"], [0.7, -6], [0.92, 0]]}
+      ]
+    },
+    "simple-icons:whatsapp": {
+      "about": "The handset rings inside the bubble.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f0"], "rotate": [[0, 0], [0.1, -14], [0.22, 12], [0.34, -10], [0.46, 8], [0.58, -5], [0.72, 0]], "anchor": [12, 12]},
+        {"scale": [[0, 1], [0.15, 1.06, "out"], [0.7, 1.06], [0.9, 1]]}
+      ]
+    },
+    "lucide:folder": {
+      "about": "Hops and lands with a small squash.",
+      "duration": 0.7,
+      "tracks": [
+        {"scaleY": [[0.5, 1], [0.6, 0.9, "out"], [0.76, 1]], "anchor": [12, 20]},
+        {"y": [[0, 0], [0.3, -2.2, "out"], [0.55, 0, "in"], [0.7, -0.6, "out"], [0.85, 0, "in"]]}
+      ]
+    },
+    "lucide:inbox": {
+      "about": "Catches a drop: the tray dips while its lip redraws.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0, 0], [0.5, 1, "out"]]},
+        {"y": [[0, 0], [0.22, 1.6, "in"], [0.46, -0.8, "out"], [0.66, 0.3], [0.82, 0]]}
+      ]
+    },
+    "lucide:bell": {
+      "about": "Swings from its crown; the clapper lags and swings wider.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s1"], "rotate": [[0, 0], [0.12, -16, "out"], [0.3, 14], [0.48, -10], [0.64, 7], [0.8, -3], [0.95, 0]], "anchor": [12, 2]},
+        {"parts": ["s0"], "rotate": [[0.06, 0], [0.2, -24, "out"], [0.38, 20], [0.56, -14], [0.72, 9], [0.86, -4], [1, 0]], "anchor": [12, 2]}
+      ]
+    },
+    "lucide:hard-drive": {
+      "about": "The divider scans across and the two lights blink in turn.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s2"], "draw": [[0, 0], [0.5, 1]]},
+        {"parts": ["s3"], "draw": [[0.08, 1], [0.1, 0, "linear"], [0.24, 0], [0.26, 1, "linear"], [0.48, 1], [0.5, 0, "linear"], [0.64, 0], [0.66, 1, "linear"]]},
+        {"parts": ["s0"], "draw": [[0.28, 1], [0.3, 0, "linear"], [0.44, 0], [0.46, 1, "linear"], [0.68, 1], [0.7, 0, "linear"], [0.84, 0], [0.86, 1, "linear"]]}
+      ]
+    },
+    "lucide:trash": {
+      "about": "The lid lifts on its hinge, then drops and rattles.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s3", "s4"], "rotate": [[0, 0], [0.3, 20, "out"], [0.55, 20], [0.75, 0, "in"], [0.84, 4, "out"], [0.93, 0, "in"]], "anchor": [21, 6]},
+        {"parts": ["s3", "s4"], "y": [[0, 0], [0.3, -1, "out"], [0.55, -1], [0.75, 0, "in"]]}
+      ]
+    },
+    "lucide:trash-2": {
+      "about": "The lid lifts on its hinge, then drops and rattles.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s3", "s4"], "rotate": [[0, 0], [0.3, 20, "out"], [0.55, 20], [0.75, 0, "in"], [0.84, 4, "out"], [0.93, 0, "in"]], "anchor": [21, 6]},
+        {"parts": ["s3", "s4"], "y": [[0, 0], [0.3, -1, "out"], [0.55, -1], [0.75, 0, "in"]]}
+      ]
+    },
+    "lucide:layers": {
+      "about": "The stack fans apart and snaps back together.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0"], "y": [[0, 0], [0.35, -2.2, "out"], [0.8, 0, "back"]]},
+        {"parts": ["s2"], "y": [[0, 0], [0.35, 2.2, "out"], [0.8, 0, "back"]]}
+      ]
+    },
+    "lucide:server": {
+      "about": "The two status lights blink in turn.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s2"], "draw": [[0.08, 1], [0.1, 0, "linear"], [0.24, 0], [0.26, 1, "linear"], [0.48, 1], [0.5, 0, "linear"], [0.64, 0], [0.66, 1, "linear"]]},
+        {"parts": ["s3"], "draw": [[0.28, 1], [0.3, 0, "linear"], [0.44, 0], [0.46, 1, "linear"], [0.68, 1], [0.7, 0, "linear"], [0.84, 0], [0.86, 1, "linear"]]}
+      ]
+    },
+    "lucide:disc": {
+      "about": "The rim redraws while the hub ducks and springs back.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0, 0], [0.7, 1]]},
+        {"parts": ["s1"], "scale": [[0, 1], [0.3, 0.4], [0.75, 1, "back"]]}
+      ]
+    },
+    "lucide:compass": {
+      "about": "The needle swings round once and settles on its bearing.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s1"], "rotate": [[0, 0], [0.55, 385], [0.8, 352], [1, 360]]}
+      ]
+    },
+    "lucide:mail": {
+      "about": "Hops while the flap redraws.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0.1, 0], [0.7, 1]]},
+        {"y": [[0, 0], [0.25, -1.6, "out"], [0.5, 0, "in"], [0.62, -0.5, "out"], [0.75, 0, "in"]]}
+      ]
+    },
+    "lucide:settings": {
+      "about": "The gear turns once around its hub.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s0"], "rotate": [[0, 0], [1, 360]]}
+      ]
+    },
+    "lucide:calendar": {
+      "about": "The rings hop one after the other and the header redraws.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0", "s1"], "y": [[0, 0], [0.22, -1.6, "out"], [0.45, 0, "in"]], "spread": 0.2},
+        {"parts": ["s3"], "draw": [[0.2, 0], [0.75, 1]]}
+      ]
+    },
+    "lucide:music": {
+      "about": "Sways to a beat while each note head pulses.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1"], "scale": [[0.1, 1], [0.3, 1.25, "out"], [0.55, 1]], "anchor": [6, 18]},
+        {"parts": ["s2"], "scale": [[0.25, 1], [0.45, 1.25, "out"], [0.7, 1]], "anchor": [18, 16]},
+        {"rotate": [[0, 0], [0.2, -8, "out"], [0.45, 6], [0.7, -3], [0.9, 0]]}
+      ]
+    },
+    "lucide:clock": {
+      "about": "The hands sweep once around the dial.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s1"], "rotate": [[0, 0], [0.92, 360]]}
+      ]
+    },
+    "lucide:history": {
+      "about": "Winds backwards one full turn.",
+      "duration": 1.0,
+      "tracks": [
+        {"rotate": [[0, 0], [0.92, -360]]}
+      ]
+    },
+    "lucide:camera": {
+      "about": "The lens snaps shut and reopens.",
+      "duration": 0.6,
+      "tracks": [
+        {"parts": ["s1"], "scale": [[0, 1], [0.25, 0.5, "in"], [0.55, 1.15, "out"], [0.85, 1]], "anchor": [12, 13]}
+      ]
+    },
+    "lucide:square-terminal": {
+      "about": "Types the prompt, then the cursor blinks.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0, 0], [0.22, 1, "out"]]},
+        {"parts": ["s1"], "draw": [[0.25, 0], [0.42, 1, "out"], [0.58, 1], [0.6, 0, "linear"], [0.76, 0], [0.78, 1, "linear"]]}
+      ]
+    },
+    "lucide:message-circle": {
+      "about": "Shrinks toward its tail and pops back.",
+      "duration": 0.6,
+      "tracks": [
+        {"scale": [[0, 1], [0.25, 0.8, "out"], [0.6, 1.08, "out"], [0.88, 1]], "anchor": [3, 21]}
+      ]
+    },
+    "lucide:phone": {
+      "about": "Rings.",
+      "duration": 0.8,
+      "tracks": [
+        {"rotate": [[0, 0], [0.1, -14], [0.22, 12], [0.34, -10], [0.46, 8], [0.58, -5], [0.72, 0]]}
+      ]
+    },
+    "lucide:video": {
+      "about": "The lens hood kicks out and springs back.",
+      "duration": 0.6,
+      "tracks": [
+        {"parts": ["s0"], "x": [[0, 0], [0.3, 1.6, "out"], [0.7, 0, "back"]]},
+        {"scale": [[0, 1], [0.3, 1.06, "out"], [0.75, 1]]}
+      ]
+    },
+    "lucide:map": {
+      "about": "Folds in and springs open while the creases redraw.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1", "s2"], "draw": [[0.2, 0], [0.7, 1]], "spread": 0.15},
+        {"scaleX": [[0, 1], [0.3, 0.7, "out"], [0.72, 1, "back"]]}
+      ]
+    },
+    "lucide:house": {
+      "about": "Hops while the door redraws.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0.15, 0], [0.75, 1]]},
+        {"y": [[0, 0], [0.25, -1.6, "out"], [0.5, 0, "in"], [0.62, -0.5, "out"], [0.75, 0, "in"]]}
+      ]
+    },
+    "lucide:book-open": {
+      "about": "The pages close a little and flap open.",
+      "duration": 0.7,
+      "tracks": [
+        {"scaleX": [[0, 1], [0.3, 0.72, "out"], [0.65, 1.06, "out"], [0.9, 1]]}
+      ]
+    },
+    "lucide:notebook-pen": {
+      "about": "The pen scribbles.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s5"], "x": [[0, 0], [0.2, -1.5], [0.4, 1], [0.6, -1], [0.82, 0]]},
+        {"parts": ["s5"], "y": [[0, 0], [0.2, 1.5], [0.4, -0.5], [0.6, 1], [0.82, 0]]}
+      ]
+    },
+    "lucide:list-checks": {
+      "about": "Ticks both boxes, then writes the lines.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s4"], "draw": [[0, 0], [0.3, 1, "out"]]},
+        {"parts": ["s3"], "draw": [[0.25, 0], [0.55, 1, "out"]]},
+        {"parts": ["s0", "s1", "s2"], "draw": [[0.15, 0], [0.55, 1, "out"]], "spread": 0.35}
+      ]
+    },
+    "lucide:calculator": {
+      "about": "The keys press in turn and the display writes the result.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s5", "s4", "s3", "s7", "s6", "s9", "s8"], "draw": [[0, 1], [0.02, 0, "linear"], [0.12, 0], [0.14, 1, "linear"]], "spread": 0.5},
+        {"parts": ["s1"], "draw": [[0.6, 0], [0.92, 1, "out"]]}
+      ]
+    },
+    "lucide:cloud-sun": {
+      "about": "The rays come out one by one while the cloud drifts.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s1", "s0", "s3", "s2"], "draw": [[0, 0], [0.3, 1, "out"]], "spread": 0.4},
+        {"parts": ["s5"], "x": [[0, 0], [0.45, 1.5], [0.95, 0]]}
+      ]
+    },
+    "lucide:locate": {
+      "about": "The ring tightens and springs back while the ticks redraw.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s4"], "scale": [[0, 1], [0.3, 0.72, "out"], [0.72, 1, "back"]]},
+        {"parts": ["s2", "s1", "s3", "s0"], "draw": [[0.15, 0], [0.45, 1, "out"]], "spread": 0.35}
+      ]
+    },
+    "lucide:podcast": {
+      "about": "Broadcasts: the inner waves draw, then the outer ones.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s4", "s1"], "draw": [[0, 0], [0.4, 1, "out"]]},
+        {"parts": ["s2", "s3"], "draw": [[0.25, 0], [0.75, 1, "out"]]}
+      ]
+    },
+    "lucide:tv": {
+      "about": "The screen flicks on and the antenna quivers.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1"], "scaleY": [[0, 1], [0.12, 0.06, "in"], [0.34, 1, "out"]], "anchor": [12, 14.5]},
+        {"parts": ["s0"], "rotate": [[0.15, 0], [0.32, -12, "out"], [0.52, 10], [0.7, -5], [0.88, 0]], "anchor": [12, 7]}
+      ]
+    },
+    "lucide:circle-play": {
+      "about": "The ring redraws while the play arrow ducks and springs back.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.7, 1]]},
+        {"parts": ["s0"], "scale": [[0, 1], [0.28, 0.5], [0.72, 1, "back"]]}
+      ]
+    },
+    "lucide:presentation": {
+      "about": "The screen rolls down and the stand unfolds.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "scaleY": [[0, 0.1], [0.5, 1, "out"]], "anchor": [12, 3]},
+        {"parts": ["s2"], "draw": [[0.4, 0], [0.85, 1, "out"]]}
+      ]
+    },
+    "lucide:chart-column-big": {
+      "about": "The bars grow from the axis.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s2"], "scaleY": [[0, 0.1], [0.5, 1, "back"]], "anchor": [9, 17]},
+        {"parts": ["s1"], "scaleY": [[0.18, 0.1], [0.7, 1, "back"]], "anchor": [17, 17]}
+      ]
+    },
+    "lucide:file-text": {
+      "about": "Writes its three lines.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s2", "s3", "s4"], "erase": [[0, 1], [0.4, 0, "out"]], "spread": 0.45}
+      ]
+    },
+    "lucide:file-pen-line": {
+      "about": "The pen wags and underlines.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0"], "rotate": [[0, 0], [0.2, -10], [0.4, 8], [0.6, -5], [0.82, 0]], "anchor": [13.5, 18]},
+        {"parts": ["s3"], "draw": [[0.1, 0], [0.6, 1]]}
+      ]
+    },
+    "lucide:file-image": {
+      "about": "The sun pops and the hills redraw.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s2"], "scale": [[0, 1], [0.25, 0.4], [0.68, 1, "back"]], "anchor": [10, 12]},
+        {"parts": ["s3"], "draw": [[0.1, 0], [0.7, 1]]}
+      ]
+    },
+    "lucide:search": {
+      "about": "Sweeps side to side, looking.",
+      "duration": 0.8,
+      "tracks": [
+        {"rotate": [[0, 0], [0.28, -20, "out"], [0.58, 15], [0.85, 0]], "anchor": [11, 11]}
+      ]
+    },
+    "lucide:zoom-in": {
+      "about": "Sweeps side to side while the plus pops.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s2", "s3"], "scale": [[0, 1], [0.3, 0.4], [0.7, 1, "back"]], "anchor": [11, 11]},
+        {"rotate": [[0, 0], [0.28, -20, "out"], [0.58, 15], [0.85, 0]], "anchor": [11, 11]}
+      ]
+    },
+    "lucide:lightbulb": {
+      "about": "Flicks on: the bulb swells and the base redraws.",
+      "duration": 0.7,
+      "tracks": [
+        {"parts": ["s0"], "scale": [[0, 1], [0.2, 0.9], [0.5, 1.12, "out"], [0.85, 1]], "anchor": [12, 14]},
+        {"parts": ["s1", "s2"], "draw": [[0.1, 0], [0.5, 1, "out"]], "spread": 0.2}
+      ]
+    },
+    "lucide:wifi": {
+      "about": "The waves spread out from the dot.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s3", "s2", "s1"], "scale": [[0, 0.3], [0.45, 1, "back"]], "spread": 0.4, "anchor": [12, 20]}
+      ]
+    },
+    "lucide:sparkles": {
+      "about": "The big spark tightens and blooms while the small ones twinkle.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s0"], "scale": [[0, 1], [0.3, 0.75], [0.7, 1, "back"]]},
+        {"parts": ["s1", "s2"], "scale": [[0.1, 1], [0.3, 0], [0.62, 1, "back"]], "anchor": [20, 4]},
+        {"parts": ["s3"], "scale": [[0.3, 1], [0.5, 0], [0.82, 1, "back"]], "anchor": [4, 20]}
+      ]
+    },
+    "lucide:audio-lines": {
+      "about": "The bars pulse in a wave.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": "strokes", "scaleY": [[0, 1], [0.18, 0.4], [0.38, 1.3], [0.58, 1]], "spread": 0.4, "anchor": [12, 11.6]}
+      ]
+    },
+    "lucide:audio-waveform": {
+      "about": "The waveform plays through.",
+      "duration": 0.85,
+      "tracks": [
+        {"draw": [[0, 0], [0.9, 1]]}
+      ]
+    },
+    "lucide:activity": {
+      "about": "The pulse runs through.",
+      "duration": 0.85,
+      "tracks": [
+        {"draw": [[0, 0], [0.9, 1]]}
+      ]
+    },
+    "lucide:gauge": {
+      "about": "The needle drops, overshoots, and settles.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s0"], "rotate": [[0, 0], [0.25, -80, "out"], [0.6, 25], [0.8, -8], [0.95, 0]], "anchor": [12, 14]}
+      ]
+    },
+    "lucide:key-round": {
+      "about": "Turns in the lock and back.",
+      "duration": 0.75,
+      "tracks": [
+        {"rotate": [[0, 0], [0.3, -28, "out"], [0.58, 10], [0.82, 0]], "anchor": [16.5, 7.5]}
+      ]
+    },
+    "lucide:key": {
+      "about": "Turns in the lock and back.",
+      "duration": 0.75,
+      "tracks": [
+        {"rotate": [[0, 0], [0.3, -28, "out"], [0.58, 10], [0.82, 0]], "anchor": [15.5, 7.5]}
+      ]
+    },
+    "lucide:send": {
+      "about": "Flies off to the upper right and returns from the lower left.",
+      "duration": 0.9,
+      "tracks": [
+        {"scale": [[0.3, 1], [0.4, 0.3, "in"], [0.44, 0.3], [0.82, 1, "out"]]},
+        {"x": [[0, 0], [0.4, 6, "in"], [0.44, -6, "linear"], [0.82, 0, "out"]]},
+        {"y": [[0, 0], [0.4, -6, "in"], [0.44, 6, "linear"], [0.82, 0, "out"]]}
+      ]
+    },
+    "lucide:plane": {
+      "about": "Flies off to the upper right and returns from the lower left.",
+      "duration": 0.9,
+      "tracks": [
+        {"scale": [[0.3, 1], [0.4, 0.3, "in"], [0.44, 0.3], [0.82, 1, "out"]]},
+        {"x": [[0, 0], [0.4, 6, "in"], [0.44, -6, "linear"], [0.82, 0, "out"]]},
+        {"y": [[0, 0], [0.4, -6, "in"], [0.44, 6, "linear"], [0.82, 0, "out"]]}
+      ]
+    },
+    "lucide:cpu": {
+      "about": "The pins light up around the chip while the core pulses.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["s11", "s1", "s3", "s9", "s7", "s8", "s2", "s0", "s10", "s5", "s4", "s6"], "draw": [[0, 0], [0.25, 1, "out"]], "spread": 0.6},
+        {"parts": ["s13"], "scale": [[0, 1], [0.3, 0.6], [0.72, 1, "back"]]}
+      ]
+    },
+    "lucide:printer": {
+      "about": "A page feeds out.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s2"], "scaleY": [[0, 0.15], [0.65, 1, "out"]], "anchor": [12, 14]}
+      ]
+    },
+    "lucide:archive": {
+      "about": "The lid lifts and drops.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0"], "y": [[0, 0], [0.3, -2, "out"], [0.55, -2], [0.75, 0, "in"], [0.84, -0.5, "out"], [0.93, 0, "in"]]}
+      ]
+    },
+    "lucide:scan": {
+      "about": "The corners close in and spring back.",
+      "duration": 0.65,
+      "tracks": [
+        {"scale": [[0, 1], [0.3, 0.78, "out"], [0.75, 1, "back"]]}
+      ]
+    },
+    "lucide:layout-grid": {
+      "about": "The four tiles squeeze together in turn and spring apart.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0", "s1", "s2", "s3"], "scale": [[0, 1], [0.25, 0.78, "out"], [0.6, 1, "back"]], "spread": 0.3}
+      ]
+    },
+    "lucide:layout-dashboard": {
+      "about": "The four panels squeeze together in turn and spring apart.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0", "s1", "s2", "s3"], "scale": [[0, 1], [0.25, 0.78, "out"], [0.6, 1, "back"]], "spread": 0.3}
+      ]
+    },
+    "lucide:guitar": {
+      "about": "Strums: a quick shake that dies away.",
+      "duration": 0.8,
+      "tracks": [
+        {"rotate": [[0, 0], [0.15, -8], [0.35, 6], [0.55, -4], [0.75, 2], [0.9, 0]], "anchor": [9, 15]}
+      ]
+    },
+    "lucide:bot": {
+      "about": "Blinks twice while its antenna quivers.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s4", "s5"], "scaleY": [[0.12, 1], [0.19, 0.1, "in"], [0.28, 1, "out"], [0.4, 1], [0.47, 0.1, "in"], [0.56, 1, "out"]], "anchor": [12, 14]},
+        {"parts": ["s0"], "rotate": [[0, 0], [0.2, -15, "out"], [0.45, 12], [0.7, -6], [0.9, 0]], "anchor": [12, 8]}
+      ]
+    },
+    "lucide:circle-help": {
+      "about": "The question mark wags.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1", "s2"], "rotate": [[0, 0], [0.2, -15, "out"], [0.45, 12], [0.7, -6], [0.9, 0]]}
+      ]
+    },
+    "lucide:clapperboard": {
+      "about": "The arm lifts and claps shut.",
+      "duration": 0.7,
+      "tracks": [
+        {"parts": ["s0", "s1", "s3"], "rotate": [[0, 0], [0.32, -18, "out"], [0.52, 0, "in"], [0.62, -5, "out"], [0.74, 0, "in"]], "anchor": [3, 11]}
+      ]
+    },
+    "lucide:chess-knight": {
+      "about": "Rears back and nods.",
+      "duration": 0.75,
+      "tracks": [
+        {"rotate": [[0, 0], [0.25, -10, "out"], [0.52, 6], [0.78, 0]], "anchor": [12, 20]}
+      ]
+    },
+    "lucide:bluetooth": {
+      "about": "Draws its rune in one stroke.",
+      "duration": 0.8,
+      "tracks": [
+        {"draw": [[0, 0], [0.9, 1]]}
+      ]
+    },
+    "custom:macs-fan-control": {
+      "about": "The fan spins up for two turns.",
+      "duration": 1.1,
+      "tracks": [
+        {"parts": ["s2", "s3", "s4", "s5"], "rotate": [[0, 0], [1, 720]]}
+      ]
+    },
+    "custom:wispr-flow": {
+      "about": "The bars bounce like a voice level.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s0", "s4"], "scaleY": [[0, 1], [0.25, 0.5], [0.5, 1], [0.75, 0.7], [0.95, 1]], "anchor": [12, 12]},
+        {"parts": ["s1", "s3"], "scaleY": [[0.05, 1], [0.3, 1.5], [0.55, 0.6], [0.8, 1.2], [1, 1]], "anchor": [12, 18.5]},
+        {"parts": ["s2"], "scaleY": [[0, 1], [0.2, 1.6], [0.45, 0.6], [0.7, 1.3], [0.95, 1]], "anchor": [12, 12.5]}
+      ]
+    },
+    "custom:codexbar": {
+      "about": "Types the prompt, then the cursor blinks.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.22, 1, "out"]]},
+        {"parts": ["s2"], "draw": [[0.25, 0], [0.42, 1, "out"], [0.58, 1], [0.6, 0, "linear"], [0.76, 0], [0.78, 1, "linear"]]}
+      ]
+    },
+    "custom:visual-studio-code": {
+      "about": "The frame redraws while the bracket kicks left and springs back.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0, 0], [0.7, 1]]},
+        {"parts": ["s1"], "x": [[0, 0], [0.28, -1.8, "out"], [0.62, 0, "back"]]}
+      ]
+    },
+    "custom:slack": {
+      "about": "The eight pills pinch toward the middle in a wave.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": "strokes", "scale": [[0, 1], [0.22, 0.7, "out"], [0.55, 1, "back"]], "spread": 0.4}
+      ]
+    },
+    "custom:iina": {
+      "about": "The play arrow ducks and springs back.",
+      "duration": 0.6,
+      "tracks": [
+        {"parts": ["s1"], "scale": [[0, 1], [0.28, 0.5], [0.75, 1, "back"]], "anchor": [11.5, 12]}
+      ]
+    },
+    "custom:kitty": {
+      "about": "Tilts its head and blinks twice.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s1", "s2"], "scaleY": [[0.12, 1], [0.19, 0.1, "in"], [0.28, 1, "out"], [0.4, 1], [0.47, 0.1, "in"], [0.56, 1, "out"]], "anchor": [12, 12.75]},
+        {"rotate": [[0, 0], [0.3, 7, "out"], [0.7, 7], [0.92, 0]], "anchor": [12, 20]}
+      ]
+    },
+    "custom:bear": {
+      "about": "Blinks twice and nods.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f0", "f1"], "scaleY": [[0.12, 1], [0.19, 0.1, "in"], [0.28, 1, "out"], [0.4, 1], [0.47, 0.1, "in"], [0.56, 1, "out"]], "anchor": [12, 12]},
+        {"y": [[0.55, 0], [0.68, 1.2, "out"], [0.85, 0]]}
+      ]
+    },
+    "custom:fantastical": {
+      "about": "The rings hop and the days ripple.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s2", "s3"], "y": [[0, 0], [0.2, -1.6, "out"], [0.42, 0, "in"]], "spread": 0.15},
+        {"parts": "fills", "y": [[0.1, 0], [0.22, -1.2, "out"], [0.4, 0, "in"]], "spread": 0.5}
+      ]
+    },
+    "custom:tableplus": {
+      "about": "The grid redraws and the plus spins.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1", "s2"], "draw": [[0, 0], [0.5, 1]], "spread": 0.2},
+        {"parts": ["s3", "s4"], "rotate": [[0, 0], [0.8, 360]], "anchor": [15, 15.5]}
+      ]
+    },
+    "simple-icons:spotify": {
+      "about": "The three sound waves pinch in and spring out, top to bottom.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f3", "f2", "f1"], "scaleX": [[0, 1], [0.25, 0.3, "out"], [0.6, 1, "back"]], "spread": 0.3}
+      ]
+    },
+    "simple-icons:discord": {
+      "about": "Tilts its head and blinks twice.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["f1", "f2"], "scaleY": [[0.12, 1], [0.19, 0.1, "in"], [0.28, 1, "out"], [0.4, 1], [0.47, 0.1, "in"], [0.56, 1, "out"]], "anchor": [12, 12.9]},
+        {"rotate": [[0, 0], [0.3, -8, "out"], [0.7, -8], [0.92, 0]]}
+      ]
+    },
+    "simple-icons:figma": {
+      "about": "The five shapes pop one after another.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f2", "f3"], "scale": [[0, 1], [0.15, 0.6, "out"], [0.42, 1, "back"]], "anchor": [8.2, 4.5]},
+        {"parts": ["f0", "f1"], "scale": [[0.12, 1], [0.27, 0.6, "out"], [0.54, 1, "back"]], "anchor": [15.8, 4.5]},
+        {"parts": ["f4", "f5"], "scale": [[0.24, 1], [0.39, 0.6, "out"], [0.66, 1, "back"]], "anchor": [8.2, 12]},
+        {"parts": ["f8", "f9"], "scale": [[0.36, 1], [0.51, 0.6, "out"], [0.78, 1, "back"]], "anchor": [15.8, 12]},
+        {"parts": ["f6", "f7"], "scale": [[0.48, 1], [0.63, 0.6, "out"], [0.9, 1, "back"]], "anchor": [8.2, 19.5]}
+      ]
+    },
+    "simple-icons:youtube": {
+      "about": "The play arrow ducks and springs back.",
+      "duration": 0.6,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0, 1], [0.28, 0.5], [0.75, 1, "back"]]},
+        {"scale": [[0, 1], [0.28, 1.05, "out"], [0.75, 1]]}
+      ]
+    },
+    "simple-icons:googlechrome": {
+      "about": "Spins one full turn.",
+      "duration": 0.9,
+      "tracks": [
+        {"rotate": [[0, 0], [1, 360]]}
+      ]
+    },
+    "simple-icons:telegram": {
+      "about": "The paper plane pulls back and darts forward.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "x": [[0, 0], [0.25, -2, "out"], [0.6, 1.5], [0.88, 0]]},
+        {"parts": ["f1"], "y": [[0, 0], [0.25, 2, "out"], [0.6, -1.5], [0.88, 0]]}
+      ]
+    },
+    "simple-icons:zoom": {
+      "about": "The letters hop in turn.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f0"], "y": [[0, 0], [0.15, -2.5, "out"], [0.35, 0, "in"]]},
+        {"parts": ["f4", "f5"], "y": [[0.15, 0], [0.3, -2.5, "out"], [0.5, 0, "in"]]},
+        {"parts": ["f2", "f3"], "y": [[0.3, 0], [0.45, -2.5, "out"], [0.65, 0, "in"]]},
+        {"parts": ["f1"], "y": [[0.45, 0], [0.6, -2.5, "out"], [0.8, 0, "in"]]}
+      ]
+    },
+    "simple-icons:1password": {
+      "about": "The keyhole turns a quarter and back.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f1"], "rotate": [[0, 0], [0.4, 90], [0.6, 90], [0.95, 0]]}
+      ]
+    },
+    "simple-icons:docker": {
+      "about": "The containers hop in a wave while the whale bobs.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f8", "f7", "f4", "f6", "f3", "f5", "f2", "f1", "f0"], "y": [[0, 0], [0.12, -2, "out"], [0.32, 0, "in"]], "spread": 0.5},
+        {"parts": ["f9"], "y": [[0, 0], [0.5, 0.8], [1, 0]]}
+      ]
+    },
+    "simple-icons:dropbox": {
+      "about": "The five flaps pinch in and spring out in turn.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": "fills", "scale": [[0, 1], [0.2, 0.75, "out"], [0.5, 1, "back"]], "spread": 0.4}
+      ]
+    },
+    "simple-icons:applemusic": {
+      "about": "The note sways to a beat.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "rotate": [[0, 0], [0.2, -10, "out"], [0.45, 8], [0.7, -4], [0.9, 0]], "anchor": [11, 12]}
+      ]
+    },
+    "simple-icons:vlcmediaplayer": {
+      "about": "The cone rocks on its base.",
+      "duration": 0.8,
+      "tracks": [
+        {"rotate": [[0, 0], [0.2, -10, "out"], [0.45, 8], [0.7, -4], [0.9, 0]], "anchor": [12, 24]}
+      ]
+    },
+    "simple-icons:github": {
+      "about": "The cat perks up and settles.",
+      "duration": 0.7,
+      "tracks": [
+        {"scaleY": [[0, 1], [0.25, 1.12, "out"], [0.5, 0.96], [0.75, 1]], "anchor": [12, 23.8]},
+        {"rotate": [[0, 0], [0.25, -6, "out"], [0.55, 4], [0.8, 0]], "anchor": [12, 23.8]}
+      ]
+    },
+    "simple-icons:notion": {
+      "about": "The N rises onto the page.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f2"], "scaleY": [[0, 0], [0.6, 1, "back"]], "anchor": [13.7, 20]},
+        {"parts": ["f0"], "y": [[0.3, 0], [0.5, -1, "out"], [0.8, 0, "back"]]}
+      ]
+    },
+    "simple-icons:obsidian": {
+      "about": "The facets of the crystal catch the light in turn.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f3", "f0", "f2", "f1"], "scale": [[0, 1], [0.18, 0.86, "out"], [0.5, 1, "back"]], "spread": 0.45}
+      ]
+    },
+    "simple-icons:arc": {
+      "about": "Swings like a pendulum from its top.",
+      "duration": 0.9,
+      "tracks": [
+        {"rotate": [[0, 0], [0.2, -8, "out"], [0.45, 6], [0.7, -3], [0.9, 0]], "anchor": [12, 2]}
+      ]
+    },
+    "simple-icons:brave": {
+      "about": "The shield raises and drops back.",
+      "duration": 0.75,
+      "tracks": [
+        {"y": [[0, 0], [0.3, -2, "out"], [0.62, 0, "in"], [0.78, -0.5, "out"], [0.95, 0, "in"]]},
+        {"parts": ["f1"], "scale": [[0.3, 1], [0.5, 1.3, "out"], [0.85, 1]], "anchor": [12, 17]}
+      ]
+    },
+    "simple-icons:steam": {
+      "about": "The piston pushes toward the valve and slides back.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "x": [[0, 0], [0.35, 2.2], [0.75, 0, "back"]]},
+        {"parts": ["f1"], "y": [[0, 0], [0.35, -2.2], [0.75, 0, "back"]]}
+      ]
+    },
+    "simple-icons:firefox": {
+      "about": "The fox shakes its tail.",
+      "duration": 0.8,
+      "tracks": [
+        {"rotate": [[0, 0], [0.2, 12, "out"], [0.45, -9], [0.7, 4], [0.9, 0]]}
+      ]
+    },
+    "simple-icons:raycast": {
+      "about": "The rays cast out while the corner points sparkle.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f0", "f1", "f5", "f6"], "x": [[0, 0], [0.3, -1.6, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f0", "f1", "f5", "f6"], "y": [[0, 0], [0.3, 1.6, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f3"], "scale": [[0.1, 1], [0.3, 0, "in"], [0.6, 1, "back"]], "anchor": [6.7, 6.7]},
+        {"parts": ["f4"], "scale": [[0.2, 1], [0.4, 0, "in"], [0.7, 1, "back"]], "anchor": [17.3, 17.3]}
+      ]
+    },
+    "simple-icons:perplexity": {
+      "about": "The shards fold in and unfold one by one.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["f1", "f2", "f3", "f6", "f4", "f5"], "scale": [[0, 1], [0.15, 0.4, "out"], [0.5, 1, "back"]], "spread": 0.45}
+      ]
+    },
+    "simple-icons:anthropic": {
+      "about": "The A pops, then its slanted stroke follows.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f1", "f2"], "scale": [[0, 1], [0.2, 0.7, "out"], [0.55, 1, "back"]], "anchor": [8.6, 12]},
+        {"parts": ["f0"], "scale": [[0.15, 1], [0.35, 0.7, "out"], [0.7, 1, "back"]], "anchor": [18.8, 12]}
+      ]
+    },
+    "simple-icons:tailscale": {
+      "about": "A pulse spreads from the center dot across the grid.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["f2"], "scale": [[0, 1], [0.15, 1.35, "out"], [0.45, 1, "back"]]},
+        {"parts": ["f9"], "scale": [[0.15, 1], [0.3, 1.35, "out"], [0.6, 1, "back"]], "anchor": [3, 12]},
+        {"parts": ["f0"], "scale": [[0.15, 1], [0.3, 1.35, "out"], [0.6, 1, "back"]], "anchor": [21, 12]},
+        {"parts": ["f10", "f11"], "scale": [[0.15, 1], [0.3, 1.35, "out"], [0.6, 1, "back"]], "anchor": [12, 3]},
+        {"parts": ["f1"], "scale": [[0.15, 1], [0.3, 1.35, "out"], [0.6, 1, "back"]], "anchor": [12, 21]},
+        {"parts": ["f12", "f13"], "scale": [[0.3, 1], [0.45, 1.35, "out"], [0.75, 1, "back"]], "anchor": [3, 3]},
+        {"parts": ["f3", "f4"], "scale": [[0.3, 1], [0.45, 1.35, "out"], [0.75, 1, "back"]], "anchor": [21, 3]},
+        {"parts": ["f5", "f6"], "scale": [[0.3, 1], [0.45, 1.35, "out"], [0.75, 1, "back"]], "anchor": [3, 21]},
+        {"parts": ["f7", "f8"], "scale": [[0.3, 1], [0.45, 1.35, "out"], [0.75, 1, "back"]], "anchor": [21, 21]}
+      ]
+    },
+    "simple-icons:bitwarden": {
+      "about": "The shield's half folds shut and opens again.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "scaleX": [[0, 1], [0.32, 0, "in"], [0.75, 1, "back"]]},
+        {"y": [[0, 0], [0.3, -1.2, "out"], [0.65, 0, "in"]]}
+      ]
+    },
+    "simple-icons:insomnia": {
+      "about": "The moon shrinks and swells.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "scale": [[0, 1], [0.3, 0.6], [0.72, 1, "back"]]}
+      ]
+    },
+    "simple-icons:iterm2": {
+      "about": "The prompt nudges forward and the cursor blinks.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["f4"], "x": [[0, 0], [0.15, 1, "out"], [0.4, 0]]},
+        {"parts": ["f3"], "scale": [[0.1, 1], [0.13, 0, "linear"], [0.33, 0], [0.36, 1, "linear"], [0.56, 1], [0.59, 0, "linear"], [0.79, 0], [0.82, 1, "linear"]], "anchor": [9.3, 7.45]}
+      ]
+    },
+    "simple-icons:warp": {
+      "about": "The two blades slide apart and snap together.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "x": [[0, 0], [0.3, 1.6, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f1"], "x": [[0, 0], [0.3, -1.6, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:alacritty": {
+      "about": "The cursor blinks.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0.1, 1], [0.13, 0, "linear"], [0.33, 0], [0.36, 1, "linear"], [0.56, 1], [0.59, 0, "linear"], [0.79, 0], [0.82, 1, "linear"]], "anchor": [12, 17]}
+      ]
+    },
+    "simple-icons:hyper": {
+      "about": "The prompt nudges forward and the cursor blinks.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["f1"], "x": [[0, 0], [0.15, 1.2, "out"], [0.4, 0]]},
+        {"parts": ["f0"], "scale": [[0.1, 1], [0.13, 0, "linear"], [0.33, 0], [0.36, 1, "linear"], [0.56, 1], [0.59, 0, "linear"], [0.79, 0], [0.82, 1, "linear"]], "anchor": [18.8, 18.9]}
+      ]
+    },
+    "simple-icons:intellijidea": {
+      "about": "The letters rise and the underline draws.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f1", "f2"], "scaleY": [[0, 0], [0.5, 1, "back"]], "spread": 0.15, "anchor": [12, 13.1]},
+        {"parts": ["f3"], "scaleX": [[0.35, 0], [0.75, 1, "out"]], "anchor": [2.2, 20.2]}
+      ]
+    },
+    "simple-icons:webstorm": {
+      "about": "The letters rise and the underline draws.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f2", "f1"], "scaleY": [[0, 0], [0.5, 1, "back"]], "spread": 0.15, "anchor": [12, 13.2]},
+        {"parts": ["f3"], "scaleX": [[0.35, 0], [0.75, 1, "out"]], "anchor": [2.3, 20.2]}
+      ]
+    },
+    "simple-icons:pycharm": {
+      "about": "The letters rise and the underline draws.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f2", "f0", "f4"], "scaleY": [[0, 0], [0.5, 1, "back"]], "spread": 0.15, "anchor": [12, 13.2]},
+        {"parts": ["f3"], "scaleX": [[0.35, 0], [0.75, 1, "out"]], "anchor": [2.3, 20.2]}
+      ]
+    },
+    "simple-icons:datagrip": {
+      "about": "The letters rise and the underline draws.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f2", "f3", "f1"], "scaleY": [[0, 0], [0.5, 1, "back"]], "spread": 0.15, "anchor": [12, 13.2]},
+        {"parts": ["f4"], "scaleX": [[0.35, 0], [0.75, 1, "out"]], "anchor": [2.2, 20.2]}
+      ]
+    },
+    "simple-icons:gitkraken": {
+      "about": "The kraken blinks twice.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f1", "f2"], "scaleY": [[0.12, 1], [0.19, 0.1, "in"], [0.28, 1, "out"], [0.4, 1], [0.47, 0.1, "in"], [0.56, 1, "out"]], "anchor": [12, 13.8]}
+      ]
+    },
+    "simple-icons:sourcetree": {
+      "about": "The tree sways.",
+      "duration": 0.9,
+      "tracks": [
+        {"rotate": [[0, 0], [0.2, -6, "out"], [0.45, 5], [0.7, -2], [0.9, 0]], "anchor": [12, 24]}
+      ]
+    },
+    "simple-icons:homebrew": {
+      "about": "Raises the glass.",
+      "duration": 0.8,
+      "tracks": [
+        {"rotate": [[0, 0], [0.3, -14, "out"], [0.75, 0, "back"]], "anchor": [12, 24]},
+        {"y": [[0, 0], [0.3, -1.5, "out"], [0.75, 0, "back"]]}
+      ]
+    },
+    "simple-icons:kubernetes": {
+      "about": "The helm turns once.",
+      "duration": 1.0,
+      "tracks": [
+        {"rotate": [[0, 0], [1, 360]]}
+      ]
+    },
+    "simple-icons:mongodb": {
+      "about": "The leaf sways on its stem.",
+      "duration": 0.9,
+      "tracks": [
+        {"rotate": [[0, 0], [0.2, -8, "out"], [0.45, 6], [0.7, -3], [0.9, 0]], "anchor": [12, 24]}
+      ]
+    },
+    "simple-icons:wireshark": {
+      "about": "The two fins pull apart and snap back.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f1"], "y": [[0, 0], [0.3, -1.4, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f2"], "y": [[0, 0], [0.3, 1.4, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:vivaldi": {
+      "about": "The V ducks and springs back.",
+      "duration": 0.6,
+      "tracks": [
+        {"parts": ["f2"], "scale": [[0, 1], [0.28, 0.6], [0.75, 1, "back"]], "anchor": [12, 12.9]}
+      ]
+    },
+    "simple-icons:duckduckgo": {
+      "about": "The duck blinks.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f3", "f4", "f5", "f6", "f7", "f8"], "scaleY": [[0.15, 1], [0.24, 0.1, "in"], [0.36, 1, "out"], [0.5, 1], [0.59, 0.1, "in"], [0.71, 1, "out"]], "anchor": [11, 9.2]}
+      ]
+    },
+    "custom:microsoft-edge": {
+      "about": "The wave rolls through.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s2"], "draw": [[0, 0], [0.6, 1]]},
+        {"parts": ["s1"], "draw": [[0.2, 0], [0.75, 1]]}
+      ]
+    },
+    "simple-icons:messenger": {
+      "about": "The bolt flashes twice.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0.1, 1], [0.14, 0, "linear"], [0.26, 0], [0.3, 1, "linear"], [0.42, 1], [0.46, 0, "linear"], [0.58, 0], [0.62, 1, "linear"]], "anchor": [12, 11.75]}
+      ]
+    },
+    "simple-icons:signal": {
+      "about": "A pulse runs once around the ring of dashes.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f0", "f2", "f5", "f7", "f9", "f11", "f12", "f14", "f16", "f15", "f13", "f10", "f8", "f6", "f4", "f1"], "scale": [[0, 1], [0.1, 1.3, "out"], [0.3, 1, "back"]], "spread": 0.7}
+      ]
+    },
+    "custom:microsoft-teams": {
+      "about": "The T writes itself.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.3, 1, "out"]]},
+        {"parts": ["s2"], "draw": [[0.25, 0], [0.65, 1, "out"]]}
+      ]
+    },
+    "custom:skype": {
+      "about": "The S writes itself.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.75, 1]]}
+      ]
+    },
+    "simple-icons:webex": {
+      "about": "The swirl spins once.",
+      "duration": 0.9,
+      "tracks": [
+        {"rotate": [[0, 0], [1, 360]]}
+      ]
+    },
+    "simple-icons:element": {
+      "about": "The four marks orbit once.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f1", "f2", "f3", "f4"], "rotate": [[0, 0], [1, 360]]}
+      ]
+    },
+    "simple-icons:threema": {
+      "about": "The three dots hop in turn.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1", "f0", "f2"], "y": [[0, 0], [0.12, -1.6, "out"], [0.32, 0, "in"]], "spread": 0.4}
+      ]
+    },
+    "simple-icons:wechat": {
+      "about": "Both bubbles blink.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f1", "f2"], "scaleY": [[0.1, 1], [0.18, 0.1, "in"], [0.3, 1, "out"]], "anchor": [8.7, 7.15]},
+        {"parts": ["f4", "f5"], "scaleY": [[0.35, 1], [0.43, 0.1, "in"], [0.55, 1, "out"]], "anchor": [16.8, 13.1]}
+      ]
+    },
+    "simple-icons:line": {
+      "about": "The letters hop in turn.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f3", "f2", "f1", "f0"], "y": [[0, 0], [0.12, -1.5, "out"], [0.32, 0, "in"]], "spread": 0.45}
+      ]
+    },
+    "simple-icons:bluesky": {
+      "about": "The butterfly flaps its wings.",
+      "duration": 0.9,
+      "tracks": [
+        {"scaleX": [[0, 1], [0.2, 0.45, "inOut"], [0.4, 1], [0.6, 0.55], [0.8, 1]]}
+      ]
+    },
+    "simple-icons:reddit": {
+      "about": "Blinks, then grins.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f2", "f3"], "scaleY": [[0.1, 1], [0.18, 0.1, "in"], [0.3, 1, "out"]], "anchor": [12, 13.2]},
+        {"parts": ["f4"], "scaleY": [[0.3, 1], [0.5, 1.5, "out"], [0.75, 1.5], [0.95, 1]], "anchor": [12, 15.6]}
+      ]
+    },
+    "simple-icons:twitch": {
+      "about": "Blinks twice.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f0", "f1"], "scaleY": [[0.12, 1], [0.19, 0.1, "in"], [0.28, 1, "out"], [0.4, 1], [0.47, 0.1, "in"], [0.56, 1, "out"]], "anchor": [14.8, 7.3]}
+      ]
+    },
+    "simple-icons:instagram": {
+      "about": "The lens focuses while the flash blinks.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f3", "f4"], "scale": [[0, 1], [0.25, 0.72, "out"], [0.65, 1, "back"]]},
+        {"parts": ["f2"], "scale": [[0.2, 1], [0.35, 1.7, "out"], [0.6, 1]], "anchor": [18.4, 5.55]}
+      ]
+    },
+    "simple-icons:things": {
+      "about": "The check mark pops.",
+      "duration": 0.65,
+      "tracks": [
+        {"parts": ["f3"], "scale": [[0, 1], [0.25, 0.5], [0.68, 1, "back"]], "anchor": [12.5, 10.8]}
+      ]
+    },
+    "simple-icons:ticktick": {
+      "about": "The check mark pops.",
+      "duration": 0.65,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0, 1], [0.25, 0.4], [0.68, 1, "back"]], "anchor": [14, 9.2]}
+      ]
+    },
+    "simple-icons:trello": {
+      "about": "The cards drop into their lists.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "scaleY": [[0, 0.2], [0.5, 1, "back"]], "anchor": [7.35, 4.4]},
+        {"parts": ["f2"], "scaleY": [[0.15, 0.2], [0.65, 1, "back"]], "anchor": [16.65, 4.4]}
+      ]
+    },
+    "simple-icons:asana": {
+      "about": "The three dots hop in turn.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f2", "f1", "f0"], "y": [[0, 0], [0.12, -1.8, "out"], [0.32, 0, "in"]], "spread": 0.4}
+      ]
+    },
+    "simple-icons:jira": {
+      "about": "The marks fan out along the diagonal and return.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f0"], "x": [[0, 0], [0.3, -1.6, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f0"], "y": [[0, 0], [0.3, 1.6, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f2"], "x": [[0, 0], [0.3, 1.6, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f2"], "y": [[0, 0], [0.3, -1.6, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:clickup": {
+      "about": "The top lifts off and drops back.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f1"], "y": [[0, 0], [0.3, -1.8, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:evernote": {
+      "about": "The elephant flaps its ear.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f0"], "rotate": [[0, 0], [0.2, -18, "out"], [0.45, 12], [0.7, -5], [0.9, 0]], "anchor": [8.4, 6.8]}
+      ]
+    },
+    "simple-icons:logseq": {
+      "about": "The small blobs hop in turn.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1", "f2"], "y": [[0, 0], [0.15, -1.8, "out"], [0.4, 0, "in"]], "spread": 0.3}
+      ]
+    },
+    "simple-icons:anki": {
+      "about": "The small star twinkles while the big one tilts.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0, 1], [0.25, 0.2, "in"], [0.65, 1, "back"]], "anchor": [17.15, 4.15]},
+        {"parts": ["f0"], "rotate": [[0, 0], [0.3, -8, "out"], [0.75, 0, "back"]], "anchor": [10, 16]}
+      ]
+    },
+    "simple-icons:duolingo": {
+      "about": "The owl blinks and bobs its beak.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f4", "f5"], "scaleY": [[0.1, 1], [0.18, 0.1, "in"], [0.3, 1, "out"], [0.42, 1], [0.5, 0.1, "in"], [0.62, 1, "out"]], "anchor": [12, 12]},
+        {"parts": ["f2", "f3"], "y": [[0.5, 0], [0.62, 0.8, "out"], [0.8, 0]]}
+      ]
+    },
+    "simple-icons:grammarly": {
+      "about": "The G swings and settles.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "rotate": [[0, 0], [0.3, -22, "out"], [0.75, 0, "back"]]}
+      ]
+    },
+    "simple-icons:loom": {
+      "about": "The petals turn while the center pulses.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0, 1], [0.3, 0.5], [0.7, 1, "back"]]},
+        {"parts": ["f0"], "rotate": [[0, 0], [1, 360]]}
+      ]
+    },
+    "simple-icons:netflix": {
+      "about": "The N builds itself, stroke by stroke.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f2"], "scaleY": [[0, 0.1], [0.4, 1, "out"]], "anchor": [7.75, 24]},
+        {"parts": ["f1"], "scaleY": [[0.15, 0.1], [0.55, 1, "out"]], "anchor": [16.25, 0]},
+        {"parts": ["f0"], "scale": [[0.3, 0], [0.8, 1, "out"]]}
+      ]
+    },
+    "simple-icons:soundcloud": {
+      "about": "The bars dance under the cloud.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["f7", "f6", "f5", "f4", "f3", "f2", "f1"], "scaleY": [[0, 1], [0.15, 0.5], [0.35, 1.25], [0.55, 1]], "spread": 0.4, "anchor": [12, 17.4]}
+      ]
+    },
+    "simple-icons:audacity": {
+      "about": "The waveform pulses.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "scaleY": [[0, 1], [0.2, 0.6], [0.45, 1.3], [0.7, 1]], "anchor": [12, 15.1]}
+      ]
+    },
+    "simple-icons:shazam": {
+      "about": "The two arcs pull apart and snap together.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f1"], "x": [[0, 0], [0.3, -1.4, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f2"], "x": [[0, 0], [0.3, 1.4, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:overcast": {
+      "about": "Broadcasts: the inner waves pulse, then the outer ones.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f7", "f8"], "scale": [[0, 1], [0.2, 0.6], [0.55, 1, "back"]]},
+        {"parts": ["f6", "f9"], "scale": [[0.15, 1], [0.35, 0.6], [0.7, 1, "back"]]}
+      ]
+    },
+    "simple-icons:pocketcasts": {
+      "about": "The rings pulse out from the center.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f1"], "scale": [[0, 1], [0.25, 0.6], [0.6, 1, "back"]]},
+        {"parts": ["f2"], "scale": [[0.15, 1], [0.4, 0.8], [0.75, 1, "back"]]}
+      ]
+    },
+    "simple-icons:audible": {
+      "about": "The sound waves pulse out one by one.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f2", "f1", "f3", "f0"], "scale": [[0, 1], [0.18, 0.8, "out"], [0.5, 1, "back"]], "spread": 0.45}
+      ]
+    },
+    "simple-icons:obsstudio": {
+      "about": "The lens ring turns once.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f2"], "rotate": [[0, 0], [1, 360]]}
+      ]
+    },
+    "simple-icons:davinciresolve": {
+      "about": "The color wheel spins once.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["f2", "f3", "f4"], "rotate": [[0, 0], [1, 360]], "anchor": [12.3, 11.6]}
+      ]
+    },
+    "simple-icons:blender": {
+      "about": "The pupil contracts and dilates.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "scale": [[0, 1], [0.3, 0.55], [0.72, 1, "back"]], "anchor": [15.75, 13.35]}
+      ]
+    },
+    "simple-icons:gimp": {
+      "about": "Wilber blinks.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f0", "f1", "f5", "f6"], "scaleY": [[0.12, 1], [0.2, 0.1, "in"], [0.32, 1, "out"], [0.45, 1], [0.53, 0.1, "in"], [0.65, 1, "out"]], "anchor": [12.5, 11]}
+      ]
+    },
+    "simple-icons:sketch": {
+      "about": "The gem's facets glint one after another.",
+      "duration": 0.95,
+      "tracks": [
+        {"parts": ["f2", "f1", "f0", "f3", "f8", "f5", "f4", "f6"], "scale": [[0, 1], [0.12, 0.88, "out"], [0.4, 1, "back"]], "spread": 0.55}
+      ]
+    },
+    "simple-icons:framer": {
+      "about": "The pieces slide apart and snap back.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "x": [[0, 0], [0.3, 1.8, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f2"], "x": [[0, 0], [0.3, -1.8, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:godotengine": {
+      "about": "The robot blinks.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f1", "f2", "f3", "f4"], "scaleY": [[0.12, 1], [0.2, 0.1, "in"], [0.32, 1, "out"], [0.45, 1], [0.53, 0.1, "in"], [0.65, 1, "out"]], "anchor": [12, 12.35]}
+      ]
+    },
+    "simple-icons:sonos": {
+      "about": "Sound ripples out from the middle dot.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f0"], "y": [[0, 0], [0.15, -1.6, "out"], [0.4, 0, "in"]]},
+        {"parts": ["f1", "f2", "f4", "f5"], "y": [[0.15, 0], [0.3, -1.6, "out"], [0.55, 0, "in"]]},
+        {"parts": ["f3", "f6"], "y": [[0.3, 0], [0.45, -1.6, "out"], [0.7, 0, "in"]]}
+      ]
+    },
+    "simple-icons:transmission": {
+      "about": "The wings flap.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f1"], "rotate": [[0, 0], [0.25, -16, "out"], [0.6, 8], [0.88, 0]], "anchor": [15.4, 8.4]},
+        {"parts": ["f2"], "rotate": [[0, 0], [0.25, 16, "out"], [0.6, -8], [0.88, 0]], "anchor": [8.6, 8.5]}
+      ]
+    },
+    "simple-icons:googledrive": {
+      "about": "The three arms pulse in turn.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f0", "f2", "f1"], "scale": [[0, 1], [0.2, 0.8, "out"], [0.5, 1, "back"]], "spread": 0.35}
+      ]
+    },
+    "simple-icons:cloudflare": {
+      "about": "The clouds drift apart and back.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["f1"], "x": [[0, 0], [0.4, 1.2], [0.9, 0]]},
+        {"parts": ["f0"], "x": [[0, 0], [0.4, -0.8], [0.9, 0]]}
+      ]
+    },
+    "simple-icons:teamviewer": {
+      "about": "The arrows pull in and push out.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "scaleX": [[0, 1], [0.3, 0.7, "out"], [0.72, 1, "back"]]}
+      ]
+    },
+    "simple-icons:anydesk": {
+      "about": "The two halves slide apart and snap together.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "x": [[0, 0], [0.3, -1.5, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f1"], "x": [[0, 0], [0.3, 1.5, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:backblaze": {
+      "about": "The flame flickers.",
+      "duration": 0.8,
+      "tracks": [
+        {"scaleY": [[0, 1], [0.2, 1.1], [0.4, 0.92], [0.6, 1.06], [0.8, 1]], "anchor": [12, 24.5]}
+      ]
+    },
+    "simple-icons:netlify": {
+      "about": "The pieces pulse out from the hub.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["f2"], "scale": [[0, 1], [0.2, 0.7, "out"], [0.55, 1, "back"]]},
+        {"parts": ["f0", "f1", "f3", "f4", "f5", "f6"], "scale": [[0.15, 1], [0.35, 0.8, "out"], [0.7, 1, "back"]]}
+      ]
+    },
+    "simple-icons:box": {
+      "about": "The two boxes pulse in turn.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0", "f2"], "scale": [[0, 1], [0.2, 0.85, "out"], [0.55, 1, "back"]], "anchor": [8.8, 12]},
+        {"parts": ["f1", "f3"], "scale": [[0.15, 1], [0.35, 0.85, "out"], [0.7, 1, "back"]], "anchor": [20, 13.9]}
+      ]
+    },
+    "simple-icons:lucid": {
+      "about": "The two shapes slide apart and snap back.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "y": [[0, 0], [0.3, -1.4, "out"], [0.72, 0, "back"]]},
+        {"parts": ["f1"], "y": [[0, 0], [0.3, 1.4, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "simple-icons:diagramsdotnet": {
+      "about": "The inner shape ducks and springs back.",
+      "duration": 0.6,
+      "tracks": [
+        {"parts": ["f0"], "scale": [[0, 1], [0.28, 0.7], [0.75, 1, "back"]], "anchor": [12, 11.2]}
+      ]
+    },
+    "simple-icons:airtable": {
+      "about": "The three faces pulse in turn.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["f0", "f1", "f2"], "scale": [[0, 1], [0.2, 0.85, "out"], [0.5, 1, "back"]], "spread": 0.35}
+      ]
+    },
+    "simple-icons:tidal": {
+      "about": "The diamonds pulse in turn.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0", "f1"], "scale": [[0, 1], [0.2, 0.8, "out"], [0.55, 1, "back"]], "spread": 0.3}
+      ]
+    },
+    "custom:adobe-after-effects": {
+      "about": "The letters write themselves.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1", "s2", "s3"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.45}
+      ]
+    },
+    "custom:adobe-illustrator": {
+      "about": "The letters write themselves and the dot pops.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1", "s2", "s3"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.4},
+        {"parts": ["f0"], "scale": [[0.5, 0], [0.9, 1, "back"]], "anchor": [15.5, 8.6]}
+      ]
+    },
+    "custom:adobe-indesign": {
+      "about": "The letters write themselves.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1", "s2", "s3"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.45}
+      ]
+    },
+    "custom:adobe-lightroom": {
+      "about": "The letters write themselves.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1", "s2", "s3"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.45}
+      ]
+    },
+    "custom:adobe-photoshop": {
+      "about": "The letters write themselves.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1", "s2"], "draw": [[0, 0], [0.5, 1, "out"]], "spread": 0.4}
+      ]
+    },
+    "custom:adobe-premiere": {
+      "about": "The letters write themselves.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1", "s2", "s3"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.45}
+      ]
+    },
+    "custom:adobe-creative-cloud": {
+      "about": "The loop draws itself.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.85, 1]]}
+      ]
+    },
+    "custom:microsoft-word": {
+      "about": "The W writes itself.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.75, 1]]}
+      ]
+    },
+    "custom:microsoft-excel": {
+      "about": "The X writes itself, one stroke after the other.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1", "s2"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.35}
+      ]
+    },
+    "custom:microsoft-powerpoint": {
+      "about": "The P writes itself.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.75, 1]]}
+      ]
+    },
+    "custom:microsoft-onenote": {
+      "about": "The N writes itself.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.75, 1]]}
+      ]
+    },
+    "custom:microsoft-outlook": {
+      "about": "The O writes itself.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.75, 1]]}
+      ]
+    },
+    "custom:affinity": {
+      "about": "The triangle draws, then its inner lines.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s0"], "draw": [[0, 0], [0.5, 1]]},
+        {"parts": ["s1", "s2"], "draw": [[0.4, 0], [0.75, 1, "out"]], "spread": 0.2}
+      ]
+    },
+    "custom:amphetamine": {
+      "about": "The pill pulses inside the ring.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s1"], "scale": [[0, 1], [0.3, 0.7], [0.72, 1, "back"]]},
+        {"parts": ["s0"], "draw": [[0, 0], [0.7, 1]]}
+      ]
+    },
+    "custom:appcleaner": {
+      "about": "The brush scrubs and sparkles fly.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1"], "rotate": [[0, 0], [0.2, -12, "out"], [0.45, 10], [0.7, -5], [0.9, 0]], "anchor": [17.5, 20.5]},
+        {"parts": ["s2", "s3"], "draw": [[0, 0], [0.3, 1, "out"]], "spread": 0.25}
+      ]
+    },
+    "custom:audio-plugin-host": {
+      "about": "The plug pulls out and pushes back in.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1", "s2", "s3"], "y": [[0, 0], [0.3, -1.5, "out"], [0.7, 0, "back"]]},
+        {"parts": ["s4"], "draw": [[0.2, 0], [0.7, 1]]}
+      ]
+    },
+    "custom:bartender": {
+      "about": "The glasses clink.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0"], "rotate": [[0, 0], [0.3, 10, "out"], [0.65, 0, "back"]], "anchor": [7, 17]},
+        {"parts": ["s1"], "rotate": [[0, 0], [0.3, -10, "out"], [0.65, 0, "back"]], "anchor": [17, 17]}
+      ]
+    },
+    "custom:bbedit": {
+      "about": "The B writes itself.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1", "s2"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.35}
+      ]
+    },
+    "custom:bex": {
+      "about": "Blinks and grins.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s2", "s3"], "scaleY": [[0.1, 1], [0.18, 0.1, "in"], [0.3, 1, "out"], [0.42, 1], [0.5, 0.1, "in"], [0.62, 1, "out"]], "anchor": [12, 12]},
+        {"parts": ["s4"], "scaleY": [[0.3, 1], [0.5, 1.6, "out"], [0.75, 1.6], [0.95, 1]], "anchor": [12, 15.2]}
+      ]
+    },
+    "custom:calibre": {
+      "about": "The books hop along the shelf.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s0", "s1", "s2"], "y": [[0, 0], [0.12, -1.6, "out"], [0.32, 0, "in"]], "spread": 0.45}
+      ]
+    },
+    "custom:canva": {
+      "about": "The C writes itself.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.7, 1]]}
+      ]
+    },
+    "custom:cleanmymac": {
+      "about": "The screen ducks and springs back.",
+      "duration": 0.65,
+      "tracks": [
+        {"parts": ["s3"], "scale": [[0, 1], [0.28, 0.5], [0.75, 1, "back"]], "anchor": [12, 10]}
+      ]
+    },
+    "custom:utm": {
+      "about": "The screen ducks and springs back.",
+      "duration": 0.65,
+      "tracks": [
+        {"parts": ["s3"], "scale": [[0, 1], [0.28, 0.5], [0.75, 1, "back"]], "anchor": [12, 10]}
+      ]
+    },
+    "custom:cleanshot": {
+      "about": "The corners close in to take the shot.",
+      "duration": 0.7,
+      "tracks": [
+        {"parts": ["s0", "s1", "s2", "s3"], "scale": [[0, 1], [0.3, 0.78, "out"], [0.72, 1, "back"]]},
+        {"parts": ["s4"], "scale": [[0.1, 1], [0.35, 0.7, "out"], [0.8, 1, "back"]]}
+      ]
+    },
+    "custom:coteditor": {
+      "about": "Writes its lines.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s2", "s3"], "draw": [[0, 0], [0.45, 1, "out"]], "spread": 0.4}
+      ]
+    },
+    "custom:craft": {
+      "about": "The mark ducks and springs back.",
+      "duration": 0.6,
+      "tracks": [
+        {"parts": ["s1"], "scale": [[0, 1], [0.28, 0.6], [0.75, 1, "back"]]}
+      ]
+    },
+    "custom:day-one": {
+      "about": "The 1 writes itself.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.7, 1]]}
+      ]
+    },
+    "custom:eyedear": {
+      "about": "The pupil contracts and dilates.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["f0"], "scale": [[0, 1], [0.3, 0.5], [0.72, 1, "back"]]}
+      ]
+    },
+    "custom:fork": {
+      "about": "The branch forks off.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s2"], "draw": [[0, 0], [0.3, 1, "out"]]},
+        {"parts": ["s1"], "draw": [[0.25, 0], [0.5, 1, "out"]]},
+        {"parts": ["s0"], "draw": [[0.4, 0], [0.85, 1]]}
+      ]
+    },
+    "custom:google-ai-edge-gallery": {
+      "about": "The four tiles squeeze together in turn and spring apart.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0", "s1", "s2", "s3"], "scale": [[0, 1], [0.25, 0.78, "out"], [0.6, 1, "back"]], "spread": 0.3}
+      ]
+    },
+    "custom:hammerspoon": {
+      "about": "The hammer swings.",
+      "duration": 0.7,
+      "tracks": [
+        {"parts": ["s1"], "rotate": [[0, 0], [0.3, -22, "out"], [0.5, 8, "in"], [0.72, 0]], "anchor": [12, 12]}
+      ]
+    },
+    "custom:hotify": {
+      "about": "The flame flickers.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "scaleY": [[0, 1], [0.2, 1.25], [0.4, 0.85], [0.6, 1.15], [0.8, 1]], "anchor": [12, 19.2]},
+        {"parts": ["s0"], "scaleY": [[0, 1], [0.25, 1.06], [0.5, 0.96], [0.8, 1]], "anchor": [12, 20.5]}
+      ]
+    },
+    "custom:istat-menus": {
+      "about": "The graph plots itself.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.75, 1]]}
+      ]
+    },
+    "custom:keka": {
+      "about": "Zips up.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s3", "s4", "s5"], "draw": [[0, 0], [0.25, 1, "out"]], "spread": 0.5}
+      ]
+    },
+    "custom:kindle": {
+      "about": "Turns a page.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s1"], "scaleX": [[0, 1], [0.3, 0.08, "in"], [0.65, 1, "out"]], "anchor": [12, 10.5]}
+      ]
+    },
+    "custom:magnet": {
+      "about": "The magnet pulls and the poles spark.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0"], "y": [[0, 0], [0.25, 1.2, "out"], [0.6, 0, "back"]]},
+        {"parts": ["s1", "s2"], "y": [[0, 0], [0.25, -1, "out"], [0.6, 0, "back"]]}
+      ]
+    },
+    "custom:mindnode": {
+      "about": "The branches grow out from the center node.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s5", "s6", "s7", "s8"], "draw": [[0, 0], [0.35, 1, "out"]], "spread": 0.3},
+        {"parts": ["s1", "s2", "s3", "s4"], "scale": [[0.15, 0], [0.55, 1, "back"]], "spread": 0.3}
+      ]
+    },
+    "custom:omnifocus": {
+      "about": "The ring redraws and the check mark pops.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.6, 1]]},
+        {"parts": ["s2"], "scale": [[0, 1], [0.25, 0.4], [0.7, 1, "back"]]}
+      ]
+    },
+    "custom:onedrive": {
+      "about": "The clouds drift apart and back.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s1"], "x": [[0, 0], [0.4, 1.2], [0.9, 0]]},
+        {"parts": ["s0"], "x": [[0, 0], [0.4, -0.8], [0.9, 0]]}
+      ]
+    },
+    "custom:openclaw": {
+      "about": "The claws snap and the eyes blink.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s1"], "rotate": [[0, 0], [0.2, -18, "out"], [0.45, 10], [0.7, 0]], "anchor": [9.5, 7]},
+        {"parts": ["s2"], "rotate": [[0, 0], [0.2, 18, "out"], [0.45, -10], [0.7, 0]], "anchor": [14.5, 7]},
+        {"parts": ["f0", "f1"], "scaleY": [[0.45, 1], [0.53, 0.1, "in"], [0.65, 1, "out"]], "anchor": [12, 12]}
+      ]
+    },
+    "custom:orbstack": {
+      "about": "The moon orbits the planet once.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s1"], "rotate": [[0, 0], [0.95, 360]]}
+      ]
+    },
+    "custom:parallels": {
+      "about": "The two bars slide past each other.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s0"], "y": [[0, 0], [0.3, -1.6, "out"], [0.72, 0, "back"]]},
+        {"parts": ["s1"], "y": [[0, 0], [0.3, 1.6, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "custom:rectangle": {
+      "about": "The window splits into panes.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.4, 1, "out"]]},
+        {"parts": ["s2"], "draw": [[0.3, 0], [0.7, 1, "out"]]}
+      ]
+    },
+    "custom:robi-writer": {
+      "about": "The pen draws and the mark pops.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.6, 1]]},
+        {"parts": ["s2"], "scale": [[0.4, 0], [0.85, 1, "back"]], "anchor": [16, 16]}
+      ]
+    },
+    "custom:spark": {
+      "about": "The bolt flashes twice.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "scale": [[0.1, 1], [0.14, 0, "linear"], [0.26, 0], [0.3, 1, "linear"], [0.42, 1], [0.46, 0, "linear"], [0.58, 0], [0.62, 1, "linear"]], "anchor": [15.5, 8]}
+      ]
+    },
+    "custom:superwhisper": {
+      "about": "The wave rises and falls with a voice.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s1"], "scaleY": [[0, 1], [0.2, 1.4], [0.45, 0.6], [0.7, 1.25], [0.95, 1]], "anchor": [12, 13]}
+      ]
+    },
+    "custom:tag-editor": {
+      "about": "The tag swings while the lines write.",
+      "duration": 0.85,
+      "tracks": [
+        {"parts": ["s3", "s4"], "rotate": [[0, 0], [0.2, -10, "out"], [0.45, 8], [0.7, 0]], "anchor": [19, 4]},
+        {"parts": ["s0", "s1", "s2"], "erase": [[0, 1], [0.4, 0, "out"]], "spread": 0.4}
+      ]
+    },
+    "custom:the-unarchiver": {
+      "about": "The arrow pops out of the box.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s3", "s4"], "y": [[0, 0], [0.3, -2, "out"], [0.72, 0, "back"]]}
+      ]
+    },
+    "custom:topos": {
+      "about": "The ring tilts and settles.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s1"], "scaleY": [[0, 1], [0.3, 0.35], [0.72, 1, "back"]], "anchor": [12, 12.25]}
+      ]
+    },
+    "custom:transmit": {
+      "about": "The truck rolls back and forward.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s3", "s4"], "y": [[0, 0], [0.2, -0.6], [0.4, 0], [0.6, -0.6], [0.8, 0]]},
+        {"x": [[0, 0], [0.3, -1.5, "out"], [0.7, 1], [1, 0]]}
+      ]
+    },
+    "custom:trendi": {
+      "about": "The trend line plots itself and the points pop.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.6, 1]]},
+        {"parts": ["s2", "s3"], "scale": [[0.3, 0], [0.75, 1, "back"]], "spread": 0.2, "anchor": [14, 14]}
+      ]
+    },
+    "custom:typora": {
+      "about": "The T writes itself.",
+      "duration": 0.75,
+      "tracks": [
+        {"parts": ["s1"], "draw": [[0, 0], [0.3, 1, "out"]]},
+        {"parts": ["s2"], "draw": [[0.25, 0], [0.65, 1, "out"]]}
+      ]
+    },
+    "custom:ulysses": {
+      "about": "The butterfly flaps its wings.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s0", "s1"], "scaleX": [[0, 1], [0.2, 0.4, "inOut"], [0.4, 1], [0.6, 0.5], [0.8, 1]], "anchor": [12, 11]}
+      ]
+    },
+    "custom:windows-app": {
+      "about": "The four panes squeeze together in turn and spring apart.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0", "s1", "s2", "s3"], "scale": [[0, 1], [0.25, 0.78, "out"], [0.6, 1, "back"]], "spread": 0.3}
+      ]
+    },
+    "custom:shottr": {
+      "about": "Draws itself in one stroke.",
+      "duration": 0.8,
+      "tracks": [
+        {"draw": [[0, 0], [0.85, 1]]}
+      ]
+    },
+    "custom:devcleaner": {
+      "about": "The sparkles pop while the brush tilts.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s2", "s3"], "scale": [[0, 1], [0.2, 0, "in"], [0.6, 1, "back"]], "spread": 0.2, "anchor": [8, 17.5]},
+        {"parts": ["s0", "s1"], "rotate": [[0, 0], [0.3, -8, "out"], [0.75, 0, "back"]], "anchor": [12, 20]}
+      ]
+    }
+  },
+  "fallbacks": {
+    "stroke": [
+      {
+        "about": "Draws itself, one stroke after another.",
+        "duration": 0.75,
+        "tracks": [
+          {"parts": "strokes", "draw": [[0, 0], [0.6, 1]], "spread": 0.4},
+          {"parts": "fills", "scale": [[0, 0.4], [0.5, 1, "back"]], "spread": 0.3}
+        ]
+      },
+      {
+        "about": "Draws itself while settling from a small tilt.",
+        "duration": 0.8,
+        "tracks": [
+          {"parts": "strokes", "draw": [[0, 0], [0.5, 1, "out"]], "spread": 0.3},
+          {"rotate": [[0, -10], [0.85, 0, "back"]]}
+        ]
+      }
+    ],
+    "fill": [
+      {
+        "about": "Ducks and pops back.",
+        "duration": 0.55,
+        "tracks": [
+          {"scale": [[0, 1], [0.25, 0.84, "out"], [0.6, 1.1, "out"], [0.9, 1]]}
+        ]
+      },
+      {
+        "about": "Wobbles and settles.",
+        "duration": 0.7,
+        "tracks": [
+          {"rotate": [[0, 0], [0.15, -10, "out"], [0.38, 8], [0.6, -5], [0.8, 2], [0.95, 0]]}
+        ]
+      },
+      {
+        "about": "Hops and lands with a small squash.",
+        "duration": 0.7,
+        "tracks": [
+          {"scaleY": [[0.5, 1], [0.6, 0.9, "out"], [0.76, 1]], "anchor": [12, 24]},
+          {"y": [[0, 0], [0.3, -2.2, "out"], [0.55, 0, "in"], [0.7, -0.6, "out"], [0.85, 0, "in"]]}
+        ]
+      },
+      {
+        "about": "Flips once like a coin.",
+        "duration": 0.8,
+        "tracks": [
+          {"turn": [[0, 0], [1, 360]]}
+        ]
+      }
+    ]
+  }
+}

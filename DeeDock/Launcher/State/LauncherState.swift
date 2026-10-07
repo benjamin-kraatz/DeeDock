@@ -17,6 +17,8 @@ final class LauncherState {
     /// Whether application tiles draw line glyphs, set by the owning dock from its Appearance
     /// settings. Apps without a glyph keep their native icon.
     var usesLineIcons = false
+    /// When line glyphs play their motion, set by the owning dock alongside ``usesLineIcons``.
+    var lineIconMotion = DockSettings.defaults.lineIconMotion
     /// The style of the current presentation, set by ``begin(pins:foregroundID:style:)``. Only the
     /// full Launcher morphs the dock, so the dock view reads this together with ``isPresented``.
     private(set) var presentationStyle: LauncherStyle = .full

@@ -32878,19 +32878,19 @@
       }
     },
     "settingsIconStyleHelp" : {
-      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow, the optional Launcher toggle, and per-display override.",
+      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow and motion, the optional Launcher toggle, and per-display override.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig. Auch der Launcher kann sie verwenden. Jedes Display kann den Stil selbst wählen."
+            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig und bewegt sich kurz; die Bewegung lässt sich abschalten. Auch der Launcher kann sie verwenden. Jedes Display kann den Stil selbst wählen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow. The Launcher can use them too. Each display can choose its own style."
+            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow and a short motion, which can be switched off. The Launcher can use them too. Each display can choose its own style."
           }
         }
       }
@@ -33431,6 +33431,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Line icons in Launcher"
+          }
+        }
+      }
+    },
+    "settingsLineIconMotion" : {
+      "comment" : "Appearance toggle under Icon style that lets line glyphs play a short motion when the pointer or keyboard selection rests on a tile. Unavailable while the native icon style is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbole beim Zeigen animieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animate icons on hover"
           }
         }
       }

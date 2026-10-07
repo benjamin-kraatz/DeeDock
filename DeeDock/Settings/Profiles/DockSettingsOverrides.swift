@@ -7,7 +7,7 @@ import Foundation
 enum DockSettingField: String, CaseIterable, Codable {
     case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
     case launcherPosition, appVisibility, tooltipPreset
-    case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, launcherStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
+    case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, launcherStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
     case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
@@ -34,6 +34,7 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .runningIndicatorStyle: \.runningIndicatorStyle
         case .iconStyle: \.iconStyle
         case .launcherLineIcons: \.launcherLineIcons
+        case .lineIconMotion: \.lineIconMotion
         case .launcherStyle: \.launcherStyle
         case .animateIndicators: \.animateIndicators
         case .launchAnimation: \.launchAnimation
@@ -76,6 +77,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle?
     var iconStyle: DockIconStyle?
     var launcherLineIcons: Bool?
+    var lineIconMotion: LineIconMotionPlayback?
     var launcherStyle: LauncherStyle?
     var animateIndicators: Bool?
     var launchAnimation: DockLaunchAnimation?
@@ -99,7 +101,7 @@ struct DockSettingsOverrides: Codable, Equatable {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case launcherPosition, appVisibility, tooltipPreset
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, launcherStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
+        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, launcherStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
         case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
@@ -114,6 +116,7 @@ struct DockSettingsOverrides: Codable, Equatable {
                      edgeDistance: edgeDistance ?? defaults.edgeDistance, positionReference: positionReference ?? defaults.positionReference)
         result.iconStyle = iconStyle ?? defaults.iconStyle
         result.launcherLineIcons = launcherLineIcons ?? defaults.launcherLineIcons
+        result.lineIconMotion = lineIconMotion ?? defaults.lineIconMotion
         result.launcherStyle = launcherStyle ?? defaults.launcherStyle
         result.animateIndicators = animateIndicators ?? defaults.animateIndicators
         result.launchAnimation = launchAnimation ?? defaults.launchAnimation
@@ -189,6 +192,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .runningIndicatorStyle: runningIndicatorStyle != nil
         case .iconStyle: iconStyle != nil
         case .launcherLineIcons: launcherLineIcons != nil
+        case .lineIconMotion: lineIconMotion != nil
         case .launcherStyle: launcherStyle != nil
         case .animateIndicators: animateIndicators != nil
         case .launchAnimation: launchAnimation != nil
@@ -230,6 +234,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .runningIndicatorStyle: runningIndicatorStyle = value?.runningIndicatorStyle
         case .iconStyle: iconStyle = value?.iconStyle
         case .launcherLineIcons: launcherLineIcons = value?.launcherLineIcons
+        case .lineIconMotion: lineIconMotion = value?.lineIconMotion
         case .launcherStyle: launcherStyle = value?.launcherStyle
         case .animateIndicators: animateIndicators = value?.animateIndicators
         case .launchAnimation: launchAnimation = value?.launchAnimation
@@ -294,6 +299,7 @@ extension DockSettingsOverrides {
         runningIndicatorStyle = try values.decodeIfPresent(DockSettings.RunningIndicatorStyle.self, forKey: .runningIndicatorStyle)
         iconStyle = try values.decodeIfPresent(DockIconStyle.self, forKey: .iconStyle)
         launcherLineIcons = try values.decodeIfPresent(Bool.self, forKey: .launcherLineIcons)
+        lineIconMotion = try values.decodeIfPresent(LineIconMotionPlayback.self, forKey: .lineIconMotion)
         launcherStyle = try values.decodeIfPresent(LauncherStyle.self, forKey: .launcherStyle)
         animateIndicators = try values.decodeIfPresent(Bool.self, forKey: .animateIndicators)
         launchAnimation = try values.decodeIfPresent(DockLaunchAnimation.self, forKey: .launchAnimation)

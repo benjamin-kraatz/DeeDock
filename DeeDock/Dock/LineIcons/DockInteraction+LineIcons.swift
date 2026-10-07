@@ -6,7 +6,7 @@ extension DockInteraction {
     /// dock draws native artwork or the catalog has no glyph for the app.
     func lineIcon(for reference: ApplicationReference, artwork: NSImage) -> DockLineIcon? {
         guard iconStyle == .line, let glyph = LineIconCatalog.shared.glyph(for: reference) else { return nil }
-        return DockLineIcon(glyph: glyph, glow: .artwork(artwork))
+        return DockLineIcon(glyph: glyph, glow: .artwork(artwork), motion: lineIconMotion)
     }
 
     /// A fused window's line glyph, matched by bundle identifier and then by app name.
@@ -18,7 +18,7 @@ extension DockInteraction {
         let identifier = bundleIdentifier.flatMap { $0.contains(".") && !$0.contains("/") ? $0 : nil }
         let url = URL(fileURLWithPath: "/Applications/\(name).app")
         guard let glyph = LineIconCatalog.shared.glyph(bundleIdentifier: identifier, url: url) else { return nil }
-        return DockLineIcon(glyph: glyph, glow: .artwork(artwork))
+        return DockLineIcon(glyph: glyph, glow: .artwork(artwork), motion: lineIconMotion)
     }
 
     /// The line glyph for one of DOKK's own tiles, or nil when this dock draws native artwork.
@@ -26,7 +26,7 @@ extension DockInteraction {
     /// - Parameter artwork: Glows behind the glyph when given; otherwise the shared spectrum does.
     func lineIcon(for tile: LineIconTile, artwork: NSImage? = nil) -> DockLineIcon? {
         guard iconStyle == .line, let glyph = LineIconCatalog.shared.glyph(for: tile) else { return nil }
-        return DockLineIcon(glyph: glyph, glow: artwork.map(DockLineGlow.artwork) ?? .spectrum)
+        return DockLineIcon(glyph: glyph, glow: artwork.map(DockLineGlow.artwork) ?? .spectrum, motion: lineIconMotion)
     }
 }
 

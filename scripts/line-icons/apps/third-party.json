@@ -3493,6 +3493,15 @@
     ]
   },
   {
+    "icon": "custom:waterfox",
+    "bundleIDs": [
+      "net.waterfox.waterfox"
+    ],
+    "names": [
+      "Waterfox"
+    ]
+  },
+  {
     "icon": "simple-icons:webex",
     "bundleIDs": [
       "Cisco-Systems.Spark"

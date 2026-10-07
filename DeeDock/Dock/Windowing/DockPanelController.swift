@@ -146,7 +146,9 @@ final class DockPanelController {
         accessibilityIDs.formIntersection(exposedIDs)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.iconStyle = settings.iconStyle
+        interaction.lineIconMotion = settings.lineIconMotion
         launcher.usesLineIcons = settings.iconStyle == .line && settings.launcherLineIcons
+        launcher.lineIconMotion = settings.lineIconMotion
         interaction.animateIndicators = settings.animateIndicators
         interaction.launchAnimation = settings.launchAnimation
         interaction.showAppBadgeCounts = settings.showAppBadgeCounts

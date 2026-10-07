@@ -56,6 +56,38 @@ nonisolated enum LineIconPath {
         return drewSomething ? path.copy() : nil
     }
 
+    /// Splits a path at each move, keeping the order the subpaths were drawn in.
+    ///
+    /// A move that nothing is drawn from yields no subpath.
+    static func subpaths(of path: CGPath) -> [CGPath] {
+        var result: [CGPath] = []
+        var current = CGMutablePath()
+        var drewSomething = false
+        func finish() {
+            if drewSomething { result.append(current) }
+            current = CGMutablePath()
+            drewSomething = false
+        }
+        path.applyWithBlock { pointer in
+            let element = pointer.pointee
+            let points = element.points
+            switch element.type {
+            case .moveToPoint:
+                finish()
+                current.move(to: points[0])
+                return
+            case .addLineToPoint: current.addLine(to: points[0])
+            case .addQuadCurveToPoint: current.addQuadCurve(to: points[1], control: points[0])
+            case .addCurveToPoint: current.addCurve(to: points[2], control1: points[0], control2: points[1])
+            case .closeSubpath: current.closeSubpath()
+            @unknown default: return
+            }
+            drewSomething = true
+        }
+        finish()
+        return result
+    }
+
     private nonisolated enum Token {
         case command(Character)
         case number(CGFloat)
