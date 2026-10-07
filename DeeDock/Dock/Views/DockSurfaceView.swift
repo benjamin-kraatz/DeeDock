@@ -140,7 +140,11 @@ struct DockSurfaceView: View {
                         openApp: openApp,
                         togglePin: togglePin,
                         menuTracking: { tracking in
-                            interaction.contextMenuTrackingChanged(tracking, target: slot.target)
+                            if tracking {
+                                interaction.contextMenuTarget = slot.target
+                            } else if interaction.contextMenuTarget == slot.target {
+                                interaction.contextMenuTarget = nil
+                            }
                             menuTracking(tracking)
                         },
                         accessibilityFocus: accessibilityFocus
