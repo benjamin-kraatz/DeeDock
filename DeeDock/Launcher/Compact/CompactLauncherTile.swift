@@ -2,12 +2,16 @@ import SwiftUI
 
 /// One app in the compact grid: artwork, name, and the same context menu as the full Launcher.
 ///
+/// A suggested tile opens through ``LauncherState/openSuggested(_:)``, which rechecks that the app
+/// still exists and records the acceptance, and adds the suggestion feedback actions.
+///
 /// Draws the app's line glyph when the dock uses Line icons in the Launcher, and its native icon
 /// otherwise. Icons load per tile, so a long library only decodes what the grid shows.
 struct CompactLauncherTile: View {
     let application: LauncherApplication
     let launcher: LauncherState
     let selected: Bool
+    var isSuggestion = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var icon: NSImage?
@@ -18,7 +22,8 @@ struct CompactLauncherTile: View {
 
     var body: some View {
         Button {
-            launcher.open(application)
+            if isSuggestion { launcher.openSuggested(application) }
+            else { launcher.open(application) }
         } label: {
             VStack(spacing: 6) {
                 artwork
@@ -36,12 +41,21 @@ struct CompactLauncherTile: View {
         .buttonStyle(.plain)
         .disabled(busy)
         .onHover { hovered = $0 }
-        .contextMenu { LauncherApplicationMenu(application: application, state: launcher) }
+        .contextMenu {
+            LauncherApplicationMenu(application: application, state: launcher, isSuggestion: isSuggestion)
+            if isSuggestion {
+                Divider()
+                LauncherSuggestionActions(application: application, state: launcher)
+            }
+        }
         .task(id: application.reference.url) { icon = launcher.icon(for: application) }
         .help(Text(verbatim: application.reference.url.path))
         .accessibilityLabel(Text(application.reference.name))
         .accessibilityValue(Text(running ? .launcherRunning : .launcherNotRunning))
         .accessibilityHint(Text(.launcherOpenHint))
+        .accessibilityActions {
+            if isSuggestion { LauncherSuggestionActions(application: application, state: launcher) }
+        }
         .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 

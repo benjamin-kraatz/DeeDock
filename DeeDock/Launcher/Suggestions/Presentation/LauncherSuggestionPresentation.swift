@@ -103,8 +103,7 @@ extension LauncherState {
         if store.debugRandomSuggestions {
             guard query.isEmpty, robiIDs == nil, !usesMixedResults else { return [] }
             let eligible = Dictionary(results.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-            return Array(suggestions.debugRandomIDs.compactMap { eligible[$0] }
-                .prefix(layout == .grid ? min(3, max(1, navigationColumns)) : 3))
+            return Array(suggestions.debugRandomIDs.compactMap { eligible[$0] }.prefix(suggestionLimit))
         }
         #endif
         guard query.isEmpty, robiIDs == nil, !usesMixedResults, store.isActive,
@@ -118,7 +117,13 @@ extension LauncherState {
             if visibility == .hidePinned, pinnedIDs.contains(id) { return nil }
             if visibility == .hideRunning, !pinnedIDs.contains(id), catalog.runningIDs.contains(id) { return nil }
             return app
-        }.prefix(layout == .grid ? min(3, max(1, navigationColumns)) : 3))
+        }.prefix(suggestionLimit))
+    }
+
+    /// At most three, and never more than one row of the full Launcher's grid. The compact grid's
+    /// six fixed columns always fit three, and its layout ignores the full Launcher's list setting.
+    private var suggestionLimit: Int {
+        presentationStyle == .full && layout == .grid ? min(3, max(1, navigationColumns)) : 3
     }
 
     /// Each visual section begins a row. This keeps vertical navigation aligned across short rows.
@@ -153,7 +158,9 @@ extension LauncherState {
     }
 
     func recordSuggestionImpression() {
-        guard isPresented, contentVisible else { return }
+        // Only the full Launcher's morph sets `contentVisible`; the compact popover's content is
+        // visible for its whole presentation.
+        guard isPresented, presentationStyle == .compact || contentVisible else { return }
         suggestions.recordImpression(store: catalog.suggestions, appIDs: suggestedApplications.map(\.id))
     }
 }
