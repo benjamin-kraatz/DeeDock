@@ -104,7 +104,7 @@ enum SettingsSection: Hashable, Identifiable {
             SettingsPage.dockGroups
         case .extras:
             [[.shelfAndTrash, .drives, .capsules, .badges, .notificationFeed],
-             [.actionTiles, .contextMenus, .soapBubbles],
+             [.actionTiles, .soapBubbles],
              [.multipleDisplays]]
         case .windowsFocus:
             [[.windowPeek, .focusSessions], [.permissions]]

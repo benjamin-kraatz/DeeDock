@@ -132,9 +132,6 @@ struct DockSettings: Codable, Equatable {
     /// Optional soap-bubble bursts on pin click and drop. Off by default, and Reduce Motion
     /// suppresses playback without rewriting this preference.
     var soapBubbleEffects: Bool = false
-    /// How a tile steps out from under its context menu. App-wide; documents saved before this key
-    /// decode as `.popOut`.
-    var contextMenuReveal: DockContextMenuReveal = .popOut
     var edge: DockEdge = .bottom
     var alignment: Alignment = .center
     /// Signed displacement from the alignment anchor, in points; positive moves right on horizontal docks and down on side docks.
@@ -204,7 +201,7 @@ extension DockSettings {
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case windowMarkupFormat, windowMarkupSearchEngine, windowMarkupFolder
-        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, launcherStyle, animateIndicators, launchAnimation, soapBubbleEffects, contextMenuReveal, edge, alignment, positionReference, behavior
+        case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, launcherStyle, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
     }
@@ -272,7 +269,6 @@ extension DockSettings {
         launchAnimation = values.contains(.launchAnimation)
             ? try values.decode(DockLaunchAnimation.self, forKey: .launchAnimation) : Self.defaults.launchAnimation
         soapBubbleEffects = try values.decodeIfPresent(Bool.self, forKey: .soapBubbleEffects) ?? false
-        contextMenuReveal = try values.decodeIfPresent(DockContextMenuReveal.self, forKey: .contextMenuReveal) ?? .popOut
         edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : .bottom
         alignment = try values.decode(Alignment.self, forKey: .alignment)
         alongEdgeOffset = try values.decode(Double.self, forKey: .alongEdgeOffset)

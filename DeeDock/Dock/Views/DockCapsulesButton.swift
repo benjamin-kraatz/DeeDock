@@ -136,8 +136,7 @@ private struct SessionCapsuleContextMenuBridge: NSViewRepresentable {
             menu.addItem(.separator())
             add(.capsulesDelete, action: #selector(delete), symbol: "trash", to: menu)
             trackedMenu = menu
-            menu.popUpContextMenu(forDockTile: self, interaction: interaction, event: event,
-                                  beginTracking: { tracking?(true) })
+            NSMenu.popUpContextMenu(menu, with: event, for: self)
             tracking?(false)
             trackedMenu = nil
         }

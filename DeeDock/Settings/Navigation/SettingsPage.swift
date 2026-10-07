@@ -47,7 +47,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case sims
     case discovery
     case soapBubbles
-    case contextMenus
     case focusBreathing
     case focusDebt
     case quarantine
@@ -76,7 +75,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
         case .shelfAndTrash, .drives, .capsules, .badges, .notificationFeed, .windowPeek,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
-             .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles, .contextMenus,
+             .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
              .discovery, .quarantine: .features
         }
     }
@@ -124,7 +123,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .simsTitle
         case .discovery: .discoveryTitle
         case .soapBubbles: .soapBubblesTitle
-        case .contextMenus: .contextMenusTitle
         case .quarantine: .quarantineTitle
         case .permissions: .windowPeekPermissionsTitle
         }
@@ -163,7 +161,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .settingsFeatureSimsSubtitle
         case .discovery: .discoverySettingsHelp
         case .soapBubbles: .settingsFeatureSoapBubblesSubtitle
-        case .contextMenus: .settingsFeatureContextMenusSubtitle
         case .quarantine: .settingsFeatureQuarantineSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
@@ -204,7 +201,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .symbol("heart.fill")
         case .discovery: .symbol("lightbulb.fill")
         case .soapBubbles: .symbol("circle.dotted")
-        case .contextMenus: .symbol("contextualmenu.and.cursorarrow")
         case .quarantine: .symbol("seal.fill")
         case .permissions: .symbol("lock.fill")
         }
@@ -243,7 +239,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: Color(red: 0.92, green: 0.42, blue: 0.58)
         case .discovery: .teal
         case .soapBubbles: Color(red: 0.38, green: 0.72, blue: 0.88)
-        case .contextMenus: Color(red: 0.95, green: 0.55, blue: 0.25)
         case .quarantine: Color(red: 0.78, green: 0.27, blue: 0.16)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
@@ -282,7 +277,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: [Color(red: 1.0, green: 0.62, blue: 0.72), Color(red: 0.86, green: 0.22, blue: 0.46)]
         case .discovery: [.mint, .teal]
         case .soapBubbles: [Color(red: 0.72, green: 0.94, blue: 1.0), Color(red: 0.78, green: 0.52, blue: 0.96)]
-        case .contextMenus: [Color(red: 1.0, green: 0.76, blue: 0.42), Color(red: 0.92, green: 0.40, blue: 0.22)]
         case .quarantine: [Color(red: 0.92, green: 0.46, blue: 0.34), Color(red: 0.62, green: 0.18, blue: 0.12)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
@@ -302,7 +296,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .discovery: .discoverySettingsHelp
         case .notificationFeed: .notificationFeedSettingsKeywords
         case .soapBubbles: .soapBubblesSettingsKeywords
-        case .contextMenus: .contextMenusSettingsKeywords
         case .focusBreathing: .focusBreathingHelp
         case .focusDebt: .focusDebtHelp
         case .quarantine: .quarantineSettingsHelp
