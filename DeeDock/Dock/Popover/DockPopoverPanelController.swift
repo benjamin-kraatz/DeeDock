@@ -30,6 +30,7 @@ final class DockPopoverPanelController<Content: View> {
     private let activates: Bool
     private let reduceMotion: Bool
     private let ideal: CGSize
+    private let outline: ((DockPopoverChrome) -> DockPopoverShape)?
     private let chromeChanged: (DockPopoverChrome) -> Void
     private var placement: DockPopoverPlacement
     private var localMonitor: Any?
@@ -67,16 +68,22 @@ final class DockPopoverPanelController<Content: View> {
     ///     gets ordinary field-editor focus. Implies `keyboard`.
     ///   - windowShadow: Whether AppKit draws the window shadow. Liquid Glass content draws its own,
     ///     and AppKit would outline the whole rectangular window around it, so glass panels pass false.
+    ///   - outline: The visible outline of content that draws nothing the window server can hit-test,
+    ///     such as Liquid Glass with no fill beneath it. Without it, clicks and scrolls on the panel's
+    ///     transparent pixels reach the window behind and count as outside clicks. With it, the panel
+    ///     receives every pointer event over its frame, and only clicks outside the outline dismiss.
     ///   - chromeChanged: Receives the resolved chrome before the content is built, and again on
     ///     every re-anchor, so the content view can draw its pointer in the right place.
     ///   - content: Built once, after the initial chrome has been published.
     init(anchor: DockPopoverAnchor, keyboard: Bool, clickFocus: Bool = false, activates: Bool = false,
          windowShadow: Bool = true, ideal: CGSize = DockPopoverGeometry.idealSize,
+         outline: ((DockPopoverChrome) -> DockPopoverShape)? = nil,
          chromeChanged: @escaping (DockPopoverChrome) -> Void, content: () -> Content) {
         self.keyboard = keyboard || activates
         self.clickFocus = clickFocus
         self.activates = activates
         self.ideal = ideal
+        self.outline = outline
         self.chromeChanged = chromeChanged
         reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         placement = DockPopoverGeometry.placement(anchor: anchor, ideal: ideal)
@@ -85,6 +92,10 @@ final class DockPopoverPanelController<Content: View> {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = windowShadow
+        // A non-opaque window passes events on fully transparent pixels to the window behind it,
+        // unless this is set explicitly. Glass composites outside the window's backing, so the gaps
+        // between glass content read as transparent; the outline check below takes over instead.
+        if outline != nil { panel.ignoresMouseEvents = false }
         panel.level = .popUpMenu
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
@@ -166,6 +177,16 @@ final class DockPopoverPanelController<Content: View> {
         }
     }
 
+    /// Whether a click on the panel lands inside the visible outline. Panels without an outline
+    /// receive only the clicks the window server routes to their drawn pixels, so every one counts.
+    private func outlineContains(_ event: NSEvent) -> Bool {
+        guard let outline else { return true }
+        // The shape is drawn in SwiftUI's top-left space; window coordinates start at the bottom left.
+        let size = panel.frame.size
+        let point = CGPoint(x: event.locationInWindow.x, y: size.height - event.locationInWindow.y)
+        return outline(placement.chrome).path(in: CGRect(origin: .zero, size: size)).contains(point)
+    }
+
     private func installMonitors() {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         // File panels route navigation before Quick Look's responder consumes Space/Escape.
@@ -177,7 +198,7 @@ final class DockPopoverPanelController<Content: View> {
                 guard event.window === panel else { return event }
                 return keyHandler?(event) == true ? nil : event
             }
-            guard event.window !== panel else {
+            if event.window === panel, outlineContains(event) {
                 // Only an explicit click grants focus. Drag hover never reaches this path.
                 if clickFocus {
                     panel.acceptsKeyboardFocus = true
@@ -186,10 +207,11 @@ final class DockPopoverPanelController<Content: View> {
                 return event
             }
             guard canDismissForOutsideClick?() != false else { return event }
-            let consumesDockClick = event.window is DockPanel
-            close(returnFocus: false)
             // A dock click dismisses the popover but must not reach the button underneath.
-            if consumesDockClick { return nil }
+            // A click on the panel's margin outside the outline dismisses without reaching the content.
+            let consumesClick = event.window is DockPanel || event.window === panel
+            close(returnFocus: false)
+            if consumesClick { return nil }
             return event
         }
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in

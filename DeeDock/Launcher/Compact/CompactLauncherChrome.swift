@@ -9,10 +9,8 @@ private struct CompactLauncherChrome: ViewModifier {
     let chrome: DockPopoverChrome
     let opaque: Bool
 
-    static let cornerRadius: CGFloat = 26
-
     func body(content: Content) -> some View {
-        let shape = DockPopoverShape(chrome: chrome, cornerRadius: Self.cornerRadius, softPointer: true)
+        let shape = DockPopoverShape.compactLauncher(chrome)
         let depth = DockPopoverGeometry.pointerDepth
         let framed = content
             .padding(.top, chrome.edge == .top ? depth : 0)
@@ -26,6 +24,13 @@ private struct CompactLauncherChrome: ViewModifier {
         } else {
             framed.glassEffect(.regular, in: shape)
         }
+    }
+}
+
+extension DockPopoverShape {
+    /// The compact Launcher's outline. The glass draws it, and the popover hit-tests clicks against it.
+    static func compactLauncher(_ chrome: DockPopoverChrome) -> DockPopoverShape {
+        DockPopoverShape(chrome: chrome, cornerRadius: 26, softPointer: true)
     }
 }
 
