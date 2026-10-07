@@ -24,8 +24,11 @@ final class CompactLauncherController {
             ? nil : previousApplication
         launcher.begin(pins: pins, foregroundID: self.previousApplication?.bundleIdentifier, style: .compact)
         // `clickFocus` routes key-downs through `keyHandler` before the search field's editor sees them.
+        // The glass leaves the gaps between tiles transparent, so the outline keeps clicks and scrolls
+        // there inside the Launcher instead of falling through to the window behind.
         popover = DockPopoverPanelController(anchor: anchor, keyboard: true, clickFocus: true, activates: true,
-                                             windowShadow: false, ideal: CompactLauncherLayout.idealSize) { chrome in
+                                             windowShadow: false, ideal: CompactLauncherLayout.idealSize,
+                                             outline: DockPopoverShape.compactLauncher) { chrome in
             model.chrome = chrome
         } content: {
             CompactLauncherView(model: model)
