@@ -43,6 +43,7 @@ struct DockSurfaceView: View {
         // Computed once per pass. Each slot and separator reads it, and this body runs on every
         // pointer move over the dock and every auto-hide frame.
         let centers = layout.centers(sizes: sizes)
+        let menuTarget = interaction.contextMenuTarget
         ZStack(alignment: .topLeading) {
             if drawsBackground {
                 DockBackgroundView(
@@ -138,10 +139,25 @@ struct DockSurfaceView: View {
                         primaryAppAction: primaryAppAction,
                         openApp: openApp,
                         togglePin: togglePin,
-                        menuTracking: menuTracking,
+                        menuTracking: { tracking in
+                            if tracking {
+                                interaction.contextMenuTarget = slot.target
+                            } else if interaction.contextMenuTarget == slot.target {
+                                interaction.contextMenuTarget = nil
+                            }
+                            menuTracking(tracking)
+                        },
                         accessibilityFocus: accessibilityFocus
                     )
-                    .environment(\.dockTileHovered, slot.target != nil && hoveredID == slot.target)
+                    .modifier(DockContextMenuSpotlight(
+                        role: menuTarget == nil ? .none : (menuTarget == slot.target ? .owner : .receded),
+                        edge: layout.edge,
+                        reduceMotion: reduceMotion,
+                        reduceTransparency: reduceTransparency
+                    ))
+                    // A menu owner keeps its line-icon glow after the pointer moves onto the menu.
+                    .environment(\.dockTileHovered, slot.target != nil
+                        && (hoveredID == slot.target || menuTarget == slot.target))
                     .onHover { inside in
                         if inside {
                             hoveredID = slot.target

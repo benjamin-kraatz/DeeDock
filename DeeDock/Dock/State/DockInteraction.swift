@@ -57,6 +57,8 @@ final class DockInteraction {
     var dragSourceID: String?
     var dragMessage: LocalizedStringResource?
     var documentTargetID: String?
+    /// The tile whose context menu is open, which the surface spotlights; nil while no menu tracks.
+    var contextMenuTarget: DockEntryID?
     var trashTargeted = false
     var shelfTargeted = false
     /// The volume tile a file drag is over, which highlights to show it will receive the drop.
