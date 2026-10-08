@@ -3,17 +3,20 @@ import Foundation
 /// Marks an enum whose raw values may leave the device as analytics property values.
 ///
 /// Conform only enums whose cases are compile-time constants. A type that wraps arbitrary text,
-/// such as an app name or a path, must never conform: this protocol, ``AnalyticsFileType``, and
-/// ``AnalyticsVersion`` are the only ways text becomes an ``AnalyticsValue``.
+/// such as an app name or a path, must never conform: this protocol, ``AnalyticsFileType``,
+/// ``AnalyticsVersion``, and ``AnalyticsPublicAppIdentifier`` are the only ways text becomes an
+/// ``AnalyticsValue``.
 nonisolated protocol AnalyticsToken: RawRepresentable where RawValue == String {}
 
-/// One analytics property value: a Bool, an exact number, or an enum token.
+/// One analytics property value: a Bool, an exact number, an enum token, or a list of public
+/// app identifiers.
 ///
 /// There is deliberately no initializer that takes a `String`, so an app name, bundle ID, path,
-/// window title, or query cannot be passed to an event by mistake. The compiler rejects it.
+/// window title, or query cannot be passed to an event by mistake. The compiler rejects it. The
+/// one list form takes ``AnalyticsPublicAppIdentifier``, which only public apps can produce.
 nonisolated struct AnalyticsValue: Equatable, Sendable {
     fileprivate enum Storage: Equatable, Sendable {
-        case bool(Bool), int(Int), double(Double), token(String)
+        case bool(Bool), int(Int), double(Double), token(String), tokens([String])
     }
 
     fileprivate let storage: Storage
@@ -25,6 +28,8 @@ nonisolated struct AnalyticsValue: Equatable, Sendable {
     init<Token: AnalyticsToken>(_ token: Token) { storage = .token(token.rawValue) }
     init(_ fileType: AnalyticsFileType) { storage = .token(fileType.identifier) }
     init(_ version: AnalyticsVersion) { storage = .token(version.text) }
+    /// Sent as a JSON array, in the given order.
+    init(_ apps: [AnalyticsPublicAppIdentifier]) { storage = .tokens(apps.map(\.bundleIdentifier)) }
     fileprivate init(token: String) { storage = .token(token) }
 
     /// The JSON-compatible form handed to the backend.
@@ -34,6 +39,7 @@ nonisolated struct AnalyticsValue: Equatable, Sendable {
         case let .int(value): value
         case let .double(value): value
         case let .token(value): value
+        case let .tokens(values): values
         }
     }
 
@@ -44,6 +50,7 @@ nonisolated struct AnalyticsValue: Equatable, Sendable {
         case let .int(value): String(value)
         case let .double(value): String(value)
         case let .token(value): value
+        case let .tokens(values): values.joined(separator: ", ")
         }
     }
 }

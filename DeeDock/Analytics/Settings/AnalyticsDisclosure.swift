@@ -14,6 +14,7 @@ enum AnalyticsDisclosure {
         Item(symbol: "slider.horizontal.3", text: .analyticsCollectedSettings),
         Item(symbol: "number", text: .analyticsCollectedCounts),
         Item(symbol: "desktopcomputer", text: .analyticsCollectedSystem),
+        Item(symbol: "scribble.variable", text: .analyticsCollectedLineIconGaps),
     ]
 
     static let neverCollected: [Item] = [

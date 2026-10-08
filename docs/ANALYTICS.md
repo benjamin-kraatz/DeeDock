@@ -6,13 +6,15 @@ and the rules for adding to it. It is linked from Settings › General › Priva
 
 ## What is never collected
 
-These are prohibited in every product event, property, and person property. There are two
-exceptions, [Apple Intelligence observability](#apple-intelligence-observability), which sends
-prompt and answer text, and [surveys](#surveys), which send what a person chose or typed in
-answer to a survey. Both are described below.
+These are prohibited in every product event, property, and person property. There are three
+exceptions, all described below: [Apple Intelligence observability](#apple-intelligence-observability),
+which sends prompt and answer text; [surveys](#surveys), which send what a person chose or typed in
+answer to a survey; and [Line icon coverage](#line-icon-coverage), which sends the bundle IDs of
+public apps that have no Line glyph yet.
 
 - App names and bundle IDs. This is the rule most likely to be broken by accident, because almost
-  everything in a dock is named after an app.
+  everything in a dock is named after an app. The only bundle IDs that leave the Mac are those of
+  public apps without a Line glyph, in `line_icon_coverage`.
 - Icons, file names, paths, and file contents.
 - Window titles and URLs.
 - Launcher and search query text.
@@ -30,10 +32,12 @@ Settings that hold a path, such as the markup folder, are reported only as "set"
 
 - `AnalyticsEvent` (`DeeDock/Analytics/Events/AnalyticsEvent.swift`) is the only way to send an
   event. Its cases take enums, Bools, numbers, and DOKK version numbers. No case takes a `String`.
-- `AnalyticsValue` has no `String` initializer. Text becomes a value in four places only:
-  an enum that conforms to `AnalyticsToken`, `AnalyticsFileType`, `AnalyticsVersion`, and the
-  settings reflection in `AnalyticsValue.swift`, which emits property names and enum case names
-  and reduces any text field to a Bool.
+- `AnalyticsValue` has no `String` initializer. Text becomes a value in five places only:
+  an enum that conforms to `AnalyticsToken`, `AnalyticsFileType`, `AnalyticsVersion`, a list of
+  `AnalyticsPublicAppIdentifier`, and the settings reflection in `AnalyticsValue.swift`, which
+  emits property names and enum case names and reduces any text field to a Bool.
+- Only `AnalyticsPublicApps` can create an `AnalyticsPublicAppIdentifier`, and only for a public
+  app. See [Line icon coverage](#line-icon-coverage).
 - `AnalyticsVersion` accepts only one to four dot-separated numbers, such as `0.13.5`. Update
   events use it for DOKK's own running and offered versions. Any other text, including a
   pre-release suffix, is dropped.
@@ -356,6 +360,7 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 | `clipboard_museum` | `action`, `kind`, `item_count` |
 | `clipboard_capture_enabled` | none |
 | `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `line_icon_coverage` | `installed_app_count`, `installed_line_icon_count`, `installed_coverage` (0 to 1), `pinned_app_count`, `pinned_line_icon_count`, `pinned_coverage` (0 to 1), `missing_public_count`, `missing_unlisted_count`, `missing_bundle_ids` (array), `missing_pinned_bundle_ids` (array). See [Line icon coverage](#line-icon-coverage). |
 | `notification_feed_opened` | `entry_count` (entries in the feed), `unread_count` (entries that arrived since it was last opened), `trigger` |
 | `notification_feed_closed` | `entry_count` (entries left when it closed), `duration`, `cleared` (Clear All was used while it was open) |
 | `harbor_opened` (Radar; Harbor is its internal name) | `trigger`, `window_count` (windows and chips across displays), `app_count`, `display_count`, `access` (`full`, `accessibility_only`, `screen_recording_only`, `none`) |
@@ -542,6 +547,29 @@ uses PostHog surveys of type **API**: it fetches their definitions and draws the
 | Survey | Where | Shown when |
 | --- | --- | --- |
 | App Recommendations Survey (`01a10ae5-3be4-0000-cb04-a670009cadbf`) | Below the Launcher's suggestions | Suggestions on, the feedback-question switch on, at least ten presentations over seven days, 30 days since the last feedback question, this iteration not yet answered or closed |
+
+## Line icon coverage
+
+`line_icon_coverage` tells us which Line glyphs to draw next. About 30 seconds after launch,
+DOKK scans the Applications folders the way the Launcher does and checks every installed and
+pinned app against the bundled Line catalog. It does this whatever icon style a dock uses, and
+at most once every six hours, so most launches send nothing. A report goes out only while
+sharing is on.
+
+- **Installed** apps are those in `/Applications`, `~/Applications`, `/System/Applications`, and
+  `/System/Library/CoreServices/Applications`, plus pinned apps stored elsewhere. Nested copies
+  the Launcher hides are left out. **Pinned** apps are the application pins on every display,
+  counted once each. An app without a glyph is counted in both groups when it is both.
+- `missing_bundle_ids` lists apps without a glyph that are **public**: Apple ships the app inside
+  macOS (a `com.apple.` ID under `/System/`), the bundled Homebrew or curated description catalog
+  lists its bundle ID, or it carries a Mac App Store receipt. `missing_pinned_bundle_ids` is the
+  pinned part of that list.
+- Any other app without a glyph, such as an in-house build or a company's internal tool, is
+  only counted in `missing_unlisted_count`. Its bundle ID, name, and path stay on the Mac.
+- Nothing is looked up online to decide whether an app is public.
+
+The event is the one place product analytics names apps. Keep it narrow: do not add app names,
+paths, versions, or apps that have a glyph.
 
 ## Logs
 
