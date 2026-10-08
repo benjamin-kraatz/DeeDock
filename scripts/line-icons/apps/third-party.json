@@ -3380,6 +3380,15 @@
     ]
   },
   {
+    "icon": "lucide:bug",
+    "bundleIDs": [
+      "com.unity3d.bugreporter"
+    ],
+    "names": [
+      "Unity Bug Reporter"
+    ]
+  },
+  {
     "icon": "simple-icons:unraid",
     "bundleIDs": [],
     "names": [
