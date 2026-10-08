@@ -137,6 +137,7 @@ final class DockPanelController {
         store.sections.configure(settings.appVisibility)
         store.configureShelf(settings.showShelf)
         store.configureNotificationFeed(settings.showNotificationFeed)
+        store.configureHarbor(settings.showHarborTile)
         store.configureLauncherPosition(settings.launcherPosition)
         store.configureSessionCapsules(settings.showSessionCapsules)
         store.configureTrash(settings.showTrash)
@@ -637,6 +638,57 @@ final class DockPanelController {
         return rect
     }
 
+    /// A picture of this dock as it is drawn right now, for Harbor's strip to transform from.
+    ///
+    /// Nil while the dock is hidden, revealing, or replaced by the Launcher, so the strip enters
+    /// from the edge instead. Icon frames come from the live layout and may be magnified when
+    /// the pointer is on the dock, which is the usual case after a click on the Harbor tile.
+    ///
+    /// - Parameter screenFrame: The Harbor panel's frame in AppKit screen coordinates; results
+    ///   are in that panel's top-left, y-down space.
+    func harborSeed(in screenFrame: CGRect) -> HarborDockSeed? {
+        // Line icons and idle-faded artwork would not match the app icons the strip draws over
+        // them, so those docks get no seed and the strip enters on its own.
+        guard !stopped, !launcher.isPresented, visibility.exposesContent, visibility.progress == 0,
+              let settings = lastSettings, !interaction.surfaceRect.isEmpty,
+              settings.iconStyle == .native, interaction.idleFade.fraction == 0 else { return nil }
+        let edge = settings.edge
+        // Root-space rect to Harbor space: through AppKit screen coordinates, as `popoverAnchor` does.
+        func convert(_ rect: CGRect) -> CGRect {
+            let screen = CGRect(x: panel.frame.minX + interaction.contentOrigin.x + rect.minX,
+                                y: panel.frame.maxY - interaction.contentOrigin.y - rect.maxY,
+                                width: rect.width, height: rect.height)
+            return CGRect(x: screen.minX - screenFrame.minX, y: screenFrame.maxY - screen.maxY,
+                          width: screen.width, height: screen.height)
+        }
+        // A button frame holds the icon square plus the running indicator on the edge side.
+        func iconSquare(_ button: CGRect) -> CGRect {
+            switch edge {
+            case .bottom: CGRect(x: button.minX, y: button.minY, width: button.width, height: button.width)
+            case .top: CGRect(x: button.minX, y: button.maxY - button.width, width: button.width, height: button.width)
+            case .left: CGRect(x: button.maxX - button.height, y: button.minY, width: button.height, height: button.height)
+            case .right: CGRect(x: button.minX, y: button.minY, width: button.height, height: button.height)
+            }
+        }
+        let tiles = store.entries.compactMap { entry -> HarborDockSeed.Tile? in
+            guard let target = entry.target, let button = interaction.iconRects[target.hitID], !button.isEmpty else { return nil }
+            let frame = convert(iconSquare(button))
+            switch entry {
+            case .app(let item):
+                return .init(id: target.hitID, kind: .app(appID: item.id, running: item.isRunning), frame: frame, icon: item.icon)
+            case .folder(let item): return .init(id: target.hitID, kind: .other, frame: frame, icon: item.icon)
+            case .trash(let item): return .init(id: target.hitID, kind: .other, frame: frame, icon: item.icon)
+            case .shelf(let item): return .init(id: target.hitID, kind: .other, frame: frame, icon: item.icon)
+            case .harbor: return .init(id: target.hitID, kind: .harbor, frame: frame, icon: nil)
+            default: return .init(id: target.hitID, kind: .other, frame: frame, icon: nil)
+            }
+        }
+        let glass = convert(interaction.surfaceRect)
+        return HarborDockSeed(glass: glass,
+                              cornerRadius: min(CGFloat(settings.cornerRadius), min(glass.width, glass.height) / 2),
+                              tiles: tiles)
+    }
+
     /// Something landed in `target`, such as a picture saved to the Shelf; the tile acknowledges it.
     func tileReceived(_ target: DockEntryID) {
         guard !stopped else { return }
@@ -875,7 +927,7 @@ final class DockPanelController {
         interaction.canMoveVolume = nil; interaction.moveVolume = nil
         interaction.openFocusSession = nil
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
-        interaction.openNotificationFeed = nil; interaction.notificationFeed = nil
+        interaction.openNotificationFeed = nil; interaction.notificationFeed = nil; interaction.openHarbor = nil
         interaction.clearNotificationFeed = nil; interaction.prepareNotificationFeedSettings = nil
         interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil
         interaction.windowPeekHoverChanged = nil; interaction.openWindowPeek = nil

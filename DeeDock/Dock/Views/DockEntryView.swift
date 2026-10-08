@@ -141,6 +141,15 @@ struct DockEntryView: View {
                     accessibilityFocus(DockEntryID.notificationFeed.hitID, $0)
                 }
             )
+        case .harbor:
+            DockHarborButton(
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.harbor.hitID, $0)
+                }
+            )
         case .volume(let item):
             DockVolumeButton(
                 item: item,

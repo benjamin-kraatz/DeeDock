@@ -48,6 +48,13 @@ struct FeaturesPageContent: View {
             NotificationFeedSettingsCard(isOn: source.binding(\.showNotificationFeed),
                                          windowAccess: context.windowAccess,
                                          feed: context.coordinator?.notificationFeed, locked: locked)
+        case .harbor:
+            HarborSettingsCard(shortcut: source.binding(\.harborShortcutEnabled),
+                               tile: source.binding(\.showHarborTile),
+                               shortcutAvailable: context.coordinator?.harbor.shortcutAvailable ?? true,
+                               locked: locked)
+            PreviewPermissionsSettingsCard(windowAccess: context.windowAccess, screenCapture: context.screenCapture,
+                                           footnote: .harborPermissionsHelp)
         case .windowPeek:
             // Permissions stay usable on their own page even when unreadable settings block edits.
             WindowPeekSettingsPane(source: source, persistentSettingsDisabled: locked)

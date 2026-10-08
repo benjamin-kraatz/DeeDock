@@ -72,6 +72,8 @@ extension AnalyticsEvent {
         case .clipboardCaptureEnabled: "clipboard_capture_enabled"
         case .notificationFeedOpened: "notification_feed_opened"
         case .notificationFeedClosed: "notification_feed_closed"
+        case .harborOpened: "harbor_opened"
+        case .harborClosed: "harbor_closed"
         case .discoveryCallout: "discovery_callout"
         case .toolOpened: "tool_opened"
         case .focusDockEntered: "focus_dock_entered"
@@ -230,6 +232,12 @@ extension AnalyticsEvent {
             ["entry_count": .init(entryCount), "unread_count": .init(unreadCount), "trigger": .init(trigger)]
         case let .notificationFeedClosed(entryCount, duration, cleared):
             ["entry_count": .init(entryCount), "duration": .init(duration), "cleared": .init(cleared)]
+        case let .harborOpened(trigger, windowCount, appCount, displayCount, access):
+            ["trigger": .init(trigger), "window_count": .init(windowCount), "app_count": .init(appCount),
+             "display_count": .init(displayCount), "access": .init(access)]
+        case let .harborClosed(outcome, duration, searched, filtered, closedWindows):
+            ["outcome": .init(outcome), "duration": .init(duration), "searched": .init(searched),
+             "filtered": .init(filtered), "closed_windows": .init(closedWindows)]
         case let .discoveryCallout(destination, action):
             ["callout": .init(destination), "action": .init(action)]
         case let .toolOpened(tool, trigger):
