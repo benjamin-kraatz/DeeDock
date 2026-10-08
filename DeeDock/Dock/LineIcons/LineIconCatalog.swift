@@ -81,10 +81,19 @@ nonisolated final class LineIconCatalog: Sendable {
     func glyph(bundleIdentifier: String?, url: URL) -> LineIconGlyph? {
         state.withLock { state in
             let document = loaded(&state)
-            let name = url.deletingPathExtension().lastPathComponent.lowercased()
-            guard let reference = bundleIdentifier.flatMap({ document.bundleIdentifiers[$0] })
-                    ?? document.appNames[name] else { return nil }
+            guard let reference = Self.reference(in: document, bundleIdentifier: bundleIdentifier, url: url)
+            else { return nil }
             return glyph(reference, document: document, state: &state)
+        }
+    }
+
+    /// Whether the catalog has a glyph for an application. Unlike ``glyph(bundleIdentifier:url:)``
+    /// it parses no paths, so measuring coverage leaves no glyphs cached.
+    func hasGlyph(bundleIdentifier: String?, url: URL) -> Bool {
+        state.withLock { state in
+            let document = loaded(&state)
+            return Self.reference(in: document, bundleIdentifier: bundleIdentifier, url: url)
+                .map { document.glyphs[$0] != nil } ?? false
         }
     }
 
@@ -99,6 +108,11 @@ nonisolated final class LineIconCatalog: Sendable {
             guard let reference = document.tiles[tile.rawValue] else { return nil }
             return glyph(reference, document: document, state: &state)
         }
+    }
+
+    private static func reference(in document: Document, bundleIdentifier: String?, url: URL) -> String? {
+        let name = url.deletingPathExtension().lastPathComponent.lowercased()
+        return bundleIdentifier.flatMap { document.bundleIdentifiers[$0] } ?? document.appNames[name]
     }
 
     private func loaded(_ state: inout State) -> Document {

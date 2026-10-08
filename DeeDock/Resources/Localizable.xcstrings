@@ -669,6 +669,24 @@
         }
       }
     },
+    "analyticsCollectedLineIconGaps" : {
+      "comment" : "List item: usage data includes which publicly available apps on this Mac have no Line icon yet (the 'Line' icon style in Appearance settings), so the team knows which icons to draw next. Apps that are not publicly available are only counted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welche öffentlich erhältlichen Apps noch kein Linien-Symbol haben, damit wir wissen, welche wir als Nächstes zeichnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which publicly available apps have no Line icon yet, so we know which to draw next"
+          }
+        }
+      }
+    },
     "analyticsCollectedSettings" : {
       "comment" : "List item: usage data includes DOKK settings as numeric values and chosen options.",
       "extractionState" : "manual",
@@ -796,19 +814,19 @@
       }
     },
     "analyticsNeverNames" : {
-      "comment" : "List item: usage data never includes names of apps, files, folders, or windows.",
+      "comment" : "List item: usage data never includes names of files, folders, or windows, or of private apps. Publicly available apps that lack a Line icon are the one exception, listed under what is collected.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Namen von Apps, Dateien, Ordnern oder Fenstern"
+            "value" : "Namen von Dateien, Ordnern, Fenstern oder privaten Apps"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Names of apps, files, folders, or windows"
+            "value" : "Names of files, folders, windows, or private apps"
           }
         }
       }
