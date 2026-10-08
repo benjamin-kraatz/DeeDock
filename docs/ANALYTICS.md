@@ -268,6 +268,7 @@ Comparing `badge_acknowledged_dock_click` with the other acknowledgement routes 
 | `stack_sorted` | `sort`, `item_count` |
 | `stack_quick_look` | `file_type`, `trigger` |
 | `stack_item_opened` | `file_type`, `is_folder`, `trigger` |
+| `stack_path_copied` | `kind`, `relative`, `is_folder`, `trigger`. Copy Path or Copy Relative Path; the path is not sent. |
 | `stack_drop` | `operation` (`copy`, `move`), `item_count`, `file_type`, `target`, `outcome` |
 | `smart_grouping` | `source`, `result` (`generated`, `cached`, `failed`), `duration`, `candidate_count`, `failure` |
 
@@ -332,7 +333,7 @@ from App Melt.
 
 | Event | Properties |
 | --- | --- |
-| `shelf` | `action` (`opened`, `added`, `removed`, `cleared`, `items_opened`, `dragged_out`, `pasted`, `previewed`, `revealed`, `copied`), `item_count`, `source` (`clipboard` for `pasted`), `trigger` |
+| `shelf` | `action` (`opened`, `added`, `removed`, `cleared`, `items_opened`, `dragged_out`, `pasted`, `previewed`, `revealed`, `copied`, `path_copied`, `relative_path_copied`), `item_count`, `source` (`clipboard` for `pasted`), `trigger` |
 | `session_capsule` | `action`, `window_count`, `capsule_count`, `trigger` |
 | `trash` | `action`, `item_count`, `outcome`, `trigger` |
 | `drive` | `action`, `kind`, `trigger` |

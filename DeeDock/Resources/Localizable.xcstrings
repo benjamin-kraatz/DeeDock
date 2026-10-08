@@ -11811,6 +11811,42 @@
         }
       }
     },
+    "fileCopyPath" : {
+      "comment" : "Context-menu command on a Folder Stack or Shelf item that copies its full file path as text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pfad kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Path"
+          }
+        }
+      }
+    },
+    "fileCopyRelativePath" : {
+      "comment" : "Context-menu command on a Folder Stack or Shelf item that copies its path relative to the stack's folder, such as ./folder/file.txt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relativen Pfad kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Relative Path"
+          }
+        }
+      }
+    },
     "filePreview.action" : {
       "comment" : "Command to preview a selected file without opening an application.",
       "extractionState" : "manual",

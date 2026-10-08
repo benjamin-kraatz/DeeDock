@@ -21,6 +21,7 @@ extension AnalyticsEvent {
         case .stackSorted: "stack_sorted"
         case .stackQuickLook: "stack_quick_look"
         case .stackItemOpened: "stack_item_opened"
+        case .stackPathCopied: "stack_path_copied"
         case .stackDrop: "stack_drop"
         case .smartGrouping: "smart_grouping"
         case .peekOpened: "peek_opened"
@@ -124,6 +125,8 @@ extension AnalyticsEvent {
             ["file_type": fileType.map(AnalyticsValue.init), "trigger": .init(trigger)]
         case let .stackItemOpened(fileType, isFolder, trigger):
             ["file_type": fileType.map(AnalyticsValue.init), "is_folder": .init(isFolder), "trigger": .init(trigger)]
+        case let .stackPathCopied(kind, relative, isFolder, trigger):
+            ["kind": .init(kind), "relative": .init(relative), "is_folder": .init(isFolder), "trigger": .init(trigger)]
         case let .stackDrop(operation, itemCount, fileType, target, outcome):
             ["operation": .init(operation), "item_count": .init(itemCount),
              "file_type": fileType.map(AnalyticsValue.init), "target": .init(target), "outcome": .init(outcome)]

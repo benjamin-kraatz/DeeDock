@@ -47,6 +47,8 @@ enum AnalyticsEvent {
     case stackSorted(FolderStackSort, itemCount: Int)
     case stackQuickLook(fileType: AnalyticsFileType?, trigger: AnalyticsTrigger)
     case stackItemOpened(fileType: AnalyticsFileType?, isFolder: Bool, trigger: AnalyticsTrigger)
+    /// Copy Path or Copy Relative Path on a stack child. The path itself is never sent.
+    case stackPathCopied(AnalyticsStackKind, relative: Bool, isFolder: Bool, trigger: AnalyticsTrigger)
     case stackDrop(AnalyticsDropOperation, itemCount: Int, fileType: AnalyticsFileType?,
                    target: AnalyticsDropTarget, outcome: AnalyticsOutcome)
     case smartGrouping(AnalyticsSmartGroupingSource, result: AnalyticsSmartGroupingResult, duration: Double,

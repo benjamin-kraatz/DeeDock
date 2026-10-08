@@ -118,6 +118,12 @@ final class FolderStackPanelController {
             state.focusSearch()
             return true
         }
+        // ⌥⌘C and ⇧⌥⌘C, as in Finder and VS Code. Claimed even while searching; a field has no use for them.
+        if event.modifierFlags.intersection([.command, .option, .control]) == [.command, .option],
+           event.charactersIgnoringModifiers?.lowercased() == "c" {
+            state.copySelectionPath(relative: event.modifierFlags.contains(.shift))
+            return true
+        }
         guard event.modifierFlags.intersection([.command, .control]).isEmpty else { return false }
         if state.searchFocused { return handleSearchKey(event) }
         switch event.keyCode {
