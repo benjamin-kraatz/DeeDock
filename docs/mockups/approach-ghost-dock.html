@@ -1,0 +1,89 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Approach ghost dock</title>
+<style>
+:root{color-scheme:dark}
+body{margin:0;font:13px -apple-system,system-ui,sans-serif;color:var(--foreground,#d8d9de)}
+.wrap{}
+h1{font-size:15px;font-weight:600;margin:0 0 4px}
+p{margin:0 0 12px;color:var(--muted-foreground,#9a9ca6)}
+.stage{position:relative;border-radius:12px;overflow:hidden;cursor:none;box-shadow:0 0 0 1px #ffffff14}
+canvas{display:block;width:100%}
+.bar{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.seg{display:inline-flex;background:#1b1c22;border-radius:8px;padding:2px}
+.seg button{background:none;border:0;color:#aeb0b8;padding:5px 10px;border-radius:6px;font:inherit;cursor:pointer}
+.seg button.on{background:#34353d;color:#fff}
+.read{font-variant-numeric:tabular-nums;color:#c9cad1;min-width:250px}
+label{color:var(--muted-foreground,#9a9ca6)}
+</style></head><body><div class="wrap">
+<p>Move the pointer down toward the bottom edge. The glow behaves as it does today. In the last ~70 pt a white ghost of the dock appears where the real dock will rest, lit from the pointer outward, and gets brighter as you close in.</p>
+<div class="stage" id="stage"><canvas id="c" width="2000" height="1080"></canvas></div>
+<div class="bar">
+ <span><label>Ghost: </label><span class="seg" id="style"><button data-v="imprint" class="on">Icon imprints</button><button data-v="slots">Plain slots</button></span></span>
+ <span><label>Wallpaper: </label><span class="seg" id="wall"><button data-v="dark" class="on">Dark</button><button data-v="light">Light</button></span></span>
+ <span><label>Pointer: </label><span class="seg" id="mode"><button data-v="auto" class="on">Auto approach</button><button data-v="mouse">Follow mouse</button></span></span>
+ <span class="read" id="read"></span>
+</div></div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),W=1000,H=540;x.scale(2,2);
+let style='imprint',wall='dark',mode='auto',mouse={x:520,y:200};
+for(const [id,set] of [['style',v=>style=v],['wall',v=>wall=v],['mode',v=>mode=v]]){
+ document.getElementById(id).onclick=e=>{if(!e.target.dataset.v)return;[...e.currentTarget.children].forEach(b=>b.classList.toggle('on',b===e.target));set(e.target.dataset.v)}}
+const st=document.getElementById('stage');
+st.onmousemove=e=>{const r=st.getBoundingClientRect();mouse={x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}};
+// Dock layout (resting glass)
+const N=11,IS=54,SP=9,PAD=9,DEPTH=IS+2*PAD+6,LEN=N*IS+(N-1)*SP+2*PAD,GX=(W-LEN)/2,GY=H-6-DEPTH,ZONE=5;
+const hues=[210,0,130,35,280,190,50,330,160,20,250];
+const icons=hues.map((h,i)=>{const o=document.createElement('canvas');o.width=o.height=IS*2;const g=o.getContext('2d');g.scale(2,2);
+ const r=IS*.225;rr(g,0,0,IS,IS,r);const gr=g.createLinearGradient(0,0,0,IS);gr.addColorStop(0,`hsl(${h} 80% 62%)`);gr.addColorStop(1,`hsl(${h} 75% 40%)`);g.fillStyle=gr;g.fill();
+ g.fillStyle='rgba(255,255,255,.92)';g.strokeStyle='rgba(255,255,255,.92)';g.lineWidth=4;g.lineCap='round';
+ const k=i%5;g.beginPath();if(k==0){g.arc(IS/2,IS/2,IS*.22,0,7);g.fill()}else if(k==1){g.moveTo(IS*.3,IS*.3);g.lineTo(IS*.7,IS*.7);g.moveTo(IS*.7,IS*.3);g.lineTo(IS*.3,IS*.7);g.stroke()}
+ else if(k==2){rr(g,IS*.27,IS*.32,IS*.46,IS*.36,5);g.stroke()}else if(k==3){g.moveTo(IS/2,IS*.25);g.lineTo(IS*.75,IS*.72);g.lineTo(IS*.25,IS*.72);g.closePath();g.fill()}else{g.arc(IS/2,IS/2,IS*.22,0,7);g.stroke()}
+ return o});
+function rr(g,x0,y0,w,h,r){g.beginPath();g.roundRect(x0,y0,w,h,r)}
+const reach=200,sl=24,tail=Math.exp(-reach/sl),ss=t=>t*t*(3-2*t);
+const ghost=document.createElement('canvas');ghost.width=W*2;ghost.height=H*2;const gx=ghost.getContext('2d');gx.scale(2,2);
+let t0=performance.now(),cur={x:520,y:200};
+function frame(now){
+ let target;
+ if(mode==='auto'){const T=((now-t0)/1000)%7;const p=T<4.2?ss(Math.min(1,T/4.2)):T<5.4?1:1-ss((T-5.4)/1.6);target={x:470+60*Math.sin(now/1300),y:250+p*(H-ZONE-1-250)}}else target=mouse;
+ cur.x+=(target.x-cur.x)*.25;cur.y+=(target.y-cur.y)*.25;
+ const remaining=Math.max(0,(H-ZONE)-cur.y),prox=1-Math.min(1,remaining/reach);
+ const outside=cur.x<GX?GX-cur.x:cur.x>GX+LEN?cur.x-GX-LEN:0,lat=ss(1-Math.min(1,outside/120));
+ const I=ss(prox)*lat,S=remaining<reach?((Math.exp(-remaining/sl)-tail)/(1-tail))*lat:0;
+ const focus=Math.min(Math.max(cur.x,GX),GX+LEN);
+ const light=wall==='dark',col=light?'255,255,255':'20,22,28';
+ // wallpaper
+ const bg=x.createLinearGradient(0,0,W,H);if(light){bg.addColorStop(0,'#1d2a55');bg.addColorStop(.55,'#3b2a5e');bg.addColorStop(1,'#141b33')}else{bg.addColorStop(0,'#e9e3d6');bg.addColorStop(1,'#cfd8e3')}
+ x.globalCompositeOperation='source-over';x.fillStyle=bg;x.fillRect(0,0,W,H);
+ if(I>.001){
+  // wash
+  const peak=(light?.55:.42)*I*(1+.8*S),hh=96*(.45+.55*I)*(1+.35*S),ww=Math.max(140,LEN*.55)*(1+.35*S);
+  x.save();x.translate(focus,H);x.scale(ww/hh,1);const g=x.createRadialGradient(0,0,0,0,0,hh);
+  [[0,1],[.25,.7],[.45,.4],[.7,.13],[.88,.03],[1,0]].forEach(([l,a])=>g.addColorStop(l,`rgba(${col},${Math.min(1,peak*a)})`));x.fillStyle=g;x.fillRect(-hh,-hh,hh*2,hh);x.restore();
+  // ghost dock
+  const ga=Math.pow(S,.85);
+  if(ga>.004){
+   gx.clearRect(0,0,W,H);gx.globalCompositeOperation='source-over';gx.filter='none';
+   const lift=(1-ga)*10; // rises into place
+   gx.save();gx.translate(0,lift);
+   rr(gx,GX,GY,LEN,DEPTH,22);gx.fillStyle=`rgba(${col},.10)`;gx.fill();gx.lineWidth=1.2;gx.strokeStyle=`rgba(${col},.55)`;gx.stroke();
+   for(let i=0;i<N;i++){const ix=GX+PAD+i*(IS+SP),iy=GY+PAD;
+    if(style==='imprint'){gx.filter=light?'grayscale(1) brightness(1.5) contrast(.8)':'grayscale(1) brightness(.35) contrast(.8)';gx.globalAlpha=.6;gx.drawImage(icons[i],ix,iy,IS,IS);gx.filter='none';gx.globalAlpha=1}
+    else{rr(gx,ix,iy,IS,IS,IS*.225);gx.fillStyle=`rgba(${col},.32)`;gx.fill();gx.strokeStyle=`rgba(${col},.6)`;gx.lineWidth=1;gx.stroke()}}
+   gx.restore();
+   // light it from the pointer outward: mask widens with the surge
+   gx.globalCompositeOperation='destination-in';
+   const R=LEN*(.28+.9*S);gx.save();gx.translate(focus,H);gx.scale(1.0,.85);
+   const m=gx.createRadialGradient(0,0,R*.15,0,0,R);m.addColorStop(0,'rgba(0,0,0,1)');m.addColorStop(.6,'rgba(0,0,0,.75)');m.addColorStop(1,'rgba(0,0,0,0)');gx.fillStyle=m;gx.fillRect(-W*2,-H*2,W*4,H*4);gx.restore();
+   x.globalAlpha=Math.min(1,ga*(light?.75:.6));x.globalCompositeOperation=light?'lighter':'source-over';x.drawImage(ghost,0,0,W,H);x.globalAlpha=1;x.globalCompositeOperation='source-over';
+  }
+  // core + edge line
+  if(S>.001){const r=30+34*S,pk=(light?.75:.5)*S;x.save();x.translate(focus,H);x.scale(2.2,1);const g2=x.createRadialGradient(0,0,0,0,0,r);[[0,1],[.35,.5],[.7,.12],[1,0]].forEach(([l,a])=>g2.addColorStop(l,`rgba(${col},${pk*a})`));x.fillStyle=g2;x.fillRect(-r,-r,r*2,r);x.restore()}
+  const lp=Math.min(1,(light?.9:.55)*I*I*(1+.4*S)),th=1.5+1.5*I+1.5*S,lg=x.createLinearGradient(GX,0,GX+LEN,0);
+  lg.addColorStop(0,`rgba(${col},0)`);lg.addColorStop(.18,`rgba(${col},${lp})`);lg.addColorStop(.82,`rgba(${col},${lp})`);lg.addColorStop(1,`rgba(${col},0)`);x.fillStyle=lg;x.fillRect(GX,H-th,LEN,th);
+ }
+ // pointer
+ x.fillStyle=light?'#fff':'#000';x.strokeStyle=light?'#000':'#fff';x.lineWidth=1;x.beginPath();x.moveTo(cur.x,cur.y);x.lineTo(cur.x,cur.y+17);x.lineTo(cur.x+4.5,cur.y+13);x.lineTo(cur.x+11,cur.y+13);x.closePath();x.fill();x.stroke();
+ document.getElementById('read').textContent=`${remaining.toFixed(0)} pt to zone · glow ${(I*100).toFixed(0)}% · surge/ghost ${(S*100).toFixed(0)}%`;
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>

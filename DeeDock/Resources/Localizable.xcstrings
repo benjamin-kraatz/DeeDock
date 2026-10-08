@@ -1875,6 +1875,42 @@
         }
       }
     },
+    "behaviorApproachGhostHelp" : {
+      "comment" : "Subtitle under the ghost dock toggle: what the ghost shows and when it appears.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein zartes Abbild des Docks erscheint dort, wo es auftauchen wird, und wird deutlicher, je näher du der Aktivierungszone kommst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A faint outline of the dock fades in where it will appear and grows clearer as you near the activation zone."
+          }
+        }
+      }
+    },
+    "behaviorApproachGhostToggle" : {
+      "comment" : "Toggle that shows a faint monochrome outline of the hidden dock inside the approach glow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geisterbild des Docks zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show a ghost of the dock"
+          }
+        }
+      }
+    },
     "behaviorApproachIndicator" : {
       "comment" : "Heading for the card that configures the glow shown at the screen edge as the pointer nears a hidden dock.",
       "extractionState" : "manual",

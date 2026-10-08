@@ -14,7 +14,8 @@ struct DockApproachSample: Equatable {
 /// Where the approach glow is drawn and how strongly the pointer lights it, in AppKit screen points.
 ///
 /// The band hugs the screen edge the dock is attached to and extends past both ends of the
-/// activation zone far enough to hold the whole glow, so it never ends in a hard edge. Strength
+/// activation zone far enough to hold the whole glow, so it never ends in a hard edge. With a ghost
+/// dock it also grows to cover the resting dock, wherever that sits relative to the zone. Strength
 /// depends on how far the pointer still is from the zone's inner boundary, so it peaks exactly
 /// where a reveal can begin. This geometry is separate from ``DockActivationGeometry`` and never
 /// captures events.
@@ -29,6 +30,8 @@ struct DockApproachGeometry: Equatable {
     static let washDepth: CGFloat = 96
     /// How much taller and wider the glow gets at full surge.
     static let surgeGrowth: CGFloat = 0.35
+    /// Room around the ghost dock: it rises this far into place and its outline must not touch the band's faded ends.
+    static let ghostMargin: CGFloat = 16
 
     let edge: DockEdge
     /// The glow window in AppKit screen coordinates (y up, origin may be negative).
@@ -45,21 +48,35 @@ struct DockApproachGeometry: Equatable {
     /// Half the glow's width along the edge at base intensity, for a zone of the given length.
     static func washHalfWidth(zoneLength: CGFloat) -> CGFloat { max(140, zoneLength * 0.55) }
 
-    init(screen: CGRect, zone: CGRect, edge: DockEdge) {
+    /// - Parameter ghost: The resting dock's bounds in the same space, when the ghost dock is shown.
+    ///   The band grows to hold it, however far the dock sits from the edge or the zone.
+    init(screen: CGRect, zone: CGRect, edge: DockEdge, ghost: CGRect? = nil) {
         self.edge = edge
         self.screen = screen
-        let depth = min(Self.washDepth * (1 + Self.surgeGrowth), edge.depth(of: screen.size))
+        let ghost = ghost.flatMap { $0.isNull || $0.isEmpty ? nil : $0.insetBy(dx: -Self.ghostMargin, dy: -Self.ghostMargin) }
+        // Inward extent of the ghost from the screen edge, including the room it rises through.
+        let ghostDepth: CGFloat = ghost.map {
+            switch edge {
+            case .bottom: $0.maxY - screen.minY
+            case .top: screen.maxY - $0.minY
+            case .left: $0.maxX - screen.minX
+            case .right: screen.maxX - $0.minX
+            }
+        } ?? 0
+        let depth = min(max(Self.washDepth * (1 + Self.surgeGrowth), ghostDepth), edge.depth(of: screen.size))
         // The glow centers inside the zone, so it can extend one full surged half-width past
         // either end. A narrower band clipped it into a visible vertical cut.
         let margin = Self.washHalfWidth(zoneLength: edge.length(of: zone.size)) * (1 + Self.surgeGrowth)
         switch edge {
         case .bottom, .top:
-            let lo = max(screen.minX, zone.minX - margin), hi = min(screen.maxX, zone.maxX + margin)
+            let lo = max(screen.minX, min(zone.minX - margin, ghost?.minX ?? .infinity))
+            let hi = min(screen.maxX, max(zone.maxX + margin, ghost?.maxX ?? -.infinity))
             frame = CGRect(x: lo, y: edge == .bottom ? screen.minY : screen.maxY - depth, width: max(0, hi - lo), height: depth)
             zoneSpan = (zone.minX - lo)...(max(zone.minX, zone.maxX) - lo)
             zoneInner = edge == .bottom ? zone.maxY - screen.minY : screen.maxY - zone.minY
         case .left, .right:
-            let lo = max(screen.minY, zone.minY - margin), hi = min(screen.maxY, zone.maxY + margin)
+            let lo = max(screen.minY, min(zone.minY - margin, ghost?.minY ?? .infinity))
+            let hi = min(screen.maxY, max(zone.maxY + margin, ghost?.maxY ?? -.infinity))
             frame = CGRect(x: edge == .left ? screen.minX : screen.maxX - depth, y: lo, width: depth, height: max(0, hi - lo))
             // Canonical x runs top to bottom, opposite AppKit's y axis.
             zoneSpan = (hi - zone.maxY)...(max(hi - zone.maxY, hi - zone.minY))
@@ -70,6 +87,14 @@ struct DockApproachGeometry: Equatable {
     /// Band length along the edge and depth into the screen.
     var length: CGFloat { edge.length(of: frame.size) }
     var depth: CGFloat { edge.depth(of: frame.size) }
+
+    /// Converts an AppKit screen rect (y up, origin may be negative) to the band's top-left view coordinates.
+    ///
+    /// Unlike canonical coordinates this keeps the screen's orientation, so artwork drawn in the
+    /// result stays upright on every edge.
+    func localRect(_ rect: CGRect) -> CGRect {
+        CGRect(x: rect.minX - frame.minX, y: frame.maxY - rect.maxY, width: rect.width, height: rect.height)
+    }
 
     /// The glow's strength and center for a pointer in AppKit screen coordinates.
     ///

@@ -75,14 +75,63 @@ import Testing
         #expect(geometry.sample(pointer: CGPoint(x: 200, y: 2)).intensity == 0)
     }
 
-    @Test("Documents saved before the indicator existed decode with it off")
+    @Test("Documents saved before the indicator existed decode with it off and the ghost on")
     func legacyDecoding() throws {
         var object = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(DockBehaviorSettings())) as? [String: Any])
         object.removeValue(forKey: "approachIndicator")
         object.removeValue(forKey: "approachColor")
+        object.removeValue(forKey: "approachGhost")
         let decoded = try JSONDecoder().decode(DockBehaviorSettings.self, from: JSONSerialization.data(withJSONObject: object))
         #expect(decoded == DockBehaviorSettings())
-        var enabled = DockBehaviorSettings(); enabled.approachIndicator = true; enabled.approachColor = .accent
+        #expect(decoded.approachGhost)
+        var enabled = DockBehaviorSettings(); enabled.approachIndicator = true; enabled.approachColor = .accent; enabled.approachGhost = false
         #expect(try JSONDecoder().decode(DockBehaviorSettings.self, from: JSONEncoder().encode(enabled)) == enabled)
+    }
+
+    /// A dock's glass that sits farther inward than the glow reaches and runs past the zone's ends.
+    private func dock(_ edge: DockEdge) -> CGRect {
+        switch edge {
+        case .bottom: CGRect(x: -1100, y: 60, width: 760, height: 120)
+        case .top: CGRect(x: -1100, y: 720, width: 760, height: 120)
+        case .left: CGRect(x: -1380, y: 70, width: 120, height: 760)
+        case .right: CGRect(x: -180, y: 70, width: 120, height: 760)
+        }
+    }
+
+    @Test("With a ghost, the band grows to cover the resting dock and its rise", arguments: DockEdge.allCases)
+    func bandCoversGhost(edge: DockEdge) {
+        let geometry = DockApproachGeometry(screen: screen, zone: zone(edge), edge: edge, ghost: dock(edge))
+        let room = dock(edge).insetBy(dx: -DockApproachGeometry.ghostMargin, dy: -DockApproachGeometry.ghostMargin)
+        #expect(geometry.frame.contains(room.intersection(screen)))
+        #expect(screen.contains(geometry.frame))
+        // The glow keeps its own reach: the sample does not depend on the ghost.
+        let plain = DockApproachGeometry(screen: screen, zone: zone(edge), edge: edge)
+        #expect(geometry.sample(pointer: point(edge, inward: 60)).intensity == plain.sample(pointer: point(edge, inward: 60)).intensity)
+    }
+
+    @Test("Local rects keep the screen's orientation on a display with a negative origin", arguments: DockEdge.allCases)
+    func localRect(edge: DockEdge) {
+        let geometry = DockApproachGeometry(screen: screen, zone: zone(edge), edge: edge, ghost: dock(edge))
+        let local = geometry.localRect(dock(edge))
+        #expect(local.size == dock(edge).size)
+        #expect(CGRect(origin: .zero, size: geometry.frame.size).contains(local))
+        #expect(local.minX == dock(edge).minX - geometry.frame.minX)
+        #expect(local.maxY == geometry.frame.maxY - dock(edge).minY)
+    }
+
+    @Test("The ghost snapshot uses resting icon sizes and skips insertion gaps")
+    func restingGhost() throws {
+        let layout = DockGeometry.layout(count: 3, favoriteCount: 0, availableLength: 1440)
+        let restingFrame = CGRect(x: -1100, y: 0, width: layout.viewportLength, height: layout.panelDepth)
+        let ghost = DockApproachGhost.resting(slots: [.launcher, .gap("insertion"), .launcher], layout: layout,
+                                              restingFrame: restingFrame, scrollOffset: 0, showsGlass: true, cornerRadius: 400)
+        #expect(ghost.tiles.count == 2)
+        #expect(ghost.tiles.allSatisfy { $0.frame.width == layout.iconSize && $0.frame.height == layout.iconSize && $0.icon == nil })
+        let glass = try #require(ghost.glass)
+        #expect(ghost.tiles.allSatisfy { glass.contains($0.frame) })
+        // The radius is capped to a capsule, matching the drawn glass.
+        #expect(ghost.cornerRadius == min(glass.width, glass.height) / 2)
+        #expect(DockApproachGhost.resting(slots: [.launcher], layout: DockGeometry.layout(count: 1, favoriteCount: 0, availableLength: 1440),
+                                          restingFrame: restingFrame, scrollOffset: 0, showsGlass: false, cornerRadius: 22).glass == nil)
     }
 }

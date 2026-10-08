@@ -19,10 +19,12 @@ struct DockBehaviorSettings: Codable, Equatable {
     /// Shows a glow at the screen edge that strengthens as the pointer nears a hidden dock's activation zone.
     var approachIndicator = false
     var approachColor: ApproachColor = .automatic
+    /// Fades a monochrome outline of the resting dock into the approach glow over its final points.
+    var approachGhost = true
 
     private enum CodingKeys: String, CodingKey {
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
-        case approachIndicator, approachColor
+        case approachIndicator, approachColor, approachGhost
         case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
     }
 
@@ -63,5 +65,6 @@ extension DockBehaviorSettings {
         animationDuration = try values.decode(Double.self, forKey: .animationDuration)
         approachIndicator = try values.decodeIfPresent(Bool.self, forKey: .approachIndicator) ?? false
         approachColor = try values.decodeIfPresent(ApproachColor.self, forKey: .approachColor) ?? .automatic
+        approachGhost = try values.decodeIfPresent(Bool.self, forKey: .approachGhost) ?? true
     }
 }
