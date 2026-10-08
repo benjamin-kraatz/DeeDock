@@ -103,7 +103,15 @@ nonisolated final class LineIconCatalog: Sendable {
 
     private func loaded(_ state: inout State) -> Document {
         if let document = state.document { return document }
-        let document = load().flatMap { try? JSONDecoder().decode(Document.self, from: $0) } ?? Document()
+        var document = load().flatMap { try? JSONDecoder().decode(Document.self, from: $0) } ?? Document()
+        #if DEBUG
+        // Development only. NotificationEmitter, the local app that posts test notifications and
+        // sets a Dock badge, borrows the WhatsApp glyph. Badge rings, the badge label's banner, and
+        // Window Peek's notice strip all need a glyph, and a test app has none in the catalog.
+        if document.appNames["notificationemitter"] == nil {
+            document.appNames["notificationemitter"] = document.appNames["whatsapp"]
+        }
+        #endif
         state.document = document
         return document
     }

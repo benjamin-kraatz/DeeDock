@@ -600,6 +600,26 @@ final class DockPanelController {
                                  settings: settings)
     }
 
+    /// The new notification this dock's Line icon label previews for `item`, plus the label itself
+    /// while it is on screen, so Window Peek can carry both into its panel. Nil when the tile has no
+    /// new badge with a banner.
+    func windowPeekNoticeHandoff(for item: DockItem) -> WindowPeekNoticeHandoff? {
+        guard !stopped, let badge = DockTooltipBadge(slot: .app(item), interaction: interaction),
+              let notice = WindowPeekNotice(badge: badge, appName: item.reference.name) else { return nil }
+        let target = DockEntryID.app(item.id)
+        var label: WindowPeekNoticeHandoff.Label?
+        if interaction.tooltips.visible == target, let presented = interaction.tooltips.presented,
+           presented.target == target {
+            // Root space to screen, as `windowPeekContext` converts the icon.
+            let rect = presented.frame
+            let frame = CGRect(x: panel.frame.minX + interaction.contentOrigin.x + rect.minX,
+                               y: panel.frame.maxY - interaction.contentOrigin.y - rect.maxY,
+                               width: rect.width, height: rect.height)
+            label = .init(frame: frame, artwork: presented.artwork)
+        }
+        return WindowPeekNoticeHandoff(notice: notice, label: label)
+    }
+
     /// Screen-space anchor for a popover attached to one of this dock's tiles.
     func popoverAnchor(for target: DockEntryID) -> DockPopoverAnchor? {
         guard !stopped, let display = lastDisplay, let settings = lastSettings,

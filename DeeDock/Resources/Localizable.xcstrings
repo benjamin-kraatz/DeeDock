@@ -47406,6 +47406,42 @@
         }
       }
     },
+    "windowPeekNoticeAccessibilityHint" : {
+      "comment" : "VoiceOver hint for the new-notification strip in Window Peek.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt die App an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the app."
+          }
+        }
+      }
+    },
+    "windowPeekNoticeAccessibilityLabel" : {
+      "comment" : "VoiceOver label for the new-notification strip in Window Peek. banner is the notification's sender and text as macOS showed them, not translated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Mitteilung: %(banner)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New notification: %(banner)@"
+          }
+        }
+      }
+    },
     "windowPeekNoWindows" : {
       "comment" : "Window Peek state when Accessibility reports no standard windows.",
       "extractionState" : "manual",

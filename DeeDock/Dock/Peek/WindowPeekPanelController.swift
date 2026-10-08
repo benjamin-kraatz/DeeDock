@@ -23,6 +23,8 @@ final class WindowPeekPanelController {
     private let keyboard: Bool
     private var placement: WindowPeekPlacement
     private var anchor: WindowPeekAnchor
+    /// The card's last reported height, for phases that trim the panel to their content.
+    private var contentHeight: CGFloat = 0
     private var localMonitor: Any?
     private var globalMonitor: Any?
     private var stopped = false
@@ -53,6 +55,11 @@ final class WindowPeekPanelController {
         hosting.sizingOptions = []
         panel.contentView = hosting
         hosting.rootView.contentHeightChanged = { [weak self] height in self?.fit(contentHeight: height) }
+        hosting.rootView.noticeHeightChanged = { [weak self] height in
+            guard let self, abs(state.noticeHeight - height) > 0.5 else { return }
+            state.noticeHeight = height
+            applyFrame()
+        }
         hosting.rootView.splitPresentationChanged = { [weak self] in
             guard let self, !self.stopped else { return }
             self.update(anchor: self.anchor, settings: self.state.settings, count: self.state.cards.count)
@@ -87,7 +94,7 @@ final class WindowPeekPanelController {
         placement = WindowPeekGeometry.placement(anchor: anchor, settings: settings, count: count,
                                                 routingFiles: state.routingFiles, split: !state.splitCards.isEmpty)
         (panel.contentView as? WindowPeekHostingView<WindowPeekView>)?.rootView.edge = anchor.edge
-        panel.setFrame(placement.frame, display: true)
+        panel.setFrame(grownPlacement.frame, display: true)
     }
 
     /// Content shorter than the panel (loading, a fallback message) would otherwise leave a gap
@@ -99,12 +106,50 @@ final class WindowPeekPanelController {
     /// count and split layout, so it is restored as is.
     private func fit(contentHeight: CGFloat) {
         guard !stopped, contentHeight > 0 else { return }
-        let frame = state.phase == .windows
-            ? placement.frame
-            : WindowPeekGeometry.fitted(placement, contentHeight: contentHeight)
+        self.contentHeight = contentHeight
+        applyFrame()
+    }
+
+    /// The placement plus however much of the notice strip is revealed. Windows-phase content fills
+    /// whatever it is offered and cannot report the strip, so its growth is added here; other phases
+    /// report it through their content height, which this only has to make room for.
+    private var grownPlacement: WindowPeekPlacement {
+        let extra = state.notice == nil ? 0 : state.noticeHeight * CGFloat(state.noticeReveal)
+        return WindowPeekGeometry.extended(placement, by: extra, within: anchor.visibleFrame)
+    }
+
+    private func applyFrame() {
+        guard !stopped else { return }
+        let grown = grownPlacement
+        let frame = state.phase == .windows || contentHeight <= 0
+            ? grown.frame
+            : WindowPeekGeometry.fitted(grown, contentHeight: contentHeight)
         guard abs(frame.height - panel.frame.height) > 0.5 || abs(frame.minY - panel.frame.minY) > 0.5 else { return }
         panel.setFrame(frame, display: true)
     }
+
+    /// Lays out the strip's space but leaves it empty and collapsed, for a flight to fill.
+    func holdNotice() {
+        state.noticeLanded = false
+        state.noticeReveal = 0
+    }
+
+    /// Reveals `fraction` of the strip's height and grows the panel by the same amount.
+    func revealNotice(_ fraction: Double) {
+        guard !stopped, state.noticeReveal != fraction else { return }
+        state.noticeReveal = fraction
+        applyFrame()
+    }
+
+    /// Shows the strip in full once its flight has landed or stopped.
+    func landNotice() {
+        guard !stopped else { return }
+        state.noticeLanded = true
+        revealNotice(1)
+    }
+
+    /// The strip's resting frame in screen coordinates, or nil before Peek has laid it out.
+    var noticeScreenFrame: CGRect? { state.noticeFrame.map(screenRect(fromContent:)) }
 
     var actionMenuPoint: CGPoint { CGPoint(x: panel.frame.midX, y: panel.frame.midY) }
 
