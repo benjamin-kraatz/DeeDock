@@ -126,6 +126,12 @@ enum AnalyticsEvent {
     case notificationFeedOpened(entryCount: Int, unreadCount: Int, trigger: AnalyticsTrigger)
     /// The notification feed closed, with how many entries it held then.
     case notificationFeedClosed(entryCount: Int, duration: Double, cleared: Bool)
+    /// Harbor opened. Counts only: never window titles or app names.
+    case harborOpened(trigger: AnalyticsTrigger, windowCount: Int, appCount: Int, displayCount: Int,
+                      access: AnalyticsHarborAccess)
+    /// Harbor closed, with how it ended and whether search or the app filter was used.
+    case harborClosed(outcome: AnalyticsHarborOutcome, duration: Double, searched: Bool, filtered: Bool,
+                      closedWindows: Int)
     case discoveryCallout(DiscoveryProposal.Destination, action: AnalyticsDiscoveryAction)
     case toolOpened(AnalyticsTool, trigger: AnalyticsTrigger)
 

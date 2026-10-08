@@ -82,6 +82,8 @@ final class DockInteraction {
     @ObservationIgnored var emptyTrash: (() -> Void)?
     @ObservationIgnored var openShelf: (() -> Void)?
     @ObservationIgnored var openNotificationFeed: (() -> Void)?
+    /// Opens Harbor, or closes it when it is open.
+    @ObservationIgnored var openHarbor: (() -> Void)?
     @ObservationIgnored var clearNotificationFeed: (() -> Void)?
     /// Routes the next Settings window to the notification feed page.
     @ObservationIgnored var prepareNotificationFeedSettings: (() -> Void)?

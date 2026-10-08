@@ -29,6 +29,8 @@ nonisolated struct ApplicationWindowSummary: Equatable, Identifiable, Sendable {
     let frame: CGRect?
     let isMinimized: Bool
     let isMain: Bool
+    /// `AXDocument`: the file or web URL the window shows, when the app reports one.
+    var document: String? = nil
 
     var id: ApplicationWindowToken { token }
 }

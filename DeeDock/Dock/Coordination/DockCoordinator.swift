@@ -39,6 +39,10 @@ final class DockCoordinator {
     var settingsDrivesRequest = false
     /// One-shot route to the notification feed page, from its tile, popover, or Discovery.
     var settingsNotificationFeedRequest = false
+    /// One-shot route to the Harbor page, from Harbor's Accessibility notice.
+    var settingsHarborRequest = false
+    /// The app-grouped window overview, shared by every display.
+    let harbor = HarborCoordinator()
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
@@ -230,6 +234,7 @@ final class DockCoordinator {
         // Someone who already turned the feed on needs no announcement.
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
+        configureHarbor()
         notificationFeedPopover.keyboardDismissed = { [weak self] displayID in
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)
@@ -410,11 +415,14 @@ final class DockCoordinator {
         }
         settings.settingsDidChange = { [weak self] in
             if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
+            self?.harbor.configureShortcut(enabled: self?.settings.value.harborShortcutEnabled ?? false)
             self?.configureVolumeReads()
             self?.scheduleShelfSemanticWarmup()
             self?.refreshPanels()
         }
         displayService.didChange = { [weak self] in
+            // Harbor's panels and layout belong to the old arrangement.
+            self?.harbor.close(raising: nil, outcome: .interrupted, animated: false)
             self?.occupancySuspended = false
             self?.reconcile($0)
         }
@@ -441,6 +449,7 @@ final class DockCoordinator {
                 forName: name, object: nil, queue: .main
             ) { [weak self] _ in MainActor.assumeIsolated {
                 self?.occupancySuspended = true
+                self?.harbor.close(raising: nil, outcome: .interrupted, animated: false)
                 self?.occupancy.stop()
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
@@ -703,6 +712,8 @@ final class DockCoordinator {
                 notificationFeedPopover.toggle(on: panel, keyboard: false)
             }
             panel.interaction.clearNotificationFeed = { [weak self] in self?.notificationFeedPopover.clear() }
+            store.openHarbor = { [weak self] in Analytics.performing(.keyboard) { self?.harbor.toggle() } }
+            panel.interaction.openHarbor = { [weak self] in self?.harbor.toggle() }
             panel.interaction.prepareNotificationFeedSettings = { [weak self] in
                 self?.settingsNotificationFeedRequest = true
             }
@@ -896,8 +907,36 @@ final class DockCoordinator {
     /// The dock state for one display, or nil when that display hosts no dock.
     func dockStore(for displayID: String) -> DockStore? { panels[displayID]?.store }
 
+    /// Opens or closes Harbor from the menu.
+    func showHarbor() { harbor.toggle() }
+
+    /// Wires Harbor to the docks it covers and registers its shortcut.
+    private func configureHarbor() {
+        harbor.displays = { [weak self] in self?.profiles.displays ?? [] }
+        harbor.stripOrder = { [weak self] id in
+            self?.panels[id]?.store.entries.compactMap { slot in
+                slot.item.flatMap { $0.isRunning ? $0.reference.id : nil }
+            } ?? []
+        }
+        harbor.dockEdge = { [weak self] id in self?.profiles.effectiveSettings(for: id).edge ?? .bottom }
+        harbor.dockSeed = { [weak self] id, screenFrame in self?.panels[id]?.harborSeed(in: screenFrame) }
+        harbor.willOpen = { [weak self] in
+            guard let self else { return }
+            popovers.closeAll()
+            windowPeeks.close(returnFocus: false)
+            modePicker.close(returnFocus: false)
+            volumeDock.cards.close()
+            timeline.end()
+            endFocus(restore: false)
+        }
+        harbor.previousApplication = { [weak self] in self?.lastExternalApplication }
+        harbor.prepareSettingsRoute = { [weak self] in self?.settingsHarborRequest = true }
+        harbor.configureShortcut(enabled: settings.value.harborShortcutEnabled)
+    }
+
     /// Opens metadata search only after a menu or keyboard action.
     func searchWindows() {
+        harbor.close(raising: nil, outcome: .interrupted, animated: false)
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         timeline.end()
@@ -1108,6 +1147,8 @@ final class DockCoordinator {
         settingsModesRequest = false
         settingsDrivesRequest = false
         settingsNotificationFeedRequest = false
+        settingsHarborRequest = false
+        harbor.stop()
         filePicker.stop()
         dragging.stop()
         folderStacks.stop()

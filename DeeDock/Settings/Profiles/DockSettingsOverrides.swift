@@ -134,6 +134,8 @@ struct DockSettingsOverrides: Codable, Equatable {
         // in the resolved settings each dock reads, but no display can hold its own value.
         result.showShelf = defaults.showShelf
         result.showNotificationFeed = defaults.showNotificationFeed
+        result.showHarborTile = defaults.showHarborTile
+        result.harborShortcutEnabled = defaults.harborShortcutEnabled
         result.secondaryDisplayAppsOnly = defaults.secondaryDisplayAppsOnly
         result.showSessionCapsules = defaults.showSessionCapsules
         result.showTrash = defaults.showTrash
