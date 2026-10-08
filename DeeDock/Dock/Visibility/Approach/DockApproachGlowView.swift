@@ -10,6 +10,8 @@ import SwiftUI
     var focus: CGFloat = 0
     var tone: DockApproachTone = .light
     var metrics = DockApproachGlowMetrics(edge: .bottom, length: 0, depth: 0, zoneSpan: 0...0)
+    /// The resting dock in the panel's top-left coordinates, or nil when the ghost is off.
+    var ghost: DockApproachGhost?
     var reduceMotion = false
     var reduceTransparency = false
 }
@@ -30,14 +32,21 @@ struct DockApproachGlowMetrics: Equatable {
     }
 }
 
-/// Hosts the glow inside the click-through panel.
+/// Hosts the glow, and the ghost dock above it, inside the click-through panel.
 struct DockApproachGlowView: View {
     let model: DockApproachGlowModel
 
     var body: some View {
-        DockApproachGlow(intensity: model.intensity, surge: model.surge, focus: model.focus, tone: model.tone, metrics: model.metrics,
-                         reduceMotion: model.reduceMotion, reduceTransparency: model.reduceTransparency)
-            .accessibilityHidden(true)
+        ZStack {
+            DockApproachGlow(intensity: model.intensity, surge: model.surge, focus: model.focus, tone: model.tone, metrics: model.metrics,
+                             reduceMotion: model.reduceMotion, reduceTransparency: model.reduceTransparency)
+            if let ghost = model.ghost {
+                DockApproachGhostLayer(amount: model.surge, focus: model.focus, ghost: ghost, edge: model.metrics.edge,
+                                       graphite: model.tone.isShadow, reduceMotion: model.reduceMotion,
+                                       reduceTransparency: model.reduceTransparency)
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 

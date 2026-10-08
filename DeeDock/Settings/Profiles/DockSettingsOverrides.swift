@@ -11,7 +11,7 @@ enum DockSettingField: String, CaseIterable, Codable {
     case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
 
     case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
-    case approachIndicator, approachColor
+    case approachIndicator, approachColor, approachGhost
 
     case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
 
@@ -56,6 +56,7 @@ enum DockSettingField: String, CaseIterable, Codable {
         case .animationDuration: \.behavior.animationDuration
         case .approachIndicator: \.behavior.approachIndicator
         case .approachColor: \.behavior.approachColor
+        case .approachGhost: \.behavior.approachGhost
         }
     }
 }
@@ -102,13 +103,14 @@ struct DockSettingsOverrides: Codable, Equatable {
     var animationDuration: Double?
     var approachIndicator: Bool?
     var approachColor: DockBehaviorSettings.ApproachColor?
+    var approachGhost: Bool?
 
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case launcherPosition, appVisibility, tooltipPreset
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, launcherStyle, animateIndicators, launchAnimation, edge, alignment, positionReference
         case autoHide, activationLocation, zoneOffset, revealDelay, hideDelay, animationStyle, animationDuration
-        case approachIndicator, approachColor
+        case approachIndicator, approachColor, approachGhost
         case alongEdgeOffset = "horizontalOffset", edgeDistance = "bottomDistance"
         case lengthMode = "widthMode", customLength = "customWidth", zoneDepth = "zoneHeight"
     }
@@ -177,6 +179,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.behavior.animationDuration = animationDuration ?? defaults.behavior.animationDuration
         result.behavior.approachIndicator = approachIndicator ?? defaults.behavior.approachIndicator
         result.behavior.approachColor = approachColor ?? defaults.behavior.approachColor
+        result.behavior.approachGhost = approachGhost ?? defaults.behavior.approachGhost
         return result
     }
 
@@ -221,6 +224,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .animationDuration: animationDuration != nil
         case .approachIndicator: approachIndicator != nil
         case .approachColor: approachColor != nil
+        case .approachGhost: approachGhost != nil
         }
     }
 
@@ -265,6 +269,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         case .animationDuration: animationDuration = value?.behavior.animationDuration
         case .approachIndicator: approachIndicator = value?.behavior.approachIndicator
         case .approachColor: approachColor = value?.behavior.approachColor
+        case .approachGhost: approachGhost = value?.behavior.approachGhost
         }
     }
 }
@@ -331,6 +336,7 @@ extension DockSettingsOverrides {
         animationDuration = try values.decodeIfPresent(Double.self, forKey: .animationDuration)
         approachIndicator = try values.decodeIfPresent(Bool.self, forKey: .approachIndicator)
         approachColor = try values.decodeIfPresent(DockBehaviorSettings.ApproachColor.self, forKey: .approachColor)
+        approachGhost = try values.decodeIfPresent(Bool.self, forKey: .approachGhost)
         edge = values.contains(.edge) ? try values.decode(DockEdge.self, forKey: .edge) : nil
     }
 }

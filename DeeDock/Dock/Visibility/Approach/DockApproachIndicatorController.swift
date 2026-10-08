@@ -27,9 +27,11 @@ import SwiftUI
     ///   - screenFrame: The display's full frame in AppKit screen coordinates.
     ///   - zone: The activation zone in the same space.
     ///   - runtimeID: The display handle used to find its wallpaper.
+    ///   - ghost: The resting dock in AppKit screen coordinates, or nil when the ghost dock is off.
+    ///     The panel grows to cover it.
     func configure(enabled: Bool, settings: DockBehaviorSettings, screenFrame: CGRect, zone: CGRect, edge: DockEdge,
-                   runtimeID: UInt32, reduceMotion: Bool, reduceTransparency: Bool) {
-        let updated = DockApproachGeometry(screen: screenFrame, zone: zone, edge: edge)
+                   runtimeID: UInt32, ghost: DockApproachGhost?, reduceMotion: Bool, reduceTransparency: Bool) {
+        let updated = DockApproachGeometry(screen: screenFrame, zone: zone, edge: edge, ghost: ghost?.bounds)
         let geometryChanged = geometry != updated
         let modeChanged = colorMode != settings.approachColor
         self.enabled = enabled
@@ -47,6 +49,8 @@ import SwiftUI
             model.metrics = DockApproachGlowMetrics(updated)
             panel?.setFrame(updated.frame, display: true)
         }
+        let localGhost = ghost.map { $0.converted(updated.localRect) }
+        if model.ghost != localGhost { model.ghost = localGhost }
         if modeChanged || geometryChanged { applyTone(animated: false) }
         if colorMode == .automatic { refreshWallpaperTone() }
     }

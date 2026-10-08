@@ -207,9 +207,16 @@ final class DockPanelController {
         }
         visibility.configure(settings.behavior, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
                              geometryChanged: changed || resetVisibility || edgeChanged)
-        approach.configure(enabled: settings.behavior.autoHide && settings.behavior.approachIndicator,
+        let approachEnabled = settings.behavior.autoHide && settings.behavior.approachIndicator
+        approach.configure(enabled: approachEnabled,
                            settings: settings.behavior, screenFrame: display.frame, zone: updated.activation.zone,
                            edge: settings.edge, runtimeID: display.runtimeID,
+                           ghost: approachEnabled && settings.behavior.approachGhost
+                               ? DockApproachGhost.resting(slots: slots, layout: interaction.layout, restingFrame: frame,
+                                                           scrollOffset: interaction.scrollOffset,
+                                                           showsGlass: settings.showBackground,
+                                                           cornerRadius: CGFloat(settings.cornerRadius))
+                               : nil,
                            reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
                            reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
     }

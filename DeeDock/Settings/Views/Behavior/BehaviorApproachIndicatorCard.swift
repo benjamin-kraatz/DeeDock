@@ -13,6 +13,7 @@ struct BehaviorApproachIndicatorCard: View {
             SettingsStackedRow {
                 DockApproachPreview(edge: source.value.edge, color: behavior.approachColor,
                                     active: behavior.approachIndicator && behavior.autoHide,
+                                    showsGhost: behavior.approachGhost,
                                     reduceMotionOverride: previewReduceMotion)
             }
             SettingsToggleRow(title: .behaviorApproachIndicatorToggle, isOn: source.binding(\.behavior.approachIndicator))
@@ -25,6 +26,10 @@ struct BehaviorApproachIndicatorCard: View {
                     SettingsOption(value: .accent, title: .behaviorApproachColorAccent, symbol: "paintpalette")
                 ], selection: source.binding(\.behavior.approachColor))
                     .settingsOverride(source.context, field: .approachColor)
+                Divider().padding(.leading, SettingsMetrics.rowInset)
+                SettingsToggleRow(title: .behaviorApproachGhostToggle, subtitle: .behaviorApproachGhostHelp,
+                                  isOn: source.binding(\.behavior.approachGhost))
+                    .settingsOverride(source.context, field: .approachGhost)
             }
         }
         .animation(.smooth(duration: 0.2), value: behavior.approachIndicator)
@@ -32,6 +37,7 @@ struct BehaviorApproachIndicatorCard: View {
 }
 
 /// A miniature screen edge: a pointer drifts toward it, the glow builds, the dock rises, and the glow fades.
+/// With `showsGhost`, the mini dock's ghost materializes in the glow just before it rises.
 ///
 /// Uses the production glow and geometry with a synthetic pointer; it never reads the real pointer
 /// or wallpaper. Reduce Motion shows one still frame instead of the loop.
@@ -39,6 +45,7 @@ struct DockApproachPreview: View {
     let edge: DockEdge
     let color: DockBehaviorSettings.ApproachColor
     let active: Bool
+    var showsGhost = true
     var reduceMotionOverride: Bool? = nil
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -47,6 +54,38 @@ struct DockApproachPreview: View {
 
     private static let screenSize = CGSize(width: 380, height: 190)
     private static let period = 3.6
+    private static let dockDepth: CGFloat = 26
+    private static let edgeGap: CGFloat = 4
+
+    private var dockLength: CGFloat { edge.isVertical ? 110 : 170 }
+
+    /// The mini dock's resting glass, in the preview screen's AppKit coordinates (y up).
+    private var dockFrame: CGRect {
+        let size = edge.size(length: dockLength, depth: Self.dockDepth), screen = Self.screenSize
+        return switch edge {
+        case .bottom: CGRect(x: (screen.width - size.width) / 2, y: Self.edgeGap, width: size.width, height: size.height)
+        case .top: CGRect(x: (screen.width - size.width) / 2, y: screen.height - Self.edgeGap - size.height,
+                          width: size.width, height: size.height)
+        case .left: CGRect(x: Self.edgeGap, y: (screen.height - size.height) / 2, width: size.width, height: size.height)
+        case .right: CGRect(x: screen.width - Self.edgeGap - size.width, y: (screen.height - size.height) / 2,
+                            width: size.width, height: size.height)
+        }
+    }
+
+    /// Blank slots stand in for icons: the preview must not read the user's real dock.
+    private var ghost: DockApproachGhost? {
+        guard showsGhost else { return nil }
+        let glass = dockFrame, count = edge.isVertical ? 4 : 6, tile: CGFloat = 16, spacing: CGFloat = 9
+        let start = (dockLength - CGFloat(count) * tile - CGFloat(count - 1) * spacing) / 2
+        let inset = (Self.dockDepth - tile) / 2
+        let tiles = (0..<count).map { index in
+            let along = start + CGFloat(index) * (tile + spacing)
+            let frame = edge.isVertical ? CGRect(x: glass.minX + inset, y: glass.minY + along, width: tile, height: tile)
+                : CGRect(x: glass.minX + along, y: glass.minY + inset, width: tile, height: tile)
+            return DockApproachGhost.Tile(frame: frame, icon: nil)
+        }
+        return DockApproachGhost(glass: glass, cornerRadius: 8, tiles: tiles)
+    }
 
     private var geometry: DockApproachGeometry {
         let screen = CGRect(origin: .zero, size: Self.screenSize)
@@ -57,7 +96,7 @@ struct DockApproachPreview: View {
         case .left: CGRect(x: 0, y: screen.midY - length / 2, width: depth, height: length)
         case .right: CGRect(x: screen.maxX - depth, y: screen.midY - length / 2, width: depth, height: length)
         }
-        return DockApproachGeometry(screen: screen, zone: zone, edge: edge)
+        return DockApproachGeometry(screen: screen, zone: zone, edge: edge, ghost: ghost?.bounds)
     }
 
     private var tone: DockApproachTone {
@@ -102,6 +141,13 @@ struct DockApproachPreview: View {
                              reduceTransparency: reduceTransparency)
                 .frame(width: local.width, height: local.height)
                 .offset(x: local.minX, y: local.minY)
+            if let ghost {
+                DockApproachGhostLayer(amount: sample.surge * (1 - reveal), focus: sample.focus,
+                                       ghost: ghost.converted(geometry.localRect), edge: edge, graphite: tone.isShadow,
+                                       reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
+                    .frame(width: local.width, height: local.height)
+                    .offset(x: local.minX, y: local.minY)
+            }
             miniDock(reveal: reveal, geometry: geometry)
             Image(systemName: "cursorarrow")
                 .font(.system(size: 13, weight: .semibold))
@@ -127,14 +173,10 @@ struct DockApproachPreview: View {
     }
 
     private func miniDock(reveal: Double, geometry: DockApproachGeometry) -> some View {
-        let size = edge.size(length: edge.isVertical ? 110 : 170, depth: 26)
-        let travel = (edge.depth(of: size) + 6) * (1 - reveal)
-        let offset: CGSize = switch edge {
-        case .bottom: CGSize(width: (Self.screenSize.width - size.width) / 2, height: Self.screenSize.height - size.height - 4 + travel)
-        case .top: CGSize(width: (Self.screenSize.width - size.width) / 2, height: 4 - travel)
-        case .left: CGSize(width: 4 - travel, height: (Self.screenSize.height - size.height) / 2)
-        case .right: CGSize(width: Self.screenSize.width - size.width - 4 + travel, height: (Self.screenSize.height - size.height) / 2)
-        }
+        let rest = dockFrame, size = rest.size
+        // Slides in from beyond the screen edge to its resting place; canonical +y is outward.
+        let travel = edge.offset(CGSize(width: 0, height: (edge.depth(of: size) + 6) * (1 - reveal)))
+        let offset = CGSize(width: rest.minX + travel.width, height: Self.screenSize.height - rest.maxY + travel.height)
         return RoundedRectangle(cornerRadius: 8, style: .continuous)
             .fill(.regularMaterial)
             .overlay { RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(.white.opacity(0.25)) }
