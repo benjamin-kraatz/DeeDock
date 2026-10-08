@@ -1,7 +1,7 @@
 // Shared app identity and version. These two keys are the
 // only version source. Target build settings must inherit them.
-CURRENT_PROJECT_VERSION = 57
-MARKETING_VERSION = 0.18.1
+CURRENT_PROJECT_VERSION = 58
+MARKETING_VERSION = 0.18.2
 PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DeeDock
 INFOPLIST_KEY_CFBundleName = DOKK
 INFOPLIST_KEY_CFBundleDisplayName = DOKK
