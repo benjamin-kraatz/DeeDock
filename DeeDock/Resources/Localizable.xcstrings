@@ -1983,6 +1983,24 @@
         }
       }
     },
+    "harborAccessibilityNotice" : {
+      "comment" : "Harbor notice when Accessibility access is off. DOKK is the product name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor zeigt deine Fenster. Um ein einzelnes Fenster nach vorn zu holen oder zu schließen, erlaube DOKK den Zugriff über die Bedienungshilfen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor shows your windows. To bring a single window forward or close it, allow Accessibility access for DOKK."
+          }
+        }
+      }
+    },
     "tooltipBadgeNew" : {
       "comment" : "Shown after an app's name in a Line icon dock's hover label when its badge is new but has no count, such as a dot.",
       "extractionState" : "manual",
@@ -15509,6 +15527,426 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Visible text only; partial context"
+          }
+        }
+      }
+    },
+    "harborCloseWindow" : {
+      "comment" : "Harbor: tooltip and accessibility action of the button that closes a window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Window"
+          }
+        }
+      }
+    },
+    "harborHidden" : {
+      "comment" : "Harbor chip state for a window whose app is hidden.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden"
+          }
+        }
+      }
+    },
+    "harborMinimized" : {
+      "comment" : "Harbor chip state for a window minimized to the Dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimized"
+          }
+        }
+      }
+    },
+    "harborName" : {
+      "comment" : "Name of Harbor, DOKK's window overview that shows every window grouped by app. Product feature name; keep untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor"
+          }
+        }
+      }
+    },
+    "harborNoMatches" : {
+      "comment" : "Harbor empty state when the search matches nothing. The query is what the person typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Fenster passen zu „%(query)@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No windows match “%(query)@”"
+          }
+        }
+      }
+    },
+    "harborNoWindows" : {
+      "comment" : "Harbor empty state when no app has a window in the current Space.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine offenen Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No open windows"
+          }
+        }
+      }
+    },
+    "harborOpenSettings" : {
+      "comment" : "Harbor notice button that opens DOKK Settings on the Harbor page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        }
+      }
+    },
+    "harborPermissionsHelp" : {
+      "comment" : "Footnote under the permission controls on Harbor's settings page. DOKK is the product name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit den Bedienungshilfen kann Harbor einzelne Fenster nach vorn holen, schließen und minimierte Fenster auflisten. Die Bildschirmaufnahme ergänzt Vorschaubilder der Fenster. Ohne beides zeigt Harbor trotzdem jede App und die Plätze ihrer Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility lets Harbor bring single windows forward, close them, and list minimized windows. Screen Recording adds window thumbnails. Without either, Harbor still shows each app and its windows' places."
+          }
+        }
+      }
+    },
+    "harborRunningApps" : {
+      "comment" : "Accessibility label of Harbor's strip of running apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufende Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running apps"
+          }
+        }
+      }
+    },
+    "harborSearchPrompt" : {
+      "comment" : "Placeholder of Harbor's search field, which filters windows by title and app name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster durchsuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search windows"
+          }
+        }
+      }
+    },
+    "harborSettingsHelp" : {
+      "comment" : "Footnote under Harbor's settings card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor legt dein Hintergrundbild über den Schreibtisch und zeigt die Fenster im aktuellen Space, nach App gruppiert. Klicke auf ein Fenster, um es nach vorn zu holen, tippe zum Filtern oder drücke Escape, um zurückzukehren. Minimierte Fenster und ausgeblendete Apps erscheinen als kleine Chips in der Gruppe ihrer App."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor covers the desktop with your wallpaper and shows the windows in the current Space, grouped by app. Click a window to bring it forward, type to filter, or press Escape to go back. Minimized windows and hidden apps appear as small chips inside their app's group."
+          }
+        }
+      }
+    },
+    "harborSettingsKeywords" : {
+      "comment" : "Search terms that find the Harbor page in Settings. Comma-separated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster, Übersicht, Mission Control, Exposé, alle Fenster, Raster, Kurzbefehl"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "windows, overview, Mission Control, Exposé, all windows, grid, shortcut"
+          }
+        }
+      }
+    },
+    "harborSettingsSubtitle" : {
+      "comment" : "Subtitle of the Harbor row on the Windows & Focus overview in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Fenster, nach App gruppiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every window, grouped by app"
+          }
+        }
+      }
+    },
+    "harborShortcutConflict" : {
+      "comment" : "Settings status when Harbor's shortcut could not be registered. The symbols are Option, Shift, Command, and the Space bar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine andere App verwendet bereits ⌥⇧⌘Leertaste. Harbor bleibt über die Menüleiste und die Dock-Kachel erreichbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another app already uses ⌥⇧⌘Space. Harbor stays available from the menu bar and the dock tile."
+          }
+        }
+      }
+    },
+    "harborShortcutToggle" : {
+      "comment" : "Settings switch for Harbor's global keyboard shortcut. The symbols are Option, Shift, Command, and the Space bar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit ⌥⇧⌘Leertaste öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open with ⌥⇧⌘Space"
+          }
+        }
+      }
+    },
+    "harborShortcutToggleHelp" : {
+      "comment" : "Subtitle of Harbor's shortcut switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktioniert in jeder App."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Works from any app."
+          }
+        }
+      }
+    },
+    "harborShow" : {
+      "comment" : "Menu command that opens Harbor, the window overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Harbor"
+          }
+        }
+      }
+    },
+    "harborShowTile" : {
+      "comment" : "Settings switch that adds the Harbor tile to every dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbor im Dock anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Harbor in the dock"
+          }
+        }
+      }
+    },
+    "harborShowTileHelp" : {
+      "comment" : "Subtitle of the Harbor tile switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardmäßig aus. Fügt neben der Ablage eine Harbor-Kachel hinzu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off by default. Adds a Harbor tile next to the Shelf."
+          }
+        }
+      }
+    },
+    "harborStripCloseHint" : {
+      "comment" : "Harbor: accessibility hint of the Harbor tile in the running-apps strip while Harbor is open. Activating it closes Harbor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließt Harbor."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closes Harbor."
+          }
+        }
+      }
+    },
+    "harborTileHint" : {
+      "comment" : "VoiceOver hint for the Harbor dock tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt alle Fenster, nach App gruppiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows every window, grouped by app."
+          }
+        }
+      }
+    },
+    "harborWindowCount" : {
+      "comment" : "How many windows an app has in Harbor. Shown after the app name in a group header and read for strip tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Fenster"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Fenster"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld window"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld windows"
+                }
+              }
+            }
           }
         }
       }

@@ -115,7 +115,10 @@ actor AccessibilityApplicationWindowService: ApplicationWindowServicing {
                     title: rawTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? rawTitle : nil,
                     frame: rect(window),
                     isMinimized: boolean(window, attribute: kAXMinimizedAttribute as CFString) ?? false,
-                    isMain: boolean(window, attribute: kAXMainAttribute as CFString) ?? false
+                    isMain: boolean(window, attribute: kAXMainAttribute as CFString) ?? false,
+                    // Document windows and Finder report a file URL, browsers the page URL. Read
+                    // once here so Harbor's captions need no second Accessibility round trip.
+                    document: string(window, attribute: kAXDocumentAttribute as CFString)
                 ))
             }
         }

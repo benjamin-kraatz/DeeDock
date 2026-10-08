@@ -216,6 +216,24 @@ Choose **Find a Window** from the DOKK menu, press Command-Shift-Space globally,
 
 **Saved Capsules** searches historical checkpoints and supports deletion. “Yesterday” requires a capsule saved yesterday; DOKK does not collect a continuous screen history. See the [window search reference](WINDOW_SEARCH.md) for limits, keyboard controls, and pending acceptance.
 
+### Harbor
+
+Harbor shows every window in the current Space at once, grouped by app. Press Option-Shift-Command-Space from any app, choose **Show Harbor** from the DOKK menu, or click the Harbor tile. The tile is off by default; turn it on in **Settings → Windows & Focus → Harbor**, where you can also turn off the shortcut. When another app already uses the shortcut, Settings says so and the menu stops showing it.
+
+Harbor covers each display with its blurred wallpaper and flies the windows into a grid of app groups. The most recently used app leads in its own row with larger thumbnails. The desktop dims first, then the windows fly, as in Mission Control. The dock itself transforms: pins that are not running and the Trash shrink away, the running apps slide together, their names and window counts appear, and the Harbor tile lights up. Closing plays this backwards and the strip lands on the dock. When the dock is hidden, the strip slides in at the dock's edge instead. Minimized windows and windows of hidden apps appear as chips inside their app's group. With Accessibility, larger thumbnails carry a second caption line: the folder of a document, the path of a Finder window, or the address of a web page. When even the smallest thumbnails do not fit, the grid scrolls.
+
+- Click a window, or select it with the arrow keys and press Return, to bring it forward. The other windows fly home.
+- Hover a window and click its Close button to close it. If the window stays open, usually because a save dialog appeared, Harbor steps aside and brings it forward.
+- Type to filter by window title and app name. Every word must match.
+- Click an app in the strip to show only its group; click it again to show every group. An app without windows on that display comes forward, as it would from the dock. The Harbor tile in the strip closes Harbor.
+- Escape clears the search, then the app filter, then closes Harbor and returns to the app you were using. A click on the wallpaper also closes it. Switching apps or Spaces closes it too.
+
+Harbor never hides or minimizes other apps. It only draws over them, so nothing changes until you choose a window. Thumbnails are one-shot captures held in memory while Harbor is open and released when it closes.
+
+**Permissions.** With Accessibility, Harbor can bring a single window forward, close it, and list minimized windows and hidden apps. Screen Recording adds thumbnails. Without Screen Recording, cards show the app icon and the window title. Without Accessibility, cards bring the whole app forward and Harbor offers a shortcut to Settings. Harbor never asks for either permission by itself.
+
+**Limits.** Public APIs do not say which Space a window belongs to. Harbor shows a window when macOS reports it on screen, which covers the current Space; windows on other Spaces and in other full-screen Spaces are left out. Two untitled windows with identical frames get no thumbnail, because Harbor cannot tell them apart without private APIs. Aerial and other video wallpapers may not provide an image; Harbor then uses a plain backdrop. Each display shows the windows that mostly overlap it. Reduce Motion replaces the flight and the dock's transformation with crossfades, and Reduce Transparency makes the backdrop, cards, and strip opaque.
+
 ### App Fusion
 
 Choose **App Fusion → Fuse windows** from the menu-bar menu to launch two apps and pair

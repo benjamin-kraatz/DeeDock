@@ -20,6 +20,7 @@ struct DockUtilityMoveModifier: ViewModifier {
                             else if slot.isLauncher { interaction.openLauncher?() }
                             else if slot.shelf != nil { interaction.openShelf?() }
                             else if slot.notificationFeed != nil { interaction.openNotificationFeed?() }
+                            else if slot.harbor != nil { interaction.openHarbor?() }
                             else { interaction.openSessionCapsules?() }
                         },
                         begin: { view, event in interaction.beginUtilityDrag?(slot, view, event) },

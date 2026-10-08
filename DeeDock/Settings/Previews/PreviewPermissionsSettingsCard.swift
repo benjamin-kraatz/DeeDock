@@ -4,9 +4,11 @@ import SwiftUI
 struct PreviewPermissionsSettingsCard: View {
     let windowAccess: WindowAccessController
     let screenCapture: ScreenCaptureAccessController
+    /// Explains what the permissions add for the page showing the card.
+    var footnote: LocalizedStringResource = .windowPeekPermissionsHelp
 
     var body: some View {
-        SettingsCard(title: .windowPeekPermissionsTitle, footnote: .windowPeekPermissionsHelp) {
+        SettingsCard(title: .windowPeekPermissionsTitle, footnote: footnote) {
             SettingsPermissionRow(symbol: "macwindow", colors: SettingsPage.windowPeek.tileColors,
                                   title: .windowAccessTitle, status: windowAccess.status.permissionMessage,
                                   state: windowAccess.status.permissionState, enableTitle: .windowAccessEnable,

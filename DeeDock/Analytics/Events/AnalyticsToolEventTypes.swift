@@ -124,3 +124,31 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     /// follow-through is reported by `system_dock_tuck`, not here.
     case systemDockTuck = "system_dock_tuck"
 }
+
+/// Which window permissions Harbor had when it opened.
+nonisolated enum AnalyticsHarborAccess: String, AnalyticsToken {
+    case full, accessibilityOnly = "accessibility_only", screenRecordingOnly = "screen_recording_only", none
+
+    init(_ access: HarborAccess) {
+        switch (access.windows, access.thumbnails) {
+        case (true, true): self = .full
+        case (true, false): self = .accessibilityOnly
+        case (false, true): self = .screenRecordingOnly
+        case (false, false): self = .none
+        }
+    }
+}
+
+/// How Harbor closed.
+nonisolated enum AnalyticsHarborOutcome: String, AnalyticsToken {
+    /// A window was brought forward.
+    case window
+    /// An app was brought forward without an exact window.
+    case app
+    /// A minimized or hidden window was restored.
+    case restored
+    /// Escape, a click on the wallpaper, the shortcut, or the tile closed it.
+    case dismissed
+    /// Another app, a Space change, sleep, or Settings took over.
+    case interrupted
+}

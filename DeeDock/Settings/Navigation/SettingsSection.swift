@@ -107,7 +107,7 @@ enum SettingsSection: Hashable, Identifiable {
              [.actionTiles, .soapBubbles],
              [.multipleDisplays]]
         case .windowsFocus:
-            [[.windowPeek, .focusSessions], [.permissions]]
+            [[.windowPeek, .harbor, .focusSessions], [.permissions]]
         case .suggestionsHistory:
             [[.appSuggestions, .discovery], [.localHistory, .clipboardMuseum]]
         case .deprecated:

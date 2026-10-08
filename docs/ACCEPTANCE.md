@@ -3106,3 +3106,42 @@ The tests were not run locally, following `AGENTS.md`. The pull request's CI job
 - Quit DOKK normally and confirm the Dock comes back. Relaunch and confirm it is tucked away again. Repeat with an update relaunch and a logout/login.
 - Force-quit DOKK while the Dock is tucked away. Relaunch with the switch on, then with it off, and confirm the Dock ends in the matching state.
 - Check badge mirroring after each restart, multiple displays, full-screen Spaces, VoiceOver labels and hints for the button and status, Reduce Motion in the diagram, and German text length.
+
+## Harbor (DEE-119)
+
+Harbor is the app-grouped window overview. The style was chosen in the interactive mockup at `docs/mockups/harbor.html`: front app large, fly-out opening, leading Close button, glow highlight, dock labels on, 34-point backdrop blur, 0.38 scrim, and `.spring(response: 0.37, dampingFraction: 0.89)`.
+
+### Implemented
+
+- One borderless panel per drawable display at the Window Peek stage level, joining every Space, including full-screen ones. Harbor covers windows and never hides or minimizes apps.
+- Discovery through Accessibility (exact identity, minimized windows, hidden apps), the on-screen window list (current Space and front-to-back order, no permission needed), and ScreenCaptureKit (thumbnails and titles). `HarborDiscoveryProjection` holds the Space and permission rules.
+- Thumbnails captured four at a time, front windows first. The panels appear as soon as discovery finishes; the backdrop fades in over 240 ms while thumbnails land over their windows. Windows fly once thumbnails arrive or 300 ms pass, whichever is first, but never before the backdrop covers the desktop. Later thumbnails fade in. Group cards, captions, and chips follow the flight with 70, 160, and 200 ms delays. On close the windows fly at once, the chrome fades in 150 ms, the backdrop clears from 100 to 340 ms, and the panels go at 390 ms (`HarborStyle`).
+- The strip transforms from the dock: `DockPanelController.harborSeed(in:)` snapshots the painted glass and every tile's icon frame (`HarborDockSeed`), the strip draws that picture first, and a spring morphs it into the running-apps layout (`HarborStripLayout`): pins without windows, folders, and the Trash shrink away in place, survivors slide together, labels and counts appear, and the Harbor tile stays as a Close control. A hidden dock gives no seed, so the strip slides in from the edge. Reduce Motion crossfades instead.
+- Group glow drawn behind the card and cut out inside it (`destinationOut`), so the halo stays outside the translucent glass.
+- Captions carry a second line from `AXDocument` when thumbnails are at least 104 points tall: a document's folder, a Finder window's path with `~`, or a page's host and path (`HarborCaptionText`).
+- A layout that overflows at the minimum thumbnail size scrolls; arrow-key selection scrolls into view.
+- Blurred wallpaper backdrop from `NSWorkspace.desktopImageURL(for:)`, decoded at a quarter of the display's pixel width and cached per file and size.
+- Layout as a pure function (`HarborLayout`): one shared thumbnail height found by binary search, with the front app's group in a row of its own.
+- Strip of running apps at the dock edge in dock order, with window counts, an app filter, and the Harbor tile when the dock shows one.
+- Search, arrow keys, Return, layered Escape, Close with save-dialog fallback, chips for minimized and hidden windows, an Accessibility notice, and dismissal on app switch, Space change, sleep, display change, and teardown.
+- Global shortcut Option-Shift-Command-Space with conflict reporting, an optional dock tile (off by default), a menu command, a Settings page, and count-only analytics (`harbor_opened`, `harbor_closed`).
+
+### Validation status
+
+`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath <scratch> CODE_SIGNING_ALLOWED=NO build-for-testing` returned **TEST BUILD SUCCEEDED**, with no warnings from the Harbor files.
+
+`DeeDockTests/HarborLayoutTests.swift` and `DeeDockTests/HarborDiscoveryTests.swift` cover layout bounds and overlaps, aspect ratios, the front-app row, overflow, chip-only groups, the current-Space rule, tucked windows, ambiguous matches, missing permissions, display assignment with negative origins, group order, search, and arrow navigation. They were compiled but not run, following `AGENTS.md`.
+
+The app was not launched. None of the following has been exercised by hand:
+
+- The feel of the two-beat opening: whether early thumbnails visibly brighten as they land over a dimming window, whether 240 ms of lead reads as deliberate or slow, and whether the panels are gone before any thumbnail is still moving on close.
+- The dock transformation on a magnified dock, a dock without its material, a left or right dock, an App Visibility section that hides running apps, and a dock that auto-hides while Harbor is open.
+- Whether `AXDocument` is reported by Safari, Finder, Preview, and TextEdit on macOS 27, and how long the extra attribute read adds to discovery with many windows.
+- Scrolling with 50 or more windows, including the scroll indicator over the backdrop and a click on empty stage space.
+
+- Opening latency and CPU, GPU, and memory use with 10, 30, and 50 windows.
+- Thumbnail capture for occluded, protected, and hidden-app windows on macOS 27.
+- Whether the panel covers the menu bar and the macOS Dock, and takes typing, on a normal Space and over a full-screen app.
+- What `desktopImageURL` returns for dynamic and Aerial wallpapers.
+- Multiple displays, mixed backing scales, and a dock on the left or right edge.
+- Close with an unsaved document, Stage Manager, VoiceOver, Reduce Motion, and Reduce Transparency.

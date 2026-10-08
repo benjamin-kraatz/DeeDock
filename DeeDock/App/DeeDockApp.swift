@@ -55,6 +55,7 @@ struct DeeDockApp: App {
                     .keyboardShortcut(delegate.coordinator.searchShortcutAvailable
                         ? KeyboardShortcut(.space, modifiers: [.command, .shift])
                         : KeyboardShortcut("f", modifiers: [.command, .shift]))
+                HarborMenuButton(harbor: delegate.coordinator.harbor) { delegate.coordinator.showHarbor() }
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                     .disabled(!delegate.coordinator.canBrowseLocalHistory)
                 Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
@@ -97,6 +98,7 @@ struct DeeDockApp: App {
 
                 Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
                     .keyboardShortcut("f", modifiers: [.command, .shift])
+                Button(.harborShow) { delegate.coordinator.showHarbor() }
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }

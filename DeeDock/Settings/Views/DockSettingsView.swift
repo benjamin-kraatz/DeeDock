@@ -83,6 +83,11 @@ struct DockSettingsView: View {
             coordinator?.settingsNotificationFeedRequest = false
             select(.extras, page: .notificationFeed)
         }
+        .onChange(of: coordinator?.settingsHarborRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsHarborRequest = false
+            select(.windowsFocus, page: .harbor)
+        }
         .onChange(of: coordinator?.settingsFeaturesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false
@@ -189,6 +194,7 @@ struct DockSettingsView: View {
         case .capsules: isOn = value.showSessionCapsules
         case .badges: isOn = value.showAppBadges
         case .notificationFeed: isOn = value.showNotificationFeed
+        case .harbor: isOn = value.harborShortcutEnabled || value.showHarborTile
         case .windowPeek: isOn = value.windowPeekEnabled
         case .magneticEdges: isOn = value.magneticEdges
         case .soapBubbles: isOn = value.soapBubbleEffects
