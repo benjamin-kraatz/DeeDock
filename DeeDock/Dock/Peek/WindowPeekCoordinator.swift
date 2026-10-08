@@ -23,6 +23,8 @@ final class WindowPeekCoordinator {
     private let screenCapture: ScreenCaptureAccessController
     private let thumbnails: any WindowThumbnailServicing
     private var controller: WindowPeekPanelController?
+    /// The hover label flying into the open Peek's notice strip, while it is in the air.
+    private var noticeFlight: WindowPeekNoticeFlight?
     private var enlarge: WindowPeekEnlargeController?
     private let markups: WindowMarkupController
     /// Collisions outside Peek (dock drags, App Fusion gestures) that suspend the enlarged preview.
@@ -193,6 +195,9 @@ final class WindowPeekCoordinator {
         controller = nil
         activeController?.closed = nil
         activeController?.close(returnFocus: false)
+        // After Peek, which then ignores the flight's request to show its strip in full.
+        noticeFlight?.stop()
+        noticeFlight = nil
         sourcePanel = nil
         sourceItem = nil
         fileDocuments = nil
@@ -230,6 +235,19 @@ final class WindowPeekCoordinator {
                                              settings: context.settings, keyboard: keyboard)
         controller = next
         unreportedTrigger = fileDocuments != nil || fileDrag ? .fileDrag : keyboard ? .keyboard : .hover
+        // Read before the hold below clears the dock's label: Peek takes over the badge detail
+        // the label was showing, and the label itself when it was on screen.
+        let handoff = fileDocuments == nil ? panel.windowPeekNoticeHandoff(for: item) : nil
+        next.state.notice = handoff?.notice
+        if let handoff, let label = handoff.label, !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            let flight = WindowPeekNoticeFlight(
+                peek: next, label: label, notice: handoff.notice,
+                reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
+            flight.finished = { [weak self, weak flight] in
+                if let self, noticeFlight === flight { noticeFlight = nil }
+            }
+            noticeFlight = flight
+        }
         panel.holdWindowPeek(true)
         next.closed = { [weak self] returnFocus in self?.close(returnFocus: returnFocus) }
         next.state.routingFiles = fileDocuments != nil
@@ -355,6 +373,8 @@ final class WindowPeekCoordinator {
             next.state.startMelt = nil
         }
         next.show()
+        // After Peek, so the overlay is ordered in front of it.
+        noticeFlight?.start()
         discover(item)
     }
 

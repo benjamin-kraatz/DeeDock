@@ -74,6 +74,32 @@ nonisolated enum WindowPeekGeometry {
         return frame
     }
 
+    /// Adds `extra` points of height on the side away from the dock, for Peek's notice strip.
+    ///
+    /// The side nearest the icon stays put, as in ``fitted(_:contentHeight:)``, so a strip pinned to
+    /// that side does not move while the panel grows. Growth stops at the display's usable frame;
+    /// beyond that the strip takes its room from the windows.
+    static func extended(_ placement: WindowPeekPlacement, by extra: CGFloat, within visibleFrame: CGRect) -> WindowPeekPlacement {
+        guard extra > 0 else { return placement }
+        let available = visibleFrame.insetBy(dx: screenMargin, dy: screenMargin)
+        var frame = placement.frame
+        let room = switch placement.edge {
+        case .bottom: available.maxY - frame.minY
+        case .top: frame.maxY - available.minY
+        case .left, .right: available.height
+        }
+        let height = min(frame.height + extra, max(frame.height, room))
+        let added = height - frame.height
+        frame.size.height = height
+        switch placement.edge {
+        case .bottom: break
+        case .top: frame.origin.y -= added
+        case .left, .right:
+            frame.origin.y = min(max(frame.origin.y - added / 2, available.minY), available.maxY - height)
+        }
+        return WindowPeekPlacement(frame: frame, edge: placement.edge)
+    }
+
     static func cardSize(_ settings: DockSettings) -> CGSize {
         let thumbnail = settings.windowPeekSize.thumbnailSize
         return switch settings.windowPeekLayout {

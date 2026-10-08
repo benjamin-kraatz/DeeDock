@@ -31,11 +31,17 @@ struct DockTooltipsOverlay: View {
                 let dock = layout.surfaceFrame(sizes: Array(repeating: layout.iconSize, count: slots.count)).intersection(viewport)
                 let frame = DockTooltipGeometry.frame(size: measuredSize, icon: iconFrame, dock: dock, region: region,
                                                       edge: layout.edge, placement: interaction.tooltipPreset.placement)
-                DockTooltipArtwork(name: slot.name, icon: slot.icon, preset: interaction.tooltipPreset,
+                let artwork = DockTooltipArtwork(name: slot.name, icon: slot.icon, preset: interaction.tooltipPreset,
                     edge: layout.edge, maximumWidth: max(1, region.width - 16), reduceTransparency: reduceTransparency,
                     badge: DockTooltipBadge(slot: slot, interaction: interaction))
+                artwork
                     .onGeometryChange(for: CGSize.self) { $0.size } action: {
                         if measuredSize != $0 { measuredSize = $0 }
+                    }
+                    // Root space, like the icon hit rects, so the panel converts it to the screen the
+                    // same way it anchors Window Peek.
+                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .named("dockRoot")) } action: { rect in
+                        interaction.tooltips.presented = .init(target: target, frame: rect, artwork: artwork)
                     }
                     // Follow already-rendered icon geometry without applying a second hover spring.
                     .animation(nil) { content in

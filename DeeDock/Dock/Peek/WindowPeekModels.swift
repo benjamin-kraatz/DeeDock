@@ -101,6 +101,19 @@ final class WindowPeekState {
     /// Pointer entered (`true`) or left a card. Set only while the enlarged preview is enabled.
     @ObservationIgnored var cardHovered: ((ApplicationWindowToken, Bool) -> Void)?
 
+    /// The new notification the dock's hover label showed for this app, shown as a strip on the
+    /// card's side nearest the dock. Nil when the tile has no new badge with a banner.
+    var notice: WindowPeekNotice?
+    /// How much of the strip's height is laid out, from 0 to 1. A hand-off flight drives it; a Peek
+    /// opened without one shows the strip in full.
+    var noticeReveal: Double = 1
+    /// False while a flight still carries the strip. Its space is laid out but left empty.
+    var noticeLanded = true
+    /// The strip's natural height, including its spacing from the windows, in points.
+    @ObservationIgnored var noticeHeight: CGFloat = 0
+    /// The strip's resting frame in the hosting view's top-left-origin space; the flight's destination.
+    @ObservationIgnored var noticeFrame: CGRect?
+
     /// Whether cards report hover and artwork frames for the enlarged preview.
     var enlargesCards: Bool { settings.windowPeekEnlargeEnabled && !routingFiles }
 

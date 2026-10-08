@@ -12,6 +12,8 @@ struct DockTooltipBadge: Equatable {
     var isNew: Bool
     /// The newest collected banner from this app since its badge was acknowledged.
     var banner: String?
+    /// The Notification Feed entry `banner` was joined from. Window Peek lays out its parts itself.
+    var entry: NotificationFeedEntry?
 
     /// The detail for `slot`, or nil when its tile shows no badge or its dock draws native artwork.
     @MainActor init?(slot: DockRenderSlot, interaction: DockInteraction) {
@@ -30,8 +32,9 @@ struct DockTooltipBadge: Equatable {
                 $0.arrivedAt > since
                     && $0.appName?.compare(item.reference.name, options: .caseInsensitive) == .orderedSame
             } : nil
+            let banner = entry.flatMap { Self.preview([$0.title, $0.subtitle ?? $0.body]) }
             self.init(summary: Self.summary(label: label, isNew: isNew), isNew: isNew,
-                      banner: entry.flatMap { Self.preview([$0.title, $0.subtitle ?? $0.body]) })
+                      banner: banner, entry: banner == nil ? nil : entry)
         case .notificationFeed:
             guard let store = interaction.notificationFeed?.store, store.unreadCount > 0,
                   interaction.lineIcon(for: .notificationFeed) != nil else { return nil }
@@ -42,10 +45,11 @@ struct DockTooltipBadge: Equatable {
         }
     }
 
-    init(summary: String?, isNew: Bool, banner: String?) {
+    init(summary: String?, isNew: Bool, banner: String?, entry: NotificationFeedEntry? = nil) {
         self.summary = summary
         self.isNew = isNew
         self.banner = banner
+        self.entry = entry
     }
 
     /// A count reads as "2 new" while it is news and as the bare number once seen. Other labels,

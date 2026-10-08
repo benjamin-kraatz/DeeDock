@@ -10,8 +10,19 @@ final class DockTooltipController {
         var keyboard = false
         var reduceMotion = false
     }
+    /// The label on screen and where it sits, kept so Window Peek can take it over.
+    struct Presented {
+        let target: DockEntryID
+        /// The artwork's frame in the dock's root space (`dockRoot`), top-left origin.
+        let frame: CGRect
+        let artwork: DockTooltipArtwork
+    }
+
     private(set) var revision = 0
     private(set) var visible: DockEntryID?
+    /// Written by the overlay as the visible label lays out. Unobserved, because nothing redraws
+    /// from it; only read when a Window Peek opens over the labelled tile.
+    @ObservationIgnored var presented: Presented?
     @ObservationIgnored private var request: Request?
     @ObservationIgnored private let scheduler: any DockVisibilityScheduling
     @ObservationIgnored private var pending: DockScheduledAction?
@@ -40,6 +51,6 @@ final class DockTooltipController {
     }
 
     /// Used for invalidated content, menus, hiding, and sleep. A subsequent request starts a fresh delay.
-    func clear() { cancel(); request = nil; visible = nil; revision &+= 1 }
+    func clear() { cancel(); request = nil; visible = nil; presented = nil; revision &+= 1 }
     private func cancel() { generation = UUID(); pending?.cancel(); pending = nil }
 }

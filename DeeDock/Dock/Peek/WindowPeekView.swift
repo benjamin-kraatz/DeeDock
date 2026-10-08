@@ -7,6 +7,8 @@ struct WindowPeekView: View {
     var edge: DockEdge = .bottom
     var contentHeightChanged: ((CGFloat) -> Void)? = nil
     var splitPresentationChanged: (() -> Void)? = nil
+    /// Reports the notice strip's natural height, spacing included, so the panel can make room for it.
+    var noticeHeightChanged: ((CGFloat) -> Void)? = nil
     var reduceTransparencyOverride: Bool? = nil
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
@@ -36,15 +38,21 @@ struct WindowPeekView: View {
 
     private var card: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Image(nsImage: state.appIcon).resizable().interpolation(.high).frame(width: 24, height: 24)
-                Text(verbatim: state.appName).font(.headline).lineLimit(1)
-                Spacer(minLength: 0)
-                if !state.routingFiles {
-                    Button(.fileRouteChooseFiles, systemImage: "doc.badge.plus") { state.chooseFiles?() }
-                        .labelStyle(.iconOnly)
-                        .disabled(state.actionBusy)
+            // The strip sits on the side nearest the dock: under the header on a top dock, below
+            // the windows otherwise. Each pair shares a zero-spacing stack because the strip carries
+            // its own spacing, which must collapse with it.
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 8) {
+                    Image(nsImage: state.appIcon).resizable().interpolation(.high).frame(width: 24, height: 24)
+                    Text(verbatim: state.appName).font(.headline).lineLimit(1)
+                    Spacer(minLength: 0)
+                    if !state.routingFiles {
+                        Button(.fileRouteChooseFiles, systemImage: "doc.badge.plus") { state.chooseFiles?() }
+                            .labelStyle(.iconOnly)
+                            .disabled(state.actionBusy)
+                    }
                 }
+                if edge == .top { noticeSlot }
             }
             if state.routingFiles {
                 Text(state.receivingFileDrag ? .fileRouteDropHelp : .fileRouteSelectDestination)
@@ -53,7 +61,10 @@ struct WindowPeekView: View {
             if let message = state.actionMessage {
                 Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
             }
-            content.disabled(state.actionBusy)
+            VStack(alignment: .leading, spacing: 0) {
+                content.disabled(state.actionBusy)
+                if edge != .top { noticeSlot }
+            }
             if state.receivingFileDrag {
                 Text(.fileRouteDropApp).font(.caption)
                     .frame(maxWidth: .infinity, minHeight: 32)
@@ -108,6 +119,30 @@ struct WindowPeekView: View {
                     Button(.windowPeekShowAll) { state.showAll?() }
                 }
             }
+        }
+    }
+
+    /// The new notification from the hovered tile's label. Clicking it opens the app, which also
+    /// acknowledges the badge.
+    @ViewBuilder private var noticeSlot: some View {
+        if let notice = state.notice, !state.routingFiles {
+            WindowPeekNoticeReveal(fraction: state.noticeReveal, pinsBottom: edge != .top) {
+                Button { state.showApp?() } label: {
+                    WindowPeekNoticeStrip(notice: notice)
+                        .contentShape(.rect(cornerRadius: WindowPeekNoticeStrip.cornerRadius))
+                        .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { state.noticeFrame = $0 }
+                }
+                .buttonStyle(.plain)
+                // Hidden, not removed, while the flight carries it: its frame is the flight's target.
+                .opacity(state.noticeLanded ? 1 : 0)
+                .accessibilityHidden(!state.noticeLanded)
+                .accessibilityLabel(Text(.windowPeekNoticeAccessibilityLabel(banner: notice.spoken)))
+                .accessibilityValue(Text(verbatim: notice.summary))
+                .accessibilityHint(Text(.windowPeekNoticeAccessibilityHint))
+                .padding(.top, 10)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { noticeHeightChanged?($0) }
+            }
+            .clipped()
         }
     }
 
