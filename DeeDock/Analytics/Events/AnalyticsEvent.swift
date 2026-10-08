@@ -4,8 +4,10 @@ import Foundation
 ///
 /// Each case carries only enums, Bools, exact numbers, and DOKK's own version numbers
 /// (``AnalyticsVersion``). There is no case that takes free text, which is what keeps app
-/// names, bundle IDs, paths, window titles, queries, and user-entered names out by construction. `docs/ANALYTICS.md` lists every event with its properties and must
-/// be updated together with this enum.
+/// names, bundle IDs, paths, window titles, queries, and user-entered names out by construction.
+/// The one exception is ``lineIconCoverage(_:)``, which names public apps that lack a Line glyph
+/// through ``AnalyticsPublicAppIdentifier``. `docs/ANALYTICS.md` lists every event with its
+/// properties and must be updated together with this enum.
 ///
 /// `Application Opened`, `Application Installed`, and `Application Backgrounded` are the SDK's.
 /// ``applicationUpdated(_:)`` is DOKK's, sent on the launch after a version or build change.
@@ -133,6 +135,9 @@ enum AnalyticsEvent {
     case harborClosed(outcome: AnalyticsHarborOutcome, duration: Double, searched: Bool, filtered: Bool,
                       closedWindows: Int)
     case discoveryCallout(DiscoveryProposal.Destination, action: AnalyticsDiscoveryAction)
+    /// How many installed and pinned apps have a Line glyph, with the bundle IDs of public apps
+    /// that have none. Sent shortly after launch, at most every six hours.
+    case lineIconCoverage(LineIconCoverage)
     case toolOpened(AnalyticsTool, trigger: AnalyticsTrigger)
 
     // Focus Dock and focus sessions

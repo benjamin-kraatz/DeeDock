@@ -52,7 +52,7 @@ actor LauncherAppDescriptions {
     }
 
     /// The App Store writes a receipt into every app it installs; other apps are never sent to Apple.
-    private nonisolated static func isAppStoreInstall(_ url: URL) -> Bool {
+    nonisolated static func isAppStoreInstall(_ url: URL) -> Bool {
         FileManager.default.fileExists(atPath: url.appendingPathComponent("Contents/_MASReceipt/receipt").path)
     }
 
@@ -68,6 +68,13 @@ actor LauncherAppDescriptions {
         let catalog = Self.loadCatalog("CuratedAppDescriptions")
         curated = catalog
         return catalog
+    }
+
+    /// Every bundle identifier in the bundled Homebrew and curated catalogs. Reads both files on
+    /// each call, so callers keep the result instead of asking again.
+    nonisolated static func bundledBundleIdentifiers() -> Set<String> {
+        Set(loadCatalog("HomebrewAppDescriptions").bundleIdentifiers.keys)
+            .union(loadCatalog("CuratedAppDescriptions").bundleIdentifiers.keys)
     }
 
     private nonisolated static func loadCatalog(_ name: String) -> Catalog {

@@ -12,6 +12,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let updater = AppUpdater()
     let loginItems = LoginItemController(service: SystemLoginItemService())
     let menuBarIcon = MenuBarIconController()
+    private let lineIconCoverage = LineIconCoverageReporter()
     private(set) lazy var onboarding = OnboardingWindowController(
         loginItems: loginItems, settings: coordinator.settings, systemDockTuck: coordinator.systemDockTuck)
     /// Reapplies the alias if SwiftUI rebuilds the application menu.
@@ -53,6 +54,9 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         onboarding.presentIfNeeded()
         // The docks and the updater exist now, so the context can describe them.
         analytics.contextDidChange()
+        lineIconCoverage.start { [weak self] in
+            self?.coordinator.profiles.pinLists.values.flatMap { $0.compactMap(\.application) } ?? []
+        }
         guard ProductAlias.presentsFestiveName else { return }
         ProductAlias.applyRunningApplicationName()
         productAliasObserver = NotificationCenter.default.addObserver(
@@ -89,6 +93,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         windowAccess.stop()
         screenCapture.stop()
         coordinator.stop()
+        lineIconCoverage.stop()
         Analytics.shared.stop()
     }
 }

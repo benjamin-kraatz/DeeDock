@@ -75,6 +75,7 @@ extension AnalyticsEvent {
         case .harborOpened: "harbor_opened"
         case .harborClosed: "harbor_closed"
         case .discoveryCallout: "discovery_callout"
+        case .lineIconCoverage: "line_icon_coverage"
         case .toolOpened: "tool_opened"
         case .focusDockEntered: "focus_dock_entered"
         case .focusDockCommand: "focus_dock_command"
@@ -240,6 +241,17 @@ extension AnalyticsEvent {
              "filtered": .init(filtered), "closed_windows": .init(closedWindows)]
         case let .discoveryCallout(destination, action):
             ["callout": .init(destination), "action": .init(action)]
+        case let .lineIconCoverage(coverage):
+            ["installed_app_count": .init(coverage.installedCount),
+             "installed_line_icon_count": .init(coverage.installedWithGlyphCount),
+             "installed_coverage": .init(coverage.installedCoverage),
+             "pinned_app_count": .init(coverage.pinnedCount),
+             "pinned_line_icon_count": .init(coverage.pinnedWithGlyphCount),
+             "pinned_coverage": .init(coverage.pinnedCoverage),
+             "missing_public_count": .init(coverage.missing.count),
+             "missing_unlisted_count": .init(coverage.unlistedMissingCount),
+             "missing_bundle_ids": .init(coverage.missing),
+             "missing_pinned_bundle_ids": .init(coverage.missingPinned)]
         case let .toolOpened(tool, trigger):
             ["tool": .init(tool), "trigger": .init(trigger)]
         case .onboardingCompleted, .workspaceRecipeStarted, .workspaceRecipeCompleted, .workspaceRecipeCanceled,
