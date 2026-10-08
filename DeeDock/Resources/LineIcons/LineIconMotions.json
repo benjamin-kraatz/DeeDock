@@ -1811,6 +1811,40 @@
         {"parts": ["s2", "s3"], "scale": [[0, 1], [0.2, 0, "in"], [0.6, 1, "back"]], "spread": 0.2, "anchor": [8, 17.5]},
         {"parts": ["s0", "s1"], "rotate": [[0, 0], [0.3, -8, "out"], [0.75, 0, "back"]], "anchor": [12, 20]}
       ]
+    },
+    "custom:desk-view": {
+      "about": "Looks down at the desk: the screen tips forward on its stand while the desk line sweeps in.",
+      "duration": 0.8,
+      "tracks": [
+        {"parts": ["s0"], "scaleY": [[0, 1], [0.3, 0.7, "out"], [0.75, 1, "back"]], "anchor": [12, 12]},
+        {"parts": ["s2"], "draw": [[0, 0], [0.55, 1, "out"]]}
+      ]
+    },
+    "lucide:bug": {
+      "about": "Scurries side to side while the legs redraw and the antennae twitch.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s7", "s8", "s6", "s4", "s5", "s3"], "draw": [[0, 0], [0.3, 1, "out"]], "spread": 0.5},
+        {"parts": ["s9", "s2"], "scale": [[0, 1], [0.2, 0.4, "in"], [0.55, 1, "back"]], "spread": 0.1, "anchor": [12, 6]},
+        {"x": [[0, 0], [0.25, -1, "out"], [0.6, 1], [0.9, 0, "back"]]}
+      ]
+    },
+    "lucide:folder-cog": {
+      "about": "The cog turns once in the folder's corner while the folder hops.",
+      "duration": 1.0,
+      "tracks": [
+        {"parts": ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"], "rotate": [[0, 0], [0.9, 360]], "anchor": [18, 18]},
+        {"parts": ["s0"], "y": [[0, 0], [0.3, -1.6, "out"], [0.6, 0, "in"], [0.72, -0.4, "out"], [0.84, 0, "in"]]}
+      ]
+    },
+    "lucide:gpu": {
+      "about": "Reseats: the card lifts off its bracket and presses back in while the fans spin up.",
+      "duration": 0.9,
+      "tracks": [
+        {"parts": ["s4"], "scale": [[0.3, 1], [0.5, 0.5, "in"], [0.9, 1, "back"]], "anchor": [8, 11]},
+        {"parts": ["s3"], "scale": [[0.38, 1], [0.58, 0.5, "in"], [0.98, 1, "back"]], "anchor": [16, 11]},
+        {"parts": ["s0", "s2", "s3", "s4"], "x": [[0, 0], [0.3, 2, "out"], [0.75, 0, "back"]]}
+      ]
     }
   },
   "fallbacks": {
