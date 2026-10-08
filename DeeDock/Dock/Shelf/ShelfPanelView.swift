@@ -189,11 +189,15 @@ struct ShelfPanelView: View {
                 if state.sort == .smart {
                     semanticItems
                 } else if state.presentation == .grid {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 10)], spacing: 10) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: ShelfGridMetrics.minimumCell),
+                                                 spacing: ShelfGridMetrics.columnSpacing)],
+                              spacing: ShelfGridMetrics.columnSpacing) {
                         ForEach(state.entries) { entry in
                             gridItem(entry).transition(itemTransition)
                         }
                     }
+                    // The grid's own width, after padding and any legacy scroller gutter.
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { state.gridContentWidth = $0 }
                 } else {
                     LazyVStack(spacing: 2) {
                         ForEach(state.entries) { entry in
@@ -202,7 +206,7 @@ struct ShelfPanelView: View {
                     }
                 }
             }
-            .padding(8)
+            .padding(ShelfGridMetrics.horizontalPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .coordinateSpace(.named(Self.listSpace))

@@ -49,7 +49,7 @@ final class ShelfCoordinator {
             state.report(failure) { [weak self] in self?.reloadFromStorage() }
         }
         let next = DockPopoverPanelController(anchor: anchor, keyboard: keyboard, clickFocus: true,
-                                              ideal: CGSize(width: 420, height: 380)) { chrome in
+                                              ideal: CGSize(width: ShelfGridMetrics.idealPanelWidth, height: 380)) { chrome in
             state.chrome = chrome
         } content: {
             ShelfPanelView(state: state, keyboard: keyboard)
@@ -402,15 +402,24 @@ final class ShelfCoordinator {
             state.openSelection()
         case 51, 117:
             state.removeSelection()
-        case 125:
-            state.select(by: 1)
-            if state.preview != nil { preview(state.selectedItems) }
-        case 126:
-            state.select(by: -1)
+        case 123, 124, 125, 126:
+            guard moveSelection(keyCode: event.keyCode) else { return false }
             if state.preview != nil { preview(state.selectedItems) }
         default:
             return false
         }
+        return true
+    }
+
+    /// Grid arrows follow the columns the grid laid out and stop at the ends.
+    /// List and Smart keep one-item Up and Down, including the wrap, and leave Left and Right alone.
+    private func moveSelection(keyCode: UInt16) -> Bool {
+        guard let state else { return false }
+        let grid = state.presentation == .grid && state.sort != .smart
+        if !grid, keyCode == 123 || keyCode == 124 { return false }
+        let columns = grid ? state.gridColumnCount : 1
+        guard let step = AdaptiveGridLayout.gridStep(keyCode: keyCode, columns: columns) else { return false }
+        if grid { state.selectClamped(by: step) } else { state.select(by: step) }
         return true
     }
 }

@@ -161,10 +161,13 @@ struct FolderStackView: View {
             }
         } else if state.presentation == .grid {
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 82), spacing: 12)], spacing: 14) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: FolderStackGridMetrics.minimumCell),
+                                             spacing: FolderStackGridMetrics.columnSpacing)], spacing: 14) {
                     ForEach(state.visibleEntries) { entry in item(entry, grid: true) }
                 }
-                .padding(16)
+                // The grid's own width, after padding and any legacy scroller gutter.
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { state.gridContentWidth = $0 }
+                .padding(FolderStackGridMetrics.horizontalPadding)
                 .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: visibleIDs)
             }
         } else if state.presentation == .list {

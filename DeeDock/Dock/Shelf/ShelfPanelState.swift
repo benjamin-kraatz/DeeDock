@@ -39,6 +39,15 @@ final class ShelfPanelState {
     /// Not observed: every visible row writes here on each scroll frame, and only event-time hit
     /// testing and sweeps read it. Observing it would re-render the whole list per row per frame.
     @ObservationIgnored var rowFrames: [UUID: CGRect] = [:]
+    /// Laid-out width of the icon grid. Keyboard strides read this, not the panel frame, so a
+    /// legacy scroller gutter is already subtracted. Zero until the first layout pass.
+    @ObservationIgnored var gridContentWidth: CGFloat = 0
+
+    /// Columns that fit `gridContentWidth`. One until the grid has been measured.
+    var gridColumnCount: Int {
+        AdaptiveGridLayout.columnCount(width: gridContentWidth, minimum: ShelfGridMetrics.minimumCell,
+                                       spacing: ShelfGridMetrics.columnSpacing)
+    }
     var preview: DockFilePreviewItem?
     var error: String?
     var showingCompost = false
@@ -241,6 +250,18 @@ final class ShelfPanelState {
         guard !navigable.isEmpty else { return }
         let current = anchorID.flatMap { navigable.firstIndex(of: $0) } ?? 0
         let next = navigable[(current + distance + navigable.count) % navigable.count]
+        anchorID = next
+        selection = [next]
+    }
+
+    /// Moves the keyboard anchor by `distance` and stops on the first or last item.
+    /// An arrow that cannot move still collapses a multiple selection to that edge item.
+    func selectClamped(by distance: Int) {
+        let navigable = order
+        guard !navigable.isEmpty else { return }
+        let current = anchorID.flatMap { navigable.firstIndex(of: $0) } ?? 0
+        let next = navigable[AdaptiveGridLayout.clampedIndex(current: current, count: navigable.count, delta: distance)]
+        guard next != anchorID || selection != [next] else { return }
         anchorID = next
         selection = [next]
     }

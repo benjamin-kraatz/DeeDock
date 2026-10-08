@@ -112,7 +112,7 @@ Drag one child to Finder or another app through the native file-drag session; th
 
 The source dock stays revealed and suppresses fading and tooltips while its stack is open. The panel closes after a successful open or drag, outside click, Escape, another stack opening, source removal/hiding, display removal, sleep, or shutdown. Failed opens remain visible with a retryable inline error. Directory changes are watched only while the panel is open.
 
-Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Space previews, Delete goes back, and Escape closes the preview before returning focus to the source folder. Tab reaches the Grid/List/Smart control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
+Focus Dock can open a stack with Return. In a list, the arrow keys move one child and wrap at the ends. In a grid, Left and Right move one child and Up and Down move one row. That row is however many columns the grid lays out, about five at its ideal width and two at its minimum. A search that stays in the grid uses the same stride. Movement stops at the first and last child. Return opens, Space previews, Delete goes back, and Escape closes the preview before returning focus to the source folder. Tab reaches the Grid/List/Smart control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
 
 Fan and Automatic presentations, search, multi-selection, file promises, move operations into stacks, and persistent utility windows remain planned.
 
@@ -140,7 +140,7 @@ Click the tile, press Return while it is selected in Focus Dock, or choose **Ope
 
 Double-click an item to open it with its default application. Right-click for **Open**, **Show in Finder**, **Copy**, **Select All**, **Remove from Shelf**, and **Clear Shelf**; each command names how many items it acts on and applies to the whole selection. The header carries an **Arrange** menu with Date Added, Name, and Smart. Smart uses Apple Intelligence to group the Shelf's available file metadata in a list and keeps missing references in Unavailable. The List/Grid switch returns with its previous choice when you leave Smart. Both choices persist with the Shelf itself.
 
-Keyboard, while the panel is open: Up and Down select, Return opens, ⌘R shows in Finder, ⌘C copies, ⌘A selects everything, Delete removes the selection, and Escape drops a multiple selection before it closes the panel.
+Keyboard, while the panel is open: in a list, Up and Down select the previous or next item and wrap. In a grid, Left and Right select one item and Up and Down select one row, using the columns the grid lays out, and stop at the ends. Return opens, ⌘R shows in Finder, ⌘C copies, ⌘A selects everything, Delete removes the selection, and Escape drops a multiple selection before it closes the panel.
 
 Select items the way a Finder list does: click to replace the selection, Command-click to toggle one, Shift-click to extend from the last, and drag across empty space to sweep a rubber band. The band never starts on an item or over the scroller, so pressing an item still drags it and the list still scrolls. Dragging any selected item carries the whole selection at once; dragging an unselected one carries just that item.
 
@@ -149,7 +149,7 @@ Removal is always explicit. Use a row's Remove, **Clear Shelf…** from the tile
 The Shelf holds at most 50 items; a larger drop is accepted up to the limit and reports the rest on the initiating dock. A file that is moved or deleted stays listed as unavailable rather than disappearing, so you can see what happened and remove it yourself. Unreadable stored bytes are reported and never overwritten.
 
 
-Select a Shelf item and press Space, or choose Quick Look from its context menu, to preview it inside the panel. Space or Escape returns to the list. Up and Down preview the previous or next item. A preview holds the file access until its native view closes.
+Select a Shelf item and press Space, or choose Quick Look from its context menu, to preview it inside the panel. Space or Escape returns to the list. Arrow keys move the preview the same way they move the selection. A preview holds the file access until its native view closes.
 
 Open **Shelf → Compost** to enable automatic archiving after 7, 14, or 30 days. It starts off.
 Age counts from the last addition or restoration, including time while DOKK is closed.

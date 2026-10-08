@@ -138,14 +138,8 @@ final class FolderStackPanelController {
             choosePresentation(by: -1)
         case 124 where state.presentationFocused:
             choosePresentation(by: 1)
-        case 123:
-            state.select(by: -1)
-        case 124:
-            state.select(by: 1)
-        case 125:
-            state.select(by: state.presentation == .grid ? 5 : 1)
-        case 126:
-            state.select(by: state.presentation == .grid ? -5 : -1)
+        case 123, 124, 125, 126:
+            moveSelection(by: arrowStep(event.keyCode))
         default:
             return beginTypeAhead(event)
         }
@@ -163,10 +157,9 @@ final class FolderStackPanelController {
             state.focusSearch(false)
         case 36, 76:
             state.openSelection()
-        case 125:
-            state.select(by: 1)
-        case 126:
-            state.select(by: -1)
+        case 125, 126:
+            // Filtered results stay in the same adaptive grid, so Up and Down keep the row stride.
+            moveSelection(by: arrowStep(event.keyCode))
         default:
             return false
         }
@@ -181,6 +174,18 @@ final class FolderStackPanelController {
         else { return false }
         state.beginTypeAhead(characters)
         return true
+    }
+
+    /// Grid arrows follow the columns the grid laid out. List arrows stay one item and wrap.
+    private func arrowStep(_ keyCode: UInt16) -> Int {
+        let columns = state.presentation == .grid ? state.gridColumnCount : 1
+        return AdaptiveGridLayout.gridStep(keyCode: keyCode, columns: columns) ?? 0
+    }
+
+    /// Grid movement stops on the first and last item. List movement keeps its wrap.
+    private func moveSelection(by delta: Int) {
+        if state.presentation == .grid { state.selectClamped(by: delta) }
+        else { state.select(by: delta) }
     }
 
     private func choosePresentation(by distance: Int) {

@@ -67,6 +67,15 @@ final class FolderStackState {
     var presentation: FolderStackPresentation
     var selectedID: String?
     var presentationFocused = false
+    /// Laid-out width of the icon grid. Keyboard strides read this, not the panel frame, so a
+    /// legacy scroller gutter is already subtracted. Zero until the first layout pass.
+    @ObservationIgnored var gridContentWidth: CGFloat = 0
+
+    /// Columns that fit `gridContentWidth`. One until the grid has been measured.
+    var gridColumnCount: Int {
+        AdaptiveGridLayout.columnCount(width: gridContentWidth, minimum: FolderStackGridMetrics.minimumCell,
+                                       spacing: FolderStackGridMetrics.columnSpacing)
+    }
     var chrome = DockPopoverChrome(edge: .bottom, attachment: DockPopoverGeometry.idealSize.width / 2)
     @ObservationIgnored var stageOnShelf: ((FolderStackEntryReference) -> Void)?
     @ObservationIgnored var openEntry: ((FolderStackEntryReference) -> Void)?
@@ -547,6 +556,18 @@ final class FolderStackState {
         guard !navigable.isEmpty else { return }
         let current = selectedID.flatMap { id in navigable.firstIndex { $0.id == id } } ?? 0
         let index = ((current + distance) % navigable.count + navigable.count) % navigable.count
+        selectedID = navigable[index].id
+        if preview != nil { preview = nil; previewSelection() }
+    }
+
+    /// Moves by `distance` and stops on the first or last visible item.
+    /// A step that would leave the listing does nothing, so a live preview stays put.
+    func selectClamped(by distance: Int) {
+        let navigable = displayedEntries
+        guard !navigable.isEmpty else { return }
+        let current = selectedID.flatMap { id in navigable.firstIndex { $0.id == id } } ?? 0
+        let index = AdaptiveGridLayout.clampedIndex(current: current, count: navigable.count, delta: distance)
+        guard navigable[index].id != selectedID else { return }
         selectedID = navigable[index].id
         if preview != nil { preview = nil; previewSelection() }
     }
