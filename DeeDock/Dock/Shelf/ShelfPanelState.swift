@@ -60,6 +60,8 @@ final class ShelfPanelState {
     @ObservationIgnored var openItems: (([ShelfItem]) -> Void)?
     @ObservationIgnored var revealItems: (([ShelfItem]) -> Void)?
     @ObservationIgnored var copyItems: (([ShelfItem]) -> Void)?
+    /// Copies the items' paths as text, one per line. `true` writes each relative to its parent folder.
+    @ObservationIgnored var copyPaths: (([ShelfItem], Bool) -> Void)?
     @ObservationIgnored var useInLauncher: (([ShelfItem]) -> Void)?
     @ObservationIgnored var clearAll: (() -> Void)?
     @ObservationIgnored var beginDrag: (([ShelfItem], NSView, NSEvent) -> Void)?
@@ -277,6 +279,7 @@ final class ShelfPanelState {
         openItems = nil
         revealItems = nil
         copyItems = nil
+        copyPaths = nil
         clearAll = nil
         compostPolicyChanged = nil
         restoreCompost = nil

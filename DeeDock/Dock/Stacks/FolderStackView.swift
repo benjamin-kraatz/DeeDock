@@ -254,6 +254,16 @@ struct FolderStackView: View {
                 NSWorkspace.shared.activateFileViewerSelecting([entry.reference.url])
             }
             Divider()
+            // The shortcuts are shown only; the panel's key handler performs them for the selection.
+            Button(.fileCopyPath, systemImage: "doc.on.clipboard") {
+                state.copyPath(entry.reference, relative: false)
+            }
+            .keyboardShortcut("c", modifiers: [.command, .option])
+            Button(.fileCopyRelativePath, systemImage: "arrow.turn.down.right") {
+                state.copyPath(entry.reference, relative: true)
+            }
+            .keyboardShortcut("c", modifiers: [.command, .option, .shift])
+            Divider()
             Button(.folderItemAddToShelf, systemImage: "tray.and.arrow.down") {
                 state.stageOnShelf?(entry.reference)
             }

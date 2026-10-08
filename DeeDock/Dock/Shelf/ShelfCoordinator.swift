@@ -71,6 +71,7 @@ final class ShelfCoordinator {
         state.openItems = { [weak self] items in self?.open(items) }
         state.revealItems = { [weak self] items in self?.reveal(items) }
         state.copyItems = { [weak self] items in self?.copy(items) }
+        state.copyPaths = { [weak self] items, relative in self?.copyPaths(items, relative: relative) }
         state.useInLauncher = { [weak self] items in self?.deliverSelectionToLauncher(items) }
         state.sortChanged = { [weak self] value in
             guard let self else { return }
@@ -303,6 +304,23 @@ final class ShelfCoordinator {
         Analytics.track(.shelf(.copied, itemCount: resolved.count, source: nil, trigger: Analytics.trigger()))
     }
 
+    /// Copies the resolved paths, so an item moved since staging reports where it lives now.
+    /// A Shelf item has no stack root, so its relative path is `./name` within its own folder.
+    private func copyPaths(_ items: [ShelfItem], relative: Bool) {
+        let resolved = items.compactMap { shelf.resolve($0.id) }
+        guard !resolved.isEmpty else {
+            state?.report(String(localized: .shelfUnavailableItems)) { [weak self] in self?.reload() }
+            return
+        }
+        defer { withExtendedLifetime(resolved) {} }
+        FilePathCopy.copy(resolved.map { access in
+            relative ? FilePathCopy.relativePath(of: access.url, in: access.url.deletingLastPathComponent())
+                     : FilePathCopy.path(of: access.url)
+        })
+        Analytics.track(.shelf(relative ? .relativePathCopied : .pathCopied, itemCount: resolved.count,
+                               source: nil, trigger: Analytics.trigger()))
+    }
+
     private func report(_ error: any Error) {
         state?.report(String(localized: .errorSaveShelf(details: error.localizedDescription))) { [weak self] in
             self?.reload()
@@ -380,6 +398,15 @@ final class ShelfCoordinator {
             // Let the native picker and buttons receive their keys. Hidden Shelf selections
             // must never open or remove files while the user is browsing Compost.
             return false
+        }
+        // ⌥⌘C and ⇧⌥⌘C copy paths. `charactersIgnoringModifiers` still reports "c" with Option
+        // held, so this must run before the ⌘C branch below or it would copy the files instead.
+        if event.modifierFlags.intersection([.command, .option, .control]) == [.command, .option],
+           event.charactersIgnoringModifiers?.lowercased() == "c" {
+            Analytics.performing(.keyboard) {
+                state.copyPaths?(state.selectedItems, event.modifierFlags.contains(.shift))
+            }
+            return true
         }
         if event.modifierFlags.contains(.command) {
             switch event.charactersIgnoringModifiers {

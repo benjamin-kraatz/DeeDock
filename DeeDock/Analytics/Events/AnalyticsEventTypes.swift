@@ -130,6 +130,7 @@ nonisolated enum AnalyticsShelfSource: String, AnalyticsToken {
 nonisolated enum AnalyticsShelfAction: String, AnalyticsToken {
     case opened, added, removed, cleared, itemsOpened = "items_opened", draggedOut = "dragged_out"
     case pasted, previewed, revealed, copied
+    case pathCopied = "path_copied", relativePathCopied = "relative_path_copied"
 }
 
 nonisolated enum AnalyticsCapsuleAction: String, AnalyticsToken {

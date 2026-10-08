@@ -404,6 +404,16 @@ private struct ShelfItemBehavior: ViewModifier {
                 } label: { Label(.shelfCopy(count: count), systemImage: "doc.on.doc") }
                     .disabled(!entry.isAvailable)
                 Button {
+                    state.copyPaths?(targets, false)
+                } label: { Label(.fileCopyPath, systemImage: "doc.on.clipboard") }
+                    .keyboardShortcut("c", modifiers: [.command, .option])
+                    .disabled(!entry.isAvailable)
+                Button {
+                    state.copyPaths?(targets, true)
+                } label: { Label(.fileCopyRelativePath, systemImage: "arrow.turn.down.right") }
+                    .keyboardShortcut("c", modifiers: [.command, .option, .shift])
+                    .disabled(!entry.isAvailable)
+                Button {
                     state.useInLauncher?(targets)
                 } label: { Label(.launcherFileUseInLauncher, systemImage: "magnifyingglass") }
                 Button {

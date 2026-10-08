@@ -327,6 +327,21 @@ final class FolderStackState {
         reload()
     }
 
+    /// Copies `entry`'s path as text. A relative path starts at the stack's root, not the
+    /// browsed subfolder, so `file.txt` inside `folder` copies `./folder/file.txt`.
+    func copyPath(_ entry: FolderStackEntryReference, relative: Bool) {
+        FilePathCopy.copy([relative ? FilePathCopy.relativePath(of: entry.url, in: rootURL)
+                                    : FilePathCopy.path(of: entry.url)])
+        Analytics.track(.stackPathCopied(analyticsKind, relative: relative, isFolder: entry.isFolder,
+                                         trigger: Analytics.trigger()))
+    }
+
+    /// The ⌥⌘C and ⇧⌥⌘C path of `copyPath(_:relative:)` for the selected child.
+    func copySelectionPath(relative: Bool) {
+        guard let entry = entries.first(where: { $0.id == selectedID }) else { return }
+        Analytics.performing(.keyboard) { copyPath(entry.reference, relative: relative) }
+    }
+
     func previewSelection() {
         if preview != nil { preview = nil; return }
         guard let entry = entries.first(where: { $0.id == selectedID }), let access else { return }
