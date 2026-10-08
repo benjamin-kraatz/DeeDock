@@ -17,7 +17,8 @@ struct HarborLayoutTests {
         Array(result.groups.values) + Array(result.windows.values) + Array(result.chips.values)
     }
 
-    @Test("Everything stays inside the bounds when it fits", arguments: [1, 3, 6, 12])
+    // Twelve such groups no longer fit at the minimum thumbnail height; `overflow` covers that case.
+    @Test("Everything stays inside the bounds when it fits", arguments: [1, 3, 6])
     func fitsInsideBounds(groupCount: Int) {
         let groups = (0..<groupCount).map { group("app\($0)", windows: $0 % 4 + 1, chips: $0 % 2) }
         let result = HarborLayout.place(groups, in: bounds)
