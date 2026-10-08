@@ -20,6 +20,9 @@ protocol HarborIntents: AnyObject {
 
 /// Opens and closes Harbor, the app-grouped window overview.
 ///
+/// People see this feature as **Radar**. "Harbor" is the internal name for types, string keys,
+/// and analytics events only; user-facing copy must say Radar.
+///
 /// One session spans every display: each gets a panel with that display's windows, grouped by app,
 /// over its blurred wallpaper. Opening gathers windows (Accessibility for exact control, the window
 /// list for the current Space, ScreenCaptureKit for thumbnails), shows the panels at once so the

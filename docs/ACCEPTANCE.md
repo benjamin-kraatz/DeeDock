@@ -3109,6 +3109,8 @@ The tests were not run locally, following `AGENTS.md`. The pull request's CI job
 
 ## Harbor (DEE-119)
 
+People see this feature as **Radar**. Harbor is the internal name used in code, string keys, analytics events, and these engineering notes; it never appears in UI copy.
+
 Harbor is the app-grouped window overview. The style was chosen in the interactive mockup at `docs/mockups/harbor.html`: front app large, fly-out opening, leading Close button, glow highlight, dock labels on, 34-point backdrop blur, 0.38 scrim, and `.spring(response: 0.37, dampingFraction: 0.89)`.
 
 ### Implemented
