@@ -35,9 +35,16 @@ nonisolated struct HubFilesSelection: Equatable, Sendable {
         case .replace:
             set([url])
         case .toggle:
-            if urls.contains(url) { urls.remove(url) } else { urls.insert(url) }
-            anchor = url
             cursor = url
+            if urls.insert(url).inserted {
+                anchor = url
+            } else {
+                urls.remove(url)
+                // Deselecting must not leave the Shift-range anchor on an unselected item: keep a
+                // still-selected anchor, otherwise move it to the selected item nearest the click.
+                if let anchor, urls.contains(anchor) { break }
+                anchor = nearestSelected(to: url, in: order)
+            }
         case .extend:
             guard let anchor, let from = order.firstIndex(of: anchor), let to = order.firstIndex(of: url) else {
                 set([url]); return
@@ -82,6 +89,15 @@ nonisolated struct HubFilesSelection: Equatable, Sendable {
         urls = Set(order)
         if anchor == nil { anchor = order.first }
         if cursor == nil { cursor = order.last }
+    }
+
+    /// The selected URL closest to `url` in `order`, or nil when nothing is selected.
+    private func nearestSelected(to url: URL, in order: [URL]) -> URL? {
+        guard let index = order.firstIndex(of: url) else { return ordered(in: order).first }
+        return order.indices
+            .filter { urls.contains(order[$0]) }
+            .min { abs($0 - index) < abs($1 - index) }
+            .map { order[$0] }
     }
 
     mutating func clear() {
