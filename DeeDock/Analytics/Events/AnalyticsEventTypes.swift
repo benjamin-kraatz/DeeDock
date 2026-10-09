@@ -100,10 +100,6 @@ nonisolated enum AnalyticsWatchEnd: String, AnalyticsToken {
     case stopped, permission, unavailable, closed, offscreen
 }
 
-nonisolated enum AnalyticsLauncherSource: String, AnalyticsToken {
-    case tile, keyboard, fileDrop = "file_drop", shelf
-}
-
 nonisolated enum AnalyticsFileOperationStatus: String, AnalyticsToken {
     case completed, failed, partial
 }
@@ -142,7 +138,8 @@ nonisolated enum AnalyticsTrashAction: String, AnalyticsToken {
 }
 
 nonisolated enum AnalyticsDriveAction: String, AnalyticsToken {
-    case stackOpened = "stack_opened", openedInFinder = "opened_in_finder", ejected
+    /// `opened_in_finder` was sent before drives opened in the DOKK Hub instead.
+    case stackOpened = "stack_opened", openedInHub = "opened_in_hub", ejected
 }
 
 nonisolated enum AnalyticsEjectOutcome: String, AnalyticsToken {

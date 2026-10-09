@@ -61,7 +61,7 @@ struct DockFolderButton: View {
         .accessibilityHint(Text(.folderStackDockHint))
         .accessibilityActions {
             Button(.folderStackOpen) { primaryAction() }
-            if item.isAvailable { Button(.folderStackShowInFinder) { interaction.revealFolder?(item) } }
+            if item.isAvailable { Button(.hubOpenInHub) { Analytics.performing(.voiceOver) { interaction.openFolderInHub?(item) } } }
             if item.isAvailable {
                 Button(.folderItemAddToShelf) { Analytics.performing(.voiceOver) { interaction.stageFolderOnShelf?(item) } }
                     .disabled(interaction.stageFolderOnShelf == nil)

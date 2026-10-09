@@ -10,11 +10,9 @@ final class DockPanelController {
     private let panel: DockPanel
     /// Edge glow shown while the pointer nears this dock's activation zone and the dock is hidden.
     private let approach = DockApproachIndicatorController()
-    let launcher: LauncherState
-    private let launcherPresentation: LauncherPresentationController
-    /// The open compact Launcher, if any. Each opening builds a new single-use controller.
-    private var compactLauncher: CompactLauncherController?
-    var launcherWillOpen: (() -> NSRunningApplication?)?
+    /// Asks the dock coordinator to open or close the DOKK Hub from this dock's tile. The trigger
+    /// says whether the tile was clicked or chosen with Focus Dock.
+    var hubRequested: ((AnalyticsHubTrigger) -> Void)?
     private(set) var geometry: DockPresentationGeometry?
     private var mouseHeld = false
     /// When the pointer or a held interaction last touched this dock. Starts at creation so a
@@ -28,6 +26,8 @@ final class DockPanelController {
     private var windowPeekHeld = false
     private var volumeCardHeld = false
     private var modePickerHeld = false
+    /// Held while an anchored DOKK Hub points at this dock's tile.
+    private var hubHeld = false
     private var lastDisplay: DisplaySnapshot?
     private var lastSettings: DockSettings?
     private var baseLayout = DockGeometry.layout(count: 0, favoriteCount: 0, availableLength: 800)
@@ -49,19 +49,15 @@ final class DockPanelController {
 
     init(store: DockStore, settings: DockSettings) {
         self.store = store
-        launcher = LauncherState(catalog: store.launcherCatalog)
-        launcher.dockStore = store
         visibility = DockVisibilityController(settings: settings.behavior, reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
         panel = DockPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-        launcherPresentation = LauncherPresentationController(panel: panel, state: launcher)
         panel.title = String(localized: .appName)
         panel.isOpaque = false; panel.backgroundColor = .clear; panel.hasShadow = false
         panel.isReleasedWhenClosed = false; panel.hidesOnDeactivate = false; panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
         panel.acceptsMouseMovedEvents = true; panel.becomesKeyOnlyIfNeeded = true
-        panel.contentView = DockHostingView(rootView: DockView(launcher: launcher, store: store, interaction: interaction, visibility: visibility))
-        launcherPresentation.didClose = { [weak self] in self?.launcherDidClose() }
-        store.openLauncher = { [weak self] in self?.openLauncher() }
+        panel.contentView = DockHostingView(rootView: DockView(store: store, interaction: interaction, visibility: visibility))
+        store.openLauncher = { [weak self] in self?.requestHub() }
         interaction.applicationCatalog = store.launcherCatalog
         interaction.openLauncher = store.openLauncher
         interaction.canMoveUtility = { [weak store] id, distance in store?.canMoveUtility(id, by: distance) == true }
@@ -87,12 +83,7 @@ final class DockPanelController {
             self?.updatePointer()
         }
         panel.keyboardHandler = { [weak self] in self?.handleKey($0) ?? false }
-        panel.resignedKey = { [weak self] in
-            guard let self else { return }
-            // The compact Launcher is its own key window, so the dock resigning key is expected there.
-            if launcher.isPresented { if compactLauncher == nil { launcherPresentation.noteWindowResignedKey() } }
-            else { resignedFocus?() }
-        }
+        panel.resignedKey = { [weak self] in self?.resignedFocus?() }
         interaction.idleFade.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.refreshInput = { [weak self] in self?.updatePointer() }
         visibility.didChange = { [weak self] in self?.present() }
@@ -102,7 +93,6 @@ final class DockPanelController {
         }
         store.presentationDidChange = { [weak self] in
             guard let self, !updatingGeometry, let display = lastDisplay, let settings = lastSettings else { return }
-            if QuarantineStampController.shared.armed, launcher.isPresented { closeLauncher() }
             interaction.tooltips.clear()
             withAnimation(visibility.reduceMotion ? nil : .easeOut(duration: 0.18)) {
                 self.update(display: display, settings: settings, animateSectionChange: true)
@@ -123,9 +113,6 @@ final class DockPanelController {
     func update(display: DisplaySnapshot, settings: DockSettings, resetVisibility: Bool = false, animateSectionChange: Bool = false) {
         guard !stopped else { return }
         if let previous = lastDisplay, previous != display || lastSettings != settings || resetVisibility { invalidateDrag?() }
-        if launcher.isPresented, resetVisibility || lastDisplay != display || lastSettings != settings {
-            closeActiveLauncher(animated: false, restoreFocus: false)
-        }
         let edgeChanged = lastSettings?.edge != settings.edge
         let axisChanged = lastSettings?.edge.isVertical != settings.edge.isVertical
         updatingGeometry = true
@@ -150,8 +137,6 @@ final class DockPanelController {
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
         interaction.iconStyle = settings.iconStyle
         interaction.lineIconMotion = settings.lineIconMotion
-        launcher.usesLineIcons = settings.iconStyle == .line && settings.launcherLineIcons
-        launcher.lineIconMotion = settings.lineIconMotion
         interaction.animateIndicators = settings.animateIndicators
         interaction.launchAnimation = settings.launchAnimation
         interaction.showAppBadgeCounts = settings.showAppBadgeCounts
@@ -192,12 +177,7 @@ final class DockPanelController {
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
         geometry = updated
         interaction.contentOrigin = updated.contentOrigin; interaction.windowSize = updated.windowFrame.size
-        launcherPresentation.origin = restingDragBounds
-        if launcher.isPresented {
-            // Catalog changes may resize the resting dock, but must not collapse the launcher.
-            // The compact Launcher follows its tile instead.
-            if let compactLauncher, let anchor = restingLauncherAnchor() { compactLauncher.update(anchor) }
-        } else if animateSectionChange && !visibility.reduceMotion && visibility.exposesContent {
+        if animateSectionChange && !visibility.reduceMotion && visibility.exposesContent {
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.18
                 context.timingFunction = CAMediaTimingFunction(name: .easeOut)
@@ -225,12 +205,6 @@ final class DockPanelController {
     /// Native events and animation samples share top-left content coordinates after inverse transformation.
     func updatePointer(eventType: NSEvent.EventType? = nil) {
         guard !stopped, !updatingGeometry, let geometry else { return }
-        if launcher.isPresented {
-            panel.ignoresMouseEvents = false
-            interaction.setPointer(nil)
-            approach.hide()
-            return
-        }
         let local = panel.convertPoint(fromScreen: NSEvent.mouseLocation)
         let point = CGPoint(x: local.x - geometry.contentOrigin.x,
                             y: panel.frame.height - local.y - geometry.contentOrigin.y)
@@ -266,7 +240,7 @@ final class DockPanelController {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = pickerHeld || popoverHeld || windowPeekHeld || volumeCardHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
+        let held = pickerHeld || popoverHeld || hubHeld || windowPeekHeld || volumeCardHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
         if inside || held { lastUse = Date() }
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
@@ -285,7 +259,7 @@ final class DockPanelController {
     }
 
     private func present() {
-        guard !stopped, !launcher.isPresented else { return }
+        guard !stopped else { return }
         if (visibility.phase == .hiding || !visibility.exposesContent) && !interaction.suppressTooltips {
             interaction.suppressTooltips = true; interaction.tooltips.clear()
         }
@@ -374,19 +348,9 @@ final class DockPanelController {
     }
 
     func containsDragRegion(_ point: CGPoint) -> Bool {
-        if containsLauncherFileDrop(point) { return true }
-        guard !stopped, !launcher.isPresented, let geometry else { return false }
+        guard !stopped, let geometry else { return false }
         return geometry.activation.retention.contains(point) || restingDragBounds.contains(point)
             || (visibility.exposesContent && interaction.containsDockPoint(contentPoint(point)))
-    }
-
-    /// Drops land on the glass, not the transparent presentation margin.
-    func containsLauncherFileDrop(_ point: CGPoint) -> Bool {
-        guard !stopped, launcher.isPresented, launcher.contentVisible else { return false }
-        let window = panel.frame
-        guard window.contains(point) else { return false }
-        let local = CGPoint(x: point.x - window.minX, y: window.maxY - point.y)
-        return launcher.contentRect.contains(local)
     }
 
     func launcherTarget(at point: CGPoint) -> Bool { utilityTarget(.launcher, at: point) }
@@ -401,7 +365,7 @@ final class DockPanelController {
         // The preview can resize and recenter the native panel. Resolving the next boundary
         // against that transient frame makes the preview invalidate its own hit test and cycle.
         // Keep the whole drag session in the pre-preview content coordinate space instead.
-        guard !launcher.isPresented, visibility.exposesContent, restingDragBounds.contains(point), !baseRestingFrame.isEmpty else { return nil }
+        guard visibility.exposesContent, restingDragBounds.contains(point), !baseRestingFrame.isEmpty else { return nil }
         let local = CGPoint(x: point.x - baseRestingFrame.minX, y: baseRestingFrame.maxY - point.y)
         return DockSectionInsertion.index(point: local, scrollOffset: interaction.scrollOffset,
             layout: baseLayout, entries: store.entries, pinCount: store.pins.count, visibility: store.sections.visibility)
@@ -420,7 +384,7 @@ final class DockPanelController {
     /// passed. Past the pins, the first trailing tile's leading edge separates "after the last pin"
     /// from `end`, so dropping beside running apps or utilities sends the launcher to the far end.
     func launcherInsertionStop(at point: CGPoint) -> Int? {
-        guard !stopped, !launcher.isPresented, visibility.exposesContent,
+        guard !stopped, visibility.exposesContent,
               restingDragBounds.contains(point) else { return nil }
         let entries = store.entries
         let centers = baseLayout.restingCenters
@@ -444,7 +408,7 @@ final class DockPanelController {
     /// The gap index among the entries matching `member` (with the source removed), when the
     /// pointer lies within half an icon of the first and last such entry.
     private func insertionIndex(at point: CGPoint, sourceID: String, member: (DockRenderSlot) -> Bool) -> Int? {
-        guard !stopped, !launcher.isPresented, visibility.exposesContent,
+        guard !stopped, visibility.exposesContent,
               restingDragBounds.contains(point) else { return nil }
         let positions = store.entries.indices.filter { member(store.entries[$0]) }
         let centers = baseLayout.restingCenters
@@ -460,7 +424,7 @@ final class DockPanelController {
     /// Uses resting section bounds so insertion previews cannot move the unpin destination.
     /// Includes spacing between running apps and a collapsed running-section control.
     func runningSectionTarget(at point: CGPoint) -> Bool {
-        guard !launcher.isPresented, visibility.exposesContent, restingDragBounds.contains(point) else { return false }
+        guard visibility.exposesContent, restingDragBounds.contains(point) else { return false }
         let indices = store.entries.indices.filter { store.entries[$0].appGroup == .running }
         guard let first = indices.first, let last = indices.last,
               last < baseLayout.restingCenters.count else { return false }
@@ -472,7 +436,7 @@ final class DockPanelController {
 
     /// Document hits use the same inverse animation transform and viewport-clipped icons as clicks.
     func documentTarget(at point: CGPoint) -> DockItem? {
-        guard !stopped, !launcher.isPresented, panel.frame.contains(point) else { return nil }
+        guard !stopped, panel.frame.contains(point) else { return nil }
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
             size: interaction.layout.viewportSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
         return DockDocumentTarget.app(at: contentPoint(point), entries: store.entries, frames: interaction.iconRects,
@@ -489,7 +453,7 @@ final class DockPanelController {
 
     /// Hit test for a trailing utility tile, using the same clipped content space as clicks.
     func utilityTarget(_ entry: DockEntryID, at point: CGPoint) -> Bool {
-        guard !stopped, !launcher.isPresented, panel.frame.contains(point), visibility.exposesContent else { return false }
+        guard !stopped, panel.frame.contains(point), visibility.exposesContent else { return false }
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle,
             progress: visibility.progress, size: interaction.layout.viewportSize,
             reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
@@ -544,8 +508,6 @@ final class DockPanelController {
 
     /// Held while any dock popover (a folder stack or the Shelf) is showing over this display.
     func holdPopover(_ held: Bool) {
-        // Another dock popover took over; the compact Launcher is one too, so it steps aside.
-        if held, compactLauncher != nil { closeActiveLauncher(animated: false, restoreFocus: false) }
         if held { exclusiveInteractionBegan?() }
         popoverHeld = held
         if held { visibility.showImmediately(); interaction.tooltips.clear() }
@@ -568,6 +530,15 @@ final class DockPanelController {
 
     /// The settings this dock last rendered with, or nil before its first update or after stop.
     var currentSettings: DockSettings? { stopped ? nil : lastSettings }
+
+    /// Held while an anchored DOKK Hub points at this dock's tile, so the tile stays where the
+    /// pointer aims and the dock does not hide under it.
+    func holdHub(_ held: Bool) {
+        guard hubHeld != held, !stopped else { return }
+        hubHeld = held
+        if held { visibility.showImmediately(); interaction.tooltips.clear() }
+        updatePointer()
+    }
 
     func holdModePicker(_ held: Bool) {
         modePickerHeld = held
@@ -640,7 +611,7 @@ final class DockPanelController {
 
     /// A picture of this dock as it is drawn right now, for Harbor's strip to transform from.
     ///
-    /// Nil while the dock is hidden, revealing, or replaced by the Launcher, so the strip enters
+    /// Nil while the dock is hidden or revealing, so the strip enters
     /// from the edge instead. Icon frames come from the live layout and may be magnified when
     /// the pointer is on the dock, which is the usual case after a click on the Harbor tile.
     ///
@@ -649,7 +620,7 @@ final class DockPanelController {
     func harborSeed(in screenFrame: CGRect) -> HarborDockSeed? {
         // Line icons and idle-faded artwork would not match the app icons the strip draws over
         // them, so those docks get no seed and the strip enters on its own.
-        guard !stopped, !launcher.isPresented, visibility.exposesContent, visibility.progress == 0,
+        guard !stopped, visibility.exposesContent, visibility.progress == 0,
               let settings = lastSettings, !interaction.surfaceRect.isEmpty,
               settings.iconStyle == .native, interaction.idleFade.fraction == 0 else { return nil }
         let edge = settings.edge
@@ -729,86 +700,41 @@ final class DockPanelController {
         interaction.scrollRequest += dragScrollVelocity(at: point) * elapsed
     }
 
-    /// Opening is deliberate focus acquisition; hover and ordinary dock geometry remain nonactivating.
-    func openLauncher(files: LauncherFileAdoption? = nil) {
-        guard !stopped, let display = lastDisplay, let settings = lastSettings else { return }
-        if launcher.isPresented {
-            guard let files else { closeActiveLauncher(); return }
-            // Only the full Launcher offers file actions, so a drop replaces an open compact grid.
-            guard compactLauncher != nil else { launcher.adoptFiles(files); return }
-            closeActiveLauncher(animated: false, restoreFocus: false)
-        }
-        let origin = restingDragBounds
-        let previousApplication = launcherWillOpen?() ?? NSWorkspace.shared.frontmostApplication
-        invalidateDrag?()
-        visibility.showImmediately()
-        interaction.tooltips.clear()
-        interaction.suppressTooltips = true
-        let trigger: AnalyticsLauncherSource = files != nil ? .fileDrop : store.keyboardFocus ? .keyboard : .tile
-        if files == nil, settings.launcherStyle == .compact, let anchor = restingLauncherAnchor() {
-            openCompactLauncher(anchor: anchor, previousApplication: previousApplication)
-            Analytics.track(.launcherOpened(trigger, fileCount: 0, style: .compact))
-            return
-        }
-        interaction.exposesContent = false
-        interaction.idleFade.update(interacting: true, fullyVisible: true)
-        visibility.update(activation: false, retained: true, held: true)
-        launcherPresentation.open(origin: origin,
-            target: LauncherGeometry.frame(visibleFrame: display.visibleFrame, origin: origin, edge: settings.edge),
-            dockWindow: geometry?.windowFrame ?? origin,
-            pins: store.pins.compactMap(\.application), previousApplication: previousApplication)
-        Analytics.track(.launcherOpened(trigger, fileCount: files?.inputs.count ?? 0, style: .full))
-        if let files { launcher.adoptFiles(files) }
-    }
-
-    /// Opens the compact grid above the Launcher tile. The dock stays in place and revealed beneath it.
-    private func openCompactLauncher(anchor: DockPopoverAnchor, previousApplication: NSRunningApplication?) {
-        interaction.idleFade.update(interacting: true, fullyVisible: true)
-        visibility.update(activation: false, retained: true, held: true)
-        interaction.compactLauncherOpen = true
-        let controller = CompactLauncherController(launcher: launcher, anchor: anchor,
-                                                   pins: store.pins.compactMap(\.application),
-                                                   previousApplication: previousApplication)
-        controller.didClose = { [weak self] in
-            guard let self else { return }
-            compactLauncher = nil
-            interaction.compactLauncherOpen = false
-            launcherDidClose()
-        }
-        compactLauncher = controller
-        controller.show()
-    }
-
-    /// The Launcher tile at rest, in screen space.
-    ///
-    /// The live tile frame is magnified while the pointer is over it and moves back once the
-    /// Launcher opens and clears the pointer, so the compact Launcher's pointer aims at the
-    /// resting layout instead. Nil when this dock has no Launcher tile.
-    private func restingLauncherAnchor() -> DockPopoverAnchor? {
-        guard let display = lastDisplay, let settings = lastSettings,
-              let index = store.entries.firstIndex(where: \.isLauncher),
-              index < baseLayout.restingCenters.count else { return nil }
-        let along = baseLayout.restingCenters[index] - interaction.scrollOffset
-        let icon = baseLayout.iconFrame(centerAlong: along, size: baseLayout.iconSize)
-        return DockPopoverAnchor(icon: DockEdge.screenRect(icon, in: baseRestingFrame), edge: settings.edge,
-                                 visibleFrame: display.visibleFrame)
-    }
-
-    /// Closes whichever Launcher style is open. The compact grid always animates through its popover.
-    private func closeActiveLauncher(animated: Bool = true, restoreFocus: Bool = true) {
-        if let compactLauncher { compactLauncher.close(restoreFocus: restoreFocus) }
-        else { launcherPresentation.close(animated: animated, restoreFocus: restoreFocus) }
-    }
-
-    /// Returns the dock to its resting frame and input handling after either Launcher style closes.
-    private func launcherDidClose() {
+    /// A click on the DOKK tile, VoiceOver's action on it, or Return on it in Focus Dock. Opening
+    /// the Hub is deliberate focus acquisition; hover never reaches this path.
+    private func requestHub() {
         guard !stopped else { return }
-        panel.setFrame(geometry?.windowFrame ?? .zero, display: true)
-        mouseHeld = false
-        updatePointer(); present()
+        hubRequested?(store.keyboardFocus ? .focusDock : .tile)
     }
 
-    func closeLauncher() { closeActiveLauncher(animated: false, restoreFocus: false) }
+    /// The DOKK tile at rest, in AppKit screen coordinates, for the anchored Hub to point at.
+    ///
+    /// The live tile frame is magnified while the pointer is over it and settles once the Hub
+    /// opens and takes the pointer away, so the Hub aims at the resting layout instead and its
+    /// pointer does not drift during the open animation. Without a visible tile (scrolled away or
+    /// absent), the Hub points at the middle of the resting glass. Nil before the first layout.
+    func hubAnchor() -> HubAnchor? {
+        guard !stopped, let display = lastDisplay, let settings = lastSettings, !baseRestingFrame.isEmpty else { return nil }
+        let tile: CGRect
+        if let index = store.entries.firstIndex(where: \.isLauncher), index < baseLayout.restingCenters.count {
+            let along = baseLayout.restingCenters[index] - interaction.scrollOffset
+            let icon = baseLayout.iconFrame(centerAlong: along, size: baseLayout.iconSize)
+            tile = DockEdge.screenRect(icon, in: baseRestingFrame)
+        } else {
+            let glass = restingDragBounds
+            tile = CGRect(x: glass.midX, y: glass.midY, width: 0, height: 0)
+        }
+        return HubAnchor(tile: tile, edge: settings.edge, visibleFrame: display.visibleFrame)
+    }
+
+    /// The source display's inputs for the Hub's Apps tab.
+    func hubAppsContext(appVisibility: DockAppVisibility, foregroundBundleIdentifier: String?) -> HubAppsDisplayContext {
+        let settings = lastSettings ?? DockSettings.defaults
+        return HubAppsDisplayContext(displayID: store.displayID, dockStore: store,
+                                     usesLineIcons: settings.iconStyle == .line && settings.launcherLineIcons,
+                                     lineIconMotion: settings.lineIconMotion, appVisibility: appVisibility,
+                                     foregroundBundleIdentifier: foregroundBundleIdentifier)
+    }
 
     func owns(_ window: NSWindow?) -> Bool { window === panel }
     /// Rebuilds the panel envelope after timeline browsing starts or ends so the glance card fits.
@@ -818,7 +744,6 @@ final class DockPanelController {
     }
 
     func focus() {
-        closeActiveLauncher(animated: false, restoreFocus: false)
         store.keyboardFocus = true
         visibility.showImmediately()
         panel.acceptsKeyboardFocus = true
@@ -828,7 +753,7 @@ final class DockPanelController {
         updatePointer()
     }
     func handleKey(_ event: NSEvent) -> Bool {
-        guard !launcher.isPresented, store.keyboardFocus else { return false }
+        guard store.keyboardFocus else { return false }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
            event.charactersIgnoringModifiers == "/" {
             Analytics.track(.focusDockCommand(.windowSearch))
@@ -904,7 +829,6 @@ final class DockPanelController {
     }
     /// Sleep cancels the idle deadline; the next display refresh resumes normal input handling.
     func suspendIdleFading() {
-        closeActiveLauncher(animated: false, restoreFocus: false)
         idleSuspended = true
         approach.hide()
         interaction.suppressTooltips = true; interaction.tooltips.clear()
@@ -912,16 +836,15 @@ final class DockPanelController {
     }
 
     func stop() {
-        compactLauncher?.didClose = nil; compactLauncher?.close(restoreFocus: false); compactLauncher = nil
-        launcherPresentation.stop(); launcherWillOpen = nil; interaction.openLauncher = nil
+        hubRequested = nil; interaction.openLauncher = nil; interaction.hubTile = nil
         invalidateDrag?(); invalidateDrag = nil
         approach.stop()
         stopped = true; interaction.exposesContent = false; interaction.suppressTooltips = true; interaction.tooltips.clear(); interaction.toggleSection = nil; interaction.idleFade.stop(); visibility.stop()
         interaction.sourceTrackingChanged = nil
         interaction.openBadgeMemory = nil
-        interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.revealFolder = nil; interaction.stageFolderOnShelf = nil
+        interaction.prepareSettings = nil; interaction.openFiles = nil; interaction.openFolder = nil; interaction.openFolderInHub = nil; interaction.stageFolderOnShelf = nil
         interaction.openTrash = nil; interaction.emptyTrash = nil
-        interaction.openVolume = nil; interaction.revealVolume = nil; interaction.ejectVolume = nil
+        interaction.openVolume = nil; interaction.openVolumeInHub = nil; interaction.ejectVolume = nil
         interaction.volumeHoverChanged = nil; interaction.beginVolumeDrag = nil
         interaction.hideVolume = nil; interaction.prepareVolumeSettings = nil
         interaction.canMoveVolume = nil; interaction.moveVolume = nil
@@ -945,7 +868,7 @@ final class DockPanelController {
         interaction.sims = nil
         windowSearchRequested = nil
         modePickerRequested = nil
-        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; volumeCardHeld = false; modePickerHeld = false
+        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; volumeCardHeld = false; modePickerHeld = false; hubHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }
 }

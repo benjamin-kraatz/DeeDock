@@ -32,9 +32,15 @@ final class LauncherFileActionState {
 
     var isActive: Bool { context != nil }
     var isBusy: Bool { status.isPending || chooser.isChoosing }
-    /// True while a native file or folder panel is open. Presentation monitors must not
-    /// dismiss the launcher for that interval; collapsing it cancels the panel.
+    /// True while a native file or folder panel is open. The Hub must not close for outside clicks
+    /// or focus loss in that interval; closing it cancels the panel.
     var isChoosing: Bool { chooser.isChoosing }
+
+    /// Called when ``isChoosing`` flips. The Hub's Apps tab takes a modal hold for that interval.
+    var choosingChanged: ((Bool) -> Void)? {
+        get { chooser.choosingChanged }
+        set { chooser.choosingChanged = newValue }
+    }
 
     /// In-process file or folder panels this mode presented. Powerbox panels have no window here.
     func ownsChooserWindow(_ window: NSWindow) -> Bool { chooser.owns(window) }

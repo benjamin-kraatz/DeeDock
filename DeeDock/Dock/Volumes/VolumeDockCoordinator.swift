@@ -18,6 +18,8 @@ final class VolumeDockCoordinator {
     private var retryAfterQuit: [String: PendingRetry] = [:]
     private var terminationObserver: NSObjectProtocol?
     private var ejectTasks: [String: Task<Void, Never>] = [:]
+    /// Opens a folder in the DOKK Hub's Files tab. Set by the dock coordinator.
+    var openInHub: ((URL) -> Void)?
 
     init(volumes: VolumeController, folderStacks: FolderStackCoordinator) {
         self.volumes = volumes
@@ -54,7 +56,7 @@ final class VolumeDockCoordinator {
             guard let self, let panel else { return }
             openStack(volume, on: panel, keyboard: false)
         }
-        panel.interaction.revealVolume = { [weak self] volume in self?.openInFinder(volume) }
+        panel.interaction.openVolumeInHub = { [weak self] volume in self?.openVolumeInHub(volume) }
         panel.interaction.ejectVolume = { [weak self, weak panel] volume in
             guard let self, let panel else { return }
             requestEject(volume, on: panel, keyboard: panel.store.keyboardFocus)
@@ -85,6 +87,7 @@ final class VolumeDockCoordinator {
         retryAfterQuit = [:]
         if let terminationObserver { NSWorkspace.shared.notificationCenter.removeObserver(terminationObserver) }
         terminationObserver = nil
+        openInHub = nil
         cards.stop()
     }
 
@@ -121,16 +124,17 @@ final class VolumeDockCoordinator {
         volumes.arrangement.setHidden(volume.volumeID, true)
     }
 
-    private func openInFinder(_ volume: VolumeDockItem) {
+    /// Shows the drive's root in the DOKK Hub's Files tab.
+    private func openVolumeInHub(_ volume: VolumeDockItem) {
         cards.dismiss()
-        Analytics.track(.drive(.openedInFinder, kind: volume.kind, trigger: Analytics.trigger()))
-        NSWorkspace.shared.open(volume.url)
+        Analytics.track(.drive(.openedInHub, kind: volume.kind, trigger: Analytics.trigger()))
+        openInHub?(volume.url)
     }
 
     private func perform(_ action: VolumeCardAction, volume: VolumeDockItem, on panel: DockPanelController) {
         let state = cards.state(for: volume.volumeID)
         switch action {
-        case .openInFinder: openInFinder(volume)
+        case .openInHub: openVolumeInHub(volume)
         case .eject: requestEject(volume, on: panel, keyboard: false)
         case .confirmEject, .retry: startEject(volume, on: panel, force: false, keyboard: false)
         case .forceEject:

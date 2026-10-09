@@ -2,11 +2,11 @@
   "source": "Hand-written choreographies for the Line icon style. Format: docs/LINE-ICON-MOTIONS.md. Preview: scripts/line-icons/motion-gallery.py.",
   "motions": {
     "custom:launcher": {
-      "about": "The ring redraws while the dot ducks and springs back.",
-      "duration": 0.75,
+      "about": "The tiles hop along the shelf one after another while the shelf redraws beneath them.",
+      "duration": 0.8,
       "tracks": [
-        {"parts": ["s0"], "draw": [[0, 0], [0.62, 1]]},
-        {"parts": ["f0"], "scale": [[0, 1], [0.28, 0.45], [0.74, 1, "back"]]}
+        {"parts": ["s1"], "draw": [[0, 0], [0.55, 1, "out"]]},
+        {"parts": ["f0", "f1", "f2", "f3"], "y": [[0, 0], [0.16, -2.4, "out"], [0.32, 0, "in"], [0.42, -0.7, "out"], [0.52, 0, "in"]], "spread": 0.44}
       ]
     },
     "custom:grok-bot": {

@@ -62,7 +62,7 @@ struct DockVolumeButton: View {
         .accessibilityHint(Text(.volumeDockHint))
         .accessibilityActions {
             Button(.volumeOpen) { interaction.openVolume?(item) }
-            Button(.volumeOpenInFinder) { interaction.revealVolume?(item) }
+            Button(.hubOpenInHub) { Analytics.performing(.voiceOver) { interaction.openVolumeInHub?(item) } }
             Button(.volumeEject) { Analytics.performing(.voiceOver) { interaction.ejectVolume?(item) } }
             Button(.volumeHideFromDock) { interaction.hideVolume?(item) }
             if interaction.canMoveVolume?(item.volumeID, -1) == true {

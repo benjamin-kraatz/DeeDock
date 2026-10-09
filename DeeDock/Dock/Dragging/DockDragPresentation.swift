@@ -116,7 +116,7 @@ enum DockRenderSlot: Identifiable {
     var name: String {
         switch self {
         case .melt(let pair, let index): pair.names[index]
-        case .launcher: String(localized: .launcherTitle)
+        case .launcher: String(localized: .hubTitle)
         case .focus(let item): String(localized: .focusTileName(item.session.modeName))
         case .action(let item): item.tile.name
         case .app(let item): item.reference.name

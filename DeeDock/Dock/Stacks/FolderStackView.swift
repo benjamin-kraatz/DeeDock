@@ -250,8 +250,13 @@ struct FolderStackView: View {
         .contextMenu {
             Button(.actionOpen, systemImage: "arrow.up.forward.app") { state.openEntry?(entry.reference) }
             Button(.filePreviewAction, systemImage: "eye") { state.showPreview(entry.reference) }
-            Button(.folderStackShowInFinder, systemImage: "finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([entry.reference.url])
+            // Folders open in the DOKK Hub; a file is still revealed in Finder, which selects it.
+            if entry.reference.isFolder, let openInHub = state.openInHub {
+                Button(.hubOpenInHub, systemImage: "macwindow") { openInHub(entry.reference.url) }
+            } else {
+                Button(.folderStackShowInFinder, systemImage: "finder") {
+                    NSWorkspace.shared.activateFileViewerSelecting([entry.reference.url])
+                }
             }
             Divider()
             // The shortcuts are shown only; the panel's key handler performs them for the selection.

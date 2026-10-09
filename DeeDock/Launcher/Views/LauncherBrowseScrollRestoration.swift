@@ -30,7 +30,7 @@ struct LauncherBrowseScrollRestoration: ViewModifier {
             } action: { _, offset in
                 // Closing tears down suggestions and layout. Those geometry changes must not
                 // overwrite the position the user last saw before dismissal.
-                guard state.contentVisible, !state.usesMixedResults, !state.usesFileActions else { return }
+                guard state.isActive, !state.usesMixedResults, !state.usesFileActions else { return }
                 state.browseScroll = LauncherBrowseScroll(context: context, offset: offset)
             }
     }

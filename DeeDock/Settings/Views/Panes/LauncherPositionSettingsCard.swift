@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Chooses where the App Launcher tile sits: either end of the dock, or directly after a pin.
+/// Chooses where the DOKK tile sits: either end of the dock, or directly after a pin.
 ///
 /// Pins are display-specific, so the caller passes the list that matches the scope it edits. A saved
 /// anchor missing from that list keeps a labeled menu item, so the menu never shows a blank choice.
@@ -19,7 +19,7 @@ struct LauncherPositionSettingsCard: View {
     }
 
     var body: some View {
-        SettingsCard(title: .launcherTitle, footnote: .settingsLauncherPositionHelp) {
+        SettingsCard(title: .hubTitle, footnote: .settingsLauncherPositionHelp) {
             SettingsMenuRow(title: .settingsLauncherPosition, selection: $position) {
                 Text(edge.isVertical ? .settingsLauncherFarTop : .settingsLauncherFarLeft)
                     .tag(LauncherDockPosition.start)

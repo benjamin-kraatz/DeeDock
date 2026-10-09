@@ -6,7 +6,7 @@ import Observation
 @MainActor @Observable
 final class DockInteraction {
     var appMelt: AppMeltController?
-    /// Owns this panel's idle deadline and artwork opacity.
+    /// Opens the DOKK Hub from this dock's DOKK tile, or closes it when it is open and anchored.
     @ObservationIgnored var openLauncher: (() -> Void)?
     @ObservationIgnored var openFocusSession: (() -> Void)?
     /// Shared local-history scrub. Nil in previews that do not browse history.
@@ -42,8 +42,9 @@ final class DockInteraction {
     var iconStyle: DockIconStyle = .native
     /// When this dock's line glyphs play their motion.
     var lineIconMotion = DockSettings.defaults.lineIconMotion
-    /// True while the compact Launcher is open above this dock, so the Launcher tile stays lit.
-    var compactLauncherOpen = false
+    /// The DOKK Hub's tile state (open, detached, transfer progress, pulse), shared by every dock.
+    /// Nil in previews, which draw the resting tile.
+    var hubTile: HubTileState?
     /// The saved preference for animated running indicators. Only Stardust uses it.
     var animateIndicators = DockSettings.defaults.animateIndicators
     /// Whether this panel currently paints anything. A hidden dock schedules no indicator
@@ -75,7 +76,8 @@ final class DockInteraction {
     @ObservationIgnored var openWindowPeek: ((DockItem) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?
     @ObservationIgnored var stageFolderOnShelf: ((FolderDockItem) -> Void)?
-    @ObservationIgnored var revealFolder: ((FolderDockItem) -> Void)?
+    /// Opens the folder or Downloads stack in the DOKK Hub's Files tab.
+    @ObservationIgnored var openFolderInHub: ((FolderDockItem) -> Void)?
     /// Per-display policy for DeeDock's own Empty Trash warning.
     var confirmsTrashEmpty = DockSettings.defaults.confirmBeforeEmptyingTrash
     @ObservationIgnored var openTrash: (() -> Void)?
@@ -90,8 +92,8 @@ final class DockInteraction {
     @ObservationIgnored var openUpdate: ((UpdateDockItem) -> Void)?
     /// Opens a volume's contents as a stack.
     @ObservationIgnored var openVolume: ((VolumeDockItem) -> Void)?
-    /// Opens the volume in a Finder window.
-    @ObservationIgnored var revealVolume: ((VolumeDockItem) -> Void)?
+    /// Opens the volume in the DOKK Hub's Files tab.
+    @ObservationIgnored var openVolumeInHub: ((VolumeDockItem) -> Void)?
     /// Starts an eject, including any confirmation the volume needs.
     @ObservationIgnored var ejectVolume: ((VolumeDockItem) -> Void)?
     /// Reports the volume tile under the pointer, or nil when the pointer leaves it.

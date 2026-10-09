@@ -176,23 +176,6 @@ struct LauncherTests {
         #expect(app.score("notes music") == nil)
     }
 
-    @Test("Launcher stays on its originating display for every dock edge", arguments: DockEdge.allCases)
-    func negativeDisplayOrigin(_ edge: DockEdge) {
-        let visible = CGRect(x: -1920, y: -900, width: 1920, height: 1080)
-        let origin = CGRect(x: -1800, y: -880, width: 420, height: 70)
-        let frame = LauncherGeometry.frame(visibleFrame: visible, origin: origin, edge: edge)
-        #expect(visible.contains(frame))
-        #expect(frame.width <= 960)
-        #expect(frame.height <= 720)
-    }
-
-    @Test("Small displays constrain the panel instead of placing controls off-screen")
-    func smallDisplay() {
-        let visible = CGRect(x: 100, y: 100, width: 700, height: 500)
-        let origin = CGRect(x: 120, y: 120, width: 400, height: 60)
-        #expect(visible.contains(LauncherGeometry.frame(visibleFrame: visible, origin: origin, edge: .left)))
-    }
-
     @Test("History persists successful opens, survives restart, and clears explicitly")
     func history() throws {
         let name = "LauncherTests.\(UUID().uuidString)"

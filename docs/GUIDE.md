@@ -19,7 +19,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Local History](#local-history)
 - [Session Capsules](#session-capsules)
 - [Action Tiles](#action-tiles)
-- [App Launcher](#app-launcher)
+- [DOKK Hub](#dokk-hub)
 - [App badges](#app-badges)
 - [Notification Feed](#notification-feed)
 - [Atmosphere](#atmosphere)
@@ -55,7 +55,7 @@ The illustrations use production code, not artwork. Placement runs the same `Doc
 ## Use the dock
 
 - Click an icon to open or activate its application. Click the foreground application's icon to hide all of its windows; click again to show and activate it.
-- In Appearance, choose **App icons** or **Line**. Line draws a white glyph for each known app and for DOKK's own tiles, and a colored glow while the pointer is over one. A Trash with items in it loses its lid and shows paper sticking out above the rim. An app with no glyph keeps the icon macOS provides. Each display can override the choice. **Line icons in Launcher** (on by default, available only with Line) draws the same glyphs on that dock's Launcher tiles, search rows, and Open With list, in the system text color so they stay legible on light glass. Rest the pointer on a Line glyph and it plays a short motion once: the Trash lid lifts or a crumpled ball drops into a full one, the Finder face blinks, the Xcode hammer strikes. More than two hundred glyphs have a motion of their own that fits the app, such as the Telegram plane darting forward or the Ghostty cursor blinking, and the rest draw themselves on or pop. Moving the keyboard selection onto a tile plays it too. A sweep along the dock is too quick to set the glyphs off, and a Launcher result that appears already selected stays still. **Animate icons on hover** (on by default, available only with Line, per display) switches every motion off at once while keeping the glow. Reduce Transparency drops the glow and draws the glyph brighter; Reduce Motion shows it without a fade and keeps the glyph still.
+- In Appearance, choose **App icons** or **Line**. Line draws a white glyph for each known app and for DOKK's own tiles, and a colored glow while the pointer is over one. A Trash with items in it loses its lid and shows paper sticking out above the rim. An app with no glyph keeps the icon macOS provides. Each display can override the choice. **Line icons in the Hub's Apps tab** (on by default, available only with Line) draws the same glyphs on the Apps tab's tiles, search rows, and Open With list when the Hub opens from that dock, in the system text color so they stay legible on light glass. Rest the pointer on a Line glyph and it plays a short motion once: the Trash lid lifts or a crumpled ball drops into a full one, the Finder face blinks, the Xcode hammer strikes. More than two hundred glyphs have a motion of their own that fits the app, such as the Telegram plane darting forward or the Ghostty cursor blinking, and the rest draw themselves on or pop. Moving the keyboard selection onto a tile plays it too. A sweep along the dock is too quick to set the glyphs off, and an Apps tab result that appears already selected stays still. **Animate icons on hover** (on by default, available only with Line, per display) switches every motion off at once while keeping the glow. Reduce Transparency drops the glow and draws the glyph brighter; Reduce Motion shows it without a fade and keeps the glyph still.
 - Hover to magnify nearby icons and see an app-name label. Running applications have a dot toward the selected screen edge by default. In Appearance, choose Dot, Bar, Square, Target Lock, Orbit, Stardust, Power Badge, or Hidden from the Running indicators gallery, in shared defaults or for an individual display.
 - **Animate indicators** switches Stardust motion on. It is on by default, honours Reduce Motion, and stops while a dock is hidden or has faded out.
 - Neon, Aura, and the withdrawn Metal styles (Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, Glitch) load as Dot, rather than failing to load.
@@ -104,7 +104,7 @@ Each direct app-level drop or **Open Files…** picker confirmation submits its 
 
 Click a pinned folder to open one transient stack inward from its dock icon. The folder is resolved and its directory watch starts before the panel appears, so a volume that does not respond cannot freeze the dock. Closing the stack during that wait leaves the panel hidden. Only one stack can be open across all displays. The header shows the Finder folder name and a per-pin Grid/List/Smart choice. Grid and List sort visible children by localized name. Smart uses Apple Intelligence on file metadata to build a grouped list without reading file contents. It organizes the 60 most recently modified children and keeps any remainder in More Items.
 
-The stack shows the current folder's immediate children. Click a child to select it, then press Space for Quick Look without opening an app. Space or Escape closes the preview; arrow keys switch the preview to another child. Double-click or press Return to open a file, package, or alias. Opening a subfolder browses it inside the same stack. Use Back or Delete to return to its parent. The context menu also provides Quick Look, Show in Finder, **Copy Path**, and **Copy Relative Path**. The relative path starts at the stack's folder, so `file.txt` in Downloads copies `./file.txt`, and a file inside `folder` on a drive copies `./folder/file.txt`. Downloads and drive stacks offer the same commands. With a child selected, ⌥⌘C copies its path and ⇧⌥⌘C its relative path.
+The stack shows the current folder's immediate children. Click a child to select it, then press Space for Quick Look without opening an app. Space or Escape closes the preview; arrow keys switch the preview to another child. Double-click or press Return to open a file, package, or alias. Opening a subfolder browses it inside the same stack. Use Back or Delete to return to its parent. The context menu also provides Quick Look, **Copy Path**, and **Copy Relative Path**, plus **Open in Hub** for a subfolder or **Show in Finder** for a file. The relative path starts at the stack's folder, so `file.txt` in Downloads copies `./file.txt`, and a file inside `folder` on a drive copies `./folder/file.txt`. Downloads and drive stacks offer the same commands. With a child selected, ⌥⌘C copies its path and ⇧⌥⌘C its relative path.
 
 Hold a dragged file over a pinned folder to spring-open its stack, then hover over subfolders to browse deeper. Drop onto a subfolder or the current folder's background to copy the files there. The copy cursor identifies the operation; source files stay in place. Existing names cause an error, with no replacement, and a failure reports how many items were copied before it occurred. Copies run off the main actor and keep their file access until completion, even if the panel closes. Packages, aliases, symbolic links, and file promises are not spring-loaded folders.
 
@@ -112,7 +112,7 @@ Drag one child to Finder or another app through the native file-drag session; th
 
 The source dock stays revealed and suppresses fading and tooltips while its stack is open. The panel closes after a successful open or drag, outside click, Escape, another stack opening, source removal/hiding, display removal, sleep, or shutdown. Failed opens remain visible with a retryable inline error. Directory changes are watched only while the panel is open.
 
-Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Space previews, Delete goes back, and Escape closes the preview before returning focus to the source folder. Tab reaches the Grid/List/Smart control. VoiceOver exposes opening, Finder reveal, presentation, move, display-copy, and unpin actions.
+Focus Dock can open a stack with Return. Arrow keys navigate its children, Return opens, Space previews, Delete goes back, and Escape closes the preview before returning focus to the source folder. Tab reaches the Grid/List/Smart control. VoiceOver exposes opening, Open in Hub, presentation, move, display-copy, and unpin actions.
 
 Fan and Automatic presentations, search, multi-selection, file promises, move operations into stacks, and persistent utility windows remain planned.
 
@@ -122,7 +122,7 @@ List and Smart items show file type, size, and last-modified date below the name
 
 The folder stack header has a Sort by menu with Recency, Alphabetical, and Size. Recency puts the most recently modified items first, Alphabetical starts with A, and Size puts the largest items first. The choice is saved per folder and display. Downloads initially uses Recency. Smart mode sorts within its groups. Size sorts files by filesystem metadata and folders by a finished contents total. Folders still being measured sort last, then by name.
 
-Downloads appears to the left of Capsules and Shelf by default. Click it to browse the Downloads folder in a stack, or use its context menu to open it in Finder and choose grid or list presentation.
+Downloads appears to the left of Capsules and Shelf by default. Click it to browse the Downloads folder in a stack, or use its context menu to open it in the [DOKK Hub](HUB.md#open-in-hub) and choose grid or list presentation.
 
 Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display, independently of Dock Modes. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
 
@@ -176,7 +176,7 @@ The context menu and VoiceOver offer **Empty Trash…** only when Trash contains
 
 ## External drives
 
-Connected USB sticks, SD cards, and external disks appear between the Shelf and Trash. Click one to browse it in a stack, or hover over it for a card with capacity, Open in Finder, and Eject. You can also drag the tile off the dock to eject it; “Eject” appears before you release. The tile dims while ejecting and leaves once the drive is safe to remove. If an app still has a file open, the card names the app and offers Show, Quit (the eject then retries), Try Again, and Eject Anyway. Drag files onto a drive tile to copy them there, or hold Shift to move them; a label beside the cursor says which. Rest on the tile to open the drive's stack and keep resting on folders to go deeper; the stack's back button takes drops and climbs a level when you rest on it. Disk images, network shares, and Time Machine backups have their own switches in Settings › Dock Extras › Drives; backup disks stay out of the dock unless you turn theirs on, because macOS only lets DOKK browse them with Full Disk Access. DOKK can ask before ejecting a hard disk. Hide a drive you rarely use from its context menu; it stays mounted. **Manage Drives…** opens a list where you can show it again, drag drives into a new order, or forget a disconnected one. Dragging a drive tile along the other drives in the dock reorders them too. See [acceptance notes](ACCEPTANCE.md#dee-83-external-volumes) for limits and pending hands-on checks.
+Connected USB sticks, SD cards, and external disks appear between the Shelf and Trash. Click one to browse it in a stack, or hover over it for a card with capacity, **Open in Hub**, and Eject. The context menu also offers **Open in Hub**, which shows the drive in the Hub's Files tab. You can also drag the tile off the dock to eject it; “Eject” appears before you release. The tile dims while ejecting and leaves once the drive is safe to remove. If an app still has a file open, the card names the app and offers Show, Quit (the eject then retries), Try Again, and Eject Anyway. Drag files onto a drive tile to copy them there, or hold Shift to move them; a label beside the cursor says which. Rest on the tile to open the drive's stack and keep resting on folders to go deeper; the stack's back button takes drops and climbs a level when you rest on it. Disk images, network shares, and Time Machine backups have their own switches in Settings › Dock Extras › Drives; backup disks stay out of the dock unless you turn theirs on, because macOS only lets DOKK browse them with Full Disk Access. DOKK can ask before ejecting a hard disk. Hide a drive you rarely use from its context menu; it stays mounted. **Manage Drives…** opens a list where you can show it again, drag drives into a new order, or forget a disconnected one. Dragging a drive tile along the other drives in the dock reorders them too. See [acceptance notes](ACCEPTANCE.md#dee-83-external-volumes) for limits and pending hands-on checks.
 
 ## Windows
 
@@ -301,36 +301,34 @@ Click a tile or select it in Focus Dock and press Return to run it. Drop files o
 
 Shortcuts may show their own permission or input dialogs. Configure the shortcut itself to save or display its output; DOKK does not retain output files. Cancel stops the CLI invocation and cannot undo actions already performed. Shortcut discovery and execution use Apple's documented `shortcuts` command, with arguments passed directly rather than through a shell.
 
-## App Launcher
+## DOKK Hub
 
-The permanent **App Launcher** tile expands the dock into a searchable app panel. It includes
-grid and list app browsing plus unified search for apps, windows, Capsules/Breadcrumbs, Shelf files,
-pinned Shortcuts, and Dock Modes. App browsing retains filters, a location/source filter, sorting, grouping, and launch history.
-Those browse controls live in one search-field overflow menu. **Ask Robi** appears there for a
-nonempty query and uses on-device Apple Intelligence to suggest apps for a task you describe.
-With files selected, Launcher can open them with a compatible app, pass them to a pinned
-Shortcut, or copy them into a chosen folder. See the [launcher reference](LAUNCHER.md)
-for controls and discovery limits, and the [acceptance notes](ACCEPTANCE.md#dee-8-app-launcher)
-for validation status.
+The **DOKK** tile opens the DOKK Hub, one large panel with three tabs. **Apps** is the app
+launcher, with suggestions, grid and list browsing, **Ask Robi**, and file actions for files
+dropped on the tile. Its search also finds windows, Capsules and Breadcrumbs, Shelf files, pinned
+Shortcuts, and Dock Modes. **Windows** shows open windows grouped by app. **Files** is a file
+browser with browser tabs, split view, Quick Look, Spotlight search, and a copy queue. The Hub
+opens next to its tile and closes like a popover. The pin button turns it into a normal window that
+stays open. ⌘1, ⌘2, and ⌘3 switch tabs, and ⌘F focuses the search field.
 
-**Settings → Dock → Appearance → Launcher** chooses **Full**, described above, or **Compact**: a
-small app grid with a search field that opens above the Launcher tile and leaves the dock in place.
-The compact grid shows apps only, with the same Suggested row above them when suggestions are on,
-but without tools, Robi, or mixed search. Dropping files
-on the tile always opens the full Launcher. **Line icons in Launcher** applies to both styles. Each
-display can override the style.
+See the [DOKK Hub reference](HUB.md) for every tab, and the [Apps tab reference](LAUNCHER.md) for
+search, discovery, and file actions. Validation status is in the
+[acceptance notes](ACCEPTANCE.md#dee-121-dokk-hub).
 
-### Launcher position
+**Settings → Dock → Appearance → Line icons in the Hub's Apps tab** draws line glyphs in the Apps
+tab while the dock uses Line icons. Each display can override it.
 
-The launcher sits at the far left of a horizontal dock, or the top of a vertical one, by default.
+### DOKK tile position
+
+The DOKK tile sits at the far left of a horizontal dock, or the top of a vertical one, by default.
 Drag the tile to another spot to move it: before the pins, right after any pin, or past
-running apps and utilities to the far end. Click it to open the launcher as usual. VoiceOver move actions step it one spot at a time.
-**Settings → Dock → Position → App Launcher** offers the same choices as a menu.
+running apps and utilities to the far end. Click it to open the Hub as usual. VoiceOver move actions step it one spot at a time.
+**Settings → Dock → Position → DOKK Hub → Tile position** offers the same choices as a menu.
 
-A launcher placed after a pin stays beside that pin when other pins are added or removed. If you
-move or unpin that pin, the launcher stays put and follows the pin that was before it. Where a display
-doesn't have that pin, or it is parked on a magnetic edge, the launcher follows the nearest
-earlier pin, or the far left if none. A launcher between pins shares the pinned section and adds no divider.
+A DOKK tile placed after a pin stays beside that pin when other pins are added or removed. If you
+move or unpin that pin, the tile stays put and follows the pin that was before it. Where a display
+doesn't have that pin, or it is parked on a magnetic edge, the tile follows the nearest
+earlier pin, or the far left if none. A tile between pins shares the pinned section and adds no divider.
 
 The position is a dock setting, saved with the other settings and kept across restarts. A drag
 updates the shared default, or that display's own value when it already overrides the default.
@@ -339,7 +337,7 @@ Pins differ per display, so the shared Settings menu lists the main display's pi
 ### App suggestions
 
 Optional **App suggestions** learn from local app activity after opt-in under **Settings → Features → App suggestions**.
-An empty Launcher query can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.
+An empty query in the Hub's Apps tab can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.
 After a week of use, a short optional survey about suggestion quality can appear below them while usage-data sharing is on.
 See [app suggestions](LAUNCHER-SUGGESTIONS.md) for the 90-day retention policy and observation limits.
 
@@ -439,8 +437,7 @@ Choose **Settings…** from the menu-bar item or app menu (⌘, while DOKK is ac
 | Along-edge offset | −1,000 to +1,000 points | 0 |
 | Edge distance | 0–300 points | 8 |
 | Position relative to | Usable desktop / Screen edge | Usable desktop |
-| App Launcher position | Far end left or top / after any pin / far end right or bottom | Far left or top |
-| Launcher style | Full / Compact | Full |
+| DOKK tile position | Far end left or top / after any pin / far end right or bottom | Far left or top |
 
 Numeric controls support sliders and locale-aware typed values. Invalid drafts never enter layout calculations; leaving the field restores the last accepted value. **Restore Defaults** on the Defaults page resets shared configuration only and preserves display overrides, visibility, and pins. Unreadable saved settings are left intact and reported in Settings; Restore Defaults explicitly replaces them.
 

@@ -12,7 +12,6 @@ struct AppearanceSettingsPane: View {
     @Binding var iconStyle: DockIconStyle
     @Binding var launcherLineIcons: Bool
     @Binding var lineIconMotion: LineIconMotionPlayback
-    @Binding var launcherStyle: LauncherStyle
     @Binding var animateIndicators: Bool
     @Binding var launchAnimation: DockLaunchAnimation
 
@@ -37,10 +36,6 @@ struct AppearanceSettingsPane: View {
                                                 set: { lineIconMotion = $0 ? .hover : .off }))
                     .disabled(iconStyle != .line)
                     .settingsOverride(overrideContext, field: .lineIconMotion)
-            }
-            SettingsCard(title: .settingsLauncherStyle, footnote: .settingsLauncherStyleHelp) {
-                LauncherStylePicker(selection: $launcherStyle)
-                    .settingsOverride(overrideContext, field: .launcherStyle)
                 SettingsToggleRow(title: .settingsLauncherLineIcons, isOn: $launcherLineIcons)
                     .disabled(iconStyle != .line)
                     .settingsOverride(overrideContext, field: .launcherLineIcons)
@@ -87,13 +82,11 @@ struct AppearanceSettingsPane: View {
     @Previewable @State var iconStyle: DockIconStyle = .native
     @Previewable @State var launcherLineIcons = true
     @Previewable @State var lineIconMotion: LineIconMotionPlayback = .hover
-    @Previewable @State var launcherStyle: LauncherStyle = .compact
     @Previewable @State var animate = true
     ScrollView {
         AppearanceSettingsPane(iconSize: $iconSize, magnification: $magnification, itemSpacing: $itemSpacing, cornerRadius: $cornerRadius,
                                runningIndicatorStyle: $indicator, iconStyle: $iconStyle,
                                launcherLineIcons: $launcherLineIcons, lineIconMotion: $lineIconMotion,
-                               launcherStyle: $launcherStyle,
                                animateIndicators: $animate,
                                launchAnimation: .constant(DockSettings.defaults.launchAnimation))
             .padding(24)

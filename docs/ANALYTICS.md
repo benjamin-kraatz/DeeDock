@@ -174,7 +174,6 @@ Registered with the SDK's `register`, so every event carries them.
 | `dock_auto_hide`, `dock_activation_location`, `dock_animation_style` | |
 | `dock_indicator_style`, `dock_tooltip_preset`, `dock_launch_animation` | |
 | `dock_icon_style`, `dock_launcher_line_icons` | `native` or `line`; Bool, effective only with `line` |
-| `dock_launcher_style` | `full` or `compact` |
 | `dock_show_background`, `dock_fade_when_idle` | |
 | `window_peek_enabled`, `window_peek_layout` | |
 | `show_shelf`, `show_trash`, `show_session_capsules`, `show_notification_feed`, `show_volumes`, `soap_bubble_effects` | |
@@ -305,8 +304,7 @@ from App Melt.
 
 | Event | Properties |
 | --- | --- |
-| `launcher_opened` | `source`, `file_count` (the files handed over with a drop or from the Shelf, else 0), `style` (`full` or `compact`; the Launcher that opened, so a file drop reports `full` under a compact setting) |
-| `launcher_closed` | `duration`, `had_query` (search text present when it closed) |
+| `launcher_closed` | Sent when the Hub's Apps tab is hidden: another tab is selected or the Hub closes. `duration` (seconds since the tab appeared), `had_query` (search text present when it was hidden) |
 | `launcher_searched` | `query_length`, `result_count`, `kind`. Never the text. |
 | `launcher_result_activated` | `kind`, `reveal`, `trigger` |
 | `launcher_suggestion_accepted` | `trigger` |
@@ -317,7 +315,22 @@ from App Melt.
 | `launcher_suggestion_feedback` | `feedback` (`useful`, `not_now`). Never which app. |
 | `launcher_suggestion_prompt_answered` | `answer` (`useful`, `not_useful`, `no_answer`) |
 
-`launcher_tool_opened` now also fires for the System Settings clone.
+`launcher_tool_opened` now also fires for the System Settings clone. The Launcher now lives in the
+DOKK Hub's Apps tab, so its events describe that tab. `launcher_opened` and the `dock_launcher_style`
+context property were retired with the Compact and Full Launcher styles; `hub_opened` replaces
+`launcher_opened`.
+
+### DOKK Hub
+
+| Event | Properties |
+| --- | --- |
+| `hub_opened` | `trigger` (`tile`, `focus_dock`, `file_drop`, `open_folder`), `tab` (`apps`, `windows`, `files`), `detached` (opened as a window rather than anchored to the dock) |
+| `hub_tab_selected` | `tab`, `via` (`click`, `keyboard`) |
+| `hub_detach_changed` | `detached` (`true` when the pin button made the Hub a window, `false` when it was attached again) |
+| `hub_file_transfer` | `kind` (`copy`, `move`), `item_count`, `cross_volume`, `outcome` (`completed`, `cancelled`, `failed`). Never names or paths. |
+| `hub_files_view_changed` | `view` (`list`, `icons`, `columns`) |
+| `hub_file_search_result_opened` | `scope` (`this_mac`, `folder`), `is_folder`. Never the query or the result. |
+| `hub_window_activated` | `minimized` (the window was minimized before it was brought forward). Never titles or app names. |
 
 ### Dock Modes
 
@@ -336,7 +349,7 @@ from App Melt.
 | `shelf` | `action` (`opened`, `added`, `removed`, `cleared`, `items_opened`, `dragged_out`, `pasted`, `previewed`, `revealed`, `copied`, `path_copied`, `relative_path_copied`), `item_count`, `source` (`clipboard` for `pasted`), `trigger` |
 | `session_capsule` | `action`, `window_count`, `capsule_count`, `trigger` |
 | `trash` | `action`, `item_count`, `outcome`, `trigger` |
-| `drive` | `action`, `kind`, `trigger` |
+| `drive` | `action` (`stack_opened`, `opened_in_hub`, `ejected`; `opened_in_finder` before the DOKK Hub), `kind`, `trigger` |
 | `drive_ejected` | `kind`, `outcome` (`ejected`, `blocked`, `failed`), `forced`, `blocker_count`, `trigger` |
 | `pin_changed` | `action` (`pin`, `unpin`, `reorder`), `kind`, `count`, `source` (`menu`, `voice_over`, `keyboard`, `drag`, `launcher`, `other`). Never which app. |
 

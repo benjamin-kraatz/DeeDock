@@ -27,7 +27,7 @@ The dock itself matches the system Dock: Liquid Glass, magnification, running in
 - Switch between Dock Modes, which are named sets of pins for every display. A mode can carry a recipe that opens apps, files, links, and Shortcuts.
 - Carry files across Spaces and displays on the Shelf.
 - Save what you were working on as a Session Capsule, and start a Focus Session timer from any mode.
-- Search apps, windows, Shelf files, and Dock Modes from the App Launcher. Run Shortcuts from Action Tiles, and see app badges with a history of what changed.
+- Open the DOKK Hub from its tile to launch apps, jump to windows, and browse, search, and copy files. Its search also finds Shelf files and Dock Modes. Run Shortcuts from Action Tiles, and see app badges with a history of what changed.
 - Drive the whole dock from the keyboard with Focus Dock. VoiceOver gets labels and actions for every tile, and DOKK respects Reduce Motion and Reduce Transparency.
 
 The [user guide](docs/GUIDE.md) covers every feature and setting in detail.

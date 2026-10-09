@@ -4,7 +4,6 @@ import SwiftUI
 ///
 /// Preview `DockContentView` with sample values instead of constructing a live workspace store.
 struct DockView: View {
-    let launcher: LauncherState
     let store: DockStore
     let interaction: DockInteraction
     let visibility: DockVisibilityController
@@ -13,29 +12,12 @@ struct DockView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
-        if launcher.isPresented, launcher.presentationStyle == .full {
-            LauncherLiquidGlass(
-                state: launcher,
-                dock: AnyView(dock(drawsBackground: false).allowsHitTesting(false).accessibilityHidden(true)),
-                dockCanvasSize: interaction.windowSize,
-                dockCornerRadius: interaction.idleFade.settings.cornerRadius,
-                reduceMotion: reduceMotion,
-                reduceTransparency: reduceTransparency
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
-            dock()
-        }
-    }
-
-    @ViewBuilder private func dock(drawsBackground: Bool = true) -> some View {
         let size = interaction.layout.viewportSize
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
                                                   size: size, reduceMotion: reduceMotion, edge: interaction.layout.edge)
-        // The dock clone inside the launcher is inert artwork, so history browsing stays with the
-        // real dock. Both layers share the viewport, and the presentation transform below moves
-        // them together, which keeps the track over the glass it measures.
-        let timeline = drawsBackground ? interaction.timeline : nil
+        // The timeline shares the dock's viewport, and the presentation transform below moves
+        // both together, which keeps the track over the glass it measures.
+        let timeline = interaction.timeline
         ZStack(alignment: .topLeading) {
             DockContentView(
                 items: store.items,
@@ -47,18 +29,16 @@ struct DockView: View {
                 interaction: interaction,
                 reduceMotion: reduceMotion,
                 reduceTransparency: reduceTransparency,
-                drawsBackground: drawsBackground,
-                ambientAnimated: drawsBackground && visibility.exposesContent && visibility.progress == 0,
+                drawsBackground: true,
+                ambientAnimated: visibility.exposesContent && visibility.progress == 0,
                 primaryAppAction: store.performPrimaryAction,
                 openApp: store.open,
                 togglePin: store.toggleFavorite,
                 dismissError: { store.errorMessage = nil }
             )
-            if drawsBackground {
-                DockRumoursOverlay(store: store, interaction: interaction,
-                    enabled: visibility.progress == 0 && !reduceMotion,
-                    reduceTransparency: reduceTransparency)
-            }
+            DockRumoursOverlay(store: store, interaction: interaction,
+                enabled: visibility.progress == 0 && !reduceMotion,
+                reduceTransparency: reduceTransparency)
             if let timeline, timeline.isActive(on: store.displayID) {
                 DockTimelineOverlay(
                     presentation: timeline.presentation,

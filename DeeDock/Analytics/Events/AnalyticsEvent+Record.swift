@@ -39,7 +39,6 @@ extension AnalyticsEvent {
         case .windowSearchActivated: "window_search_activated"
         case .windowSearchClosed: "window_search_closed"
         case .fusion: "fusion"
-        case .launcherOpened: "launcher_opened"
         case .launcherSearched: "launcher_searched"
         case .launcherResultActivated: "launcher_result_activated"
         case .launcherSuggestionAccepted: "launcher_suggestion_accepted"
@@ -50,6 +49,13 @@ extension AnalyticsEvent {
         case .launcherSuggestionsShown: "launcher_suggestions_shown"
         case .launcherSuggestionFeedback: "launcher_suggestion_feedback"
         case .launcherSuggestionPromptAnswered: "launcher_suggestion_prompt_answered"
+        case .hubOpened: "hub_opened"
+        case .hubTabSelected: "hub_tab_selected"
+        case .hubDetachChanged: "hub_detach_changed"
+        case .hubFileTransfer: "hub_file_transfer"
+        case .hubFilesViewChanged: "hub_files_view_changed"
+        case .hubFileSearchResultOpened: "hub_file_search_result_opened"
+        case .hubWindowActivated: "hub_window_activated"
         case .modeSwitched: "mode_switched"
         case .modeEdited: "mode_edited"
         case .workspacePrepared: "workspace_prepared"
@@ -170,8 +176,6 @@ extension AnalyticsEvent {
         case let .fusion(step, outcome, failure, operation, duration):
             ["step": .init(step), "outcome": .init(outcome), "failure": failure.map(AnalyticsValue.init),
              "operation": operation.map(AnalyticsValue.init), "duration": .init(duration)]
-        case let .launcherOpened(source, fileCount, style):
-            ["source": .init(source), "file_count": .init(fileCount), "style": .init(style)]
         case let .launcherSearched(queryLength, resultCount, kind):
             ["query_length": .init(queryLength), "result_count": .init(resultCount), "kind": .init(kind)]
         case let .launcherResultActivated(kind, reveal, trigger):
@@ -193,6 +197,21 @@ extension AnalyticsEvent {
             ["feedback": .init(feedback)]
         case let .launcherSuggestionPromptAnswered(answer):
             ["answer": .init(answer)]
+        case let .hubOpened(trigger, tab, detached):
+            ["trigger": .init(trigger), "tab": .init(tab), "detached": .init(detached)]
+        case let .hubTabSelected(tab, via):
+            ["tab": .init(tab), "via": .init(via)]
+        case let .hubDetachChanged(detached):
+            ["detached": .init(detached)]
+        case let .hubFileTransfer(kind, itemCount, crossVolume, outcome):
+            ["kind": .init(kind), "item_count": .init(itemCount), "cross_volume": .init(crossVolume),
+             "outcome": .init(outcome)]
+        case let .hubFilesViewChanged(view):
+            ["view": .init(view)]
+        case let .hubFileSearchResultOpened(scope, isFolder):
+            ["scope": .init(scope), "is_folder": .init(isFolder)]
+        case let .hubWindowActivated(minimized):
+            ["minimized": .init(minimized)]
         case let .modeSwitched(source, modeCount):
             ["source": .init(source), "mode_count": .init(modeCount)]
         case let .modeEdited(edit, modeCount, stepCount):

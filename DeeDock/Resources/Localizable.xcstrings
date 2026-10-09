@@ -20224,19 +20224,19 @@
       }
     },
     "launcherFile.drop" : {
-      "comment" : "Native drag feedback when files are over the Launcher tile or open panel.",
+      "comment" : "Native drag feedback when files are over the DOKK tile in the dock: dropping them opens the DOKK Hub's Apps tab with file actions.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Im Starter verwenden"
+            "value" : "Im DOKK Hub verwenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use in Launcher"
+            "value" : "Use in DOKK Hub"
           }
         }
       }
@@ -21677,42 +21677,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Back to app search"
-          }
-        }
-      }
-    },
-    "launcherTileHint" : {
-      "comment" : "Accessibility hint for the launcher tile.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dock erweitern, um Apps zu finden und zu öffnen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expand the dock to find and open apps."
-          }
-        }
-      }
-    },
-    "launcherTitle" : {
-      "comment" : "Permanent dock tile and launcher title.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App-Launcher"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Launcher"
           }
         }
       }
@@ -33610,19 +33574,19 @@
       }
     },
     "settingsIconStyleHelp" : {
-      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow and motion, the optional Launcher toggle, and per-display override.",
+      "comment" : "Explains the Line icon style: bundled white glyphs, fallback to the app icon, hover glow and motion, the optional toggle for the DOKK Hub's Apps tab, and per-display override.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig und bewegt sich kurz; die Bewegung lässt sich abschalten. Auch der Launcher kann sie verwenden. Jedes Display kann den Stil selbst wählen."
+            "value" : "Weiße Strichsymbole statt der App-Grafik. Eine App ohne Symbol behält ihr eigenes Icon. Beim Zeigen leuchtet das Symbol farbig und bewegt sich kurz; die Bewegung lässt sich abschalten. Auch der Apps-Tab des Hubs kann sie verwenden. Jedes Display kann den Stil selbst wählen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow and a short motion, which can be switched off. The Launcher can use them too. Each display can choose its own style."
+            "value" : "White line glyphs in place of app artwork. An app with no glyph keeps its own icon. Hover adds a colored glow and a short motion, which can be switched off. The Hub's Apps tab can use them too. Each display can choose its own style."
           }
         }
       }
@@ -34150,19 +34114,19 @@
       }
     },
     "settingsLauncherLineIcons" : {
-      "comment" : "Appearance toggle under Icon style that also draws line glyphs in this dock's Launcher. Unavailable while the native icon style is selected.",
+      "comment" : "Appearance toggle under Icon style that also draws line glyphs in the Apps tab of the DOKK Hub opened from this dock. Unavailable while the native icon style is selected.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Strichsymbole auch im Launcher"
+            "value" : "Strichsymbole auch im Apps-Tab des Hubs"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Line icons in Launcher"
+            "value" : "Line icons in the Hub's Apps tab"
           }
         }
       }
@@ -34186,109 +34150,37 @@
       }
     },
     "settingsLauncherPosition" : {
-      "comment" : "Launcher placement setting; directions refer to physical dock ends.",
+      "comment" : "Setting for where the DOKK tile (which opens the DOKK Hub) sits in the dock; directions refer to physical dock ends.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Launcher-Position"
+            "value" : "Position der Kachel"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Launcher position"
+            "value" : "Tile position"
           }
         }
       }
     },
     "settingsLauncherPositionHelp" : {
-      "comment" : "Launcher placement setting; directions refer to physical dock ends.",
+      "comment" : "Explains placing the DOKK tile, which opens the DOKK Hub; directions refer to physical dock ends.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platziere den Launcher an einem Ende des Docks oder direkt hinter einer angehefteten App. Du kannst ihn auch im Dock verschieben."
+            "value" : "Platziere die DOKK-Kachel an einem Ende des Docks oder direkt hinter einer angehefteten App. Du kannst sie auch im Dock verschieben."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Place the launcher at either end of the dock or right after a pinned app. You can also drag it along the dock."
-          }
-        }
-      }
-    },
-    "settingsLauncherStyle" : {
-      "comment" : "Appearance card title for choosing how the Launcher opens, and the accessibility label of its style picker.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Launcher"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Launcher"
-          }
-        }
-      }
-    },
-    "settingsLauncherStyleCompact" : {
-      "comment" : "Launcher style: a small app grid that opens above the dock's Launcher tile.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kompakt"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compact"
-          }
-        }
-      }
-    },
-    "settingsLauncherStyleFull" : {
-      "comment" : "Launcher style: the dock grows into the full Launcher with suggestions, tools, and file actions.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vollständig"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full"
-          }
-        }
-      }
-    },
-    "settingsLauncherStyleHelp" : {
-      "comment" : "Explains the two Launcher styles, that file drops always use the full Launcher, and the per-display override.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vollständig lässt das Dock zum durchsuchbaren Launcher mit Vorschlägen, Werkzeugen und Dateiaktionen wachsen. Kompakt öffnet ein kleines App-Raster über der Launcher-Kachel, das Dock bleibt an seinem Platz. Abgelegte Dateien öffnen immer den vollständigen Launcher. Jedes Display kann den Stil selbst wählen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full grows the dock into a searchable Launcher with suggestions, tools, and file actions. Compact opens a small app grid above the Launcher tile and leaves the dock in place. Dropped files always open the full Launcher. Each display can choose its own style."
+            "value" : "Place the DOKK tile at either end of the dock or right after a pinned app. You can also drag it along the dock."
           }
         }
       }
@@ -49460,6 +49352,2190 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“Yesterday” searches only capsules saved yesterday. Choose Saved Capsules. Without a saved checkpoint, there is no history to search."
+          }
+        }
+      }
+    },
+    "hubFilesCopySuffix" : {
+      "comment" : "Word appended to a duplicated file's name when the name is taken, like Finder: 'Report copy.pdf'. Must match Finder's word in this language.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "copy"
+          }
+        }
+      }
+    },
+    "hubFilesErrorEmptyName" : {
+      "comment" : "Error when the user tries to rename a file to an empty name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte gib einen Namen ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a name."
+          }
+        }
+      }
+    },
+    "hubFilesErrorInvalidCharacter" : {
+      "comment" : "Error when a new file name contains a slash or colon.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namen dürfen kein „/“ oder „:“ enthalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Names can't contain “/” or “:”."
+          }
+        }
+      }
+    },
+    "hubFilesErrorNameTaken" : {
+      "comment" : "Error when renaming to a name already used in the folder. %@ is the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Name „%@“ ist bereits belegt. Bitte wähle einen anderen Namen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The name “%@” is already taken. Please choose a different name."
+          }
+        }
+      }
+    },
+    "hubWindowsSearchPrompt" : {
+      "comment" : "Placeholder of the DOKK Hub header search field while the Windows tab is visible. Searches window titles and app names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster durchsuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search windows"
+          }
+        }
+      }
+    },
+    "hubWindowsSummary" : {
+      "comment" : "DOKK Hub Windows tab summary line. %1$@ is a window count such as '9 windows' (hubWindowsWindowCount), %2$@ an app count such as '5 apps' (hubWindowsAppCount).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ in %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ in %2$@"
+          }
+        }
+      }
+    },
+    "hubWindowsWindowCount" : {
+      "comment" : "DOKK Hub Windows tab: number of windows, used in the summary line and as the spoken count of an app group.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Fenster"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Fenster"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld window"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld windows"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubWindowsAppCount" : {
+      "comment" : "DOKK Hub Windows tab: number of apps with windows, used in the summary line.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld App"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Apps"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld app"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld apps"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubWindowsOpenRadar" : {
+      "comment" : "DOKK Hub Windows tab button that opens Radar, DOKK's full-screen window overview. Radar is a feature name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radar öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Radar"
+          }
+        }
+      }
+    },
+    "hubWindowsMinimized" : {
+      "comment" : "DOKK Hub Windows tab badge on a window card whose window is minimized to the Dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimized"
+          }
+        }
+      }
+    },
+    "hubWindowsHidden" : {
+      "comment" : "DOKK Hub Windows tab badge on a window card whose app is hidden (Command-H).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden"
+          }
+        }
+      }
+    },
+    "hubWindowsActivateHint" : {
+      "comment" : "VoiceOver hint for a window card in the DOKK Hub Windows tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holt dieses Fenster nach vorn."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brings this window to the front."
+          }
+        }
+      }
+    },
+    "hubWindowsAccessibilityHint" : {
+      "comment" : "DOKK Hub Windows tab note shown when Accessibility access is off. Explains what turning it on adds; must not sound like a warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das sind die Fenster in diesem Space. Um auch minimierte Fenster zu sehen und einzelne Fenster nach vorn zu holen, erlaube DOKK den Zugriff über die Bedienungshilfen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These are the windows in this Space. To also see minimized windows and bring a single window forward, allow Accessibility access for DOKK."
+          }
+        }
+      }
+    },
+    "hubWindowsScreenRecordingHint" : {
+      "comment" : "DOKK Hub Windows tab note shown when Screen Recording access is off; cards show app icons instead of previews. Explains what turning it on adds; must not sound like a warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um hier eine Vorschau jedes Fensters zu sehen, erlaube DOKK die Bildschirmaufnahme."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To see a preview of each window here, allow Screen Recording for DOKK."
+          }
+        }
+      }
+    },
+    "hubWindowsOpenSystemSettings" : {
+      "comment" : "DOKK Hub Windows tab button next to a permission note; opens the matching privacy pane in macOS System Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open System Settings"
+          }
+        }
+      }
+    },
+    "hubWindowsNoResults" : {
+      "comment" : "DOKK Hub Windows tab: no window title or app name matches the search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Treffer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No results"
+          }
+        }
+      }
+    },
+    "hubWindowsEmpty" : {
+      "comment" : "DOKK Hub Windows tab: no app has an open window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine offenen Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No open windows"
+          }
+        }
+      }
+    },
+    "hubAppsAllApps" : {
+      "comment" : "Section title above the full app grid in the DOKK Hub's Apps tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Apps"
+          }
+        }
+      }
+    },
+    "hubAppsSortRecent" : {
+      "comment" : "Chip in the Hub's Apps tab that sorts apps by when they were last opened through DOKK.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt benutzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently used"
+          }
+        }
+      }
+    },
+    "hubAppsSortName" : {
+      "comment" : "Chip in the Hub's Apps tab that sorts apps alphabetically by name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A–Z"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A–Z"
+          }
+        }
+      }
+    },
+    "hubAppsSortLabel" : {
+      "comment" : "Accessibility label for the pair of sort chips (Recently used, A–Z) in the Hub's Apps tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps sortieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort apps"
+          }
+        }
+      }
+    },
+    "hubAppsSuggestionReasonToday" : {
+      "comment" : "Second line on a suggested-app card in the Hub: the app was last opened through DOKK earlier today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute geöffnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened today"
+          }
+        }
+      }
+    },
+    "hubAppsSuggestionReasonLastOpened" : {
+      "comment" : "Second line on a suggested-app card in the Hub. The argument is a relative date such as “yesterday” or “3 days ago”, already localized.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt %@ geöffnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last opened %@"
+          }
+        }
+      }
+    },
+    "hubAppsSuggestionReasonUsage" : {
+      "comment" : "Second line on a suggested-app card in the Hub when DOKK has no launch history for the app; the on-device model suggested it from app usage patterns.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passend zu deiner App-Nutzung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Based on your recent app use"
+          }
+        }
+      }
+    },
+    "hubAppsSuggestionHint" : {
+      "comment" : "Accessibility hint on a suggested-app card in the Hub.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet die vorgeschlagene App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the suggested app"
+          }
+        }
+      }
+    },
+    "hubFilesTransferCopyFailed" : {
+      "comment" : "Error shown when copying an item failed. %1$@ is the item's name, %2$@ is macOS's reason (already localized).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ konnte nicht kopiert werden. %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” couldn't be copied. %2$@"
+          }
+        }
+      }
+    },
+    "hubFilesTransferMoveFailed" : {
+      "comment" : "Error shown when moving an item failed. %1$@ is the item's name, %2$@ is macOS's reason (already localized).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ konnte nicht bewegt werden. %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” couldn't be moved. %2$@"
+          }
+        }
+      }
+    },
+    "hubFilesEjectBlocked" : {
+      "comment" : "Error when a drive can't be ejected because apps still use files on it. %@ is the drive name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ kann nicht ausgeworfen werden, weil es verwendet wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” can't be ejected because it's in use."
+          }
+        }
+      }
+    },
+    "hubFilesEjectBlockedBy" : {
+      "comment" : "Error when a drive can't be ejected. %1$@ is the drive name, %2$@ a list of app names supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ kann nicht ausgeworfen werden, weil %2$@ es verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” can't be ejected because %2$@ is using it."
+          }
+        }
+      }
+    },
+    "hubFilesEjectFailed" : {
+      "comment" : "Error when ejecting a drive failed. %1$@ is the drive name, %2$@ is macOS's reason (already localized).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ konnte nicht ausgeworfen werden. %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” couldn't be ejected. %2$@"
+          }
+        }
+      }
+    },
+    "hubTitle" : {
+      "comment" : "Name of the DOKK Hub: the panel that opens from the DOKK tile with the Apps, Windows, and Files tabs. Window title, dock tile tooltip, and accessibility label. Keep the brand name DOKK.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Hub"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Hub"
+          }
+        }
+      }
+    },
+    "hubTileHint" : {
+      "comment" : "Accessibility hint for the DOKK tile in the dock, which opens the DOKK Hub.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet deine Apps, Fenster und Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens your apps, windows, and files."
+          }
+        }
+      }
+    },
+    "hubTabApps" : {
+      "comment" : "DOKK Hub tab switcher: the tab that lists and searches applications.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
+    },
+    "hubTabWindows" : {
+      "comment" : "DOKK Hub tab switcher: the tab that shows open windows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows"
+          }
+        }
+      }
+    },
+    "hubTabFiles" : {
+      "comment" : "DOKK Hub tab switcher: the tab that browses files and folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files"
+          }
+        }
+      }
+    },
+    "hubTabSwitcherLabel" : {
+      "comment" : "Accessibility label of the DOKK Hub's tab switcher (Apps, Windows, Files).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hub-Bereich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hub section"
+          }
+        }
+      }
+    },
+    "hubPinHelp" : {
+      "comment" : "Tooltip and accessibility label of the DOKK Hub's pin button, which turns the panel into a normal window that stays open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als Fenster offen halten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep open as a window"
+          }
+        }
+      }
+    },
+    "hubAttachHelp" : {
+      "comment" : "Tooltip and accessibility label of the DOKK Hub's unpin button, which attaches the window to its dock tile again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am Dock anheften"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attach to the dock"
+          }
+        }
+      }
+    },
+    "hubCloseHelp" : {
+      "comment" : "Tooltip and accessibility label of the DOKK Hub's close button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "hubSearchClear" : {
+      "comment" : "Accessibility label and tooltip of the button that clears the DOKK Hub's search field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear search"
+          }
+        }
+      }
+    },
+    "hubOpenInHub" : {
+      "comment" : "Menu item and button on folder stacks, the Downloads stack, and drives: opens the folder or drive in the Files tab of the DOKK Hub. 'Hub' is the DOKK Hub.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Hub öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Hub"
+          }
+        }
+      }
+    },
+    "hubTransferProgressLabel" : {
+      "comment" : "Accessibility value of the DOKK tile while the Hub copies or moves files in the background. %lld is a percentage from 0 to 100.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien werden übertragen, %lld Prozent"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transferring files, %lld percent"
+          }
+        }
+      }
+    },
+    "hubFilesAvailable" : {
+      "comment" : "Files tab status bar: free space on the shown folder's volume. The argument is a size such as \"412 GB\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ available"
+          }
+        }
+      }
+    },
+    "hubFilesBack" : {
+      "comment" : "Files tab pane navigation: back button label and tooltip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "hubFilesForward" : {
+      "comment" : "Files tab pane navigation: forward button label and tooltip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorwärts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forward"
+          }
+        }
+      }
+    },
+    "hubFilesCloseTab" : {
+      "comment" : "Files tab strip: closes one browser tab. Button tooltip and accessibility action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Tab"
+          }
+        }
+      }
+    },
+    "hubFilesNewTab" : {
+      "comment" : "Files tab strip: accessibility label of the + button that opens a browser tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Tab"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Tab"
+          }
+        }
+      }
+    },
+    "hubFilesNewTabHelp" : {
+      "comment" : "Files tab strip: tooltip of the + button, with its keyboard shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Tab ⌘T"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Tab ⌘T"
+          }
+        }
+      }
+    },
+    "hubFilesColumnName" : {
+      "comment" : "Files list view column header: item name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "hubFilesColumnModified" : {
+      "comment" : "Files list view column header: modification date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geändert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date Modified"
+          }
+        }
+      }
+    },
+    "hubFilesColumnKind" : {
+      "comment" : "Files list view column header: item kind such as PDF document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kind"
+          }
+        }
+      }
+    },
+    "hubFilesColumnSize" : {
+      "comment" : "Files list view column header: file size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "hubFilesColumnWhere" : {
+      "comment" : "Files search results column header: the folder containing a result.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where"
+          }
+        }
+      }
+    },
+    "hubFilesCopied" : {
+      "comment" : "Files tab status bar after a copy finished. The number is how many items were copied.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt kopiert"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte kopiert"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copied %lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copied %lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesMoved" : {
+      "comment" : "Files tab status bar after a move finished. The number is how many items were moved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt bewegt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte bewegt"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moved %lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moved %lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesCopying" : {
+      "comment" : "Files tab status bar while a copy runs. The number is how many items are being copied.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt wird kopiert"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte werden kopiert"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copying %lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copying %lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesMoving" : {
+      "comment" : "Files tab status bar while a move runs. The number is how many items are being moved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt wird bewegt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte werden bewegt"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moving %lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Moving %lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesCopyFailed" : {
+      "comment" : "Files tab status bar when a copy failed. The argument is the system's error description.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren fehlgeschlagen: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy failed: %@"
+          }
+        }
+      }
+    },
+    "hubFilesMoveFailed" : {
+      "comment" : "Files tab status bar when a move failed. The argument is the system's error description.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegen fehlgeschlagen: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move failed: %@"
+          }
+        }
+      }
+    },
+    "hubFilesTransferPausedPrefix" : {
+      "comment" : "Files tab status bar while a transfer is paused. The argument is the transfer label, such as \"Copying 3 items\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausiert · %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused · %@"
+          }
+        }
+      }
+    },
+    "hubFilesTransferPause" : {
+      "comment" : "Files tab status bar: pauses the running copy or move.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anhalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "hubFilesTransferResume" : {
+      "comment" : "Files tab status bar: resumes a paused copy or move.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        }
+      }
+    },
+    "hubFilesTransferCancel" : {
+      "comment" : "Files tab status bar: cancels the running copy or move.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "hubFilesTransferQueued" : {
+      "comment" : "Files tab status bar, accessibility label of the +N chip: how many more transfers wait in the queue.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weiterer Vorgang wartet"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weitere Vorgänge warten"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld more transfer waiting"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld more transfers waiting"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesDateToday" : {
+      "comment" : "Files date column for items changed today. The argument is the time, such as 10:24.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute, %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today, %@"
+          }
+        }
+      }
+    },
+    "hubFilesDateYesterday" : {
+      "comment" : "Files date column for items changed yesterday. The argument is the time, such as 14:32.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestern, %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday, %@"
+          }
+        }
+      }
+    },
+    "hubFilesDriveFree" : {
+      "comment" : "Files sidebar, under a drive's name: its free space. The argument is a size such as \"42 GB\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ frei"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ free"
+          }
+        }
+      }
+    },
+    "hubFilesEject" : {
+      "comment" : "Files sidebar: ejects a drive. Button tooltip and accessibility action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswerfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eject"
+          }
+        }
+      }
+    },
+    "hubFilesEmptyFolder" : {
+      "comment" : "Files pane placeholder when the shown folder has no visible items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Ordner ist leer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This folder is empty"
+          }
+        }
+      }
+    },
+    "hubFilesNoRecents" : {
+      "comment" : "Files pane placeholder when Recents has no files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine zuletzt benutzten Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No recent files"
+          }
+        }
+      }
+    },
+    "hubFilesNoResults" : {
+      "comment" : "Files search placeholder when nothing matches.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Treffer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No results"
+          }
+        }
+      }
+    },
+    "hubFilesUnreadableFolder" : {
+      "comment" : "Files pane placeholder when macOS denied reading the folder; the system's reason follows below.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK kann diesen Ordner nicht lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK can’t read this folder"
+          }
+        }
+      }
+    },
+    "hubFilesAlertTitle" : {
+      "comment" : "Files tab: title of the alert shown when a file operation (rename, new folder, trash, eject) failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Aktion konnte nicht ausgeführt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The action couldn’t be completed"
+          }
+        }
+      }
+    },
+    "hubFilesAlertOK" : {
+      "comment" : "Files tab: dismisses the failed-operation alert.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "hubFilesItemCount" : {
+      "comment" : "Files: number of items in a folder, a listing, or a selection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesSelectedCount" : {
+      "comment" : "Files tab status bar: how many items are selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld ausgewählt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld ausgewählt"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld selected"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld selected"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesResultCount" : {
+      "comment" : "Files search scope bar: number of search results.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Treffer"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Treffer"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld result"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld results"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubFilesKindFolder" : {
+      "comment" : "Files Kind column and preview for folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        }
+      }
+    },
+    "hubFilesMenuOpen" : {
+      "comment" : "Files context menu, preview button, and accessibility action: opens the item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "hubFilesMenuQuickLook" : {
+      "comment" : "Files context menu, preview button, and accessibility action: shows the item in Quick Look.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Look"
+          }
+        }
+      }
+    },
+    "hubFilesMenuReveal" : {
+      "comment" : "Files context menu: shows the item in a Finder window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reveal in Finder"
+          }
+        }
+      }
+    },
+    "hubFilesPreviewReveal" : {
+      "comment" : "Files preview column button: shows the selected item in a Finder window. Keep short; it shares a row with Open and Quick Look.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reveal in Finder"
+          }
+        }
+      }
+    },
+    "hubFilesMenuCopyPath" : {
+      "comment" : "Files context menu: copies the item's full path as text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pfad kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Path"
+          }
+        }
+      }
+    },
+    "hubFilesMenuRename" : {
+      "comment" : "Files context menu: starts renaming the item inline. Also the rename field's accessibility label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "hubFilesMenuNewFolder" : {
+      "comment" : "Files context menu: creates a folder in the shown folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Folder"
+          }
+        }
+      }
+    },
+    "hubFilesMenuTrash" : {
+      "comment" : "Files context menu: moves the selected items to the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Papierkorb legen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Trash"
+          }
+        }
+      }
+    },
+    "hubFilesUntitledFolder" : {
+      "comment" : "Files: name of a newly created folder before the user renames it (Finder's convention).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "untitled folder"
+          }
+        }
+      }
+    },
+    "hubFilesRenamePlaceholder" : {
+      "comment" : "Files inline rename field placeholder when the name is cleared.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "hubFilesPlaceRecents" : {
+      "comment" : "Files sidebar favorite and tab title: recently used files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recents"
+          }
+        }
+      }
+    },
+    "hubFilesPlaceDesktop" : {
+      "comment" : "Files sidebar favorite: the Desktop folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreibtisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desktop"
+          }
+        }
+      }
+    },
+    "hubFilesPlaceDocuments" : {
+      "comment" : "Files sidebar favorite: the Documents folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        }
+      }
+    },
+    "hubFilesPlaceDownloads" : {
+      "comment" : "Files sidebar favorite: the Downloads folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
+          }
+        }
+      }
+    },
+    "hubFilesPlaceApplications" : {
+      "comment" : "Files sidebar favorite: the Applications folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programme"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applications"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarFavorites" : {
+      "comment" : "Files sidebar section title for favorite places.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarDrives" : {
+      "comment" : "Files sidebar section title for mounted drives.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufwerke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drives"
+          }
+        }
+      }
+    },
+    "hubFilesPreviewTitle" : {
+      "comment" : "Files preview column title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "hubFilesPreviewModified" : {
+      "comment" : "Files preview column: modification date line. The argument is a formatted date such as \"Today, 10:24\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geändert: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modified: %@"
+          }
+        }
+      }
+    },
+    "hubFilesPreviewToggle" : {
+      "comment" : "Files status bar toggle: shows or hides the preview column.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau einblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Preview"
+          }
+        }
+      }
+    },
+    "hubFilesSplitToggle" : {
+      "comment" : "Files status bar toggle: shows two panes side by side.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geteilte Ansicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split View"
+          }
+        }
+      }
+    },
+    "hubFilesViewModeLabel" : {
+      "comment" : "Files status bar: accessibility label of the list / icons / columns control.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darstellung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View"
+          }
+        }
+      }
+    },
+    "hubFilesViewList" : {
+      "comment" : "Files view mode: list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
+    },
+    "hubFilesViewIcons" : {
+      "comment" : "Files view mode: icon grid.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbole"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons"
+          }
+        }
+      }
+    },
+    "hubFilesViewColumns" : {
+      "comment" : "Files view mode: Finder-style columns.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Columns"
+          }
+        }
+      }
+    },
+    "hubFilesSearchPrompt" : {
+      "comment" : "Hub header search field placeholder while the Files tab is shown.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien und Ordner suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search files and folders"
+          }
+        }
+      }
+    },
+    "hubFilesSearchIn" : {
+      "comment" : "Files search scope bar label before the scope choices (This Mac, the current folder).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search:"
+          }
+        }
+      }
+    },
+    "hubFilesSearchThisMac" : {
+      "comment" : "Files search scope: search every indexed volume.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This Mac"
+          }
+        }
+      }
+    },
+    "hubFilesSortAscending" : {
+      "comment" : "Files list header accessibility value of the sorted column.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufsteigend sortiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorted ascending"
+          }
+        }
+      }
+    },
+    "hubFilesSortDescending" : {
+      "comment" : "Files list header accessibility value of the sorted column.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absteigend sortiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorted descending"
           }
         }
       }

@@ -5,6 +5,82 @@ see [Acceptance gaps](ACCEPTANCE-GAPS.md). The sections below preserve the evide
 implementation slice. Statements such as "tests were not run" describe that slice's original
 validation, unless a later dated result supersedes them.
 
+## DEE-121 DOKK Hub
+
+Implemented on `feature/dee-121`. The DOKK tile replaces the App Launcher tile and opens the
+DOKK Hub: one glass panel with **Apps**, **Windows**, and **Files** tabs, anchored above its tile
+or detached as a normal window with the pin button. The Hub replaces both launcher styles. The
+Compact popover, the Full presentation that expanded the dock, its morph, **Back to dock**, and
+the Appearance **Launcher style** setting are gone. Folder stacks, Downloads, and drives offer
+**Open in Hub** instead of Open in Finder or Show in Finder. The approved visual and interaction
+reference is `docs/mockups/dokk-hub.html`. Behavior is described in [DOKK Hub](HUB.md) and
+[Apps tab](LAUNCHER.md).
+
+Validation on 2026-10-09: the integration build
+`xcodebuild build-for-testing -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -derivedDataPath /tmp/dee121/DD-int CODE_SIGNING_ALLOWED=NO`
+returned **TEST BUILD SUCCEEDED** with no errors. The log is `/tmp/dee121/build-int2.log`. New
+Swift Testing files cover Hub geometry, the Apps and Windows models, the Files model, file sorting,
+collision naming, and the transfer queue (`DeeDockTests/Hub*Tests.swift`). They were compiled and
+not run, following `AGENTS.md`. The app was not launched and previews were not rendered.
+Compilation does not establish native acceptance.
+
+### Required hands-on acceptance
+
+None of these scenarios has been exercised.
+
+- [ ] Open from the tile, Focus Dock Return, and VoiceOver. Close with Escape, the close button,
+  ⌘W, an outside click, and another app taking focus. Check that Escape and the close button
+  reactivate the previous app and that an outside click does not.
+- [ ] Anchored: the pointer aims at the tile on bottom, top, left, and right docks, with
+  magnification, a scrolled dock, and the tile at both ends and after a pin. The dock stays
+  revealed under the Hub with auto-hide on.
+- [ ] Detached: pin and unpin, move, resize to the 900 × 500 minimum, reopen at the saved frame,
+  and click the tile to bring the window forward with a pulse.
+- [ ] Multiple displays, including negative origins and mixed backing scales. Open from a second
+  display's tile while the Hub is open on the first. Unplug the display of a detached Hub and
+  reopen it.
+- [ ] Holds: a context menu, a file chooser, a confirmation dialog, Quick Look, and a drag over
+  another app keep an anchored Hub open. A running transfer keeps it open through outside clicks.
+- [ ] Tabs: ⌘1–⌘3, ⌘F, last-used tab on reopen, separate search text per tab, typing over
+  content, and the Escape order in each tab. Input-method composition in the search field.
+- [ ] Apps tab: Suggested cards and their reasons, sort chips, every options-menu item, Robi with
+  ⌘Return and Escape, a file drop on the tile, and a Shelf handoff. Compare with the launcher
+  checks under DEE-8.
+- [ ] Windows tab with and without Screen Recording, and with and without Accessibility. Check
+  thumbnails, titles, minimized and hidden windows, the permission hints and their buttons,
+  arrow navigation, activation, and Open Radar.
+- [ ] Files tab: drag between split panes on one volume (move) and to another volume (copy),
+  Option to copy, spring-loading into folders, sidebar places, and browser tabs, and a drag out
+  to Finder and to another app. Drop files in from Finder.
+- [ ] Copy a large folder to a USB drive. Pause, resume, and cancel it. Check the partial item is
+  removed, the progress ring on the DOKK tile with the Hub closed, and collision names
+  (`name copy`, `name copy 2`).
+- [ ] Eject a drive from the Files sidebar, including one that an app is using, and check that a
+  pane showing it moves to the home folder.
+- [ ] Quick Look with Space and ⌘Y, arrow keys while it is open, and the preview column for one
+  file, a folder, and several items.
+- [ ] Spotlight search in This Mac and in the current folder, an unindexed volume, opening a
+  folder result and a file result, and dragging a result out.
+- [ ] List, Icons, and Columns views, sorting, breadcrumbs, back and forward, ⌘↑, rename, New
+  Folder, Move to Trash with Put Back, and saved browser tabs after a restart.
+- [ ] Open in Hub from a pinned folder, Downloads, a folder inside a stack, a drive's card, and a
+  drive's context menu. Check the macOS privacy prompts for Desktop, Documents, and Downloads.
+- [ ] VoiceOver labels and actions, keyboard-only use, light and dark appearance, German copy,
+  Reduce Motion, and Reduce Transparency.
+- [ ] Spaces and full-screen apps: an anchored Hub over a full-screen app, a detached Hub on its
+  own Space, and the Windows tab after a Space change.
+- [ ] Sleep and wake, and a display change, with a transfer running and the Hub anchored and
+  detached.
+
+### Known gaps from code review
+
+- File search depends on the Spotlight index and does not say when a location is not indexed.
+- The Windows tab sees only the current Space, apart from minimized windows and hidden apps.
+- There is no global shortcut for the Hub.
+- A folder stack's access-denied view still offers Open in Finder.
+- Files has no Copy, Paste, Duplicate, or Undo. A cancelled move between volumes leaves the items
+  that already moved at the destination.
+
 ## DEE-115 notification feed
 
 Implemented on `feat/notification-panel`. An opt-in Notification Feed reads NotificationCenter banners through Accessibility and collects them in memory. A movable bell tile shows an unread badge and opens a popover. Settings → Features → Notification Feed holds the switch, the Accessibility row, and a transparency note. A launch-announced Discovery tip offers **Turn On**. Analytics send counts on open and close and the toggle through `setting_changed`, never text, app names, or arrivals. See [Notification feed](NOTIFICATION-FEED.md) for the design and the hands-on checks still required.
@@ -1875,6 +1951,9 @@ The final settings window uses a singleton SwiftUI `Window` scene, native `Navig
 
 ## DEE-78: Launcher scroll restoration
 
+> The Back to Dock flow below was retired by [DEE-121](#dee-121-dokk-hub). Scroll restoration now
+> applies to the Hub's Apps tab, per display.
+
 Ordinary app grid and list browsing retain a per-display offset in memory across dismissal.
 Changed browse controls, grid column counts, or ordered app sections start at the top.
 Query changes and file-action adoption clear the saved offset. Optional suggestions can
@@ -1896,6 +1975,10 @@ it restored browsing at the top. The other scenarios above remain pending. See
 [current evidence](ACCEPTANCE-GAPS.md#current-evidence) for the observed values and environment.
 
 ## DEE-8: App Launcher
+
+> Retired by [DEE-121](#dee-121-dokk-hub). The panel that expanded the dock, its transition, and
+> the Compact style no longer exist. The launcher content lives on in the DOKK Hub's Apps tab. The
+> record below describes the retired presentation and stays for history.
 
 Implemented from DEE-8 and its September 7 clarification. A permanent utility tile expands
 its existing dock panel on the source display and reverses the transition on dismissal. The

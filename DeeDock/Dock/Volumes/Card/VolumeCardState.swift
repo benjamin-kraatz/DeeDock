@@ -30,7 +30,7 @@ enum VolumeCardUsage: Equatable {
 
 /// Every button the card offers. The coordinator decides what each one does.
 enum VolumeCardAction: Equatable {
-    case openInFinder
+    case openInHub
     case eject
     case confirmEject
     case forceEject
