@@ -268,7 +268,6 @@ final class HubPanelController {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]
         panel.hasShadow = false
         panel.isMovable = false
-        receiveClicksOnTransparentPixels()
     }
 
     private func applyDetachedWindowStyle() {
@@ -290,21 +289,6 @@ final class HubPanelController {
         panel.isMovable = true
         panel.hasShadow = true
         panel.invalidateShadow()
-        receiveClicksOnTransparentPixels()
-    }
-
-    /// Makes every pixel of the window take its own clicks.
-    ///
-    /// The panel is non-opaque with a clear background, so by default the window server hit-tests
-    /// it by alpha and lets clicks on fully transparent pixels fall through to the window below.
-    /// Liquid Glass is composited by the window server, not drawn into the window's backing, so
-    /// empty glass counts as transparent: a click between app tiles reached the app behind (which
-    /// closed an anchored Hub as an outside click), and in a detached Hub the header's glyph-only
-    /// buttons took clicks only on their strokes. Setting the property explicitly to `false` turns
-    /// alpha hit-testing off. Clicks on an anchored Hub's transparent shadow margin now reach the
-    /// panel too; the local mouse monitor still treats them as outside clicks (see `belongsToHub`).
-    private func receiveClicksOnTransparentPixels() {
-        panel.ignoresMouseEvents = false
     }
 
     // MARK: - Traffic lights
