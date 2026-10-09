@@ -8,7 +8,6 @@ extension DockSettings.PositionReference: AnalyticsToken {}
 extension DockSettings.RunningIndicatorStyle: AnalyticsToken {}
 extension DockIconStyle: AnalyticsToken {}
 extension LineIconMotionPlayback: AnalyticsToken {}
-extension LauncherStyle: AnalyticsToken {}
 extension DockBehaviorSettings.ActivationLocation: AnalyticsToken {}
 extension DockAnimationStyle: AnalyticsToken {}
 extension DockTooltipPreset: AnalyticsToken {}
@@ -36,3 +35,4 @@ extension UpdateAction: AnalyticsToken {}
 extension UpdateOffer.Stage: AnalyticsToken {}
 extension UpdateIslandAnnouncement.Kind: AnalyticsToken {}
 extension SettingsPage: AnalyticsToken {}
+extension HubTab: AnalyticsToken {}

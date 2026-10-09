@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// DDock's own windows, drawn like app results but without pin, favorite, or suggestion controls.
+/// DOKK's own windows, drawn like app results but without pin, favorite, or suggestion controls.
 struct LauncherToolsSection: View {
     let state: LauncherState
     let tools: [LauncherTool]
@@ -8,16 +8,14 @@ struct LauncherToolsSection: View {
     var grid = true
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(.launcherToolsSectionTitle)
-                .font(.headline).foregroundStyle(.secondary)
-                .accessibilityAddTraits(.isHeader).padding(.leading, 12)
+        VStack(alignment: .leading, spacing: 0) {
+            HubAppsSectionHeader(title: Text(.launcherToolsSectionTitle))
             if grid {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: max(1, columns)), spacing: 0) {
+                LazyVGrid(columns: LauncherGridColumns.items(columns), spacing: HubAppsStyle.gridRowSpacing) {
                     tiles
                 }
             } else {
-                LazyVStack(spacing: 0) { tiles }
+                LazyVStack(spacing: 2) { tiles }
             }
         }
     }
@@ -34,6 +32,8 @@ private struct LauncherToolButton: View {
     let state: LauncherState
     let grid: Bool
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorScheme) private var colorScheme
     @State private var hovered = false
 
     var body: some View {
@@ -41,27 +41,31 @@ private struct LauncherToolButton: View {
             Group {
                 if grid {
                     VStack(spacing: 8) {
-                        artwork(size: 60)
-                        Text(tool.title).font(.callout).lineLimit(2)
-                            .allowsTightening(true).minimumScaleFactor(0.9)
-                            .multilineTextAlignment(.center).frame(height: 34, alignment: .top)
+                        artwork(size: HubAppsStyle.tileIconSize)
+                            .scaleEffect(hovered && !reduceMotion ? HubAppsStyle.tileHoverScale : 1)
+                        Text(tool.title).font(.system(size: 12.5)).lineLimit(1).truncationMode(.tail)
                     }
-                    .padding(10).frame(maxWidth: .infinity)
+                    .padding(EdgeInsets(top: 12, leading: 4, bottom: 10, trailing: 4))
+                    .frame(maxWidth: .infinity)
                 } else {
                     HStack(spacing: 12) {
-                        artwork(size: 34)
-                        Text(tool.title).font(.body.bold()).lineLimit(1)
+                        artwork(size: HubAppsStyle.listIconSize)
+                        Text(tool.title).font(.body.weight(.medium)).lineLimit(1)
                         Spacer()
                         Text(.appName).font(.caption).foregroundStyle(.secondary)
                     }
-                    .padding(10).frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 6).padding(.horizontal, 10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .background(Color.primary.opacity(hovered ? 0.06 : 0), in: .rect(cornerRadius: 14))
+            .background(hovered ? HubAppsStyle.chip(colorScheme) : .clear,
+                        in: .rect(cornerRadius: grid ? HubAppsStyle.tileCornerRadius : HubStyle.rowRadius,
+                                  style: .continuous))
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .onHover { hovered = $0 }
+        .animation(reduceMotion ? nil : HubStyle.hover, value: hovered)
         .accessibilityLabel(Text(tool.title))
         .accessibilityHint(Text(.launcherOpenHint))
     }
@@ -69,6 +73,7 @@ private struct LauncherToolButton: View {
     private func open() {
         Analytics.track(.launcherToolOpened(tool))
         if tool == .systemSettingsClone {
+            // Opening a DOKK window hands focus away, so an anchored Hub dismisses.
             state.close?()
             Analytics.performing(.launcher) { openWindow.openSystemSettingsClone() }
         } else {

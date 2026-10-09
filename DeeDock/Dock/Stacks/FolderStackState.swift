@@ -70,6 +70,8 @@ final class FolderStackState {
     var chrome = DockPopoverChrome(edge: .bottom, attachment: DockPopoverGeometry.idealSize.width / 2)
     @ObservationIgnored var stageOnShelf: ((FolderStackEntryReference) -> Void)?
     @ObservationIgnored var openEntry: ((FolderStackEntryReference) -> Void)?
+    /// Opens a folder in the DOKK Hub's Files tab. Nil hides the command.
+    @ObservationIgnored var openInHub: ((URL) -> Void)?
     @ObservationIgnored var presentationChanged: ((FolderStackPresentation) -> Bool)?
     @ObservationIgnored var dragCompleted: ((Bool) -> Void)?
     @ObservationIgnored private var retryAction: (() -> Void)?
@@ -816,6 +818,6 @@ final class FolderStackState {
         copyFailed = nil
         bookmarkRefresh = nil
         sortChanged = nil
-        openEntry = nil; stageOnShelf = nil; presentationChanged = nil; dragCompleted = nil
+        openEntry = nil; openInHub = nil; stageOnShelf = nil; presentationChanged = nil; dragCompleted = nil
     }
 }

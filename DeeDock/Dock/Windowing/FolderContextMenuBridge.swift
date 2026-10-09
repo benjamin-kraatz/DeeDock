@@ -34,7 +34,7 @@ struct FolderContextMenuBridge: NSViewRepresentable {
             guard let item else { return }
             let menu = NSMenu(); menu.delegate = self
             add(.folderStackOpen, action: #selector(openStack), symbol: "square.grid.2x2", to: menu, enabled: item.isAvailable)
-            add(.folderStackShowInFinder, action: #selector(showInFinder), symbol: "finder", to: menu, enabled: item.isAvailable)
+            add(.hubOpenInHub, action: #selector(openInHub), symbol: "macwindow", to: menu, enabled: item.isAvailable)
             add(.folderItemAddToShelf, action: #selector(stageOnShelf), symbol: "tray.and.arrow.down", to: menu,
                 enabled: item.isAvailable && interaction?.stageFolderOnShelf != nil)
             menu.addItem(.separator())
@@ -80,7 +80,7 @@ struct FolderContextMenuBridge: NSViewRepresentable {
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
         @objc private func openStack() { if let item { Analytics.performing(.menu) { interaction?.openFolder?(item, false) } } }
         @objc private func stageOnShelf() { if let item { Analytics.performing(.menu) { interaction?.stageFolderOnShelf?(item) } } }
-        @objc private func showInFinder() { if let item { interaction?.revealFolder?(item) } }
+        @objc private func openInHub() { if let item { Analytics.performing(.menu) { interaction?.openFolderInHub?(item) } } }
         @objc private func useGrid() { if let item { interaction?.setFolderPresentation?(item.reference.id, .grid) } }
         @objc private func useList() { if let item { interaction?.setFolderPresentation?(item.reference.id, .list) } }
         @objc private func movePrevious() {

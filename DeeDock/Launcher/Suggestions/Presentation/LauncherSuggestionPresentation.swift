@@ -120,11 +120,8 @@ extension LauncherState {
         }.prefix(suggestionLimit))
     }
 
-    /// At most three, and never more than one row of the full Launcher's grid. The compact grid's
-    /// six fixed columns always fit three, and its layout ignores the full Launcher's list setting.
-    private var suggestionLimit: Int {
-        presentationStyle == .full && layout == .grid ? min(3, max(1, navigationColumns)) : 3
-    }
+    /// The Hub shows suggestions as one row of three cards in both grid and list layouts.
+    private var suggestionLimit: Int { 3 }
 
     /// Each visual section begins a row. This keeps vertical navigation aligned across short rows.
     var browseRows: [[LauncherBrowseItem]] {
@@ -158,9 +155,8 @@ extension LauncherState {
     }
 
     func recordSuggestionImpression() {
-        // Only the full Launcher's morph sets `contentVisible`; the compact popover's content is
-        // visible for its whole presentation.
-        guard isPresented, presentationStyle == .compact || contentVisible else { return }
+        // Only a visible Apps tab counts as an impression.
+        guard isActive else { return }
         suggestions.recordImpression(store: catalog.suggestions, appIDs: suggestedApplications.map(\.id))
     }
 }

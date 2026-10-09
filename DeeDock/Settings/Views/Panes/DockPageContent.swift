@@ -53,7 +53,6 @@ struct DockPageContent: View {
                                        iconStyle: binding(\.iconStyle),
                                        launcherLineIcons: binding(\.launcherLineIcons),
                                        lineIconMotion: binding(\.lineIconMotion),
-                                       launcherStyle: binding(\.launcherStyle),
                                        animateIndicators: binding(\.animateIndicators),
                                        launchAnimation: binding(\.launchAnimation),
                                        overrideContext: override)

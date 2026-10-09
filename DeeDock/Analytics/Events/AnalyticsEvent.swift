@@ -78,10 +78,7 @@ enum AnalyticsEvent {
     case fusion(AnalyticsFusionStep, outcome: AnalyticsOutcome, failure: AnalyticsFusionFailure?,
                 operation: FusionOperation?, duration: Double)
 
-    // Launcher
-    /// `style` is the Launcher that actually opened: a file drop opens the full one even when the
-    /// dock's setting is compact.
-    case launcherOpened(AnalyticsLauncherSource, fileCount: Int, style: LauncherStyle)
+    // Launcher (the Hub's Apps tab). Opening is reported as `hubOpened`.
     case launcherSearched(queryLength: Int, resultCount: Int, kind: LauncherSearchKind)
     case launcherResultActivated(LauncherSearchKind, reveal: Bool, trigger: AnalyticsTrigger)
     case launcherSuggestionAccepted(trigger: AnalyticsTrigger)
@@ -94,6 +91,20 @@ enum AnalyticsEvent {
     case launcherSuggestionsShown(count: Int)
     case launcherSuggestionFeedback(AnalyticsSuggestionFeedback)
     case launcherSuggestionPromptAnswered(AnalyticsSuggestionPromptAnswer)
+
+    // DOKK Hub
+    /// The Hub opened. `tab` is the tab it showed first; `detached` is whether it opened as a window.
+    case hubOpened(trigger: AnalyticsHubTrigger, tab: HubTab, detached: Bool)
+    case hubTabSelected(HubTab, via: AnalyticsHubTabSwitch)
+    /// The pin button turned the Hub into a window (`true`) or attached it to the dock again.
+    case hubDetachChanged(detached: Bool)
+    /// A copy or move in the Files tab ended. Counts only, never names or paths.
+    case hubFileTransfer(AnalyticsHubTransferKind, itemCount: Int, crossVolume: Bool,
+                         outcome: AnalyticsHubTransferOutcome)
+    case hubFilesViewChanged(AnalyticsHubFilesView)
+    case hubFileSearchResultOpened(scope: AnalyticsHubSearchScope, isFolder: Bool)
+    /// A window was brought forward from the Windows tab.
+    case hubWindowActivated(minimized: Bool)
 
     // Dock Modes
     case modeSwitched(AnalyticsModeSource, modeCount: Int)

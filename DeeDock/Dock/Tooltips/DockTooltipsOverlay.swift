@@ -16,7 +16,9 @@ struct DockTooltipsOverlay: View {
 
     private var request: DockTooltipController.Request {
         let candidate = hovered ?? selected
+        // The open DOKK Hub points at its tile, so the tile's name would only cover the pointer.
         let valid = slots.contains { $0.target != nil && $0.target == candidate }
+            && !(candidate == .launcher && interaction.hubTile?.isOpen == true)
         return .init(target: enabled && !interaction.suppressTooltips && valid ? candidate : nil,
               preset: interaction.tooltipPreset, keyboard: hovered == nil && selected != nil, reduceMotion: reduceMotion)
     }

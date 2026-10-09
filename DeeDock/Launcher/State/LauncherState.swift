@@ -2,7 +2,11 @@ import AppKit
 import Observation
 import SwiftUI
 
-/// One presentation's search, selection, and cancellable intelligence, sharing discovery and history across displays.
+/// The Hub Apps tab's search, selection, and cancellable intelligence.
+///
+/// One instance exists for the app-wide Hub (owned by ``HubAppsModel``). Discovery, favorites, and
+/// history are app-wide through ``catalog``; the source display's pins, line-icon settings, and
+/// app visibility are swapped in by ``HubAppsModel/present(on:)`` each time the Hub opens.
 @MainActor @Observable
 final class LauncherState {
     let catalog: ApplicationCatalog
@@ -12,28 +16,14 @@ final class LauncherState {
     var library: LauncherLibrary { catalog.launcherLibrary }
     var favorites: LauncherFavorites { catalog.launcherFavorites }
     var history: LauncherHistory { catalog.launcherHistory }
-    var isPresented = false
-    var contentVisible = false
-    /// Whether application tiles draw line glyphs, set by the owning dock from its Appearance
-    /// settings. Apps without a glyph keep their native icon.
+    /// True between ``begin(pins:foregroundID:)`` and ``end()``: the Hub's Apps tab is visible in an
+    /// open Hub. Late completions from an earlier presentation check this before touching the UI.
+    private(set) var isActive = false
+    /// Whether application tiles draw line glyphs, set from the Appearance settings of the display
+    /// whose DOKK tile opened the Hub. Apps without a glyph keep their native icon.
     var usesLineIcons = false
-    /// When line glyphs play their motion, set by the owning dock alongside ``usesLineIcons``.
+    /// When line glyphs play their motion, set alongside ``usesLineIcons``.
     var lineIconMotion = DockSettings.defaults.lineIconMotion
-    /// The style of the current presentation, set by ``begin(pins:foregroundID:style:)``. Only the
-    /// full Launcher morphs the dock, so the dock view reads this together with ``isPresented``.
-    private(set) var presentationStyle: LauncherStyle = .full
-    /// The native glass animation's destination. Reversing it preserves the current velocity.
-    var expanded = false
-    /// Native animation completion, scoped by the presentation controller to this opening.
-    @ObservationIgnored var transitionCompleted: ((Bool) -> Void)?
-    /// The expanded panel, in the presentation window's coordinates. The content lays out here for
-    /// the whole morph. Rendering transforms it without reflowing hosted controls.
-    var contentRect = CGRect.zero
-    /// The resting dock glass, in the same coordinates.
-    var dockRect = CGRect.zero
-    /// Shifts the dock's contents from its own window's origin to the presentation window's, so
-    /// they keep the position they had while they fade.
-    var dockContentOffset = CGSize.zero
     let search = LauncherSearchState()
     /// File-first actions: open with an app, pass to a Shortcut, or copy to a folder.
     let fileActions = LauncherFileActionState()
@@ -75,7 +65,7 @@ final class LauncherState {
     /// On-disk location constraint for browsing, unified app search, and Robi.
     ///
     /// Defaults to Applications folders. Sort, group, layout, and the All / Running / Pinned /
-    /// Recent / Favorites filter are session-scoped on this panel, so this is too.
+    /// Recent / Favorites filter last until DOKK quits, so this does too.
     var locationFilter: LauncherLocationFilter = .applicationsFolders {
         didSet {
             guard oldValue != locationFilter else { return }
@@ -131,7 +121,10 @@ final class LauncherState {
     private(set) var robiIDs: [String]?
     private(set) var robiBusy = false
     var robiMessage: LocalizedStringResource?
+    /// Dismisses the Hub after an action that hands focus elsewhere (a tool window, a Dock Mode).
+    /// The Hub's Apps model wires this to ``HubShell/dismissAfterAction()`` while the tab is visible.
     @ObservationIgnored var close: (() -> Void)?
+    /// Called after an app, window, file, or document opened successfully. Wired like ``close``.
     @ObservationIgnored var didOpen: (() -> Void)?
     @ObservationIgnored private let owner = UUID()
     @ObservationIgnored private let robi = LauncherRobi()
@@ -250,24 +243,38 @@ final class LauncherState {
         return value
     }
 
-    /// Starts a presentation in `style`.
+    /// Starts a presentation: window discovery, a fresh suggestion prediction, and app discovery.
     ///
-    /// Both styles predict suggestions. The compact grid shows only apps, so it skips window discovery
-    /// and starts with the default browse options instead of the full Launcher's session choices.
-    func begin(pins: [ApplicationReference], foregroundID: String? = nil, style: LauncherStyle = .full) {
+    /// The query and browse options are kept, so switching Hub tabs and back resumes the same
+    /// search. Any file-action batch from an earlier presentation is dropped.
+    /// - Parameters:
+    ///   - pins: Pins of the source display; used for discovery hints and as pinned IDs when no
+    ///     ``dockStore`` is attached.
+    ///   - foregroundID: Bundle ID of the app that was frontmost before the Hub opened, as the
+    ///     suggestion context.
+    func begin(pins: [ApplicationReference], foregroundID: String? = nil) {
         presentationGeneration = UUID()
         presentedAt = Date()
-        presentationStyle = style
-        if style == .full { search.begin() } else { resetBrowseOptions() }
+        isActive = true
+        search.begin()
         fileActions.resetForPresentation()
         fileActions.didOpen = { [weak self] in self?.didOpen?() }
         initialPinnedIDs = Set(pins.map(\.id))
-        query = ""; error = nil; selectedID = nil
+        error = nil; selectedID = nil; keyboardNavigationActive = false
         suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
         library.acquire(owner, extraURLs: pins.map(\.url) + catalog.running.map(\.url) + history.visits.values.map { $0.reference.url })
     }
 
+    #if DEBUG
+    /// Marks a canvas fixture as presented without starting app discovery, window search, or a
+    /// suggestion prediction.
+    func activateForPreview() { isActive = true }
+    #endif
+
+    /// Ends the presentation: cancels discovery, ranking, Robi, an open file chooser, and pending
+    /// suggestion work. Safe to call when already ended.
     func end() {
+        isActive = false
         if let presentedAt {
             Analytics.track(.launcherClosed(duration: Date().timeIntervalSince(presentedAt), hadQuery: !query.isEmpty))
             self.presentedAt = nil
@@ -294,7 +301,7 @@ final class LauncherState {
         error = nil
         let token = presentationGeneration
         catalog.open(application.reference) { [weak self] error in
-            guard let self, isPresented, presentationGeneration == token else { return }
+            guard let self, isActive, presentationGeneration == token else { return }
             if let error { self.error = error }
             else { didOpen?() }
         }

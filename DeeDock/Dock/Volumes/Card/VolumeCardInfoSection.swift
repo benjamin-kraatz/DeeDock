@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The resting card: Open in Finder, Eject, and whether anything is using the volume.
+/// The resting card: Open in Hub, Eject, and whether anything is using the volume.
 ///
 /// Fixed external disks get a compact red eject icon instead of a full-width button, because
 /// ejecting them cuts off apps and backups that expect the disk to stay connected.
@@ -13,8 +13,8 @@ struct VolumeCardInfoSection: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 10) {
-                Button { perform(.openInFinder) } label: {
-                    Text(.volumeOpenInFinder).frame(maxWidth: .infinity)
+                Button { perform(.openInHub) } label: {
+                    Text(.hubOpenInHub).frame(maxWidth: .infinity)
                 }
                 if kind.isFixedDisk {
                     Button { perform(.eject) } label: {

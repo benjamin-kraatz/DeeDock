@@ -608,7 +608,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         }
         if sourceID == nil, payload.isReady, (payload.stageableItems ?? payload.documents) != nil,
            let candidate, candidate.store.displayID == nativeDisplayID,
-           candidate.containsLauncherFileDrop(point) || candidate.launcherTarget(at: point) {
+           candidate.launcherTarget(at: point) {
             launcherDestinationID = candidate.store.displayID
             documentDrag.clear()
             documentHoverChanged?(nil, nil, nil)

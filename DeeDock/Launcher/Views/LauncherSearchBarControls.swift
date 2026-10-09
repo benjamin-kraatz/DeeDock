@@ -1,11 +1,14 @@
 import SwiftUI
 
-/// One search-field overflow for type, filters, layout, and file actions.
+/// The Apps tab's options menu: result type, filters, layout, file actions, and maintenance.
 ///
 /// File-action mode keeps Choose Files and hides browse-only items. A discrete result type
 /// replaces the app filter and location, sort, group, and layout pickers with result actions.
 struct LauncherSearchBarOverflowMenu: View {
     @Bindable var state: LauncherState
+    /// Asks the owner to confirm clearing launch history.
+    var requestClearHistory: () -> Void = {}
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         @Bindable var search = state.search
@@ -49,6 +52,8 @@ struct LauncherSearchBarOverflowMenu: View {
             if !state.usesFileActions {
                 capture
             }
+            Divider()
+            maintenance
         } label: {
             Image(systemName: labelSymbol)
                 .contentTransition(.symbolEffect(.replace))
@@ -161,6 +166,23 @@ struct LauncherSearchBarOverflowMenu: View {
         }
     }
 
+    @ViewBuilder private var maintenance: some View {
+        Button {
+            state.library.refresh()
+            state.search.refreshWindows()
+        } label: {
+            Label { Text(.launcherRefresh) } icon: { Image(systemName: "arrow.clockwise") }
+        }
+        .disabled(state.library.isLoading || state.search.actionBusy || state.search.discovering)
+        Button(action: requestClearHistory) {
+            Label { Text(.launcherClearHistory) } icon: { Image(systemName: "clock.arrow.circlepath") }
+        }
+        // Opening Settings deliberately activates DOKK; an anchored Hub closes as focus leaves it.
+        Button { openWindow.openDockSettings() } label: {
+            Label { Text(.launcherOpenSettings) } icon: { Image(systemName: "gearshape") }
+        }
+    }
+
     private var chooseFiles: some View {
         Button {
             state.chooseFiles()
@@ -239,7 +261,7 @@ struct LauncherRobiButton: View {
             }
         }
         .buttonStyle(LauncherRobiButtonStyle())
-        .keyboardShortcut(.return, modifiers: .command)
+        // ⌘↩ arrives through HubAppsModel.handleKeyDown, which the shell offers every key first.
         .accessibilityLabel(
             Text(state.robiBusy ? .launcherRobiCancel : .launcherAskRobi)
         )
@@ -262,10 +284,10 @@ private struct LauncherRobiButtonStyle: ButtonStyle {
 
         var body: some View {
             configuration.label
-                .font(.body.weight(.medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(LauncherRobiTint.label(colorScheme))
-                .padding(.horizontal, 12)
-                .frame(height: 28)
+                .padding(.horizontal, 10)
+                .frame(height: 24)
                 .background(
                     LauncherRobiTint.fill(pressed: configuration.isPressed, hovering: hovering),
                     in: .capsule

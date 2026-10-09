@@ -1,8 +1,11 @@
 import SwiftUI
 
-/// Compact, keyboard-accessible rows for objects that need source and action labels as well as a title.
-struct LauncherMixedResultsView: View {
+/// Mixed search in the Apps tab: app matches in the chosen grid or list, then compact,
+/// keyboard-accessible rows for objects that need source and action labels as well as a title.
+struct LauncherMixedResultsView<Header: View>: View {
     let launcher: LauncherState
+    /// The results row with its count, sort chips, and options, pinned above the scrolling results.
+    @ViewBuilder var header: Header
     private var state: LauncherSearchState { launcher.search }
 
     var body: some View {
@@ -12,9 +15,21 @@ struct LauncherMixedResultsView: View {
             options: launcher.searchOptions
         )
         let tools = LauncherTool.matching(launcher.query)
-        if !tools.isEmpty {
-            LauncherToolsSection(state: launcher, tools: tools, columns: 1, grid: false)
+        VStack(alignment: .leading, spacing: 0) {
+            header
+                .padding(.horizontal, HubAppsStyle.contentInsets.leading)
+                .padding(.top, HubAppsStyle.contentInsets.top)
+            if !tools.isEmpty {
+                LauncherToolsSection(state: launcher, tools: tools, columns: 1, grid: false)
+                    .padding(.horizontal, HubAppsStyle.contentInsets.leading)
+            }
+            results(tools: tools)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .task(id: input) { await state.rank(input) }
+    }
+
+    @ViewBuilder private func results(tools: [LauncherTool]) -> some View {
         ZStack {
             if state.results.isEmpty, !tools.isEmpty {
                 Color.clear
@@ -30,7 +45,7 @@ struct LauncherMixedResultsView: View {
             } else {
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 4) {
+                        LazyVStack(alignment: .leading, spacing: 2) {
                             if state.ranking { ProgressView().controlSize(.small).padding() }
                             LauncherSearchAppSections(launcher: launcher, results: state.visible)
                             ForEach(state.visible.filter { $0.application == nil }) { result in
@@ -41,7 +56,8 @@ struct LauncherMixedResultsView: View {
                                     .padding(10)
                             }
                         }
-                        .padding(2)
+                        .padding(.horizontal, HubAppsStyle.contentInsets.leading)
+                        .padding(.bottom, HubAppsStyle.contentInsets.bottom)
                     }
                     .onChange(of: state.selectedID) { _, id in
                         if let id { proxy.scrollTo(id, anchor: .center) }
@@ -53,7 +69,6 @@ struct LauncherMixedResultsView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .task(id: input) { await state.rank(input) }
     }
 }
 
@@ -64,7 +79,9 @@ private struct LauncherMixedResultRow: View {
     private var selected: Bool { state.selectedID == result.id }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorScheme) private var colorScheme
     @State private var appIcon: NSImage?
+    @State private var hovered = false
     private var shortcutStatus: ActionTileStatus? {
         guard case .shortcut(let id) = result.id else { return nil }
         return state.actions?.statuses[id]
@@ -78,7 +95,7 @@ private struct LauncherMixedResultRow: View {
                 Group {
                     if let application = result.application,
                        let lineIcon = launcher.lineIcon(for: application, artwork: appIcon) {
-                        DockLineIconArtwork(icon: lineIcon, size: 34, hovered: selected,
+                        DockLineIconArtwork(icon: lineIcon, size: HubAppsStyle.listIconSize, hovered: selected || hovered,
                                             reduceMotion: reduceMotion, reduceTransparency: reduceTransparency,
                                             color: .primary)
                     } else if let appIcon {
@@ -87,7 +104,7 @@ private struct LauncherMixedResultRow: View {
                         Image(systemName: result.kind.symbol).font(.title2)
                     }
                 }
-                .frame(width: 34, height: 34).accessibilityHidden(true)
+                .frame(width: HubAppsStyle.listIconSize, height: HubAppsStyle.listIconSize).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text(result.title).font(.body.bold()).lineLimit(1)
@@ -106,21 +123,21 @@ private struct LauncherMixedResultRow: View {
                 Spacer(minLength: 4)
                 Text(result.action).font(.caption).foregroundStyle(.secondary)
             }
-            .padding(10)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                selected ? Color.accentColor.opacity(0.18) : .clear,
-                in: .rect(cornerRadius: 12)
-            )
+            .background(hovered ? HubAppsStyle.chip(colorScheme) : .clear,
+                        in: .rect(cornerRadius: HubStyle.rowRadius, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 12).strokeBorder(
-                    selected ? Color.accentColor : .clear,
-                    lineWidth: 2
-                )
+                if selected {
+                    RoundedRectangle(cornerRadius: HubStyle.rowRadius, style: .continuous)
+                        .strokeBorder(Color.accentColor, lineWidth: 2)
+                }
             }
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .onHover { hovered = $0 }
         .task(id: result.application?.reference.url) {
             appIcon = result.application.map { launcher.icon(for: $0) }
         }

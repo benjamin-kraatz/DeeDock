@@ -152,3 +152,38 @@ nonisolated enum AnalyticsHarborOutcome: String, AnalyticsToken {
     /// Another app, a Space change, sleep, or Settings took over.
     case interrupted
 }
+
+/// What opened the DOKK Hub.
+nonisolated enum AnalyticsHubTrigger: String, AnalyticsToken {
+    /// A click on the DOKK tile, or VoiceOver's default action on it.
+    case tile
+    /// Return on the DOKK tile while Focus Dock has keyboard focus.
+    case focusDock = "focus_dock"
+    /// Files dropped on the DOKK tile or handed over from the Shelf.
+    case fileDrop = "file_drop"
+    /// Open in Hub on a folder stack, the Downloads stack, or a drive.
+    case openFolder = "open_folder"
+}
+
+/// How a Hub tab was chosen.
+nonisolated enum AnalyticsHubTabSwitch: String, AnalyticsToken {
+    case click, keyboard
+}
+
+nonisolated enum AnalyticsHubTransferKind: String, AnalyticsToken {
+    case copy, move
+}
+
+nonisolated enum AnalyticsHubTransferOutcome: String, AnalyticsToken {
+    case completed, cancelled, failed
+}
+
+/// The Files tab's view style.
+nonisolated enum AnalyticsHubFilesView: String, AnalyticsToken {
+    case list, icons, columns
+}
+
+/// Where a Files tab search looked.
+nonisolated enum AnalyticsHubSearchScope: String, AnalyticsToken {
+    case thisMac = "this_mac", folder
+}

@@ -1,55 +1,55 @@
-# Launcher
+# Apps tab
 
-Optional [app suggestions](LAUNCHER-SUGGESTIONS.md) appear above ordinary results for an empty query after explicit opt-in.
+The [DOKK Hub](HUB.md)'s Apps tab is DOKK's app launcher. It replaced the Compact and Full launcher
+styles. The Hub owns the panel, the header search field, the tab switcher, and dismissal. This page
+describes the tab's content. Optional [app suggestions](LAUNCHER-SUGGESTIONS.md) appear above
+ordinary results for an empty query after explicit opt-in.
 
-## Compact style
+## Layout
 
-With **Launcher style** set to **Compact** in Appearance, the tile opens a small app grid in a dock
-popover above it instead of expanding the dock. The grid uses the same app results, opening,
-history, context menu, and line icons as the full Launcher, but skips window discovery because it
-shows no windows. It starts from the default browse options. With an empty query and
-[suggestions](LAUNCHER-SUGGESTIONS.md) on, up to three suggested apps lead the grid in a Suggested row
-with the same feedback actions as the full Launcher. The row slides in when the prediction
-arrives (Reduce Motion shows it at once). The survey card appears only in the full Launcher, because
-the compact search field keeps focus and its answer field could not take it.
+With an empty query, the tab shows up to three Suggested cards, then the controls row, the app
+grid or list, and the **DOKK** tools section. Each Suggested card shows the app's icon, its name,
+and a short reason: **Opened today**, **Last opened** with a relative date such as "2 days ago", or
+**Based on your recent app use** when DOKK has no launch history for that app. The cards keep
+one row of three in both grid and list layouts.
 
-The search field keeps focus. Down enters the grid at the first tile, a suggestion when the
-Suggested row shows, the arrows then move by tile or row, keeping the column between the Suggested
-row and the grid, and Return opens the selected app, or the first tile when nothing is selected. Escape first
-leaves the grid, then clears the query, then closes and reactivates the previous app. Opening an app,
-an outside click, a click on the dock, or another app taking focus closes it without reactivating
-anything. Another dock popover opening also closes it. A file drop on the tile replaces the
-compact grid with the full Launcher, which owns file actions. The panel keeps one size while it is
-open, and the Launcher tile's line glyph keeps glowing until it closes. It draws Liquid Glass with a
-soft pointer aimed at the tile's resting position, so magnification under the click cannot offset
-it; Reduce Transparency uses an opaque background. The grid is leading-aligned at a fixed width,
-so an always-visible scroller sits in the trailing gutter instead of shifting the tiles.
+The controls row shows a title: **All Apps**, the number of matching apps, or the number of mixed
+results or file actions. **Ask Robi** appears for a nonempty query. **Recently used** and **A–Z**
+chips set the sort while apps are shown. Other sort orders stay in the options menu, and while one
+of them is active neither chip is highlighted. The options menu ends the row.
 
-The rest of this page describes the full Launcher.
+Grid columns follow the panel width. Tiles and cards lift on hover and enter with a short stagger
+when the tab appears. Reduce Motion turns both off.
 
-The permanent **App Launcher** tile expands its dock window into a panel on the same display.
-**Back to dock** and Escape reverse the transition. An outside click closes the panel without
-reactivating the previous app. Reduce Motion disables the window animation, and Reduce
-Transparency supplies an opaque background.
+## Keyboard
 
-The whole dock expands into the launcher. Native AppKit glass shapes merge inside one glass
-container, with launcher content embedded in the growing shape. The controls keep their final
-layout size while a parent layer moves and scales them. The dock's icons stay outside the glass
-views, clipped to the dock shape, so they look identical to the resting dock throughout. Closing
-uses a critically damped spring and completes as soon as the resting dock is fully restored,
-rather than waiting out the sub-pixel tail. Search receives focus after expansion;
-Reduce Motion presents it immediately.
+The header search field keeps focus while you type. The Hub offers every key to the tab first.
 
-Ordinary app browsing remembers its scroll position per display until DDock quits or that
-display's dock is recreated. Reopening restores the offset when the filters, sort, grouping,
-layout, grid column count, and ordered app results still match. Changing the query or entering
-file actions clears it. Mixed search has no scroll restoration. The position is approximate
-if the optional Suggested section changes height between openings.
+- Down and Up move through the results. In a grid they move by row.
+- Left and Right move by tile once arrow navigation has started. Before that, they move the text
+  cursor.
+- Return opens the selected result, or the first result when nothing is selected.
+- ⌘Return asks Robi about the query, or cancels a running request.
+- Tab drops the arrow selection and moves to the native controls.
+- Typing while the results have focus moves the text into the search field.
+- Escape cancels Robi first, then drops the arrow selection. After that the Hub clears the query,
+  then closes an anchored Hub.
 
-The launcher is also a selectable tile in **Focus Dock**. Return opens it. In the launcher,
-typing searches apps, windows, saved work, Shelf filenames, pinned Shortcuts, and Dock Modes.
+A click anywhere in the results also drops the arrow selection. Input-method composition keeps
+arrows, Return, and Escape until it ends.
+
+Opening an app, a window, a file, or a DOKK tool closes an anchored Hub. A detached Hub stays open.
+
+The query stays when you switch Hub tabs and is cleared when the Hub closes. Browse options stay
+in both cases. Ordinary app
+browsing remembers its scroll position per display until DOKK quits. Reopening restores the offset
+when the filters, sort, grouping, layout, grid column count, and ordered app results still match.
+Changing the query or entering file actions clears it. Mixed search has no scroll restoration. The
+position is approximate if the optional Suggested section changes height between openings.
+
+Typing searches apps, windows, saved work, Shelf filenames, pinned Shortcuts, and Dock Modes.
 Arrows select results, and Return performs the selected result's labeled action. If no result
-has been selected, Return performs the first result's action. Command-F focuses the search field. Tab navigates the native controls.
+has been selected, Return performs the first result's action.
 
 ## Search and discovery
 
@@ -58,7 +58,7 @@ It ignores case, accents, character width, and invisible formatting characters. 
 initials, and metadata matches. One-edit typo matching applies to name tokens of at least four
 characters and includes adjacent transpositions. Typing does not invoke Robi.
 
-Discovery runs off the main actor when the launcher opens. It scans `/Applications`,
+Discovery runs off the main actor when the Apps tab appears. It scans `/Applications`,
 `~/Applications`, `/System/Applications`, and `/System/Library/CoreServices/Applications`.
 Spotlight supplements those directories with apps at other indexed locations. Pins, running
 apps, and previously opened apps supply additional known locations. The standard directory
@@ -66,9 +66,9 @@ scan works without Spotlight. Background helpers and nested bundles are excluded
 general discovery, as are cache locations and incompatible device builds. Candidates must have
 a runnable executable. Duplicate bundle identifiers produce one entry.
 
-The installed-app snapshot stays in memory between presentations. Opening the launcher or
-choosing **Refresh apps** refreshes it. Discovery stops when the last launcher closes. Apps in
-unindexed, nonstandard folders that DDock has never opened or pinned may not appear. A warning
+The installed-app snapshot stays in memory between presentations. Showing the Apps tab or
+choosing **Refresh apps** refreshes it. Discovery stops when the tab is hidden or the Hub closes.
+Apps in unindexed, nonstandard folders that DOKK has never opened or pinned may not appear. A warning
 identifies directory enumeration failures. Synthetic metadata-ranking measurements are recorded in [DEE-20 acceptance](ACCEPTANCE.md#dee-20-unified-launcher).
 Discovery completeness and end-to-end native latency remain unmeasured.
 
@@ -113,7 +113,7 @@ App-level search remains available without capture permission or Apple Intellige
 Capsule matches identify historical saved text. Matches found only in saved breadcrumb OCR carry
 **Saved OCR text · historical**. Opening a capsule uses the current saved object and does not
 resume it automatically. Shelf rows identify stored references whose availability is checked on
-opening. Missing files produce an error and keep the Launcher open. Shortcut availability is
+opening. Missing files produce an error and keep the Hub open. Shortcut availability is
 checked by the existing runner; running, success, and failure status remain visible in the row.
 The runner prevents duplicate concurrent runs. A deleted or guarded mode cannot be activated.
 Unreadable stores show a notice without removing other providers' results or rewriting storage.
@@ -131,14 +131,19 @@ The existing **Find a Window** entry points and keyboard shortcut keep their exi
 | View | Grid or list |
 | Filter | All apps, running, pinned on the source display, recent, or favorites |
 | Location | All discovered paths, Applications folders, or standard Mac locations |
-| Sort | Name, last opened through DDock, or number of opens through DDock |
+| Sort | Name, last opened through DOKK, or number of opens through DOKK |
 | Group | None, application category, or first letter |
 
-Those controls live in one overflow menu in the search field, with Choose Files and
-Capture & image search. The idle bar shows that menu and Close. A query also shows Clear
-and **Ask Robi**.
+Those controls live in the options menu at the end of the controls row. The menu also holds
+**Result type**, **Show Nested Apps**, **Reset to Defaults**, **Choose Files**, **Capture & image
+search…**, **Refresh apps**, **Clear launch history…**, and **Settings…**. **Show Nested Apps**
+also lists apps stored in a subfolder next to another app, such as an editor's build templates.
+**Refresh apps** rescans apps and window titles. **Settings…** opens DOKK's Settings, which closes
+an anchored Hub because focus leaves it. With a non-app result type selected, the app filter,
+location, sort, grouping, and view are replaced by the actions for the selected result. In
+file-action mode, the menu keeps Choose Files and the maintenance commands.
 
-The overflow button shows when browsing differs from its defaults (All types, All apps,
+The options button shows when browsing differs from its defaults (All types, All apps,
 Applications folders, Name, no grouping). It turns accent-tinted and swaps the ellipsis for the
 active app filter's symbol, then the result type's, or a generic filter glyph when only
 location, sort, or grouping changed. VoiceOver reads the active choices as its value. **Reset to
@@ -154,12 +159,12 @@ firmlink prefix. It does not scan the disk again.
 
 Search relevance precedes the selected sort order. Choosing **Recent** selects last-opened
 sorting; the sort menu can change that order. Missing category metadata goes into **Other
-apps**. View choices remain with the display's panel for its lifetime.
+apps**. Browse choices last until DOKK quits and are shared by every display.
 
-Launch history records successful app opens and document handoffs through the shared DDock
+Launch history records successful app opens and document handoffs through the shared DOKK
 application catalog. Hiding an already foreground app, failed opens, and app activation
-outside DDock do not create entries. History persists under `launcher.history.v1` and retains
-at most 500 app identities. The launcher options menu clears the history after confirmation.
+outside DOKK do not create entries. History persists under `launcher.history.v1` and retains
+at most 500 app identities. **Clear launch history…** in the options menu clears it after confirmation.
 Unreadable history bytes remain untouched until that explicit clear action.
 
 To mark an app as a favorite, right-click it and choose **Add to Favorites**.
@@ -171,33 +176,35 @@ They are independent of dock pins and remain when you clear launch history.
 
 ## Robi
 
-**Ask Robi** appears in the search field when the trimmed query is not empty. It matches a
+**Ask Robi** appears in the controls row when the trimmed query is not empty. ⌘Return does the same. It matches a
 task description to installed apps using on-device Apple Intelligence. The button animates
-in and out with the other Launcher snappy motion. Reduce Motion shows and hides it at once.
+in and out with a short snappy animation. Reduce Motion shows and hides it at once.
 It receives the task and app names, categories, and bundle identifiers. It receives no file
 contents or window captures. Requests use bounded batches and can be cancelled. Editing the
-query or closing the launcher invalidates pending suggestions.
+query, hiding the Apps tab, or closing the Hub invalidates pending suggestions.
 
-While Robi's answer is shown, a **Robi** chip replaces the magnifier in the search field and
-Ask Robi hides. Clicking the chip or pressing Esc returns to app search and keeps the query.
-Esc closes the launcher only when Robi is not active.
+While Robi's answer is shown, a **Robi** chip leads the controls row and Ask Robi hides.
+Clicking the chip or pressing Esc returns to app search and keeps the query. Esc clears the
+query or closes the Hub only when Robi is not active.
 
 Suggestions are restricted to known app identities. Robi never opens an app itself. The user
 chooses a result to launch it. If Apple Intelligence is unavailable or a request fails, the
-launcher shows an explanation and keeps ordinary app search available. A final review limits the combined results to five suggestions. Suggestion quality depends on
+Apps tab shows an explanation and keeps ordinary app search available. A final review limits the combined results to five suggestions. Suggestion quality depends on
 the local model and app metadata; the native checks cover a limited set of tasks.
 
 The search phrase `do a barrel roll` reveals the Easter egg. With Reduce Motion enabled, its
 message appears without rotation.
 
-Compilation and remaining native checks are recorded in [acceptance notes](ACCEPTANCE.md#dee-8-app-launcher).
+Compilation and remaining native checks are recorded in the [DEE-8 acceptance notes](ACCEPTANCE.md#dee-8-app-launcher)
+and, for the Apps tab in the Hub, the [DEE-121 acceptance notes](ACCEPTANCE.md#dee-121-dokk-hub).
 
 ## File actions
 
-Choose **Use in Launcher** from a Shelf selection, drop files on the Launcher tile or open
-panel, or choose **Choose Files**. The launcher stays open while the native file or folder
-panel is up. Outside clicks do not dismiss it then, because that would cancel the panel.
-Closing the launcher still cancels an open panel. The Launcher shows the ordered batch and
+Choose **Use in Launcher** from a Shelf selection, drop files on the DOKK tile or the open Apps tab, or choose
+**Choose Files** in the options menu. A tile drop or Shelf handoff opens the Hub on the Apps tab.
+The Hub stays open while the native file or folder panel is up. Outside clicks do not dismiss it
+then, because that would cancel the panel. Closing the Hub or switching tabs still cancels an
+open panel and drops the batch. The Apps tab shows the ordered batch and
 actions that can use it. Search and the Apps / Shortcuts / Folders filter narrow that list.
 Hover and keyboard selection do not run an action. Return or a click runs it once.
 
@@ -206,7 +213,7 @@ path remains [Window Peek file routing](WINDOW-FILE-HANDOFF.md). An app that dec
 for only some files stays listed with the unsupported names. Those files are not opened
 silently.
 
-Pinned Shortcuts appear as **Pass selected files to this Shortcut**. DDock does not claim to
+Pinned Shortcuts appear as **Pass selected files to this Shortcut**. DOKK does not claim to
 know what a Shortcut accepts. Mark **Pass selected files** in Settings to sort a Shortcut
 with the file-input actions. The installed Shortcut list loads when Settings, Watch, or this
 file-action UI appears. **Reload Shortcuts** remains a manual refresh. The existing
@@ -217,7 +224,7 @@ destination names are never replaced; a conflicting copy gets a numbered name. S
 destinations are local bookmarks under Settings → Features → Action Tiles. Removing a
 destination deletes the bookmark, not the folder.
 
-Clear the batch or choose **Back to Search** to return to ordinary Launcher search. File
+Clear the batch or choose **Back to Search** to return to ordinary app search. File
 contents are not read to rank actions. Shortcut output is not captured back to Shelf.
 
 Compilation and remaining native checks are recorded in [acceptance notes](ACCEPTANCE.md#dee-24-launcher-file-actions).

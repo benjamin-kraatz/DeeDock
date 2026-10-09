@@ -16,6 +16,8 @@ final class FolderStackCoordinator {
     private var springCleanup: Task<Void, Never>?
     private weak var sourcePanel: DockPanelController?
     var keyboardDismissed: ((String) -> Void)?
+    /// Opens a folder in the DOKK Hub's Files tab. The open stack closes first.
+    var openInHub: ((URL) -> Void)?
     var isOpen: Bool { controller != nil }
     var isKeyboardActive: Bool { controller != nil && sourcePanel?.store.keyboardFocus == true }
 
@@ -93,6 +95,12 @@ final class FolderStackCoordinator {
             }
         }
         next.state.openEntry = { [weak next] in next?.open($0) }
+        if openInHub != nil {
+            next.state.openInHub = { [weak self, weak next] url in
+                next?.close(returnFocus: false)
+                self?.openInHub?(url)
+            }
+        }
         next.state.presentationChanged = { [weak panel] in panel?.store.setFolderPresentation($0, for: reference.id) == true }
         next.state.dragCompleted = { [weak next] accepted in
             if accepted, next?.state.copying != true { next?.close(returnFocus: false) }
@@ -154,5 +162,5 @@ final class FolderStackCoordinator {
         controller?.close(returnFocus: returnFocus)
     }
 
-    func stop() { close(returnFocus: false); keyboardDismissed = nil }
+    func stop() { close(returnFocus: false); keyboardDismissed = nil; openInHub = nil }
 }

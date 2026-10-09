@@ -43,6 +43,8 @@ final class DockCoordinator {
     var settingsHarborRequest = false
     /// The app-grouped window overview, shared by every display.
     let harbor = HarborCoordinator()
+    /// The one DOKK Hub (Apps, Windows, Files), opened from any display's DOKK tile.
+    @ObservationIgnored let hub: HubCoordinator
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
@@ -153,6 +155,7 @@ final class DockCoordinator {
                                      suggestions: LauncherSuggestionsStore(), launcherFavorites: LauncherFavorites(),
                                      surveyDefaults: .standard)
         recipes = WorkspaceRecipeCoordinator(applications: catalog.service, actions: actionTiles)
+        hub = HubCoordinator(launcher: LauncherState(catalog: catalog), openRadar: { [harbor] in harbor.toggle() })
         let menus = ApplicationMenuController(
             access: windowAccess,
             applications: ApplicationMenuService(applications: applicationService),
@@ -235,6 +238,7 @@ final class DockCoordinator {
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configureHarbor()
+        configureHub()
         notificationFeedPopover.keyboardDismissed = { [weak self] displayID in
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)
@@ -307,12 +311,14 @@ final class DockCoordinator {
             self?.windowPeeks.hoverFiles(item, on: panel, documents: documents)
         }
         dragging.deliverToLauncher = { [weak self] documents, panel in
-            self?.popovers.closeAll()
-            panel.openLauncher(files: .owned(documents, source: .drop))
+            guard let self else { return }
+            popovers.closeAll()
+            hub.adoptFiles(.owned(documents, source: .drop), on: hubContext(for: panel.store.displayID))
         }
         shelves.useInLauncher = { [weak self] adoption, panel in
-            self?.popovers.closeAll()
-            panel.openLauncher(files: adoption)
+            guard let self else { return }
+            popovers.closeAll()
+            hub.adoptFiles(adoption, on: hubContext(for: panel.store.displayID))
         }
         dragging.chooseDocumentDestination = { [weak self] documents, item, panel in
             guard let self, item.isRunning,
@@ -352,6 +358,7 @@ final class DockCoordinator {
         }
         popovers.openChanged = { [weak self] open in
             if open {
+                self?.hub.dismissAnchored()
                 self?.windowPeeks.close(returnFocus: false)
                 self?.volumeDock.cards.dismiss()
                 self?.modePicker.close(returnFocus: false)
@@ -421,8 +428,9 @@ final class DockCoordinator {
             self?.refreshPanels()
         }
         displayService.didChange = { [weak self] in
-            // Harbor's panels and layout belong to the old arrangement.
+            // Harbor's panels and layout belong to the old arrangement, and so does the Hub's anchor.
             self?.harbor.close(raising: nil, outcome: .interrupted, animated: false)
+            self?.hub.suspend()
             self?.occupancySuspended = false
             self?.reconcile($0)
         }
@@ -450,6 +458,7 @@ final class DockCoordinator {
             ) { [weak self] _ in MainActor.assumeIsolated {
                 self?.occupancySuspended = true
                 self?.harbor.close(raising: nil, outcome: .interrupted, animated: false)
+                self?.hub.suspend()
                 self?.occupancy.stop()
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
@@ -525,11 +534,10 @@ final class DockCoordinator {
                 self?.panels.values.forEach { $0.store.refresh(); $0.store.presentationDidChange?() }
             }
             let panel = DockPanelController(store: store, settings: profiles.effectiveSettings(for: display.id))
-            configureLauncherSearch(on: panel)
-            panel.launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
-            panel.launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
-            panel.launcher.suggestionVisibility = { [weak self] in
-                self?.profiles.modes.effectiveVisibility(for: display.id) ?? .showAll
+            panel.interaction.hubTile = hub.tile
+            panel.hubRequested = { [weak self] trigger in
+                guard let self, let context = hubContext(for: display.id) else { return }
+                hub.toggle(trigger: trigger, anchor: context)
             }
             panel.interaction.appMelt = appMelt
             panel.interaction.actionTiles = actionTiles
@@ -551,17 +559,6 @@ final class DockCoordinator {
                    !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
-            }
-            panel.launcherWillOpen = { [weak self, weak panel] in
-                guard let self, let panel else { return nil }
-                let previous = previousApplication ?? lastExternalApplication
-                popovers.closeAll()
-                windowPeeks.close(returnFocus: false)
-                modePicker.close(returnFocus: false)
-                timeline.end()
-                endFocus(restore: false)
-                for other in panels.values where other !== panel { other.closeLauncher() }
-                return previous
             }
             panel.exclusiveInteractionBegan = { [weak self] in
                 guard let self else { return }
@@ -659,15 +656,16 @@ final class DockCoordinator {
                 }
                 panel.store.stageOnShelf(DocumentResourceAccess([access.url], retaining: [access]))
             }
-            panel.interaction.revealFolder = { [weak self, weak panel] folder in
-                guard folder.isAvailable else { return }
-                if !folder.isDownloads { self?.pinWeather.recordUse(folder.id) }
+            panel.interaction.openFolderInHub = { [weak self, weak panel] folder in
+                guard let self, folder.isAvailable else { return }
+                if !folder.isDownloads { pinWeather.recordUse(folder.id) }
                 let access = FolderResourceAccess(folder.reference)
                 guard access.isAvailable else {
                     panel?.store.errorMessage = .folderStackUnavailable
                     return
                 }
-                NSWorkspace.shared.activateFileViewerSelecting([access.url])
+                // DOKK is not sandboxed; the resolved path stays readable after the bookmark scope ends.
+                hub.openFolder(access.url)
                 withExtendedLifetime(access) {}
             }
             store.openShelf = { [weak self, weak panel] in
@@ -735,22 +733,6 @@ final class DockCoordinator {
             }
             // Drive order and visibility are app-wide, so there is no display to select.
             panel.interaction.prepareVolumeSettings = { [weak self] in self?.settingsDrivesRequest = true }
-            panel.launcher.createCapsule = { [weak self, weak panel] application in
-                guard let self, let panel, panels[display.id] === panel else { return }
-                panel.closeLauncher()
-                sessionCapsules.beginFromApplication(application, on: panel)
-            }
-            panel.launcher.openTool = { [weak self, weak panel] tool in
-                guard let self, let panel else { return }
-                panel.closeLauncher()
-                switch tool {
-                case .clipboardMuseum: showClipboardMuseum()
-                case .localHistory: browseLocalHistory()
-                case .fusion: showFusion()
-                // Needs a SwiftUI openWindow action, so the launcher view opens it directly.
-                case .systemSettingsClone: break
-                }
-            }
             store.copyPin = { [weak self] pin, targetID in
                 guard let self, let target = panels[targetID] else { return }
                 if !target.store.pins.contains(where: { $0.id == pin.id }) {
@@ -815,6 +797,7 @@ final class DockCoordinator {
         sessionCapsules.reanchor()
         notificationFeedPopover.reanchor()
         windowPeeks.refresh()
+        hub.refreshAnchor()
         if let id = zonePreview.displayID {
             if let geometry = panels[id]?.geometry { zonePreview.update(geometry) }
             else { zonePreview.stop() }
@@ -922,6 +905,7 @@ final class DockCoordinator {
         harbor.dockSeed = { [weak self] id, screenFrame in self?.panels[id]?.harborSeed(in: screenFrame) }
         harbor.willOpen = { [weak self] in
             guard let self else { return }
+            hub.dismissAnchored()
             popovers.closeAll()
             windowPeeks.close(returnFocus: false)
             modePicker.close(returnFocus: false)
@@ -937,6 +921,7 @@ final class DockCoordinator {
     /// Opens metadata search only after a menu or keyboard action.
     func searchWindows() {
         harbor.close(raising: nil, outcome: .interrupted, animated: false)
+        hub.dismissAnchored()
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         timeline.end()
@@ -947,6 +932,7 @@ final class DockCoordinator {
 
     func focusDock() {
         guard let id = DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation), let panel = panels[id] else { return }
+        hub.dismissAnchored()
         endFocus(restore: false)
         previousApplication = lastExternalApplication
         focusedID = id
@@ -964,6 +950,7 @@ final class DockCoordinator {
             timeline.end()
             return
         }
+        hub.dismissAnchored()
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
@@ -1030,17 +1017,80 @@ final class DockCoordinator {
         clipboardMuseum.show(returningTo: lastExternalApplication)
     }
 
+    /// Wires the Hub to the docks and the launcher behind its Apps tab.
+    ///
+    /// The launcher used to belong to each dock; the Hub has one for the whole app, so the hooks
+    /// that need a dock resolve the display the Hub opened on, falling back to the pointer's.
+    private func configureHub() {
+        let launcher = hub.apps.launcher
+        launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
+        launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
+        configureLauncherSearch(launcher)
+        launcher.createCapsule = { [weak self] application in
+            guard let self, let panel = hubPanel() else { return }
+            hub.dismissAfterAction()
+            sessionCapsules.beginFromApplication(application, on: panel)
+        }
+        launcher.openTool = { [weak self] tool in
+            guard let self else { return }
+            hub.dismissAfterAction()
+            switch tool {
+            case .clipboardMuseum: showClipboardMuseum()
+            case .localHistory: browseLocalHistory()
+            case .fusion: showFusion()
+            // Needs a SwiftUI openWindow action, so the launcher view opens it directly.
+            case .systemSettingsClone: break
+            }
+        }
+        hub.resolveContext = { [weak self] id in self?.hubContext(for: id) }
+        hub.willOpen = { [weak self] in
+            guard let self else { return nil }
+            // Read before ending Focus Dock, which forgets the app it would have restored.
+            let previous = previousApplication ?? lastExternalApplication
+            popovers.closeAll()
+            windowPeeks.close(returnFocus: false)
+            modePicker.close(returnFocus: false)
+            volumeDock.cards.close()
+            timeline.end()
+            endFocus(restore: false)
+            return previous
+        }
+        hub.isTileClick = { [weak self] event in
+            guard let self else { return false }
+            let point = NSEvent.mouseLocation
+            return panels.values.contains { $0.owns(event.window) && $0.launcherTarget(at: point) }
+        }
+        hub.holdDock = { [weak self] id, held in self?.panels[id]?.holdHub(held) }
+        folderStacks.openInHub = { [weak self] url in self?.hub.openFolder(url) }
+        volumeDock.openInHub = { [weak self] url in self?.hub.openFolder(url) }
+    }
+
+    /// Where the Hub opens for `displayID`, or for the display under the pointer when nil.
+    private func hubContext(for displayID: String?) -> HubOpenContext? {
+        let id = displayID ?? DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation)
+        guard let id, let panel = panels[id], let anchor = panel.hubAnchor() else { return nil }
+        let foreground = (previousApplication ?? lastExternalApplication)?.bundleIdentifier
+        let apps = panel.hubAppsContext(appVisibility: profiles.modes.effectiveVisibility(for: id),
+                                        foregroundBundleIdentifier: foreground)
+        return HubOpenContext(displayID: id, anchor: anchor, apps: apps)
+    }
+
+    /// The dock the Hub belongs to: the display it opened on, else the one under the pointer.
+    private func hubPanel() -> DockPanelController? {
+        if let id = hub.openDisplayID, let panel = panels[id] { return panel }
+        return DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation).flatMap { panels[$0] }
+    }
+
     /// Shared search borrows stored metadata; native actions stay with the same owners as the dock tiles.
-    private func configureLauncherSearch(on panel: DockPanelController) {
-        let search = panel.launcher.search
+    private func configureLauncherSearch(_ launcher: LauncherState) {
+        let search = launcher.search
         search.shelf = shelf; search.capsules = capsules; search.actions = actionTiles; search.modes = profiles.modes
-        search.explicitSearch = { [weak self, weak panel] in
-            panel?.closeLauncher()
+        search.explicitSearch = { [weak self] in
+            self?.hub.dismissAfterAction()
             self?.searchWindows()
         }
-        search.dispatch = { [weak self, weak panel] result, reveal in
-            guard let self, let panel else { return }
-            let launcher = panel.launcher
+        search.dispatch = { [weak self, weak launcher] result, reveal in
+            guard let self, let launcher else { return }
             let search = launcher.search
             switch result.id {
             case .application(let id):
@@ -1050,17 +1100,18 @@ final class DockCoordinator {
                 if reveal { launcher.showInFinder(app) } else { launcher.open(app) }
             case .window:
                 guard let source = result.window else { return }
-                search.activateWindow(source) { [weak panel] in panel?.launcher.didOpen?() }
+                search.activateWindow(source) { [weak launcher] in launcher?.didOpen?() }
             case .capsule(let id):
                 guard capsules.capsules.contains(where: { $0.id == id }) else {
                     search.actionError = String(localized: .unifiedStale); return
                 }
-                panel.closeLauncher()
+                guard let panel = hubPanel() else { return }
+                hub.dismissAfterAction()
                 sessionCapsules.show(id, on: panel, anchor: .launcher)
             case .shelf(let id):
                 search.performOwnedAction({ [shelves] completion in
                     shelves.openReference(id, reveal: reveal, completion: completion)
-                }, completion: { [weak panel] in panel?.launcher.didOpen?() })
+                }, completion: { [weak launcher] in launcher?.didOpen?() })
             case .shortcut(let id):
                 guard actionTiles.run(id, source: .launcher) else {
                     search.actionError = String(localized: .unifiedShortcutUnavailable); return
@@ -1127,6 +1178,7 @@ final class DockCoordinator {
     }
 
     func stop() {
+        hub.stop()
         systemDockTuck.stop()
         discovery.stop()
         clipboardMuseum.didUse = nil

@@ -8,8 +8,16 @@ import AppKit
 final class LauncherFileChooser {
     private var fileToken: UUID?
     private var folderToken: UUID?
-    private var filePanel: NSOpenPanel?
-    private var folderPanel: NSOpenPanel?
+    private var filePanel: NSOpenPanel? { didSet { notifyIfChanged(oldValue: oldValue != nil || folderPanel != nil) } }
+    private var folderPanel: NSOpenPanel? { didSet { notifyIfChanged(oldValue: filePanel != nil || oldValue != nil) } }
+
+    /// Called on the main actor when ``isChoosing`` flips, so the Hub can hold itself open while a
+    /// panel is up. Collapsing the Hub would cancel the panel.
+    var choosingChanged: ((Bool) -> Void)?
+
+    private func notifyIfChanged(oldValue wasChoosing: Bool) {
+        if wasChoosing != isChoosing { choosingChanged?(isChoosing) }
+    }
 
     var isChoosing: Bool { filePanel != nil || folderPanel != nil }
 

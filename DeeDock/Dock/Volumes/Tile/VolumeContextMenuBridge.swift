@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Right-click menu for a volume tile: Open, Open in Finder, Eject, Hide from Dock, and the Drives
+/// Right-click menu for a volume tile: Open, Open in Hub, Eject, Hide from Dock, and the Drives
 /// settings page.
 struct VolumeContextMenuBridge: NSViewRepresentable {
     let item: VolumeDockItem
@@ -42,7 +42,7 @@ struct VolumeContextMenuBridge: NSViewRepresentable {
             menu.delegate = self
             menu.autoenablesItems = false
             add(.volumeOpen, action: #selector(open), symbol: "square.stack.3d.up", to: menu, enabled: available)
-            add(.volumeOpenInFinder, action: #selector(reveal), symbol: "folder", to: menu, enabled: available)
+            add(.hubOpenInHub, action: #selector(openInHub), symbol: "macwindow", to: menu, enabled: available)
             menu.addItem(.separator())
             add(.volumeEject, action: #selector(eject), symbol: "eject", to: menu, enabled: available)
             menu.addItem(.separator())
@@ -66,7 +66,7 @@ struct VolumeContextMenuBridge: NSViewRepresentable {
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
         @objc private func open() { if let item { interaction?.openVolume?(item) } }
-        @objc private func reveal() { if let item { interaction?.revealVolume?(item) } }
+        @objc private func openInHub() { if let item { Analytics.performing(.menu) { interaction?.openVolumeInHub?(item) } } }
         @objc private func eject() { if let item { Analytics.performing(.menu) { interaction?.ejectVolume?(item) } } }
         @objc private func hide() { if let item { interaction?.hideVolume?(item) } }
         @objc private func settings() { openSettings?() }

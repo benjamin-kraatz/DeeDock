@@ -122,19 +122,18 @@ A first changed-pattern hit does not prove stable adaptation. All measurements d
 synthetic scenario; they do not establish accuracy or usefulness on real habits. No scenario data is saved
 or exported, and the generator, session, controls, and playback metrics are compiled only into Debug builds.
 
-## Launcher behavior
+## Behavior in the Apps tab
 
-An empty query can show a **Suggested** section below the search controls and above ordinary app results.
-Grid layout shows up to three apps in one row, reducing the count for narrow windows. List layout shows up to three rows.
-The [compact Launcher](LAUNCHER.md#compact-style) shows up to three apps in a row above its grid.
+An empty query in the [DOKK Hub's Apps tab](LAUNCHER.md#layout) can show a **Suggested** section above the controls row and ordinary app results.
+It shows up to three apps as cards in one row, in both grid and list layouts. Each card's reason comes from DOKK's launch history: **Opened today** or **Last opened** with a relative date. Without history for that app it reads **Based on your recent app use**.
 An app can appear in both Suggested and ordinary results. Each occurrence has a separate selection identity.
 Arrow keys move through both sections, and Return opens or activates the selected app through the existing application service.
 
 Suggestions respect the Launcher filters and the current display's hidden app groups.
-DDock, the app that was foreground before Launcher opened, excluded apps, helpers, and unavailable apps are ineligible.
+DOKK, the app that was foreground before the Hub opened, excluded apps, helpers, and unavailable apps are ineligible.
 Typing a query uses ordinary search. Suggestions do not replace Ask Robi or use Apple Intelligence.
 
-Ranking stays fixed while Launcher is open. Filters and availability can remove candidates without reordering the snapshot.
+Ranking stays fixed while the Apps tab is visible. Filters and availability can remove candidates without reordering the snapshot.
 Excluding an app removes its suggestion immediately. If a selected suggestion disappears, Return does nothing until another selection is made.
 New observations affect the next presentation. History below the evidence requirements produces no suggestions. Learning does not require waiting 90 days.
 
@@ -148,7 +147,7 @@ Each suggestion has contextual menu and accessibility actions:
 
 Ignoring a suggestion is not negative feedback. Actual foreground transitions teach the predictor regardless of which app launched or activated the target.
 
-An optional survey card appears below the suggestions in the full Launcher after at least seven days and ten suggestion presentations.
+An optional survey card appears below the suggestions in the Apps tab after at least seven days and ten suggestion presentations.
 It is the PostHog survey "App Recommendations Survey" (ID `01a10ae5-3be4-0000-cb04-a670009cadbf`), which DOKK fetches and draws
 itself because posthog-ios renders surveys on iOS only. The card appears only while usage-data sharing is on, since that is where
 the answers go. See [Surveys](ANALYTICS.md#surveys) for what is sent.
