@@ -66,6 +66,11 @@ final class HubPanelController {
         panel.minSize = HubStyle.minimumDetachedSize
         let hosting = HubHostingView(rootView: content)
         hosting.sizingOptions = []
+        // The Hub draws its own header where a detached window's title bar and toolbar sit, so
+        // SwiftUI must not see them as a safe area. Otherwise a ScrollView at the top of a tab
+        // (the Apps tab's browse grid) extends itself up under the title bar, over the header,
+        // and takes every click meant for the tab switcher, search, pin, and close buttons.
+        hosting.safeAreaRegions = []
         panel.contentView = hosting
         applyAnchoredWindowStyle()
         panel.resignedKey = { [weak self] in self?.resignedKey?() }
