@@ -82,5 +82,22 @@
   {"icon": "custom:devcleaner", "bundleIDs": ["com.oneminutegames.XcodeCleaner"], "names": ["DevCleaner", "DevCleaner for Xcode"]},
   {"icon": "custom:macs-fan-control", "bundleIDs": ["com.crystalidea.macsfancontrol"], "names": ["Macs Fan Control"]},
   {"icon": "custom:tag-editor", "bundleIDs": ["com.amvidia.Tag-Editor-Free", "com.amvidia.Tag-Editor"], "names": ["Tag Editor 2"]},
-  {"icon": "custom:forklift", "bundleIDs": ["com.binarynights.ForkLift", "com.binarynights.ForkLift-3"], "names": ["ForkLift"]}
+  {"icon": "custom:forklift", "bundleIDs": ["com.binarynights.ForkLift", "com.binarynights.ForkLift-3"], "names": ["ForkLift"]},
+  {"icon": "custom:stirling-pdf", "bundleIDs": ["stirling.pdf.dev"], "names": ["Stirling PDF", "Stirling-PDF"]},
+  {"icon": "custom:carbon-copy-cloner", "bundleIDs": ["com.bombich.ccc"], "names": ["Carbon Copy Cloner"]},
+  {"icon": "custom:ocenaudio", "bundleIDs": ["com.ocenaudio"], "names": ["ocenaudio"]},
+  {"icon": "custom:mist", "bundleIDs": ["com.ninxsoft.mist"], "names": ["Mist"]},
+  {"icon": "custom:sftp-commander", "bundleIDs": ["com.mpl.SftpCommander"], "names": ["SFTP Commander"]},
+  {"icon": "custom:image2icon", "bundleIDs": ["net.shinyfrog.image2icon"], "names": ["Image2icon"]},
+  {"icon": "custom:drawsimple", "bundleIDs": ["com.cohen.wts.drawsimple"], "names": ["DrawSimple"]},
+  {"icon": "custom:mindthread", "bundleIDs": ["com.bithulu.mindthread"], "names": ["MindThread"]},
+  {"icon": "custom:simplemind", "bundleIDs": ["com.modelmakertools.simplemindmacstd", "com.modelmakertools.simplemindosx"], "names": ["SimpleMind", "SimpleMind Pro"]},
+  {"icon": "custom:elmedia-player", "bundleIDs": ["com.Eltima.ElmediaPlayer.MAS", "com.Eltima.ElmediaPlayer"], "names": ["Elmedia Player"]},
+  {"icon": "custom:super-easy-timer", "bundleIDs": ["com.paulsolt.SuperEasyTimerMac"], "names": ["Super Easy Timer"]},
+  {"icon": "custom:disk-speed-test", "bundleIDs": ["com.blackmagic-design.DiskSpeedTest"], "names": ["Blackmagic Disk Speed Test", "Disk Speed Test"]},
+  {"icon": "custom:download-shuttle", "bundleIDs": ["com.fiplab.downloadmanager"], "names": ["Download Shuttle"]},
+  {"icon": "custom:typeface", "bundleIDs": ["com.criminalbird.typeface.standalone", "com.criminalbird.typeface"], "names": ["Typeface"]},
+  {"icon": "custom:sitesucker", "bundleIDs": ["us.sitesucker.mac.sitesucker-pro", "us.sitesucker.mac.sitesucker"], "names": ["SiteSucker Pro", "SiteSucker"]},
+  {"icon": "custom:countdown-timer-pro", "bundleIDs": ["com.nicolas.obakke.countdown"], "names": ["Countdown Timer Pro"]},
+  {"icon": "custom:calculator-plus", "bundleIDs": ["maccatalyst.kenchung.Calculator"], "names": ["Calculator+="]}
 ]

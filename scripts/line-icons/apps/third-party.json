@@ -3703,5 +3703,24 @@
     "names": [
       "Zulip"
     ]
+  },
+  {
+    "icon": "lucide:playing-cards",
+    "bundleIDs": [
+      "com.pcv-soft.mac.mcsolitaire"
+    ],
+    "names": [
+      "McSolitaire"
+    ]
+  },
+  {
+    "icon": "lucide:droplet",
+    "bundleIDs": [
+      "com.sindresorhus.Color-Picker"
+    ],
+    "names": [
+      "Color Picker",
+      "System Color Picker"
+    ]
   }
 ]
