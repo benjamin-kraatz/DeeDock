@@ -181,6 +181,7 @@ final class HubPanelController {
         installMonitors()
         panel.alphaValue = 1
         panel.orderFrontRegardless()
+        receivePointerEventsOnTransparentPixels()
         // Opening is a deliberate request, so DOKK activates and the search field gets a normal
         // field editor. Hover never reaches this path.
         ExplicitWindowPresenter.shared.present(panel)
@@ -273,6 +274,7 @@ final class HubPanelController {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]
         panel.hasShadow = false
         panel.isMovable = false
+        receivePointerEventsOnTransparentPixels()
     }
 
     private func applyDetachedWindowStyle() {
@@ -294,6 +296,23 @@ final class HubPanelController {
         panel.isMovable = true
         panel.hasShadow = true
         panel.invalidateShadow()
+        receivePointerEventsOnTransparentPixels()
+    }
+
+    /// Makes the whole window frame take its own clicks and scrolls.
+    ///
+    /// A non-opaque window with a clear background is hit-tested by alpha: the window server sends
+    /// events on fully transparent pixels to the window behind it. Liquid Glass is composited by the
+    /// window server rather than drawn into the window's backing, so every gap between tiles, rows,
+    /// and header controls counts as transparent. Without this, a scroll over empty glass scrolled
+    /// the app behind the Hub, and a click there reached that app and closed an anchored Hub as an
+    /// outside click. Only an explicit `false` turns alpha hit-testing off, so it is set again after
+    /// every style change and once the window exists on screen (the panel is deferred). Clicks on an
+    /// anchored Hub's transparent shadow margin now reach the panel; the local mouse monitor still
+    /// treats them as outside clicks (see ``belongsToHub(_:)``). `DockPopoverPanelController` does
+    /// the same for glass popovers.
+    private func receivePointerEventsOnTransparentPixels() {
+        panel.ignoresMouseEvents = false
     }
 
     // MARK: - Traffic lights
@@ -350,7 +369,9 @@ final class HubPanelController {
         localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
             guard let self else { return event }
             if belongsToHub(event) { return event }
-            return outsideClick?(event) == true ? nil : event
+            let consumed = outsideClick?(event) == true
+            // A click on the Hub's own transparent margin dismisses without reaching its content.
+            return consumed || event.window === panel ? nil : event
         }
         globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
             _ = self?.outsideClick?(nil)
@@ -370,16 +391,17 @@ final class HubPanelController {
         removeMouseMonitors()
     }
 
-    /// Clicks on the glass, on a sheet or child window of the Hub, or on Quick Look belong to the
-    /// Hub. A click on the transparent shadow margin does not.
+    /// Clicks inside the glass outline, on a sheet or child window of the Hub, or on Quick Look
+    /// belong to the Hub. A click on the transparent shadow margin, or beside the pointer, does not.
     private func belongsToHub(_ event: NSEvent) -> Bool {
         guard let window = event.window else { return false }
         if window === panel {
             let bounds = panel.contentView?.bounds ?? .zero
             // The content view is flipped (top-left origin); window coordinates start at the bottom left.
             let point = CGPoint(x: event.locationInWindow.x, y: bounds.height - event.locationInWindow.y)
-            return Self.glass(in: CGRect(origin: .zero, size: bounds.size), insets: state.layout.insets,
-                              flipped: true).contains(point)
+            let glass = Self.glass(in: CGRect(origin: .zero, size: bounds.size), insets: state.layout.insets,
+                                   flipped: true)
+            return HubGlassShape(layout: state.layout).path(in: glass).contains(point)
         }
         return window.sheetParent === panel || window.parent === panel || window is QLPreviewPanel
     }
