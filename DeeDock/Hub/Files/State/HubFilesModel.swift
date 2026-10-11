@@ -43,6 +43,9 @@ final class HubFilesModel: HubTabModel {
     let transfers: HubFileTransferQueue
     let volumes: HubVolumes
     let search: HubFileSearch
+    /// Lookout, the content search. Phase 2 shows its results beside `search`'s names; for now the tab only tells it
+    /// when it appears and hides, which warms and releases what it keeps in memory (inert while Lookout is off).
+    let lookout: LookoutEngine
     @ObservationIgnored let quickLook = HubFilesQuickLook()
     @ObservationIgnored private(set) weak var shell: HubShell?
     @ObservationIgnored private let defaults: UserDefaults
@@ -57,8 +60,10 @@ final class HubFilesModel: HubTabModel {
     @ObservationIgnored var previewOverrides = HubFilesPreviewOverrides()
 
     /// Creates the model with live services, restoring the last layout from `defaults`.
-    convenience init(defaults: UserDefaults = .standard) {
-        self.init(defaults: defaults, dataSource: HubFilesLiveDataSource())
+    ///
+    /// - Parameter lookout: The app's one Lookout engine; nil makes an inert one (previews and tests).
+    convenience init(defaults: UserDefaults = .standard, lookout: LookoutEngine? = nil) {
+        self.init(defaults: defaults, dataSource: HubFilesLiveDataSource(), lookout: lookout)
     }
 
     /// Creates the model with an injected data source (previews and tests).
@@ -66,12 +71,14 @@ final class HubFilesModel: HubTabModel {
          dataSource: HubFilesDataSource,
          transfers: HubFileTransferQueue = HubFileTransferQueue(),
          volumes: HubVolumes = HubVolumes(),
-         search: HubFileSearch = HubFileSearch()) {
+         search: HubFileSearch = HubFileSearch(),
+         lookout: LookoutEngine? = nil) {
         self.defaults = defaults
         self.dataSource = dataSource
         self.transfers = transfers
         self.volumes = volumes
         self.search = search
+        self.lookout = lookout ?? .inert()
         let home = dataSource.homeDirectory
         let snapshot = HubFilesSnapshot.load(from: defaults) ?? .firstRun(home: home)
         showsPreview = snapshot.showsPreview
@@ -126,6 +133,7 @@ final class HubFilesModel: HubTabModel {
         observeUnmounts()
         refreshActivation()
         if isSearching { runSearch() }
+        lookout.hubFilesDidAppear()
     }
 
     /// Marks the tab visible without a shell, so panes load (previews and tests).
@@ -141,6 +149,7 @@ final class HubFilesModel: HubTabModel {
         dropHighlight = nil
         volumes.stop()
         search.stop()
+        lookout.hubDidClose()
         if let unmountObserver { NSWorkspace.shared.notificationCenter.removeObserver(unmountObserver) }
         unmountObserver = nil
         refreshActivation()

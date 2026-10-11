@@ -239,6 +239,8 @@ final class DockCoordinator {
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configureHarbor()
         configureHub()
+        // Lookout indexes in the background while the app runs; it does nothing until it's set up and on.
+        hub.lookout.start()
         notificationFeedPopover.keyboardDismissed = { [weak self] displayID in
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)

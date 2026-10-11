@@ -22044,6 +22044,318 @@
         }
       }
     },
+    "lookoutFailedIndex" : {
+      "comment" : "Lookout error: its search index on this Mac can't be opened or created.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout kann seinen Index nicht öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout can't open its index."
+          }
+        }
+      }
+    },
+    "lookoutFailedIndexing" : {
+      "comment" : "Lookout error: reading files failed, for example because the search model couldn't load.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout hat wegen eines Fehlers aufgehört, Dateien zu lesen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout stopped reading files because of an error."
+          }
+        }
+      }
+    },
+    "lookoutFailedService" : {
+      "comment" : "Lookout error: the background helper that reads files can't be started.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dateileser von Lookout ist nicht verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout's file reader isn't available."
+          }
+        }
+      }
+    },
+    "lookoutPauseLowPowerMode" : {
+      "comment" : "Why Lookout's reading waits: the Mac is in Low Power Mode (use macOS's name for the mode).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stromsparmodus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low Power Mode"
+          }
+        }
+      }
+    },
+    "lookoutPauseOnBattery" : {
+      "comment" : "Why Lookout's reading waits: the Mac runs on battery and the setting to read files on battery is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Akkubetrieb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On battery"
+          }
+        }
+      }
+    },
+    "lookoutPauseUser" : {
+      "comment" : "Why Lookout's reading waits: the person paused it themselves.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von dir pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused by you"
+          }
+        }
+      }
+    },
+    "lookoutPauseWarm" : {
+      "comment" : "Why Lookout's reading waits: the Mac is running hot, so it pauses until it cools down.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac ist warm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac is warm"
+          }
+        }
+      }
+    },
+    "lookoutStatusFailed" : {
+      "comment" : "Lookout status chip after Lookout had to stop because of an error. A second line explains it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout angehalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout stopped"
+          }
+        }
+      }
+    },
+    "lookoutStatusIndexing" : {
+      "comment" : "Lookout status chip while Lookout reads the contents of files in the chosen folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading files"
+          }
+        }
+      }
+    },
+    "lookoutStatusIndexingRemaining" : {
+      "comment" : "Second line of the Lookout status while it reads files: how many files are still waiting to be read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Dateien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file left"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files left"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutStatusNotSetUp" : {
+      "comment" : "Lookout status chip while Lookout, DOKK's content search, hasn't been set up yet; choosing it starts setup.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up"
+          }
+        }
+      }
+    },
+    "lookoutStatusOff" : {
+      "comment" : "Lookout status chip after the person turned Lookout, DOKK's content search, off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout off"
+          }
+        }
+      }
+    },
+    "lookoutStatusPaused" : {
+      "comment" : "Lookout status chip while reading files waits; already indexed files stay searchable. A second line says why.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
+        }
+      }
+    },
+    "lookoutStatusPreparing" : {
+      "comment" : "Lookout status chip before the indexer has reported anything, right after Lookout starts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird vorbereitet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting ready"
+          }
+        }
+      }
+    },
+    "lookoutStatusReady" : {
+      "comment" : "Lookout status chip when every file Lookout may read has been read and search is ready.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout bereit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout ready"
+          }
+        }
+      }
+    },
+    "lookoutStatusWaitingForModel" : {
+      "comment" : "Lookout status chip while the on-device search model is still downloading; file names are searchable meanwhile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell wird geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading model"
+          }
+        }
+      }
+    },
     "markupActionsAccessibility" : {
       "comment" : "VoiceOver label for the markup action bar.",
       "extractionState" : "manual",

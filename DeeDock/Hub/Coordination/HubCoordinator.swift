@@ -28,6 +28,9 @@ final class HubCoordinator {
     let apps: HubAppsModel
     let windows: HubWindowsModel
     let files: HubFilesModel
+    /// Lookout, the Files tab's content search. One engine for the app's lifetime; the dock coordinator starts it
+    /// with the other services and `stop()` ends it.
+    let lookout: LookoutEngine
 
     /// Returns where to open for a display, or for the display under the pointer when nil.
     @ObservationIgnored var resolveContext: ((String?) -> HubOpenContext?)?
@@ -56,14 +59,18 @@ final class HubCoordinator {
     ///   - launcher: The app-wide launcher state, already wired by the owner (search dispatch,
     ///     file actions, suggestions, capsules, tools).
     ///   - openRadar: Opens Radar from the Windows tab.
-    init(launcher: LauncherState, openRadar: @escaping @MainActor () -> Void, defaults: UserDefaults = .standard) {
+    ///   - lookout: The Lookout engine; nil makes the live one (inert under the test host and in previews).
+    init(launcher: LauncherState, openRadar: @escaping @MainActor () -> Void, defaults: UserDefaults = .standard,
+         lookout: LookoutEngine? = nil) {
         self.defaults = defaults
         let preferences = HubShellPreferences.load(from: defaults)
         self.preferences = preferences
         state = HubShellState(tab: preferences.lastTab)
         apps = HubAppsModel(launcher: launcher)
         windows = HubWindowsModel(openRadar: openRadar)
-        files = HubFilesModel(defaults: defaults)
+        let lookout = lookout ?? LookoutEngine.live()
+        self.lookout = lookout
+        files = HubFilesModel(defaults: defaults, lookout: lookout)
         let files = files
         tile.transferProgress = { [weak files] in files?.transferProgress }
         let panel = HubPanelController(state: state, content: HubCoordinatorView(hub: self))
@@ -170,6 +177,7 @@ final class HubCoordinator {
     /// Ends the Hub for app teardown. Cancels running copies and moves so their partial
     /// destination items are removed before the process exits.
     func stop() {
+        lookout.stop()
         files.transfers.cancelAllForTermination()
         if isOpen { close(restoreFocus: false, animated: false) }
         panel?.stop()
