@@ -38,9 +38,7 @@ nonisolated enum ModelFiles {
 
     /// Where the app keeps them: `~/Library/Application Support/DDock/Lookout/Models`, beside DOKK's other
     /// Application Support data. Debug and release builds share it, so a development build needn't download again.
-    static var installed: URL {
-        URL.applicationSupportDirectory.appending(path: "DDock/Lookout/Models", directoryHint: .isDirectory)
-    }
+    static var installed: URL { LookoutPaths.standard.models }
 
     /// The files that aren't in `folder` yet. Only verified files get their final name, so being there is enough.
     static func missing(in folder: URL) -> [File] {

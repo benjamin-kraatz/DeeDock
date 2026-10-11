@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DEE125000000000000000304 /* LookoutIndexService.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = DEE125000000000000000004 /* LookoutIndexService.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DEE125000000000000000301 /* LookoutQueryService.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = DEE125000000000000000002 /* LookoutQueryService.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		DEE400000000000000000001 /* Sparkle-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = DEE400000000000000000002 /* Sparkle-LICENSE.txt */; };
@@ -28,6 +29,13 @@
 			remoteGlobalIDString = DEE125000000000000000200;
 			remoteInfo = LookoutQueryService;
 		};
+		DEE125000000000000000305 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DEE125000000000000000400;
+			remoteInfo = LookoutIndexService;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,12 +45,14 @@
 			dstSubfolderSpec = 16;
 			files = (
 				DEE125000000000000000301 /* LookoutQueryService.xpc in Embed XPC Services */,
+				DEE125000000000000000304 /* LookoutIndexService.xpc in Embed XPC Services */,
 			);
 			name = "Embed XPC Services";
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DEE125000000000000000004 /* LookoutIndexService.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = LookoutIndexService.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEE125000000000000000001 /* LookoutBench */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LookoutBench; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEE125000000000000000002 /* LookoutQueryService.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = LookoutQueryService.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEE125000000000000000003 /* LookoutService.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = LookoutService.xcconfig; path = Configuration/LookoutService.xcconfig; sourceTree = "<group>"; };
@@ -54,6 +64,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		DEE125000000000000000016 /* Indexing */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Indexing;
+			sourceTree = "<group>";
+		};
+		DEE125000000000000000017 /* IndexService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = IndexService;
+			sourceTree = "<group>";
+		};
+		DEE125000000000000000018 /* ServiceSupport */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ServiceSupport;
+			sourceTree = "<group>";
+		};
 		DEE125000000000000000011 /* Core */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Core;
@@ -92,6 +117,11 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DEE125000000000000000422 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		DEE125000000000000000122 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -138,6 +168,7 @@
 				DD0000000000000000000003 /* DeeDockTests.xctest */,
 				DEE125000000000000000001 /* LookoutBench */,
 				DEE125000000000000000002 /* LookoutQueryService.xpc */,
+				DEE125000000000000000004 /* LookoutIndexService.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,7 +186,10 @@
 			children = (
 				DEE125000000000000000011 /* Core */,
 				DEE125000000000000000012 /* Embedding */,
+				DEE125000000000000000016 /* Indexing */,
 				DEE125000000000000000014 /* QueryService */,
+				DEE125000000000000000017 /* IndexService */,
+				DEE125000000000000000018 /* ServiceSupport */,
 				DEE125000000000000000013 /* Bench */,
 				DEE125000000000000000015 /* CLlama */,
 			);
@@ -180,9 +214,11 @@
 			);
 			dependencies = (
 				DEE125000000000000000303 /* PBXTargetDependency */,
+				DEE125000000000000000306 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* DeeDock */,
+				DEE125000000000000000011 /* Core */,
 			);
 			name = DeeDock;
 			packageProductDependencies = (
@@ -227,6 +263,7 @@
 			fileSystemSynchronizedGroups = (
 				DEE125000000000000000011 /* Core */,
 				DEE125000000000000000012 /* Embedding */,
+				DEE125000000000000000016 /* Indexing */,
 				DEE125000000000000000013 /* Bench */,
 			);
 			name = LookoutBench;
@@ -248,11 +285,35 @@
 			fileSystemSynchronizedGroups = (
 				DEE125000000000000000011 /* Core */,
 				DEE125000000000000000012 /* Embedding */,
+				DEE125000000000000000018 /* ServiceSupport */,
 				DEE125000000000000000014 /* QueryService */,
 			);
 			name = LookoutQueryService;
 			productName = LookoutQueryService;
 			productReference = DEE125000000000000000002 /* LookoutQueryService.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
+		DEE125000000000000000400 /* LookoutIndexService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DEE125000000000000000410 /* Build configuration list for PBXNativeTarget "LookoutIndexService" */;
+			buildPhases = (
+				DEE125000000000000000420 /* Build llama.cpp */,
+				DEE125000000000000000421 /* Sources */,
+				DEE125000000000000000422 /* Frameworks */,
+				DEE125000000000000000423 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				DEE125000000000000000011 /* Core */,
+				DEE125000000000000000012 /* Embedding */,
+				DEE125000000000000000016 /* Indexing */,
+				DEE125000000000000000018 /* ServiceSupport */,
+				DEE125000000000000000017 /* IndexService */,
+			);
+			name = LookoutIndexService;
+			productName = LookoutIndexService;
+			productReference = DEE125000000000000000004 /* LookoutIndexService.xpc */;
 			productType = "com.apple.product-type.xpc-service";
 		};
 /* End PBXNativeTarget section */
@@ -292,12 +353,18 @@
 				000000000000000100000000 /* DeeDock */,
 				DD0000000000000000000006 /* DeeDockTests */,
 				DEE125000000000000000200 /* LookoutQueryService */,
+				DEE125000000000000000400 /* LookoutIndexService */,
 				DEE125000000000000000100 /* LookoutBench */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		DEE125000000000000000423 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		DEE125000000000000000223 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
@@ -317,6 +384,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		DEE125000000000000000420 /* Build llama.cpp */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			inputPaths = (
+				"$(SRCROOT)/scripts/build-llama.sh",
+				"$(SRCROOT)/scripts/llama.cpp-no-logits.patch",
+			);
+			name = "Build llama.cpp";
+			shellPath = /bin/sh;
+			shellScript = (
+				"# A no-op once Vendor/llama/BUILD matches the pinned tag and patch (about 20 ms). It runs on every build",
+				"# instead of declaring outputs, because several targets run it and two declaring the same output would fail.",
+				"/bin/bash \"${SRCROOT}/scripts/build-llama.sh\"",
+			);
+		};
 		DEE125000000000000000120 /* Build llama.cpp */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -379,6 +461,11 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		DEE125000000000000000421 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		DEE125000000000000000121 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -402,6 +489,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		DEE125000000000000000306 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DEE125000000000000000400 /* LookoutIndexService */;
+			targetProxy = DEE125000000000000000305 /* PBXContainerItemProxy */;
+		};
 		DEE125000000000000000303 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DEE125000000000000000200 /* LookoutQueryService */;
@@ -990,9 +1082,90 @@
 			};
 			name = Release;
 		};
+		DEE125000000000000000411 /* Debug configuration for PBXNativeTarget "LookoutIndexService" */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DEE125000000000000000003 /* LookoutService.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor/llama/include";
+				INFOPLIST_FILE = "Configuration/LookoutIndexService-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/Vendor/llama/lib";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Lookout/CLlama";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DEE125000000000000000413 /* Preview configuration for PBXNativeTarget "LookoutIndexService" */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DEE125000000000000000003 /* LookoutService.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor/llama/include";
+				INFOPLIST_FILE = "Configuration/LookoutIndexService-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/Vendor/llama/lib";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Lookout/CLlama";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Preview;
+		};
+		DEE125000000000000000412 /* Release configuration for PBXNativeTarget "LookoutIndexService" */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DEE125000000000000000003 /* LookoutService.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor/llama/include";
+				INFOPLIST_FILE = "Configuration/LookoutIndexService-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/Vendor/llama/lib";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Lookout/CLlama";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DEE125000000000000000410 /* Build configuration list for PBXNativeTarget "LookoutIndexService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DEE125000000000000000411 /* Debug configuration for PBXNativeTarget "LookoutIndexService" */,
+				DEE125000000000000000413 /* Preview configuration for PBXNativeTarget "LookoutIndexService" */,
+				DEE125000000000000000412 /* Release configuration for PBXNativeTarget "LookoutIndexService" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		000000000000000010000000 /* Build configuration list for PBXProject "DeeDock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -1,15 +1,20 @@
 import Foundation
 
-// LookoutBench: Lookout's phase 0 spike. Measures EmbeddingGemma 2 on the vendored llama.cpp and checks its vectors
-// against DigUp's reference. A developer tool: it isn't part of DOKK.app.
+// LookoutBench: Lookout's developer tool. Measures EmbeddingGemma 2 on the vendored llama.cpp, checks its vectors
+// against DigUp's reference, and runs the indexing pipeline without the app. It isn't part of DOKK.app.
 
 let usage = """
     usage: LookoutBench reference --models <folder> --refs <folder>
            LookoutBench bench --models <folder> [--refs <folder>]
+           LookoutBench index --models <folder> --index <folder> --root <folder>... [--exclude <folder>]...
+           LookoutBench estimate --root <folder>...
 
-      --models  the folder with embeddinggemma-2-Q8_0.gguf and mmproj-embeddinggemma-2-Q8_0.gguf
-      --refs    DigUp's Tests/LlamaRuntimeTests/Reference (photo.jpg, screen.png, speech.wav, vectors.json);
-                bench measures images and checks the reference only with it
+      --models   the folder with embeddinggemma-2-Q8_0.gguf and mmproj-embeddinggemma-2-Q8_0.gguf
+      --refs     DigUp's Tests/LlamaRuntimeTests/Reference (photo.jpg, screen.png, speech.wav, vectors.json);
+                 bench measures images and checks the reference only with it
+      --index    the folder index.sqlite goes in (created when missing); not the app's unless you pass it
+      --root     a folder to index or estimate (repeatable)
+      --exclude  a folder to skip inside the roots (repeatable)
     """
 
 // Line by line even into a pipe, so the header and the probes' echoed output keep their order.
@@ -27,6 +32,12 @@ do {
         exit(try Benchmark.run(models: arguments.requiredFolder("models"), references: references))
     case "probe-text":
         try TextProbe.run(models: arguments.requiredFolder("models"))
+    case "index":
+        guard let index = arguments.folder("index") else { throw BenchFailure("missing --index <folder>") }
+        try IndexCommand.run(models: arguments.requiredFolder("models"), index: index,
+                             roots: arguments.folders("root"), excluded: arguments.folders("exclude"))
+    case "estimate":
+        try EstimateCommand.run(roots: arguments.folders("root"))
     case "probe-full":
         let references = arguments.folder("refs") == nil ? nil : try arguments.requiredFolder("refs")
         try FullProbe.run(models: arguments.requiredFolder("models"), references: references)

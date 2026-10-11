@@ -1,0 +1,277 @@
+// Adapted from DigUp (MIT, © 2026 Abdur Rahim) — https://github.com/ARahim3/DigUp
+
+import Foundation
+
+/// The index service's work: sync, index what the sync just queued (if it's a few files: new files go first, on any
+/// power source), then the backfill if allowed, then the rest of long files (`Indexer.finishLongFiles`) under the
+/// same rule. Between batches it yields to a new sync, a new configuration, a pause and the backfill being turned
+/// off. When it has nothing it may do, it waits a minute with the model warm (screenshots come in bursts), then the
+/// process exits (`IdleExit`).
+///
+/// Before the model has downloaded it only syncs (file names are searchable at once) and says it's waiting; the app
+/// calls `syncNow` once the download is done. Folders that aren't there (an unplugged drive) or can't be read are
+/// skipped, and what was indexed from them stays. That's checked before every sync, not once: a drive ejected while
+/// this runs must not crawl as "all deleted".
+///
+/// Threads: requests arrive on NSXPC's queues and only set flags under `lock`. All work, and every use of the store
+/// and the indexer, runs on `queue`, one serial utility-QoS queue (the indexer's extraction runs one batch ahead on a
+/// second thread of its own).
+final class IndexWork: @unchecked Sendable {
+    /// A sync that queues more files than this is a first pass or a big change: those wait for the backfill.
+    static let newFilesLimit = 50
+    /// Seconds with nothing to do before the process exits.
+    static let idleSeconds = 60
+    /// The counts (a GROUP BY over every file) are refreshed at most this often while files go by.
+    static let countsInterval = 1.0
+
+    private let queue = DispatchQueue(label: "Lookout.Index.work", qos: .utility)
+    private let status: StatusBroadcaster
+    private lazy var idleExit = IdleExit(after: Self.idleSeconds, on: queue) { [self] in
+        indexer?.finish()
+    }
+
+    // Requests, guarded by `lock`.
+    private let lock = NSLock()
+    private var pendingConfiguration: LookoutIndexConfiguration?
+    private var syncRequested = false
+    private var paused = false
+    /// No app is connected: stop as DigUp's helper did when the app went away.
+    private var appAway = false
+    private var backfillAllowed = false
+    /// Bumped by every request, so the loop notices one that came in while it decided to stop.
+    private var generation = 0
+    private var looping = false
+
+    // The work queue's own state.
+    private var configuration: LookoutIndexConfiguration?
+    private var store: IndexStore?
+    private var indexer: Indexer?
+    private var roots: [URL] = []
+    /// Files the last syncs queued, indexed first whatever the power policy says.
+    private var newFiles = Set<Int64>()
+    private var countsRefreshed = Date.distantPast
+
+    init(status: StatusBroadcaster) {
+        self.status = status
+    }
+
+    // MARK: Requests (any thread)
+
+    /// The service launched: clear up after processes that died, and exit if nothing ever asks for work.
+    func launched() {
+        queue.async { ScratchFolder.removeStale() }
+        idleExit.arm()
+    }
+
+    func configure(_ configuration: LookoutIndexConfiguration) {
+        request {
+            pendingConfiguration = configuration
+            backfillAllowed = configuration.backfillAllowed
+        }
+        status.update { $0.backfillAllowed = configuration.backfillAllowed }
+    }
+
+    func syncNow() { request { syncRequested = true } }
+
+    func setBackfillAllowed(_ allowed: Bool) {
+        request { backfillAllowed = allowed }
+        status.update { $0.backfillAllowed = allowed }
+    }
+
+    func pause() { request { paused = true } }
+    func resume() { request { paused = false } }
+
+    /// Whether an app is connected. With none, work stops after the current batch.
+    func setAppConnected(_ connected: Bool) { request { appAway = !connected } }
+
+    private func request(_ change: () -> Void) {
+        idleExit.disarm()
+        let start = lock.withLock { () -> Bool in
+            change()
+            generation += 1
+            guard !looping else { return false }
+            looping = true
+            return true
+        }
+        if start { queue.async { [self] in loop() } }
+    }
+
+    // MARK: Loop (the work queue)
+
+    /// Runs passes until one ends with no request having arrived during it, then arms the idle exit.
+    private func loop() {
+        while true {
+            let seen = lock.withLock { generation }
+            pass()
+            let done = lock.withLock { () -> Bool in
+                guard generation == seen else { return false }
+                looping = false
+                return true
+            }
+            if done { break }
+        }
+        idleExit.arm()
+    }
+
+    /// Requests that make a run stop between batches. The backfill also stops when it's no longer allowed.
+    private func shouldYield(backfill: Bool) -> Bool {
+        lock.withLock {
+            syncRequested || paused || appAway || pendingConfiguration != nil || (backfill && !backfillAllowed)
+        }
+    }
+
+    private func pass() {
+        let (newConfiguration, sync, isPaused, isAway) = lock.withLock {
+            defer { (pendingConfiguration, syncRequested) = (nil, false) }
+            return (pendingConfiguration, syncRequested, paused, appAway)
+        }
+        if let newConfiguration {
+            guard apply(newConfiguration) else { return }
+        }
+        guard let store, let indexer, let configuration else { return }
+        if isPaused || isAway {
+            indexer.closeWorker()
+            settle(isPaused ? .paused : .idle, store)
+            return
+        }
+        if sync || newConfiguration != nil {
+            guard self.sync(indexer, store) else { return }
+        }
+        if shouldYield(backfill: false) { return }
+        guard LlamaModels.complete(in: URL(fileURLWithPath: configuration.modelsFolder, isDirectory: true)) else {
+            // Nothing to embed with yet; the app asks for a sync once the download is done.
+            settle(.waitingForModel, store)
+            return
+        }
+        do {
+            if !newFiles.isEmpty {
+                try run(indexer, store, only: newFiles)
+                let yielded = shouldYield(backfill: false)
+                // New files a run stopped before stay first in line; done, anything still pending joins the backfill.
+                newFiles = yielded ? Set(try store.pending(limit: nil, only: newFiles).map(\.id)) : []
+                if yielded { return }
+            }
+            let backfill = lock.withLock { backfillAllowed }
+            if backfill, try store.pendingCount() > 0 {
+                try run(indexer, store, only: nil)
+                if shouldYield(backfill: true) { return }
+            }
+            // Once nothing is waiting: the rest of long PDFs and documents, the same way.
+            if backfill, try store.pendingCount() == 0, try store.unfinishedCount().files > 0 {
+                try finishLongFiles(indexer, store)
+                if shouldYield(backfill: true) { return }
+            }
+            settle(.idle, store)
+        } catch {
+            // The model can't run, or the index can't be written: stop until the next request, never retry here.
+            indexer.closeWorker()
+            settle(.failed(message: "\(error)"), store)
+        }
+    }
+
+    /// Opens the store and makes the indexer for a configuration, checks the model and drops files under none of the
+    /// roots. False when the index can't be opened (the status says why).
+    private func apply(_ new: LookoutIndexConfiguration) -> Bool {
+        do {
+            let folder = URL(fileURLWithPath: new.indexFolder, isDirectory: true)
+            if store?.directory.standardizedFileURL != folder.standardizedFileURL {
+                indexer?.finish()
+                (store, indexer) = (nil, nil)
+                store = try IndexStore(directory: folder)
+            }
+            guard let store else { return false }
+            if indexer == nil || configuration?.options != new.options || configuration?.modelsFolder != new.modelsFolder {
+                indexer?.finish()
+                let made = try Indexer(store: store, options: new.options) {
+                    try LlamaEmbedder(models: LlamaModels.locate(in: URL(fileURLWithPath: new.modelsFolder)),
+                                      textOnly: false, log: try? LookoutPaths.standard.logFile("index-service.log"))
+                }
+                // A new version may bring a new model: the index starts over by itself (keyword search on names
+                // goes on meanwhile).
+                made.embedderSource = LlamaEmbedder.modelInfo.vectorSource
+                made.resetOnModelChange = { [status] _, _ in status.update { $0.vectorsChangedAt = Date() } }
+                indexer = made
+            }
+            configuration = new
+            roots = new.allowedRoots
+            newFiles = []
+            try indexer?.checkModel()
+            // Folders taken out of the app leave the index; folders that are only missing right now keep their files.
+            if try store.prune(keepingUnder: roots.map(\.path)) > 0 {
+                status.update { $0.vectorsChangedAt = Date() }
+            }
+            return true
+        } catch {
+            configuration = nil
+            settle(.failed(message: "can't open the index: \(error)"), store)
+            return false
+        }
+    }
+
+    /// Crawls the roots that are there and readable, and reconciles the index. False when the sync failed (the
+    /// status says why).
+    private func sync(_ indexer: Indexer, _ store: IndexStore) -> Bool {
+        status.update {
+            $0.activity = .syncing
+            ($0.done, $0.total, $0.current) = (0, 0, nil)
+        }
+        let availability = RootAvailability.check(roots)
+        store.scope = availability.available.map(\.path)
+        status.update {
+            $0.missingRoots = availability.missing
+            $0.notPermittedRoots = availability.notPermitted
+        }
+        do {
+            let summary = try indexer.sync(availability.available)
+            if summary.queued.count <= Self.newFilesLimit { newFiles.formUnion(summary.queued) }
+            if summary.changed + summary.removed > 0 { status.update { $0.vectorsChangedAt = Date() } }
+            refreshCounts(store, force: true)
+            return true
+        } catch {
+            settle(.failed(message: "sync failed: \(error)"), store)
+            return false
+        }
+    }
+
+    private func run(_ indexer: Indexer, _ store: IndexStore, only ids: Set<Int64>?) throws {
+        let isNew = ids != nil
+        status.update { $0.activity = .indexing }
+        try indexer.run(only: ids, shouldStop: { [self] in shouldYield(backfill: !isNew) }, onEvent: { [self] event in
+            report(event.path, event.kind, event.state, done: event.done, total: event.total, store)
+        })
+    }
+
+    private func finishLongFiles(_ indexer: Indexer, _ store: IndexStore) throws {
+        status.update { $0.activity = .finishingLongFiles }
+        try indexer.finishLongFiles(shouldStop: { [self] in shouldYield(backfill: true) }, onStep: { [self] step in
+            report(step.path, step.kind, step.state, done: step.done, total: step.total, store)
+        })
+    }
+
+    /// One file read: progress, the file for the onboarding feed, and a reload hint when it got vectors.
+    private func report(_ path: String, _ kind: FileKind, _ state: String, done: Int, total: Int, _ store: IndexStore) {
+        let gotSegments = state == "done" || state == "partial"
+        status.update {
+            ($0.done, $0.total) = (done, total)
+            $0.current = .init(kind: kind, name: (path as NSString).lastPathComponent)
+            if gotSegments { $0.vectorsChangedAt = Date() }
+        }
+        refreshCounts(store, force: false)
+    }
+
+    /// Ends a pass: the activity it ended in, fresh counts, no progress.
+    private func settle(_ activity: LookoutIndexStatus.Activity, _ store: IndexStore?) {
+        if let store { refreshCounts(store, force: true) }
+        status.update {
+            $0.activity = activity
+            ($0.done, $0.total, $0.current) = (0, 0, nil)
+        }
+    }
+
+    private func refreshCounts(_ store: IndexStore, force: Bool) {
+        guard force || Date().timeIntervalSince(countsRefreshed) >= Self.countsInterval,
+              let counts = try? store.counts() else { return }
+        countsRefreshed = Date()
+        status.update { $0.counts = counts }
+    }
+}

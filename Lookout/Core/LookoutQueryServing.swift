@@ -33,4 +33,9 @@ nonisolated enum LookoutServiceNames {
     static func query(appBundleIdentifier: String) -> String {
         "\(appBundleIdentifier).LookoutQueryService"
     }
+
+    /// The index service's XPC service name, derived the same way: the app's identifier plus `.LookoutIndexService`.
+    static func index(appBundleIdentifier: String) -> String {
+        "\(appBundleIdentifier).LookoutIndexService"
+    }
 }

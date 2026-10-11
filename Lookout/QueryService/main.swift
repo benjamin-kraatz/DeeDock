@@ -16,5 +16,6 @@ final class QueryServiceDelegate: NSObject, NSXPCListenerDelegate {
 let delegate = QueryServiceDelegate()
 let listener = NSXPCListener.service()
 listener.delegate = delegate
-// Never returns: the service runs until launchd stops it.
+QueryEncoderService.shared.startIdleCountdown()
+// Never returns: the service runs until it exits when idle (`IdleExit`) or launchd stops it.
 listener.resume()
