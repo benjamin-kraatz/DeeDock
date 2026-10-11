@@ -1,0 +1,19 @@
+// Build settings shared by Lookout's XPC services, embedded in DOKK.app's Contents/XPCServices.
+//
+// They inherit App.xcconfig, so the service version always matches the app's (release prep bumps App.xcconfig only)
+// and the bundle identifier follows the app's per-configuration identity: a Debug app embeds
+// de.benjaminkraatz.DeeDock.dev.LookoutQueryService, a Release app de.benjaminkraatz.DeeDock.LookoutQueryService.
+// The app-only identity and analytics keys are reset below.
+#include "App.xcconfig"
+
+// One unconditional line is enough: $(inherited) resolves to App.xcconfig's per-configuration value first.
+// Repeating it with [config=...] would append the suffix twice.
+PRODUCT_BUNDLE_IDENTIFIER = $(inherited).$(TARGET_NAME)
+
+PRODUCT_NAME = $(TARGET_NAME)
+PRODUCT_MODULE_NAME = $(TARGET_NAME)
+INFOPLIST_KEY_CFBundleName = $(TARGET_NAME)
+INFOPLIST_KEY_CFBundleDisplayName = $(TARGET_NAME)
+INFOPLIST_KEY_DOKKAnalyticsAPIKey =
+INFOPLIST_KEY_DOKKAnalyticsHost =
+ASSETCATALOG_COMPILER_APPICON_NAME =

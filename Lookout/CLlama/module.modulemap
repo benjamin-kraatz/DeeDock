@@ -1,0 +1,19 @@
+// Adapted from DigUp (MIT, © 2026 Abdur Rahim) — https://github.com/ARahim3/DigUp
+//
+// llama.cpp's C API for Swift (`import CLlama`). scripts/build-llama.sh writes the headers and libllamacpp.a into
+// Vendor/llama (out of git); targets find this file through SWIFT_INCLUDE_PATHS and the library through
+// LIBRARY_SEARCH_PATHS. The link lines autolink the static library and what it needs: libc++ for the C++ sources,
+// Metal and MetalKit for the GPU backend, Accelerate for the BLAS backend.
+module CLlama [system] {
+    header "../../Vendor/llama/include/llama.h"
+    header "../../Vendor/llama/include/mtmd.h"
+    header "../../Vendor/llama/include/mtmd-helper.h"
+    header "../../Vendor/llama/include/llama-build.h"
+    link "llamacpp"
+    link "c++"
+    link framework "Accelerate"
+    link framework "Foundation"
+    link framework "Metal"
+    link framework "MetalKit"
+    export *
+}
