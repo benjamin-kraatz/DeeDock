@@ -161,6 +161,7 @@ private struct LauncherFileActionRow: View {
         case .openWith: .launcherFileKindApps
         case .shortcut: .launcherFileKindShortcuts
         case .copyTo, .chooseFolder: .launcherFileKindFolders
+        case .findSimilar: .launcherFileKindLookout
         }
     }
 
@@ -170,6 +171,7 @@ private struct LauncherFileActionRow: View {
         case .shortcut: .launcherFilePassToShortcut
         case .copyTo: .launcherFileCopyAction
         case .chooseFolder: .launcherFileChooseFolder
+        case .findSimilar: .launcherFileFindSimilarAction
         }
     }
 }

@@ -38,6 +38,21 @@ enum LauncherFileActionCatalog {
         }
     }
 
+    /// Find Similar, first in the list: offered only when Lookout said it can search with the batch's one file.
+    static func similarItem() -> LauncherFileActionItem {
+        LauncherFileActionItem(
+            id: .findSimilar,
+            title: String(localized: .lookoutSimilarButton),
+            subtitle: .launcherFileFindSimilarDetail,
+            symbol: "photo.badge.magnifyingglass",
+            support: .all,
+            unsupportedNames: [],
+            unavailable: false,
+            rank: -100,
+            application: nil
+        )
+    }
+
     static func matching(_ items: [LauncherFileActionItem], query: String) -> [LauncherFileActionItem] {
         let normalized = LauncherApplication.normalize(query)
         guard !normalized.isEmpty else {

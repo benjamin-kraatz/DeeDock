@@ -109,6 +109,19 @@ final class HubCoordinator {
         setup.focusSearch = { [weak self] in self?.focusSearchField() }
         setup.downloader.onProgress = { [weak files] in files?.lookoutDownloadProgress = $0 }
         lookoutSettings.presentSetup = { [weak self] in self?.presentLookoutSetup() }
+        // A file dropped on the DOKK tile: the Apps tab's file actions offer Find Similar when Lookout can search
+        // with it, and it searches in the Files tab.
+        apps.launcher.fileActions.similar = LauncherFileSimilar(
+            isAvailable: { [weak files] url in await files?.canFindSimilar(fileAt: url) ?? false },
+            run: { [weak self] url in self?.findSimilarFromFileActions(url) })
+    }
+
+    /// Find Similar in the Apps tab's file actions: the batch is done with, and the Files tab searches with the file
+    /// (its stored vector when the index holds it, else the picture read).
+    private func findSimilarFromFileActions(_ url: URL) {
+        apps.launcher.fileActions.clear()
+        selectTab(.files, via: nil)
+        files.findSimilar(fileAt: url, via: .hubTile)
     }
 
     /// Opens Lookout's onboarding over the Files tab, opening the Hub first when it's closed (Settings asks this way).

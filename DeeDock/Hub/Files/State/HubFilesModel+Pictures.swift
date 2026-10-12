@@ -142,6 +142,26 @@ extension HubFilesModel {
         return similarAvailability(for: item)
     }
 
+    /// Whether Find Similar can search with the file at `url`, which came from outside the tab (a file dropped on the
+    /// DOKK tile, offered in the Apps tab's file actions): Lookout can search, and it's a picture Lookout reads or a
+    /// file the index holds. Asks the index for a document.
+    func canFindSimilar(fileAt url: URL) async -> Bool {
+        let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey])
+        let isDirectory = values.map { $0.isDirectory == true && $0.isPackage != true } ?? url.hasDirectoryPath
+        var inIndex: Bool?
+        if LookoutSimilarAvailability.dependsOnIndex(url, isDirectory: isDirectory, options: similarOptions) {
+            inIndex = await isIndexed(url.path)
+        }
+        return LookoutSimilarAvailability.of(url, isDirectory: isDirectory, canSearch: canSearchPictures,
+                                             inIndex: inIndex, options: similarOptions).isAvailable
+    }
+
+    /// Find Similar on the file at `url` from outside the tab (`canFindSimilar(fileAt:)` said it can): its stored
+    /// vector when the index holds it, else, for a picture, the picture read like a dropped one.
+    func findSimilar(fileAt url: URL, via source: AnalyticsLookoutImageSource) {
+        searchWithPicture(.similar(url, segmentID: nil, isPicture: LookoutPictureDrop.isPictureFile(url), via: source))
+    }
+
     /// Whether the index holds a vector for the file at `path`.
     private func isIndexed(_ path: String) async -> Bool {
         await lookout.indexedPaths([path]).contains(path)

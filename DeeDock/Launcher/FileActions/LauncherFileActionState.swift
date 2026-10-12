@@ -21,6 +21,12 @@ final class LauncherFileActionState {
     @ObservationIgnored var actionsController: ActionTilesController?
     @ObservationIgnored var catalog: ApplicationCatalog?
     @ObservationIgnored var didOpen: (() -> Void)?
+    /// Lookout's Find Similar, which the Hub offers (`HubCoordinator`); nil elsewhere.
+    @ObservationIgnored var similar: LauncherFileSimilar?
+    /// The batch's one file once Lookout said it can search with it: Find Similar is listed for it.
+    private(set) var similarURL: URL?
+    /// Asks Lookout about the batch's one file; cancelled with the batch.
+    @ObservationIgnored private var similarCheck: Task<Void, Never>?
     @ObservationIgnored private var lastQuery = ""
     @ObservationIgnored private var compatibility: LauncherFileCompatibility.Snapshot?
     @ObservationIgnored private var catalogItems: [LauncherFileActionItem] = []
@@ -55,6 +61,7 @@ final class LauncherFileActionState {
     func resetForPresentation() {
         cancelWork()
         context = nil
+        similarURL = nil
         overflowed = false
         actions = []
         catalogItems = []
@@ -87,7 +94,9 @@ final class LauncherFileActionState {
         context = LauncherFileContext(generation: generation, source: adoption.source,
                                       access: adoption.access, inputs: adoption.inputs)
         compatibility = nil
+        similarURL = nil
         rebuildCatalog()
+        checkSimilar(adoption, generation: generation)
         let urls = adoption.inputs.filter(\.isAvailable).map(\.url)
         guard !urls.isEmpty else { ranking = false; return }
         ranking = true
@@ -105,6 +114,7 @@ final class LauncherFileActionState {
     func clear() {
         cancelWork()
         context = nil
+        similarURL = nil
         overflowed = false
         actions = []
         catalogItems = []
@@ -186,6 +196,12 @@ final class LauncherFileActionState {
 
     /// One deliberate activation. Hover, keyboard highlight, and repeated clicks while pending do nothing.
     func activate(_ item: LauncherFileActionItem) {
+        if case .findSimilar = item.id {
+            // Not a file operation: Lookout searches with the file in the Files tab, and reports that itself.
+            guard isActive, !status.isPending, let similarURL, let similar else { return }
+            similar.run(similarURL)
+            return
+        }
         guard isActive, !status.isPending, !ranking, actions.contains(where: { $0.id == item.id }) else { return }
         guard !item.unavailable || item.support == .mixed else { return }
         status = .pending
@@ -196,6 +212,7 @@ final class LauncherFileActionState {
             case .openWith: .application
             case .shortcut: .shortcut
             case .copyTo, .chooseFolder: .folder
+            case .findSimilar: .all   // handled above
             }
             unreportedAction = (kind, context.inputs.count, context.source,
                                 AnalyticsFileType.common(of: context.inputs.map(\.url)))
@@ -209,6 +226,8 @@ final class LauncherFileActionState {
             copy(to: id, token: token)
         case .chooseFolder:
             chooseFolder(token: token)
+        case .findSimilar:
+            break
         }
     }
 
@@ -240,9 +259,26 @@ final class LauncherFileActionState {
 
     // MARK: - Private
 
+    /// Asks Lookout whether it can search with a batch of one available file, and lists Find Similar when it can.
+    /// The answer counts only for the batch it was asked for (`generation`).
+    private func checkSimilar(_ adoption: LauncherFileAdoption, generation: UUID) {
+        similarCheck?.cancel()
+        similarCheck = nil
+        guard let similar, !adoption.overflowed, adoption.inputs.count == 1, let input = adoption.inputs.first,
+              input.isAvailable else { return }
+        let url = input.url
+        similarCheck = Task { [weak self] in
+            let available = await similar.isAvailable(url)
+            guard let self, !Task.isCancelled, available, contextGeneration == generation else { return }
+            similarURL = url
+            rebuildCatalog()
+        }
+    }
+
     private func rebuildCatalog() {
         guard let context else { catalogItems = []; actions = []; return }
-        catalogItems = LauncherFileActionCatalog.items(
+        let findSimilar = similarURL == nil ? [] : [LauncherFileActionCatalog.similarItem()]
+        catalogItems = findSimilar + LauncherFileActionCatalog.items(
             inputs: context.inputs,
             applications: catalog?.launcherLibrary.applications ?? [],
             shortcuts: actionsController?.tiles ?? [],
@@ -394,6 +430,8 @@ final class LauncherFileActionState {
         operationGeneration = UUID()
         discovery?.cancel()
         discovery = nil
+        similarCheck?.cancel()
+        similarCheck = nil
         operation?.cancel()
         operation = nil
         chooser.cancel()

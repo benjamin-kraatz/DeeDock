@@ -20409,6 +20409,24 @@
         }
       }
     },
+    "launcherFile.kindLookout" : {
+      "comment" : "File-action kind shown beside Find Similar in the Apps tab's file actions. Lookout is DOKK's search by content; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        }
+      }
+    },
     "launcherFile.noActions" : {
       "comment" : "Empty file-action list title.",
       "extractionState" : "manual",
@@ -55754,6 +55772,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sorted descending"
+          }
+        }
+      }
+    },
+    "launcherFile.findSimilarDetail" : {
+      "comment" : "Subtitle of Find Similar in the Apps tab's file actions, for one dropped picture or file Lookout has read. It switches to the Files tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sucht im Tab „Dateien“ mit dieser Datei nach ähnlichen Bildern und Dokumenten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search with this file for pictures and documents like it, in the Files tab."
+          }
+        }
+      }
+    },
+    "launcherFile.findSimilarAction" : {
+      "comment" : "Short action label for Find Similar in the Apps tab's file actions: searches with the file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
           }
         }
       }
