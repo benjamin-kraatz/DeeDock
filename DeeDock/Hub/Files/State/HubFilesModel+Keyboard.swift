@@ -53,8 +53,8 @@ extension HubFilesModel {
             return true
         case .carriageReturn, .enter:
             guard isSearching else { return false }
-            if searchSelection.isEmpty, let first = searchResults.first {
-                openSearchResult(first)
+            if searchSelection.isEmpty, lookoutSelection == nil {
+                openFirstSearchResult()
             } else {
                 openSelection()
             }
@@ -111,12 +111,18 @@ extension HubFilesModel {
 
     // MARK: Results
 
+    /// ↑/↓ walk both sections, Return opens, Space previews, and → / ← open and close Lookout's "Weaker matches"
+    /// fold, as they expand and collapse a disclosure row in Finder.
     private func handleResultsKey(_ key: NSEvent.SpecialKey?, character: String, shift: Bool,
                                   flags: NSEvent.ModifierFlags, event: NSEvent) -> Bool {
         switch key {
         case .downArrow?: moveSearchSelection(by: 1, extending: shift); return true
         case .upArrow?: moveSearchSelection(by: -1, extending: shift); return true
         case .carriageReturn?, .enter?: openSelection(); return true
+        case .rightArrow? where flags.isEmpty && !lookoutWeakExpanded && !lookoutResults.weak.isEmpty:
+            setLookoutWeakExpanded(true); return true
+        case .leftArrow? where flags.isEmpty && lookoutWeakExpanded:
+            setLookoutWeakExpanded(false); return true
         default: break
         }
         if character == " ", flags.isEmpty { toggleQuickLook(); return true }

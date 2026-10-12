@@ -1,54 +1,75 @@
 import SwiftUI
 
-/// Search results replacing the panes while the header field has a query: a scope bar, a
-/// Name / Where / Date Modified / Size header, and rows with the match highlighted.
+/// Search results replacing the panes while the header field has a query, in the mockup's Sections layout
+/// (`docs/mockups/lookout.html`): a scope bar with Lookout's status chip, then "Names · Spotlight" with the name
+/// rows, then "Lookout · by content" (`LookoutSection`).
+///
+/// Every row is a direct child of one `LazyVStack`, so the arrow keys' scroll requests reach rows in either section
+/// (`HubFilesSearchResultID`). Spotlight's rows show as soon as they arrive; Lookout fills in beneath them.
 struct HubFilesSearchResults: View {
     let model: HubFilesModel
 
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        let results = model.searchResults
         VStack(spacing: 0) {
-            HubFilesSearchScopeBar(model: model, resultCount: results.count)
-            HubFilesSearchHeader()
+            HubFilesSearchScopeBar(model: model)
+            Rectangle().fill(HubFilesTheme(scheme).line).frame(height: 0.5)
             ScrollViewReader { proxy in
                 ScrollView {
-                    LazyVStack(spacing: 0) {
-                        ForEach(results) { item in
-                            HubFilesSearchRow(model: model, item: item)
-                                .id(item.url)
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        HubFilesNameResultsSection(model: model)
+                        if model.showsLookoutSection {
+                            LookoutSection(model: model)
                         }
                     }
-                    .padding(EdgeInsets(top: 4, leading: 10, bottom: 10, trailing: 10))
-                }
-                .overlay {
-                    if results.isEmpty {
-                        Group {
-                            if model.search.isSearching && model.previewOverrides.searchResults == nil {
-                                ProgressView().controlSize(.small)
-                            } else {
-                                Text(.hubFilesNoResults)
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
-                        .allowsHitTesting(false)
-                    }
+                    .padding(EdgeInsets(top: 2, leading: 10, bottom: 14, trailing: 10))
+                    .animation(HubFilesMotion.layout, value: model.visibleLookoutHits.map(\.id))
                 }
                 .onChange(of: model.searchScrollRequest) { _, request in
                     guard let request else { return }
-                    withAnimation(HubFilesMotion.quick) { proxy.scrollTo(request.url) }
+                    withAnimation(HubFilesMotion.quick) { proxy.scrollTo(request.id) }
                 }
             }
         }
     }
 }
 
-/// "Search: This Mac | “Folder”" and the result count.
+/// "Names · Spotlight · N" and the name rows, or a spinner while Spotlight looks and "No file or folder names contain
+/// this." when it found none. Sibling views, so each row is its own lazy child of the results' stack.
+private struct HubFilesNameResultsSection: View {
+    let model: HubFilesModel
+
+    var body: some View {
+        let results = model.searchResults
+        let searching = model.search.isSearching && model.previewOverrides.searchResults == nil
+        HubFilesSearchSectionHeader(section: .names, count: searching && results.isEmpty ? nil : results.count)
+        if results.isEmpty {
+            Group {
+                if searching {
+                    ProgressView().controlSize(.small)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading, 12)
+                } else {
+                    Text(.lookoutNamesEmpty)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        ForEach(results) { item in
+            HubFilesSearchRow(model: model, item: item)
+                .id(HubFilesSearchResultID.name(item.url))
+        }
+    }
+}
+
+/// "Search: This Mac | “Folder”", and Lookout's status chip at the trailing end.
 private struct HubFilesSearchScopeBar: View {
     let model: HubFilesModel
-    let resultCount: Int
 
     var body: some View {
         HStack(spacing: 8) {
@@ -61,8 +82,10 @@ private struct HubFilesSearchScopeBar: View {
                 model.searchScope = .currentFolder
             }
             Spacer(minLength: 8)
-            Text(.hubFilesResultCount(resultCount))
-                .monospacedDigit()
+            // Always shown, "Lookout off" included, as in the mockup: it's the way to Lookout's settings.
+            LookoutStatusChip(status: model.lookoutStatus, downloadProgress: model.lookoutDownloadProgress,
+                              onSetUpLookout: { model.onSetUpLookout() },
+                              onOpenLookoutSettings: { model.onOpenLookoutSettings() })
         }
         .font(.system(size: 12.5))
         .foregroundStyle(.secondary)
@@ -97,28 +120,5 @@ private struct HubFilesScopeButton: View {
         .buttonStyle(.plain)
         .animation(HubFilesMotion.quick, value: isOn)
         .accessibilityAddTraits(isOn ? [.isButton, .isSelected] : .isButton)
-    }
-}
-
-/// The results' column titles.
-private struct HubFilesSearchHeader: View {
-    @Environment(\.colorScheme) private var scheme
-
-    var body: some View {
-        HStack(spacing: 0) {
-            Text(.hubFilesColumnName).frame(maxWidth: .infinity, alignment: .leading)
-            Text(.hubFilesColumnWhere).frame(width: HubFilesMetrics.whereColumnWidth, alignment: .leading)
-            Text(.hubFilesColumnModified).frame(width: HubFilesMetrics.modifiedColumnWidth, alignment: .leading)
-            Text(.hubFilesColumnSize).frame(width: HubFilesMetrics.sizeColumnWidth, alignment: .trailing)
-        }
-        .font(.system(size: 12))
-        .foregroundStyle(.secondary)
-        .lineLimit(1)
-        .padding(.horizontal, 8)
-        .frame(height: HubFilesMetrics.listHeaderHeight)
-        .overlay(alignment: .bottom) {
-            Rectangle().fill(HubFilesTheme(scheme).line).frame(height: 0.5)
-        }
-        .padding(.horizontal, 10)
     }
 }

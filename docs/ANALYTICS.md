@@ -242,12 +242,18 @@ launches, and reset when sent:
 | `badge_acknowledged_dock_click`, `badge_acknowledged_activation`, `badge_acknowledged_frontmost` | a new badge was acknowledged by clicking its dock tile, by bringing its app to the front another way, or by arriving while its app was already frontmost |
 | `badge_cleared_while_new` | the app removed a new badge before it was acknowledged in DOKK, for example after it was read on another device |
 | `badge_detail_shown`, `badge_detail_shown_with_banner` | a Line dock label showed a badge count, without or with the newest notification banner under it |
+| `lookout_search_with_results`, `lookout_search_without_results` | a Files search ended (the query was cleared, a result opened, or the Hub or the Files tab closed) while Lookout was on and its final results had arrived: with hits, or with the "nothing stands out" state. One per search, from the last query typed |
+| `lookout_weak_matches_expanded` | the "Weaker matches" fold under Lookout's results was opened |
 
 Magnification itself is not tracked. Its settings are.
 
 Badge counters are plain counts. They never include the badge text, the app, or the banner.
 Comparing `badge_acknowledged_dock_click` with the other acknowledgement routes across
 `dock_icon_style` shows whether the Line ring sends people to the dock.
+
+Lookout's counters and `lookout_result_opened` tune its strong/weak split (`LookoutRanking.strongRatio`, 0.5):
+opens with `section = weak` against `section = strong`, and `lookout_weak_matches_expanded` against
+`lookout_search_with_results`, show how often what people want sits inside the fold.
 
 ### Onboarding
 
@@ -330,6 +336,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `hub_file_transfer` | `kind` (`copy`, `move`), `item_count`, `cross_volume`, `outcome` (`completed`, `cancelled`, `failed`). Never names or paths. |
 | `hub_files_view_changed` | `view` (`list`, `icons`, `columns`) |
 | `hub_file_search_result_opened` | `scope` (`this_mac`, `folder`), `is_folder`. Never the query or the result. |
+| `lookout_result_opened` | `section` (`names`, `strong`, `weak`), `rank` (1-based within its section), `kind` (`screenshot`, `image`, `pdf`, `doc`, `folder`; absent for `names`), `match` (`meaning`, `words`, `both`; absent for `names`), `scope` (`this_mac`, `folder`), `is_lookup` (Lookout read the query as a code or number, so exact words counted double). Sent for every Lookout result opened and, while Lookout is on, for every name result too, beside `hub_file_search_result_opened`. Never the query, a name, a path, or a score. |
 | `hub_window_activated` | `minimized` (the window was minimized before it was brought forward). Never titles or app names. |
 
 ### Dock Modes

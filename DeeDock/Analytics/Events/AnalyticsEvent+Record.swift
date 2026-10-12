@@ -55,6 +55,7 @@ extension AnalyticsEvent {
         case .hubFileTransfer: "hub_file_transfer"
         case .hubFilesViewChanged: "hub_files_view_changed"
         case .hubFileSearchResultOpened: "hub_file_search_result_opened"
+        case .lookoutResultOpened: "lookout_result_opened"
         case .hubWindowActivated: "hub_window_activated"
         case .modeSwitched: "mode_switched"
         case .modeEdited: "mode_edited"
@@ -210,6 +211,9 @@ extension AnalyticsEvent {
             ["view": .init(view)]
         case let .hubFileSearchResultOpened(scope, isFolder):
             ["scope": .init(scope), "is_folder": .init(isFolder)]
+        case let .lookoutResultOpened(section, rank, kind, match, scope, isLookup):
+            ["section": .init(section), "rank": .init(rank), "kind": kind.map(AnalyticsValue.init),
+             "match": match.map(AnalyticsValue.init), "scope": .init(scope), "is_lookup": .init(isLookup)]
         case let .hubWindowActivated(minimized):
             ["minimized": .init(minimized)]
         case let .modeSwitched(source, modeCount):

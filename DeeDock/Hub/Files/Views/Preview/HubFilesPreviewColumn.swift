@@ -4,6 +4,7 @@ import SwiftUI
 ///
 /// One item: a Quick Look preview in a rounded well, its details, and Open, Quick Look, and
 /// Reveal in Finder. Several: a fanned stack with the count and total size. None: the folder.
+/// A Lookout hit also gets "Why it matched" under its details.
 struct HubFilesPreviewColumn: View {
     let model: HubFilesModel
 
@@ -27,6 +28,10 @@ struct HubFilesPreviewColumn: View {
                 .id(selection.map(\.url))
                 .transition(.opacity.combined(with: .scale(scale: 0.97)))
             HubFilesPreviewDetails(model: model, selection: selection)
+            if let hit = model.selectedLookoutHit {
+                LookoutWhyCard(why: LookoutWhy(hit: hit, isLookup: model.lookoutResults.isLookup))
+                    .transition(.opacity)
+            }
             if selection.count == 1 {
                 HubFilesPreviewActions(model: model)
             }
@@ -127,8 +132,13 @@ private struct HubFilesPreviewDetails: View {
         }
         let kind = item.isDirectory ? String(localized: .hubFilesKindFolder) : item.kindDescription
         let amount = item.isDirectory ? count : HubFilesFormatting.size(item.byteSize)
-        return [[kind, amount].compactMap { $0 }.joined(separator: " · "),
-                String(localized: .hubFilesPreviewModified(HubFilesFormatting.date(item.modified)))]
+        var lines = [[kind, amount].compactMap { $0 }.joined(separator: " · ")]
+        // A Lookout hit's place, as its row shows it; name results show theirs in the row's Where column.
+        if let hit = model.selectedLookoutHit { lines.insert(model.lookoutLocation(of: hit), at: 0) }
+        if !item.isDirectory || item.modified != nil {
+            lines.append(String(localized: .hubFilesPreviewModified(HubFilesFormatting.date(item.modified))))
+        }
+        return lines
     }
 }
 

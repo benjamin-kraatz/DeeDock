@@ -103,6 +103,10 @@ enum AnalyticsEvent {
                          outcome: AnalyticsHubTransferOutcome)
     case hubFilesViewChanged(AnalyticsHubFilesView)
     case hubFileSearchResultOpened(scope: AnalyticsHubSearchScope, isFolder: Bool)
+    /// A Files search result opened while Lookout was on: a Spotlight name result or a Lookout hit. `rank` is 1-based
+    /// within its section; `kind` and `match` are nil for a name result. Never the query, a name or a path.
+    case lookoutResultOpened(section: AnalyticsLookoutSection, rank: Int, kind: AnalyticsLookoutKind?,
+                             match: AnalyticsLookoutMatch?, scope: AnalyticsHubSearchScope, isLookup: Bool)
     /// A window was brought forward from the Windows tab.
     case hubWindowActivated(minimized: Bool)
 

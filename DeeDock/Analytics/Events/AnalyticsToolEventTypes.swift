@@ -187,3 +187,23 @@ nonisolated enum AnalyticsHubFilesView: String, AnalyticsToken {
 nonisolated enum AnalyticsHubSearchScope: String, AnalyticsToken {
     case thisMac = "this_mac", folder
 }
+
+/// Which part of the Files search results an opened result was in.
+nonisolated enum AnalyticsLookoutSection: String, AnalyticsToken {
+    /// Spotlight's name results.
+    case names
+    /// Lookout's strong hits, shown at once.
+    case strong
+    /// Lookout's weaker hits, inside the "Weaker matches" fold.
+    case weak
+}
+
+/// What a Lookout hit is.
+nonisolated enum AnalyticsLookoutKind: String, AnalyticsToken {
+    case screenshot, image, pdf, doc, folder
+}
+
+/// Why a Lookout hit qualified.
+nonisolated enum AnalyticsLookoutMatch: String, AnalyticsToken {
+    case meaning, words, both
+}

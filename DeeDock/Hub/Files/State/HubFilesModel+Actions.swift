@@ -16,10 +16,11 @@ extension HubFilesModel {
         }
     }
 
-    /// Opens a search result: a folder shows in the active pane and ends the search; a file opens.
+    /// Opens a name search result: a folder shows in the active pane and ends the search; a file opens.
     func openSearchResult(_ item: HubFileItem) {
-        let scope: AnalyticsHubSearchScope = searchScope == .thisMac ? .thisMac : .folder
-        Analytics.track(.hubFileSearchResultOpened(scope: scope, isFolder: item.isDirectory))
+        Analytics.track(.hubFileSearchResultOpened(scope: analyticsSearchScope, isFolder: item.isDirectory))
+        trackNameResultOpenedForLookout(item)
+        endLookoutSearchSession()
         if item.isDirectory {
             show(.folder(normalizing: item.url))
         } else {
@@ -28,8 +29,13 @@ extension HubFilesModel {
         }
     }
 
-    /// Return / ⌘↓ / Open: a single folder opens in place, files open in their apps.
+    /// Return / ⌘↓ / Open: a single folder opens in place, files open in their apps. A selected Lookout hit opens
+    /// as a Lookout result.
     func openSelection() {
+        if isSearching, let hit = selectedLookoutHit {
+            openLookoutResult(hit)
+            return
+        }
         let items = actionableItems
         guard !items.isEmpty else { return }
         if isSearching {
