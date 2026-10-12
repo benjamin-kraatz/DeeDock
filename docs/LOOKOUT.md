@@ -1,6 +1,6 @@
 # Lookout
 
-Lookout is DOKK's on-device search by content. It finds photos, screenshots, PDFs, and documents in folders you choose by what they show or say. A search for "the dog on the beach" finds the photo, whatever the file is called. Lookout lives in the Hub's Files tab. Spotlight's name matches come first, under **Names · Spotlight**, and Lookout's results follow under **Lookout · by content**. A picture can be the query too: drop or paste one into the search field, or use **Find Similar** on a result, and Lookout finds pictures that look like it and documents about what it shows ([Searching with a picture](#searching-with-a-picture)).
+Lookout is DOKK's on-device search by content. It finds photos, screenshots, PDFs, and documents in folders you choose by what they show or say. A search for "the dog on the beach" finds the photo, whatever the file is called. Lookout lives in the Hub's Files tab. Spotlight's name matches come first, under **Names · Spotlight**, and Lookout's results follow under **Lookout · by content**. A picture or a file Lookout has read can be the query too: drop or paste one into the search field, or use **Find Similar** on a result or a file in the browser, and Lookout finds pictures that look like it and documents about what it shows ([Searching with a picture](#searching-with-a-picture)).
 
 Implemented on `feature/dee-125` for [DEE-125](https://linear.app/d-zwei/issue/DEE-125). [The user guide](GUIDE.md#lookout) describes how Lookout behaves for a person, and [DOKK Hub](HUB.md#search) covers the Files search around it. The [acceptance notes](ACCEPTANCE.md#dee-125-lookout) list what still needs checking by hand. The approved design is the interactive mockup at `docs/mockups/lookout.html`, and for searching with a picture `docs/mockups/lookout-image-search.html`.
 
@@ -35,6 +35,7 @@ The app code is in `DeeDock/Hub/Files/Lookout/`.
 - `LookoutSearch` (`Search/`) waits 150 ms after the last keystroke. It then publishes keyword hits first, with the last word matched as a prefix because it is probably half typed. Once the query vector arrives, hybrid results replace them. A generation token drops results that arrive late. If the encoder fails, the final results are keyword-only.
 - `LookoutFolderWatcher` (`Monitoring/`) reports FSEvents in the chosen folders and ignores hidden files such as `.DS_Store`. The engine waits 2 s after the last change (`LookoutEngine.syncDebounce`), then asks the service to sync. `LookoutMonitor` also asks for a sync when a volume mounts or ejects and after wake. Nothing polls.
 - `LookoutPowerPolicy` (`Monitoring/`) decides when the backfill may run. See [Power policy](#power-policy).
+- `LookoutProgressTracker` (`Progress/`) turns the statuses into `LookoutEngine.progress`, where reading stands. See [Progress](#progress).
 
 The code both sides share is in `Lookout/`: `Core` holds the index, the crawl rules, the search, and the ranking. `Indexing` holds the extractors, `Embedding` wraps llama.cpp, and `IndexService`, `QueryService`, `ServiceSupport`, and `Bench` hold the two services and the bench.
 
@@ -64,7 +65,13 @@ The crawler never walks `~/Library`, so the index can't index itself.
 
 `Rules` and `IndexOptions` decide. Lookout indexes these kinds:
 
-- Documents: `txt`, `text`, `md`, `markdown`, `rtf`, `docx`, `doc`, `odt`, `html`, and `htm`.
+- Documents: `txt`, `text`, `md`, `markdown`, `rtf`, `docx`, `doc`, `odt`, `html`, `htm`, `xhtml`, `rst`, `adoc`, `asciidoc`, `org`, `textile`, `mdx`, `tex`, `latex`, `srt`, `vtt`, `webarchive`, and `rtfd`.
+  - Markup (reStructuredText, AsciiDoc, Org, Textile, MDX) is read as it's written, like Markdown.
+  - Subtitles (`srt`, `vtt`) keep only what's said: cue numbers, timings, the WebVTT header, `NOTE`, `STYLE` and `REGION` blocks, and formatting tags are left out, and each cue becomes one line.
+  - LaTeX loses its comments, its preamble, and its commands. A command's braced argument stays as words (`\section{Results}` reads "Results"), except for commands whose argument is markup or a name, such as `\usepackage`, `\label`, `\cite`, and `\includegraphics`. Lookout doesn't expand macros.
+  - A Safari web archive is a property list. Its main resource's HTML, decoded with the encoding it names, goes through the same HTML stripping as `html` files, and so does XHTML. Nothing goes through WebKit or `NSAttributedString`'s HTML import, which must run on the main thread.
+  - An `.rtfd` is a package folder. The crawler indexes the package as one document and never walks into it, also where macOS doesn't call it a package. `QueuedFileGate` reads the `TXT.rtf` inside it (see below).
+  - All of these but rtf, rtfd, docx, doc, and odt are read by `DocumentText` (`Core/`), so the app's tests reach them. The Cocoa text system reads the rest (`DocExtractor`).
 - PDFs: the text of each page. A page with fewer than 200 characters of text is embedded as a rendered image.
 - Images whose longer side is at least 256 pixels.
 - Screenshots, recognized by macOS's screen-capture attribute or by a name that starts with "Screenshot", "Screen Shot", "CleanShot", or "SCR-". Vision OCR reads their text.
@@ -73,7 +80,9 @@ Lookout skips these:
 
 - Source code and data files. Audio and video are ignored, and Spotlight still finds them by name.
 - Keys, certificates, and password files, wherever they are.
-- Hidden files and folders, bundles, and symbolic links.
+- Hidden files and folders, bundles (other than `.rtfd` documents), and symbolic links.
+- SVG, although macOS calls it a picture: ImageIO can't decode it. It's ignored like any other type Lookout doesn't handle, and not counted as a problem.
+- XML, JSON, YAML, CSV, TSV, property lists, logs, and configuration files, as data. EPUB, mail files, and Pages, Numbers, and Keynote documents aren't read either.
 - Folders such as `node_modules`, `DerivedData`, and `Pods`, folders whose names end in `.noindex`, and `~/Library`, except iCloud Drive and cloud storage folders chosen as roots.
 - iCloud and cloud storage files that aren't downloaded, because reading a placeholder downloads it.
 - Code projects, except the screenshots in them.
@@ -81,7 +90,11 @@ Lookout skips these:
 
 The backfill can read a file hours after the crawl queued it, so `QueuedFileGate` checks each file again just before it's read. The stored path must still pass the settings and the crawl's folder rules. The file must be a regular file and not a link, and `lstat` and the opened descriptor must agree. `F_GETPATH` on the descriptor gives where the open file really is, which catches a folder on the way that became a link. Any other path than the stored one must pass the same rules itself and be the queued inode. Paths are never compared by spelling, because on a case-sensitive volume `Notes` linked to its sibling `NOTES` differs only in case. The extractors read the bytes from that descriptor, never the path, so the check and the read can't race. A file whose inode changed is queued again with its new identity. A file that fails a check is skipped, and the next sync settles it.
 
+An `.rtfd` goes through the same checks as a folder on the way: the package must be a real folder and not a link, it's opened with `O_DIRECTORY | O_NOFOLLOW`, `F_GETPATH` must place it where it was found, and its inode is compared with the row's. `TXT.rtf` is then opened inside that descriptor with `openat` and `O_NOFOLLOW`, checked as a regular file with its data on this Mac, and read under the same size cap. The crawl stores the package's inode, so a save that replaces the package is a new file, and the size and date of `TXT.rtf`, so an edit in place reads as a change.
+
 The bytes are copied into memory in 8 MB reads, never memory-mapped. A mapped file that's cut shorter while it's read would crash the index service with SIGBUS, while a read just returns fewer bytes. Files over 512 MB are skipped (`QueuedFileGate.maxReadBytes`). A long PDF is read again for each step of the later pass.
+
+An index made before these types were added catches up on its next sync, which every launch and every change in the folders starts. Files Lookout ignores were never recorded, so the new types arrive as new files, and nothing already read is read again. An SVG that the old rules took for a picture, and failed to read, is no longer found by the crawl, so the sync removes it. No version number had to change.
 
 Long files are read a step at a time. A PDF over 50 pages gets its first 30 pages in the first pass, and a document gets its first 40 chunks, about 64,000 characters. The rest is read after everything else. Pages or chunks past 5,000 are left out.
 
@@ -107,9 +120,11 @@ A picture can be the query instead of words. The design is the interactive mocku
 
 ### Ways in
 
-- **Drop.** While something is dragged over the Hub with the Files tab showing, the search field widens by 90 pt into a drop well. A picture shows "Drop to search with this picture", and dropping it searches with it. Anything else shows "Lookout searches with pictures only" in orange and can't be dropped there. The Hub only watches drags, and `HubDragObserver` refuses every drop it sees, so dropping anywhere but the field does what it did before. Files moved between the tab's own panes open the well only when they're pictures. `HubFilesPictureDrag` pieces the drag together from the observer over the Hub, the field, and the tab's AppKit drop regions. It waits 150 ms between regions, so the well doesn't flicker.
+- **Drop.** While something is dragged over the Hub with the Files tab showing, the search field widens by 90 pt into a drop well. A picture shows "Drop to search with this picture", and a document the index holds shows "Drop to find files like this one". Dropping either searches with it: with its stored vector when the index holds it ("From your index · instant"), else, for a picture, the picture read (`LookoutPictureQuery.dropped`). A document of a kind Lookout reads that the index doesn't hold shows "Lookout hasn't read this file yet" in orange, and anything else "Lookout searches with pictures only". Neither can be dropped there. Whether the index holds a dragged document is one indexed query, asked when the drag enters the Hub; the well opens with the answer (`HubFilesModel.lookUpDraggedDocument`). Only a picture from outside DOKK wakes the picture reader. The Hub only watches drags, and `HubDragObserver` refuses every drop it sees, so dropping anywhere but the field does what it did before. Files moved between the tab's own panes open the well only when they can be searched with: pictures, and documents the index holds. `HubFilesPictureDrag` pieces the drag together from the observer over the Hub, the field, and the tab's AppKit drop regions. It waits 150 ms between regions, so the well doesn't flicker.
+- **The field's text.** A file dragged onto the field is never inserted as its path. While a text field edits, AppKit's field editor registers for file URLs, filenames, web URLs, and pictures, and would insert a dropped file's path before the field's drop target saw the drag. `HubPanel.makeFirstResponder` narrows the field editor's drag types to plain text, RTF, and HTML each time editing begins, so file and picture drags fall through to the SwiftUI drop targets. Plain text still drops in as text. This applies to every text field in the Hub.
 - **Paste.** ⌘V with picture bytes on the pasteboard and no text searches with them, and so does a picture file copied in Finder. Anything else pastes as text.
-- **Find Similar.** A full-width button in the preview column above Open, Quick Look, and Reveal, an item in the results' context menu, ⌘⇧L, or dragging a result row onto the field. It's hidden for folders and until Lookout can search (ready, reading files, or paused). It's disabled with "Lookout doesn't read this kind of file" for kinds Lookout doesn't index, by the crawl's own rules (`LookoutSimilarAvailability`). It works on name results, Lookout results, and the results of a search with a picture, so searches chain. A document the index doesn't hold has nothing to search with, so the button hides once the reader says so (`LookoutIndexSearching.indexedPaths`).
+- **Find Similar.** A full-width button in the preview column above Open, Quick Look, and Reveal, an item in the context menu, ⌘⇧L, or dragging a search result onto the field. It works on one selected file, in search results and in the browser alike. It's hidden for folders and until Lookout can search (ready, reading files, or paused). It's disabled with "Lookout doesn't read this kind of file" for kinds Lookout doesn't index, by the crawl's own rules (`LookoutSimilarAvailability`). A document the index doesn't hold has nothing to search with, so it's disabled with "Lookout hasn't read this file yet" once the reader says so (`LookoutIndexSearching.indexedPaths`). The reader is asked when the file is selected; a file it doesn't hold is asked about again the next time, because the backfill may have read it since. A picture the index doesn't hold is read like a dropped one. Find Similar works on name results, Lookout results, the results of a search with a picture, so searches chain, and files in the browser, where there were no words, so the results bar has no "Back to".
+- **The DOKK tile.** A file dropped on the DOKK tile (or the open Apps tab) opens the Apps tab's file actions. When exactly one file was dropped and Lookout can search with it, a picture Lookout reads or a file the index holds, **Find Similar** comes first in the list, with the same glyph (`LauncherFileSimilar`, wired by `HubCoordinator`). The file actions ask Lookout once per batch. Choosing it ends the batch, switches to the Files tab, and searches with the file as Find Similar does.
 
 The picture becomes a chip in the field: its thumbnail, its name or "Pasted picture", and ✕. ⌫ in the empty field, ✕, and "Back to “…”" in the results bar remove it and bring back the words searched before it. The clear button and Escape remove both. Typing replaces the picture with a search by words. Find Similar on a result of a picture search replaces the picture and keeps the earlier words (`LookoutPictureSession`).
 
@@ -130,6 +145,29 @@ The query's own kind comes first. An image vector is a picture query, and that i
 ### Words in a dropped screenshot
 
 Not built. Lookout reads the text in screenshots when it indexes them, and the plan was to read a dropped screenshot's text too and match its codes and long numbers as exact words. Vision keeps about 100 MB cached in whatever process runs it. That would be either DOKK.app or the query service, which already holds about 900 MB with the encoder. It would also add 0.1–0.25 s to a picture query. And word matches don't fit the two groups, which rank by meaning alone, or their chips and sentences. Combining a picture with words is Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)).
+
+## Progress
+
+`LookoutEngine.progress` says where reading stands, for Settings and anything else that shows progress. `LookoutSettingsModel.progress` passes it through, with a preview override. It's nil while Lookout isn't set up or is off. The view that shows it is designed separately; the data is complete.
+
+| Field | Meaning |
+| --- | --- |
+| `phase` | `counting` (walking the folders), `reading`, `upToDate`, `paused(reason)` (`lowPowerMode`, `warm`, `onBattery`, `user`), `waitingForDrive(name:)`, `waitingForModel`, `failed(LookoutFailure)` |
+| `done`, `total` | Files of the current pass read or otherwise settled, and the files it reads. Up to date, both are every file the index knows. |
+| `totalIsFinal` | False while the walk is still counting: the total may grow. |
+| `remaining` | Files waiting, plus long files part read. Nil while the first walk counts. |
+| `filesPerSecond` | The smoothed pace while reading files. Nil while it's too early, and while long files finish, which go by pages. |
+| `estimatedRemaining` | About how long the files waiting take at that pace, or the pages and chunks left while long files finish. Nil when it can't be said honestly. |
+| `kinds` | Read of known, by `FileKind`, for kinds with files. |
+| `lastCompleted` | When the index was last up to date, also from before DOKK started. |
+| `skipped`, `failed`, `problems` | Files Lookout tried and skipped or couldn't read, and both by `LookoutProblemReason`, most first. |
+
+- **Phases.** Failures, the model, and pauses come from the engine's status (`LookoutStatus`). The rest come from the service's activity: `syncing` is counting, reading files or finishing long files is reading, and idle is up to date, or waiting for a drive while a chosen folder isn't there. The drive's name is the volume's (`/Volumes/Photos/…` → "Photos"), or the folder's.
+- **The pass.** A pass starts when files wait while none did, and counts only its own files. An index that has never been up to date is still in its first pass, which counts from the start, also after DOKK relaunched partway. During the first walk, the total is how many files the walk has found so far: the crawler reports every 250 (`Crawler.foundReportInterval`), and the status carries it as `discovered`. Files queued during a pass make its total grow; files removed can't make it go backwards.
+- **The pace.** `LookoutRateEstimator` takes the plain average for the first 10 s and 5 files and reports nothing meanwhile. After that it moves toward each new sample's pace by `1 − e^(−Δt/30 s)`, an exponential average weighted by how long each sample covers, so eight images committed at once don't count more than the seconds they took. A pause, a walk, or any other phase that isn't reading forgets the last sample, so the gap never counts as slow reading, and the pace carries on when reading resumes. The time left uses the pending files only; the later pages of long files follow at their own pace and get their own estimate once that pass runs.
+- **Publishing.** The engine feeds the tracker every status the service sends, so the pace sees every step, but `progress` changes at most every 500 ms (`LookoutEngine.progressInterval`) within one phase. A phase change shows at once. A trailing publish, the one owned task, makes sure the last status always shows, and `stop()` cancels it. Nothing polls.
+- **The service's part.** `LookoutIndexStatus` carries `discovered` and `upToDateAt`, and `IndexStore.Counts.problems`. The service records the time the index was last up to date in the index's `meta` table (`up_to_date_at`) whenever it settles idle with nothing waiting, and sends its counts as soon as a configuration opens the index, before the walk. Problems are counted in SQL by the start of each file's stored reason (`LookoutProblemReason.rules`), so reasons that differ per file, such as "small image 120×90", come back as one row. The stored reasons can name a file and never leave the index.
+- **Previews.** `LookoutProgressPreviewData` (`Progress/`) holds eight deterministic states: still counting, running early, running with an estimate, paused for Low Power Mode, waiting for a drive, up to date, up to date with problems, and reading stopped. `LookoutProblemReason.title` has each reason's words.
 
 ## Power policy
 
@@ -288,6 +326,9 @@ The estimates in onboarding use DigUp's per-file costs, measured on an M4 Pro (`
 - Audio, video, and code are not indexed. Indexing them is Planned.
 - Combining a picture with words in one search is Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)), and so is reading the words in a dropped screenshot.
 - Searching with a picture has not been exercised hands-on: real drags from Finder, browsers, and Photos, pasting, the drop well, the query service's encoder loading inside DOKK.app, and its idle exit. A Photos drag that carries only a file promise isn't read.
+- Find Similar in the browser and from the DOKK tile, dropping indexed documents on the field, and the field no longer inserting a dragged file's path have not been exercised hands-on. A picture dragged out of a browser that also carries its address as plain text may still insert that address while the field is being edited: it's text to the field editor.
+- The new document types have been read only in tests, on made-up files. Real LaTeX with heavy macros, subtitles with unusual cue settings, and web archives from other browsers than Safari may read less cleanly.
+- The progress model has no view yet; a separate design pass builds it.
 - The engine can pause reading, but no control offers it yet.
 - Settings has no controls for skipped subfolders or file types yet.
 - Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending with Esi.

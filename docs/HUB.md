@@ -17,7 +17,8 @@ Apps and Windows open with focus in the search field. Opening the Hub closes fol
 Shelf and other dock popovers, Window Peek, the Dock Mode picker, drive cards, and Focus Dock.
 
 Drop files on the DOKK tile or on the open Apps tab, or choose **Use in Launcher** from a Shelf
-selection, to open the Apps tab in file-action mode. The Windows tab does not accept drops. **Open in Hub** on a folder stack, the Downloads stack, or a drive opens the
+selection, to open the Apps tab in file-action mode. For one picture, or one file Lookout has read,
+the file actions start with **Find Similar**, which searches with it in the Files tab. The Windows tab does not accept drops. **Open in Hub** on a folder stack, the Downloads stack, or a drive opens the
 Files tab on that folder. See [Open in Hub](#open-in-hub).
 
 ### Anchored and detached
@@ -237,9 +238,13 @@ already work. After setup, the chip opens **Settings → Lookout**. When Lookout
 turned off, the section is hidden. See [Lookout](GUIDE.md#lookout) for setup and settings.
 
 To search with a picture, drop one on the search field, paste one with ⌘V, or use **Find Similar**
-on a result: the button in the preview column, the context menu, ⇧⌘L, or dragging the row onto the
-field. While something is dragged over the Hub, the field widens into a drop well that says
-"Drop to search with this picture", or "Lookout searches with pictures only" for anything else.
+on a result or on a file while browsing: the button in the preview column, the context menu, ⇧⌘L,
+or dragging a result onto the field. A PDF or document Lookout has read can be dropped on the field
+too, and searches with what Lookout stored for it. While something is dragged over the Hub, the
+field widens into a drop well that says "Drop to search with this picture", "Drop to find files
+like this one" for a document Lookout has read, "Lookout hasn't read this file yet" for one it
+hasn't, or "Lookout searches with pictures only" for anything else. A dragged file is never typed
+into the field as its path.
 Only the field takes the drop. Every other drop target behaves as before. The picture shows as a
 chip in the field. The results start with a bar that shows the picture and how it was read. There's
 no names section. Lookout's matches come in two groups, **Looks like it** and **About what it
@@ -256,8 +261,8 @@ results out of both sections, and folder results accept drops.
 ### Context menu and keyboard
 
 Right-click an item for **Open**, **Quick Look**, **Reveal in Finder**, **Copy Path**, **Rename**,
-**New Folder**, and **Move to Trash**. A search result also offers **Find Similar** once Lookout
-is set up. Right-click empty space for **New Folder**,
+**New Folder**, and **Move to Trash**. A single file, in search results or in the browser, also
+offers **Find Similar** while Lookout can search. Right-click empty space for **New Folder**,
 **Reveal in Finder**, and **Copy Path** for the current folder. **Copy Path** copies plain text, one
 path per line. **Reveal in Finder** opens Finder with the item selected and closes an anchored Hub.
 
@@ -277,7 +282,7 @@ path per line. **Reveal in Finder** opens Finder with the item selected and clos
 | Tab, Shift-Tab | Switch the active pane |
 | Arrow keys | Move the selection. Shift extends it. |
 | ⌘V with a picture copied | Search with the picture (search results and listing alike) |
-| ⇧⌘L | Find Similar on the selected search result |
+| ⇧⌘L | Find Similar on the selected search result or file |
 | ⌫ in the empty search field | Remove the picture searched with and bring back the earlier words |
 
 In Columns, Left opens the parent folder and Right opens the selected folder. Command-click
@@ -301,8 +306,10 @@ DOKK follows Finder's rule. A drop on the same volume moves the items, and a dro
 copies them. Hold Option to copy on the same volume. When another app offers only a copy, DOKK
 copies.
 
-Dropping a picture on the header's search field searches with it, and dragging a search result
-onto the field runs Find Similar on it (see [Search](#search)). The field takes nothing else.
+Dropping a picture, or a document Lookout has read, on the header's search field searches with it,
+and dragging a search result onto the field runs Find Similar on it (see [Search](#search)).
+Moving such a file between panes opens the field's drop well too; moving anything else doesn't. The
+field takes no other file, and never inserts a file's path as text. Plain text still drops in.
 
 Hold a drag over a folder, a sidebar place, or a browser tab to spring-load it. The folder opens,
 or the tab is selected, after the system spring-loading delay.

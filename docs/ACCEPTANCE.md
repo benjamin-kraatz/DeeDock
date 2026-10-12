@@ -146,8 +146,9 @@ None of these scenarios has been exercised.
   file copied in Finder, then text: only the text pastes as text.
 - [ ] Find Similar from the preview button, the context menu, ⇧⌘L, and by dragging a result onto
   the field, on a picture, a screenshot, a PDF page hit (the bar names the page), a document, and a
-  name result outside the chosen folders (a picture is read, a document has no button). Folders have
-  no button, and a ZIP shows **Lookout doesn't read this kind of file**.
+  name result outside the chosen folders (a picture is read, a document's button is disabled with
+  **Lookout hasn't read this file yet**). Folders have no button, and a ZIP shows **Lookout doesn't
+  read this kind of file**.
 - [ ] Chaining: Find Similar on a result of a picture search, then ⌫ goes back to the first words.
 - [ ] Chip: ⌫ in the empty field and ✕ bring back the earlier words; **Back to “…”** does the
   same; the clear button and Escape clear everything; typing starts a search by words.
@@ -165,8 +166,62 @@ None of these scenarios has been exercised.
 - [ ] Analytics in the debug log: `lookout_image_search` with each source and `cold`, and
   `query: image` on `lookout_result_opened`, never a name or a path.
 
+### Find Similar everywhere, more document types, and progress data
+
+Implemented on `feature/dee-125`: Find Similar in the Files browser, dropping documents the index
+holds on the search field, the field no longer inserting a dragged file's path, Find Similar in the
+Apps tab's file actions after a drop on the DOKK tile, the document types `rst`, `adoc`, `asciidoc`,
+`org`, `tex`, `latex`, `textile`, `xhtml`, `mdx`, `srt`, `vtt`, `webarchive`, and `rtfd` with SVG
+ignored, and `LookoutEngine.progress`. See [Lookout](LOOKOUT.md#ways-in),
+[What gets read](LOOKOUT.md#what-gets-read), and [Progress](LOOKOUT.md#progress).
+
+Validation on 2026-10-12: the DeeDock scheme builds with the services, and the 262 Lookout tests in
+35 suites pass, including new suites for the document types (rules, the `.rtfd` crawl and gate,
+subtitles, LaTeX, web archives, and an existing index's next sync), Find Similar's new ways in (the
+browser, the Apps tab's file actions, and the Hub's field editor refusing file drags), and the
+progress model (the pace, the phases, passes, the first walk's growing total, the problem counts in
+SQL, and the engine's throttle). Nothing was seen on screen, previews were not rendered, and the app
+was not exercised by hand.
+
+None of these scenarios has been exercised.
+
+- [ ] Drag a file from the Files tab and from Finder onto the search field while it's being edited
+  and while it isn't: no path appears in the field. Drag plain text from TextEdit: it still drops in
+  as text. Rename a file in the Files tab and drag a file onto the rename field: no path appears.
+- [ ] Drop on the field a picture in the index (the bar says **From your index · instant**), a
+  picture outside it (it's read), a PDF and a Markdown file in the index (**Drop to find files like
+  this one**, then the document groups), a PDF outside the chosen folders (**Lookout hasn't read
+  this file yet**, refused), and a ZIP (**Lookout searches with pictures only**, refused).
+- [ ] Move an indexed PDF between panes: the well opens and the move still works. Move an
+  unindexed text file: no well. Check the query service's memory doesn't grow for document drags.
+- [ ] Browser Find Similar: select a photo, a screenshot, a PDF, and a document in the list, icons,
+  and columns views, and use the button, the context menu, and ⇧⌘L. The Files tab switches to the
+  picture search with the chip, the bar, and the groups, with no **Back to**. A document outside the
+  index shows the disabled button with its reason; a folder has none; before setup there's none.
+- [ ] The browsing preview column with Find Similar: Open, Quick Look, and Reveal stay visible under
+  a long, three-line name; the well shrinks first.
+- [ ] Drop one photo on the DOKK tile: **Find Similar** is first in the file actions, with the
+  glyph, and choosing it opens the Files tab's picture search. Drop two files, a ZIP, and an
+  unindexed PDF: no Find Similar. Drop with Lookout off: none.
+- [ ] Put a `.rst`, `.adoc`, `.org`, `.tex`, `.textile`, `.xhtml`, `.mdx`, `.srt`, `.vtt`,
+  `.webarchive` (saved from Safari), and `.rtfd` (saved from TextEdit with a picture) in a chosen
+  folder. Each becomes searchable by its words, the subtitles without timings, the LaTeX without
+  commands. Edit the `.rtfd` in TextEdit and check it's read again.
+- [ ] On an index made before this change: the next sync picks up the new types without reading
+  anything else again, and an SVG that failed before leaves the index and its problem count.
+- [ ] Progress in a debugger or a temporary view (none ships yet): the first pass shows
+  `counting` with a total that grows, then `reading` with a final total, a pace after about 10 s,
+  and a time left that settles; Low Power Mode shows `paused(lowPowerMode)` and resuming keeps the
+  pace; unplugging a chosen drive shows `waitingForDrive` with its name; quitting and relaunching
+  partway keeps the first pass counting from the start; `lastCompleted` survives a relaunch.
+- [ ] Analytics in the debug log: `lookout_image_search` with `source` `browser`, `hub_tile`, and
+  `drop` for a dropped document, and `cold: false` for every stored vector.
+
 ### Known gaps from code review
 
+- A picture dragged out of a browser that also carries its address as plain text may still insert
+  the address while the field is being edited, because it's text to the field editor.
+- The progress model has no view yet; a separate design pass builds it.
 - Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending
   with Esi.
 - Audio, video, and code are Planned. Combining a picture with words, and reading the words in a

@@ -345,7 +345,7 @@ See [app suggestions](LAUNCHER-SUGGESTIONS.md) for the 90-day retention policy a
 
 ## Lookout
 
-Lookout finds files by what's in them. Describe a photo, a screenshot, or a passage in your own words, and Lookout finds it in the Hub's Files search, whatever the file is called. It reads documents, PDFs, images, and screenshots in the folders you choose, in more than 100 languages, on this Mac. Lookout is off until you set it up. See [Lookout](LOOKOUT.md) for how it is built, and the [acceptance notes](ACCEPTANCE.md#dee-125-lookout) for what has been checked.
+Lookout finds files by what's in them. Describe a photo, a screenshot, or a passage in your own words, and Lookout finds it in the Hub's Files search, whatever the file is called. It reads documents, PDFs, images, and screenshots in the folders you choose, in more than 100 languages, on this Mac. Documents include text and Markdown files, Word, OpenDocument, and RTF documents (also with pictures, `.rtfd`), web pages and Safari web archives, AsciiDoc, reStructuredText, Org, Textile, and LaTeX files, and subtitles (`.srt`, `.vtt`), of which Lookout reads only what's said. SVG files, data files such as XML or JSON, code, EPUB, and Pages, Numbers, and Keynote documents aren't read. Lookout is off until you set it up. See [Lookout](LOOKOUT.md) for how it is built, and the [acceptance notes](ACCEPTANCE.md#dee-125-lookout) for what has been checked.
 
 ### Set up Lookout
 
@@ -389,9 +389,10 @@ Select a Lookout result to see **Why it matched** in the preview column, such as
 
 You can search with a picture instead of words:
 
-- Drag a picture over the Hub. The search field opens up and says **Drop to search with this picture**. Drop the picture on it. Anything that isn't a picture shows **Lookout searches with pictures only** and can't be dropped there.
+- Drag a picture over the Hub. The search field opens up and says **Drop to search with this picture**. Drop the picture on it. A PDF or document Lookout has read works too, and says **Drop to find files like this one**. One Lookout hasn't read says **Lookout hasn't read this file yet**, and anything else **Lookout searches with pictures only**; neither can be dropped there. Dropping a file on the search field never types its path into it.
 - Copy a picture, or take a screenshot to the clipboard with ⌃⇧⌘4, then press ⌘V in the Files tab.
-- Select a search result and click **Find Similar** in the preview column, choose it from the context menu, or press ⇧⌘L. You can also drag a result onto the search field. Find Similar doesn't appear for folders, and kinds of file Lookout doesn't read say so.
+- Select a search result, or a file while you browse, and click **Find Similar** in the preview column, choose it from the context menu, or press ⇧⌘L. You can also drag a result onto the search field. Find Similar doesn't appear for folders. Kinds of file Lookout doesn't read say so, and so does a document Lookout hasn't read yet.
+- Drop one picture, or one file Lookout has read, on the DOKK tile. The Apps tab lists **Find Similar** first among the file actions. Choose it to search with the file in the Files tab.
 
 The picture shows as a chip in the search field. Above the results, a bar shows the picture and how Lookout read it, such as **New picture · read in 0.4 s · not saved**, or **From your index · instant** for Find Similar on a file Lookout already read. The first picture after a while takes about a second, while Lookout wakes its picture reader. Lookout reads the picture on this Mac and never saves it.
 
