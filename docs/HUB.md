@@ -97,8 +97,8 @@ while a tab's content has focus moves it into the search field.
 Each press of Escape does the first of these that applies:
 
 1. The visible tab handles it. Apps cancels Robi, then drops the arrow-key selection. Files closes
-   Lookout's onboarding card, closes Quick Look, or cancels a rename. Windows has no Escape step of
-   its own.
+   Lookout's onboarding card, closes Quick Look, cancels a rename, or clears a search with a picture
+   (the picture and the words). Windows has no Escape step of its own.
 2. The Hub clears the visible tab's search.
 3. An anchored Hub without a hold closes.
 
@@ -236,6 +236,17 @@ While the model downloads, the section shows a download card with a progress bar
 already work. After setup, the chip opens **Settings → Lookout**. When Lookout has been set up and
 turned off, the section is hidden. See [Lookout](GUIDE.md#lookout) for setup and settings.
 
+To search with a picture, drop one on the search field, paste one with ⌘V, or use **Find Similar**
+on a result: the button in the preview column, the context menu, ⇧⌘L, or dragging the row onto the
+field. While something is dragged over the Hub, the field widens into a drop well that says
+"Drop to search with this picture", or "Lookout searches with pictures only" for anything else.
+Only the field takes the drop. Every other drop target behaves as before. The picture shows as a
+chip in the field. The results start with a bar that shows the picture and how it was read. There's
+no names section. Lookout's matches come in two groups, **Looks like it** and **About what it
+shows**, each with its own **Weaker matches** fold. A document gets **Says something similar** and
+**Pictures of it** instead. ⌫ in the empty field or ✕ on the chip removes the picture and brings back the earlier
+words, and typing starts a new search by words. See [Searching with a picture](GUIDE.md#search-with-a-picture).
+
 Down moves from the search field into the results, through the names, then Lookout's hits, then
 the weaker hits while their fold is open. Right and Left open and close the fold. Return opens the
 selected result, or the first one when nothing is selected. Space opens Quick Look. A folder
@@ -245,7 +256,8 @@ results out of both sections, and folder results accept drops.
 ### Context menu and keyboard
 
 Right-click an item for **Open**, **Quick Look**, **Reveal in Finder**, **Copy Path**, **Rename**,
-**New Folder**, and **Move to Trash**. Right-click empty space for **New Folder**,
+**New Folder**, and **Move to Trash**. A search result also offers **Find Similar** once Lookout
+is set up. Right-click empty space for **New Folder**,
 **Reveal in Finder**, and **Copy Path** for the current folder. **Copy Path** copies plain text, one
 path per line. **Reveal in Finder** opens Finder with the item selected and closes an anchored Hub.
 
@@ -264,6 +276,9 @@ path per line. **Reveal in Finder** opens Finder with the item selected and clos
 | ⌥⌘S | Split View |
 | Tab, Shift-Tab | Switch the active pane |
 | Arrow keys | Move the selection. Shift extends it. |
+| ⌘V with a picture copied | Search with the picture (search results and listing alike) |
+| ⇧⌘L | Find Similar on the selected search result |
+| ⌫ in the empty search field | Remove the picture searched with and bring back the earlier words |
 
 In Columns, Left opens the parent folder and Right opens the selected folder. Command-click
 toggles an item and Shift-click extends the selection.
@@ -274,7 +289,7 @@ away saves, and Escape cancels. Empty names, names with `/` or `:`, and names al
 an alert. Move to Trash uses the system Trash, so Finder's **Put Back** works. It asks for no
 confirmation and the Files tab has no Undo.
 
-The Files tab has no Copy, Paste, or Duplicate commands. To copy, drag with Option.
+The Files tab has no Copy, Paste, or Duplicate commands for files. To copy, drag with Option.
 
 ### Drag and drop
 
@@ -285,6 +300,9 @@ Dropping items into the folder they are already in does nothing.
 DOKK follows Finder's rule. A drop on the same volume moves the items, and a drop on another volume
 copies them. Hold Option to copy on the same volume. When another app offers only a copy, DOKK
 copies.
+
+Dropping a picture on the header's search field searches with it, and dragging a search result
+onto the field runs Find Similar on it (see [Search](#search)). The field takes nothing else.
 
 Hold a drag over a folder, a sidebar place, or a browser tab to spring-load it. The folder opens,
 or the tab is selected, after the system spring-loading delay.
@@ -339,7 +357,10 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
   Drive rows offer Eject. Browser tabs offer Close Tab.
 - Reduce Motion: the Hub fades in and out without scaling or moving. The tab switch fades without
   sliding, and the selection pill moves without animation. Hover lifts, entrance staggers, and the
-  tile's halo rotation stop.
+  tile's halo rotation stop. The search field's drop well doesn't pulse, and the picture chip and
+  the results fade in instead of springing.
+- The picture chip has a VoiceOver label with the picture's name and a Remove action. The results
+  bar, Find Similar, and the closeness meter have labels, and Find Similar is a row action.
 - Reduce Transparency: the Hub draws an opaque background instead of Liquid Glass.
 
 ## Known limitations
@@ -347,7 +368,8 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
 - Name search finds only items in the Spotlight index. Folders excluded from Spotlight, unindexed
   volumes, and some network shares return nothing, and the tab does not say why.
 - Lookout searches only the folders chosen for it, and only documents, PDFs, images, and
-  screenshots. Audio, video, code, and searching with an image are Planned. Its onboarding, macOS's
+  screenshots. Audio, video, code, and combining a picture with words are Planned. Searching with a
+  picture has not been exercised by hand. Its onboarding, macOS's
   folder prompts, and the model download have not been exercised by hand. See
   [Lookout](LOOKOUT.md#known-limitations).
 - The Windows tab sees only the current Space, apart from minimized windows and hidden apps.

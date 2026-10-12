@@ -1,8 +1,8 @@
 # Lookout
 
-Lookout is DOKK's on-device search by content. It finds photos, screenshots, PDFs, and documents in folders you choose by what they show or say. A search for "the dog on the beach" finds the photo, whatever the file is called. Lookout lives in the Hub's Files tab. Spotlight's name matches come first, under **Names · Spotlight**, and Lookout's results follow under **Lookout · by content**.
+Lookout is DOKK's on-device search by content. It finds photos, screenshots, PDFs, and documents in folders you choose by what they show or say. A search for "the dog on the beach" finds the photo, whatever the file is called. Lookout lives in the Hub's Files tab. Spotlight's name matches come first, under **Names · Spotlight**, and Lookout's results follow under **Lookout · by content**. A picture can be the query too: drop or paste one into the search field, or use **Find Similar** on a result, and Lookout finds pictures that look like it and documents about what it shows ([Searching with a picture](#searching-with-a-picture)).
 
-Implemented on `feature/dee-125` for [DEE-125](https://linear.app/d-zwei/issue/DEE-125). [The user guide](GUIDE.md#lookout) describes how Lookout behaves for a person, and [DOKK Hub](HUB.md#search) covers the Files search around it. The [acceptance notes](ACCEPTANCE.md#dee-125-lookout) list what still needs checking by hand. The approved design is the interactive mockup at `docs/mockups/lookout.html`.
+Implemented on `feature/dee-125` for [DEE-125](https://linear.app/d-zwei/issue/DEE-125). [The user guide](GUIDE.md#lookout) describes how Lookout behaves for a person, and [DOKK Hub](HUB.md#search) covers the Files search around it. The [acceptance notes](ACCEPTANCE.md#dee-125-lookout) list what still needs checking by hand. The approved design is the interactive mockup at `docs/mockups/lookout.html`, and for searching with a picture `docs/mockups/lookout-image-search.html`.
 
 Lookout adapts the indexer, the crawl rules, and the ranking of [DigUp](https://github.com/ARahim3/DigUp) (MIT, © 2026 Abdur Rahim). Adapted files say so in their first line.
 
@@ -13,7 +13,7 @@ Lookout runs in three processes. DOKK.app embeds two XPC services in its bundle,
 | Process | Job | Memory | Lifetime |
 | --- | --- | --- | --- |
 | `LookoutIndexService` | The index's only writer. Syncs the chosen folders, extracts text, runs Vision OCR, and embeds with the full model at utility QoS. | About 1 GB while it works | Waits about 60 s with the model loaded after it runs out of work, then exits. The next message relaunches it. |
-| `LookoutQueryService` | Embeds search queries with the text model only, at user-initiated QoS. | 215 MB | Loads the model on its first call and exits 120 s after its last call. |
+| `LookoutQueryService` | Embeds search queries with the text model at user-initiated QoS, and pictures with the image encoder, which it loads into the same model only for the first search with a picture. | 215 MB, or about 900 MB once a picture was searched with | Loads the text model on its first call and exits 120 s after its last call, which releases the image encoder too. |
 | DOKK.app | Reads the index, ranks results, and shows them. | The vectors, about 30 MB per 20,000 | The app's lifetime |
 
 The services never ask for folder access. The index service skips a chosen folder it can't read and reports it as not permitted. It also skips a folder that isn't there, such as one on an unplugged drive, and keeps what it already indexed from it. Searches show none of those files meanwhile, because a file that isn't there can't be opened, previewed, or dragged (`LookoutSearchFilter.requireExisting`). They come back when the drive does, with nothing to read again. The service checks this before every sync, so an ejected drive never looks like a folder whose files were deleted.
@@ -31,6 +31,7 @@ The app code is in `DeeDock/Hub/Files/Lookout/`.
 - `LookoutEngine` (`Engine/`) puts the parts together. `HubCoordinator` creates one engine for the app's lifetime, and `DockCoordinator` starts it. It runs whether or not the Hub is open, so new files get indexed. It owns both XPC connections, the folder watcher, the mount and wake monitor, and the power policy. It saves `LookoutSettings` as JSON under the `hub.lookout.v1` defaults key and publishes `LookoutStatus` for the status chip and Settings. Under the test host and in previews, `LookoutEngine.live()` returns an inert engine that never starts.
 - `LookoutIndexConnection` (`Services/`) sends the configuration, and a pause, again to a relaunched index service.
 - `LookoutIndexReader` (`Search/`) is an actor that owns a read-only `IndexStore` and its `Searcher`. SQLite's write-ahead log lets it read while the service writes, so a search never waits for indexing. Vectors load on the first meaning search or when the Files tab appears. While the service adds vectors, the reader reloads them at most every 2 s. They are released 120 s after the Files tab hides or the Hub closes (`LookoutEngine.vectorReleaseDelay`).
+- `LookoutPictureSearch` (`Search/`) searches with a picture or with a file's stored vector. See [Searching with a picture](#searching-with-a-picture).
 - `LookoutSearch` (`Search/`) waits 150 ms after the last keystroke. It then publishes keyword hits first, with the last word matched as a prefix because it is probably half typed. Once the query vector arrives, hybrid results replace them. A generation token drops results that arrive late. If the encoder fails, the final results are keyword-only.
 - `LookoutFolderWatcher` (`Monitoring/`) reports FSEvents in the chosen folders and ignores hidden files such as `.DS_Store`. The engine waits 2 s after the last change (`LookoutEngine.syncDebounce`), then asks the service to sync. `LookoutMonitor` also asks for a sync when a volume mounts or ejects and after wake. Nothing polls.
 - `LookoutPowerPolicy` (`Monitoring/`) decides when the backfill may run. See [Power policy](#power-policy).
@@ -99,6 +100,36 @@ Requiring a meaning match to stand out gives Lookout an honest empty state. When
 Each hit records whether meaning, words, or both matched, and which segment it points at: a PDF page, a passage, a picture, or a screenshot. The preview column's **Why it matched** card turns that into one sentence, such as "Page 7 matched by meaning." For a lookup, the card says exact words count double.
 
 `Searcher` can also filter by file kind, but the Files tab doesn't offer that filter yet.
+
+## Searching with a picture
+
+A picture can be the query instead of words. The design is the interactive mockup at `docs/mockups/lookout-image-search.html`.
+
+### Ways in
+
+- **Drop.** While something is dragged over the Hub with the Files tab showing, the search field widens by 90 pt into a drop well. A picture shows "Drop to search with this picture", and dropping it searches with it. Anything else shows "Lookout searches with pictures only" in orange and can't be dropped there. The Hub only watches drags, and `HubDragObserver` refuses every drop it sees, so dropping anywhere but the field does what it did before. Files moved between the tab's own panes open the well only when they're pictures. `HubFilesPictureDrag` pieces the drag together from the observer over the Hub, the field, and the tab's AppKit drop regions. It waits 150 ms between regions, so the well doesn't flicker.
+- **Paste.** ⌘V with picture bytes on the pasteboard and no text searches with them, and so does a picture file copied in Finder. Anything else pastes as text.
+- **Find Similar.** A full-width button in the preview column above Open, Quick Look, and Reveal, an item in the results' context menu, ⌘⇧L, or dragging a result row onto the field. It's hidden for folders and until Lookout can search (ready, reading files, or paused). It's disabled with "Lookout doesn't read this kind of file" for kinds Lookout doesn't index, by the crawl's own rules (`LookoutSimilarAvailability`). It works on name results, Lookout results, and the results of a search with a picture, so searches chain. A document the index doesn't hold has nothing to search with, so the button hides once the reader says so (`LookoutIndexSearching.indexedPaths`).
+
+The picture becomes a chip in the field: its thumbnail, its name or "Pasted picture", and ✕. ⌫ in the empty field, ✕, and "Back to “…”" in the results bar remove it and bring back the words searched before it. The clear button and Escape remove both. Typing replaces the picture with a search by words. Find Similar on a result of a picture search replaces the picture and keeps the earlier words (`LookoutPictureSession`).
+
+### Reading the picture
+
+DOKK.app reads a dropped or pasted picture itself. It holds the drag's or the pasteboard's access, and the query service may not be allowed to read where the picture is. `QueryPicture` (`Core/`) sizes it in memory the way the indexer sizes stored pictures. ImageIO decodes straight to at most 1536 px for a screenshot and 1024 px for a photo, upright. The bicubic resize then fills 280 or 140 soft tokens (`ImageSizing`, which moved to `Core/` for this). A pasted picture is sized as a screenshot, and a file as a screenshot when macOS or its name says it is one. The packed RGB pixels go over XPC (`LookoutQueryServing.embedPicture`). Nothing is written to disk on either side, and the vector lives only while its search is current.
+
+The query service loads the image encoder into the text model it already holds (`LlamaEmbedder.attachMedia`), for pictures of up to 280 tokens, which fit its 512-token context. It does so only for the first picture, so a service that only embeds words never loads the 555 MB file. A picture dragged into the Hub from outside DOKK wakes the encoder at once (`warmUpPictureReader`), so it's usually warm by the drop. The idle exit releases both 120 s after the last call. The results bar shows "Waking Lookout's picture reader…" while the encoder loads and "Reading your picture…" while it encodes the picture. Then it says "New picture · read in 0.4 s · not saved".
+
+Find Similar on a file in the index encodes nothing. It reuses a stored vector (`Searcher.similarSource`): the segment a Lookout result matched, such as that PDF page, else the file's picture, else its first segment with a vector. The results bar says "From your index · Page 7 · instant". A picture the index doesn't hold, such as a name result outside the chosen folders, is read like a dropped one.
+
+### Ranking
+
+`Searcher.similar` scores every stored vector against the query vector on the query's own scale, as text search does (`Searcher.meaning`), and keeps each file's best segment. There are no words, so a file qualifies by meaning alone at z ≥ 2.0 and scores its z. A picture query's cosines to other pictures run far above its cosines to text, even after `meaning` centers each modality. So the results come in two groups ranked on their own: pictures and screenshots, and PDFs and documents. Each group splits at its own `LookoutRanking.strongRatio` of its own top score, has its own **Weaker matches** fold, and forms its own folders by the usual rule. A folder that forms in both groups stays in the one where it scores higher. The file searched with never appears in its own results, and its folder doesn't count it.
+
+The query's own kind comes first. An image vector is a picture query, and that includes a screenshot's picture and a rendered PDF page. Its groups are **Looks like it**, then **About what it shows**. A text vector is a document query, with **Says something similar**, then **Pictures of it**. A group with nothing above the gate says "Nothing stands out here." When neither group has a strong hit, the results give the honest message. Rows say **Looks alike** for a picture found with a picture, and **Same subject** otherwise. **Why it matched** shows the picture searched with ≈ the match, one sentence, and a three-step closeness meter from the hit's z: 4 and up is **Very close**, 3 and up **Close**, and the rest **Somewhat alike** (`LookoutPictureWhy`).
+
+### Words in a dropped screenshot
+
+Not built. Lookout reads the text in screenshots when it indexes them, and the plan was to read a dropped screenshot's text too and match its codes and long numbers as exact words. Vision keeps about 100 MB cached in whatever process runs it. That would be either DOKK.app or the query service, which already holds about 900 MB with the encoder. It would also add 0.1–0.25 s to a picture query. And word matches don't fit the two groups, which rank by meaning alone, or their chips and sentences. Combining a picture with words is Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)).
 
 ## Power policy
 
@@ -170,6 +201,7 @@ While the download runs and setup isn't complete yet, the Files search shows a d
 The privacy line in onboarding and Settings reads: "Lookout reads only the folders you pick, on this Mac, and keeps its index here. DOKK downloads the model once from Hugging Face; that request sends nothing about your files."
 
 - Lookout reads only the chosen folders. The services never ask for folder access. macOS's prompts come from DOKK.app, in onboarding's access step or after **Add folder…** in Settings.
+- A picture searched with is read in memory and never saved. The app sends its pixels to the query service, which keeps nothing once it has answered.
 - The index and the model stay on this Mac, in the folder above.
 - The only network request is the one-time model download from Hugging Face. It asks for two fixed files at a pinned revision and sends nothing about the person's files.
 - Usage analytics carry counts and closed tokens only, never paths, file names, query text, or scores. [Analytics](ANALYTICS.md) lists the Lookout events.
@@ -207,7 +239,7 @@ XPC services don't inherit the app's environment, so the default is the practica
 
 ```
 LookoutBench reference --models <folder> --refs <folder>
-LookoutBench bench --models <folder> [--refs <folder>]
+LookoutBench bench --models <folder> [--refs <folder>] [--image <file>]
 LookoutBench index --models <folder> --index <folder> --root <folder>... [--exclude <folder>]...
 LookoutBench estimate --root <folder>...
 ```
@@ -216,17 +248,19 @@ LookoutBench estimate --root <folder>...
 - `--refs` is DigUp's `Tests/LlamaRuntimeTests/Reference` folder, with `photo.jpg`, `screen.png`, `speech.wav`, and `vectors.json`. Those files are not in this repository.
 - `--index` is the folder `index.sqlite` goes in. It is created when missing and is never the app's folder unless you pass that.
 - `--root` and `--exclude` can be repeated.
+- `--image` is the picture the picture-search probe searches with. Without it, the probe uses macOS's Sonoma wallpaper (`/System/Library/Desktop Pictures/Sonoma.heic`).
 
 The commands:
 
 - `reference` embeds DigUp's fixed inputs the way DigUp's indexer hands them over and compares each vector with `vectors.json`. The inputs are queries in English, Bengali, and Arabic, a short document, a document of about 1,800 tokens, a screenshot at 280 tokens, a photo at 140 tokens and as a 70-token video frame, and a 16 kHz WAV. It exits 0 when every cosine is at least 0.99 and also reports whether DigUp's 0.999 holds.
-- `bench` runs each probe in a child process, so one probe's memory doesn't show in the next one's figures. The text probe runs first, so a run right after a build also shows the first start before Metal's shader cache holds the binary's pipelines. It prints the measurements and a decision gate: warm query p95 at most 150 ms, encoder cold start at most 2 s, query encoder memory at most 600 MB, the slowest image embed's median at most 1,500 ms, indexer memory at most 2,000 MB, and every reference cosine when `--refs` is given. It exits 0 when every gate passes.
+- `bench` runs each probe in a child process, so one probe's memory doesn't show in the next one's figures. The text probe runs first, so a run right after a build also shows the first start before Metal's shader cache holds the binary's pipelines. It prints the measurements and a decision gate: warm query p95 at most 150 ms, encoder cold start at most 2 s, query encoder memory at most 600 MB, the slowest image embed's median at most 1,500 ms, indexer memory at most 2,000 MB, and every reference cosine when `--refs` is given. For searching with a picture, it adds a warm picture query p95 of at most 600 ms, a cold picture search (encoder load plus first picture) of at most 2.5 s, and the query service with the encoder at most 1,000 MB. It exits 0 when every gate passes. A gate it can't measure without `--refs` counts as not passed.
+- The picture-search probe (`probe-image`) starts as the query service does, with the text model only. It then loads the image encoder into it on the first picture and embeds pictures prepared the way the app prepares them (`QueryPicture`), at 280 and 140 tokens.
 - `index` does what the index service does for one sync, in one process, without XPC and without the power policy. It prints each file, the counts, the timings, and the peak memory.
 - `estimate` prints what onboarding shows for each folder, with its subfolders one level down. It reads metadata only.
 
 ## Measured performance
 
-Phase 0 measured the encoder figures on an M4 with a Release build. The indexing figure comes from phase 1a's bench run on a test folder.
+Phase 0 measured the encoder figures on an M4 with a Release build. The indexing figure comes from phase 1a's bench run on a test folder. The picture-search figures come from four `LookoutBench probe-image` and `bench` runs on the same M4 with a Release build on 2026-10-12, with Sonoma.heic and 10 warm runs per size.
 
 | Measure | Result |
 | --- | --- |
@@ -237,6 +271,13 @@ Phase 0 measured the encoder figures on an M4 with a Release build. The indexing
 | One image embed | 0.24–0.58 s |
 | Indexing a test folder | 2.9 files/s, 1.0 GB peak |
 | Reference cosine | At least 0.999999 |
+| Picture search, warm, 280 tokens (screenshots, pasted pictures) | 529–575 ms median, 553–644 ms p95 |
+| Picture search, warm, 140 tokens (photos) | 226–237 ms median, 238–255 ms p95 |
+| Picture search, cold (encoder load plus first picture) | 0.71–0.78 s. 1.21 s once, right after a build, while Metal compiles the encoder's shaders. The text model's own first shader compile (5.6 s) comes before that, as it does for words. |
+| Image encoder load into a running query service | 0.16–0.20 s, or 0.59 s with the shader compile |
+| App: sizing the picture (Sonoma.heic, 6K) | 116–180 ms at 280 tokens, 60–85 ms at 140 |
+| Query service with the image encoder | 898–916 MB peak |
+| One picture at 280 against 140 tokens | Cosine 0.94–0.96 |
 
 The estimates in onboarding use DigUp's per-file costs, measured on an M4 Pro (`Estimator.Costs`).
 
@@ -245,7 +286,8 @@ The estimates in onboarding use DigUp's per-file costs, measured on an M4 Pro (`
 - The XPC services have not been exercised hands-on inside DOKK.app: idle exit, relaunch, and the replayed configuration.
 - Onboarding, macOS's Files and Folders prompts, and a real model download have not been exercised live.
 - Audio, video, and code are not indexed. Indexing them is Planned.
-- Searching with an image as the query is Planned.
+- Combining a picture with words in one search is Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)), and so is reading the words in a dropped screenshot.
+- Searching with a picture has not been exercised hands-on: real drags from Finder, browsers, and Photos, pasting, the drop well, the query service's encoder loading inside DOKK.app, and its idle exit. A Photos drag that carries only a file promise isn't read.
 - The engine can pause reading, but no control offers it yet.
 - Settings has no controls for skipped subfolders or file types yet.
 - Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending with Esi.

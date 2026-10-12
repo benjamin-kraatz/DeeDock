@@ -385,6 +385,20 @@ Results that fit less clearly fold under **Weaker matches (N)**. Click it, or pr
 
 Select a Lookout result to see **Why it matched** in the preview column, such as "Page 7 matched by meaning." Up and Down move through both sections. Return opens the selected result, Space opens Quick Look, and you can drag results out. A folder result opens in the pane.
 
+### Search with a picture
+
+You can search with a picture instead of words:
+
+- Drag a picture over the Hub. The search field opens up and says **Drop to search with this picture**. Drop the picture on it. Anything that isn't a picture shows **Lookout searches with pictures only** and can't be dropped there.
+- Copy a picture, or take a screenshot to the clipboard with ⌃⇧⌘4, then press ⌘V in the Files tab.
+- Select a search result and click **Find Similar** in the preview column, choose it from the context menu, or press ⇧⌘L. You can also drag a result onto the search field. Find Similar doesn't appear for folders, and kinds of file Lookout doesn't read say so.
+
+The picture shows as a chip in the search field. Above the results, a bar shows the picture and how Lookout read it, such as **New picture · read in 0.4 s · not saved**, or **From your index · instant** for Find Similar on a file Lookout already read. The first picture after a while takes about a second, while Lookout wakes its picture reader. Lookout reads the picture on this Mac and never saves it.
+
+The results come in two groups. For a picture: **Looks like it**, with photos and screenshots that look like it, and **About what it shows**, with documents and PDF pages about the same thing. For a document: **Says something similar**, then **Pictures of it**. Each group has its own **Weaker matches**. When nothing clearly fits, Lookout says so. Select a result to see **Why it matched**: your picture beside the match, one sentence, and how close it is, from **Somewhat alike** to **Very close**. The file you searched with never appears in its own results, and Find Similar works on these results too.
+
+Press ⌫ in the empty search field, or click ✕ on the chip, to go back to the words you searched before. **Back to “…”** above the results does the same. Typing starts a new search by words, and the clear button or Escape clears everything.
+
 ### Lookout settings
 
 **Settings → Lookout** has these options:

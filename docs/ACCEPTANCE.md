@@ -112,11 +112,66 @@ None of these scenarios has been exercised.
 - [ ] Memory and lifetime: the index service exits about 60 s after its work ends, the query
   service 120 s after its last query, and the vectors are released 2 minutes after the Hub closes.
 
+### Searching with a picture
+
+Implemented on `feature/dee-125` from `docs/mockups/lookout-image-search.html`: dropping or pasting
+a picture into the Files search field, Find Similar on results, the picture chip, and the two
+result groups. See [Searching with a picture](LOOKOUT.md#searching-with-a-picture).
+
+Validation on 2026-10-12: `LookoutBench` in Release passed the picture gates on an M4: warm picture
+query p95 568 ms at 280 tokens and 240 ms at 140 (limit 600 ms), cold picture search 0.77 s (limit
+2.5 s; 1.21 s once with the encoder's first shader compile), and 906 MB peak for the query service
+with the encoder (limit 1 GB). Earlier runs measured the 280-token p95 at 553–644 ms, so it sits
+near its limit. The DeeDock scheme builds, and the 231 Lookout tests in 32 suites pass, including
+new suites for the vector-only ranking, Find Similar's vector, the picture search's phases, the
+chip, the drop rules, and the analytics. Nothing was seen on screen, previews were not rendered,
+and no drag, paste, or XPC call was made by hand.
+
+None of these scenarios has been exercised.
+
+- [ ] Drag a photo from Finder over the Hub: the field widens into the well, it pulses until the
+  pointer is over it, then glows. Drop it: the chip appears, the bar shows **Waking Lookout's
+  picture reader…** on the first picture, then **Reading your picture…**, then the two groups.
+- [ ] Drag a ZIP file and a folder over the Hub: the orange **Lookout searches with pictures only**
+  shows, and nothing drops on the field.
+- [ ] Drops elsewhere don't change: files onto a pane, a folder row, a sidebar place, a browser tab,
+  and the Apps tab's file drop. Moving a non-picture between panes shows no well.
+- [ ] Drag a picture out of Safari or Photos. Note what Photos offers; a file promise alone isn't
+  read.
+- [ ] The picture reader is warm by the drop: drag in, wait a second over the Hub, drop, and check
+  the bar goes straight to reading. Check Activity Monitor for the query service at about 900 MB
+  after a picture and about 215 MB in a session with words only, and that it exits 120 s after the
+  last search.
+- [ ] Paste a screenshot copied with ⌃⇧⌘4 with ⌘V in the field and in the listing, then a picture
+  file copied in Finder, then text: only the text pastes as text.
+- [ ] Find Similar from the preview button, the context menu, ⇧⌘L, and by dragging a result onto
+  the field, on a picture, a screenshot, a PDF page hit (the bar names the page), a document, and a
+  name result outside the chosen folders (a picture is read, a document has no button). Folders have
+  no button, and a ZIP shows **Lookout doesn't read this kind of file**.
+- [ ] Chaining: Find Similar on a result of a picture search, then ⌫ goes back to the first words.
+- [ ] Chip: ⌫ in the empty field and ✕ bring back the earlier words; **Back to “…”** does the
+  same; the clear button and Escape clear everything; typing starts a search by words.
+- [ ] Results: the group order for a picture and for a document, each group's own weaker fold with
+  Right and Left, "Nothing stands out here." for an empty group, the honest message, and the file
+  searched with missing from its results. Scope **This Mac** against the current folder.
+- [ ] Preview: the shorter well, **Why it matched** with Yours ≈ Match, the sentence for each case,
+  and the closeness meter.
+- [ ] States: not set up (the **Search with a picture** card), downloading (the Pictures model
+  message), reading files, and paused ("It still reads your picture…").
+- [ ] Reduce Motion: no well pulse, and the chip, the bar, and the rows fade. Reduce Transparency,
+  light and dark, German copy without cut-off text, and VoiceOver on the chip, the well, Find
+  Similar, and the meter.
+- [ ] Analytics in the debug log: `lookout_image_search` with each source and `cold`, and
+  `query: image` on `lookout_result_opened`, never a name or a path.
+
 ### Known gaps from code review
 
 - Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending
   with Esi.
-- Audio, video, code, and searching with an image are Planned.
+- Audio, video, and code are Planned. Combining a picture with words, and reading the words in a
+  dropped screenshot, are Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)).
+- The Files tab has no "Try Lookout" card with example searches, so the mockup's idle hint ("Or drop a
+  picture on the search field to find ones like it.") has nowhere to go yet.
 - The engine can pause reading, but no control offers it yet.
 - Settings has no controls for skipped subfolders or file types yet.
 
