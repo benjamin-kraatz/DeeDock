@@ -38,6 +38,10 @@ final class IndexWork: @unchecked Sendable {
     /// No app is connected: stop as DigUp's helper did when the app went away.
     private var appAway = false
     private var backfillAllowed = false
+    /// "Read everything again" was asked for; the next pass resets the index before it syncs.
+    private var resetRequested = false
+    /// Replies waiting for the index to close (`closeIndex`); the next pass closes it and calls them.
+    private var closeReplies: [@Sendable () -> Void] = []
     /// Bumped by every request, so the loop notices one that came in while it decided to stop.
     private var generation = 0
     private var looping = false
@@ -81,6 +85,19 @@ final class IndexWork: @unchecked Sendable {
     func pause() { request { paused = true } }
     func resume() { request { paused = false } }
 
+    /// Queues every file again and syncs (`IndexStore.resetAll`).
+    func resetIndex() { request { (resetRequested, syncRequested) = (true, true) } }
+
+    /// Closes the index and forgets the configuration; `reply` runs once it's closed. A configuration that arrived
+    /// before this is dropped (the app is stopping); one that arrives after it opens the index again.
+    func closeIndex(reply: @escaping @Sendable () -> Void) {
+        request {
+            closeReplies.append(reply)
+            pendingConfiguration = nil
+            (syncRequested, resetRequested) = (false, false)
+        }
+    }
+
     /// Whether an app is connected. With none, work stops after the current batch.
     func setAppConnected(_ connected: Bool) { request { appAway = !connected } }
 
@@ -116,14 +133,20 @@ final class IndexWork: @unchecked Sendable {
     /// Requests that make a run stop between batches. The backfill also stops when it's no longer allowed.
     private func shouldYield(backfill: Bool) -> Bool {
         lock.withLock {
-            syncRequested || paused || appAway || pendingConfiguration != nil || (backfill && !backfillAllowed)
+            syncRequested || paused || appAway || pendingConfiguration != nil || !closeReplies.isEmpty
+                || (backfill && !backfillAllowed)
         }
     }
 
     private func pass() {
-        let (newConfiguration, sync, isPaused, isAway) = lock.withLock {
-            defer { (pendingConfiguration, syncRequested) = (nil, false) }
-            return (pendingConfiguration, syncRequested, paused, appAway)
+        let replies = lock.withLock {
+            defer { closeReplies = [] }
+            return closeReplies
+        }
+        if !replies.isEmpty { close(replying: replies) }
+        let (newConfiguration, sync, reset, isPaused, isAway) = lock.withLock {
+            defer { (pendingConfiguration, syncRequested, resetRequested) = (nil, false, false) }
+            return (pendingConfiguration, syncRequested, resetRequested, paused, appAway)
         }
         if let newConfiguration {
             guard apply(newConfiguration) else { return }
@@ -133,6 +156,16 @@ final class IndexWork: @unchecked Sendable {
             indexer.closeWorker()
             settle(isPaused ? .paused : .idle, store)
             return
+        }
+        if reset {
+            do {
+                try store.resetAll()
+                newFiles = []
+                status.update { $0.vectorsChangedAt = Date() }
+            } catch {
+                settle(.failed(message: "can't reset the index: \(error)"), store)
+                return
+            }
         }
         if sync || newConfiguration != nil {
             guard self.sync(indexer, store) else { return }
@@ -167,6 +200,20 @@ final class IndexWork: @unchecked Sendable {
             indexer.closeWorker()
             settle(.failed(message: "\(error)"), store)
         }
+    }
+
+    /// Frees the model and closes the store (its last reference goes, so SQLite closes the file), then answers.
+    private func close(replying replies: [@Sendable () -> Void]) {
+        indexer?.finish()
+        (store, indexer, configuration) = (nil, nil, nil)
+        roots = []
+        newFiles = []
+        status.update {
+            $0.activity = .idle
+            ($0.done, $0.total, $0.current) = (0, 0, nil)
+            $0.counts = IndexStore.Counts()
+        }
+        replies.forEach { $0() }
     }
 
     /// Opens the store and makes the indexer for a configuration, checks the model and drops files under none of the

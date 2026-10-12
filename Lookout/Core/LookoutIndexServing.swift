@@ -38,6 +38,17 @@ import Foundation
 
     /// The latest status, as a JSON-encoded `LookoutIndexStatus`.
     func currentStatus(reply: @escaping @Sendable (Data) -> Void)
+
+    /// "Read everything again": queues every file once more (`IndexStore.resetAll`), drops their vectors and syncs.
+    /// File names stay searchable meanwhile. Needs a configuration (`start`) first; without one it does nothing.
+    func resetIndex()
+
+    /// Stops work after the file being read, frees the model, closes the index and forgets the configuration, so
+    /// the app can delete `index.sqlite` without this process writing to the deleted file afterwards. A later `start`
+    /// opens the index again (a new, empty one if it was deleted).
+    ///
+    /// - Parameter reply: Called once the index is closed.
+    func closeIndex(reply: @escaping @Sendable () -> Void)
 }
 
 /// What the app exports on the index service's connection, so the service can report progress.

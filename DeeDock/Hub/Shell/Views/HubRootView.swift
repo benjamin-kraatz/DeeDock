@@ -6,12 +6,16 @@ import SwiftUI
 /// follow ``HubShellState/tab``. `content` builds one tab's view. Tab models are told about
 /// visibility by the coordinator, not by this view's appearance, so a SwiftUI re-render never
 /// starts or stops a tab's discovery.
-struct HubRootView<Content: View>: View {
+///
+/// `overlay` covers the header and the tab inside the glass, for a sheet-like card such as Lookout's
+/// onboarding; it is empty otherwise.
+struct HubRootView<Content: View, Overlay: View>: View {
     let state: HubShellState
     @Binding var query: String
     let prompt: LocalizedStringResource
     let actions: HubHeaderActions
     @ViewBuilder let content: (HubTab) -> Content
+    @ViewBuilder var overlay: () -> Overlay
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -25,6 +29,7 @@ struct HubRootView<Content: View>: View {
                     .accessibilityHidden(true)
                 HubTabContent(state: state, content: content)
             }
+            .overlay { overlay() }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .ignoresSafeArea()
@@ -50,6 +55,14 @@ struct HubTabContent<Content: View>: View {
         .animation(state.reduceMotion ? .easeOut(duration: 0.15) : HubStyle.tabContent, value: state.tab)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
+    }
+}
+
+extension HubRootView where Overlay == EmptyView {
+    /// A Hub with nothing over its content.
+    init(state: HubShellState, query: Binding<String>, prompt: LocalizedStringResource, actions: HubHeaderActions,
+         @ViewBuilder content: @escaping (HubTab) -> Content) {
+        self.init(state: state, query: query, prompt: prompt, actions: actions, content: content) { EmptyView() }
     }
 }
 

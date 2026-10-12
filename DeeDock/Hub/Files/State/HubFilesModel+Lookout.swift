@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 /// Lookout in the Files search: its status and results (or the preview overrides), the one selection that spans the
 /// names and Lookout sections, opening hits, the "Weaker matches" fold, and the analytics of a search.
@@ -10,6 +11,29 @@ extension HubFilesModel {
 
     /// Lookout's status for the chip and the section.
     var lookoutStatus: LookoutStatus { previewOverrides.lookoutStatus ?? lookout.status }
+
+    /// The status as the chip and the section show it: while onboarding's model download runs before setup is
+    /// complete, they show the download (and its progress) instead of "Set up". Their actions still follow
+    /// `lookoutStatus`, so a click resumes onboarding.
+    var lookoutDisplayStatus: LookoutStatus {
+        let status = lookoutStatus
+        return status == .notSetUp && lookoutDownloadProgress != nil ? .waitingForModel : status
+    }
+
+    /// The status chip's click: onboarding before setup, Lookout's Settings section after.
+    func openLookoutFromChip(using openWindow: OpenWindowAction) {
+        if lookoutStatus == .notSetUp {
+            onSetUpLookout()
+        } else {
+            openLookoutSettings(using: openWindow)
+        }
+    }
+
+    /// Opens Settings at Lookout's section.
+    func openLookoutSettings(using openWindow: OpenWindowAction) {
+        onOpenLookoutSettings()
+        openWindow.openDockSettings()
+    }
     /// Where Lookout's search for the current query is.
     var lookoutPhase: LookoutSearch.Phase { previewOverrides.lookoutPhase ?? lookout.search.phase }
     /// Lookout's latest results for the current query.

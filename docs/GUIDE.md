@@ -20,6 +20,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Session Capsules](#session-capsules)
 - [Action Tiles](#action-tiles)
 - [DOKK Hub](#dokk-hub)
+- [Lookout](#lookout)
 - [App badges](#app-badges)
 - [Notification Feed](#notification-feed)
 - [Atmosphere](#atmosphere)
@@ -307,7 +308,8 @@ The **DOKK** tile opens the DOKK Hub, one large panel with three tabs. **Apps** 
 launcher, with suggestions, grid and list browsing, **Ask Robi**, and file actions for files
 dropped on the tile. Its search also finds windows, Capsules and Breadcrumbs, Shelf files, pinned
 Shortcuts, and Dock Modes. **Windows** shows open windows grouped by app. **Files** is a file
-browser with browser tabs, split view, Quick Look, Spotlight search, and a copy queue. The Hub
+browser with browser tabs, split view, Quick Look, Spotlight search, and a copy queue. With
+[Lookout](#lookout) set up, its search also finds files by what's in them. The Hub
 opens next to its tile and closes like a popover. The pin button turns it into a normal window that
 stays open. ⌘1, ⌘2, and ⌘3 switch tabs, and ⌘F focuses the search field.
 
@@ -340,6 +342,61 @@ Optional **App suggestions** learn from local app activity after opt-in under **
 An empty query in the Hub's Apps tab can show up to three likely apps above the ordinary results. Pause, reset, exclusions, and feedback controls are included.
 After a week of use, a short optional survey about suggestion quality can appear below them while usage-data sharing is on.
 See [app suggestions](LAUNCHER-SUGGESTIONS.md) for the 90-day retention policy and observation limits.
+
+## Lookout
+
+Lookout finds files by what's in them. Describe a photo, a screenshot, or a passage in your own words, and Lookout finds it in the Hub's Files search, whatever the file is called. It reads documents, PDFs, images, and screenshots in the folders you choose, in more than 100 languages, on this Mac. Lookout is off until you set it up. See [Lookout](LOOKOUT.md) for how it is built, and the [acceptance notes](ACCEPTANCE.md#dee-125-lookout) for what has been checked.
+
+### Set up Lookout
+
+Search for anything in the Files tab, then click **Lookout off · Set up** at the end of the scope bar, or **Set up Lookout** in the results. Turning on **Settings → Lookout → Search by content** opens the same card over the Hub. Setup has five steps. Return continues, **Back** returns to the previous step, and Escape closes the card.
+
+1. **Welcome** shows three example searches and how Lookout handles your data. Click **Continue**, or **Not now** to close.
+2. **Choose where Lookout looks** lists Desktop, Documents, and Downloads, checked, and Pictures, unchecked. Each folder shows about how many files it has, how long the first pass takes, and how big the index gets. Desktop, Documents, and Downloads show **Estimate after access** until macOS lets Lookout read them. Click **Add folder…** to pick another folder. Lookout doesn't read your whole Mac, your whole home folder, or anything in `~/Library`, and says so if you pick one. **Lookout never reads** lists what it always skips: apps and bundles, iCloud files that aren't downloaded, code projects except the screenshots in them, folders that look like datasets, `~/Library` with caches and hidden folders such as `~/.ssh`, and keys, certificates, and password files.
+3. **Allow access** asks macOS about each folder it protects. Click **Allow…** beside a folder, and macOS shows its prompt. The folder then shows **Allowed** or **Not allowed · Skipped**. To allow a skipped folder, click **Open Settings**, allow DOKK under Privacy & Security › Files and Folders, and come back. The row updates by itself. **Continue** needs an answer for every folder and at least one allowed folder. If every folder is allowed already, setup skips this step.
+4. **Download the model** downloads EmbeddingGemma 2 by Google DeepMind once from Hugging Face, 865 MB in two parts: **Words**, 310 MB, and **Pictures**, 555 MB. Each part shows its progress, then **Checking…**, then **Ready**. **Read files on battery too** is on. When it's off, the first pass waits while the Mac runs on battery. You can close the card, and the download continues. If the download stops, **Try Again** continues from where it stopped. If you quit DOKK during the download, the next download continues from what already arrived.
+5. **Lookout is reading your files** shows the first pass's progress in a ring, and the names of files as Lookout reads them. Files you used recently go first, so they're searchable in minutes. Click **Start searching** to go to the search field, or **Finish in the background**.
+
+Lookout saves your choices when the first pass starts. If you close the card before that, it opens where you left off the next time, as long as DOKK keeps running.
+
+### The status chip
+
+The chip at the end of the Files search's scope bar says what Lookout is doing:
+
+- **Lookout off · Set up**: Lookout isn't set up. Click the chip to set it up.
+- **Downloading model**, with the percentage.
+- **Getting ready**, then **Reading files**, with the number of files left.
+- **Lookout ready**: everything is read.
+- **Paused**, with the reason: **Low Power Mode**, **Mac is warm**, or **On battery**. What Lookout has already read stays searchable.
+- **Lookout stopped**: an error stopped reading. Hold the pointer over the chip to see why.
+- **Lookout off**: Lookout is set up and turned off.
+
+The dot is green when Lookout is ready, orange when it's paused, red when it stopped, and gray when it's off. It pulses while Lookout reads files or downloads. After setup, clicking the chip opens **Settings → Lookout**.
+
+### Search by content
+
+Type in the Files search. Spotlight's name matches show first, under **Names · Spotlight**. Lookout's matches follow under **Lookout · by content**. Matches by words appear at once, and matches by meaning join them a moment later. Lookout searches the same scope as the names: **This Mac** or the current folder.
+
+Each Lookout result shows a thumbnail, where the file is, and the passage that matched, with your words highlighted. A chip names its kind, such as **Picture**, **Screenshot**, **PDF · Page 7**, or **Document**. Another says how it matched: **Meaning**, **Exact words**, or **Meaning + words**. A folder with three or more matching files shows as one result, such as **Folder · 5 matching files**, with a stack of thumbnails.
+
+For example, "the dog on the beach" finds the photo, "payment declined error" finds the screenshot, and "pets in the lease" finds page 7 of the lease, even when the lease is in German. For codes and long numbers, such as an order number, exact words count double.
+
+Results that fit less clearly fold under **Weaker matches (N)**. Click it, or press Right, to show them, and press Left to hide them. When nothing clearly fits, Lookout says "Nothing stands out for this" instead of guessing. While Lookout is still reading or waits, a line above its results says that some matches may be missing.
+
+Select a Lookout result to see **Why it matched** in the preview column, such as "Page 7 matched by meaning." Up and Down move through both sections. Return opens the selected result, Space opens Quick Look, and you can drag results out. A folder result opens in the pane.
+
+### Lookout settings
+
+**Settings → Lookout** has these options:
+
+- **Search by content** turns Lookout on and off. Turning it off keeps the index, so turning it on again doesn't start over.
+- **Folders** lists your folders with the number of searchable files in each. A folder on a disconnected drive shows **Not connected · stays searchable**, and Lookout catches up when the drive returns. A folder macOS doesn't allow shows **Not allowed** with **Open Settings**. **Remove** takes a folder and its files out of the index. **Add folder…** adds a folder. macOS may ask about it right then, and Lookout adds it only when it's allowed.
+- **Read files on battery too** lets reading continue on battery. Whatever you choose, reading waits in Low Power Mode and while the Mac is warm. Up to 50 new files are read right away in any case, so a new screenshot is searchable in seconds.
+- **Model**, **Index on disk**, and **Memory while searching** show what Lookout uses. Searching takes about 250 MB, released 2 minutes after the Hub closes.
+- **Read everything again** reads every file once more. File names stay searchable meanwhile.
+- **Delete index and model** asks first, then stops Lookout and deletes what it has read and the downloaded model. Your files stay as they are. Lookout is then not set up, and setting it up again downloads the model again.
+
+Lookout reads only the folders you pick, on this Mac, and keeps its index here. DOKK downloads the model once from Hugging Face, and that request sends nothing about your files. The file names in the first pass show only on your screen. When usage-data sharing is on, Lookout sends counts only, never file names, paths, or what you searched for.
 
 ## App badges
 

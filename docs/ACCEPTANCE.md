@@ -5,6 +5,114 @@ see [Acceptance gaps](ACCEPTANCE-GAPS.md). The sections below preserve the evide
 implementation slice. Statements such as "tests were not run" describe that slice's original
 validation, unless a later dated result supersedes them.
 
+## DEE-125 Lookout
+
+Implemented on `feature/dee-125`. Lookout adds search by content to the Hub's Files search: the
+names from Spotlight first, then a **Lookout · by content** section with photos, screenshots, PDF
+pages, documents, and folders that match what was typed. Two XPC services embedded in DOKK.app do
+the work. `LookoutIndexService` indexes the chosen folders into SQLite, and `LookoutQueryService`
+embeds queries with EmbeddingGemma 2 on llama.cpp. Onboarding is five steps over the Hub, and
+**Settings → Lookout** manages folders, power, and the index. The approved reference is
+`docs/mockups/lookout.html`. The design is in [Lookout](LOOKOUT.md), and behavior is in the
+[user guide](GUIDE.md#lookout) and [DOKK Hub](HUB.md#search).
+
+Validation on 2026-10-12: the build succeeds, and the 158 Lookout tests in 25 suites in
+`DeeDockTests/Lookout/` pass. They cover the crawl rules, the index store, the ranking, folder
+grouping, scope, the settings, the engine, the power policy, the search phases, the onboarding
+draft and coordinator, folder choice, the model downloader, data removal, and the analytics
+payloads. Nothing was seen on screen. Previews were not
+rendered, and the app was not exercised by hand. Passing tests do not establish native acceptance.
+
+### Required hands-on acceptance
+
+None of these scenarios has been exercised.
+
+- [ ] Onboarding opens from the status chip, from the **Set up Lookout** card, and from the
+  **Search by content** switch in Settings with the Hub closed. Check that it holds an anchored Hub
+  open through the folder picker and macOS's prompt, and that sleep, a display change, and ⌘W end it.
+- [ ] Welcome: the three examples, the privacy line, **Not now**, and **Continue**.
+- [ ] Choose folders: Desktop, Documents, and Downloads checked, Pictures unchecked, estimates for
+  Pictures and added folders, and **Estimate after access** for the protected ones. No macOS prompt
+  may appear before the access step. **Add folder…** with a plain folder, a folder inside a chosen
+  one, a folder around chosen ones, `/`, the home folder, and a folder in `~/Library`.
+- [ ] Access, folder allowed: **Allow…** shows macOS's prompt in context, the row turns to
+  **Allowed**, and the Hub takes keyboard focus back.
+- [ ] Access, folder not allowed: the row shows **Not allowed · Skipped** and **Open Settings**.
+  **Continue** stays off until every folder has an answer and one is allowed.
+- [ ] Access, Open Settings and return: the link opens Privacy & Security › Files and Folders.
+  Allow DOKK there, come back, and check that the row turns to **Allowed** without a new prompt.
+- [ ] Access, already allowed: with every chosen folder allowed, **Continue** on the folders step
+  goes straight to the download.
+- [ ] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
+  **Allowed** without a prompt.
+- [ ] Download, fresh: both files download, show **Checking…** and **Ready**, and land in
+  `~/Library/Application Support/DDock/Lookout/Models/`. Note the time and the free space before
+  and after.
+- [ ] Download, interrupted and resumed: turn Wi-Fi off mid-file, check the error, turn it on, and
+  click **Try Again**. The file continues from its partial bytes.
+- [ ] Download, relaunch mid-download: quit DOKK during the download, relaunch, walk onboarding to
+  the download step, and check that it resumes from `Partial/`.
+- [ ] Download, checksum failure, if it can be simulated by changing a partial file: the error
+  appears, the partial file is deleted, and **Try Again** downloads it fresh.
+- [ ] Download, low disk space: with less than about 1 GB free, the error names the space needed
+  and the space free.
+- [ ] Download in the background: close the card during the download and check the download card
+  and the chip's percentage in the Files search.
+- [ ] First pass: the ring moves, the feed shows file names, recently used files come first, and
+  **Start searching** and **Finish in the background** both end onboarding while reading goes on.
+  Check the first search after the first pass has no 5-second encoder start.
+- [ ] Status chip in every state it can reach: **Lookout off · Set up**, **Downloading model**,
+  **Getting ready**, **Reading files**, **Lookout ready**, **Paused** for Low Power Mode, warmth,
+  and battery, **Lookout stopped**, and **Lookout off**.
+- [ ] Search for a photo by description, such as "the dog on the beach".
+- [ ] Search for text inside a screenshot, such as an error message.
+- [ ] Search for a PDF page: the result names the page, and **Why it matched** names it too.
+- [ ] Search for a passage inside a long document, including one past the first 40 chunks after the
+  first pass finished.
+- [ ] Search for a code or a long number: the lookup weighting applies and the why card says so.
+- [ ] A folder result: a folder with three or more matching files shows its thumbnail stack and
+  opens in the pane.
+- [ ] Weaker matches: the fold is closed by default, opens and closes by click and by Right and
+  Left, and the selection moves out of it when it closes.
+- [ ] The honest empty state for a query nothing fits, and the notes while reading or paused.
+- [ ] Scope: **This Mac** against the current folder, and a folder search never listing that
+  folder as a result.
+- [ ] Keyboard in search: Down from the field, Up and Down across both sections, Return on a file,
+  a folder, and with nothing selected.
+- [ ] Keyboard in onboarding: Return continues, Escape closes, Tab and Space reach the controls,
+  and ⌘1 to ⌘3 and ⌘F do nothing while the card shows.
+- [ ] Quick Look with Space on a Lookout file, a PDF page hit, and a folder hit.
+- [ ] Drag a Lookout result out to Finder and to another app, and drop files on a folder result.
+- [ ] Reduce Motion: the card, the step slides, the ring, the feed, the result arrivals, and the
+  status dot.
+- [ ] Reduce Transparency: the onboarding card and the result cards draw opaque.
+- [ ] Light and dark appearance for the card, every step, the results, the chips, and Settings.
+- [ ] German copy in every step, the chip, the results, the why card, the errors, and Settings.
+  Check that no text is cut off.
+- [ ] VoiceOver: the chip, the card's steps and buttons, the folder rows, the result rows, the
+  weaker-matches fold, and the Settings rows.
+- [ ] Sleep and wake during the first pass and during the download.
+- [ ] Unplug a drive with a chosen folder: Settings shows **Not connected · stays searchable**, its
+  files stay searchable, and Lookout catches up when the drive returns.
+- [ ] Power policy: Low Power Mode, a serious thermal state if one can be reached, and battery with
+  **Read files on battery too** off. Check that a new screenshot indexes at once in each.
+- [ ] New files: save a screenshot and check it is searchable within seconds.
+- [ ] **Read everything again**: names stay searchable while every file is read again.
+- [ ] **Delete index and model**: the confirmation, then `index.sqlite*`, `Models/`, and
+  `Partial/` are gone, `Logs/` and the person's files remain, and Lookout is not set up.
+- [ ] Turn **Search by content** off and on: the Lookout section hides and returns, the index is
+  kept, and reading resumes.
+- [ ] Memory and lifetime: the index service exits about 60 s after its work ends, the query
+  service 120 s after its last query, and the vectors are released 2 minutes after the Hub closes.
+
+### Known gaps from code review
+
+- Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending
+  with Esi.
+- Audio, video, code, and searching with an image are Planned.
+- The engine can pause reading, but no control offers it yet.
+- Settings has no controls for skipped subfolders or file types yet.
+
 ## DEE-121 DOKK Hub
 
 Implemented on `feature/dee-121`. The DOKK tile replaces the App Launcher tile and opens the

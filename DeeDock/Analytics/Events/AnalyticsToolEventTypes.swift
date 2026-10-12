@@ -123,6 +123,12 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     /// The macOS Dock switch, changed by a click in Settings or the tour. Quit and launch
     /// follow-through is reported by `system_dock_tuck`, not here.
     case systemDockTuck = "system_dock_tuck"
+    /// Lookout's "Search by content" switch in Settings.
+    case lookoutEnabled = "lookout_enabled"
+    /// Lookout's "Read files on battery too" in Settings.
+    case lookoutIndexOnBattery = "lookout_index_on_battery"
+    /// How many folders Lookout reads, after one was added or removed in Settings.
+    case lookoutFolderCount = "lookout_folder_count"
 }
 
 /// Which window permissions Harbor had when it opened.
@@ -163,6 +169,8 @@ nonisolated enum AnalyticsHubTrigger: String, AnalyticsToken {
     case fileDrop = "file_drop"
     /// Open in Hub on a folder stack, the Downloads stack, or a drive.
     case openFolder = "open_folder"
+    /// Lookout's settings asked for its onboarding, which shows over the Hub.
+    case lookoutSetup = "lookout_setup"
 }
 
 /// How a Hub tab was chosen.
@@ -206,4 +214,29 @@ nonisolated enum AnalyticsLookoutKind: String, AnalyticsToken {
 /// Why a Lookout hit qualified.
 nonisolated enum AnalyticsLookoutMatch: String, AnalyticsToken {
     case meaning, words, both
+}
+
+/// A step of Lookout's onboarding (`LookoutSetupStep`).
+nonisolated enum AnalyticsLookoutSetupStep: String, AnalyticsToken {
+    case welcome, folders, access, download, firstPass = "first_pass"
+}
+
+/// How one run of Lookout's model download ended.
+nonisolated enum AnalyticsLookoutDownloadOutcome: String, AnalyticsToken {
+    case completed, failed, cancelled
+}
+
+/// Why Lookout's model download failed (`LookoutDownloadError`).
+nonisolated enum AnalyticsLookoutDownloadError: String, AnalyticsToken {
+    case network, server, host, checksum, incomplete, write, diskSpace = "disk_space"
+}
+
+/// macOS's answer when Lookout asked to read a folder.
+nonisolated enum AnalyticsLookoutAccessOutcome: String, AnalyticsToken {
+    case allowed, denied
+}
+
+/// Where Lookout asked to read a folder.
+nonisolated enum AnalyticsLookoutAccessContext: String, AnalyticsToken {
+    case onboarding, settings
 }

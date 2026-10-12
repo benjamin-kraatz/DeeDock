@@ -12,6 +12,8 @@ import Foundation
     func pause() {}
     func resume() {}
     func invalidate() {}
+    func resetIndex() {}
+    func closeIndex(timeout: Duration) async {}
 }
 
 /// Never warm; every embed fails, so search stays keyword-only.
@@ -28,6 +30,8 @@ nonisolated struct LookoutInertIndexReader: LookoutIndexSearching {
     func prepareVectors() async {}
     func releaseVectors() async {}
     func indexDidChange() async {}
+    func closeIndex() async {}
+    func searchableFileCounts(under folders: [String]) async -> [String: Int] { [:] }
 }
 
 @MainActor final class LookoutInertMonitor: LookoutMonitoring {

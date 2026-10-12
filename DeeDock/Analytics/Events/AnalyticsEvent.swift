@@ -107,6 +107,19 @@ enum AnalyticsEvent {
     /// within its section; `kind` and `match` are nil for a name result. Never the query, a name or a path.
     case lookoutResultOpened(section: AnalyticsLookoutSection, rank: Int, kind: AnalyticsLookoutKind?,
                              match: AnalyticsLookoutMatch?, scope: AnalyticsHubSearchScope, isLookup: Bool)
+    /// A step of Lookout's onboarding came on screen (also when it opens again at a step).
+    case lookoutSetupStepViewed(AnalyticsLookoutSetupStep)
+    /// Lookout's onboarding applied setup as the first pass started. `estimatedFiles` is the sum of the included
+    /// folders' estimates. Counts and a flag only, never names or paths.
+    case lookoutSetupCompleted(folderCount: Int, allowedCount: Int, skippedCount: Int, estimatedFiles: Int,
+                               indexOnBattery: Bool)
+    /// Lookout's onboarding closed before setup, at `lastStep`.
+    case lookoutSetupAbandoned(lastStep: AnalyticsLookoutSetupStep)
+    /// One run of Lookout's model download ended. `error` is set when it failed.
+    case lookoutModelDownload(outcome: AnalyticsLookoutDownloadOutcome, seconds: Int, error: AnalyticsLookoutDownloadError?)
+    /// macOS answered Lookout's request to read a folder ("Allow…" in onboarding, "Add folder…" in Settings). Never
+    /// the folder.
+    case lookoutAccessResult(AnalyticsLookoutAccessOutcome, context: AnalyticsLookoutAccessContext)
     /// A window was brought forward from the Windows tab.
     case hubWindowActivated(minimized: Bool)
 

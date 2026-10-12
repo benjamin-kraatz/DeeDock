@@ -71,6 +71,8 @@ private struct HubFilesNameResultsSection: View {
 private struct HubFilesSearchScopeBar: View {
     let model: HubFilesModel
 
+    @Environment(\.openWindow) private var openWindow
+
     var body: some View {
         HStack(spacing: 8) {
             Text(.hubFilesSearchIn)
@@ -83,9 +85,9 @@ private struct HubFilesSearchScopeBar: View {
             }
             Spacer(minLength: 8)
             // Always shown, "Lookout off" included, as in the mockup: it's the way to Lookout's settings.
-            LookoutStatusChip(status: model.lookoutStatus, downloadProgress: model.lookoutDownloadProgress,
+            LookoutStatusChip(status: model.lookoutDisplayStatus, downloadProgress: model.lookoutDownloadProgress,
                               onSetUpLookout: { model.onSetUpLookout() },
-                              onOpenLookoutSettings: { model.onOpenLookoutSettings() })
+                              onOpenLookoutSettings: { model.openLookoutFromChip(using: openWindow) })
         }
         .font(.system(size: 12.5))
         .foregroundStyle(.secondary)

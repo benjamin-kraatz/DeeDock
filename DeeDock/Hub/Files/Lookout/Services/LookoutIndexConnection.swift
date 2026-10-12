@@ -74,6 +74,23 @@ import os
         requestWork { $0.resume() }
     }
 
+    func resetIndex() {
+        guard configuration != nil else { return }
+        // A relaunch replays the configuration (which syncs) first; the reset follows it in order. An interruption
+        // before the barrier replays only the configuration, so a lost reset just means one more press.
+        if !isServiceRunning { launch() }
+        requestWork { $0.resetIndex() }
+    }
+
+    func closeIndex(timeout: Duration) async {
+        guard isServiceRunning, let service = proxy() else { return }
+        // The proxy's error handler doesn't reach this reply; an interruption or a service that never answers ends
+        // the wait at `timeout` instead.
+        _ = try? await LookoutXPCReply<Void>.call(timeout: timeout) { reply in
+            service.closeIndex { reply.finish(.success(())) }
+        }
+    }
+
     func invalidate() {
         let old = connection
         connection = nil

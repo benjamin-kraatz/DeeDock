@@ -49,7 +49,8 @@ final class LookoutEngine {
     @ObservationIgnored private let reader: any LookoutIndexSearching
     @ObservationIgnored private let monitor: any LookoutMonitoring
     @ObservationIgnored private let power: any LookoutPowerPolicing
-    @ObservationIgnored private let paths: LookoutPaths
+    /// Where the index and the models live.
+    @ObservationIgnored let paths: LookoutPaths
     @ObservationIgnored private let canRun: Bool
     @ObservationIgnored private let syncDebounce: Duration
     @ObservationIgnored private let releaseDelay: Duration
@@ -204,19 +205,31 @@ final class LookoutEngine {
         releaseTask?.cancel()
         releaseTask = nil
         guard isRunning else { return }
-        if !encoder.isWarm, warmTask == nil {
-            let encoder = encoder
-            warmTask = Task { [weak self] in
-                do {
-                    try await encoder.warmUp()
-                } catch {
-                    LookoutLog.logger.info("Lookout warm-up failed: \(String(describing: error), privacy: .public)")
-                }
-                self?.warmTask = nil
-            }
-        }
+        startWarmUp()
         let reader = reader
         Task { await reader.prepareVectors() }
+    }
+
+    /// Warms the query encoder now, whether or not Lookout runs yet. Onboarding calls this when the model has
+    /// arrived and when the first pass starts: the encoder's very first launch compiles its Metal shaders (about
+    /// 5 s), and that should happen while the first pass runs, not on the first search. The encoder exits 120 s
+    /// after its last call, so a later search may still pay the ordinary cold start (about 0.4 s).
+    func warmQueryEncoder() {
+        guard canRun else { return }
+        startWarmUp()
+    }
+
+    private func startWarmUp() {
+        guard !encoder.isWarm, warmTask == nil else { return }
+        let encoder = encoder
+        warmTask = Task { [weak self] in
+            do {
+                try await encoder.warmUp()
+            } catch {
+                LookoutLog.logger.info("Lookout warm-up failed: \(String(describing: error), privacy: .public)")
+            }
+            self?.warmTask = nil
+        }
     }
 
     /// The Files tab hid or the Hub closed: release the vectors `vectorReleaseDelay` from now unless the tab comes back
@@ -235,11 +248,43 @@ final class LookoutEngine {
         }
     }
 
-    /// The model files finished downloading: the service indexes what waits, and meaning search may start.
+    /// The model files finished downloading: the query encoder warms (`warmQueryEncoder`), and a running service
+    /// indexes what waits, so meaning search may start.
     func modelDidArrive() {
+        warmQueryEncoder()
         guard isRunning else { return }
         connection.syncNow()
         search.refresh()
+    }
+
+    // MARK: Maintenance
+
+    /// "Read everything again" in Settings: the service reads every file once more. Names stay searchable meanwhile,
+    /// and what's read becomes searchable again as it goes. Does nothing while Lookout doesn't run.
+    func readEverythingAgain() {
+        guard isRunning else { return }
+        connection.resetIndex()
+    }
+
+    /// "Delete index and model" in Settings: closes the index in the service and here, stops Lookout, forgets the
+    /// settings (Lookout is not set up again), and deletes the index files and the models (`LookoutDataRemoval`).
+    /// The person's files are never touched.
+    ///
+    /// The service closes its store before anything is deleted, so it can't keep writing to a deleted file; one
+    /// that doesn't answer within 5 s is cut off when the engine stops.
+    ///
+    /// - Throws: The first file that couldn't be deleted (the rest are still tried).
+    func deleteIndexAndModel() async throws {
+        await connection.closeIndex(timeout: .seconds(5))
+        apply(LookoutSettings())
+        stop()
+        await reader.closeIndex()
+        try await LookoutDataRemoval.remove(in: paths)
+    }
+
+    /// For each chosen folder, how many of its files are searchable by content, for Settings.
+    func searchableFileCounts() async -> [String: Int] {
+        await reader.searchableFileCounts(under: settings.folders)
     }
 
     // MARK: Events

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Where Lookout keeps its data: one folder holding the index (`index.sqlite` and its WAL), the downloaded models and
-/// the services' logs. The real one is `~/Library/Application Support/DDock/Lookout/`, beside DOKK's other
+/// Where Lookout keeps its data: one folder holding the index (`index.sqlite` and its WAL), the downloaded models,
+/// model downloads in progress and the services' logs. The real one is `~/Library/Application Support/DDock/Lookout/`, beside DOKK's other
 /// Application Support data; tests and the bench pass a base of their own.
 ///
 /// The folder is inside `~/Library`, which the crawler never walks (`Rules.skipReason`), so the index can't index
@@ -25,6 +25,13 @@ nonisolated struct LookoutPaths: Sendable, Equatable {
     var indexFile: URL { base.appending(path: IndexStore.mainFile, directoryHint: .notDirectory) }
     /// The model files (`ModelFiles`).
     var models: URL { base.appending(path: "Models", directoryHint: .isDirectory) }
+    /// Model downloads in progress (the app's `LookoutModelDownloader`). A file moves into `models` only once its
+    /// checksum matches, so the services never see a partial one.
+    var partialDownloads: URL { base.appending(path: "Partial", directoryHint: .isDirectory) }
+    /// The index database and the files SQLite keeps beside it (write-ahead log, shared memory, rollback journal).
+    var indexFiles: [URL] {
+        ["", "-wal", "-shm", "-journal"].map { base.appending(path: IndexStore.mainFile + $0, directoryHint: .notDirectory) }
+    }
     /// The services' logs: llama.cpp's warnings and errors (`LlamaLog`).
     var logs: URL { base.appending(path: "Logs", directoryHint: .isDirectory) }
 

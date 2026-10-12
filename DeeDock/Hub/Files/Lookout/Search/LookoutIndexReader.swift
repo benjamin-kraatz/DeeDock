@@ -73,6 +73,27 @@ actor LookoutIndexReader: LookoutIndexSearching {
         }
     }
 
+    func closeIndex() {
+        trailingReload?.cancel()
+        trailingReload = nil
+        stale = false
+        lastReload = nil
+        // The last references go, so SQLite closes the file; `openIfNeeded` opens whatever is there next time.
+        searcher = nil
+        store = nil
+    }
+
+    func searchableFileCounts(under folders: [String]) -> [String: Int] {
+        guard (try? openIfNeeded()) != nil, let store else { return [:] }
+        var counts: [String: Int] = [:]
+        for folder in folders {
+            // The index stores real paths (/private/var, not /var).
+            let real = FolderSelection.realPath((folder as NSString).standardizingPath)
+            if let count = try? store.searchableFileCount(under: real) { counts[folder] = count }
+        }
+        return counts
+    }
+
     private func trailingReloadFired() {
         trailingReload = nil
         reloadIfStale()

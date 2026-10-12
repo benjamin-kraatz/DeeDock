@@ -53,6 +53,9 @@ final class IndexServiceController: NSObject, LookoutIndexServing, @unchecked Se
     func pause() { work.pause() }
     func resume() { work.resume() }
 
+    func resetIndex() { work.resetIndex() }
+    func closeIndex(reply: @escaping @Sendable () -> Void) { work.closeIndex(reply: reply) }
+
     func currentStatus(reply: @escaping @Sendable (Data) -> Void) {
         reply((try? status.current.encoded()) ?? Data())
     }

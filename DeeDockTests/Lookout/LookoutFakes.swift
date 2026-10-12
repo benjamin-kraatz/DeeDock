@@ -6,7 +6,7 @@ import Foundation
 @MainActor final class FakeIndexConnection: LookoutIndexControlling {
     enum Call: Equatable {
         case start(LookoutIndexConfiguration)
-        case syncNow, pause, resume, invalidate
+        case syncNow, pause, resume, invalidate, resetIndex, closeIndex
         case setBackfillAllowed(Bool)
     }
 
@@ -36,6 +36,13 @@ import Foundation
     func invalidate() {
         calls.append(.invalidate)
         isServiceRunning = false
+    }
+
+    func resetIndex() { calls.append(.resetIndex) }
+
+    func closeIndex(timeout: Duration) async {
+        guard isServiceRunning else { return }
+        calls.append(.closeIndex)
     }
 
     func clearCalls() { calls.removeAll() }
@@ -85,6 +92,8 @@ actor FakeIndexReader: LookoutIndexSearching {
     private(set) var prepared = 0
     private(set) var released = 0
     private(set) var changes = 0
+    private(set) var closed = 0
+    var counts: [String: Int] = [:]
     private var keywordDelays: [String: Duration] = [:]
     private var available = true
 
@@ -103,6 +112,8 @@ actor FakeIndexReader: LookoutIndexSearching {
     func prepareVectors() { prepared += 1 }
     func releaseVectors() { released += 1 }
     func indexDidChange() { changes += 1 }
+    func closeIndex() { closed += 1 }
+    func searchableFileCounts(under folders: [String]) -> [String: Int] { counts.filter { folders.contains($0.key) } }
 }
 
 @MainActor final class FakeMonitor: LookoutMonitoring {

@@ -13,6 +13,8 @@ enum SettingsSection: Hashable, Identifiable {
     case extras
     case windowsFocus
     case suggestionsHistory
+    /// Lookout, the Files tab's search by content. Its own page: the section is the page.
+    case lookout
     /// Personality features slated for removal in 1.0.0, kept reachable but out of the way.
     case deprecated
     case display(String)
@@ -20,7 +22,7 @@ enum SettingsSection: Hashable, Identifiable {
     /// What the app and the dock are; the sidebar's untitled first group.
     static let primary: [SettingsSection] = [.general, .dock, .atmosphere, .modes]
     /// Opt-in capabilities, listed under the sidebar's Features heading.
-    static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory]
+    static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory, .lookout]
     /// Sections that always exist, in sidebar order. Displays are inserted from the profile store.
     static let fixed: [SettingsSection] = primary + featureSections + [.deprecated]
 
@@ -33,6 +35,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .extras: "extras"
         case .windowsFocus: "windowsFocus"
         case .suggestionsHistory: "suggestionsHistory"
+        case .lookout: "lookout"
         case .deprecated: "deprecated"
         case .display(let id): "display.\(id)"
         }
@@ -48,6 +51,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .extras: .settingsExtras
         case .windowsFocus: .settingsWindowsFocus
         case .suggestionsHistory: .settingsSuggestionsHistory
+        case .lookout: .lookoutSettingsTitle
         case .deprecated: .settingsDeprecated
         case .display: nil
         }
@@ -62,6 +66,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .extras: .settingsExtrasSummary
         case .windowsFocus: .settingsWindowsFocusSummary
         case .suggestionsHistory: .settingsSuggestionsHistorySummary
+        case .lookout: .lookoutSettingsSummary
         case .deprecated: .settingsDeprecatedSummary
         case .display: .settingsDisplaySummary
         }
@@ -76,6 +81,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .extras: .symbol("puzzlepiece.extension.fill")
         case .windowsFocus: .symbol("macwindow.on.rectangle")
         case .suggestionsHistory: .symbol("clock.arrow.circlepath")
+        case .lookout: .lookout
         case .deprecated: .symbol("archivebox.fill")
         case .display: .symbol("display")
         }
@@ -90,6 +96,9 @@ enum SettingsSection: Hashable, Identifiable {
         case .extras: [Color(red: 1.0, green: 0.47, blue: 0.72), Color(red: 0.83, green: 0.15, blue: 0.52)]
         case .windowsFocus: [Color(red: 1.0, green: 0.58, blue: 0.34), Color(red: 0.84, green: 0.24, blue: 0.16)]
         case .suggestionsHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
+        // The onboarding hero's gradient (the mockup's `.hero .spybig`), top to bottom.
+        case .lookout: [Color(red: 100 / 255, green: 210 / 255, blue: 1), Color(red: 10 / 255, green: 132 / 255, blue: 1),
+                        Color(red: 94 / 255, green: 92 / 255, blue: 230 / 255)]
         case .deprecated: [Color(red: 0.74, green: 0.72, blue: 0.68), Color(red: 0.50, green: 0.47, blue: 0.42)]
         }
     }
@@ -112,7 +121,7 @@ enum SettingsSection: Hashable, Identifiable {
             [[.appSuggestions, .discovery], [.localHistory, .clipboardMuseum]]
         case .deprecated:
             [SettingsPage.deprecatedPages]
-        case .modes, .atmosphere:
+        case .modes, .atmosphere, .lookout:
             []
         }
     }
@@ -120,7 +129,7 @@ enum SettingsSection: Hashable, Identifiable {
     /// Sections whose pages write dock preferences, so the window offers to restore them.
     var offersRestoreDefaults: Bool {
         switch self {
-        case .general, .atmosphere, .modes: false
+        case .general, .atmosphere, .modes, .lookout: false
         case .dock, .display, .extras, .windowsFocus, .suggestionsHistory, .deprecated: true
         }
     }
@@ -135,6 +144,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .deprecated: [.settingsDeprecatedFeatureNotice]
         case .modes: [.dockModesKeywords]
         case .atmosphere: [.atmosphereSummary]
+        case .lookout: [.lookoutSettingsKeywords]
         case .display: []
         }
     }

@@ -17,7 +17,7 @@ struct LookoutSection: View {
     var body: some View {
         let results = model.lookoutResults
         let phase = model.lookoutPhase
-        let content = LookoutSectionContent(status: model.lookoutStatus, phase: phase, results: results)
+        let content = LookoutSectionContent(status: model.lookoutDisplayStatus, phase: phase, results: results)
         HubFilesSearchSectionHeader(section: .lookout, count: phase == .done && content.body == .results ? results.count : nil)
             .padding(.top, 6)
         if let notice = content.notice {

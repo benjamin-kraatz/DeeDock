@@ -65,6 +65,7 @@ These keep an anchored Hub open through outside clicks, focus loss, and Escape:
 - An open file chooser, an alert or confirmation dialog, or Quick Look.
 - A context menu or options menu from Hub content.
 - A copy or move in the Files tab.
+- Lookout's onboarding card. It closes when the Hub closes, and opens again where it left off.
 
 Focus moving to a menu, Quick Look, or a sheet or child window of the Hub does not count as focus
 loss.
@@ -96,7 +97,8 @@ while a tab's content has focus moves it into the search field.
 Each press of Escape does the first of these that applies:
 
 1. The visible tab handles it. Apps cancels Robi, then drops the arrow-key selection. Files closes
-   Quick Look or cancels a rename. Windows has no Escape step of its own.
+   Lookout's onboarding card, closes Quick Look, or cancels a rename. Windows has no Escape step of
+   its own.
 2. The Hub clears the visible tab's search.
 3. An anchored Hub without a hold closes.
 
@@ -211,15 +213,34 @@ while it is open, and the panel follows. Escape or Space closes it.
 ### Search
 
 Type in the header search field, or start typing over the listing. The scope bar offers
-**This Mac** and the active pane's current folder. Search uses Spotlight and matches file and
-folder names, ignoring case and accents. It does not search file contents.
+**This Mac** and the active pane's current folder. Results replace the panes in two sections.
 
-Results replace the panes and show the name, location, date modified, and size. Prefix matches
-come first, then recently used or modified items. Search collects at most 200 Spotlight results
-and does not update while you look at them. Down moves from the search field into the results.
-Return opens the selected result, or the first one when nothing is selected. A folder result opens
-in the active pane and ends the search. A file opens in its default app. You can drag results out,
-and folder results accept drops.
+**Names · Spotlight** comes first. Spotlight matches file and folder names, ignoring case and
+accents. Each row shows the name, location, date modified, and size. Prefix matches come first,
+then recently used or modified items. This section collects at most 200 Spotlight results and does
+not update while you look at them.
+
+**Lookout · by content** follows. [Lookout](LOOKOUT.md) finds photos, screenshots, PDFs, and
+documents in the folders you chose by what they show or say. Each row has a thumbnail, the
+location, an excerpt with the matched words highlighted, a kind chip (with the page for a PDF), and
+a chip that says whether meaning, exact words, or both matched. A folder whose files keep matching
+shows as one row with a stack of thumbnails. Keyword hits appear first, and the meaning results
+replace them a moment later. Weaker matches fold under **Weaker matches (N)**. When nothing clearly
+fits, the section says so instead of listing guesses. Selecting a Lookout row adds a
+**Why it matched** card to the preview column. Lookout searches the same scope as the names.
+
+The scope bar ends with Lookout's status chip, such as **Lookout ready** or
+**Reading files · 1,204 files left**. Before setup it reads **Lookout off · Set up** and opens
+Lookout's onboarding over the Files tab, and the Lookout section shows a **Set up Lookout** card.
+While the model downloads, the section shows a download card with a progress bar, and the names
+already work. After setup, the chip opens **Settings → Lookout**. When Lookout has been set up and
+turned off, the section is hidden. See [Lookout](GUIDE.md#lookout) for setup and settings.
+
+Down moves from the search field into the results, through the names, then Lookout's hits, then
+the weaker hits while their fold is open. Right and Left open and close the fold. Return opens the
+selected result, or the first one when nothing is selected. Space opens Quick Look. A folder
+result opens in the active pane and ends the search. A file opens in its default app. You can drag
+results out of both sections, and folder results accept drops.
 
 ### Context menu and keyboard
 
@@ -323,8 +344,12 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
 
 ## Known limitations
 
-- File search finds only items in the Spotlight index. Folders excluded from Spotlight, unindexed
+- Name search finds only items in the Spotlight index. Folders excluded from Spotlight, unindexed
   volumes, and some network shares return nothing, and the tab does not say why.
+- Lookout searches only the folders chosen for it, and only documents, PDFs, images, and
+  screenshots. Audio, video, code, and searching with an image are Planned. Its onboarding, macOS's
+  folder prompts, and the model download have not been exercised by hand. See
+  [Lookout](LOOKOUT.md#known-limitations).
 - The Windows tab sees only the current Space, apart from minimized windows and hidden apps.
 - macOS asks for permission the first time the Files tab reads Desktop, Documents, or Downloads.
 - The Hub has no global keyboard shortcut. Open it from the tile or Focus Dock.

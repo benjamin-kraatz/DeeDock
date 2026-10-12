@@ -27,6 +27,12 @@ import Foundation
     func resume()
     /// Drops the connection for good (the engine stopped). A later `start` opens a new one.
     func invalidate()
+    /// "Read everything again": the service queues every file again and syncs. Relaunches it with the last
+    /// configuration first when it isn't running; does nothing before the first `start`.
+    func resetIndex()
+    /// Asks a running service to close the index (`LookoutIndexServing.closeIndex`) and waits for it, at most
+    /// `timeout`. Returns at once when no service is running: one that exited has nothing open.
+    func closeIndex(timeout: Duration) async
 }
 
 /// Why the index service's connection changed.
@@ -83,6 +89,12 @@ nonisolated protocol LookoutIndexSearching: Sendable {
     /// The index service changed the stored vectors (`LookoutIndexStatus.vectorsChangedAt`): reload loaded vectors,
     /// at most every 2 s.
     func indexDidChange() async
+    /// Closes the read-only store and drops the vectors, before the index files are deleted. The next search opens
+    /// the index again once the service has made a new one.
+    func closeIndex() async
+    /// For each folder (absolute paths, as Settings lists them), how many files under it have something to find
+    /// besides their name. Empty while there's no index to read.
+    func searchableFileCounts(under folders: [String]) async -> [String: Int]
 }
 
 /// What the monitor reports.

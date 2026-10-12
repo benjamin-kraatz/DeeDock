@@ -31,6 +31,10 @@ final class HubCoordinator {
     /// Lookout, the Files tab's content search. One engine for the app's lifetime; the dock coordinator starts it
     /// with the other services and `stop()` ends it.
     let lookout: LookoutEngine
+    /// Lookout's onboarding, shown over the Hub, and its model download.
+    let lookoutSetup: LookoutSetupCoordinator
+    /// What Lookout's Settings section shows and does.
+    let lookoutSettings: LookoutSettingsModel
 
     /// Returns where to open for a display, or for the display under the pointer when nil.
     @ObservationIgnored var resolveContext: ((String?) -> HubOpenContext?)?
@@ -71,6 +75,8 @@ final class HubCoordinator {
         let lookout = lookout ?? LookoutEngine.live()
         self.lookout = lookout
         files = HubFilesModel(defaults: defaults, lookout: lookout)
+        lookoutSetup = .live(engine: lookout)
+        lookoutSettings = .live(engine: lookout, setup: lookoutSetup)
         let files = files
         tile.transferProgress = { [weak files] in files?.transferProgress }
         let panel = HubPanelController(state: state, content: HubCoordinatorView(hub: self))
@@ -83,6 +89,35 @@ final class HubCoordinator {
             self?.preferences.detachedFrame = frame
             self?.savePreferences()
         }
+        configureLookout()
+    }
+
+    /// Connects Lookout's onboarding to the Hub: the Files tab's "Set up" leads into it, the card holds the Hub open
+    /// and gives keyboard focus back after the folder picker or a macOS prompt, and the download's progress reaches
+    /// the Files tab's card and chip.
+    private func configureLookout() {
+        let setup = lookoutSetup
+        let files = files
+        files.onSetUpLookout = { [weak self] in self?.presentLookoutSetup() }
+        setup.holdHub = { [weak self] holding in
+            if holding { self?.beginHold(.modal) } else { self?.endHold(.modal) }
+        }
+        setup.refocusHub = { [weak self] in
+            guard let self, isOpen, let window = panel?.window, !window.isKeyWindow else { return }
+            window.makeKey()
+        }
+        setup.focusSearch = { [weak self] in self?.focusSearchField() }
+        setup.downloader.onProgress = { [weak files] in files?.lookoutDownloadProgress = $0 }
+        lookoutSettings.presentSetup = { [weak self] in self?.presentLookoutSetup() }
+    }
+
+    /// Opens Lookout's onboarding over the Files tab, opening the Hub first when it's closed (Settings asks this way).
+    func presentLookoutSetup() {
+        if !isOpen || state.tab != .files { open(tab: .files, trigger: .lookoutSetup) }
+        guard isOpen else { return }
+        lookoutSetup.present()
+        // The header's search field sits under the card; typing must not reach it.
+        focusContent()
     }
 
     /// True while the Hub is on screen.
@@ -177,6 +212,7 @@ final class HubCoordinator {
     /// Ends the Hub for app teardown. Cancels running copies and moves so their partial
     /// destination items are removed before the process exits.
     func stop() {
+        lookoutSetup.downloader.cancel()
         lookout.stop()
         files.transfers.cancelAllForTermination()
         if isOpen { close(restoreFocus: false, animated: false) }
@@ -222,6 +258,7 @@ final class HubCoordinator {
     ///     detached; only moving the Hub to another display keeps it.
     private func close(restoreFocus: Bool, animated: Bool = true, clearsSearch: Bool = true) {
         guard let panel, isOpen else { return }
+        lookoutSetup.hubDidClose()
         hideVisibleTab()
         // Cleared after the visible tab hid, so Files leaves search mode without reactivating its
         // panes and Apps ends its session before its query resets.
@@ -364,6 +401,16 @@ final class HubCoordinator {
     private func handleKeyDown(_ event: NSEvent) -> Bool {
         let editor = panel?.window.firstResponder as? NSTextView
         if editor?.hasMarkedText() == true { return false }
+        if lookoutSetup.isPresented {
+            if lookoutSetup.handleKeyDown(event) { return true }
+            // ⌘W still closes the Hub; anything else goes to the card's focused control.
+            let modifiers = event.modifierFlags.intersection([.command, .control, .option, .shift])
+            if modifiers == .command, event.charactersIgnoringModifiers?.lowercased() == "w" {
+                close(restoreFocus: true)
+                return true
+            }
+            return false
+        }
         let fromSearchField = editor != nil && state.searchFieldFocused
         if model(for: state.tab).handleKeyDown(event, fromSearchField: fromSearchField) { return true }
         let modifiers = event.modifierFlags.intersection([.command, .control, .option, .shift])
@@ -456,6 +503,11 @@ private struct HubCoordinatorView: View {
                     prompt: model.searchPrompt,
                     actions: hub.headerActions) { tab in
             HubTabView(hub: hub, tab: tab)
+        } overlay: {
+            if hub.lookoutSetup.isPresented {
+                LookoutSetupOverlay(setup: hub.lookoutSetup, reduceMotion: hub.state.reduceMotion,
+                                    reduceTransparency: hub.state.reduceTransparency)
+            }
         }
     }
 }

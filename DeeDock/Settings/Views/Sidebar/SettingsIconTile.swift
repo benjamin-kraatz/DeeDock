@@ -8,6 +8,8 @@ enum SettingsGlyph: Hashable {
     case symbol(String)
     /// A display with a dock resting at its bottom edge.
     case dock
+    /// Lookout's spyglass (SF Symbols has none).
+    case lookout
 }
 
 /// Compact symbol artwork shared by sidebar and overview rows.
@@ -35,6 +37,10 @@ struct SettingsIconTile: View {
                 .shadow(color: .black.opacity(0.22), radius: 0.5, y: 0.5)
         case .dock:
             DockTileGlyph(size: size)
+        case .lookout:
+            LookoutGlyph(size: size * 0.62)
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.22), radius: 0.5, y: 0.5)
         }
     }
 }

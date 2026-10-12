@@ -39,4 +39,14 @@ nonisolated extension IndexStore {
         }
         return counts
     }
+
+    /// How many files under `root` have something to find besides their name (done, or long files part read), for
+    /// the Settings folder list. `root` is a real path, as the index stores them. Ignores `scope`.
+    func searchableFileCount(under root: String) throws -> Int {
+        let prefix = root.hasSuffix("/") ? root : root + "/"
+        var count = 0
+        try db.query("SELECT COUNT(*) FROM files WHERE path >= ? AND path < ? AND state IN ('done', 'partial')",
+                     [.text(prefix), .text(prefix + "\u{10FFFF}")]) { count = Int($0.int(0)) }
+        return count
+    }
 }

@@ -36,7 +36,7 @@ final class HubFilesModel: HubTabModel {
     /// Whether the "Weaker matches" fold under Lookout's results is open. It closes again for every new query.
     var lookoutWeakExpanded = false
     /// Progress of Lookout's model download, 0…1, for the Lookout section's download card and the status chip; nil
-    /// when unknown. Phase 3's onboarding download sets it; until then the card shows an indeterminate bar.
+    /// while nothing downloads. `LookoutModelDownloader` sets it (`HubCoordinator.configureLookout`).
     var lookoutDownloadProgress: Double?
     /// The drop target under an in-flight drag, for the accent highlight.
     var dropHighlight: HubFilesDropHighlight?
@@ -55,10 +55,11 @@ final class HubFilesModel: HubTabModel {
     /// for it. The tab also tells it when it appears and hides, which warms and releases what it keeps in memory
     /// (inert while Lookout is off).
     let lookout: LookoutEngine
-    /// "Set up Lookout" in the search results' promo card, and the status chip while Lookout isn't set up. A no-op
-    /// until phase 3 sets it to open Lookout's onboarding.
+    /// "Set up Lookout" in the search results' promo card, and the status chip while Lookout isn't set up: opens
+    /// Lookout's onboarding over the Hub (`HubCoordinator.presentLookoutSetup`).
     @ObservationIgnored var onSetUpLookout: () -> Void = {}
-    /// The status chip once Lookout is set up. A no-op until phase 3 sets it to open Lookout's settings.
+    /// The status chip once Lookout is set up: routes Settings to Lookout's section (`DockCoordinator`). The view
+    /// that calls it opens the Settings window (`openLookoutSettings(using:)`).
     @ObservationIgnored var onOpenLookoutSettings: () -> Void = {}
     @ObservationIgnored let quickLook = HubFilesQuickLook()
     @ObservationIgnored private(set) weak var shell: HubShell?
