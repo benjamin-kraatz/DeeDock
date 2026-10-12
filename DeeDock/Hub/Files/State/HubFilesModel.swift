@@ -148,14 +148,14 @@ final class HubFilesModel: HubTabModel {
 
     /// Shows `folder` in the active pane of the selected tab and clears any search.
     func open(folder: URL) {
-        query = ""
+        endSearch()
         activePane.navigate(to: .folder(normalizing: folder))
         refreshActivation()
     }
 
     /// Opens `url`'s enclosing folder in the active pane and selects it.
     func reveal(_ url: URL) {
-        query = ""
+        endSearch()
         let pane = activePane
         guard let parent = HubFilesPath.parent(of: url) else { return }
         pane.navigate(to: .folder(normalizing: parent))
@@ -274,7 +274,7 @@ final class HubFilesModel: HubTabModel {
 
     /// Navigates the active pane to a sidebar place and clears any search.
     func show(_ location: HubFilesLocation, in pane: HubFilesPane? = nil) {
-        query = ""
+        endSearch()
         (pane ?? activePane).navigate(to: location)
         refreshActivation()
     }
@@ -330,6 +330,14 @@ final class HubFilesModel: HubTabModel {
     }
 
     // MARK: Search
+
+    /// Ends the search before the panes navigate: the words, and a picture searched with. Clearing the words alone
+    /// leaves a picture search showing over the panes, because its field is already empty (`queryDidChange` never
+    /// runs), so the picture goes first.
+    private func endSearch() {
+        if pictureSession.isActive { removePicture(restoringWords: false) }
+        query = ""
+    }
 
     private func queryDidChange(from oldValue: String) {
         // The model replacing the words for a picture runs `searchDidChange` itself.

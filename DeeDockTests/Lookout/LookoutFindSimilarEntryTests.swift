@@ -56,6 +56,19 @@ import Testing
             == .available(isPicture: true))
     }
 
+    @Test func navigatingEndsASearchWithAPicture() {
+        for navigate in [{ (model: HubFilesModel) in model.show(.folder(URL(filePath: "/Users/tester"))) },
+                         { (model: HubFilesModel) in model.open(folder: URL(filePath: "/Users/tester/Desktop")) },
+                         { (model: HubFilesModel) in model.reveal(URL(filePath: "/Users/tester/Desktop/IMG_5012.HEIC")) }] {
+            let model = model()
+            model.findSimilar(photo)
+            #expect(model.isPictureSearch && model.isSearching)
+            // A folder result opened, a sidebar place clicked, a file revealed: the panes show again.
+            navigate(model)
+            #expect(!model.isPictureSearch && !model.isSearching && model.query.isEmpty)
+        }
+    }
+
     @Test func findSimilarOnAFileFromOutsideTheTabSearchesWithIt() async {
         let model = model()
         let url = photo.url
