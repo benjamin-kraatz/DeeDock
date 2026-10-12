@@ -107,9 +107,9 @@ import Testing
         var ran: [URL] = []
     }
 
-    /// Waits for the file actions' check with Lookout, which runs in a task of its own.
-    private func settle(_ state: LauncherFileActionState, until done: () -> Bool) async {
-        for _ in 0..<200 where !done() { await Task.yield() }
+    /// Lets the file actions' own tasks run for a moment, for a check that nothing happens.
+    private func letTasksRun() async {
+        try? await Task.sleep(for: .milliseconds(100))
     }
 
     @Test func aDroppedFileLookoutCanSearchWithListsFindSimilarFirst() async throws {
@@ -120,7 +120,7 @@ import Testing
         state.similar = LauncherFileSimilar(isAvailable: { calls.asked.append($0); return true },
                                             run: { calls.ran.append($0) })
         state.adopt(adoption([file]))
-        await settle(state) { state.similarURL != nil }
+        #expect(await eventually { state.similarURL != nil })
         #expect(calls.asked.map(\.lastPathComponent) == ["IMG_1.png"])
         let first = try #require(state.actions.first)
         #expect(first.id == .findSimilar && first.symbol == "photo.badge.magnifyingglass")
@@ -141,11 +141,11 @@ import Testing
         let state = LauncherFileActionState()
         state.similar = LauncherFileSimilar(isAvailable: { calls.asked.append($0); return false }, run: { _ in })
         state.adopt(adoption([one, two]))
-        await settle(state) { false }
+        await letTasksRun()
         #expect(calls.asked.isEmpty && state.similarURL == nil)
         state.adopt(adoption([one]))
-        await settle(state) { calls.asked.count == 1 }
-        await settle(state) { false }
+        #expect(await eventually { calls.asked.count == 1 })
+        await letTasksRun()
         #expect(calls.asked.map(\.lastPathComponent) == ["IMG_1.png"] && state.similarURL == nil)
         #expect(!state.actions.contains { $0.id == .findSimilar })
     }

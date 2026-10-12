@@ -43,10 +43,22 @@ actor FakePictureReader: LookoutIndexSearching {
     private var sources: [String: LookoutSimilarSource] = [:]
     private var results: LookoutSimilarResults?
     private var delay: Duration = .zero
+    /// Calls to hold until `releaseHeld()`, and the held ones waiting.
+    private var toHold = 0
+    private var held: [CheckedContinuation<Void, Never>] = []
+    /// Calls to `similar` that have returned.
+    private(set) var answered = 0
 
     func setSource(_ source: LookoutSimilarSource) { sources[source.path] = source }
     func setResults(_ results: LookoutSimilarResults?) { self.results = results }
     func setDelay(_ delay: Duration) { self.delay = delay }
+    /// Holds the next call to `similar` until `releaseHeld()`: a reader call that stays in flight as long as a test
+    /// needs, whatever the load.
+    func holdNextAnswer() { toHold += 1 }
+    func releaseHeld() {
+        held.forEach { $0.resume() }
+        held = []
+    }
 
     func search(_ request: LookoutSearchRequest) async throws -> LookoutResultSet? { nil }
     func prepareVectors() {}
@@ -59,7 +71,13 @@ actor FakePictureReader: LookoutIndexSearching {
     func similar(_ request: LookoutSimilarRequest) async throws -> LookoutSimilarResults? {
         requests.append(request)
         let answer = results
-        try? await Task.sleep(for: delay)
+        if toHold > 0 {
+            toHold -= 1
+            await withCheckedContinuation { held.append($0) }
+        } else {
+            try? await Task.sleep(for: delay)
+        }
+        answered += 1
         return answer.map { LookoutSimilarResults(queryIsPicture: request.queryIsPicture, groups: $0.groups) }
     }
 

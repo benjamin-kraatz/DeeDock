@@ -226,7 +226,7 @@ import Testing
     /// engine sends then wins, and the stale "no index" is dropped.
     @Test func theFirstIndexArrivingDuringAReaderCallStillSearches() async throws {
         await reader.setResults(nil)
-        await reader.setDelay(.milliseconds(250))
+        await reader.holdNextAnswer()                     // "no index", held in flight until released below
         let engine = LookoutEngine(settings: .activeForTests, repository: nil, connection: connection,
                                    encoder: encoder, reader: reader, monitor: FakeMonitor(), power: FakePowerPolicy(),
                                    paths: LookoutPaths(base: URL(fileURLWithPath: "/tmp/lookout-picture-engine-tests",
@@ -238,13 +238,14 @@ import Testing
         #expect(await eventually { await reader.requests.count == 1 })
         #expect(search.phase == .reading)                 // the reader call is in flight
         await reader.setResults(someResults())
-        await reader.setDelay(.zero)
         var status = LookoutIndexStatus()
         status.activity = .indexing
         status.counts = IndexStore.Counts(byKindAndState: ["image": ["done": 1, "pending": 9]])
         connection.send(status)                           // the first files
         #expect(await eventually { search.phase == .done && search.results.groups.first?.strong.count == 1 })
-        try await Task.sleep(for: .milliseconds(350))     // the stale answer comes back, and is dropped
+        await reader.releaseHeld()                        // the stale "no index" comes back, and is dropped
+        #expect(await eventually { await reader.answered == 2 })
+        try await Task.sleep(for: .milliseconds(100))
         #expect(search.phase == .done && search.results.groups.first?.strong.count == 1)
         engine.stop()
     }

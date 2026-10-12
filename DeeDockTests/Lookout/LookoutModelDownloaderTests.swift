@@ -36,7 +36,7 @@ struct LookoutModelDownloaderTests {
     }
 
     private func finished(_ downloader: LookoutModelDownloader) async -> Bool {
-        await eventually(timeout: .seconds(10)) { downloader.phase != .downloading }
+        await eventually { downloader.phase != .downloading }
     }
 
     private func installed(_ file: ModelFiles.File) -> URL { paths.models.appending(path: file.name) }

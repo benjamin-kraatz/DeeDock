@@ -158,12 +158,19 @@ actor FakeIndexReader: LookoutIndexSearching {
     }
 }
 
-/// Waits until `condition` holds, polling every few milliseconds, for at most `timeout`.
-@MainActor func eventually(timeout: Duration = .seconds(3), _ condition: () async -> Bool) async -> Bool {
+/// Waits until `condition` holds, for at most `timeout`.
+///
+/// The deadline is generous on purpose: CI runs the whole test target in parallel on a few cores, where a step that
+/// takes milliseconds here can wait seconds for a thread. It only bounds a test that's really stuck; a passing test
+/// returns as soon as its condition holds. Polling starts every 2 ms and backs off to every 50 ms, so dozens of
+/// waiting tests don't keep the main actor busy with checks.
+@MainActor func eventually(timeout: Duration = .seconds(30), _ condition: () async -> Bool) async -> Bool {
     let deadline = ContinuousClock.now + timeout
+    var pause = Duration.milliseconds(2)
     while ContinuousClock.now < deadline {
         if await condition() { return true }
-        try? await Task.sleep(for: .milliseconds(5))
+        try? await Task.sleep(for: pause)
+        pause = min(pause * 2, .milliseconds(50))
     }
     return await condition()
 }
