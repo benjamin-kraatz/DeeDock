@@ -25,35 +25,63 @@ nonisolated enum LookoutPictureInput: Sendable, Equatable {
 
 /// Reads a picture to search with into memory, sized for the encoder (`QueryPicture`), off the main actor. Nothing is
 /// written anywhere: the bytes are read once and dropped when the search has its vector.
+///
+/// The read (blocking `pread`s of up to 512 MB) and the decode and resize (CPU-bound: about 0.15 s in Release, nearly
+/// a second in Debug) run on `queue`, a dispatch queue of their own, never on Swift's cooperative thread pool. That
+/// pool has one thread per core; work that blocks one starves every task and actor waiting for a thread, which is
+/// how parallel tests on a few cores timed out, and how a slow volume would stall the app's other async work.
 nonisolated enum LookoutPictureReading {
     /// The largest picture file read: the indexer's limit (`QueuedFileGate.maxReadBytes`).
     static let maxBytes = 512 << 20
 
     /// A picture file. Sized as a screenshot when macOS or its name says it is one, as the indexer does.
     ///
-    /// The read and the decode run on a worker of their own, which cancelling the caller cancels: a search that's
-    /// replaced stops reading between 8 MB pieces and doesn't decode, so replacing big pictures one after another
-    /// never holds several of their buffers.
+    /// The read and the decode run on `queue`, and cancelling the caller reaches them: a search that's replaced stops
+    /// reading between 8 MB pieces and doesn't decode, so replacing big pictures one after another never holds
+    /// several of their buffers.
     ///
     /// - Throws: `QueryPicture.Failure`, the read's error, or `CancellationError`.
     static func picture(at url: URL) async throws -> QueryPicture {
-        try await cancellably {
-            let data = try bytes(at: url, checkCancellation: Task.checkCancellation)
-            try Task.checkCancellation()
+        try await onQueue { cancellation in
+            let data = try bytes(at: url, checkCancellation: cancellation.check)
+            try cancellation.check()
             let source = try source(data, typeHint: UTType(filenameExtension: url.pathExtension))
             return try QueryPicture.make(from: source, screenshot: Rules.isScreenshot(url))
         }
     }
 
-    /// Runs `work` on a detached worker at user-initiated priority, and cancels the worker when the calling task is
-    /// cancelled (a detached task doesn't inherit cancellation). A caller that's cancelled already starts nothing.
-    private static func cancellably<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T {
+    /// Where pictures are read and decoded: concurrent, so a replaced search finishing its last piece never holds up
+    /// the next one, at user-initiated QoS, as a search the person is waiting for.
+    private static let queue = DispatchQueue(label: "Lookout.PictureReading", qos: .userInitiated,
+                                             attributes: .concurrent)
+
+    /// Cancellation for work on `queue`, where `Task.checkCancellation` can't see the caller's task: the caller's
+    /// cancellation handler sets it, and the work checks it between steps.
+    final class Cancellation: @unchecked Sendable {
+        private let lock = NSLock()
+        private var cancelled = false   // guarded by `lock`
+
+        func cancel() { lock.withLock { cancelled = true } }
+
+        /// - Throws: `CancellationError` once `cancel()` was called.
+        func check() throws {
+            if lock.withLock({ cancelled }) { throw CancellationError() }
+        }
+    }
+
+    /// Runs `work` on `queue` and hands back its result. Cancelling the calling task cancels `work` through the
+    /// `Cancellation` it's given; a caller that's cancelled already starts nothing.
+    private static func onQueue<T: Sendable>(_ work: @escaping @Sendable (Cancellation) throws -> T) async throws -> T {
         try Task.checkCancellation()
-        let worker = Task.detached(priority: .userInitiated, operation: work)
+        let cancellation = Cancellation()
         return try await withTaskCancellationHandler {
-            try await worker.value
+            try await withCheckedThrowingContinuation { continuation in
+                queue.async {
+                    continuation.resume(with: Result { try cancellation.check(); return try work(cancellation) })
+                }
+            }
         } onCancel: {
-            worker.cancel()
+            cancellation.cancel()
         }
     }
 
@@ -78,14 +106,13 @@ nonisolated enum LookoutPictureReading {
                                            checkCancellation: checkCancellation)
     }
 
-    /// Pasted picture bytes. Sized as a screenshot: what people paste is mostly what they just captured. Decoded on a
-    /// worker that cancelling the caller cancels.
+    /// Pasted picture bytes. Sized as a screenshot: what people paste is mostly what they just captured. Decoded on
+    /// `queue`; a caller cancelled before it starts decodes nothing.
     ///
     /// - Throws: `QueryPicture.Failure`, or `CancellationError`.
     static func picture(from data: Data) async throws -> QueryPicture {
-        try await cancellably {
-            try Task.checkCancellation()
-            return try QueryPicture.make(from: source(data, typeHint: nil), screenshot: true)
+        try await onQueue { _ in
+            try QueryPicture.make(from: source(data, typeHint: nil), screenshot: true)
         }
     }
 
