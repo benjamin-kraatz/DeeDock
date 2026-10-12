@@ -52,7 +52,8 @@ final class HubFilesModel: HubTabModel {
     var pictureDropState: HubSearchDropState = .none
     /// True while a drag the field takes is right over it.
     var isPictureDropTargeted = false
-    /// Whether the index holds a vector for a file, by path, as Find Similar checks name results.
+    /// Whether the index holds a vector for a file, by path, as Find Similar checks name results, browser files and
+    /// dragged documents.
     var similarIndexed: [String: Bool] = [:]
 
     // MARK: Services
@@ -84,6 +85,9 @@ final class HubFilesModel: HubTabModel {
     @ObservationIgnored var dropOperationCache: (key: String, operation: NSDragOperation)?
     /// Whether a drag is over the Hub, for the drop well.
     @ObservationIgnored let pictureDrag = HubFilesPictureDrag()
+    /// Asks the index whether a dragged document is in it, while the drag is over the Hub; cancelled when the drop
+    /// well closes (`HubFilesModel+Pictures`).
+    @ObservationIgnored var dragLookup: Task<Void, Never>?
     /// True while the model itself sets `query` for a picture, so the change isn't taken for typing.
     @ObservationIgnored var settingQueryForPicture = false
     /// The picture the picture search last started with, so a scope change or reappearing reuses its vector.

@@ -154,6 +154,8 @@ final class LookoutPictureSearch {
         if case .indexed(let path, let segmentID, let fallback) = input {
             if let stored = await reader.similarSource(path: path, segmentID: segmentID) {
                 guard isCurrent(token) else { return }
+                // A stored vector reads nothing, so it never waits for the picture reader.
+                Analytics.track(LookoutAnalytics.imageSearch(source: source, cold: false))
                 storedSource = stored
                 current = (stored.vector, stored.modality == .image, excluding)
                 await finish(LookoutSimilarRequest(vector: stored.vector, queryIsPicture: stored.modality == .image,

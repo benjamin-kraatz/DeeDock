@@ -15,12 +15,37 @@ import Testing
         let none: (URL) -> LookoutSimilarAvailability? = { _ in nil }
         #expect(LookoutPictureDrop.classify(urls: [photo], hasImageData: false, result: none) == .picture(photo))
         #expect(LookoutPictureDrop.classify(urls: [zip], hasImageData: false, result: none) == .refused)
-        #expect(LookoutPictureDrop.classify(urls: [pdf], hasImageData: false, result: none) == .refused)
+        #expect(LookoutPictureDrop.classify(urls: [URL(filePath: "/x/logo.svg")], hasImageData: false, result: none)
+            == .refused)
         let folder = URL(filePath: "/Users/tester/Pictures/Holiday", directoryHint: .isDirectory)
         #expect(LookoutPictureDrop.classify(urls: [folder], hasImageData: false, result: none) == .refused)
         #expect(LookoutPictureDrop.classify(urls: [], hasImageData: true, result: none) == .imageData)
         #expect(LookoutPictureDrop.classify(urls: [], hasImageData: false, result: none) == nil)
         #expect(LookoutPictureDrop.refused.isAccepted == false && LookoutPictureDrop.imageData.isAccepted)
+        #expect(LookoutPictureDrop.unread.isAccepted == false)
+    }
+
+    /// A document is taken when the index holds it (its stored vector), refused with why when it doesn't, and waits
+    /// for the index's answer before saying either.
+    @Test func aDocumentIsTakenOnlyWhenTheIndexHoldsIt() {
+        let none: (URL) -> LookoutSimilarAvailability? = { _ in nil }
+        func drop(_ known: Bool?, fromFilesPane: Bool = false) -> LookoutPictureDrop? {
+            LookoutPictureDrop.classify(urls: [pdf], hasImageData: false, fromFilesPane: fromFilesPane,
+                                        inIndex: { _ in known }, result: none)
+        }
+        #expect(drop(nil) == nil)
+        #expect(drop(true) == .similar(pdf))
+        #expect(drop(false) == .unread)
+        // Moving files between panes opens the well for a document the index holds, and stays quiet otherwise.
+        #expect(drop(true, fromFilesPane: true) == .similar(pdf))
+        #expect(drop(false, fromFilesPane: true) == nil)
+        #expect(LookoutSimilarAvailability.dependsOnIndex(pdf, isDirectory: false))
+        #expect(!LookoutSimilarAvailability.dependsOnIndex(photo, isDirectory: false))
+        #expect(!LookoutSimilarAvailability.dependsOnIndex(zip, isDirectory: false))
+        // A dropped picture prefers its stored vector and is read when the index doesn't hold it; a document has no
+        // picture to fall back on.
+        #expect(LookoutPictureQuery.dropped(photo).input == .indexed(path: photo.path, segmentID: nil, fallback: photo))
+        #expect(LookoutPictureQuery.dropped(pdf).input == .indexed(path: pdf.path, segmentID: nil, fallback: nil))
     }
 
     @Test func aResultDraggedOntoTheFieldFindsSimilar() {
@@ -39,7 +64,7 @@ import Testing
 
     // MARK: Find Similar
 
-    @Test func findSimilarFollowsWhatLookoutReads() {
+    @Test func findSimilarFollowsWhatLookoutReads() throws {
         func of(_ url: URL, folder: Bool = false, canSearch: Bool = true, inIndex: Bool? = nil) -> LookoutSimilarAvailability {
             LookoutSimilarAvailability.of(url, isDirectory: folder, canSearch: canSearch, inIndex: inIndex)
         }
@@ -47,7 +72,13 @@ import Testing
         #expect(of(photo, inIndex: false) == .available(isPicture: true))   // read like a dropped picture
         #expect(of(pdf, inIndex: true) == .available(isPicture: false))
         #expect(of(pdf) == .available(isPicture: false))                    // not known yet
-        #expect(of(pdf, inIndex: false) == .hidden)                         // nothing to search with
+        #expect(of(pdf, inIndex: false) == .notIndexed)                     // nothing to search with: says why
+        #expect(String(localized: try #require(LookoutSimilarAvailability.notIndexed.disabledReason))
+            == String(localized: .lookoutSimilarNotIndexed))
+        #expect(LookoutSimilarAvailability.available(isPicture: true).disabledReason == nil)
+        let letter = URL(filePath: "/x/Letter.rtfd", directoryHint: .isDirectory)
+        #expect(of(letter, folder: true, inIndex: true) == .available(isPicture: false))   // a package document
+        #expect(of(URL(filePath: "/x/logo.svg")) == .unsupported)
         #expect(of(zip) == .unsupported)
         #expect(of(URL(filePath: "/x/main.swift")) == .unsupported)
         #expect(of(URL(filePath: "/x/Holiday", directoryHint: .isDirectory), folder: true) == .hidden)
@@ -128,11 +159,14 @@ import Testing
         let event = LookoutAnalytics.imageSearch(source: .drop, cold: true)
         #expect(event.name == "lookout_image_search")
         #expect(event.properties.values.mapValues(\.displayText) == ["source": "drop", "cold": "true"])
-        #expect([AnalyticsLookoutImageSource.drop, .paste, .similar].map(\.rawValue) == ["drop", "paste", "similar"])
+        #expect([AnalyticsLookoutImageSource.drop, .paste, .similar, .browser, .hubTile].map(\.rawValue)
+            == ["drop", "paste", "similar", "browser", "hub_tile"])
         #expect(LookoutPictureQuery.dropped(photo).analyticsSource == .drop)
         #expect(LookoutPictureQuery.dropped(photo, via: .paste).analyticsSource == .paste)
         #expect(LookoutPictureQuery.pasted(Data(), image: nil).analyticsSource == .paste)
         #expect(LookoutPictureQuery.similar(pdf, segmentID: nil, isPicture: false).analyticsSource == .similar)
+        #expect(LookoutPictureQuery.similar(pdf, segmentID: nil, isPicture: false, via: .browser).analyticsSource
+            == .browser)
     }
 
     @Test func anOpenedPictureResultSaysItWasAPictureSearch() {

@@ -23,6 +23,38 @@ import Testing
         return model
     }
 
+    // MARK: The browser
+
+    @Test func findSimilarInTheBrowserSearchesWithThePictureAndHasNoWordsToGoBackTo() {
+        let model = model()
+        #expect(!model.isSearching)
+        #expect(model.similarAvailability(for: photo) == .available(isPicture: true))
+        model.findSimilar(photo)
+        #expect(model.isPictureSearch && model.isSearching)
+        #expect(model.pictureQuery?.analyticsSource == .browser)
+        // Its stored vector when the index holds it, else the picture read like a dropped one.
+        #expect(model.pictureQuery?.input == .indexed(path: photo.url.path, segmentID: nil, fallback: photo.url))
+        #expect(model.pictureSession.wordsBefore.isEmpty)
+        #expect(model.query.isEmpty)
+    }
+
+    @Test func theBrowserOffersFindSimilarByWhatLookoutReadsAndHolds() {
+        let model = model()
+        #expect(model.similarAvailability(for: folder) == .hidden)
+        #expect(model.similarAvailability(for: pdf) == .available(isPicture: false))   // until the index answers
+        model.similarIndexed[pdf.url.path] = false
+        #expect(model.similarAvailability(for: pdf) == .notIndexed)
+        model.findSimilar(pdf)
+        #expect(!model.isPictureSearch)   // disabled: nothing to search with
+        model.similarIndexed[pdf.url.path] = true
+        model.findSimilar(pdf)
+        #expect(model.pictureQuery?.input == .indexed(path: pdf.url.path, segmentID: nil, fallback: nil))
+        // Hidden until Lookout can search, as in search results.
+        #expect(self.model(status: .notSetUp).similarAvailability(for: photo) == .hidden)
+        #expect(self.model(status: .waitingForModel).similarAvailability(for: photo) == .hidden)
+        #expect(self.model(status: .paused(.lowPowerMode)).similarAvailability(for: photo) == .available(isPicture: true))
+    }
+
     // MARK: The header field
 
     /// The field editor takes text drags only, so a dragged file reaches the field's drop target (which searches with

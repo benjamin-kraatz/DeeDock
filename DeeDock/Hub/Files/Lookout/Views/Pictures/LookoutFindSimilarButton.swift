@@ -1,11 +1,16 @@
 import SwiftUI
 
-/// Find Similar in the preview column (the mockup's `.simbtn`): a full-width Lookout-tinted button with ⌘⇧L, or,
-/// for a kind of file Lookout doesn't read, the same shape disabled with "Lookout doesn't read this kind of file".
-/// The caller hides it for folders and before Lookout is set up (`LookoutSimilarAvailability.hidden`).
+/// Find Similar in the preview column (the mockup's `.simbtn`): a full-width Lookout-tinted button with ⌘⇧L, or the
+/// same shape disabled with why: "Lookout doesn't read this kind of file", or "Lookout hasn't read this file yet" for
+/// a document the index doesn't hold (`LookoutSimilarAvailability.disabledReason`). The caller hides it for folders
+/// and before Lookout is set up (`LookoutSimilarAvailability.hidden`). Search results and the browser show the same
+/// button.
 struct LookoutFindSimilarButton: View {
-    let isAvailable: Bool
+    let availability: LookoutSimilarAvailability
     let action: () -> Void
+
+    private var isAvailable: Bool { availability.isAvailable }
+    private var reason: LocalizedStringResource { availability.disabledReason ?? .lookoutSimilarUnsupported }
 
     @Environment(\.colorScheme) private var scheme
     @State private var hovered = false
@@ -30,7 +35,7 @@ struct LookoutFindSimilarButton: View {
                         .overlay { RoundedRectangle(cornerRadius: 5).strokeBorder(theme.accentLine, lineWidth: 1) }
                         .accessibilityHidden(true)
                 } else {
-                    Text(.lookoutSimilarUnsupported)
+                    Text(reason)
                         .font(.system(size: 12.5))
                         .multilineTextAlignment(.center)
                 }
@@ -53,15 +58,16 @@ struct LookoutFindSimilarButton: View {
         .disabled(!isAvailable)
         .onHover { hovered = $0 }
         .animation(HubFilesMotion.quick, value: hovered)
-        .help(isAvailable ? Text(.lookoutSimilarHint) : Text(.lookoutSimilarUnsupported))
+        .help(isAvailable ? Text(.lookoutSimilarHint) : Text(reason))
         .accessibilityHint(isAvailable ? Text(.lookoutSimilarHint) : Text(verbatim: ""))
     }
 }
 
 #Preview("Find Similar") {
     VStack(spacing: 10) {
-        LookoutFindSimilarButton(isAvailable: true) {}
-        LookoutFindSimilarButton(isAvailable: false) {}
+        LookoutFindSimilarButton(availability: .available(isPicture: true)) {}
+        LookoutFindSimilarButton(availability: .unsupported) {}
+        LookoutFindSimilarButton(availability: .notIndexed) {}
     }
     .frame(width: 240)
     .padding()

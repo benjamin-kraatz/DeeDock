@@ -4,7 +4,8 @@ import SwiftUI
 ///
 /// One item: a Quick Look preview in a rounded well, its details, and Open, Quick Look, and
 /// Reveal in Finder. Several: a fanned stack with the count and total size. None: the folder.
-/// A Lookout hit also gets "Why it matched" under its details, and a search result Find Similar above the actions.
+/// A Lookout hit also gets "Why it matched" under its details, and one selected file Find Similar above the actions,
+/// in search results and in the browser alike.
 ///
 /// In a search with a picture the column is compact (the mockup's `.pv.im`): a shorter well, one line of details,
 /// and, while nothing is selected, the picture searched with. The well is the one part that gives: it shrinks from
@@ -59,7 +60,7 @@ struct HubFilesPreviewColumn: View {
                         .transition(.opacity)
                 }
             }
-            if let item = selection.first, selection.count == 1, model.isSearching {
+            if let item = selection.first, selection.count == 1 {
                 HubFilesFindSimilar(model: model, item: item)
             }
             if selection.count == 1 {
@@ -123,9 +124,9 @@ private struct LookoutPictureQueryWell: View {
     }
 }
 
-/// Find Similar for the one selected search result: shown when Lookout can search with it, disabled for a kind of
-/// file it doesn't read, and absent for folders. A name result outside the index is checked once, off the main
-/// actor, so a document Lookout hasn't read loses the button.
+/// Find Similar for the one selected file, a search result or a file in the browser: shown when Lookout can search
+/// with it, disabled with why for a kind of file it doesn't read or a document it hasn't read, and absent for folders
+/// and until Lookout can search. Whether the index holds a document is asked off the main actor when it's selected.
 private struct HubFilesFindSimilar: View {
     let model: HubFilesModel
     let item: HubFileItem
@@ -134,7 +135,7 @@ private struct HubFilesFindSimilar: View {
         let availability = model.similarAvailability(for: item)
         Group {
             if availability != .hidden {
-                LookoutFindSimilarButton(isAvailable: availability.isAvailable) {
+                LookoutFindSimilarButton(availability: availability) {
                     model.findSimilarForSelection()
                 }
                 .transition(.opacity)

@@ -4,7 +4,7 @@ import AppKit
 struct LookoutPictureQuery: Identifiable, Equatable {
     /// Where the picture came from.
     enum Origin: Equatable {
-        /// Dropped on the search field (or a copied picture file, pasted).
+        /// Dropped on the search field (a picture, or a document the index holds), or a copied picture file pasted.
         case dropped(URL)
         /// Picture bytes pasted from the pasteboard.
         case pasted
@@ -44,10 +44,15 @@ struct LookoutPictureQuery: Identifiable, Equatable {
         self.analyticsSource = analyticsSource
     }
 
-    /// A picture file dropped on the field, or copied in Finder and pasted (`via: .paste`).
+    /// A file dropped on the field, or a picture file copied in Finder and pasted (`via: .paste`). A file the index
+    /// holds searches with its stored vector, at once; a picture it doesn't hold is read (`LookoutPictureInput.indexed`
+    /// with the picture as its fallback). A document the index doesn't hold has nothing to search with, so the field
+    /// never takes one (`LookoutPictureDrop.unread`).
     static func dropped(_ url: URL, via source: AnalyticsLookoutImageSource = .drop) -> LookoutPictureQuery {
-        LookoutPictureQuery(origin: .dropped(url), name: url.lastPathComponent, input: .file(url),
-                            analyticsSource: source)
+        let fallback = LookoutPictureDrop.isPictureFile(url) ? url : nil
+        return LookoutPictureQuery(origin: .dropped(url), name: url.lastPathComponent,
+                                   input: .indexed(path: url.path, segmentID: nil, fallback: fallback),
+                                   analyticsSource: source)
     }
 
     /// Picture bytes: pasted, or dragged out of an app that offers no file (`via: .drop`).
@@ -59,10 +64,14 @@ struct LookoutPictureQuery: Identifiable, Equatable {
 
     /// Find Similar on the file at `url`: its stored vector (`segmentID` preferred), or, for a picture the index
     /// doesn't hold, the picture read like a dropped one.
-    static func similar(_ url: URL, segmentID: Int64?, isPicture: Bool) -> LookoutPictureQuery {
+    ///
+    /// - Parameter source: Where Find Similar was chosen: a search result (`.similar`), the browser (`.browser`), or
+    ///   the Apps tab's file actions after a drop on the DOKK tile (`.hubTile`).
+    static func similar(_ url: URL, segmentID: Int64?, isPicture: Bool,
+                        via source: AnalyticsLookoutImageSource = .similar) -> LookoutPictureQuery {
         LookoutPictureQuery(origin: .similar(url), name: url.lastPathComponent,
                             input: .indexed(path: url.path, segmentID: segmentID, fallback: isPicture ? url : nil),
-                            analyticsSource: .similar)
+                            analyticsSource: source)
     }
 
     static func == (lhs: LookoutPictureQuery, rhs: LookoutPictureQuery) -> Bool { lhs.id == rhs.id }

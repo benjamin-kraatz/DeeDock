@@ -232,6 +232,10 @@ nonisolated enum AnalyticsLookoutImageSource: String, AnalyticsToken {
     case paste
     /// Find Similar on a result (the button, the menu, ⌘⇧L, or dragging the row onto the field).
     case similar
+    /// Find Similar on a file in the Files tab's browser (the button, the menu, or ⌘⇧L).
+    case browser
+    /// Find Similar in the Apps tab's file actions, for a file dropped on the DOKK tile or the Apps tab.
+    case hubTile = "hub_tile"
 }
 
 /// A step of Lookout's onboarding (`LookoutSetupStep`).

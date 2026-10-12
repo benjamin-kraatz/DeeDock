@@ -18,11 +18,12 @@ enum HubFilesMetrics {
     static let compactPreviewWellHeight: CGFloat = 140
 
     /// How tall the preview well may be: its ideal, down to what it shrinks to when the details, the cards, and the
-    /// actions under it need the room (a three-line name over a two-line sentence). Browsing never shrinks it.
+    /// actions under it need the room (a three-line name over a two-line sentence).
     static func previewWellHeights(pictureSearch: Bool, searching: Bool) -> ClosedRange<CGFloat> {
         if pictureSearch { return 88...compactPreviewWellHeight }
         if searching { return 150...searchPreviewWellHeight }
-        return previewWellHeight...previewWellHeight
+        // Browsing has Find Similar above the actions too: the well gives first, as it does in search.
+        return 170...previewWellHeight
     }
     static let statusBarHeight: CGFloat = 46
     static let tileIconSize: CGFloat = 54

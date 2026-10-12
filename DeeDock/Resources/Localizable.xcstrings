@@ -25326,6 +25326,24 @@
         }
       }
     },
+    "lookoutPictureDropDocument" : {
+      "comment" : "Files search field: shown inside the field while a document Lookout has read (a PDF, a text file) is dragged over the Hub. Dropping it on the field searches for files like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablegen, um ähnliche Dateien zu finden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop to find files like this one"
+          }
+        }
+      }
+    },
     "lookoutPicturePrompt" : {
       "comment" : "Files search field: VoiceOver label of the text field while a picture is being searched with. Typing replaces the picture with a search by words.",
       "extractionState" : "manual",
@@ -25772,6 +25790,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Searches with this file for pictures and documents like it."
+          }
+        }
+      }
+    },
+    "lookoutSimilarNotIndexed" : {
+      "comment" : "Disabled Find Similar button in the Files preview column, and the search field's drop well while such a file is dragged over the Hub: a document of a kind Lookout reads (a PDF, a text file) that it hasn't read, because it's outside the chosen folders or still waiting. Lookout is the feature's name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout hat diese Datei noch nicht gelesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout hasn’t read this file yet"
           }
         }
       }

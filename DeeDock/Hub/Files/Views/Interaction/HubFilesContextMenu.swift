@@ -16,8 +16,8 @@ enum HubFilesContextMenu {
         menu.add(.hubFilesMenuQuickLook, key: " ", modifiers: []) { model.toggleQuickLook() }
         menu.add(.hubFilesMenuReveal, key: "r", modifiers: [.command, .option]) { model.revealSelectionInFinder() }
         menu.add(.hubFilesMenuCopyPath, key: "c", modifiers: [.command, .option]) { model.copySelectionPaths() }
-        // Search results offer Find Similar: hidden for folders and before Lookout is set up, disabled for kinds of
-        // file Lookout doesn't read.
+        // One search result or browser file offers Find Similar: hidden for folders and until Lookout can search,
+        // disabled for kinds of file Lookout doesn't read and for documents it hasn't read.
         let similar = model.selectionSimilarAvailability
         if similar != .hidden {
             menu.addItem(.separator())

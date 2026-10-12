@@ -68,6 +68,16 @@ final class HubFilesPictureDrag {
         return drop
     }
 
+    /// Whether `key` holds the drag right now.
+    func holds(_ key: String) -> Bool { inside.contains(key) }
+
+    /// Forgets the classification, so the next `classify` reads the drag again: what decides it changed (the index
+    /// answered whether it holds the dragged document).
+    func forgetClassification() {
+        classifiedChangeCount = nil
+        drop = nil
+    }
+
     /// The drag left the Hub (or was dropped): forget where it was and what it is. A drag that began in the Files
     /// tab keeps its origin until `sessionEnded`, in case it comes back.
     func reset() {

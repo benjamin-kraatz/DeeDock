@@ -98,44 +98,53 @@ extension HubFilesModel {
 
     // MARK: Find Similar
 
-    /// Whether Find Similar is offered for `item`, a name result or a Lookout hit.
+    /// Whether Find Similar is offered for `item`: a name result, a Lookout hit, or a file in the browser.
     func similarAvailability(for item: HubFileItem) -> LookoutSimilarAvailability {
         let inIndex = isLookoutHitPath(item.url.path) ? true : similarIndexed[item.url.path]
         return LookoutSimilarAvailability.of(item.url, isDirectory: item.isDirectory, canSearch: canSearchPictures,
                                              inIndex: inIndex, options: similarOptions)
     }
 
-    /// Learns whether the index holds `item`, so a document outside it shows no Find Similar. Cheap: one indexed
-    /// query; the answer is kept for the session.
+    /// Learns whether the index holds `item`, a document, so one Lookout hasn't read shows Find Similar disabled with
+    /// why. Cheap: one indexed query. A file the index holds is remembered for the session; one it doesn't is asked
+    /// about again when it's selected again, since the backfill may have read it meanwhile.
     func checkSimilarIndexed(_ item: HubFileItem) async {
         let path = item.url.path
-        guard canSearchPictures, !item.isDirectory, similarIndexed[path] == nil, !isLookoutHitPath(path),
-              previewOverrides.lookoutStatus == nil else { return }
-        let found = await lookout.indexedPaths([path])
-        similarIndexed[path] = found.contains(path)
+        guard canSearchPictures, similarIndexed[path] != true, !isLookoutHitPath(path),
+              previewOverrides.lookoutStatus == nil,
+              LookoutSimilarAvailability.dependsOnIndex(item.url, isDirectory: item.isDirectory, options: similarOptions)
+        else { return }
+        similarIndexed[path] = await isIndexed(path)
     }
 
-    /// Find Similar on a result: a Lookout hit searches with the segment it matched (that PDF page), anything else
-    /// with the file's picture or first segment; a picture the index doesn't hold is read like a dropped one.
+    /// Find Similar on a result or a file in the browser: a Lookout hit searches with the segment it matched (that PDF
+    /// page), anything else with the file's picture or first segment; a picture the index doesn't hold is read like a
+    /// dropped one. From the browser there were no words, so the results bar has no "Back to".
     func findSimilar(_ item: HubFileItem, segmentID: Int64? = nil) {
         guard case .available(let isPicture) = similarAvailability(for: item) else { return }
-        searchWithPicture(.similar(item.url, segmentID: segmentID, isPicture: isPicture))
+        let source: AnalyticsLookoutImageSource = isSearching ? .similar : .browser
+        searchWithPicture(.similar(item.url, segmentID: segmentID, isPicture: isPicture, via: source))
     }
 
-    /// ⌘⇧L, the menu item and the button: Find Similar on the one selected search result.
+    /// ⌘⇧L, the menu item and the button: Find Similar on the one selected search result or browser file.
     func findSimilarForSelection() {
-        guard isSearching else { return }
-        if let hit = selectedLookoutHit {
+        if isSearching, let hit = selectedLookoutHit {
             findSimilar(hit.fileItem, segmentID: hit.segmentID)
         } else if actionableItems.count == 1, let item = actionableItems.first {
             findSimilar(item)
         }
     }
 
-    /// Whether the single selected search result has Find Similar to offer, for the button and the menu.
+    /// Whether the single selected item (a search result, or a file in the active pane) has Find Similar to offer,
+    /// for the button, the menu and ⌘⇧L.
     var selectionSimilarAvailability: LookoutSimilarAvailability {
-        guard isSearching, actionableItems.count == 1, let item = actionableItems.first else { return .hidden }
+        guard actionableItems.count == 1, let item = actionableItems.first else { return .hidden }
         return similarAvailability(for: item)
+    }
+
+    /// Whether the index holds a vector for the file at `path`.
+    private func isIndexed(_ path: String) async -> Bool {
+        await lookout.indexedPaths([path]).contains(path)
     }
 
     private var similarOptions: IndexOptions {
@@ -255,8 +264,11 @@ extension HubFilesModel: HubSearchExtras {
 
     func hubDragChanged(inside: Bool) { pictureDragActivity("hub", inside: inside) }
 
+    /// The search field's key in the drag tracking (`HubFilesPictureDrag`).
+    static let fieldDragKey = "field"
+
     func searchFieldDragTargeted(_ targeted: Bool) {
-        pictureDragActivity("field", inside: targeted)
+        pictureDragActivity(Self.fieldDragKey, inside: targeted)
         isPictureDropTargeted = targeted && searchFieldAcceptsDrag
     }
 
@@ -265,22 +277,25 @@ extension HubFilesModel: HubSearchExtras {
     func searchFieldPerformDrop() -> Bool {
         let pasteboard = NSPasteboard(name: .drag)
         let drop = pictureDrag.drop
+        let origin = pictureDrag.origin
         pictureDragEnded()
         switch drop {
         case .picture(let url):
+            // Its stored vector when the index holds it, else the picture read.
             searchWithPicture(.dropped(url))
         case .similar(let url):
             if let hit = (isPictureSearch ? pictureResults.all : lookoutResults.all).first(where: { $0.path == url.path }) {
                 findSimilar(hit.fileItem, segmentID: hit.segmentID)
-            } else if let item = searchResults.first(where: { $0.url == url }) {
+            } else if origin == .searchResult, let item = searchResults.first(where: { $0.url == url }) {
                 findSimilar(item)
             } else {
-                return false
+                // A document the index holds, from a pane or from outside DOKK: its stored vector.
+                searchWithPicture(.dropped(url))
             }
         case .imageData:
             guard let data = Self.pictureData(on: pasteboard) else { return false }
             searchWithPicture(.pasted(data, image: Self.thumbnail(of: data), via: .drop))
-        case .refused, nil:
+        case .unread, .refused, nil:
             return false
         }
         return true
@@ -294,27 +309,59 @@ extension HubFilesModel: HubSearchExtras {
     }
 
     /// A region with key `key` heard a drag enter or leave. The first entry classifies the drag and opens the well;
-    /// a picture also wakes Lookout's picture reader, so it's ready by the drop.
+    /// a picture from outside DOKK also wakes Lookout's picture reader, so it's ready by the drop.
     func pictureDragActivity(_ key: String, inside: Bool) {
         guard isVisible, lookoutStatus != .off else { return }
         if inside {
             guard pictureDrag.enter(key) else { return }
-            let drop = pictureDrag.classify(NSPasteboard(name: .drag)) { classifyDrag($0) }
-            switch drop {
-            case .refused?:
-                pictureDropState = .refusing(message: String(localized: .lookoutPictureDropRefused))
-            case .some(.picture), .some(.imageData):
-                pictureDropState = .accepting(message: String(localized: .lookoutPictureDropHere))
-                // A picture from outside is most likely headed for the field. Pictures moved between the tab's own
-                // panes usually aren't, and the reader's 555 MB shouldn't load for every move.
-                if pictureDrag.origin == .outside { lookout.warmPictureReader() }
-            case .some(.similar):
-                pictureDropState = .accepting(message: String(localized: .lookoutPictureDropHere))
-            case nil:
-                pictureDropState = .none
-            }
+            showDropWell(for: pictureDrag.classify(NSPasteboard(name: .drag)) { classifyDrag($0) })
         } else {
             pictureDrag.exit(key) { [weak self] in self?.closeDropWell() }
+        }
+    }
+
+    private func showDropWell(for drop: LookoutPictureDrop?) {
+        switch drop {
+        case .refused?:
+            pictureDropState = .refusing(message: String(localized: .lookoutPictureDropRefused))
+        case .unread?:
+            pictureDropState = .refusing(message: String(localized: .lookoutSimilarNotIndexed))
+        case .some(.picture), .some(.imageData):
+            pictureDropState = .accepting(message: String(localized: .lookoutPictureDropHere))
+            // A picture from outside is most likely headed for the field. Pictures moved between the tab's own
+            // panes usually aren't, and the reader's 555 MB shouldn't load for every move. Documents never wake it.
+            if pictureDrag.origin == .outside { lookout.warmPictureReader() }
+        case .similar(let url)?:
+            let message: LocalizedStringResource = LookoutPictureDrop.isPictureFile(url) ? .lookoutPictureDropHere
+                : .lookoutPictureDropDocument
+            pictureDropState = .accepting(message: String(localized: message))
+        case nil:
+            pictureDropState = .none
+            lookUpDraggedDocument()
+        }
+    }
+
+    /// A dragged document whose place in the index isn't known yet: asks the index (one query, a few milliseconds)
+    /// and classifies the drag again with the answer, while it's still the same drag over the Hub. The answer is
+    /// kept, so moving off and on again doesn't ask twice. The lookup is `dragLookup`, cancelled when the well closes.
+    private func lookUpDraggedDocument() {
+        let pasteboard = NSPasteboard(name: .drag)
+        guard canSearchPictures, let url = Self.draggedFiles(on: pasteboard).first, similarIndexed[url.path] == nil,
+              LookoutSimilarAvailability.dependsOnIndex(url, isDirectory: url.hasDirectoryPath, options: similarOptions)
+        else { return }
+        let changeCount = pasteboard.changeCount
+        dragLookup?.cancel()
+        dragLookup = Task { [weak self] in
+            guard let self else { return }
+            let held = await isIndexed(url.path)
+            guard !Task.isCancelled else { return }
+            dragLookup = nil
+            similarIndexed[url.path] = held
+            let current = NSPasteboard(name: .drag)
+            guard pictureDrag.isActive, current.changeCount == changeCount else { return }
+            pictureDrag.forgetClassification()
+            showDropWell(for: pictureDrag.classify(current) { classifyDrag($0) })
+            isPictureDropTargeted = pictureDrag.holds(Self.fieldDragKey) && searchFieldAcceptsDrag
         }
     }
 
@@ -325,22 +372,30 @@ extension HubFilesModel: HubSearchExtras {
     }
 
     private func closeDropWell() {
+        dragLookup?.cancel()
+        dragLookup = nil
         pictureDrag.reset()
         pictureDropState = .none
         isPictureDropTargeted = false
     }
 
+    /// The file URLs on a drag pasteboard, in order.
+    private static func draggedFiles(on pasteboard: NSPasteboard) -> [URL] {
+        pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+    }
+
     private func classifyDrag(_ pasteboard: NSPasteboard) -> LookoutPictureDrop? {
         // DOKK's own dock-item drags rearrange the dock; the field has nothing to say about them.
         guard pasteboard.string(forType: DockDragCoordinator.pasteboardType) == nil else { return nil }
-        let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true])
-            as? [URL] ?? []
+        let urls = Self.draggedFiles(on: pasteboard)
         let hasImageData = pasteboard.availableType(from: Self.pictureTypes) != nil
         let hits = isPictureSearch ? pictureResults.all : lookoutResults.all
         let names = isPictureSearch ? [] : searchResults
         let fromResults = pictureDrag.origin == .searchResult
+        let indexed = similarIndexed
         return LookoutPictureDrop.classify(urls: urls, hasImageData: hasImageData,
-                                           fromFilesPane: pictureDrag.origin == .filesPane) { url in
+                                           fromFilesPane: pictureDrag.origin == .filesPane, options: similarOptions,
+                                           inIndex: { indexed[$0.path] }) { url in
             // A Lookout hit is in the index, so Find Similar works on it; a folder hit has nothing to search with.
             if let hit = hits.first(where: { $0.path == url.path }) {
                 return hit.isFolder ? .hidden : .available(isPicture: LookoutPictureDrop.isPictureFile(url))

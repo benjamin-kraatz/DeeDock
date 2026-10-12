@@ -21,9 +21,10 @@ extension HubFilesModel {
             return false
         }
 
-        // Searching with a picture: ⌘V pastes one, ⌘⇧L finds files like the selection, wherever the focus is.
+        // Searching with a picture: ⌘V pastes one, ⌘⇧L finds files like the selected result or browser file, wherever
+        // the focus is.
         if flags == .command, character == "v", pastePicture() { return true }
-        if flags == [.command, .shift], character == "l", isSearching {
+        if flags == [.command, .shift], character == "l", selectionSimilarAvailability != .hidden {
             findSimilarForSelection()
             return true
         }
