@@ -273,7 +273,7 @@ final class IndexWork: @unchecked Sendable {
         do {
             let summary = try indexer.sync(availability.available)
             if summary.queued.count <= Self.newFilesLimit { newFiles.formUnion(summary.queued) }
-            if summary.changed + summary.removed > 0 { status.update { $0.vectorsChangedAt = Date() } }
+            if summary.vectorsChanged { status.update { $0.vectorsChangedAt = Date() } }
             refreshCounts(store, force: true)
             return true
         } catch {
@@ -304,13 +304,15 @@ final class IndexWork: @unchecked Sendable {
         })
     }
 
-    /// One file read: progress, the file for the onboarding feed, and a reload hint when it got vectors.
+    /// One file read: progress, the file for the onboarding feed, and a reload hint when its segments changed. A
+    /// file comes back `pending` only when the indexer queued it again because another file is at its path
+    /// (`QueuedFileGate`), which deletes its segments.
     private func report(_ path: String, _ kind: FileKind, _ state: String, done: Int, total: Int, _ store: IndexStore) {
-        let gotSegments = state == "done" || state == "partial"
+        let segmentsChanged = state == "done" || state == "partial" || state == "pending"
         status.update {
             ($0.done, $0.total) = (done, total)
             $0.current = .init(kind: kind, name: (path as NSString).lastPathComponent)
-            if gotSegments { $0.vectorsChangedAt = Date() }
+            if segmentsChanged { $0.vectorsChangedAt = Date() }
         }
         refreshCounts(store, force: false)
     }

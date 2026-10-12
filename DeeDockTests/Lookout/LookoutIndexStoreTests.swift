@@ -56,7 +56,7 @@ struct LookoutIndexStoreTests {
         #expect(try store.file(at: "/a/x.png")?.state == "done")
         // Replaced with contents of the same length, the date kept: another inode.
         let replaced = try IndexSync.apply(crawl([file("/a/x.png", inode: 2)]), roots: roots, to: store)
-        #expect(replaced.changed == 1 && replaced.queued == [id])
+        #expect(replaced.changed == 1 && replaced.queued == [id] && replaced.vectorsChanged)
         let record = try #require(try store.file(at: "/a/x.png"))
         #expect(record.state == "pending" && record.inode == 2)
         #expect(try count(store, "SELECT COUNT(*) FROM segments WHERE kind != 'name'") == 0)
@@ -76,26 +76,50 @@ struct LookoutIndexStoreTests {
         let renamed = try IndexSync.apply(crawl([file("/a/Screenshot capture.png", kind: .screenshot, inode: 3)]),
                                           roots: roots, to: store)
         #expect(renamed.moved == 1 && renamed.added == 0 && renamed.removed == 0 && renamed.queued == [id])
+        #expect(renamed.changed == 1 && renamed.vectorsChanged, "its segments went: the app reloads")
         let record = try #require(try store.file(at: "/a/Screenshot capture.png"))
         #expect(record.id == id && record.kind == .screenshot && record.state == "pending")
         #expect(try count(store, "SELECT COUNT(*) FROM segments WHERE kind != 'name'") == 0)
     }
 
-    /// A drive gets a new device number at every mount, and the rows keep the old one: a rename after a remount is
-    /// still a move, found by the root's current device.
-    @Test func aRenameAfterARemountIsStillAMove() throws {
+    /// A drive gets a new device number at every mount. The sync after a remount records it for each unchanged file
+    /// without reading it again, so a later rename is still a move and keeps the vectors.
+    @Test func aRemountRefreshesTheDeviceAndALaterRenameKeepsTheVectors() throws {
+        let store = try store()
+        let roots = [URL(fileURLWithPath: "/a")]
+        let id = try #require(try IndexSync.apply(crawl([file("/a/scan.png", inode: 5, device: 1)]), roots: roots,
+                                                  to: store).queued.first)
+        try store.addSegment(file: id, kind: .image, modality: .image, vector: vector)
+        try store.finish(id, state: "done")
+        let remounted = try IndexSync.apply(crawl([file("/a/scan.png", inode: 5, device: 9)]), roots: roots, to: store)
+        #expect(remounted.unchanged == 1 && remounted.queued.isEmpty && !remounted.vectorsChanged)
+        #expect(try store.file(at: "/a/scan.png")?.device == 9 && store.file(at: "/a/scan.png")?.state == "done")
+        let renamed = try IndexSync.apply(crawl([file("/a/scan 2.png", inode: 5, device: 9)]), roots: roots, to: store)
+        #expect(renamed.moved == 1 && renamed.added == 0 && renamed.removed == 0 && renamed.queued.isEmpty)
+        #expect(!renamed.vectorsChanged)
+        #expect(try store.file(at: "/a/scan 2.png")?.id == id)
+        #expect(try count(store, "SELECT COUNT(*) FROM segments WHERE kind != 'name'") == 1, "vectors kept")
+    }
+
+    /// A volume mounted inside a root numbers its inodes on its own. A file there that goes, and a new file on the
+    /// root's volume with the same inode, size, date and kind, are two files: the new one is read, never handed the
+    /// old one's contents. The root here is a real folder, so its device is the one the candidates carry.
+    @Test func aFileOnANestedVolumeIsNeverTakenForAnotherVolumesFile() throws {
         let store = try store()
         let roots = [folder.url]
         var info = stat()
         try #require(stat(folder.path, &info) == 0)
-        let device = UInt64(bitPattern: Int64(info.st_dev))
-        let old = file(folder.path + "/scan.png", inode: 5, device: device &+ 1000)   // found under the old mount
-        let id = try #require(try IndexSync.apply(crawl([old]), roots: roots, to: store).queued.first)
+        let rootDevice = UInt64(bitPattern: Int64(info.st_dev))
+        let nested = file(folder.path + "/Mounted/photo.png", inode: 42, device: rootDevice &+ 1)
+        let id = try #require(try IndexSync.apply(crawl([nested]), roots: roots, to: store).queued.first)
+        try store.addSegment(file: id, kind: .image, modality: .image, vector: vector)
         try store.finish(id, state: "done")
-        let renamed = try IndexSync.apply(crawl([file(folder.path + "/scan 2.png", inode: 5, device: device)]),
-                                          roots: roots, to: store)
-        #expect(renamed.moved == 1 && renamed.added == 0 && renamed.removed == 0 && renamed.queued.isEmpty)
-        #expect(try store.file(at: folder.path + "/scan 2.png")?.id == id)
+        let newFile = file(folder.path + "/photo.png", inode: 42, device: rootDevice)
+        let summary = try IndexSync.apply(crawl([newFile]), roots: roots, to: store)
+        #expect(summary.moved == 0 && summary.added == 1 && summary.removed == 1 && summary.vectorsChanged)
+        let record = try #require(try store.file(at: folder.path + "/photo.png"))
+        #expect(record.id != id && record.state == "pending")
+        #expect(try count(store, "SELECT COUNT(*) FROM segments WHERE kind != 'name'") == 0)
     }
 
     @Test func aChangedFileIsQueuedAgainWithoutItsOldSegments() throws {

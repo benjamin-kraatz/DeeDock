@@ -75,6 +75,11 @@ nonisolated extension IndexStore {
                   .int(id)])
     }
 
+    /// Records the device number a file's volume has now (it changes at every mount), without reading it again.
+    func setDevice(_ id: Int64, _ device: UInt64) throws {
+        try db.run("UPDATE files SET device = ? WHERE id = ?", [.int(Int64(bitPattern: device)), .int(id)])
+    }
+
     /// Records a newer last-used date for a file whose contents didn't change (it moves up the queue if it's pending).
     func setLastUsed(_ id: Int64, _ lastUsed: Double?) throws {
         try db.run("UPDATE files SET last_used = ? WHERE id = ?", [.optional(lastUsed), .int(id)])

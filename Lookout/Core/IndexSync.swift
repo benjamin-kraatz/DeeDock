@@ -1,6 +1,5 @@
 // Adapted from DigUp (MIT, © 2026 Abdur Rahim) — https://github.com/ARahim3/DigUp
 
-import Darwin
 import Foundation
 
 /// Reconciles the index with a crawl: new files are queued, changed ones re-queued, moved ones re-pathed (no
@@ -11,10 +10,16 @@ import Foundation
 nonisolated enum IndexSync {
     /// What one sync changed.
     struct Summary: Sendable {
+        /// `changed` counts every file queued again in place of its segments, including a move that changed the
+        /// file's kind (that one counts as `moved` too).
         var added = 0, changed = 0, moved = 0, removed = 0, unchanged = 0
         var crawl: CrawlReport
         /// Files this sync queued for embedding (new or changed), so a watcher can index exactly those first.
         var queued: [Int64] = []
+
+        /// Whether this sync deleted segments the app may have loaded: a changed file (also one moved under a name of
+        /// another kind) loses them, and so does a removed one. The app then reloads its vectors.
+        var vectorsChanged: Bool { changed + removed > 0 }
     }
 
     /// Applies `crawl` (a crawl of `roots`) to `store`, in one transaction.
@@ -26,24 +31,16 @@ nonisolated enum IndexSync {
         // /var, or every sync would insert them again. A root that isn't there resolves to itself.
         let rootPaths = roots.map { FolderSelection.realPath($0.standardizedFileURL.path) }
         let existing = try store.files(under: rootPaths)
-        // Moves are found by volume and inode. A row's stored device can be stale: a drive gets a new device number at
-        // every mount, and an unchanged file keeps the number it was found with. So each row is keyed by the device
-        // its root has now (one `stat` per root and sync), which is what the crawl's candidates carry. A root that
-        // can't be read now falls back to the stored number. Rows on a volume mounted inside a root are keyed by the
-        // root's volume, so their moves aren't found and they're read again, which is only slower.
-        let rootDevices: [(path: String, device: UInt64)] = rootPaths.compactMap { root in
-            var info = stat()
-            guard stat(root, &info) == 0 else { return nil }
-            return (root, UInt64(bitPattern: Int64(info.st_dev)))
-        }.sorted { $0.path.count > $1.path.count }
-        func currentDevice(of row: FileRecord) -> UInt64 {
-            rootDevices.first { FolderSelection.isInside(row.path, $0.path) }?.device ?? row.device
-        }
+        // Moves are matched strictly on the stored device and inode (plus size and date): an inode number means one
+        // file only on its own volume, and a volume mounted inside a root has its own numbers. A drive gets a new
+        // device number at every mount, so the stored one is kept current instead: a file found unchanged at its path
+        // takes the device its candidate reports (below), which is exact for each file, nested volumes included. A
+        // rename in the very sync that follows a remount then doesn't match, and that one file is read again.
         var byPath: [String: FileRecord] = [:]
         var byInode: [String: FileRecord] = [:]
         for file in existing {
             byPath[file.path] = file
-            byInode["\(currentDevice(of: file)):\(file.inode)"] = file
+            byInode["\(file.device):\(file.inode)"] = file
         }
         let seen = Set(crawl.candidates.map(\.path))
         var movedFrom = Set<String>()
@@ -63,6 +60,8 @@ nonisolated enum IndexSync {
                         // Opened since: a pending file moves up the queue. (Spotlight only answers for files it
                         // has a date for, so a missing date never clears a known one.)
                         if let lastUsed = file.lastUsed, lastUsed != row.lastUsed { try store.setLastUsed(row.id, lastUsed) }
+                        // Remounted: the same file under the drive's new device number, kept for move matching.
+                        if row.device != file.device { try store.setDevice(row.id, file.device) }
                         summary.unchanged += 1
                     }
                 } else if let row = byInode["\(file.device):\(file.inode)"], !seen.contains(row.path),
@@ -72,6 +71,7 @@ nonisolated enum IndexSync {
                         // The new name changed what it is ("capture.png" → "Screenshot capture.png"), and a screenshot
                         // is read differently (OCR): read again as what it is now.
                         try store.requeue(row.id, as: file)
+                        summary.changed += 1   // its segments went (`vectorsChanged`)
                         summary.queued.append(row.id)
                     } else if let lastUsed = file.lastUsed, lastUsed != row.lastUsed {
                         try store.setLastUsed(row.id, lastUsed)
