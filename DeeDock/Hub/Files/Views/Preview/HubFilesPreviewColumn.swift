@@ -5,6 +5,11 @@ import SwiftUI
 /// One item: a Quick Look preview in a rounded well, its details, and Open, Quick Look, and
 /// Reveal in Finder. Several: a fanned stack with the count and total size. None: the folder.
 /// A Lookout hit also gets "Why it matched" under its details, and a search result Find Similar above the actions.
+///
+/// In a search with a picture the column is compact (the mockup's `.pv.im`): a shorter well, one line of details,
+/// and, while nothing is selected, the picture searched with. The well is the one part that gives: it shrinks from
+/// its ideal height down to `HubFilesMetrics.previewWellHeights` lower bound before a long name or a two-line
+/// sentence could push Open, Quick Look, and Reveal off the bottom of the 640 pt Hub.
 struct HubFilesPreviewColumn: View {
     let model: HubFilesModel
 
@@ -14,9 +19,8 @@ struct HubFilesPreviewColumn: View {
 
     var body: some View {
         let selection = selection
-        // A search with a picture keeps the preview shorter, so the comparison and Find Similar fit (the mockup's
-        // `.pv.im`).
-        let compact = model.isPictureSearch
+        let wellHeights = HubFilesMetrics.previewWellHeights(pictureSearch: model.isPictureSearch,
+                                                             searching: model.isSearching)
         VStack(alignment: .leading, spacing: 10) {
             Text(.hubFilesPreviewTitle)
                 .font(.system(size: 12.5, weight: .semibold))
@@ -24,7 +28,10 @@ struct HubFilesPreviewColumn: View {
                 .accessibilityAddTraits(.isHeader)
             well(selection)
                 .frame(maxWidth: .infinity)
-                .frame(height: compact ? HubFilesMetrics.compactPreviewWellHeight : HubFilesMetrics.previewWellHeight)
+                .frame(minHeight: wellHeights.lowerBound, idealHeight: wellHeights.upperBound,
+                       maxHeight: wellHeights.upperBound)
+                // Laid out first, with room for the text and cards set aside, so the well gives before they do.
+                .layoutPriority(1)
                 .background(HubFilesTheme(scheme).well, in: .rect(cornerRadius: 14))
                 .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(HubFilesTheme(scheme).line, lineWidth: 0.5) }
                 .overlay(alignment: .bottomTrailing) {
@@ -36,7 +43,7 @@ struct HubFilesPreviewColumn: View {
                     }
                 }
                 .clipShape(.rect(cornerRadius: 14))
-                .id(selection.map(\.url))
+                .id(wellID(selection))
                 .transition(.opacity.combined(with: .scale(scale: 0.97)))
             HubFilesPreviewDetails(model: model, selection: selection)
             if let hit = model.selectedLookoutHit {
@@ -67,7 +74,15 @@ struct HubFilesPreviewColumn: View {
         .overlay(alignment: .leading) {
             Rectangle().fill(HubFilesTheme(scheme).line).frame(width: 0.5)
         }
-        .animation(HubFilesMotion.animation(.spring(response: 0.35, dampingFraction: 0.85)), value: selection.map(\.url))
+        .animation(HubFilesMotion.animation(.spring(response: 0.35, dampingFraction: 0.85)), value: wellID(selection))
+    }
+
+    /// What the well shows, so it cross-fades when that changes: the selection, or the picture searched with.
+    private func wellID(_ selection: [HubFileItem]) -> [URL] {
+        if selection.isEmpty, let picture = model.pictureQuery {
+            return [picture.fileURL ?? URL(filePath: "/pasted/\(picture.id.uuidString)")]
+        }
+        return selection.map(\.url)
     }
 
     @ViewBuilder
@@ -80,8 +95,30 @@ struct HubFilesPreviewColumn: View {
             } else {
                 HubFilesQuickLookWell(item: item)
             }
+        } else if let picture = model.pictureQuery {
+            // Nothing selected in a search with a picture (it's still being read, or nothing stood out): the picture
+            // itself, as the mockup's preview shows it.
+            LookoutPictureQueryWell(picture: picture)
         } else if let folder = model.isSearching ? nil : model.activePane.folderURL {
             HubFilesFolderIcon(url: folder, size: 128)
+        }
+    }
+}
+
+/// The picture searched with, filling the well: a pasted picture's own pixels, or the file through Quick Look.
+private struct LookoutPictureQueryWell: View {
+    let picture: LookoutPictureQuery
+
+    var body: some View {
+        if let image = picture.image {
+            Image(nsImage: image)
+                .resizable()
+                .interpolation(.high)
+                .aspectRatio(contentMode: .fit)
+                .padding(8)
+                .accessibilityLabel(Text(verbatim: picture.name))
+        } else if let url = picture.fileURL {
+            HubFilesQuickLookWell(item: .lookout(path: url.path, isFolder: false, size: nil, modified: nil))
         }
     }
 }
@@ -143,6 +180,7 @@ private struct HubFilesPreviewDetails: View {
                     .font(.system(size: 12.5))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .textSelection(.enabled)
@@ -162,6 +200,8 @@ private struct HubFilesPreviewDetails: View {
     private var title: String {
         if selection.count > 1 { return HubFilesFormatting.itemCount(selection.count) }
         if let item = selection.first { return item.name }
+        // The picture searched with, while nothing is selected.
+        if let picture = model.pictureQuery { return picture.name }
         return model.isSearching ? "" : model.displayName(for: model.activePane.location)
     }
 
@@ -176,6 +216,11 @@ private struct HubFilesPreviewDetails: View {
         }
         let kind = item.isDirectory ? String(localized: .hubFilesKindFolder) : item.kindDescription
         let amount = item.isDirectory ? count : HubFilesFormatting.size(item.byteSize)
+        // A search with a picture keeps to the mockup's one line, "Desktop › Holiday Sylt 2026 · 3.1 MB", so the
+        // comparison card and Find Similar fit under the well; the row already shows the date.
+        if let hit = model.selectedLookoutHit, model.isPictureSearch {
+            return [[model.lookoutLocation(of: hit), amount].compactMap { $0 }.joined(separator: " · ")]
+        }
         var lines = [[kind, amount].compactMap { $0 }.joined(separator: " · ")]
         // A Lookout hit's place, as its row shows it; name results show theirs in the row's Where column.
         if let hit = model.selectedLookoutHit { lines.insert(model.lookoutLocation(of: hit), at: 0) }

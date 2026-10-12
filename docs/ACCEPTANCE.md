@@ -155,7 +155,8 @@ None of these scenarios has been exercised.
   Right and Left, "Nothing stands out here." for an empty group, the honest message, and the file
   searched with missing from its results. Scope **This Mac** against the current folder.
 - [ ] Preview: the shorter well, **Why it matched** with Yours ≈ Match, the sentence for each case,
-  and the closeness meter.
+  and the closeness meter; Open, Quick Look, and Reveal stay visible under them; the picture
+  searched with shows while it's being read and when nothing stood out.
 - [ ] States: not set up (the **Search with a picture** card), downloading (the Pictures model
   message), reading files, and paused ("It still reads your picture…").
 - [ ] Reduce Motion: no well pulse, and the chip, the bar, and the rows fade. Reduce Transparency,

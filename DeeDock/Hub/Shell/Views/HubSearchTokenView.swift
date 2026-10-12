@@ -13,7 +13,6 @@ struct HubSearchTokenView: View {
     @State private var shown = false
 
     var body: some View {
-        let accent = LookoutTheme(scheme).accent
         HStack(spacing: 6) {
             HubSearchTokenThumbnail(token: token)
             Text(verbatim: token.title)
@@ -38,8 +37,9 @@ struct HubSearchTokenView: View {
         .fixedSize(horizontal: true, vertical: false)
         .background(LookoutTheme(scheme).accentSoft, in: .rect(cornerRadius: 7, style: .continuous))
         .overlay {
+            // The mockup's `--accentLine`: the system accent's hairline, as around a selected row.
             RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .strokeBorder(accent.opacity(0.55), lineWidth: 0.5)
+                .strokeBorder(HubFilesTheme(scheme).accentLine, lineWidth: 0.5)
         }
         .scaleEffect(shown || reduceMotion ? 1 : 0.6)
         .opacity(shown ? 1 : 0)
@@ -48,6 +48,8 @@ struct HubSearchTokenView: View {
                 shown = true
             }
         }
+        // The full name, for one the chip has cut short.
+        .help(Text(verbatim: token.title))
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(verbatim: token.accessibilityLabel))
         .accessibilityAction(named: Text(.lookoutPictureRemove), remove)

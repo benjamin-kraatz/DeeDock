@@ -501,6 +501,8 @@ struct HubFilesPreviewOverrides {
     var picturePhase: LookoutPictureSearch.Phase?
     var pictureResults: LookoutSimilarResults?
     var pictureReadSeconds: Double?
+    /// The stored vector Find Similar reused, for "From your index · Page 7 · instant".
+    var pictureStoredSource: LookoutSimilarSource?
 }
 
 /// Scrolls the search results to a row after arrow keys.

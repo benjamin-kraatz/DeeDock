@@ -57,7 +57,9 @@ private struct HubFilesIdleStatus: View {
 
     private var parts: [String] {
         if model.isSearching {
-            return [HubFilesFormatting.itemCount(model.searchResults.count)]
+            // A search with a picture lists no names: count its hits instead.
+            let count = model.isPictureSearch ? model.pictureResults.all.count : model.searchResults.count
+            return [HubFilesFormatting.itemCount(count)]
         }
         let pane = model.activePane
         var parts = [HubFilesFormatting.itemCount(pane.items.count)]

@@ -12,6 +12,7 @@ struct LookoutFindSimilarButton: View {
 
     var body: some View {
         let lookout = LookoutTheme(scheme)
+        let theme = HubFilesTheme(scheme)
         let shape = RoundedRectangle(cornerRadius: 9, style: .continuous)
         Button(action: action) {
             HStack(spacing: 7) {
@@ -21,11 +22,12 @@ struct LookoutFindSimilarButton: View {
                         .accessibilityHidden(true)
                     Text(.lookoutSimilarButton)
                         .font(.system(size: 12.5, weight: .semibold))
+                    // The mockup's `kbd`: a hairline in the system accent, like the button's own edge.
                     Text(verbatim: "⌘⇧L")
                         .font(.system(size: 10.5, design: .monospaced))
                         .padding(.horizontal, 5)
                         .padding(.vertical, 1)
-                        .overlay { RoundedRectangle(cornerRadius: 5).strokeBorder(lookout.accent.opacity(0.55), lineWidth: 1) }
+                        .overlay { RoundedRectangle(cornerRadius: 5).strokeBorder(theme.accentLine, lineWidth: 1) }
                         .accessibilityHidden(true)
                 } else {
                     Text(.lookoutSimilarUnsupported)
@@ -39,10 +41,10 @@ struct LookoutFindSimilarButton: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .padding(.horizontal, 10)
-            .background(isAvailable ? (hovered ? Color.accentColor.opacity(0.3) : lookout.accentSoft)
-                        : HubFilesTheme(scheme).chip, in: shape)
+            // Hover takes the selection fill (the mockup's `--accentSel`); the edge is the selection hairline.
+            .background(isAvailable ? (hovered ? theme.accentSelection : lookout.accentSoft) : theme.chip, in: shape)
             .overlay {
-                if isAvailable { shape.strokeBorder(Color.accentColor.opacity(0.55), lineWidth: 0.5) }
+                if isAvailable { shape.strokeBorder(theme.accentLine, lineWidth: 0.5) }
             }
             .opacity(isAvailable ? 1 : 0.5)
             .contentShape(shape)

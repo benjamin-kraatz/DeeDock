@@ -10,9 +10,20 @@ enum HubFilesMetrics {
     static let rowHeight: CGFloat = 32
     static let previewWidth: CGFloat = 272
     static let previewWellHeight: CGFloat = 250
+    /// The well's height for a search result (the Lookout mockup's 200 pt), so "Why it matched" and Find Similar
+    /// fit under it inside the 640 pt Hub.
+    static let searchPreviewWellHeight: CGFloat = 200
     /// The well's height in a search with a picture, so "Why it matched" with its comparison and Find Similar fit
-    /// under it (the mockup's 200 → 160 pt).
-    static let compactPreviewWellHeight: CGFloat = 200
+    /// under it inside the 640 pt Hub (the mockup's 200 → 160 pt, in a column 272 pt wide instead of 330).
+    static let compactPreviewWellHeight: CGFloat = 140
+
+    /// How tall the preview well may be: its ideal, down to what it shrinks to when the details, the cards, and the
+    /// actions under it need the room (a three-line name over a two-line sentence). Browsing never shrinks it.
+    static func previewWellHeights(pictureSearch: Bool, searching: Bool) -> ClosedRange<CGFloat> {
+        if pictureSearch { return 88...compactPreviewWellHeight }
+        if searching { return 150...searchPreviewWellHeight }
+        return previewWellHeight...previewWellHeight
+    }
     static let statusBarHeight: CGFloat = 46
     static let tileIconSize: CGFloat = 54
     static let tileMinimumWidth: CGFloat = 96

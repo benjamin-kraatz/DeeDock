@@ -45,7 +45,12 @@ enum LookoutPicturePreviewData {
         LookoutSimilarResults.Group(kind: .pictures),
     ])
 
+    /// The lease's page 7 as Find Similar reuses it from the index, for "From your index · Page 7 · instant".
+    static let leaseSource = LookoutSimilarSource(vector: [], modality: .text, segment: .page, page: 7,
+                                                  path: similarLease.fileURL?.path ?? "")
+
     /// A Files model searching with `picture`, Lookout overridden to `status`, `phase`, `results` and `seconds`.
+    /// Find Similar on the lease reads as reused from the index (`leaseSource`).
     static func model(picture: LookoutPictureQuery, status: LookoutStatus = .ready,
                       phase: LookoutPictureSearch.Phase = .done,
                       results: LookoutSimilarResults = LookoutSimilarResults(queryIsPicture: true),
@@ -56,6 +61,7 @@ enum LookoutPicturePreviewData {
             model.previewOverrides.picturePhase = phase
             model.previewOverrides.pictureResults = results
             model.previewOverrides.pictureReadSeconds = seconds
+            if picture == similarLease { model.previewOverrides.pictureStoredSource = leaseSource }
             model.query = wordsBefore
             model.searchWithPicture(picture)
             model.lookoutSelection = results.groups.first?.strong.first?.path

@@ -12,13 +12,15 @@ struct LookoutThumbnail: View {
     let item: HubFileItem
     let kind: LookoutHitKind
     var size: CGFloat = 58
+    /// The corner radius; a row's 9 pt at 58 pt, scaled, unless given.
+    var cornerRadius: CGFloat?
 
     @Environment(\.hubFilesIconSource) private var source
     @Environment(\.displayScale) private var scale
     @Environment(\.colorScheme) private var scheme
     @State private var thumbnail: NSImage?
 
-    private var radius: CGFloat { size * 9 / 58 }
+    private var radius: CGFloat { cornerRadius ?? size * 9 / 58 }
 
     var body: some View {
         ZStack {

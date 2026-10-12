@@ -12,8 +12,8 @@ struct LookoutPictureGroupSection: View {
 
     var body: some View {
         let expanded = model.pictureWeakExpanded.contains(group.kind)
+        // The header's own 10 pt top margin is the mockup's gap under the results bar and between the groups.
         HubFilesSearchSectionHeader(section: .lookoutGroup(title), count: group.count)
-            .padding(.top, 6)
         if group.isEmpty {
             Text(.lookoutPictureGroupEmpty)
                 .font(.system(size: 12))

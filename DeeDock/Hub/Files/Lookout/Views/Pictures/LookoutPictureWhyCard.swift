@@ -14,6 +14,9 @@ struct LookoutPictureWhyCard: View {
 
     @Environment(\.colorScheme) private var scheme
 
+    /// The comparison's 58 pt pictures take a tighter corner than a row's thumbnail (the mockup's `.cmp .thumb`).
+    private static let thumbnailRadius: CGFloat = 7
+
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: 10, style: .continuous)
         VStack(alignment: .leading, spacing: 4) {
@@ -23,7 +26,7 @@ struct LookoutPictureWhyCard: View {
             HStack(spacing: 8) {
                 LookoutComparisonSide(caption: .lookoutPictureYours) {
                     if queryIsPicture, let picture {
-                        LookoutPictureThumbnail(picture: picture, size: 58)
+                        LookoutPictureThumbnail(picture: picture, size: 58, cornerRadius: Self.thumbnailRadius)
                     } else {
                         LookoutMiniPage()
                     }
@@ -34,7 +37,7 @@ struct LookoutPictureWhyCard: View {
                     .accessibilityHidden(true)
                 LookoutComparisonSide(caption: .lookoutPictureMatch) {
                     if why.resultIsPicture {
-                        LookoutThumbnail(item: hit.fileItem, kind: LookoutHitKind(hit))
+                        LookoutThumbnail(item: hit.fileItem, kind: LookoutHitKind(hit), cornerRadius: Self.thumbnailRadius)
                     } else {
                         LookoutMiniPage()
                     }

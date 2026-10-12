@@ -25,7 +25,8 @@ extension HubFilesModel {
     var pictureSubtitle: LookoutPictureSubtitle {
         LookoutPictureSubtitle(isPasted: pictureQuery?.fileURL == nil, phase: picturePhase,
                                canSearch: LookoutPictureContent.canSearch(lookoutDisplayStatus),
-                               stored: previewOverrides.pictureResults == nil ? lookout.pictureSearch.storedSource : nil,
+                               stored: previewOverrides.pictureResults == nil ? lookout.pictureSearch.storedSource
+                                   : previewOverrides.pictureStoredSource,
                                readSeconds: pictureReadSeconds)
     }
 

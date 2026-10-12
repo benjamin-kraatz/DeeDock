@@ -6,11 +6,13 @@ import SwiftUI
 struct LookoutPictureThumbnail: View {
     let picture: LookoutPictureQuery
     var size: CGFloat = 46
+    /// The corner radius; the results bar's 8 pt at 46 pt, scaled, unless given.
+    var cornerRadius: CGFloat?
 
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        let shape = RoundedRectangle(cornerRadius: size * 8 / 46, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: cornerRadius ?? size * 8 / 46, style: .continuous)
         Group {
             if let image = picture.image {
                 Image(nsImage: image)
@@ -22,7 +24,8 @@ struct LookoutPictureThumbnail: View {
                     .overlay { shape.strokeBorder(LookoutTheme(scheme).strongLine, lineWidth: 0.5) }
             } else if let url = picture.fileURL {
                 let item = HubFileItem.lookout(path: url.path, isFolder: false, size: nil, modified: nil)
-                LookoutThumbnail(item: item, kind: LookoutHitKind(fileNamed: item.name), size: size)
+                LookoutThumbnail(item: item, kind: LookoutHitKind(fileNamed: item.name), size: size,
+                                 cornerRadius: cornerRadius)
             } else {
                 Image(systemName: "photo")
                     .font(.system(size: size * 0.4))
