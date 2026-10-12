@@ -30,6 +30,31 @@ final class HubPanel: NSPanel {
     /// Escape that no view consumed. The shell's key monitor handles Escape first; this keeps
     /// AppKit from beeping when it falls through.
     override func cancelOperation(_ sender: Any?) {}
+
+    /// Text drags the field editor takes: plain text, RTF and HTML, which it inserts as text.
+    static let fieldEditorDragTypes: [NSPasteboard.PasteboardType] = [.string, .rtf, .html]
+
+    /// Keeps file and picture drags out of the Hub's text fields.
+    ///
+    /// While a text field edits, AppKit's field editor (an `NSTextView`) registers for file URLs, filenames, web
+    /// URLs and pictures as well as text, and inserts a dropped file as its path. AppKit gives a drag to the deepest
+    /// view under the pointer that registered for one of its types, so the field editor would take every file
+    /// dragged over the header's search field before that field's own drop target could (the Files tab searches with
+    /// a dropped picture or indexed file, `HubSearchExtras`). Registering the editor for text types only lets those
+    /// drags fall through to the SwiftUI drop targets behind it, which take or refuse them; plain text still drops in
+    /// as text.
+    ///
+    /// The window's field editor is the system's and is reused for every field, and it registers its types again
+    /// whenever editing begins, which happens inside this call. So the registration is narrowed after every change
+    /// of first responder, never by replacing the system's field editor.
+    override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
+        let changed = super.makeFirstResponder(responder)
+        if let editor = firstResponder as? NSTextView, editor.isFieldEditor {
+            editor.unregisterDraggedTypes()
+            editor.registerForDraggedTypes(Self.fieldEditorDragTypes)
+        }
+        return changed
+    }
 }
 
 /// Hosts the Hub's SwiftUI content. Accepts the first click while DOKK is inactive, so a click on
