@@ -352,9 +352,12 @@ final class LookoutEngine {
             Task { await reader.indexDidChange() }
         }
         // The index may have just appeared: a search that found none gets another go, by words or with a picture.
+        // The search with a picture is refreshed whatever its phase: one whose reader call found no index may not
+        // have published `.unavailable` yet, and no later status crosses from no files to some again. The refresh's
+        // generation drops that stale answer.
         if (previous?.counts.files ?? 0) == 0, newStatus.counts.files > 0 {
             if search.phase == .unavailable { search.refresh() }
-            if pictureSearch.phase == .unavailable { pictureSearch.refresh() }
+            pictureSearch.refresh()
         }
         updateStatus()
     }

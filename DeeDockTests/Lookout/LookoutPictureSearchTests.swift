@@ -7,6 +7,7 @@ import Testing
 /// for Find Similar without encoding anything, the file searched with left out, and nothing from a search that ended.
 @MainActor struct LookoutPictureSearchTests {
     private let reader = FakePictureReader()
+    private let connection = FakeIndexConnection()
     private let encoder = FakePictureEncoder()
     private let folder = LookoutTestFolder()
 
@@ -217,5 +218,34 @@ import Testing
         try handle.truncate(atOffset: UInt64(LookoutPictureReading.maxBytes) + 1)   // sparse: nothing written
         try handle.close()
         #expect(throws: QueryPicture.Failure.self) { try LookoutPictureReading.bytes(at: file) }
+    }
+
+    // MARK: Round 7
+
+    /// The first index arrives while a reader call that found none is still on its way back: the refresh the
+    /// engine sends then wins, and the stale "no index" is dropped.
+    @Test func theFirstIndexArrivingDuringAReaderCallStillSearches() async throws {
+        await reader.setResults(nil)
+        await reader.setDelay(.milliseconds(250))
+        let engine = LookoutEngine(settings: .activeForTests, repository: nil, connection: connection,
+                                   encoder: encoder, reader: reader, monitor: FakeMonitor(), power: FakePowerPolicy(),
+                                   paths: LookoutPaths(base: URL(fileURLWithPath: "/tmp/lookout-picture-engine-tests",
+                                                                 isDirectory: true)),
+                                   canRun: true)
+        engine.start()
+        let search = engine.pictureSearch
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        #expect(await eventually { await reader.requests.count == 1 })
+        #expect(search.phase == .reading)                 // the reader call is in flight
+        await reader.setResults(someResults())
+        await reader.setDelay(.zero)
+        var status = LookoutIndexStatus()
+        status.activity = .indexing
+        status.counts = IndexStore.Counts(byKindAndState: ["image": ["done": 1, "pending": 9]])
+        connection.send(status)                           // the first files
+        #expect(await eventually { search.phase == .done && search.results.groups.first?.strong.count == 1 })
+        try await Task.sleep(for: .milliseconds(350))     // the stale answer comes back, and is dropped
+        #expect(search.phase == .done && search.results.groups.first?.strong.count == 1)
+        engine.stop()
     }
 }

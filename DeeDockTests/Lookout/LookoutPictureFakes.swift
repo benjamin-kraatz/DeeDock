@@ -55,10 +55,12 @@ actor FakePictureReader: LookoutIndexSearching {
     func closeIndex() {}
     func searchableFileCounts(under folders: [String]) -> [String: Int] { [:] }
 
+    /// Answers as the index was when it was asked, like a query against the database, however long it then takes.
     func similar(_ request: LookoutSimilarRequest) async throws -> LookoutSimilarResults? {
         requests.append(request)
+        let answer = results
         try? await Task.sleep(for: delay)
-        return results.map { LookoutSimilarResults(queryIsPicture: request.queryIsPicture, groups: $0.groups) }
+        return answer.map { LookoutSimilarResults(queryIsPicture: request.queryIsPicture, groups: $0.groups) }
     }
 
     func similarSource(path: String, segmentID: Int64?) -> LookoutSimilarSource? {
