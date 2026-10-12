@@ -45,16 +45,17 @@ nonisolated enum Rules {
 
     static let screenshotPrefixes = ["Screenshot", "Screen Shot", "CleanShot", "SCR-"]
 
-    /// Decides what a file is from its name and type (and, for `.ts`, its first bytes).
+    /// Decides what a file is from its name, its type and its screen-capture attribute. It never opens the file: the
+    /// crawler classifies before its `lstat` check, so the file may still be a FIFO (opening one with no writer blocks
+    /// forever), a link, or a placeholder whose contents a read would download.
     static func classify(_ url: URL, type: UTType?, options: IndexOptions) -> Classification {
         let ext = url.pathExtension.lowercased()
         if options.excludedExtensions.contains(ext) { return .skip("excluded type") }
         if isSecret(url.lastPathComponent) { return .skip("key or password file") }
-        // .ts / .mts are usually TypeScript, which Spotlight calls MPEG-2 video. Only a real transport stream is video,
-        // and Lookout doesn't index video.
-        if ext == "ts" || ext == "mts" || ext == "m2ts" {
-            return isMPEGTransportStream(url) ? .ignore : .skip("code or data file")
-        }
+        // .ts and .mts are usually TypeScript, which Spotlight calls MPEG-2 video; .m2ts is only video. Lookout indexes
+        // neither, so none is read to tell them apart (DigUp sniffed the first bytes for its video index).
+        if ext == "ts" || ext == "mts" { return .skip("code or data file") }
+        if ext == "m2ts" { return .ignore }
         if docExtensions.contains(ext) { return .index(.doc) }
         if codeExtensions.contains(ext) { return .skip("code or data file") }
         guard let type else { return .ignore }
@@ -74,19 +75,10 @@ nonisolated enum Rules {
                 ".pypirc", "htpasswd", ".htpasswd"].contains(where: lower.hasPrefix)
     }
 
-    /// MPEG-TS packets start with 0x47 every 188 bytes (or every 192 with a 4-byte timecode, as in .m2ts / AVCHD .mts).
-    static func isMPEGTransportStream(_ url: URL) -> Bool {
-        guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
-        defer { try? handle.close() }
-        guard let data = try? handle.read(upToCount: 600), data.count >= 400 else { return false }
-        let bytes = [UInt8](data)
-        return (bytes[0] == 0x47 && bytes[188] == 0x47 && bytes[376] == 0x47)
-            || (bytes[4] == 0x47 && bytes[196] == 0x47 && bytes[388] == 0x47)
-    }
-
-    /// macOS marks screenshots with an extended attribute that survives moves and copies; names are the fallback.
+    /// macOS marks screenshots with an extended attribute that survives moves and copies; names are the fallback. The
+    /// attribute is read from the entry itself (`XATTR_NOFOLLOW`), never from a link's target.
     static func isScreenshot(_ url: URL) -> Bool {
-        if getxattr(url.path, "com.apple.metadata:kMDItemIsScreenCapture", nil, 0, 0, 0) > 0 { return true }
+        if getxattr(url.path, "com.apple.metadata:kMDItemIsScreenCapture", nil, 0, 0, XATTR_NOFOLLOW) > 0 { return true }
         let name = url.lastPathComponent
         return screenshotPrefixes.contains { name.hasPrefix($0) }
     }

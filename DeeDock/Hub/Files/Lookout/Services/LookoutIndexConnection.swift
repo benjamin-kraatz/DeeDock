@@ -30,6 +30,8 @@ import os
     private var paused = false
     /// A request for work was sent and its barrier hasn't replied yet.
     private var awaitingAcknowledgement = false
+    /// `closeIndex` is waiting: nothing is sent that could open the index again before the files are deleted.
+    private var isClosing = false
     private var replaysWithoutAcknowledgement = 0
 
     /// - Parameter serviceName: `LookoutServiceNames.index(appBundleIdentifier:)`.
@@ -82,12 +84,27 @@ import os
         requestWork { $0.resetIndex() }
     }
 
-    func closeIndex(timeout: Duration) async {
-        guard isServiceRunning, let service = proxy() else { return }
-        // The proxy's error handler doesn't reach this reply; an interruption or a service that never answers ends
-        // the wait at `timeout` instead.
-        _ = try? await LookoutXPCReply<Void>.call(timeout: timeout) { reply in
-            service.closeIndex { reply.finish(.success(())) }
+    func closeIndex(timeout: Duration) async throws {
+        isClosing = true
+        defer { isClosing = false }
+        do {
+            try await LookoutXPCReply<Void>.call(timeout: timeout) { reply in
+                // This proxy's error handler settles the call, so a service that can't be reached or dies fails it at
+                // once instead of at `timeout`.
+                let service = liveConnection().remoteObjectProxyWithErrorHandler { @Sendable error in
+                    reply.finish(.failure(error))
+                } as? any LookoutIndexServing
+                guard let service else { return reply.finish(.failure(LookoutIndexCloseError.unavailable)) }
+                service.closeIndex { reply.finish(.success(())) }
+            }
+        } catch {
+            // The service closes the index once its batch is through even after this gave up, so the configuration
+            // follows the close request and opens it again.
+            isClosing = false
+            if configuration != nil { launch() }
+            if error is CancellationError { throw error }
+            throw error as? LookoutEncoderError == .timedOut ? LookoutIndexCloseError.timedOut
+                : LookoutIndexCloseError.unavailable
         }
     }
 
@@ -104,7 +121,9 @@ import os
 
     /// Sends the remembered state to a (possibly new) service process: the pause first, then the configuration.
     private func launch() {
-        guard let configuration, let data = try? configuration.encoded(), let service = proxy() else { return }
+        guard !isClosing, let configuration, let data = try? configuration.encoded(), let service = proxy() else {
+            return
+        }
         if paused { service.pause() }
         isServiceRunning = true
         awaitingAcknowledgement = true
@@ -115,7 +134,7 @@ import os
 
     /// Sends a request for work, then the barrier that proves it arrived.
     private func requestWork(_ send: (any LookoutIndexServing) -> Void) {
-        guard let service = proxy() else { return }
+        guard !isClosing, let service = proxy() else { return }
         awaitingAcknowledgement = true
         send(service)
         let receiver = statusReceiver

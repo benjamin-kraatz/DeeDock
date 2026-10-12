@@ -4,9 +4,8 @@ import Darwin
 import Foundation
 import UniformTypeIdentifiers
 
-/// Walks the chosen folders and applies `Rules`. Reads metadata only, never file contents (except the 600-byte
-/// sniff that tells a real MPEG-TS video from a TypeScript file), plus one Spotlight query per folder for last-used
-/// dates (`LastUsedDates`).
+/// Walks the chosen folders and applies `Rules`. Reads metadata only, never file contents, plus one Spotlight query per
+/// folder for last-used dates (`LastUsedDates`).
 ///
 /// Hidden files and folders and bundle contents are never walked. Symbolic links are never followed: the enumerator
 /// doesn't descend into a linked folder, and a linked file is reported as a "link or special file".

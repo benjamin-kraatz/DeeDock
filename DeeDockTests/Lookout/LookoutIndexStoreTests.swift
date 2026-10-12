@@ -12,8 +12,8 @@ struct LookoutIndexStoreTests {
     }
 
     private func file(_ path: String, kind: FileKind = .image, size: Int64 = 10, mtime: Double = 1, inode: UInt64,
-                      lastUsed: Double? = nil) -> Candidate {
-        Candidate(path: path, kind: kind, size: size, mtime: mtime, inode: inode, device: 1, lastUsed: lastUsed)
+                      device: UInt64 = 1, lastUsed: Double? = nil) -> Candidate {
+        Candidate(path: path, kind: kind, size: size, mtime: mtime, inode: inode, device: device, lastUsed: lastUsed)
     }
 
     private func crawl(_ candidates: [Candidate]) -> CrawlReport {
@@ -40,6 +40,29 @@ struct LookoutIndexStoreTests {
         let record = try #require(try store.file(at: "/a/x.png"))
         #expect(record.id == id && record.state == "pending" && record.lastUsed == 5)
         #expect(try count(store, "SELECT COUNT(*) FROM fts") == 1)   // the name is searchable at once
+    }
+
+    @Test func anotherFileAtThePathIsQueuedAgainButARemountIsNot() throws {
+        let store = try store()
+        let roots = [URL(fileURLWithPath: "/a")]
+        let first = try IndexSync.apply(crawl([file("/a/x.png", inode: 1)]), roots: roots, to: store)
+        let id = try #require(first.queued.first)
+        try store.addSegment(file: id, kind: .image, modality: .image, vector: vector)
+        try store.finish(id, state: "done")
+        // Remounted: a new device number, the same file.
+        let remounted = try IndexSync.apply(crawl([file("/a/x.png", inode: 1, device: 7)]), roots: roots, to: store)
+        #expect(remounted.unchanged == 1 && remounted.queued.isEmpty)
+        #expect(try store.file(at: "/a/x.png")?.state == "done")
+        // Replaced with contents of the same length, the date kept: another inode.
+        let replaced = try IndexSync.apply(crawl([file("/a/x.png", inode: 2)]), roots: roots, to: store)
+        #expect(replaced.changed == 1 && replaced.queued == [id])
+        let record = try #require(try store.file(at: "/a/x.png"))
+        #expect(record.state == "pending" && record.inode == 2)
+        #expect(try count(store, "SELECT COUNT(*) FROM segments WHERE kind != 'name'") == 0)
+        // A move found by its inode still keeps the row.
+        let moved = try IndexSync.apply(crawl([file("/a/renamed.png", inode: 2)]), roots: roots, to: store)
+        #expect(moved.moved == 1 && moved.queued.isEmpty)
+        #expect(try store.file(at: "/a/renamed.png")?.id == id)
     }
 
     @Test func aChangedFileIsQueuedAgainWithoutItsOldSegments() throws {

@@ -30,12 +30,14 @@ struct LookoutRulesTests {
         }
     }
 
-    @Test func typeScriptIsCodeAndATransportStreamIsIgnoredVideo() throws {
-        let typeScript = try folder.write("app.ts", Data("export const x: number = 1;\n".utf8))
-        #expect(classify(typeScript) == .skip("code or data file"))
+    /// Told apart by name only: no file is opened to classify it (a FIFO would block, a link would be followed).
+    @Test func typeScriptNamesAreCodeAndM2TSIsIgnoredVideo() throws {
         var bytes = [UInt8](repeating: 0xFF, count: 188 * 4)
-        for packet in 0..<4 { bytes[packet * 188] = 0x47 }
-        #expect(classify(try folder.write("clip.ts", Data(bytes))) == .ignore)
+        for packet in 0..<4 { bytes[packet * 188] = 0x47 }   // a real transport stream: still not read
+        #expect(classify(try folder.write("app.ts", Data("export const x: number = 1;\n".utf8))) == .skip("code or data file"))
+        #expect(classify(try folder.write("clip.ts", Data(bytes))) == .skip("code or data file"))
+        #expect(classify(try folder.write("module.mts", Data(bytes))) == .skip("code or data file"))
+        #expect(classify(try folder.write("00001.m2ts", Data(bytes))) == .ignore)
     }
 
     @Test func documentsPDFsAndImagesAreIndexedButNotMediaOrCode() throws {

@@ -266,16 +266,22 @@ final class LookoutEngine {
         connection.resetIndex()
     }
 
+    /// How long "Delete index and model" waits for the service to close the index: a batch of pictures or a step of
+    /// a long PDF can take a while to commit.
+    static let closeTimeout: Duration = .seconds(30)
+
     /// "Delete index and model" in Settings: closes the index in the service and here, stops Lookout, forgets the
     /// settings (Lookout is not set up again), and deletes the index files and the models (`LookoutDataRemoval`).
     /// The person's files are never touched.
     ///
-    /// The service closes its store before anything is deleted, so it can't keep writing to a deleted file; one
-    /// that doesn't answer within 5 s is cut off when the engine stops.
+    /// Nothing is touched until the service confirms that its store and model are closed: a batch it's committing
+    /// finishes first, and deleting SQLite's files under a writer would corrupt them. Without that confirmation within
+    /// `closeTimeout`, this throws, and Lookout, its settings and its files stay as they were.
     ///
-    /// - Throws: The first file that couldn't be deleted (the rest are still tried).
+    /// - Throws: `LookoutIndexCloseError` when the service didn't confirm; otherwise the first file that couldn't be
+    ///   deleted (the rest are still tried).
     func deleteIndexAndModel() async throws {
-        await connection.closeIndex(timeout: .seconds(5))
+        try await connection.closeIndex(timeout: Self.closeTimeout)
         apply(LookoutSettings())
         stop()
         await reader.closeIndex()

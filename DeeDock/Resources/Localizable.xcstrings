@@ -23280,6 +23280,42 @@
         }
       }
     },
+    "lookoutSettingsDeleteIndexBusy" : {
+      "comment" : "Lookout settings: Delete index and model stopped before deleting anything, because Lookout's indexing didn't close its index within 30 seconds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest gerade noch Dateien, deshalb wurde nichts gelöscht. Versuch es gleich noch einmal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is still reading files, so nothing was deleted. Try again in a moment."
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleting" : {
+      "comment" : "Lookout settings: shown beside a spinner in place of the Delete index and model button while it waits for indexing to stop and deletes the files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird gelöscht …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deleting…"
+          }
+        }
+      }
+    },
     "lookoutSettingsFolderMissing" : {
       "comment" : "Lookout settings: the folder isn't there right now (a drive that isn't connected); what Lookout read from it stays searchable.",
       "extractionState" : "manual",

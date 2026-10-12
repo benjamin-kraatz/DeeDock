@@ -37,7 +37,11 @@ nonisolated enum IndexSync {
         try store.db.transaction {
             for file in crawl.candidates {
                 if let row = byPath[file.path] {
-                    if row.size != file.size || abs(row.mtime - file.mtime) > 0.001 || row.kind != file.kind {
+                    // Another inode at the same path is another file, even with the same size and date (contents
+                    // replaced and the timestamp kept). The device isn't compared: a drive gets a new device number
+                    // at every mount, and its files must not be read again for that.
+                    if row.size != file.size || abs(row.mtime - file.mtime) > 0.001 || row.kind != file.kind
+                        || row.inode != file.inode {
                         try store.requeue(row.id, as: file)
                         summary.changed += 1
                         summary.queued.append(row.id)

@@ -30,9 +30,22 @@ import Foundation
     /// "Read everything again": the service queues every file again and syncs. Relaunches it with the last
     /// configuration first when it isn't running; does nothing before the first `start`.
     func resetIndex()
-    /// Asks a running service to close the index (`LookoutIndexServing.closeIndex`) and waits for it, at most
-    /// `timeout`. Returns at once when no service is running: one that exited has nothing open.
-    func closeIndex(timeout: Duration) async
+    /// Asks the service to close the index (`LookoutIndexServing.closeIndex`) and waits, at most `timeout`, for its
+    /// confirmation that the store and the model are closed. The request goes out even when no service is known to
+    /// run, because a process from before a relaunch of DOKK may still hold the store. Requests that could open the
+    /// index again (a configuration, a relaunch) wait until the call ends.
+    ///
+    /// - Throws: `LookoutIndexCloseError` when the service didn't confirm. Nothing may be deleted then, and the
+    ///   remembered configuration is sent again so Lookout goes on as before.
+    func closeIndex(timeout: Duration) async throws
+}
+
+/// The index service didn't confirm that it closed the index (`LookoutIndexControlling.closeIndex`).
+nonisolated enum LookoutIndexCloseError: Error, Equatable {
+    /// No confirmation within the time limit: a batch may still be committing.
+    case timedOut
+    /// The call failed: the service couldn't be reached, or went away before answering.
+    case unavailable
 }
 
 /// Why the index service's connection changed.

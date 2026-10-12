@@ -13,7 +13,7 @@ import Foundation
     func resume() {}
     func invalidate() {}
     func resetIndex() {}
-    func closeIndex(timeout: Duration) async {}
+    func closeIndex(timeout: Duration) async throws {}
 }
 
 /// Never warm; every embed fails, so search stays keyword-only.

@@ -102,7 +102,9 @@ None of these scenarios has been exercised.
 - [ ] New files: save a screenshot and check it is searchable within seconds.
 - [ ] **Read everything again**: names stay searchable while every file is read again.
 - [ ] **Delete index and model**: the confirmation, then `index.sqlite*`, `Models/`, and
-  `Partial/` are gone, `Logs/` and the person's files remain, and Lookout is not set up.
+  `Partial/` are gone, `Logs/` and the person's files remain, and Lookout is not set up. Also
+  delete during the first pass: the row shows **Deleting…** until the service answers, and the
+  files go only then.
 - [ ] Turn **Search by content** off and on: the Lookout section hides and returns, the index is
   kept, and reading resumes.
 - [ ] Memory and lifetime: the index service exits about 60 s after its work ends, the query

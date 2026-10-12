@@ -138,6 +138,7 @@ private struct LookoutSettingsNoticeRow: View {
         case .notAllowed: String(localized: .lookoutSettingsAddNotAllowed)
         case .missing: String(localized: .lookoutSetupFolderMissing)
         case .deleteFailed(let reason): String(localized: .lookoutSettingsDeleteFailed(reason))
+        case .deleteWaitedTooLong: String(localized: .lookoutSettingsDeleteIndexBusy)
         }
     }
 }

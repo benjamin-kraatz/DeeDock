@@ -101,15 +101,17 @@ nonisolated final class Indexer {
     /// first step (`IndexOptions.pdfStep` pages, `docStep` chunks) and stay `partial` for `finishLongFiles`.
     /// Per-file problems are recorded on the file; a model that can't run or a settings mismatch stops the run
     /// (pending files stay pending, so the next run resumes). `shouldStop` is asked between batches: pausing, or new
-    /// files that should go first.
+    /// files that should go first. `shouldAbandon` is asked once more after a batch is read and before it's
+    /// committed: closing the index drops that batch (its files stay pending) rather than write to the store.
     @discardableResult
     func run(limit: Int? = nil, only ids: Set<Int64>? = nil, shouldStop: () -> Bool = { false },
-             onEvent: (Event) -> Void = { _ in }) throws -> [String: Int] {
+             shouldAbandon: () -> Bool = { false }, onEvent: (Event) -> Void = { _ in }) throws -> [String: Int] {
         guard gate != nil else { return [:] }   // no sync yet: nothing to check files against
         let queue = try store.pending(limit: limit, only: ids)
         var states: [String: Int] = [:]
         var done = 0
-        try process(Self.batches(queue).map { Job(files: $0) }, shouldStop: shouldStop) { _, job, results, seconds in
+        try process(Self.batches(queue).map { Job(files: $0) }, shouldStop: shouldStop,
+                    shouldAbandon: shouldAbandon) { _, job, results, seconds in
             for (offset, file) in job.files.enumerated() {
                 let (state, note) = results[offset]
                 states[state, default: 0] += 1
@@ -126,8 +128,8 @@ nonisolated final class Indexer {
     /// going first) loses nothing, and the next pass goes on from there. It runs once nothing is pending: a book's last
     /// pages matter less than everything else's first ones, and they take a while (0.04–0.2 s a page, 2026-10-09).
     @discardableResult
-    func finishLongFiles(shouldStop: () -> Bool = { false }, onStep: (Step) -> Void = { _ in }) throws
-        -> [String: Int] {
+    func finishLongFiles(shouldStop: () -> Bool = { false }, shouldAbandon: () -> Bool = { false },
+                         onStep: (Step) -> Void = { _ in }) throws -> [String: Int] {
         guard gate != nil else { return [:] }   // no sync yet: nothing to check files against
         var jobs: [Job] = []
         for file in try store.unfinished() {
@@ -148,7 +150,7 @@ nonisolated final class Indexer {
         var files = Set(jobs.map { $0.files[0].id }).count
         var states: [String: Int] = [:]
         var finished = Set<Int64>()
-        try process(jobs, shouldStop: shouldStop) { index, job, results, seconds in
+        try process(jobs, shouldStop: shouldStop, shouldAbandon: shouldAbandon) { index, job, results, seconds in
             let file = job.files[0]
             let (state, note) = results[0]
             if state != "partial", finished.insert(file.id).inserted {
@@ -165,12 +167,13 @@ nonisolated final class Indexer {
     }
 
     /// Runs `jobs` in order until `shouldStop` (asked between jobs), passing each one's results to `committed` (with
-    /// its place in `jobs`). Jobs that `skip` turns down when their turn comes are left out.
+    /// its place in `jobs`). Jobs that `skip` turns down when their turn comes are left out. `shouldAbandon` is asked
+    /// after a job is read, which can take seconds (OCR, rendered pages), and before its commit writes anything.
     ///
     /// Two stages overlap: while the model embeds one job, the next one is read and decoded on another thread
     /// (images scaled, screenshots OCR'd, PDF pages rendered). OCR alone is ~0.24 s per Retina screenshot, about as
     /// long as embedding it.
-    private func process(_ jobs: [Job], shouldStop: () -> Bool,
+    private func process(_ jobs: [Job], shouldStop: () -> Bool, shouldAbandon: () -> Bool = { false },
                          committed: (Int, Job, [(String, String?)], Double) -> Void,
                          skip: (Job) -> Bool = { _ in false }) throws {
         guard let gate else { return }
@@ -186,6 +189,7 @@ nonisolated final class Indexer {
             ahead = index + 1 < jobs.count ? prepare(jobs[index + 1], gate: gate) : nil
             defer { try? FileManager.default.removeItem(at: prepared.folder) }
             guard !skip(job) else { continue }
+            guard !shouldAbandon() else { break }
             let results = try commit(prepared)
             committed(index, job, results, Date().timeIntervalSince(started) / Double(job.files.count))
         }

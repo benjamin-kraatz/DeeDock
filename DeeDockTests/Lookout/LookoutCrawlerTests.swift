@@ -108,6 +108,23 @@ struct LookoutCrawlerTests {
         #expect(names(report) == ["real.txt"])
     }
 
+    /// Classifying never opens a file: a FIFO with no writer would block the crawl (and the service's queue) forever,
+    /// a link would be followed, and a placeholder would download.
+    @Test(.timeLimit(.minutes(1)))
+    func transportStreamNamesAreNeverOpened() throws {
+        try folder.folder("ts")
+        #expect(mkfifo(folder.path + "/ts/pipe.ts", 0o600) == 0)
+        let target = try folder.write("outside/real.ts", Data(repeating: 0x47, count: 600))
+        try FileManager.default.createSymbolicLink(at: folder.url.appendingPathComponent("ts/link.mts"),
+                                                   withDestinationURL: target)
+        try folder.write("ts/clip.m2ts", Data(repeating: 0x47, count: 600))
+        try folder.write("ts/notes.txt")
+        let report = Crawler.crawl([folder.url.appendingPathComponent("ts")], options: IndexOptions(),
+                                   readsLastUsed: false)
+        #expect(names(report) == ["ts/notes.txt"])
+        #expect(report.skipped["code or data file"] == 2 && report.skipped["other type"] == 1)
+    }
+
     @Test func insideACodeProjectOnlyScreenshotsCount() throws {
         try folder.folder("project/.git")
         try folder.write("project/README.md")

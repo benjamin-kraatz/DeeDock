@@ -394,7 +394,7 @@ Select a Lookout result to see **Why it matched** in the preview column, such as
 - **Read files on battery too** lets reading continue on battery. Whatever you choose, reading waits in Low Power Mode and while the Mac is warm. Up to 50 new files are read right away in any case, so a new screenshot is searchable in seconds.
 - **Model**, **Index on disk**, and **Memory while searching** show what Lookout uses. Searching takes about 250 MB, released 2 minutes after the Hub closes.
 - **Read everything again** reads every file once more. File names stay searchable meanwhile.
-- **Delete index and model** asks first, then stops Lookout and deletes what it has read and the downloaded model. Your files stay as they are. Lookout is then not set up, and setting it up again downloads the model again.
+- **Delete index and model** asks first, then stops Lookout and deletes what it has read and the downloaded model. While Lookout finishes the file it's reading, the row says **Deleting…**. If that takes longer than 30 seconds, nothing is deleted and Settings asks you to try again. Your files stay as they are. Lookout is then not set up, and setting it up again downloads the model again.
 
 Lookout reads only the folders you pick, on this Mac, and keeps its index here. DOKK downloads the model once from Hugging Face, and that request sends nothing about your files. The file names in the first pass show only on your screen. When usage-data sharing is on, Lookout sends counts only, never file names, paths, or what you searched for.
 

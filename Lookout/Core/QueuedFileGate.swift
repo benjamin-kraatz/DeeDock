@@ -15,7 +15,8 @@ import Foundation
 /// 3. `open` with `O_NOFOLLOW`, then `fstat` on the descriptor: still a regular file, and the same one `lstat` saw.
 ///    `O_NONBLOCK` keeps a FIFO swapped in at the last moment from blocking the open.
 /// 4. `F_GETPATH` on the descriptor: the open file is at the stored path. A folder on the way that became a link
-///    between step 1 and the open shows up here as another path.
+///    between step 1 and the open shows up here as another path, which is refused unless it passes step 1 itself and
+///    is the queued inode (`placeRefusal`).
 /// 5. Its inode against the record. Another file at the same path (a replacement that kept the size and date) is
 ///    queued again with its own identity rather than read under the old row.
 ///
@@ -79,11 +80,11 @@ nonisolated struct QueuedFileGate: Sendable {
         guard Self.refusal(for: info) == nil, info.st_dev == linkInfo.st_dev, info.st_ino == linkInfo.st_ino else {
             return .refused(state: "skipped", detail: "link or special file")
         }
-        // Case aside: on a case-insensitive volume a rename that only changed case opens the same file under its new
-        // spelling, and the next sync moves the row. A link on the way leads to a different path altogether.
-        guard let opened = Self.openPath(descriptor),
-              opened.compare(file.path, options: .caseInsensitive) == .orderedSame else {
-            return .refused(state: "skipped", detail: "not where it was found: a folder on its way moved or is a link")
+        guard let opened = Self.openPath(descriptor) else {
+            return .refused(state: "failed", detail: Self.errorText(errno))
+        }
+        if let reason = placeRefusal(opened: opened, file: file, inode: UInt64(info.st_ino)) {
+            return .refused(state: "skipped", detail: reason)
         }
         if UInt64(info.st_ino) != file.inode {
             let mtime = Double(info.st_mtimespec.tv_sec) + Double(info.st_mtimespec.tv_nsec) / 1e9
@@ -100,6 +101,18 @@ nonisolated struct QueuedFileGate: Sendable {
         } catch {
             return .refused(state: "failed", detail: "\(error)")
         }
+    }
+
+    /// Why the file open at `opened` (its `F_GETPATH`) may not be read for `file`'s row, or nil. Usually it's the stored
+    /// path. Another path means a case-only rename on a case-insensitive volume, a hard link the kernel names
+    /// differently, or a folder on the way swapped for a link. On a case-sensitive volume that link may lead to a
+    /// sibling spelled the same but for case (`Notes` → `NOTES`), so paths are never compared by spelling. Another path
+    /// must itself pass the settings and folder rules (`refusal(forPath:)`), and the file must be the very one the crawl
+    /// queued (the same inode).
+    func placeRefusal(opened: String, file: FileRecord, inode: UInt64) -> String? {
+        guard opened != file.path else { return nil }
+        if let reason = refusal(forPath: opened) { return reason }
+        return inode == file.inode ? nil : "not where it was found: a folder on its way moved or is a link"
     }
 
     /// Why the settings no longer allow reading `path`, or nil. String checks only, so it costs nothing.

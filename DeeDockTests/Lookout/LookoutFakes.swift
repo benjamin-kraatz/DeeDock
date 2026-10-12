@@ -13,6 +13,8 @@ import Foundation
     var onStatus: ((LookoutIndexStatus) -> Void)?
     var onConnectionEvent: ((LookoutIndexConnectionEvent) -> Void)?
     var isServiceRunning = false
+    /// What `closeIndex` throws: the service didn't confirm the close. Nil confirms it.
+    var closeError: LookoutIndexCloseError?
     private(set) var calls: [Call] = []
 
     func start(_ configuration: LookoutIndexConfiguration) {
@@ -40,9 +42,9 @@ import Foundation
 
     func resetIndex() { calls.append(.resetIndex) }
 
-    func closeIndex(timeout: Duration) async {
-        guard isServiceRunning else { return }
+    func closeIndex(timeout: Duration) async throws {
         calls.append(.closeIndex)
+        if let closeError { throw closeError }
     }
 
     func clearCalls() { calls.removeAll() }

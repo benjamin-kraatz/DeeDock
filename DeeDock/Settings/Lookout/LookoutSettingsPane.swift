@@ -75,10 +75,16 @@ private struct LookoutSettingsMaintenanceCard: View {
             .help(Text(.lookoutSettingsRebuildHelp))
             Group {
                 if model.isDeleting {
-                    ProgressView()
-                        .controlSize(.small)
-                        .padding(.horizontal, SettingsMetrics.rowInset)
-                        .frame(maxWidth: .infinity, minHeight: SettingsMetrics.rowMinimumHeight, alignment: .leading)
+                    // Up to `LookoutEngine.closeTimeout` while the service finishes its batch and closes the index.
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text(.lookoutSettingsDeleting)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .padding(.horizontal, SettingsMetrics.rowInset)
+                    .frame(maxWidth: .infinity, minHeight: SettingsMetrics.rowMinimumHeight, alignment: .leading)
                 } else {
                     LookoutSettingsLinkRow(title: .lookoutSettingsDelete, color: LookoutTheme.failed) {
                         confirmsDelete = true

@@ -70,6 +70,32 @@ struct LookoutDataRemovalTests {
         try? FileManager.default.removeItem(at: root)
     }
 
+    @Test("Without the service's confirmation that the index is closed, nothing is deleted or forgotten",
+          arguments: [LookoutIndexCloseError.timedOut, .unavailable])
+    func unconfirmedCloseDeletesNothing(error: LookoutIndexCloseError) async throws {
+        let (gone, kept) = try makeFiles()
+        let connection = FakeIndexConnection()
+        connection.closeError = error
+        let reader = FakeIndexReader()
+        let engine = LookoutEngine(settings: .activeForTests, repository: nil, connection: connection,
+                                   encoder: FakeQueryEncoder(), reader: reader, monitor: FakeMonitor(),
+                                   power: FakePowerPolicy(), paths: paths, canRun: true)
+        engine.start()
+        await #expect(throws: error) { try await engine.deleteIndexAndModel() }
+        #expect(!connection.calls.contains(.invalidate))
+        #expect(await reader.closed == 0)
+        #expect(engine.isRunning && engine.settings == .activeForTests)
+        for file in gone + kept { #expect(FileManager.default.fileExists(atPath: file.path), "\(file.path)") }
+
+        // Settings says so and offers the button again.
+        let model = LookoutSettingsModel(engine: engine, setup: nil, inspector: LookoutStubFolderInspector(),
+                                         picker: LookoutStubFolderPicker(), home: "/Users/tester")
+        await model.deleteEverything()
+        #expect(model.notice == .deleteWaitedTooLong && !model.isDeleting)
+        for file in gone { #expect(FileManager.default.fileExists(atPath: file.path), "\(file.path)") }
+        try? FileManager.default.removeItem(at: root)
+    }
+
     @Test("Read everything again asks a running service to reset, and nothing while Lookout is off")
     func readEverythingAgain() {
         let connection = FakeIndexConnection()

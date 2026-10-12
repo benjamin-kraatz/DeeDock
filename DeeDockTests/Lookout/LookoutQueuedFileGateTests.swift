@@ -159,4 +159,17 @@ struct LookoutQueuedFileGateTests {
         }
         #expect(read.count == 9 << 20)
     }
+
+    /// Where the kernel says the open file is (`F_GETPATH`), against the row. Paths aren't compared by spelling: on a
+    /// case-sensitive volume `Notes` linked to its sibling `NOTES` differs only in case and is another file.
+    @Test func anotherOpenPathMustPassTheRulesAndBeTheQueuedFile() {
+        let file = record(root + "/Notes/x.txt", inode: 5)
+        let gate = gate()
+        #expect(gate.placeRefusal(opened: file.path, file: file, inode: 5) == nil)
+        #expect(gate.placeRefusal(opened: root + "/NOTES/x.txt", file: file, inode: 9) != nil, "a case-twin sibling")
+        #expect(gate.placeRefusal(opened: root + "/NOTES/x.txt", file: file, inode: 5) == nil, "a case-only rename")
+        #expect(gate.placeRefusal(opened: folder.path + "/elsewhere/x.txt", file: file, inode: 5)
+            == "outside the chosen folders")
+        #expect(gate.placeRefusal(opened: root + "/.private/x.txt", file: file, inode: 5) == "hidden folder")
+    }
 }

@@ -197,10 +197,17 @@ final class IndexWork: @unchecked Sendable {
         }
     }
 
-    /// Frees the model and closes the store (its last reference goes, so SQLite closes the file), then answers.
+    /// Frees the model and closes the store (its last reference goes, so SQLite closes the file), then answers. The
+    /// app deletes the index once it hears back, so the answer comes only once the store is really gone: if anything
+    /// still holds it, there's no answer, the app's wait times out, and nothing is deleted.
     private func close(replying replies: [@Sendable () -> Void]) {
         indexer?.finish()
+        weak let closing = store
         (store, indexer, configuration) = (nil, nil, nil)
+        guard closing == nil else {
+            settle(.failed(message: "the index is still open after closing it; the close isn't confirmed"), nil)
+            return
+        }
         roots = []
         newFiles = []
         status.update {
@@ -275,17 +282,24 @@ final class IndexWork: @unchecked Sendable {
         }
     }
 
+    /// A close is waiting: a batch already read is dropped rather than committed, so the reply comes sooner.
+    private func closeRequested() -> Bool {
+        lock.withLock { !closeReplies.isEmpty }
+    }
+
     private func run(_ indexer: Indexer, _ store: IndexStore, only ids: Set<Int64>?) throws {
         let isNew = ids != nil
         status.update { $0.activity = .indexing }
-        try indexer.run(only: ids, shouldStop: { [self] in shouldYield(backfill: !isNew) }, onEvent: { [self] event in
+        try indexer.run(only: ids, shouldStop: { [self] in shouldYield(backfill: !isNew) },
+                        shouldAbandon: { [self] in closeRequested() }, onEvent: { [self] event in
             report(event.path, event.kind, event.state, done: event.done, total: event.total, store)
         })
     }
 
     private func finishLongFiles(_ indexer: Indexer, _ store: IndexStore) throws {
         status.update { $0.activity = .finishingLongFiles }
-        try indexer.finishLongFiles(shouldStop: { [self] in shouldYield(backfill: true) }, onStep: { [self] step in
+        try indexer.finishLongFiles(shouldStop: { [self] in shouldYield(backfill: true) },
+                                    shouldAbandon: { [self] in closeRequested() }, onStep: { [self] step in
             report(step.path, step.kind, step.state, done: step.done, total: step.total, store)
         })
     }

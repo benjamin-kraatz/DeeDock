@@ -20,6 +20,8 @@ final class LookoutSettingsModel {
         case missing
         /// "Delete index and model" couldn't delete everything; `reason` is the system's description.
         case deleteFailed(String)
+        /// "Delete index and model" deleted nothing: the index service didn't confirm it closed the index in time.
+        case deleteWaitedTooLong
     }
 
     let engine: LookoutEngine
@@ -162,6 +164,8 @@ final class LookoutSettingsModel {
         do {
             try await engine.deleteIndexAndModel()
             notice = nil
+        } catch is LookoutIndexCloseError {
+            notice = .deleteWaitedTooLong
         } catch {
             notice = .deleteFailed(error.localizedDescription)
         }
