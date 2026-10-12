@@ -241,6 +241,9 @@ extension LookoutFolderChoice.Refusal {
         case .wholeDisk: .lookoutFolderRefusedDisk
         case .homeFolder: .lookoutFolderRefusedHome
         case .library: .lookoutFolderRefusedLibrary
+        case .hidden: .lookoutFolderRefusedHidden
+        case .bundle: .lookoutFolderRefusedBundle
+        case .system: .lookoutFolderRefusedSystem
         }
     }
 }

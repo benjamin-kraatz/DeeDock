@@ -40,6 +40,9 @@ nonisolated final class Indexer {
     private let makeEmbedder: () throws -> any Embedder
     private(set) var worker: (any Embedder)?
     let scratch: URL
+    /// What every file is checked against just before it's read (`QueuedFileGate`): the roots the last sync walked.
+    /// Nil until a sync succeeds, and nothing is read until then.
+    private(set) var gate: QueuedFileGate?
 
     /// When set, an index built with another model or other settings is emptied and embedded again (a new version may
     /// bring a new model), and this hears about it. When nil, indexing stops with `fingerprintMismatch`.
@@ -81,9 +84,15 @@ nonisolated final class Indexer {
 
     // MARK: Sync
 
-    /// Crawls `roots` and reconciles the index (`IndexSync`).
+    /// Crawls `roots` and reconciles the index (`IndexSync`). Only the roots the crawl walked count: a refused one
+    /// (`Rules.checkRoots`) keeps its rows rather than looking emptied, and its files aren't read
+    /// (`QueuedFileGate`).
     func sync(_ roots: [URL]) throws -> IndexSync.Summary {
-        try IndexSync.apply(Crawler.crawl(roots, options: options), roots: roots, to: store)
+        let crawl = Crawler.crawl(roots, options: options)
+        let walked = crawl.roots.map { URL(fileURLWithPath: $0, isDirectory: true) }
+        let summary = try IndexSync.apply(crawl, roots: walked, to: store)
+        gate = QueuedFileGate(roots: crawl.roots, options: options)
+        return summary
     }
 
     // MARK: Run
@@ -96,6 +105,7 @@ nonisolated final class Indexer {
     @discardableResult
     func run(limit: Int? = nil, only ids: Set<Int64>? = nil, shouldStop: () -> Bool = { false },
              onEvent: (Event) -> Void = { _ in }) throws -> [String: Int] {
+        guard gate != nil else { return [:] }   // no sync yet: nothing to check files against
         let queue = try store.pending(limit: limit, only: ids)
         var states: [String: Int] = [:]
         var done = 0
@@ -118,6 +128,7 @@ nonisolated final class Indexer {
     @discardableResult
     func finishLongFiles(shouldStop: () -> Bool = { false }, onStep: (Step) -> Void = { _ in }) throws
         -> [String: Int] {
+        guard gate != nil else { return [:] }   // no sync yet: nothing to check files against
         var jobs: [Job] = []
         for file in try store.unfinished() {
             let info = try store.info(of: file.id)
@@ -162,6 +173,7 @@ nonisolated final class Indexer {
     private func process(_ jobs: [Job], shouldStop: () -> Bool,
                          committed: (Int, Job, [(String, String?)], Double) -> Void,
                          skip: (Job) -> Bool = { _ in false }) throws {
+        guard let gate else { return }
         var ahead: PendingBatch?
         defer {
             // A job prepared for a run that stopped early: throw its files away.
@@ -170,8 +182,8 @@ nonisolated final class Indexer {
         for (index, job) in jobs.enumerated() {
             guard !shouldStop() else { break }
             let started = Date()
-            let prepared = (ahead ?? prepare(job)).wait()
-            ahead = index + 1 < jobs.count ? prepare(jobs[index + 1]) : nil
+            let prepared = (ahead ?? prepare(job, gate: gate)).wait()
+            ahead = index + 1 < jobs.count ? prepare(jobs[index + 1], gate: gate) : nil
             defer { try? FileManager.default.removeItem(at: prepared.folder) }
             guard !skip(job) else { continue }
             let results = try commit(prepared)

@@ -24,6 +24,9 @@ nonisolated extension Indexer {
     struct Outcome: Sendable {
         let state: String
         let detail: String?
+        /// Another file is at the path now (`QueuedFileGate.Verdict.changed`): `commit` queues the row again as this
+        /// one instead of settling it.
+        var requeue: Candidate?
     }
 
     enum Payload: Sendable {
@@ -61,19 +64,35 @@ nonisolated extension Indexer {
     /// The preparation thread: utility QoS, as the service's work queue.
     private static let preparing = DispatchQueue(label: "Lookout.Index.prepare", qos: .utility)
 
-    func prepare(_ job: Job) -> PendingBatch {
+    /// - Parameter gate: The last sync's file check (`QueuedFileGate`).
+    func prepare(_ job: Job, gate: QueuedFileGate) -> PendingBatch {
         let pending = PendingBatch()
         let (options, folder) = (options, scratch.appendingPathComponent(UUID().uuidString))
         Self.preparing.async {
-            pending.fulfill(Self.prepare(job, options: options, into: folder))
+            pending.fulfill(Self.prepare(job, options: options, gate: gate, into: folder))
         }
         return pending
     }
 
-    static func prepare(_ job: Job, options: IndexOptions, into folder: URL) -> Prepared {
+    /// Reads and decodes a job's files. Every file passes `gate` first, and the extractors get the bytes it read from
+    /// the checked descriptor, never the path: a file that became a link since the crawl is never followed.
+    static func prepare(_ job: Job, options: IndexOptions, gate: QueuedFileGate, into folder: URL) -> Prepared {
         let batch = job.files
         var prepared = Prepared(batch: batch, step: job.step, folder: folder)
-        let url = URL(fileURLWithPath: batch[0].path)
+        /// The bytes of the file in `slot`, or nil with its outcome recorded.
+        func opened(_ slot: Int) -> Data? {
+            switch gate.open(batch[slot]) {
+            case .read(let data):
+                return data
+            case .changed(let now):
+                prepared.outcomes[slot] = Outcome(state: "pending", detail: "changed since it was queued; queued again",
+                                                  requeue: now)
+            case .refused(let state, let detail):
+                prepared.outcomes[slot] = Outcome(state: state, detail: detail)
+            }
+            return nil
+        }
+        let fileExtension = (batch[0].path as NSString).pathExtension
         do {
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
             switch batch[0].kind {
@@ -81,12 +100,13 @@ nonisolated extension Indexer {
                 let screenshot = batch[0].kind == .screenshot
                 var ready: [ReadyImage] = []
                 for (slot, file) in batch.enumerated() {
-                    let url = URL(fileURLWithPath: file.path)
+                    guard let data = opened(slot) else { continue }
                     do {
-                        let image = try ImageExtractor.prepare(url, maxPixel: screenshot ? 1536 : 1024,
+                        let source = try ImageExtractor.source(data, fileExtension: (file.path as NSString).pathExtension)
+                        let image = try ImageExtractor.prepare(source, maxPixel: screenshot ? 1536 : 1024,
                                                                minSide: options.minImageSide, to: folder,
                                                                png: screenshot)
-                        let ocr = screenshot ? ImageExtractor.fullImage(url).map(ScreenshotOCR.text(in:)) ?? "" : ""
+                        let ocr = screenshot ? ImageExtractor.fullImage(source).map(ScreenshotOCR.text(in:)) ?? "" : ""
                         ready.append(ReadyImage(slot: slot, image: image, ocr: ocr))
                     } catch {
                         if case ExtractError.tooSmall = error {
@@ -98,17 +118,19 @@ nonisolated extension Indexer {
                 }
                 prepared.payload = .images(screenshot: screenshot, ready: ready)
             case .pdf:
+                guard let data = opened(0) else { break }
                 // Long PDFs (books) get their first pages now and the rest after everything else.
                 var wanted = 0..<0
-                let read = try PDFExtractor.pages(of: url, range: { total in
+                let read = try PDFExtractor.pages(of: data, range: { total in
                     wanted = (job.step ?? (total > options.bigPDFPages ? 0..<options.pdfStep : 0..<options.maxPages))
                         .clamped(to: 0..<min(total, options.maxPages))
                     return wanted
                 }, minText: options.minPageText, renderPixels: 1400, to: folder)
                 prepared.payload = .pdf(pages: read.pages, read: wanted, total: read.total, title: read.title)
             case .doc:
+                guard let data = opened(0) else { break }
                 // The chunks are cut the same way every time, so a later step goes on where the last one stopped.
-                let text = try DocExtractor.text(of: url)
+                let text = try DocExtractor.text(of: data, fileExtension: fileExtension)
                 let chunks = DocExtractor.chunks(text, limit: options.maxChunks + 1)
                 let read = (job.step ?? 0..<options.docStep).clamped(to: 0..<min(chunks.count, options.maxChunks))
                 prepared.payload = .doc(chunks: Array(chunks[read]), read: read, total: chunks.count,

@@ -48,8 +48,15 @@ elif [[ "$(git -C "$SOURCE" describe --tags --exact-match 2>/dev/null)" != "$TAG
   git -C "$SOURCE" checkout --quiet --force "$TAG"   # --force also drops the old patch
 fi
 # Without the patch, every input token costs 1 MiB of logits that an embedding model never produces (262k vocabulary).
-if git -C "$SOURCE" apply --check "../../$PATCH" 2>/dev/null; then
-  git -C "$SOURCE" apply "../../$PATCH"
+# Only a patch that reverses cleanly counts as applied. Anything else (an older patch, a half-applied one, other edits)
+# starts over from the pinned tag, and a patch that won't apply there fails the build before anything is stamped.
+if ! git -C "$SOURCE" apply --reverse --check "../../$PATCH" 2>/dev/null; then
+  git -C "$SOURCE" checkout --quiet --force "$TAG"
+  git -C "$SOURCE" clean --quiet -d --force
+  if ! git -C "$SOURCE" apply "../../$PATCH"; then
+    echo "error: $PATCH doesn't apply to llama.cpp $TAG in $SOURCE. Update the patch for this tag." >&2
+    exit 1
+  fi
 fi
 
 if ! command -v cmake > /dev/null; then

@@ -92,6 +92,12 @@ nonisolated final class Searcher {
         vectorsLoaded = false
     }
 
+    /// The most files keyword search keeps, best first, among those the settings filter accepts.
+    static let wordFiles = 100
+    /// The most keyword-matching segments one search steps through to fill `wordFiles`. Each costs a row and, for a
+    /// new file, the filter's `stat`; this bounds a search whose best matches were all deleted since the last sync.
+    static let wordWindow = 4_000
+
     /// Searches the index.
     ///
     /// - Parameters:
@@ -101,7 +107,8 @@ nonisolated final class Searcher {
     ///   - scope: A folder to search inside ("Current folder"), as an absolute real path; nil for the whole index.
     ///     Applied to the vector rows and inside the keyword query.
     ///   - kinds: Only files of these kinds; nil for all.
-    ///   - filter: Which files the settings allow (`LookoutSearchFilter`); nil shows everything indexed.
+    ///   - filter: Which files the settings allow (`LookoutSearchFilter`); nil shows everything indexed. Its folders
+    ///     and types also go into the keyword query, before its limits.
     ///   - limit: The most hits returned, files and folders together.
     ///   - prefixLast: Match the last word as a prefix (it's probably half-typed): the keyword-only first pass.
     /// - Returns: Hits best first, split into strong and weak.
@@ -135,24 +142,51 @@ nonisolated final class Searcher {
         let patterns = Self.patterns(terms, prefixLast: prefixLast)
         var words: [(file: Int64, segment: Int64, snippet: String?)] = []
         var coverage: [Int64: Double] = [:]   // share of the query's words found anywhere in the file
+        var allowed: [Int64: Bool] = [:]      // the settings filter's verdict, existence included, asked once a file
         if !patterns.isEmpty {
-            // The scope goes into the query, so the 1,000-row limit is spent inside it.
-            let scopeSQL = range == nil ? "" : " AND f.path >= ? AND f.path < ?"
-            let scopeValues = range.map { [SQLValue.text($0.lower), .text($0.upper)] } ?? []
-            var seen = Set<Int64>()
-            try store.db.query("""
-                SELECT s.file, s.id, snippet(fts, 1, '«', '»', '…', 12), fts.original, f.kind FROM fts
-                JOIN segments s ON s.id = fts.rowid JOIN files f ON f.id = s.file
-                WHERE fts MATCH ?\(scopeSQL) ORDER BY bm25(fts, 3.0, 1.0) LIMIT 1000
-                """, [.text(patterns.joined(separator: " OR "))] + scopeValues) { row in
-                let file = row.int(0)
-                guard words.count < 100, kindAllowed(FileKind(rawValue: row.text(4) ?? "")),
-                      seen.insert(file).inserted else { return }
-                // Text that normalizing changed is quoted as it's written (with its hamza, harakat, joiners).
-                let snippet = row.text(3).flatMap { SearchText.snippet($0, terms: terms) } ?? row.text(2)
-                words.append((file, row.int(1), snippet))
+            // The scope, the kinds and the settings' folders and types go into the query, so its LIMIT is spent on
+            // files that may be shown. Rows come best first, and a file counts towards `wordFiles` only once the
+            // filter, with its existence check, has accepted it: files deleted since the last sync can't crowd out a
+            // valid one further down. `wordWindow` caps the work, and snippets are made only for accepted files.
+            let match = SQLValue.text(patterns.joined(separator: " OR "))
+            var conditions = "", values = [match]
+            if let range {
+                conditions += " AND f.path >= ? AND f.path < ?"
+                values += [.text(range.lower), .text(range.upper)]
             }
-            if !words.isEmpty {
+            if let kinds {
+                conditions += " AND f.kind IN (\(kinds.map { _ in "?" }.joined(separator: ", ")))"
+                values += kinds.map(\.rawValue).sorted().map { .text($0) }
+            }
+            if let filter {
+                let condition = filter.sqlCondition(column: "f.path")
+                conditions += " AND " + condition.sql
+                values += condition.values
+            }
+            var seen = Set<Int64>()
+            var matched: [(file: Int64, segment: Int64)] = []
+            try store.db.scan("""
+                SELECT s.file, s.id, f.path FROM fts JOIN segments s ON s.id = fts.rowid JOIN files f ON f.id = s.file
+                WHERE fts MATCH ?\(conditions) ORDER BY bm25(fts, 3.0, 1.0) LIMIT \(Self.wordWindow)
+                """, values) { row in
+                let file = row.int(0)
+                if seen.insert(file).inserted {
+                    let ok = filter?.allows(row.text(2) ?? "") ?? true
+                    allowed[file] = ok
+                    if ok { matched.append((file, row.int(1))) }
+                }
+                return matched.count < Self.wordFiles
+            }
+            if !matched.isEmpty {
+                var snippets: [Int64: String] = [:]
+                try store.db.query("""
+                    SELECT rowid, snippet(fts, 1, '«', '»', '…', 12), original FROM fts
+                    WHERE fts MATCH ? AND rowid IN (\(matched.map { String($0.segment) }.joined(separator: ",")))
+                    """, [match]) { row in
+                    // Text that normalizing changed is quoted as it's written (with its hamza, harakat, joiners).
+                    snippets[row.int(0)] = row.text(2).flatMap { SearchText.snippet($0, terms: terms) } ?? row.text(1)
+                }
+                words = matched.map { ($0.file, $0.segment, snippets[$0.segment]) }
                 let files = words.map { String($0.file) }.joined(separator: ",")
                 for pattern in patterns {
                     try store.db.query("""
@@ -179,7 +213,7 @@ nonisolated final class Searcher {
         var scored: [Int64: Double] = [:]
         var members: [LookoutFolderGrouping.Member] = []
         for file in candidates {
-            guard let row = fileRows[file], filter?.allows(row.path) ?? true else { continue }
+            guard let row = fileRows[file], allowed[file] ?? filter?.allows(row.path) ?? true else { continue }
             let z = best[file]?.z, share = coverage[file] ?? 0
             var score = meaningWeight * max(z ?? 0, 0) + wordsWeight * pow(share, LookoutRanking.coverageExponent)
             if hinted.contains(row.kind) { score += LookoutRanking.kindHintBonus }

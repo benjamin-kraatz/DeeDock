@@ -2,8 +2,8 @@ import Foundation
 
 /// What the app tells the index service to index (`LookoutIndexServing.start`). Paths are absolute.
 nonisolated struct LookoutIndexConfiguration: Codable, Sendable, Equatable {
-    /// The folders the user chose (`FolderSelection.folders`). Files under none of them leave the index. `/` is never
-    /// indexed (`Rules.isAllowedRoot`).
+    /// The folders the user chose (`FolderSelection.folders`). Files under none of them leave the index. Folders Lookout
+    /// never reads (`Rules.RootRefusal`) are dropped by `allowedRoots`.
     var roots: [String]
     /// Folders skipped inside the roots (`FolderSelection.effectiveSkips`).
     var excludedFolders: [String] = []
@@ -26,10 +26,12 @@ nonisolated struct LookoutIndexConfiguration: Codable, Sendable, Equatable {
 
     /// The roots that may be indexed, as folder URLs of their real paths (what the crawl reports, so pruning and the
     /// store's scope compare like with like). A root that isn't there stays as given.
+    ///
+    /// Each saved root is checked again here, as given and on its real path (`Rules.checkRoots`): the app refused
+    /// these folders when they were picked, but a chosen folder may since have become a link to ~/Library, and the
+    /// configuration may come from an older version. A refused root is left out, so `IndexWork` prunes its files.
     var allowedRoots: [URL] {
-        roots.filter(Rules.isAllowedRoot).map {
-            URL(fileURLWithPath: FolderSelection.realPath(($0 as NSString).standardizingPath), isDirectory: true)
-        }
+        Rules.checkRoots(roots).allowed.map { URL(fileURLWithPath: $0, isDirectory: true) }
     }
 
     func encoded() throws -> Data { try LookoutJSON.encode(self) }

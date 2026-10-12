@@ -92,10 +92,51 @@ struct LookoutRulesTests {
         #expect(reason("/Users/tester/Downloads/MediaKit", excluded: ["/Users/tester/Downloads/Media"]) == nil)
     }
 
-    @Test func theWholeDiskIsNeverARoot() {
-        #expect(!Rules.isAllowedRoot("/"))
-        #expect(!Rules.isAllowedRoot("//"))
-        #expect(!Rules.isAllowedRoot(""))
-        #expect(Rules.isAllowedRoot("/Users/tester/Documents"))
+    @Test("Folders Lookout never reads are refused as roots", arguments: [
+        ("/", Rules.RootRefusal.wholeDisk), ("//", .wholeDisk), ("", .wholeDisk), ("/Volumes", .wholeDisk),
+        ("/Users/tester", .homeFolder), ("/Users/tester/", .homeFolder), ("/Users", .homeFolder),
+        ("/Users/tester/Library", .library), ("/Users/tester/Library/CloudStorage", .library),
+        ("/Users/tester/Library/Mobile Documents", .library),
+        ("/Users/tester/Library/Mobile Documents/com~apple~TextEdit", .library),
+        ("/Users/tester/Library/Containers/com.example.app", .library),
+        ("/Users/tester/.ssh", .hidden), ("/Users/tester/Code/.git/objects", .hidden),
+        ("/Volumes/Archive/.Trashes", .hidden),
+        ("/System/Library", .system), ("/Library/Keychains", .system), ("/Applications", .system),
+        ("/usr/local/share", .system), ("/private/etc", .system), ("/private/var/db", .system),
+        ("/private/var/folders/aa/bb/C/com.example", .system), ("/private/var/folders/aa/bb/T", .system),
+        ("/dev", .system), ("/cores", .system),
+    ])
+    func refusedRoots(path: String, refusal: Rules.RootRefusal) {
+        #expect(Rules.rootRefusal(path, home: "/Users/tester", temporary: "/private/var/folders/aa/bb/T") == refusal)
+    }
+
+    @Test("Ordinary folders, other drives, scratch folders, iCloud Drive and cloud storage may be roots", arguments: [
+        "/Users/tester/Documents", "/Users/tester/Library Books", "/Users/Shared/Photos", "/Volumes/Archive",
+        "/Volumes/Archive/Scans", "/private/tmp/scratch", "/private/var/folders/aa/bb/T/LookoutTests-1",
+        "/Users/tester/Library/CloudStorage/Dropbox", "/Users/tester/Library/CloudStorage/GoogleDrive-me@example.com/My Drive",
+        "/Users/tester/Library/CloudStorage/OneDrive-Personal", "/Users/tester/Library/Mobile Documents/com~apple~CloudDocs",
+        "/Users/tester/Library/Mobile Documents/com~apple~CloudDocs/Taxes",
+    ])
+    func allowedRoots(path: String) {
+        #expect(Rules.rootRefusal(path, home: "/Users/tester", temporary: "/private/var/folders/aa/bb/T") == nil)
+    }
+
+    @Test func aFolderInsideABundleIsRefused() throws {
+        let folder = LookoutTestFolder()
+        let contents = try folder.folder("Tool.app/Contents/Resources")
+        #expect(Rules.rootRefusal(contents.path, home: "/Users/tester") == .bundle)
+        #expect(Rules.rootRefusal(folder.path, home: "/Users/tester") == nil)
+    }
+
+    @Test func rootsAreCheckedAsGivenAndWhereTheyLead() throws {
+        let folder = LookoutTestFolder()
+        let library = try folder.folder("home/Library/Keychains")
+        let documents = try folder.folder("home/Documents")
+        let link = folder.url.appendingPathComponent("home/Notes")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: library)
+        let checked = Rules.checkRoots([link.path, documents.path + "/", folder.path + "/home"],
+                                       home: folder.path + "/home")
+        #expect(checked.allowed == [documents.path])
+        #expect(checked.refused.map(\.refusal) == [.library, .homeFolder])
     }
 }

@@ -16,6 +16,9 @@ nonisolated struct Candidate: Sendable, Equatable {
 
 /// What a crawl found, and what it left out and why.
 nonisolated struct CrawlReport: Sendable {
+    /// The real paths of the roots walked. Refused roots (`Rules.checkRoots`) are left out; they're counted in
+    /// `skippedFolders`.
+    var roots: [String] = []
     var candidates: [Candidate] = []
     /// Reason → files.
     var skipped: [String: Int] = [:]

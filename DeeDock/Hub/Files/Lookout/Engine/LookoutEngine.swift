@@ -372,11 +372,14 @@ final class LookoutEngine {
                                          backfillAllowed: blocker == nil)
     }
 
-    /// The search filter for the settings, with the folders as real paths (as the index stores them).
+    /// The search filter for the settings, with the folders as real paths (as the index stores them). A saved folder
+    /// Lookout never reads (`Rules.checkRoots`, say one that has become a link to ~/Library) shows nothing, as the
+    /// index service doesn't read it either.
     private func filter() -> LookoutSearchFilter {
         let selection = settings.selection
         let real = { (path: String) in FolderSelection.realPath((path as NSString).standardizingPath) }
-        return LookoutSearchFilter(folders: selection.folders.map(real), skipped: selection.effectiveSkips.map(real),
+        return LookoutSearchFilter(folders: Rules.checkRoots(selection.folders).allowed,
+                                   skipped: selection.effectiveSkips.map(real),
                                    excludedExtensions: IndexOptions.extensions(
                                        settings.excludedExtensions.joined(separator: ",")))
     }

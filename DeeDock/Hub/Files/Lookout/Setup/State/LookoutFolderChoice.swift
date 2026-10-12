@@ -3,15 +3,9 @@ import Foundation
 /// The rules for folders Lookout may read, shared by onboarding and Settings: what's refused, what an added folder
 /// does to the folders already chosen, and which folders make macOS ask first.
 nonisolated enum LookoutFolderChoice {
-    /// Why a folder can't be chosen.
-    enum Refusal: Equatable, Sendable {
-        /// `/`: every volume and the system.
-        case wholeDisk
-        /// The home folder itself: it holds ~/Library and everything else at once.
-        case homeFolder
-        /// ~/Library or a folder inside it, which Lookout never reads.
-        case library
-    }
+    /// Why a folder can't be chosen: the rule the index service and the crawler apply again before every walk
+    /// (`Rules.RootRefusal`).
+    typealias Refusal = Rules.RootRefusal
 
     /// What choosing a folder does.
     enum Outcome: Equatable, Sendable {
@@ -28,15 +22,10 @@ nonisolated enum LookoutFolderChoice {
         return standardized.count > 1 && standardized.hasSuffix("/") ? String(standardized.dropLast()) : standardized
     }
 
-    /// Why `path` can't be chosen, or nil when it can.
+    /// Why `path` can't be chosen, or nil when it can. It's checked as given and where it really is
+    /// (`Rules.checkRoots`), so a link to ~/Library is refused like ~/Library itself.
     static func refusal(for path: String, home: String) -> Refusal? {
-        let path = normalized(path)
-        let home = normalized(home)
-        if !Rules.isAllowedRoot(path) { return .wholeDisk }
-        if path == home { return .homeFolder }
-        let library = home + "/Library"
-        if path == library || FolderSelection.isInside(path, library) { return .library }
-        return nil
+        Rules.checkRoots([path], home: home).refused.first?.refusal
     }
 
     /// What choosing `path` does, given the folders already `chosen`. A folder inside a chosen one adds nothing; a
@@ -52,13 +41,15 @@ nonisolated enum LookoutFolderChoice {
     }
 
     /// Whether reading `path` may make macOS show its Files and Folders prompt: Desktop, Documents and Downloads,
-    /// iCloud Drive, and other volumes (removable and network ones are protected). Onboarding never reads these
+    /// iCloud Drive, cloud storage folders (File Provider), and other volumes (removable and network ones are
+    /// protected). Onboarding never reads these
     /// before the access step, and asks for them there in context. Other folders in the home folder (Pictures,
     /// a project folder) read without a prompt.
     static func needsPrompt(_ path: String, home: String) -> Bool {
         let path = normalized(path)
         let home = normalized(home)
-        let protected = ["Desktop", "Documents", "Downloads", "Library/Mobile Documents"].map { home + "/" + $0 }
+        let protected = ["Desktop", "Documents", "Downloads", "Library/Mobile Documents", "Library/CloudStorage"]
+            .map { home + "/" + $0 }
         if protected.contains(where: { path == $0 || FolderSelection.isInside(path, $0) }) { return true }
         return path == "/Volumes" || FolderSelection.isInside(path, "/Volumes")
     }

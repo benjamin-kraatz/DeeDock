@@ -102,11 +102,127 @@ nonisolated enum Rules {
         return nil
     }
 
-    /// Whether a folder can be chosen to index at all. The whole disk can't: it would walk every volume and the
-    /// system, and `FolderSelection`'s prefix rules can't express "/" as a parent.
-    static func isAllowedRoot(_ path: String) -> Bool {
-        let standardized = (path as NSString).standardizingPath
-        return !standardized.isEmpty && standardized != "/"
+    /// Why a folder can't be a root, a folder Lookout walks. The app refuses these when they're picked
+    /// (`LookoutFolderChoice`), and the service and the crawler check every saved root again before each walk, on its
+    /// real path: a chosen folder that has since become a symbolic link to `~/Library` resolves there and is refused.
+    enum RootRefusal: String, Sendable, Equatable {
+        /// `/`, or `/Volumes` itself: every volume and the system. `FolderSelection`'s prefix rules can't express "/"
+        /// as a parent either.
+        case wholeDisk
+        /// The home folder, or a folder around it such as `/Users`: it holds ~/Library and everything else at once.
+        case homeFolder
+        /// ~/Library or a folder inside it, which Lookout never reads, apart from the cloud folders `isCloudFolder` allows.
+        case library
+        /// A folder with a hidden component (`.ssh`, `.config`): the crawler never walks into those either.
+        case hidden
+        /// An app, a library bundle or another package, or a folder inside one.
+        case bundle
+        /// The system's own folders (`systemFolders`).
+        case system
+
+        /// The reason a crawl report gives for a refused root.
+        var reason: String {
+            switch self {
+            case .wholeDisk: "the whole disk"
+            case .homeFolder: "the home folder"
+            case .library: "~/Library"
+            case .hidden: "hidden folder"
+            case .bundle: "app or bundle"
+            case .system: "system folder"
+            }
+        }
+    }
+
+    /// Folders of the system, refused as roots with everything inside them. `/etc`, `/var` and `/tmp` aren't listed:
+    /// they are links into `/private`, and the checks run on real paths.
+    ///
+    /// `/private` has two exceptions: folders inside `/private/tmp` and inside the user's own temporary folder may be
+    /// roots. Both hold scratch files people make themselves (and the tests' folders). The rest of `/private`
+    /// (`/private/etc`, `/private/var/db`, other apps' caches in `/private/var/folders`) is the system's.
+    static let systemFolders = ["/System", "/Library", "/Applications", "/usr", "/bin", "/sbin", "/private", "/dev",
+                                "/cores", "/Network"]
+
+    /// The real path of this user's temporary folder (`/private/var/folders/…/T`).
+    static let temporaryFolder: String = {
+        let path = (NSTemporaryDirectory() as NSString).standardizingPath
+        return FolderSelection.realPath(path)
+    }()
+
+    /// Why `path` can't be a root, or nil when it can. The check doesn't resolve links: pass a real path
+    /// (`FolderSelection.realPath`, or use `checkRoots`) to check where a folder really is. It looks up only whether
+    /// each folder on the way is a package.
+    ///
+    /// - Parameters:
+    ///   - home: The home folder (tests pass a folder of their own). It's compared as given and as its real path.
+    ///   - temporary: The user's temporary folder (`temporaryFolder`), which may hold roots although it's in
+    ///     `/private`.
+    static func rootRefusal(_ path: String, home: String = FileManager.default.homeDirectoryForCurrentUser.path,
+                            temporary: String = temporaryFolder) -> RootRefusal? {
+        let path = normalizedFolder(path)
+        if path.isEmpty || path == "/" || path == "/Volumes" { return .wholeDisk }
+        let homes = Set([normalizedFolder(home), FolderSelection.realPath(normalizedFolder(home))])
+        if homes.contains(where: { path == $0 || FolderSelection.isInside($0, path) }) { return .homeFolder }
+        for home in homes where path == home + "/Library" || FolderSelection.isInside(path, home + "/Library") {
+            if !isCloudFolder(path, home: home) { return .library }
+        }
+        let components = path.split(separator: "/")
+        if components.contains(where: { $0.hasPrefix(".") }) { return .hidden }
+        let inside = { (folder: String) in path == folder || FolderSelection.isInside(path, folder) }
+        if systemFolders.contains(where: inside) {
+            let scratch = ["/private/tmp", normalizedFolder(temporary)]
+            guard scratch.contains(where: { FolderSelection.isInside(path, $0) }) else { return .system }
+        }
+        // Packages last: they cost a lookup per folder on the way (a few, once per root and walk).
+        var folder = ""
+        for component in components {
+            folder += "/" + component
+            let values = try? URL(fileURLWithPath: folder, isDirectory: true).resourceValues(forKeys: [.isPackageKey])
+            if values?.isPackage == true { return .bundle }
+        }
+        return nil
+    }
+
+    /// Whether `path` (inside `home`'s Library) is a cloud folder people keep their files in, or inside one: a File
+    /// Provider folder in `~/Library/CloudStorage` (Dropbox, Google Drive, OneDrive, which `~/Dropbox` and the like
+    /// link to), or iCloud Drive (`~/Library/Mobile Documents/com~apple~CloudDocs`). `CloudStorage` and
+    /// `Mobile Documents` themselves stay refused, as do other apps' containers in `Mobile Documents`. Their
+    /// placeholders that aren't downloaded are still skipped file by file.
+    static func isCloudFolder(_ path: String, home: String) -> Bool {
+        let storage = home + "/Library/CloudStorage"
+        let iCloudDrive = home + "/Library/Mobile Documents/com~apple~CloudDocs"
+        return FolderSelection.isInside(path, storage) || path == iCloudDrive || FolderSelection.isInside(path, iCloudDrive)
+    }
+
+    /// An absolute path with `.`, `..`, repeated and trailing slashes resolved by its text alone. Not
+    /// `standardizingPath`, which turns `/private/etc` into `/etc` and would hide a real path's system folder from
+    /// `rootRefusal`. Empty stays empty.
+    static func normalizedFolder(_ path: String) -> String {
+        guard !path.isEmpty else { return "" }
+        var components: [Substring] = []
+        for component in path.split(separator: "/") where component != "." {
+            if component == ".." { _ = components.popLast() } else { components.append(component) }
+        }
+        return "/" + components.joined(separator: "/")
+    }
+
+    /// The real path of each of `paths` that may be a root, and the rest with why not. A path is checked as given and
+    /// where it really is: "~/Notes" that has become a link to ~/Library is refused. A path that isn't there right now
+    /// (an unplugged drive) resolves to itself.
+    static func checkRoots(_ paths: [String], home: String = FileManager.default.homeDirectoryForCurrentUser.path,
+                           temporary: String = temporaryFolder)
+        -> (allowed: [String], refused: [(path: String, refusal: RootRefusal)]) {
+        var allowed: [String] = [], refused: [(path: String, refusal: RootRefusal)] = []
+        for path in paths {
+            let given = normalizedFolder(path)
+            let real = FolderSelection.realPath(given)
+            if let refusal = rootRefusal(given, home: home, temporary: temporary)
+                ?? rootRefusal(real, home: home, temporary: temporary) {
+                refused.append((path, refusal))
+            } else {
+                allowed.append(real)
+            }
+        }
+        return (allowed, refused)
     }
 
     static func isProjectRoot(_ folder: String) -> Bool {

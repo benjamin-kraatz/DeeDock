@@ -34,7 +34,10 @@ None of these scenarios has been exercised.
 - [ ] Choose folders: Desktop, Documents, and Downloads checked, Pictures unchecked, estimates for
   Pictures and added folders, and **Estimate after access** for the protected ones. No macOS prompt
   may appear before the access step. **Add folder…** with a plain folder, a folder inside a chosen
-  one, a folder around chosen ones, `/`, the home folder, and a folder in `~/Library`.
+  one, a folder around chosen ones, `/`, the home folder, a folder in `~/Library`, a hidden folder,
+  `/Library`, and a link to a folder in `~/Library`. iCloud Drive, a folder in
+  `~/Library/CloudStorage`, and `~/Dropbox` must be accepted, and `~/Library/CloudStorage` itself
+  refused.
 - [ ] Access, folder allowed: **Allow…** shows macOS's prompt in context, the row turns to
   **Allowed**, and the Hub takes keyboard focus back.
 - [ ] Access, folder not allowed: the row shows **Not allowed · Skipped** and **Open Settings**.

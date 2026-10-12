@@ -18,13 +18,24 @@ nonisolated enum ImageExtractor {
         let taken: String?
     }
 
+    /// An image source over a file's bytes, read from the descriptor `QueuedFileGate` checked. The file's extension
+    /// is ImageIO's hint for formats it can't tell from the bytes alone, as it is when ImageIO opens a path.
+    ///
+    /// - Throws: `ExtractError.unreadable`.
+    static func source(_ data: Data, fileExtension: String) throws -> CGImageSource {
+        var options: [CFString: Any] = [kCGImageSourceShouldCache: false]
+        if let type = UTType(filenameExtension: fileExtension) { options[kCGImageSourceTypeIdentifierHint] = type.identifier }
+        guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary)
+        else { throw ExtractError.unreadable("not an image") }
+        return source
+    }
+
     /// Writes a downscaled copy for the model. ImageIO decodes straight to the thumbnail size, so a 48 MP photo never
     /// gets decoded at full resolution. Orientation is applied, so the model sees the picture upright.
     ///
     /// - Throws: `ExtractError.tooSmall` when the longer side is under `minSide`, `unreadable` otherwise.
-    static func prepare(_ url: URL, maxPixel: Int, minSide: Int, to folder: URL, png: Bool) throws -> Prepared {
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary)
-        else { throw ExtractError.unreadable("not an image") }
+    static func prepare(_ source: CGImageSource, maxPixel: Int, minSide: Int, to folder: URL, png: Bool) throws
+        -> Prepared {
         let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] ?? [:]
         let width = properties[kCGImagePropertyPixelWidth] as? Int ?? 0
         let height = properties[kCGImagePropertyPixelHeight] as? Int ?? 0
@@ -45,9 +56,8 @@ nonisolated enum ImageExtractor {
     }
 
     /// The image at full resolution (for OCR, where small UI text matters).
-    static func fullImage(_ url: URL) -> CGImage? {
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
-        return CGImageSourceCreateImageAtIndex(source, 0, nil)
+    static func fullImage(_ source: CGImageSource) -> CGImage? {
+        CGImageSourceCreateImageAtIndex(source, 0, nil)
     }
 
     /// Encodes `image` as PNG (screenshots and pages: sharp text) or JPEG at 0.9 (photos).

@@ -22422,6 +22422,24 @@
         }
       }
     },
+    "lookoutFolderRefusedBundle" : {
+      "comment" : "Shown when the person picks an app, a package or a folder inside one for Lookout: it isn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nicht in Apps oder Paketen. Wähle einen gewöhnlichen Ordner."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read inside apps or packages. Pick an ordinary folder."
+          }
+        }
+      }
+    },
     "lookoutFolderRefusedDisk" : {
       "comment" : "Shown when the person picks the whole disk as a folder for Lookout: it isn't added.",
       "extractionState" : "manual",
@@ -22436,6 +22454,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lookout doesn’t read your whole Mac. Pick the folders you want it to search."
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedHidden" : {
+      "comment" : "Shown when the person picks a hidden folder (its name, or a parent's, starts with a dot) for Lookout: it isn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest keine versteckten Ordner. Wähle einen Ordner, den der Finder anzeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read hidden folders. Pick a folder that Finder shows."
           }
         }
       }
@@ -22459,19 +22495,37 @@
       }
     },
     "lookoutFolderRefusedLibrary" : {
-      "comment" : "Shown when the person picks ~/Library or a folder inside it for Lookout: it isn't added. ~/Library is a folder name; keep it.",
+      "comment" : "Shown when the person picks ~/Library or a folder inside it for Lookout: it isn't added. iCloud Drive and cloud storage folders (Dropbox, Google Drive, OneDrive) inside it can be added. ~/Library and iCloud Drive are names; keep them.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lookout liest ~/Library nie. Wähle einen Ordner außerhalb davon."
+            "value" : "Lookout liest ~/Library nicht, außer iCloud Drive und Cloud-Speicher-Ordnern. Wähle einen Ordner außerhalb davon."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lookout never reads ~/Library. Pick a folder outside it."
+            "value" : "Lookout doesn’t read ~/Library, apart from iCloud Drive and cloud storage folders. Pick a folder outside it."
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedSystem" : {
+      "comment" : "Shown when the person picks one of macOS's own folders (System, Library, Applications, usr and the like) for Lookout: it isn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nicht die Ordner von macOS selbst. Wähle einen Ordner mit deinen Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read macOS’s own folders. Pick a folder with your files."
           }
         }
       }

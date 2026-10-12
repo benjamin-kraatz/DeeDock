@@ -8,25 +8,31 @@ nonisolated enum DocExtractor {
     /// Plain text from txt/md directly, HTML by stripping tags, and rtf/docx/doc/odt through the Cocoa text system.
     /// (Cocoa's HTML import runs WebKit and must be on the main thread; the service indexes on a background queue.)
     ///
-    /// - Throws: The file can't be read or decoded.
-    static func text(of url: URL) throws -> String {
-        let ext = url.pathExtension.lowercased()
+    /// - Parameters:
+    ///   - data: The file's bytes, read from the descriptor `QueuedFileGate` checked.
+    ///   - fileExtension: The file's extension, which says how to read it.
+    /// - Throws: The file can't be decoded.
+    static func text(of data: Data, fileExtension: String) throws -> String {
         let type: NSAttributedString.DocumentType
-        switch ext {
+        switch fileExtension.lowercased() {
         case "docx": type = .officeOpenXML
         case "doc": type = .docFormat
         case "odt": type = .openDocument
         case "rtf": type = .rtf
-        case "html", "htm": return plainText(fromHTML: try readText(url))
-        default: return try readText(url)
+        case "html", "htm": return plainText(fromHTML: decodeText(data))
+        default: return decodeText(data)
         }
-        return try NSAttributedString(url: url, options: [.documentType: type], documentAttributes: nil).string
+        return try NSAttributedString(data: data, options: [.documentType: type], documentAttributes: nil).string
     }
 
-    private static func readText(_ url: URL) throws -> String {
-        var encoding = String.Encoding.utf8
-        if let text = try? String(contentsOf: url, usedEncoding: &encoding) { return text }
-        return try String(contentsOf: url, encoding: .isoLatin1)
+    /// Plain text in UTF-32 or UTF-16 with a byte-order mark, else UTF-8, else Latin-1, which decodes any bytes.
+    static func decodeText(_ data: Data) -> String {
+        if data.starts(with: [0xFF, 0xFE, 0, 0]) || data.starts(with: [0, 0, 0xFE, 0xFF]),
+           let text = String(data: data, encoding: .utf32) { return text }
+        if data.starts(with: [0xFF, 0xFE]) || data.starts(with: [0xFE, 0xFF]),
+           let text = String(data: data, encoding: .utf16) { return text }
+        if let text = String(data: data, encoding: .utf8) { return text }
+        return String(data: data, encoding: .isoLatin1) ?? ""
     }
 
     /// Good enough for search: drops scripts, styles and comments, turns block ends into line breaks, strips the

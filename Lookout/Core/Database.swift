@@ -63,6 +63,16 @@ nonisolated final class Database {
         while try statement.step() { try row(statement) }
     }
 
+    /// Runs `sql` with `values` bound and calls `row` for each result row while it returns true. The rows after the
+    /// first `false` are never stepped.
+    ///
+    /// - Throws: `Failure` from SQLite, or whatever `row` throws.
+    func scan(_ sql: String, _ values: [SQLValue] = [], while row: (Statement) throws -> Bool) throws {
+        let statement = try Statement(self, sql)
+        try statement.bind(values)
+        while try statement.step(), try row(statement) {}
+    }
+
     /// Runs one statement with `values` bound, ignoring any rows.
     func run(_ sql: String, _ values: [SQLValue] = []) throws { try query(sql, values) }
 

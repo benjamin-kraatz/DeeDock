@@ -6,13 +6,21 @@ import Testing
 struct LookoutFolderChoiceTests {
     private let home = "/Users/tester"
 
-    @Test("The whole disk, the home folder and ~/Library are refused", arguments: [
+    @Test("The whole disk, the home folder, ~/Library, hidden and system folders are refused", arguments: [
         ("/", LookoutFolderChoice.Refusal.wholeDisk),
         ("", .wholeDisk),
+        ("/Volumes", .wholeDisk),
         ("/Users/tester", .homeFolder),
         ("/Users/tester/", .homeFolder),
+        ("/Users", .homeFolder),
         ("/Users/tester/Library", .library),
-        ("/Users/tester/Library/Mobile Documents/com~apple~CloudDocs", .library),
+        ("/Users/tester/Library/CloudStorage", .library),
+        ("/Users/tester/Library/Mobile Documents", .library),
+        ("/Users/tester/Library/Mobile Documents/com~apple~Pages", .library),
+        ("/Users/tester/.config", .hidden),
+        ("/System/Library", .system),
+        ("/Library/Application Support", .system),
+        ("/Applications", .system),
     ])
     func refusals(path: String, refusal: LookoutFolderChoice.Refusal) {
         #expect(LookoutFolderChoice.refusal(for: path, home: home) == refusal)
@@ -25,6 +33,37 @@ struct LookoutFolderChoiceTests {
         #expect(LookoutFolderChoice.refusal(for: "/Users/tester/Library Books", home: home) == nil)
         #expect(LookoutFolderChoice.refusal(for: "/Volumes/Archive", home: home) == nil)
         #expect(LookoutFolderChoice.refusal(for: "/Users/other", home: home) == nil)
+    }
+
+    @Test("A link is refused where it leads")
+    func linkIsCheckedWhereItLeads() throws {
+        let folder = LookoutTestFolder()
+        let library = try folder.folder("home/Library/Mail")
+        let link = folder.url.appendingPathComponent("home/Mail")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: library)
+        #expect(LookoutFolderChoice.refusal(for: link.path, home: folder.path + "/home") == .library)
+    }
+
+    @Test("iCloud Drive and cloud storage folders picked in the open panel are added", arguments: [
+        "/Users/tester/Library/CloudStorage/Dropbox",
+        "/Users/tester/Library/CloudStorage/GoogleDrive-me@example.com/My Drive",
+        "/Users/tester/Library/Mobile Documents/com~apple~CloudDocs",
+    ])
+    func cloudFoldersAreAccepted(path: String) {
+        #expect(LookoutFolderChoice.choose(path, chosen: [], home: home) == .add(path, replacing: []))
+        #expect(LookoutFolderChoice.needsPrompt(path, home: home))
+    }
+
+    @Test("A link such as ~/Dropbox that leads into CloudStorage is added")
+    func cloudLinkIsAccepted() throws {
+        let folder = LookoutTestFolder()
+        let home = folder.path + "/home"
+        let dropbox = try folder.folder("home/Library/CloudStorage/Dropbox")
+        let link = folder.url.appendingPathComponent("home/Dropbox")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: dropbox)
+        #expect(LookoutFolderChoice.choose(link.path, chosen: [], home: home)
+            == .add(LookoutFolderChoice.normalized(link.path), replacing: []))
+        #expect(Rules.checkRoots([link.path], home: home).allowed == [dropbox.path])
     }
 
     @Test("A folder inside a chosen one adds nothing")

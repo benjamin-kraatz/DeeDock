@@ -1,0 +1,186 @@
+import Darwin
+import Foundation
+
+/// Checks a queued file again just before the indexer reads it, and opens it so that the file checked is the file read.
+///
+/// The crawl's checks held when the file was queued, which can be hours before the backfill reads it. By then
+/// `notes.txt` may have become a link to a key outside the chosen folders, or a folder on its way may have. Reading it
+/// by path would index the target under `notes.txt`, past both the folder rules and the secret-name rules. So each file
+/// is checked again, in this order:
+///
+/// 1. Its stored path against the settings: not a key or password file (`Rules.isSecret`), not an excluded type,
+///    inside a root that's walked and not in a skipped folder there, and no hidden, developer or `.noindex` folder or
+///    ~/Library on the way down from that root.
+/// 2. `lstat`: a regular file, not a link, not a dataless placeholder (reading one downloads it).
+/// 3. `open` with `O_NOFOLLOW`, then `fstat` on the descriptor: still a regular file, and the same one `lstat` saw.
+///    `O_NONBLOCK` keeps a FIFO swapped in at the last moment from blocking the open.
+/// 4. `F_GETPATH` on the descriptor: the open file is at the stored path. A folder on the way that became a link
+///    between step 1 and the open shows up here as another path.
+/// 5. Its inode against the record. Another file at the same path (a replacement that kept the size and date) is
+///    queued again with its own identity rather than read under the old row.
+///
+/// The extractors then read the bytes from that descriptor (`Verdict.read`), never the path, so the check and the read
+/// can't race. Devices aren't compared with the record, because an external drive gets a new device number at every
+/// mount. The crawl's relevance rules (code projects, datasets) aren't repeated: they decide what's worth reading, not
+/// what may be read. Nor are packages on the way looked up again, which would cost a lookup per folder for every file.
+nonisolated struct QueuedFileGate: Sendable {
+    /// What to do with a queued file.
+    enum Verdict {
+        /// Read it: these are its bytes, read from the descriptor that was checked.
+        case read(Data)
+        /// Another file is at the path now: queue it again as this one.
+        case changed(Candidate)
+        /// Don't read it. `state` is `skipped` (the crawl's reason, which a later sync settles for good) or `failed`
+        /// (it couldn't be opened).
+        case refused(state: String, detail: String)
+    }
+
+    /// Files larger than this aren't read: their bytes are copied into memory (`contents(of:size:)`), and a long PDF
+    /// is read again for every step of its later pass. 512 MB keeps the largest scanned books.
+    static let maxReadBytes = 512 << 20
+
+    /// The real paths of the roots the last sync walked (`CrawlReport.roots`).
+    let roots: [String]
+    /// The skipped folders, as given and as real paths.
+    let skipped: [String]
+    let excludedExtensions: Set<String>
+    /// The real path of the home folder, whose `Library` is never read.
+    let home: String
+
+    /// - Parameters:
+    ///   - roots: The real paths of the walked roots. Files under none of them are refused.
+    ///   - options: The indexing settings: skipped folders and file types.
+    ///   - home: The home folder (tests pass a folder of their own).
+    init(roots: [String], options: IndexOptions,
+         home: String = FileManager.default.homeDirectoryForCurrentUser.path) {
+        self.roots = roots
+        skipped = options.excludedFolders.flatMap { [$0, FolderSelection.realPath($0)] }
+        excludedExtensions = options.excludedExtensions
+        self.home = FolderSelection.realPath(Rules.normalizedFolder(home))
+    }
+
+    /// Checks `file` again and opens it (see the type's steps). Touches only the file: no database.
+    func open(_ file: FileRecord) -> Verdict {
+        if let reason = refusal(forPath: file.path) { return .refused(state: "skipped", detail: reason) }
+        var linkInfo = stat()
+        guard lstat(file.path, &linkInfo) == 0 else { return .refused(state: "failed", detail: Self.errorText(errno)) }
+        if let reason = Self.refusal(for: linkInfo) { return .refused(state: "skipped", detail: reason) }
+
+        let descriptor = Darwin.open(file.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        // A link put in place after `lstat`: O_NOFOLLOW makes that open fail with ELOOP.
+        guard descriptor >= 0 else {
+            let error = errno
+            return error == ELOOP ? .refused(state: "skipped", detail: "link or special file")
+                : .refused(state: "failed", detail: Self.errorText(error))
+        }
+        defer { close(descriptor) }
+        var info = stat()
+        guard fstat(descriptor, &info) == 0 else { return .refused(state: "failed", detail: Self.errorText(errno)) }
+        guard Self.refusal(for: info) == nil, info.st_dev == linkInfo.st_dev, info.st_ino == linkInfo.st_ino else {
+            return .refused(state: "skipped", detail: "link or special file")
+        }
+        // Case aside: on a case-insensitive volume a rename that only changed case opens the same file under its new
+        // spelling, and the next sync moves the row. A link on the way leads to a different path altogether.
+        guard let opened = Self.openPath(descriptor),
+              opened.compare(file.path, options: .caseInsensitive) == .orderedSame else {
+            return .refused(state: "skipped", detail: "not where it was found: a folder on its way moved or is a link")
+        }
+        if UInt64(info.st_ino) != file.inode {
+            let mtime = Double(info.st_mtimespec.tv_sec) + Double(info.st_mtimespec.tv_nsec) / 1e9
+            return .changed(Candidate(path: file.path, kind: file.kind, size: Int64(info.st_size), mtime: mtime,
+                                      inode: UInt64(info.st_ino), device: UInt64(bitPattern: Int64(info.st_dev)),
+                                      lastUsed: file.lastUsed))
+        }
+        guard info.st_size <= Self.maxReadBytes else {
+            let megabytes = Int(info.st_size >> 20)
+            return .refused(state: "skipped", detail: "too large to read (\(megabytes) MB)")
+        }
+        do {
+            return .read(try Self.contents(of: descriptor, size: Int(info.st_size)))
+        } catch {
+            return .refused(state: "failed", detail: "\(error)")
+        }
+    }
+
+    /// Why the settings no longer allow reading `path`, or nil. String checks only, so it costs nothing.
+    func refusal(forPath path: String) -> String? {
+        let name = (path as NSString).lastPathComponent
+        if Rules.isSecret(name) { return "key or password file" }
+        if excludedExtensions.contains((name as NSString).pathExtension.lowercased()) { return "excluded type" }
+        // Any root that holds the file may allow it: a folder chosen inside a skipped one is walked whole. The
+        // closest root's reason is the one reported.
+        let holding = roots.filter { FolderSelection.isInside(path, $0) }.sorted { $0.count > $1.count }
+        guard !holding.isEmpty else { return "outside the chosen folders" }
+        var reasons: [String] = []
+        for root in holding {
+            guard let reason = refusal(forPath: path, under: root) else { return nil }
+            reasons.append(reason)
+        }
+        return reasons[0]
+    }
+
+    /// Why the crawl wouldn't have reached `path` from `root`: a skipped folder, or a folder on the way it never walks
+    /// into.
+    private func refusal(forPath path: String, under root: String) -> String? {
+        guard FolderSelection.isSearched(path, folders: [root], skipped: skipped) else { return "excluded folder" }
+        let between = path.dropFirst(root.count + 1).split(separator: "/").dropLast()
+        var folder = root
+        for component in between {
+            folder += "/" + component
+            if component.hasPrefix(".") { return "hidden folder" }
+            if let reason = Rules.skipReason(forFolder: URL(fileURLWithPath: folder), home: home, excluded: []) {
+                return reason
+            }
+        }
+        return nil
+    }
+
+    /// Why a file with this `stat` isn't read, or nil for a regular file with its data on this Mac.
+    private static func refusal(for info: stat) -> String? {
+        guard (info.st_mode & S_IFMT) == S_IFREG else { return "link or special file" }
+        // Reading a dataless placeholder (iCloud "Optimize Mac Storage", File Providers) downloads it.
+        if info.st_flags & 0x4000_0000 != 0 { return "in the cloud, not downloaded" }   // SF_DATALESS
+        return nil
+    }
+
+    /// The path of the file open at `descriptor`, as the kernel knows it (a real path, like the crawl's).
+    private static func openPath(_ descriptor: Int32) -> String? {
+        var buffer = [CChar](repeating: 0, count: Int(MAXPATHLEN))
+        guard fcntl(descriptor, F_GETPATH, &buffer) != -1 else { return nil }
+        return String(cString: buffer)
+    }
+
+    /// The file's bytes, read from the descriptor in 8 MB pieces with `pread`. Never memory-mapped, by design: a
+    /// mapped file that's cut shorter while it's read faults the reading thread with SIGBUS and takes the service down.
+    /// A read only ever returns fewer bytes. A file cut shorter after `fstat` yields what's left, and the extractor
+    /// fails on it or reads it; one that grew yields its first `size` bytes. Handing PDFKit or ImageIO a URL, even
+    /// `/dev/fd/<n>`, wouldn't avoid this, as they may map a file they open themselves.
+    ///
+    /// - Throws: `ReadFailure` when a read fails.
+    static func contents(of descriptor: Int32, size: Int) throws -> Data {
+        guard size > 0 else { return Data() }
+        var data = Data(count: size)
+        var total = 0
+        try data.withUnsafeMutableBytes { buffer in
+            while total < size {
+                let read = pread(descriptor, buffer.baseAddress! + total, min(size - total, 8 << 20), off_t(total))
+                if read < 0, errno == EINTR { continue }
+                guard read >= 0 else { throw ReadFailure(errorText(errno)) }
+                if read == 0 { break }   // cut shorter since `fstat`: read what's there
+                total += read
+            }
+        }
+        if total < size { data.count = total }
+        return data
+    }
+
+    private static func errorText(_ error: Int32) -> String {
+        "unreadable: \(String(cString: strerror(error)))"
+    }
+
+    /// A read that failed after the checks passed.
+    struct ReadFailure: Error, CustomStringConvertible {
+        let description: String
+        init(_ description: String) { self.description = description }
+    }
+}

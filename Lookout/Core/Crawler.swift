@@ -12,10 +12,12 @@ import UniformTypeIdentifiers
 /// doesn't descend into a linked folder, and a linked file is reported as a "link or special file".
 nonisolated enum Crawler {
     /// - Parameters:
-    ///   - roots: The chosen folders. The whole disk (`/`) is never walked (`Rules.isAllowedRoot`).
+    ///   - roots: The chosen folders. Each is checked again on its real path, the root itself included
+    ///     (`Rules.checkRoots`), and a refused one (the whole disk, the home folder, ~/Library, a hidden, bundle or
+    ///     system folder) is not walked.
     ///   - readsLastUsed: Whether to ask Spotlight when each file was last used. A count for an estimate doesn't need
     ///     it.
-    ///   - home: The home folder whose `Library` is never walked (tests pass a folder of their own).
+    ///   - home: The home folder, never a root, whose `Library` is never walked (tests pass a folder of their own).
     static func crawl(_ roots: [URL], options: IndexOptions, readsLastUsed: Bool = true,
                       home: String = FileManager.default.homeDirectoryForCurrentUser.path) -> CrawlReport {
         let fm = FileManager.default
@@ -25,18 +27,22 @@ nonisolated enum Crawler {
         var projectRoots = Set<String>()
         var found: [Candidate] = []
         var foundPaths = Set<String>()   // a folder inside another root would be walked twice
-        let allowed = roots.map { $0.standardizedFileURL }.filter { Rules.isAllowedRoot($0.path) }
-        if allowed.count < roots.count { report.skippedFolders["the whole disk", default: 0] += roots.count - allowed.count }
-        let rootPaths = Set(allowed.map(\.path))
+        // Checked here too, not only when the configuration arrives: a chosen folder that has become a link to
+        // ~/Library resolves there now and is refused. The walk starts at the real path, so it never goes through a
+        // link, and it reports real paths (/private/var, where a root says /var).
+        let checked = Rules.checkRoots(roots.map(\.path), home: home)
+        for refused in checked.refused { report.skippedFolders[refused.refusal.reason, default: 0] += 1 }
+        let allowed = checked.allowed.map { URL(fileURLWithPath: $0, isDirectory: true) }
+        report.roots = checked.allowed
+        let rootPaths = Set(checked.allowed)
+        // Skips as given and as real paths, to compare with the real paths the walk reports.
+        let excluded = options.excludedFolders.flatMap { [$0, FolderSelection.realPath($0)] }
 
         for root in allowed {
             if Rules.isProjectRoot(root.path) { projectRoots.insert(root.path) }
             // A skip applies inside the chosen folders that contain it: a folder chosen inside a skipped one is
-            // walked whole (`FolderSelection`). The walk reports real paths (/private/var, where the root says /var).
-            let real = FolderSelection.realPath(root.path)
-            let skips = options.excludedFolders.filter {
-                FolderSelection.isInside($0, root.path) || FolderSelection.isInside($0, real)
-            }.flatMap { [$0, FolderSelection.realPath($0)] }
+            // walked whole (`FolderSelection`).
+            let skips = excluded.filter { FolderSelection.isInside($0, root.path) }
             guard let walker = fm.enumerator(at: root, includingPropertiesForKeys: keys,
                                              options: [.skipsHiddenFiles, .skipsPackageDescendants],
                                              errorHandler: { _, _ in true }) else { continue }
@@ -123,7 +129,7 @@ nonisolated enum Crawler {
         }
 
         if readsLastUsed, !kept.isEmpty {
-            let dates = LastUsedDates.query(allowed.map { FolderSelection.realPath($0.path) })
+            let dates = LastUsedDates.query(checked.allowed)
             if !dates.isEmpty {
                 for index in kept.indices { kept[index].lastUsed = dates[kept[index].path] }
             }

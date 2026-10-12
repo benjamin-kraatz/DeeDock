@@ -84,6 +84,38 @@ struct LookoutSearcherScopeTests {
         #expect(try index.searcher().search("budget", queryVector: nil, filter: elsewhere).isEmpty)
     }
 
+    /// More than `Searcher.wordFiles` strong word matches the filter turns down, above one weaker match it allows.
+    private static let crowd = Searcher.wordFiles + 20
+    /// A weaker match: the word once in a long passage ranks below the crowd's short "budget budget".
+    private static let weaker = "budget " + Array(repeating: "quarterly notes about the garden and the roof", count: 30)
+        .joined(separator: " ")
+
+    @Test func deletedFilesDontUseUpTheWordBudget() throws {
+        let index = try LookoutSearchIndex()
+        for number in 0..<Self.crowd { try index.add("docs/gone-\(number).txt", text: "budget budget") }   // not on disk
+        try index.folder.write("docs/kept.txt")
+        try index.add("docs/kept.txt", text: Self.weaker)
+        let filter = LookoutSearchFilter(folders: [index.folder.path])
+        let results = try index.searcher().search("budget", queryVector: nil, filter: filter)
+        #expect(results.all.map(\.path) == [index.path("docs/kept.txt")])
+    }
+
+    @Test func excludedFoldersAndTypesDontUseUpTheWordBudget() throws {
+        let index = try LookoutSearchIndex()
+        for number in 0..<Self.crowd {
+            try index.add("root/Media/clip-\(number).txt", text: "budget budget")
+            try index.add("root/notes-\(number).md", text: "budget budget")
+        }
+        try index.add("root/kept.txt", text: Self.weaker)
+        try index.add("root/Media/Courses/syllabus.txt", text: Self.weaker)   // chosen inside the skip: searched
+        try index.add("elsewhere/other.txt", text: "budget budget")
+        let filter = LookoutSearchFilter(folders: [index.path("root"), index.path("root/Media/Courses")],
+                                         skipped: [index.path("root/Media")], excludedExtensions: ["md"],
+                                         requireExisting: false)
+        let results = try index.searcher().search("budget", queryVector: nil, filter: filter)
+        #expect(Set(results.all.map(\.path)) == [index.path("root/kept.txt"), index.path("root/Media/Courses/syllabus.txt")])
+    }
+
     @Test func vectorsLoadForTheFirstMeaningSearchAndCanBeReleased() throws {
         let index = try LookoutSearchIndex()
         try index.background(30)

@@ -10,11 +10,20 @@ nonisolated extension Indexer {
         let batch = prepared.batch
         let later = prepared.step != nil
         if let step = prepared.step, let outcome = prepared.outcomes[0] {
+            // Another file at the path: its earlier pages aren't this one's, so it starts over.
+            if let now = outcome.requeue {
+                try store.requeue(batch[0].id, as: now)
+                return [(outcome.state, outcome.detail)]
+            }
             return [try stopReading(batch[0], at: step.lowerBound, because: outcome.detail ?? outcome.state)]
         }
         var results = [(String, String?)](repeating: ("failed", nil), count: batch.count)
         for (slot, outcome) in prepared.outcomes {
-            try store.finish(batch[slot].id, state: outcome.state, detail: outcome.detail)
+            if let now = outcome.requeue {
+                try store.requeue(batch[slot].id, as: now)
+            } else {
+                try store.finish(batch[slot].id, state: outcome.state, detail: outcome.detail)
+            }
             results[slot] = (outcome.state, outcome.detail)
         }
         do {

@@ -32,14 +32,10 @@ final class IndexWork: @unchecked Sendable {
 
     // Requests, guarded by `lock`.
     private let lock = NSLock()
-    private var pendingConfiguration: LookoutIndexConfiguration?
-    private var syncRequested = false
-    private var paused = false
-    /// No app is connected: stop as DigUp's helper did when the app went away.
-    private var appAway = false
+    /// The configuration, sync, reset, pause and whether an app is connected (with none, work stops as DigUp's helper
+    /// did when the app went away). Each waits until a pass performs it (`IndexRequests.take`).
+    private var requests = IndexRequests()
     private var backfillAllowed = false
-    /// "Read everything again" was asked for; the next pass resets the index before it syncs.
-    private var resetRequested = false
     /// Replies waiting for the index to close (`closeIndex`); the next pass closes it and calls them.
     private var closeReplies: [@Sendable () -> Void] = []
     /// Bumped by every request, so the loop notices one that came in while it decided to stop.
@@ -69,37 +65,37 @@ final class IndexWork: @unchecked Sendable {
 
     func configure(_ configuration: LookoutIndexConfiguration) {
         request {
-            pendingConfiguration = configuration
+            requests.configuration = configuration
             backfillAllowed = configuration.backfillAllowed
         }
         status.update { $0.backfillAllowed = configuration.backfillAllowed }
     }
 
-    func syncNow() { request { syncRequested = true } }
+    func syncNow() { request { requests.sync = true } }
 
     func setBackfillAllowed(_ allowed: Bool) {
         request { backfillAllowed = allowed }
         status.update { $0.backfillAllowed = allowed }
     }
 
-    func pause() { request { paused = true } }
-    func resume() { request { paused = false } }
+    func pause() { request { requests.paused = true } }
+    /// Goes on reading, after a crawl (`IndexRequests.resume`).
+    func resume() { request { requests.resume() } }
 
     /// Queues every file again and syncs (`IndexStore.resetAll`).
-    func resetIndex() { request { (resetRequested, syncRequested) = (true, true) } }
+    func resetIndex() { request { (requests.reset, requests.sync) = (true, true) } }
 
     /// Closes the index and forgets the configuration; `reply` runs once it's closed. A configuration that arrived
     /// before this is dropped (the app is stopping); one that arrives after it opens the index again.
     func closeIndex(reply: @escaping @Sendable () -> Void) {
         request {
             closeReplies.append(reply)
-            pendingConfiguration = nil
-            (syncRequested, resetRequested) = (false, false)
+            requests.dropWork()
         }
     }
 
     /// Whether an app is connected. With none, work stops after the current batch.
-    func setAppConnected(_ connected: Bool) { request { appAway = !connected } }
+    func setAppConnected(_ connected: Bool) { request { requests.appAway = !connected } }
 
     private func request(_ change: () -> Void) {
         idleExit.disarm()
@@ -133,8 +129,8 @@ final class IndexWork: @unchecked Sendable {
     /// Requests that make a run stop between batches. The backfill also stops when it's no longer allowed.
     private func shouldYield(backfill: Bool) -> Bool {
         lock.withLock {
-            syncRequested || paused || appAway || pendingConfiguration != nil || !closeReplies.isEmpty
-                || (backfill && !backfillAllowed)
+            requests.sync || requests.paused || requests.appAway || requests.configuration != nil
+                || !closeReplies.isEmpty || (backfill && !backfillAllowed)
         }
     }
 
@@ -144,20 +140,19 @@ final class IndexWork: @unchecked Sendable {
             return closeReplies
         }
         if !replies.isEmpty { close(replying: replies) }
-        let (newConfiguration, sync, reset, isPaused, isAway) = lock.withLock {
-            defer { (pendingConfiguration, syncRequested, resetRequested) = (nil, false, false) }
-            return (pendingConfiguration, syncRequested, resetRequested, paused, appAway)
-        }
+        // A held pass (paused, or no app) leaves its sync and reset waiting (`IndexRequests.take`).
+        let taken = lock.withLock { requests.take() }
+        let newConfiguration = taken.configuration
         if let newConfiguration {
             guard apply(newConfiguration) else { return }
         }
         guard let store, let indexer, let configuration else { return }
-        if isPaused || isAway {
+        if taken.isHeld {
             indexer.closeWorker()
-            settle(isPaused ? .paused : .idle, store)
+            settle(taken.paused ? .paused : .idle, store)
             return
         }
-        if reset {
+        if taken.reset {
             do {
                 try store.resetAll()
                 newFiles = []
@@ -167,7 +162,7 @@ final class IndexWork: @unchecked Sendable {
                 return
             }
         }
-        if sync || newConfiguration != nil {
+        if taken.sync || newConfiguration != nil {
             guard self.sync(indexer, store) else { return }
         }
         if shouldYield(backfill: false) { return }

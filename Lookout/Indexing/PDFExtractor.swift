@@ -23,10 +23,11 @@ nonisolated enum PDFExtractor {
     /// eval (2026-10-08), a glyph-order page as picture + garbled-text vector beat the picture alone: R@1 0.75 vs 0.73,
     /// MRR 0.84 vs 0.81 (an English query for a Bengali page found it only through the text vector).
     ///
+    /// - Parameter data: The file's bytes, read from the descriptor `QueuedFileGate` checked.
     /// - Throws: `ExtractError.unreadable` or `.locked`; a page image that can't be written.
-    static func pages(of url: URL, range: (Int) -> Range<Int>, minText: Int, renderPixels: Int, to folder: URL)
+    static func pages(of data: Data, range: (Int) -> Range<Int>, minText: Int, renderPixels: Int, to folder: URL)
         throws -> (pages: [Page], total: Int, title: String?) {
-        guard let document = PDFDocument(url: url) else { throw ExtractError.unreadable("can't open PDF") }
+        guard let document = PDFDocument(data: data) else { throw ExtractError.unreadable("can't open PDF") }
         if document.isLocked { throw ExtractError.locked }
         var pages: [Page] = []
         for index in range(document.pageCount).clamped(to: 0..<document.pageCount) {

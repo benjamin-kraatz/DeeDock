@@ -26,7 +26,10 @@ enum IndexCommand {
         indexer.resetOnModelChange = { indexed, now in print("model changed, indexing again:\n  was \(indexed)\n  now \(now)") }
         try indexer.checkModel()
 
-        let realRoots = roots.map { URL(fileURLWithPath: FolderSelection.realPath($0.path), isDirectory: true) }
+        // The service's rules: folders Lookout never reads are refused, and their files leave the index.
+        let checked = Rules.checkRoots(roots.map(\.path))
+        for refused in checked.refused { print("refused (\(refused.refusal.reason)): \(refused.path)") }
+        let realRoots = checked.allowed.map { URL(fileURLWithPath: $0, isDirectory: true) }
         let pruned = try store.prune(keepingUnder: realRoots.map(\.path))
         let availability = RootAvailability.check(realRoots)
         store.scope = availability.available.map(\.path)
