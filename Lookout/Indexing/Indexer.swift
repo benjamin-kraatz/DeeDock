@@ -87,8 +87,10 @@ nonisolated final class Indexer {
     /// Crawls `roots` and reconciles the index (`IndexSync`). Only the roots the crawl walked count: a refused one
     /// (`Rules.checkRoots`) keeps its rows rather than looking emptied, and its files aren't read
     /// (`QueuedFileGate`).
-    func sync(_ roots: [URL]) throws -> IndexSync.Summary {
-        let crawl = Crawler.crawl(roots, options: options)
+    ///
+    /// - Parameter found: Hears how many files the walk has found so far while it walks (`Crawler.crawl`).
+    func sync(_ roots: [URL], found: ((Int) -> Void)? = nil) throws -> IndexSync.Summary {
+        let crawl = Crawler.crawl(roots, options: options, found: found)
         let walked = crawl.roots.map { URL(fileURLWithPath: $0, isDirectory: true) }
         let summary = try IndexSync.apply(crawl, roots: walked, to: store)
         gate = QueuedFileGate(roots: crawl.roots, options: options)

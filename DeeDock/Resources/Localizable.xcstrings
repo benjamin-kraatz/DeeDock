@@ -23028,6 +23028,150 @@
         }
       }
     },
+    "lookoutProblemTooSmall" : {
+      "comment" : "Lookout progress in Settings: why some pictures weren't read, beside how many. They're smaller than Lookout reads (icons, thumbnails).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu klein zum Lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too small to read"
+          }
+        }
+      }
+    },
+    "lookoutProblemTooLarge" : {
+      "comment" : "Lookout progress in Settings: why some files weren't read, beside how many. They're over Lookout's size limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu groß zum Lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too large to read"
+          }
+        }
+      }
+    },
+    "lookoutProblemPasswordProtected" : {
+      "comment" : "Lookout progress in Settings: why some PDFs or documents weren't read, beside how many.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwortgeschützt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password-protected"
+          }
+        }
+      }
+    },
+    "lookoutProblemNoText" : {
+      "comment" : "Lookout progress in Settings: why some PDFs or documents weren't read, beside how many. They have no text or pages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Text zum Lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No text to read"
+          }
+        }
+      }
+    },
+    "lookoutProblemNotDownloaded" : {
+      "comment" : "Lookout progress in Settings: why some iCloud or cloud storage files weren't read, beside how many. Reading them would download them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht aus der Cloud geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not downloaded from the cloud"
+          }
+        }
+      }
+    },
+    "lookoutProblemExcluded" : {
+      "comment" : "Lookout progress in Settings: why some files weren't read, beside how many. A setting or a folder rule left them out after they were found (a skipped type or folder, a key file, a link).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durch eine Regel ausgelassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left out by a rule"
+          }
+        }
+      }
+    },
+    "lookoutProblemUnreadable" : {
+      "comment" : "Lookout progress in Settings: why some files weren't read, beside how many. They couldn't be opened or decoded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht lesbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t be read"
+          }
+        }
+      }
+    },
+    "lookoutProblemOther" : {
+      "comment" : "Lookout progress in Settings: files that weren't read for another reason, beside how many.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anderes Problem"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other problem"
+          }
+        }
+      }
+    },
     "lookoutPromoMessage" : {
       "comment" : "Files search results: the card that offers to set up Lookout. Everything happens on this Mac; nothing leaves it.",
       "extractionState" : "manual",

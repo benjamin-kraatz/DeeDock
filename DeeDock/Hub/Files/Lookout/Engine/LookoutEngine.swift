@@ -19,21 +19,28 @@ import os
 /// in-memory vectors are released `vectorReleaseDelay` after the Files tab hides or the Hub closes, and load again for
 /// the next search.
 ///
-/// Main actor. The owned tasks (the sync debounce, the vector release, the warm-up) are cancelled when they're
-/// replaced and in `stop()`. Calls into the reader actor are short one-way hops that own nothing; the actor orders
-/// them.
+/// `progress` follows every status the service sends, but changes at most every `progressInterval` while files go
+/// by (a phase change shows at once); a trailing publish makes sure the last status always shows. Nothing polls.
+///
+/// Main actor. The owned tasks (the sync debounce, the vector release, the warm-up, the trailing progress publish)
+/// are cancelled when they're replaced and in `stop()`. Calls into the reader actor are short one-way hops that own
+/// nothing; the actor orders them.
 @MainActor @Observable
 final class LookoutEngine {
     /// FSEvents changes settle this long before a sync (a copy in progress, a burst of screenshots).
     nonisolated static let syncDebounce: Duration = .seconds(2)
     /// How long the vectors stay in memory after the Files tab hides or the Hub closes.
     nonisolated static let vectorReleaseDelay: Duration = .seconds(120)
+    /// The shortest time between two changes of `progress` while the phase stays the same: twice a second.
+    nonisolated static let progressInterval: Duration = .milliseconds(500)
 
     /// What the UI shows.
     private(set) var status: LookoutStatus = .notSetUp
     private(set) var settings: LookoutSettings
     /// The index service's latest status, while running: counts, progress, the current file.
     private(set) var indexStatus: LookoutIndexStatus?
+    /// Where reading stands, for Settings (`LookoutProgress`); nil while Lookout isn't set up or is off.
+    private(set) var progress: LookoutProgress?
     /// True between `start()` and `stop()` while Lookout is active.
     private(set) var isRunning = false
     /// Lookout's content search; phase 2's Files UI shows it beside the name search.
@@ -64,6 +71,13 @@ final class LookoutEngine {
     @ObservationIgnored private var syncTask: Task<Void, Never>?
     @ObservationIgnored private var releaseTask: Task<Void, Never>?
     @ObservationIgnored private var warmTask: Task<Void, Never>?
+    @ObservationIgnored private var progressTracker = LookoutProgressTracker()
+    @ObservationIgnored private let progressInterval: Duration
+    @ObservationIgnored private let now: () -> Date
+    /// When `progress` last changed, and the newer progress waiting for `progressInterval` to pass.
+    @ObservationIgnored private var progressPublishedAt: ContinuousClock.Instant?
+    @ObservationIgnored private var pendingProgress: LookoutProgress??
+    @ObservationIgnored private var progressTask: Task<Void, Never>?
 
     /// - Parameters:
     ///   - settings: The settings to start with (usually `repository.loadOrDefault()`).
@@ -71,11 +85,15 @@ final class LookoutEngine {
     ///   - canRun: False for an engine that must never start (previews, tests of the UI).
     ///   - syncDebounce: The FSEvents debounce; tests shorten it.
     ///   - releaseDelay: The vector release delay; tests shorten it.
+    ///   - progressInterval: The progress throttle; tests shorten it.
+    ///   - now: The clock the progress's pace is measured with; tests pass their own.
     init(settings: LookoutSettings, repository: LookoutSettingsRepository?, connection: any LookoutIndexControlling,
          encoder: any LookoutQueryEncoding, reader: any LookoutIndexSearching, monitor: any LookoutMonitoring,
          power: any LookoutPowerPolicing, paths: LookoutPaths, canRun: Bool,
          syncDebounce: Duration = LookoutEngine.syncDebounce,
-         releaseDelay: Duration = LookoutEngine.vectorReleaseDelay) {
+         releaseDelay: Duration = LookoutEngine.vectorReleaseDelay,
+         progressInterval: Duration = LookoutEngine.progressInterval,
+         now: @escaping () -> Date = Date.init) {
         self.settings = settings
         self.repository = repository
         self.connection = connection
@@ -87,6 +105,8 @@ final class LookoutEngine {
         self.canRun = canRun
         self.syncDebounce = syncDebounce
         self.releaseDelay = releaseDelay
+        self.progressInterval = progressInterval
+        self.now = now
         search = LookoutSearch(reader: reader, encoder: encoder)
         pictureSearch = LookoutPictureSearch(reader: reader, encoder: encoder)
         updateStatus()
@@ -148,6 +168,9 @@ final class LookoutEngine {
         releaseTask = nil
         warmTask?.cancel()
         warmTask = nil
+        progressTask?.cancel()
+        progressTask = nil
+        pendingProgress = nil
         guard isRunning else { return updateStatus() }
         isRunning = false
         monitor.stop()
@@ -388,6 +411,37 @@ final class LookoutEngine {
         let new = LookoutStatus.map(settings: settings, index: isRunning ? indexStatus : nil, blocker: blocker,
                                     userPaused: userPaused, serviceUnavailable: serviceUnavailable)
         if new != status { status = new }
+        updateProgress()
+    }
+
+    /// Feeds the tracker every status, so the pace sees every step, and publishes the result: at once when the phase
+    /// changes (or progress appears or goes), else at most every `progressInterval`, with a trailing publish so the
+    /// latest always shows. The trailing publish is `progressTask`, replaced by nothing and cancelled in `stop()`.
+    private func updateProgress() {
+        let next = progressTracker.progress(status: status, index: isRunning ? indexStatus : nil, now: now())
+        guard next != (pendingProgress ?? progress) else { return }
+        let elapsed = progressPublishedAt.map { ContinuousClock.now - $0 }
+        if next?.phase != progress?.phase || elapsed.map({ $0 >= progressInterval }) ?? true {
+            publishProgress(next)
+            return
+        }
+        pendingProgress = .some(next)
+        guard progressTask == nil, let elapsed else { return }
+        let wait = progressInterval - elapsed
+        progressTask = Task { [weak self] in
+            try? await Task.sleep(for: wait)
+            guard !Task.isCancelled, let self, let pending = pendingProgress else { return }
+            progressTask = nil
+            publishProgress(pending)
+        }
+    }
+
+    private func publishProgress(_ new: LookoutProgress?) {
+        progressTask?.cancel()
+        progressTask = nil
+        pendingProgress = nil
+        progressPublishedAt = ContinuousClock.now
+        if new != progress { progress = new }
     }
 
     /// What the index service gets: the chosen folders without nested duplicates, the skips that matter, where the
@@ -416,5 +470,6 @@ final class LookoutEngine {
         syncTask?.cancel()
         releaseTask?.cancel()
         warmTask?.cancel()
+        progressTask?.cancel()
     }
 }

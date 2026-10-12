@@ -214,6 +214,7 @@ final class IndexWork: @unchecked Sendable {
             $0.activity = .idle
             ($0.done, $0.total, $0.current) = (0, 0, nil)
             $0.counts = IndexStore.Counts()
+            ($0.discovered, $0.upToDateAt) = (nil, nil)
         }
         replies.forEach { $0() }
     }
@@ -244,11 +245,17 @@ final class IndexWork: @unchecked Sendable {
             configuration = new
             roots = new.allowedRoots
             newFiles = []
+            let upToDate = (try? store.meta(Self.upToDateKey)).flatMap(Double.init)
+                .map(Date.init(timeIntervalSince1970:))
+            status.update { $0.upToDateAt = upToDate }
             try indexer?.checkModel()
             // Folders taken out of the app leave the index; folders that are only missing right now keep their files.
             if try store.prune(keepingUnder: roots.map(\.path)) > 0 {
                 status.update { $0.vectorsChangedAt = Date() }
             }
+            // What the index already holds, before the walk: progress counts a resumed pass from there.
+            store.scope = RootAvailability.check(roots).available.map(\.path)
+            refreshCounts(store, force: true)
             return true
         } catch {
             configuration = nil
@@ -271,12 +278,16 @@ final class IndexWork: @unchecked Sendable {
             $0.notPermittedRoots = availability.notPermitted
         }
         do {
-            let summary = try indexer.sync(availability.available)
+            let summary = try indexer.sync(availability.available) { [status] found in
+                status.update { $0.discovered = found }
+            }
+            status.update { $0.discovered = nil }
             if summary.queued.count <= Self.newFilesLimit { newFiles.formUnion(summary.queued) }
             if summary.vectorsChanged { status.update { $0.vectorsChangedAt = Date() } }
             refreshCounts(store, force: true)
             return true
         } catch {
+            status.update { $0.discovered = nil }
             settle(.failed(message: "sync failed: \(error)"), store)
             return false
         }
@@ -317,14 +328,25 @@ final class IndexWork: @unchecked Sendable {
         refreshCounts(store, force: false)
     }
 
-    /// Ends a pass: the activity it ended in, fresh counts, no progress.
+    /// Ends a pass: the activity it ended in, fresh counts, no progress. Idle with nothing waiting in the folders
+    /// that are there means the index is up to date, which is recorded with the time (`upToDateAt`).
     private func settle(_ activity: LookoutIndexStatus.Activity, _ store: IndexStore?) {
         if let store { refreshCounts(store, force: true) }
+        let counts = status.current.counts
+        let upToDate = activity == .idle && store != nil && counts.pending + counts.unfinished == 0 ? Date() : nil
+        if let upToDate, let store {
+            // A failed write loses only the time Settings shows; the next idle pass records it again.
+            try? store.setMeta(Self.upToDateKey, String(upToDate.timeIntervalSince1970))
+        }
         status.update {
             $0.activity = activity
             ($0.done, $0.total, $0.current) = (0, 0, nil)
+            if let upToDate { $0.upToDateAt = upToDate }
         }
     }
+
+    /// The `meta` key of when the index was last up to date (seconds since 1970).
+    static let upToDateKey = "up_to_date_at"
 
     private func refreshCounts(_ store: IndexStore, force: Bool) {
         guard force || Date().timeIntervalSince(countsRefreshed) >= Self.countsInterval,

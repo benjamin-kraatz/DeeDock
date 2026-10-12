@@ -11,12 +11,17 @@ nonisolated extension IndexStore {
         /// Long files still being read (`unfinishedCount`), and their pages and chunks left.
         var unfinished = 0
         var left = 0
+        /// Skipped and failed files by why (`LookoutProblemReason` raw value → files). Optional, so a status from a
+        /// service that doesn't send it still decodes.
+        var problems: [String: Int]?
 
         /// Every file the index knows.
         var files: Int { total { _ in true } }
         /// Files with something to find besides their name: done, or long files part read.
         var searchable: Int { total { $0 == "done" || $0 == "partial" } }
         var pending: Int { total { $0 == "pending" } }
+        var skipped: Int { total { $0 == "skipped" } }
+        var failed: Int { total { $0 == "failed" } }
 
         private func total(_ state: (String) -> Bool) -> Int {
             byKindAndState.values.reduce(0) { sum, states in
@@ -32,6 +37,15 @@ nonisolated extension IndexStore {
             counts.byKindAndState[$0.text(0) ?? "?", default: [:]][$0.text(1) ?? "?"] = Int($0.int(2))
         }
         (counts.unfinished, counts.left) = try unfinishedCount()
+        var problems: [String: Int] = [:]
+        // Sorted in SQL, so per-file reasons ("small image 120×90") don't come back one row each.
+        try db.query("""
+            SELECT \(LookoutProblemReason.sqlCase) AS reason, COUNT(*) FROM files
+            WHERE state IN ('skipped', 'failed')\(scopeSQL) GROUP BY reason
+            """, scopeValues) { row in
+            problems[row.text(0) ?? LookoutProblemReason.other.rawValue, default: 0] += Int(row.int(1))
+        }
+        counts.problems = problems
         let inScope = scope == nil ? "" : " AND file IN (SELECT id FROM files WHERE 1\(scopeSQL))"
         try db.query("SELECT COUNT(*), COUNT(vec) FROM segments WHERE kind != 'name'\(inScope)", scopeValues) {
             counts.segments = Int($0.int(0))

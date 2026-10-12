@@ -34,6 +34,14 @@ nonisolated struct LookoutIndexStatus: Codable, Sendable, Equatable {
     /// Progress through the current pass: files for the first pass, pages and chunks for the later pass.
     var done = 0
     var total = 0
+    /// While `syncing`: how many files to index the walk has found so far (`Crawler.foundReportInterval` at a
+    /// time), so the first pass can show its total still growing. Nil when no walk is under way, and before the
+    /// walk has reported.
+    var discovered: Int?
+    /// When the index was last up to date: everything in the folders that are there read, nothing waiting. Kept in
+    /// the index (`meta.up_to_date_at`), so it survives the service's and the app's restarts. Nil until that first
+    /// happens.
+    var upToDateAt: Date?
     /// Files by kind and state, vectors, unfinished long files: within the folders that are there now.
     var counts = IndexStore.Counts()
     /// Chosen folders that aren't there (an unplugged drive): their files stay in the index.
