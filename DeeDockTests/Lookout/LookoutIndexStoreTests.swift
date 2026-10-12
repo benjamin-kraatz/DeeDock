@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 import Testing
 @testable import DeeDock
@@ -63,6 +64,38 @@ struct LookoutIndexStoreTests {
         let moved = try IndexSync.apply(crawl([file("/a/renamed.png", inode: 2)]), roots: roots, to: store)
         #expect(moved.moved == 1 && moved.queued.isEmpty)
         #expect(try store.file(at: "/a/renamed.png")?.id == id)
+    }
+
+    @Test func aMoveThatChangesTheKindIsReadAgainAsTheNewKind() throws {
+        let store = try store()
+        let roots = [URL(fileURLWithPath: "/a")]
+        let first = try IndexSync.apply(crawl([file("/a/capture.png", kind: .image, inode: 3)]), roots: roots, to: store)
+        let id = try #require(first.queued.first)
+        try store.addSegment(file: id, kind: .image, modality: .image, vector: vector)
+        try store.finish(id, state: "done")
+        let renamed = try IndexSync.apply(crawl([file("/a/Screenshot capture.png", kind: .screenshot, inode: 3)]),
+                                          roots: roots, to: store)
+        #expect(renamed.moved == 1 && renamed.added == 0 && renamed.removed == 0 && renamed.queued == [id])
+        let record = try #require(try store.file(at: "/a/Screenshot capture.png"))
+        #expect(record.id == id && record.kind == .screenshot && record.state == "pending")
+        #expect(try count(store, "SELECT COUNT(*) FROM segments WHERE kind != 'name'") == 0)
+    }
+
+    /// A drive gets a new device number at every mount, and the rows keep the old one: a rename after a remount is
+    /// still a move, found by the root's current device.
+    @Test func aRenameAfterARemountIsStillAMove() throws {
+        let store = try store()
+        let roots = [folder.url]
+        var info = stat()
+        try #require(stat(folder.path, &info) == 0)
+        let device = UInt64(bitPattern: Int64(info.st_dev))
+        let old = file(folder.path + "/scan.png", inode: 5, device: device &+ 1000)   // found under the old mount
+        let id = try #require(try IndexSync.apply(crawl([old]), roots: roots, to: store).queued.first)
+        try store.finish(id, state: "done")
+        let renamed = try IndexSync.apply(crawl([file(folder.path + "/scan 2.png", inode: 5, device: device)]),
+                                          roots: roots, to: store)
+        #expect(renamed.moved == 1 && renamed.added == 0 && renamed.removed == 0 && renamed.queued.isEmpty)
+        #expect(try store.file(at: folder.path + "/scan 2.png")?.id == id)
     }
 
     @Test func aChangedFileIsQueuedAgainWithoutItsOldSegments() throws {

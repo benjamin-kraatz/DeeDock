@@ -1,5 +1,6 @@
 // Adapted from DigUp (MIT, © 2026 Abdur Rahim) — https://github.com/ARahim3/DigUp
 
+import Darwin
 import Foundation
 
 /// Reconciles the index with a crawl: new files are queued, changed ones re-queued, moved ones re-pathed (no
@@ -25,11 +26,24 @@ nonisolated enum IndexSync {
         // /var, or every sync would insert them again. A root that isn't there resolves to itself.
         let rootPaths = roots.map { FolderSelection.realPath($0.standardizedFileURL.path) }
         let existing = try store.files(under: rootPaths)
+        // Moves are found by volume and inode. A row's stored device can be stale: a drive gets a new device number at
+        // every mount, and an unchanged file keeps the number it was found with. So each row is keyed by the device
+        // its root has now (one `stat` per root and sync), which is what the crawl's candidates carry. A root that
+        // can't be read now falls back to the stored number. Rows on a volume mounted inside a root are keyed by the
+        // root's volume, so their moves aren't found and they're read again, which is only slower.
+        let rootDevices: [(path: String, device: UInt64)] = rootPaths.compactMap { root in
+            var info = stat()
+            guard stat(root, &info) == 0 else { return nil }
+            return (root, UInt64(bitPattern: Int64(info.st_dev)))
+        }.sorted { $0.path.count > $1.path.count }
+        func currentDevice(of row: FileRecord) -> UInt64 {
+            rootDevices.first { FolderSelection.isInside(row.path, $0.path) }?.device ?? row.device
+        }
         var byPath: [String: FileRecord] = [:]
         var byInode: [String: FileRecord] = [:]
         for file in existing {
             byPath[file.path] = file
-            byInode["\(file.device):\(file.inode)"] = file
+            byInode["\(currentDevice(of: file)):\(file.inode)"] = file
         }
         let seen = Set(crawl.candidates.map(\.path))
         var movedFrom = Set<String>()
@@ -54,7 +68,14 @@ nonisolated enum IndexSync {
                 } else if let row = byInode["\(file.device):\(file.inode)"], !seen.contains(row.path),
                           !movedFrom.contains(row.path), row.size == file.size, abs(row.mtime - file.mtime) < 0.001 {
                     try store.move(row.id, to: file.path)
-                    if let lastUsed = file.lastUsed, lastUsed != row.lastUsed { try store.setLastUsed(row.id, lastUsed) }
+                    if row.kind != file.kind {
+                        // The new name changed what it is ("capture.png" → "Screenshot capture.png"), and a screenshot
+                        // is read differently (OCR): read again as what it is now.
+                        try store.requeue(row.id, as: file)
+                        summary.queued.append(row.id)
+                    } else if let lastUsed = file.lastUsed, lastUsed != row.lastUsed {
+                        try store.setLastUsed(row.id, lastUsed)
+                    }
                     movedFrom.insert(row.path)
                     summary.moved += 1
                 } else {

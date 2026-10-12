@@ -49,7 +49,8 @@ None of these scenarios has been exercised.
 - [ ] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
   **Allowed** without a prompt.
 - [ ] Download, fresh: both files download, show **Checking…** and **Ready**, and land in
-  `~/Library/Application Support/DDock/Lookout/Models/`. Note the time and the free space before
+  `~/Library/Application Support/DDock/Lookout/Models/` (`Lookout-dev/Models/` for a Debug build,
+  which downloads its own copy). Note the time and the free space before
   and after.
 - [ ] Download, interrupted and resumed: turn Wi-Fi off mid-file, check the error, turn it on, and
   click **Try Again**. The file continues from its partial bytes.
@@ -95,8 +96,9 @@ None of these scenarios has been exercised.
 - [ ] VoiceOver: the chip, the card's steps and buttons, the folder rows, the result rows, the
   weaker-matches fold, and the Settings rows.
 - [ ] Sleep and wake during the first pass and during the download.
-- [ ] Unplug a drive with a chosen folder: Settings shows **Not connected · stays searchable**, its
-  files stay searchable, and Lookout catches up when the drive returns.
+- [ ] Unplug a drive with a chosen folder: Settings shows **Not connected · results return when
+  it's back**, its files don't appear in results, and they return without being read again when the
+  drive is connected. Lookout then catches up on changes.
 - [ ] Power policy: Low Power Mode, a serious thermal state if one can be reached, and battery with
   **Read files on battery too** off. Check that a new screenshot indexes at once in each.
 - [ ] New files: save a screenshot and check it is searchable within seconds.

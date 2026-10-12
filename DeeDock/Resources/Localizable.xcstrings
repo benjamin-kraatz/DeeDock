@@ -23317,19 +23317,19 @@
       }
     },
     "lookoutSettingsFolderMissing" : {
-      "comment" : "Lookout settings: the folder isn't there right now (a drive that isn't connected); what Lookout read from it stays searchable.",
+      "comment" : "Lookout settings: the folder isn't there right now (a drive that isn't connected). Lookout keeps what it read from it, but shows no results from it until the drive is connected again, because those files can't be opened meanwhile. “it” is the drive.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nicht verbunden · bleibt durchsuchbar"
+            "value" : "Nicht verbunden · Treffer kommen zurück, sobald es wieder da ist"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not connected · stays searchable"
+            "value" : "Not connected · results return when it’s back"
           }
         }
       }

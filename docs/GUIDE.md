@@ -390,7 +390,7 @@ Select a Lookout result to see **Why it matched** in the preview column, such as
 **Settings → Lookout** has these options:
 
 - **Search by content** turns Lookout on and off. Turning it off keeps the index, so turning it on again doesn't start over.
-- **Folders** lists your folders with the number of searchable files in each. A folder on a disconnected drive shows **Not connected · stays searchable**, and Lookout catches up when the drive returns. A folder macOS doesn't allow shows **Not allowed** with **Open Settings**. **Remove** takes a folder and its files out of the index. **Add folder…** adds a folder. macOS may ask about it right then, and Lookout adds it only when it's allowed.
+- **Folders** lists your folders with the number of searchable files in each. A folder on a disconnected drive shows **Not connected · results return when it's back**. Lookout keeps what it read there, shows its results again once the drive is connected, and catches up on changes. A folder macOS doesn't allow shows **Not allowed** with **Open Settings**. **Remove** takes a folder and its files out of the index. **Add folder…** adds a folder. macOS may ask about it right then, and Lookout adds it only when it's allowed.
 - **Read files on battery too** lets reading continue on battery. Whatever you choose, reading waits in Low Power Mode and while the Mac is warm. Up to 50 new files are read right away in any case, so a new screenshot is searchable in seconds.
 - **Model**, **Index on disk**, and **Memory while searching** show what Lookout uses. Searching takes about 250 MB, released 2 minutes after the Hub closes.
 - **Read everything again** reads every file once more. File names stay searchable meanwhile.

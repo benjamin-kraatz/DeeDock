@@ -16,7 +16,7 @@ Lookout runs in three processes. DOKK.app embeds two XPC services in its bundle,
 | `LookoutQueryService` | Embeds search queries with the text model only, at user-initiated QoS. | 215 MB | Loads the model on its first call and exits 120 s after its last call. |
 | DOKK.app | Reads the index, ranks results, and shows them. | The vectors, about 30 MB per 20,000 | The app's lifetime |
 
-The services never ask for folder access. The index service skips a chosen folder it can't read and reports it as not permitted. It also skips a folder that isn't there, such as one on an unplugged drive, and keeps what it already indexed from it. The service checks this before every sync, so an ejected drive never looks like a folder whose files were deleted.
+The services never ask for folder access. The index service skips a chosen folder it can't read and reports it as not permitted. It also skips a folder that isn't there, such as one on an unplugged drive, and keeps what it already indexed from it. Searches show none of those files meanwhile, because a file that isn't there can't be opened, previewed, or dragged (`LookoutSearchFilter.requireExisting`). They come back when the drive does, with nothing to read again. The service checks this before every sync, so an ejected drive never looks like a folder whose files were deleted.
 
 Before every sync, the service and the crawler also check each saved folder again where it really leads, with the rules onboarding uses (`Rules.checkRoots`, see [Onboarding](#onboarding)). The root itself is checked, not only the folders inside it. A chosen folder that has since become a link to `~/Library` resolves there and is skipped, and the next configuration drops its files from the index. Folders inside `/private/tmp` and inside the user's temporary folder may be roots, because people keep scratch files there. The rest of `/private` may not.
 
@@ -39,7 +39,7 @@ The code both sides share is in `Lookout/`: `Core` holds the index, the crawl ru
 
 ### Where the data lives
 
-Lookout keeps everything in `~/Library/Application Support/DDock/Lookout/` (`LookoutPaths.standard`). Debug and Release builds share it, so a development build doesn't download the model again.
+Lookout keeps everything in `~/Library/Application Support/DDock/Lookout/` (`LookoutPaths.standard`). That folder belongs to the Release app, `de.benjaminkraatz.DeeDock`. Every other app identity gets its own folder beside it, named from its bundle identifier: the Debug app, `de.benjaminkraatz.DeeDock.dev`, uses `DDock/Lookout-dev/`. A development build therefore keeps its own index and downloads its own copy of the model. With one shared index, each app's service would prune the folders the other app chose, and deleting from one app could unlink files the other was writing. The services derive the same folder from their own bundle identifier, which is the app's plus `.LookoutIndexService` or `.LookoutQueryService`. The index service also gets the index and model folders in its configuration.
 
 | Path | Contents |
 | --- | --- |
@@ -156,7 +156,7 @@ While the download runs and setup isn't complete yet, the Files search shows a d
 **Settings → Lookout** sits under the Features heading of the sidebar (`DeeDock/Settings/Lookout/`). `LookoutSettingsModel` sends every change through `LookoutEngine.apply(_:)`, which saves it and tells the index service. Before setup, the page shows only the switch and the privacy line.
 
 - **Search by content.** Off stops the engine and keeps the index. Turning it on before setup opens onboarding over the Hub. The switch stays off until setup completes.
-- **Folders.** Each folder shows how many of its files are searchable by content, and the card shows the total. A folder that isn't connected shows **Not connected · stays searchable**. A folder macOS doesn't let Lookout read shows **Not allowed** with **Open Settings**. **Remove** takes a folder out, and the service drops its files from the index. **Add folder…** reads the picked folder right away, in the foreground, so macOS's prompt appears in context. DOKK adds the folder only when the read is allowed. The refusal rules match onboarding.
+- **Folders.** Each folder shows how many of its files are searchable by content, and the card shows the total. A folder that isn't connected shows **Not connected · results return when it's back**: its index is kept, and its results return once the drive is connected. A folder macOS doesn't let Lookout read shows **Not allowed** with **Open Settings**. **Remove** takes a folder out, and the service drops its files from the index. **Add folder…** reads the picked folder right away, in the foreground, so macOS's prompt appears in context. DOKK adds the folder only when the read is allowed. The refusal rules match onboarding.
 - **Read files on battery too.** Its subtitle says that reading still waits in Low Power Mode or when the Mac is warm.
 - **Model**, **Index on disk**, and **Memory while searching.** Index on disk is the database plus its write-ahead log. The memory row reads "about 250 MB, released 2 min after the Hub closes".
 - **Read everything again.** Calls `resetIndex()` on the service, which queues every file again and drops their vectors. Names stay searchable meanwhile. The row is disabled while Lookout isn't running.

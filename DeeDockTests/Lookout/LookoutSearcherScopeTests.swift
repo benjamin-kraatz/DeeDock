@@ -116,6 +116,20 @@ struct LookoutSearcherScopeTests {
         #expect(Set(results.all.map(\.path)) == [index.path("root/kept.txt"), index.path("root/Media/Courses/syllabus.txt")])
     }
 
+    /// A folder on an unplugged drive keeps its rows, but its files can't be opened, so they show no results until the
+    /// drive is back. Then they return as they were, with nothing read again (Settings: "results return when it's
+    /// back").
+    @Test func filesOnAnUnpluggedDriveReturnWhenItsBack() throws {
+        let index = try LookoutSearchIndex()
+        try index.add("Drive/Scans/invoice.txt", text: "budget")
+        let filter = LookoutSearchFilter(folders: [index.path("Drive")])
+        #expect(try index.searcher().search("budget", queryVector: nil, filter: filter).isEmpty)
+        #expect(try index.store.file(at: index.path("Drive/Scans/invoice.txt"))?.state == "done", "kept")
+        try index.folder.write("Drive/Scans/invoice.txt")   // connected again
+        let back = try index.searcher().search("budget", queryVector: nil, filter: filter)
+        #expect(back.all.map(\.path) == [index.path("Drive/Scans/invoice.txt")])
+    }
+
     @Test func vectorsLoadForTheFirstMeaningSearchAndCanBeReleased() throws {
         let index = try LookoutSearchIndex()
         try index.background(30)
