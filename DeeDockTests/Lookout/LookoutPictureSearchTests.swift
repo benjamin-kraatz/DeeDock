@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 import Testing
 @testable import DeeDock
@@ -190,5 +191,31 @@ import Testing
         search.clear()
         search.refresh()
         #expect(search.phase == .idle)
+    }
+
+    // MARK: Reading a dropped file
+
+    @Test func aDroppedFileIsReadFromOneCheckedDescriptor() throws {
+        let file = try folder.write("IMG_1.png", Data(repeating: 7, count: 10))
+        #expect(try LookoutPictureReading.bytes(at: file).count == 10)
+        // Over the cap, checked on the open file: refused before anything is read.
+        #expect(throws: QueryPicture.Failure.self) { try LookoutPictureReading.bytes(at: file, maxBytes: 4) }
+        // Not a regular file, or not there: refused, never a silent zero size.
+        let subfolder = try folder.folder("Holiday.png")
+        #expect(throws: QueryPicture.Failure.self) { try LookoutPictureReading.bytes(at: subfolder) }
+        let fifo = folder.url.appendingPathComponent("pipe.png")
+        #expect(mkfifo(fifo.path, 0o600) == 0)
+        #expect(throws: QueryPicture.Failure.self) { try LookoutPictureReading.bytes(at: fifo) }
+        #expect(throws: QueryPicture.Failure.self) {
+            try LookoutPictureReading.bytes(at: folder.url.appendingPathComponent("gone.png"))
+        }
+    }
+
+    @Test func aFileOverTheCapIsRefusedWithoutReadingIt() throws {
+        let file = try folder.write("huge.png", Data())
+        let handle = try FileHandle(forWritingTo: file)
+        try handle.truncate(atOffset: UInt64(LookoutPictureReading.maxBytes) + 1)   // sparse: nothing written
+        try handle.close()
+        #expect(throws: QueryPicture.Failure.self) { try LookoutPictureReading.bytes(at: file) }
     }
 }
