@@ -16,7 +16,7 @@ import Foundation
     func closeIndex(timeout: Duration) async throws {}
 }
 
-/// Never warm; every embed fails, so search stays keyword-only.
+/// Never warm; every embed fails, so search stays keyword-only and a picture finds nothing.
 @MainActor final class LookoutInertQueryEncoder: LookoutQueryEncoding {
     var isWarm: Bool { false }
     func warmUp() async throws { throw LookoutEncoderError.unavailable }
@@ -32,6 +32,9 @@ nonisolated struct LookoutInertIndexReader: LookoutIndexSearching {
     func indexDidChange() async {}
     func closeIndex() async {}
     func searchableFileCounts(under folders: [String]) async -> [String: Int] { [:] }
+    func similar(_ request: LookoutSimilarRequest) async throws -> LookoutSimilarResults? { nil }
+    func similarSource(path: String, segmentID: Int64?) async -> LookoutSimilarSource? { nil }
+    func indexedPaths(_ paths: [String]) async -> Set<String> { [] }
 }
 
 @MainActor final class LookoutInertMonitor: LookoutMonitoring {

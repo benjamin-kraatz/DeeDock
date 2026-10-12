@@ -14,7 +14,8 @@ import os
 /// becoming allowed, and `resume()`. The connection replays the configuration and pause state to a relaunched
 /// service (`LookoutIndexControlling`).
 ///
-/// Memory: the query encoder is warmed when the Files tab appears; its service exits 120 s after its last call. The
+/// Memory: the query encoder is warmed when the Files tab appears; its service exits 120 s after its last call. Its
+/// picture reader loads only for a search with a picture, or when a picture is dragged over the Hub. The
 /// in-memory vectors are released `vectorReleaseDelay` after the Files tab hides or the Hub closes, and load again for
 /// the next search.
 ///
@@ -37,6 +38,8 @@ final class LookoutEngine {
     private(set) var isRunning = false
     /// Lookout's content search; phase 2's Files UI shows it beside the name search.
     let search: LookoutSearch
+    /// Searching with a picture or with a file's stored vector (Find Similar).
+    let pictureSearch: LookoutPictureSearch
 
     /// Chosen folders that aren't there right now (an unplugged drive). Their files stay indexed.
     var missingFolders: [String] { indexStatus?.missingRoots ?? [] }
@@ -85,6 +88,7 @@ final class LookoutEngine {
         self.syncDebounce = syncDebounce
         self.releaseDelay = releaseDelay
         search = LookoutSearch(reader: reader, encoder: encoder)
+        pictureSearch = LookoutPictureSearch(reader: reader, encoder: encoder)
         updateStatus()
     }
 
@@ -131,6 +135,8 @@ final class LookoutEngine {
         connection.start(configuration)
         search.filter = filter()
         search.isAvailable = true
+        pictureSearch.filter = search.filter
+        pictureSearch.isAvailable = true
         updateStatus()
     }
 
@@ -151,6 +157,7 @@ final class LookoutEngine {
         connection.invalidate()
         encoder.invalidate()
         search.isAvailable = false
+        pictureSearch.isAvailable = false
         let reader = reader
         Task { await reader.releaseVectors() }
         indexStatus = nil
@@ -178,6 +185,7 @@ final class LookoutEngine {
             monitor.watch(roots: configuration.roots)
             connection.start(configuration)
             search.filter = filter()
+            pictureSearch.filter = search.filter
             search.refresh()
         }
         updateStatus()
@@ -217,6 +225,14 @@ final class LookoutEngine {
     func warmQueryEncoder() {
         guard canRun else { return }
         startWarmUp()
+    }
+
+    /// Loads the query service's picture reader now: a picture is being dragged over the Hub, so it's ready by the
+    /// drop. It goes away with the rest of the service 120 s after the last call. Does nothing while Lookout doesn't
+    /// run.
+    func warmPictureReader() {
+        guard isRunning else { return }
+        pictureSearch.warmUp()
     }
 
     private func startWarmUp() {

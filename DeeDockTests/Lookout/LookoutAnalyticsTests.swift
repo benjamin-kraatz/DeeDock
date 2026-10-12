@@ -32,13 +32,14 @@ struct LookoutAnalyticsTests {
         let event = LookoutAnalytics.opened(hit, section: .weak, rank: 2, scope: .folder, isLookup: true)
         #expect(event.name == "lookout_result_opened")
         #expect(values(event) == ["section": "weak", "rank": "2", "kind": "image", "match": "both", "scope": "folder",
-                                  "is_lookup": "true"])
+                                  "is_lookup": "true", "query": "text"])
     }
 
     @Test("A name open has no kind or match")
     func nameOpen() {
         let event = LookoutAnalytics.openedName(rank: 1, scope: .thisMac, isLookup: false)
-        #expect(values(event) == ["section": "names", "rank": "1", "scope": "this_mac", "is_lookup": "false"])
+        #expect(values(event) == ["section": "names", "rank": "1", "scope": "this_mac", "is_lookup": "false",
+                                  "query": "text"])
     }
 
     @Test("No property ever carries the query, a name or a path")
@@ -54,7 +55,8 @@ struct LookoutAnalyticsTests {
             for value in values(event).values {
                 #expect(!forbidden.contains { value.localizedCaseInsensitiveContains($0) }, "\(event.name): \(value)")
             }
-            #expect(Set(values(event).keys).isSubset(of: ["section", "rank", "kind", "match", "scope", "is_lookup"]))
+            #expect(Set(values(event).keys).isSubset(of: ["section", "rank", "kind", "match", "scope", "is_lookup",
+                                                          "query"]))
         }
     }
 

@@ -42,6 +42,40 @@ actor LookoutIndexReader: LookoutIndexSearching {
         return results
     }
 
+    func similar(_ request: LookoutSimilarRequest) throws -> LookoutSimilarResults? {
+        guard let searcher = try openIfNeeded() else { return nil }
+        let wasLoaded = searcher.vectorsLoaded
+        let scope = request.scope.map(Self.indexPath)
+        let results = try searcher.similar(to: request.vector, queryIsPicture: request.queryIsPicture,
+                                           excluding: Set(request.excluding.map(Self.indexPath)), scope: scope,
+                                           filter: request.filter, limit: request.limit)
+        if !wasLoaded, searcher.vectorsLoaded { didReload() }
+        return results
+    }
+
+    func similarSource(path: String, segmentID: Int64?) -> LookoutSimilarSource? {
+        guard let searcher = try? openIfNeeded() else { return nil }
+        do {
+            return try searcher.similarSource(path: Self.indexPath(path), preferredSegment: segmentID)
+        } catch {
+            LookoutLog.logger.error("Can't read a stored Lookout vector: \(String(describing: error), privacy: .public)")
+            return nil
+        }
+    }
+
+    func indexedPaths(_ paths: [String]) -> Set<String> {
+        guard let searcher = try? openIfNeeded() else { return [] }
+        // Asked by the caller's spelling, answered in it: the index stores real paths.
+        let byIndexPath = Dictionary(paths.map { (Self.indexPath($0), $0) }, uniquingKeysWith: { first, _ in first })
+        let found = (try? searcher.indexedPaths(Set(byIndexPath.keys))) ?? []
+        return Set(found.compactMap { byIndexPath[$0] })
+    }
+
+    /// A path as the index stores it: standardized and real (/private/var, not /var), as the crawl reports it.
+    private static func indexPath(_ path: String) -> String {
+        FolderSelection.realPath((path as NSString).standardizingPath)
+    }
+
     func prepareVectors() {
         guard let searcher = try? openIfNeeded(), !searcher.vectorsLoaded else { return }
         do {

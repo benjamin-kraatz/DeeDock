@@ -216,6 +216,24 @@ nonisolated enum AnalyticsLookoutMatch: String, AnalyticsToken {
     case meaning, words, both
 }
 
+/// What a Files search that opened a result searched with.
+nonisolated enum AnalyticsLookoutQuery: String, AnalyticsToken {
+    /// Typed words.
+    case text
+    /// A picture, or a file's stored vector (Find Similar).
+    case image
+}
+
+/// Where a search with a picture came from.
+nonisolated enum AnalyticsLookoutImageSource: String, AnalyticsToken {
+    /// Dropped on the search field.
+    case drop
+    /// Pasted into the search field.
+    case paste
+    /// Find Similar on a result (the button, the menu, ⌘⇧L, or dragging the row onto the field).
+    case similar
+}
+
 /// A step of Lookout's onboarding (`LookoutSetupStep`).
 nonisolated enum AnalyticsLookoutSetupStep: String, AnalyticsToken {
     case welcome, folders, access, download, firstPass = "first_pass"

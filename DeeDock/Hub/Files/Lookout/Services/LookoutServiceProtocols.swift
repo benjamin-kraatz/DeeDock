@@ -72,6 +72,26 @@ nonisolated enum LookoutIndexConnectionEvent: Sendable, Equatable {
     func embed(query: String) async throws -> [Float]
     /// Drops the connection (the engine stopped).
     func invalidate()
+
+    /// True after the image encoder answered in a service process that is still running: the next picture takes
+    /// a fraction of a second. False after launch, an interruption, or a failure, when the next picture also waits
+    /// for the image encoder to load (and for the text model, if the service exited).
+    var isPictureReaderWarm: Bool { get }
+    /// Loads the image encoder now, so a picture about to be dropped doesn't wait for it.
+    ///
+    /// - Throws: `LookoutEncoderError`.
+    func warmUpPictureReader() async throws
+    /// The picture's vector: 768 L2-normalized floats. The pixels go to the query service in memory only.
+    ///
+    /// - Throws: `LookoutEncoderError`, or `CancellationError` when the calling task is cancelled.
+    func embed(picture: QueryPicture) async throws -> [Float]
+}
+
+extension LookoutQueryEncoding {
+    // Encoders that can't read pictures (fakes of text search) never become warm and fail every picture.
+    var isPictureReaderWarm: Bool { false }
+    func warmUpPictureReader() async throws { throw LookoutEncoderError.unavailable }
+    func embed(picture: QueryPicture) async throws -> [Float] { throw LookoutEncoderError.unavailable }
 }
 
 /// What `LookoutSearch` asks the index reader for.
@@ -84,6 +104,20 @@ nonisolated struct LookoutSearchRequest: Sendable, Equatable {
     var kinds: Set<FileKind>?
     var filter: LookoutSearchFilter?
     var prefixLast: Bool
+    var limit = 40
+}
+
+/// What `LookoutPictureSearch` asks the index reader for: a search with a vector alone (`Searcher.similar`).
+nonisolated struct LookoutSimilarRequest: Sendable, Equatable {
+    /// 768 L2-normalized floats.
+    var vector: [Float]
+    /// The vector is a picture's: the pictures group comes first.
+    var queryIsPicture: Bool
+    /// Files never to return, as absolute paths (they're resolved as the index stores them): the file searched with.
+    var excluding: Set<String> = []
+    /// A folder to search inside, or nil for the whole index.
+    var scope: String?
+    var filter: LookoutSearchFilter?
     var limit = 40
 }
 
@@ -108,6 +142,25 @@ nonisolated protocol LookoutIndexSearching: Sendable {
     /// For each folder (absolute paths, as Settings lists them), how many files under it have something to find
     /// besides their name. Empty while there's no index to read.
     func searchableFileCounts(under folders: [String]) async -> [String: Int]
+    /// Searches with a vector alone, opening the index first if it has appeared since the last call.
+    ///
+    /// - Returns: The results, or nil while there's no index to read yet.
+    /// - Throws: SQLite errors.
+    func similar(_ request: LookoutSimilarRequest) async throws -> LookoutSimilarResults?
+    /// The stored vector Find Similar searches with for the file at `path` (`Searcher.similarSource`), preferring
+    /// `segmentID`.
+    ///
+    /// - Returns: Nil when the file isn't in the index, has no vector yet, or there's no index.
+    func similarSource(path: String, segmentID: Int64?) async -> LookoutSimilarSource?
+    /// Which of `paths` the index holds with at least one vector, so Find Similar can reuse it.
+    func indexedPaths(_ paths: [String]) async -> Set<String>
+}
+
+extension LookoutIndexSearching {
+    // Readers without vectors (fakes of text search) find nothing similar.
+    func similar(_ request: LookoutSimilarRequest) async throws -> LookoutSimilarResults? { nil }
+    func similarSource(path: String, segmentID: Int64?) async -> LookoutSimilarSource? { nil }
+    func indexedPaths(_ paths: [String]) async -> Set<String> { [] }
 }
 
 /// What the monitor reports.

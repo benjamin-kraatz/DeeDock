@@ -56,6 +56,7 @@ extension AnalyticsEvent {
         case .hubFilesViewChanged: "hub_files_view_changed"
         case .hubFileSearchResultOpened: "hub_file_search_result_opened"
         case .lookoutResultOpened: "lookout_result_opened"
+        case .lookoutImageSearch: "lookout_image_search"
         case .lookoutSetupStepViewed: "lookout_setup_step_viewed"
         case .lookoutSetupCompleted: "lookout_setup_completed"
         case .lookoutSetupAbandoned: "lookout_setup_abandoned"
@@ -216,9 +217,12 @@ extension AnalyticsEvent {
             ["view": .init(view)]
         case let .hubFileSearchResultOpened(scope, isFolder):
             ["scope": .init(scope), "is_folder": .init(isFolder)]
-        case let .lookoutResultOpened(section, rank, kind, match, scope, isLookup):
+        case let .lookoutResultOpened(section, rank, kind, match, scope, isLookup, query):
             ["section": .init(section), "rank": .init(rank), "kind": kind.map(AnalyticsValue.init),
-             "match": match.map(AnalyticsValue.init), "scope": .init(scope), "is_lookup": .init(isLookup)]
+             "match": match.map(AnalyticsValue.init), "scope": .init(scope), "is_lookup": .init(isLookup),
+             "query": .init(query)]
+        case let .lookoutImageSearch(source, cold):
+            ["source": .init(source), "cold": .init(cold)]
         case let .lookoutSetupStepViewed(step):
             ["step": .init(step)]
         case let .lookoutSetupCompleted(folderCount, allowedCount, skippedCount, estimatedFiles, indexOnBattery):

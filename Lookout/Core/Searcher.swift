@@ -23,13 +23,13 @@ nonisolated final class Searcher {
     let store: IndexStore
     /// Rows × 768 float16, row-major; nil while released or empty.
     private(set) var matrix: VectorStorage?
-    private var rowFile: [Int64] = []
-    private var rowSegment: [Int64] = []
-    private var rowModality: [Modality] = []
+    private(set) var rowFile: [Int64] = []
+    private(set) var rowSegment: [Int64] = []
+    private(set) var rowModality: [Modality] = []
     /// The file kind of each row, for the `kinds` filter on meaning matches.
-    private var rowKind: [FileKind] = []
+    private(set) var rowKind: [FileKind] = []
     /// False for the vectors the later pass adds (`Indexer.finishLongFiles`): scored, but they don't set the scale.
-    private var rowSetsScale: [Bool] = []
+    private(set) var rowSetsScale: [Bool] = []
     /// The model the index's vectors were made with (`meta.vector_source`).
     private(set) var vectorSource: String?
     /// False after `releaseVectors()` (or `loadVectors: false`): keyword search still works, and the next search with
@@ -288,7 +288,7 @@ nonisolated final class Searcher {
     // MARK: Details
 
     /// A `files` row, as a hit needs it.
-    private struct FileRow {
+    struct FileRow {
         let path: String
         let kind: FileKind
         let modified: Double
@@ -297,7 +297,7 @@ nonisolated final class Searcher {
     }
 
     /// A `segments` row, as a hit needs it.
-    private struct SegmentRow {
+    struct SegmentRow {
         let kind: SegmentKind
         let loc: Double?
         let locEnd: Double?
@@ -317,7 +317,7 @@ nonisolated final class Searcher {
     }
 
     /// The ids of the files under `range` (a scope), from the UNIQUE path index.
-    private func files(in range: (lower: String, upper: String)) throws -> Set<Int64> {
+    func files(in range: (lower: String, upper: String)) throws -> Set<Int64> {
         var ids = Set<Int64>()
         try store.db.query("SELECT id FROM files WHERE path >= ? AND path < ?", [.text(range.lower), .text(range.upper)]) {
             ids.insert($0.int(0))
@@ -326,7 +326,7 @@ nonisolated final class Searcher {
     }
 
     /// The rows of `ids`, in one query. Ids gone from the index since the vectors loaded are simply missing.
-    private func files(withIDs ids: Set<Int64>) throws -> [Int64: FileRow] {
+    func files(withIDs ids: Set<Int64>) throws -> [Int64: FileRow] {
         guard !ids.isEmpty else { return [:] }
         var rows: [Int64: FileRow] = [:]
         try store.db.query("""
@@ -343,7 +343,7 @@ nonisolated final class Searcher {
     }
 
     /// The rows of `ids`, in one query.
-    private func segments(withIDs ids: Set<Int64>) throws -> [Int64: SegmentRow] {
+    func segments(withIDs ids: Set<Int64>) throws -> [Int64: SegmentRow] {
         guard !ids.isEmpty else { return [:] }
         var rows: [Int64: SegmentRow] = [:]
         try store.db.query("""

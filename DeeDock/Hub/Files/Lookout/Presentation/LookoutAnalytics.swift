@@ -1,23 +1,35 @@
 import Foundation
 
-/// Lookout's analytics, built from results only: section, rank, kind and match tokens, scope, and whether the query
-/// was a lookup. Nothing here takes the query, a name or a path, and `AnalyticsValue` can't carry text anyway.
+/// Lookout's analytics, built from results only: section, rank, kind and match tokens, scope, whether the query was a
+/// lookup, and whether it was words or a picture. Nothing here takes the query, the picture, a name or a path, and
+/// `AnalyticsValue` can't carry text anyway.
 enum LookoutAnalytics {
     /// `lookout_result_opened` for a Lookout hit.
     ///
     /// - Parameters:
     ///   - section: `.strong` or `.weak`.
     ///   - rank: 1-based within its section.
+    ///   - query: `.image` for a search with a picture, where `rank` counts within the hit's group.
     static func opened(_ hit: LookoutHit, section: AnalyticsLookoutSection, rank: Int,
-                       scope: AnalyticsHubSearchScope, isLookup: Bool) -> AnalyticsEvent {
+                       scope: AnalyticsHubSearchScope, isLookup: Bool,
+                       query: AnalyticsLookoutQuery = .text) -> AnalyticsEvent {
         .lookoutResultOpened(section: section, rank: rank, kind: AnalyticsLookoutKind(hit),
-                             match: AnalyticsLookoutMatch(hit.match), scope: scope, isLookup: isLookup)
+                             match: AnalyticsLookoutMatch(hit.match), scope: scope, isLookup: isLookup, query: query)
     }
 
     /// `lookout_result_opened` for a Spotlight name result opened while Lookout was on, so name opens compare with
-    /// Lookout's. A name result has no Lookout kind or match.
+    /// Lookout's. A name result has no Lookout kind or match, and a search with a picture lists no names.
     static func openedName(rank: Int, scope: AnalyticsHubSearchScope, isLookup: Bool) -> AnalyticsEvent {
-        .lookoutResultOpened(section: .names, rank: rank, kind: nil, match: nil, scope: scope, isLookup: isLookup)
+        .lookoutResultOpened(section: .names, rank: rank, kind: nil, match: nil, scope: scope, isLookup: isLookup,
+                             query: .text)
+    }
+
+    /// `lookout_image_search` when a search with a picture starts.
+    ///
+    /// - Parameter cold: The picture reader had to load first. False for Find Similar on a file in the index, which
+    ///   reads nothing.
+    static func imageSearch(source: AnalyticsLookoutImageSource, cold: Bool) -> AnalyticsEvent {
+        .lookoutImageSearch(source: source, cold: cold)
     }
 
     /// The counter for a search that ends with Lookout in `phase` showing `results`: shown or empty once its final
