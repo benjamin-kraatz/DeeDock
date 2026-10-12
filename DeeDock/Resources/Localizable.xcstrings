@@ -26316,6 +26316,636 @@
         }
       }
     },
+    "lookoutProgressCounting" : {
+      "comment" : "Lookout settings, progress card title while Lookout walks the chosen folders and counts files, before it reads any.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht deine Ordner durch …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking through your folders…"
+          }
+        }
+      }
+    },
+    "lookoutProgressCountingSoFar" : {
+      "comment" : "Lookout settings, progress card second line while counting: how many files it has found so far; the total still grows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bisher %lld Datei · zählt noch"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bisher %lld Dateien · zählt noch"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file so far · still counting"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files so far · still counting"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutProgressCountingNothingYet" : {
+      "comment" : "Lookout settings, progress card second line while counting, before any file has been found.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nichts gezählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing counted yet"
+          }
+        }
+      }
+    },
+    "lookoutProgressUpToDate" : {
+      "comment" : "Lookout settings, progress card title when every file Lookout may read has been read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dem neuesten Stand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to date"
+          }
+        }
+      }
+    },
+    "lookoutProgressOfFiles" : {
+      "comment" : "Lookout settings, progress card: files read out of all files, both already formatted numbers (“3,210 of 5,202 files”).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ von %2$@ Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ of %2$@ files"
+          }
+        }
+      }
+    },
+    "lookoutProgressRate" : {
+      "comment" : "Lookout settings, progress card: how fast Lookout reads right now; the argument is a formatted number such as “5.4”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Dateien pro Sekunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ files per second"
+          }
+        }
+      }
+    },
+    "lookoutProgressTimeLeft" : {
+      "comment" : "Lookout settings, progress card: the estimated time until reading ends; the argument is a formatted duration such as “6 min” or “1 hr, 25 min”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch etwa %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About %@ left"
+          }
+        }
+      }
+    },
+    "lookoutProgressLessThanMinute" : {
+      "comment" : "Lookout settings, progress card: the estimated time left is under a minute.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weniger als eine Minute"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Less than a minute left"
+          }
+        }
+      }
+    },
+    "lookoutProgressEstimating" : {
+      "comment" : "Lookout settings, progress card: reading just started and the time left can't be estimated yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schätzt die Restzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimating time left"
+          }
+        }
+      }
+    },
+    "lookoutProgressFinishedToday" : {
+      "comment" : "Lookout settings, progress card when up to date: when the last pass finished, earlier today; the argument is a time such as “10:41”. Follows the file count after a middle dot, so it starts lowercase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fertig um %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finished at %@"
+          }
+        }
+      }
+    },
+    "lookoutProgressFinishedYesterday" : {
+      "comment" : "Lookout settings, progress card when up to date: when the last pass finished, yesterday; the argument is a time such as “10:41”. Follows the file count after a middle dot, so it starts lowercase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gestern um %@ fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finished yesterday at %@"
+          }
+        }
+      }
+    },
+    "lookoutProgressFinishedOn" : {
+      "comment" : "Lookout settings, progress card when up to date: when the last pass finished, on an earlier day; the argument is a date and time such as “Oct 3, 10:41”. Follows the file count after a middle dot, so it starts lowercase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fertig am %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finished %@"
+          }
+        }
+      }
+    },
+    "lookoutProgressWaitingForDrive" : {
+      "comment" : "Lookout settings, progress card title when a chosen folder is on a drive that isn't connected; the argument is the drive's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartet auf „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for “%@”"
+          }
+        }
+      }
+    },
+    "lookoutProgressWaitingForDriveDetail" : {
+      "comment" : "Lookout settings, progress card second line when a chosen folder is on a drive that isn't connected. “It” is the drive.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seine Dateien werden gelesen, sobald es wieder verbunden ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its files are read once it’s connected again"
+          }
+        }
+      }
+    },
+    "lookoutProgressPause" : {
+      "comment" : "Lookout settings, progress card button: pauses reading files. What's already read stays searchable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "lookoutProgressResume" : {
+      "comment" : "Lookout settings, progress card button: resumes reading files after the person paused it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        }
+      }
+    },
+    "lookoutProgressSkipped" : {
+      "comment" : "Lookout settings, progress card: how many files Lookout chose not to read (too large, a kind it doesn't read in full).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld übersprungen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld übersprungen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld skipped"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld skipped"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutProgressFailedCount" : {
+      "comment" : "Lookout settings, progress card: how many files Lookout tried to read and couldn't.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nicht lesbar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nicht lesbar"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld couldn’t be read"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld couldn’t be read"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutProgressProblemsLabel" : {
+      "comment" : "Accessibility label of the row that lists why files were skipped or couldn't be read, in Lookout's progress card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersprungene und nicht lesbare Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped and unreadable files"
+          }
+        }
+      }
+    },
+    "lookoutProgressProblemsHint" : {
+      "comment" : "Accessibility hint of the row that lists why files were skipped or couldn't be read: clicking it shows the reasons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt die Gründe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the reasons"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindPictures" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for photos and other pictures (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindScreenshots" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for screenshots (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmfotos"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshots"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindPDFs" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for PDFs (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFs"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindDocuments" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for text documents (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindsLabel" : {
+      "comment" : "Accessibility label of the per-kind breakdown in Lookout's progress card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortschritt nach Art"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress by kind"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindValue" : {
+      "comment" : "Accessibility value of one kind in Lookout's progress breakdown: the kind's name, then files read out of all of that kind, both formatted numbers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@ von %3$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@ of %3$@"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenReading" : {
+      "comment" : "Accessibility label of Lookout's progress card while it reads files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is reading files"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenCounting" : {
+      "comment" : "Accessibility label of Lookout's progress card while it counts files in the chosen folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout sieht deine Ordner durch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is looking through your folders"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenUpToDate" : {
+      "comment" : "Accessibility label of Lookout's progress card when everything is read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout ist auf dem neuesten Stand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is up to date"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenPaused" : {
+      "comment" : "Accessibility label of Lookout's progress card while reading waits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout ist pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is paused"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenWaiting" : {
+      "comment" : "Accessibility label of Lookout's progress card while a chosen folder's drive isn't connected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet auf ein Laufwerk"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is waiting for a drive"
+          }
+        }
+      }
+    },
     "markupActionsAccessibility" : {
       "comment" : "VoiceOver label for the markup action bar.",
       "extractionState" : "manual",

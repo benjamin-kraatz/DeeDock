@@ -38,9 +38,10 @@ final class LookoutSettingsModel {
     @ObservationIgnored private let inspector: any LookoutFolderInspecting
     @ObservationIgnored private let picker: any LookoutFolderPicking
     @ObservationIgnored private var previewStatus: LookoutStatus?
-    @ObservationIgnored private var previewProgress: LookoutProgress?
     @ObservationIgnored private var previewMissing: [String] = []
     @ObservationIgnored private var previewNotPermitted: [String] = []
+    /// A pinned progress card (previews); `progress` derives it from the engine otherwise.
+    @ObservationIgnored private(set) var previewProgress: LookoutProgressDisplay?
     @ObservationIgnored private var isPreview = false
 
     init(engine: LookoutEngine, setup: LookoutSetupCoordinator?, inspector: any LookoutFolderInspecting,
@@ -64,9 +65,6 @@ final class LookoutSettingsModel {
     // MARK: State
 
     var status: LookoutStatus { previewStatus ?? engine.status }
-    /// Where reading stands: phase, files done and left, pace, time left, kinds, problems (`LookoutProgress`). Nil
-    /// while Lookout isn't set up or is off. Throttled by the engine, so a view can follow it directly.
-    var progress: LookoutProgress? { isPreview ? previewProgress : engine.progress }
     var settings: LookoutSettings { engine.settings }
     /// Onboarding has completed setup.
     var isSetUp: Bool { settings.setupCompleted }
@@ -212,12 +210,10 @@ final class LookoutSettingsModel {
 extension LookoutSettingsModel {
     /// A model over an inert engine with `settings` and fixed counts and states. It reads no folder and opens no
     /// panel.
-    ///
-    /// - Parameter progress: The progress to show, such as one of `LookoutProgressPreviewData`'s samples.
     static func preview(status: LookoutStatus = .ready, folders: [String] = LookoutSettingsModel.previewFolders,
                         counts: [String: Int] = LookoutSettingsModel.previewCounts, missing: [String] = [],
                         notPermitted: [String] = [], bytes: Int64? = 180_000_000,
-                        notice: Notice? = nil, progress: LookoutProgress? = nil) -> LookoutSettingsModel {
+                        notice: Notice? = nil, progress: LookoutProgressDisplay? = nil) -> LookoutSettingsModel {
         var settings = LookoutSettings()
         settings.setupCompleted = status != .notSetUp
         settings.enabled = status != .notSetUp && status != .off
@@ -227,9 +223,9 @@ extension LookoutSettingsModel {
                                          home: "/Users/preview")
         model.isPreview = true
         model.previewStatus = status
-        model.previewProgress = progress
         model.previewMissing = missing
         model.previewNotPermitted = notPermitted
+        model.previewProgress = progress
         model.folderCounts = counts
         model.indexBytes = bytes
         model.notice = notice

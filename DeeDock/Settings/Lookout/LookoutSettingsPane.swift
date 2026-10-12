@@ -14,6 +14,10 @@ struct LookoutSettingsPane: View {
                                   isOn: Binding(get: { model.isOn }, set: { model.setOn($0) }))
             }
             if model.isSetUp {
+                if let progress = model.progress {
+                    LookoutProgressCard(progress: progress, pause: { model.pauseReading() },
+                                        resume: { model.resumeReading() })
+                }
                 LookoutSettingsFoldersCard(model: model)
                 SettingsCard {
                     SettingsToggleRow(title: .lookoutBatteryTitle, subtitle: .lookoutBatteryDetail,
@@ -129,6 +133,13 @@ private struct LookoutSettingsLinkRow: View {
 #Preview("Lookout · ready") {
     LookoutSettingsPane(model: .preview())
         .frame(width: 680, height: 820)
+}
+
+#Preview("Lookout · reading, German") {
+    LookoutSettingsPane(model: .preview(status: .indexing(remaining: 1_992, progress: 0.61),
+                                        progress: .Sample.readingMid))
+        .frame(width: 680, height: 900)
+        .environment(\.locale, Locale(identifier: "de"))
 }
 
 #Preview("Lookout · missing drive, not allowed, dark") {

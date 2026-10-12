@@ -30,7 +30,20 @@ struct LookoutStatusChip: View {
                     .monospacedDigit()
             }
             .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 10))
-            .background(hovered ? theme.chipHighlight : theme.chip, in: .rect(cornerRadius: 9))
+            .background {
+                let shape = RoundedRectangle(cornerRadius: 9)
+                shape.fill(hovered ? theme.chipHighlight : theme.chip)
+                // While reading with a known size, the chip fills from its leading edge with the soft Lookout wash,
+                // so the Files tab shows how far the pass is without a word more.
+                if let progressFill {
+                    GeometryReader { proxy in
+                        shape.fill(LookoutTheme(scheme).accentSoft)
+                            .frame(width: proxy.size.width * progressFill)
+                    }
+                    .clipShape(shape)
+                    .animation(HubFilesMotion.animation(.easeOut(duration: 0.35)), value: progressFill)
+                }
+            }
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -56,6 +69,13 @@ struct LookoutStatusChip: View {
         case .indexing, .waitingForModel: true
         default: false
         }
+    }
+
+    /// How much of the chip the wash covers: the pass's progress while reading, once the service knows its size.
+    /// Never quite full, so a chip at 99 % still reads as working (`LookoutProgressFormatting.displayFraction`).
+    private var progressFill: Double? {
+        guard case .indexing(_, let progress?) = status else { return nil }
+        return LookoutProgressFormatting.displayFraction(progress)
     }
 
     /// The second part after " · ", if any: the files left, why reading waits, the download's progress.
@@ -84,8 +104,10 @@ struct LookoutStatusChip: View {
         return text
     }
 
+    /// The tooltip and VoiceOver's label: the words, then the percentage the wash shows.
     private var plainLabel: String {
-        [title, detail].compactMap { $0 }.joined(separator: ", ")
+        let percent = progressFill.map { LookoutProgressFormatting.percent($0) }
+        return [title, detail, percent].compactMap { $0 }.joined(separator: ", ")
     }
 
     private var help: String {
