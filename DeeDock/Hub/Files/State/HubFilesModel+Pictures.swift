@@ -87,7 +87,8 @@ extension HubFilesModel {
     func runPictureSearch(_ picture: LookoutPictureQuery) {
         if searchedPictureID == picture.id, lookout.pictureSearch.rescope(resolvedSearchScope) { return }
         searchedPictureID = picture.id
-        lookout.pictureSearch.search(picture.input, source: picture.analyticsSource, scope: resolvedSearchScope)
+        lookout.pictureSearch.search(picture.input, source: picture.analyticsSource, scope: resolvedSearchScope,
+                                     id: picture.id)
     }
 
     private func setQueryForPicture(_ text: String) {

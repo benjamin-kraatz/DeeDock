@@ -248,4 +248,26 @@ import Testing
         #expect(search.phase == .done && search.results.groups.first?.strong.count == 1)
         engine.stop()
     }
+
+    @Test func theSamePictureSearchedAgainSendsItsAnalyticsOnce() async throws {
+        await reader.setResults(someResults())
+        encoder.delay = .milliseconds(200)
+        let file = try LookoutTestPictures.file(named: "IMG_1.png", in: folder)
+        let search = search()
+        var events: [String] = []
+        search.sendAnalytics = { events.append($0.name) }
+        let picture = UUID()
+        search.search(.file(file), source: .drop, scope: .thisMac, id: picture)
+        #expect(events.count == 1)
+        // A scope change while it's still being read, or the Files tab appearing again: the same picture.
+        search.search(.file(file), source: .drop, scope: .folder(folder.url), id: picture)
+        search.refresh()
+        #expect(events.count == 1)
+        #expect(await eventually { search.phase == .done })
+        #expect(events.count == 1)
+        // Another picture, or one without an identity, is a new request.
+        search.search(.file(file), source: .drop, scope: .thisMac, id: UUID())
+        search.search(.file(file), source: .drop, scope: .thisMac)
+        #expect(events.count == 3)
+    }
 }

@@ -73,8 +73,13 @@ final class LookoutPictureSearch {
     /// What was last searched with, until `clear()`, so `refresh()` can run it again.
     @ObservationIgnored private var request: (input: LookoutPictureInput, source: AnalyticsLookoutImageSource,
                                               scope: HubFileSearch.Scope)?
-    /// `lookout_image_search` was sent for `request`: a search that runs again doesn't send it twice.
+    /// The picture `request` is for (`LookoutPictureQuery.id`), when the caller says.
+    @ObservationIgnored private var requestID: UUID?
+    /// `lookout_image_search` was sent for `request`'s picture: a search that runs again for the same picture (a
+    /// restart, a refresh, a scope change while it was still being read) doesn't send it twice.
     @ObservationIgnored private var requestTracked = false
+    /// Sends an analytics event; `Analytics.track` unless a test listens.
+    @ObservationIgnored var sendAnalytics: (AnalyticsEvent) -> Void = { Analytics.track($0) }
 
     init(reader: any LookoutIndexSearching, encoder: any LookoutQueryEncoding) {
         self.reader = reader
@@ -88,12 +93,16 @@ final class LookoutPictureSearch {
     ///
     /// - Parameters:
     ///   - source: Where the picture came from, for `lookout_image_search`.
+    ///   - id: The picture searched with (`LookoutPictureQuery.id`). The same picture searched again, as a scope
+    ///     change does while it's still being read, is the same request for analytics: `lookout_image_search` is
+    ///     sent once. Nil is always a new request.
     /// - Returns: Whether the search waits for the picture reader to load (it was cold).
     @discardableResult
     func search(_ input: LookoutPictureInput, source: AnalyticsLookoutImageSource,
-                scope: HubFileSearch.Scope) -> Bool {
+                scope: HubFileSearch.Scope, id: UUID? = nil) -> Bool {
+        if id == nil || id != requestID { requestTracked = false }
         request = (input, source, scope)
-        requestTracked = false
+        requestID = id
         return start()
     }
 
@@ -145,7 +154,7 @@ final class LookoutPictureSearch {
     private func track(cold: Bool) {
         guard !requestTracked, let request else { return }
         requestTracked = true
-        Analytics.track(LookoutAnalytics.imageSearch(source: request.source, cold: cold))
+        sendAnalytics(LookoutAnalytics.imageSearch(source: request.source, cold: cold))
     }
 
     /// Searches the current picture again within a new scope, with the vector it already has.
@@ -167,6 +176,7 @@ final class LookoutPictureSearch {
     func clear() {
         cancelRunning()
         request = nil
+        requestID = nil
         requestTracked = false
         current = nil
         readSeconds = nil
