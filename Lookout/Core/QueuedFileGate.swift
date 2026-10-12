@@ -20,6 +20,11 @@ import Foundation
 /// 5. Its inode against the record. Another file at the same path (a replacement that kept the size and date) is
 ///    queued again with its own identity rather than read under the old row.
 ///
+/// A package document (`Rules.packageDocuments`, an `.rtfd`) goes through the same steps as a folder: the package must
+/// be a real folder, never a link, opened with `O_DIRECTORY | O_NOFOLLOW`, and it is its inode that's compared with the
+/// record. The file holding its text is then opened inside that descriptor (`openat`, `O_NOFOLLOW`), so neither the
+/// package nor the file in it can be a link, and the same size cap applies (`openPackage`).
+///
 /// The extractors then read the bytes from that descriptor (`Verdict.read`), never the path, so the check and the read
 /// can't race. Devices aren't compared with the record, because an external drive gets a new device number at every
 /// mount. The crawl's relevance rules (code projects, datasets) aren't repeated: they decide what's worth reading, not
@@ -63,6 +68,9 @@ nonisolated struct QueuedFileGate: Sendable {
     /// Checks `file` again and opens it (see the type's steps). Touches only the file: no database.
     func open(_ file: FileRecord) -> Verdict {
         if let reason = refusal(forPath: file.path) { return .refused(state: "skipped", detail: reason) }
+        if let entry = Rules.packageDocumentEntry(URL(fileURLWithPath: file.path)) {
+            return openPackage(file, entry: entry)
+        }
         var linkInfo = stat()
         guard lstat(file.path, &linkInfo) == 0 else { return .refused(state: "failed", detail: Self.errorText(errno)) }
         if let reason = Self.refusal(for: linkInfo) { return .refused(state: "skipped", detail: reason) }
@@ -101,6 +109,66 @@ nonisolated struct QueuedFileGate: Sendable {
         } catch {
             return .refused(state: "failed", detail: "\(error)")
         }
+    }
+
+    /// `open` for a package document: the package checked as `open` checks a file (a real folder, not a link, at its
+    /// stored path, the queued inode), then `entry` opened inside it and checked as a regular file with data on this
+    /// Mac and within the size cap. A package replaced since the crawl (another inode) is queued again with the
+    /// entry's size and date.
+    private func openPackage(_ file: FileRecord, entry: String) -> Verdict {
+        var linkInfo = stat()
+        guard lstat(file.path, &linkInfo) == 0 else { return .refused(state: "failed", detail: Self.errorText(errno)) }
+        if let reason = Self.packageRefusal(for: linkInfo) { return .refused(state: "skipped", detail: reason) }
+        let directory = Darwin.open(file.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard directory >= 0 else {
+            let error = errno
+            return error == ELOOP || error == ENOTDIR ? .refused(state: "skipped", detail: "link or special file")
+                : .refused(state: "failed", detail: Self.errorText(error))
+        }
+        defer { close(directory) }
+        var info = stat()
+        guard fstat(directory, &info) == 0 else { return .refused(state: "failed", detail: Self.errorText(errno)) }
+        guard Self.packageRefusal(for: info) == nil, info.st_dev == linkInfo.st_dev, info.st_ino == linkInfo.st_ino else {
+            return .refused(state: "skipped", detail: "link or special file")
+        }
+        guard let opened = Self.openPath(directory) else {
+            return .refused(state: "failed", detail: Self.errorText(errno))
+        }
+        if let reason = placeRefusal(opened: opened, file: file, inode: UInt64(info.st_ino)) {
+            return .refused(state: "skipped", detail: reason)
+        }
+        let descriptor = openat(directory, entry, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        guard descriptor >= 0 else {
+            let error = errno
+            return error == ELOOP ? .refused(state: "skipped", detail: "link or special file")
+                : .refused(state: "failed", detail: Self.errorText(error))
+        }
+        defer { close(descriptor) }
+        var inner = stat()
+        guard fstat(descriptor, &inner) == 0 else { return .refused(state: "failed", detail: Self.errorText(errno)) }
+        if let reason = Self.refusal(for: inner) { return .refused(state: "skipped", detail: reason) }
+        if UInt64(info.st_ino) != file.inode {
+            let mtime = Double(inner.st_mtimespec.tv_sec) + Double(inner.st_mtimespec.tv_nsec) / 1e9
+            return .changed(Candidate(path: file.path, kind: file.kind, size: Int64(inner.st_size), mtime: mtime,
+                                      inode: UInt64(info.st_ino), device: UInt64(bitPattern: Int64(info.st_dev)),
+                                      lastUsed: file.lastUsed))
+        }
+        guard inner.st_size <= Self.maxReadBytes else {
+            let megabytes = Int(inner.st_size >> 20)
+            return .refused(state: "skipped", detail: "too large to read (\(megabytes) MB)")
+        }
+        do {
+            return .read(try Self.contents(of: descriptor, size: Int(inner.st_size)))
+        } catch {
+            return .refused(state: "failed", detail: "\(error)")
+        }
+    }
+
+    /// Why a package with this `stat` isn't read, or nil for a real folder with its data on this Mac.
+    private static func packageRefusal(for info: stat) -> String? {
+        guard (info.st_mode & S_IFMT) == S_IFDIR else { return "link or special file" }
+        if info.st_flags & 0x4000_0000 != 0 { return "in the cloud, not downloaded" }   // SF_DATALESS
+        return nil
     }
 
     /// Why the file open at `opened` (its `F_GETPATH`) may not be read for `file`'s row, or nil. Usually it's the stored

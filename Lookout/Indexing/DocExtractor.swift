@@ -5,71 +5,25 @@ import Foundation
 
 /// Reads documents' text and cuts it into pieces for the model.
 nonisolated enum DocExtractor {
-    /// Plain text from txt/md directly, HTML by stripping tags, and rtf/docx/doc/odt through the Cocoa text system.
-    /// (Cocoa's HTML import runs WebKit and must be on the main thread; the service indexes on a background queue.)
+    /// The text of a document. rtf (and an rtfd's `TXT.rtf`, which `QueuedFileGate` read), docx, doc and odt go
+    /// through the Cocoa text system; everything else is plain or markup text, HTML, a web archive, subtitles or LaTeX
+    /// (`DocumentText`). Cocoa's HTML import runs WebKit and must be on the main thread, and the service indexes on a
+    /// background queue, so HTML never goes through it.
     ///
     /// - Parameters:
     ///   - data: The file's bytes, read from the descriptor `QueuedFileGate` checked.
     ///   - fileExtension: The file's extension, which says how to read it.
     /// - Throws: The file can't be decoded.
     static func text(of data: Data, fileExtension: String) throws -> String {
+        if let text = try DocumentText.text(of: data, fileExtension: fileExtension) { return text }
         let type: NSAttributedString.DocumentType
         switch fileExtension.lowercased() {
         case "docx": type = .officeOpenXML
         case "doc": type = .docFormat
         case "odt": type = .openDocument
-        case "rtf": type = .rtf
-        case "html", "htm": return plainText(fromHTML: decodeText(data))
-        default: return decodeText(data)
+        default: type = .rtf   // rtf, and the rtf inside an rtfd
         }
         return try NSAttributedString(data: data, options: [.documentType: type], documentAttributes: nil).string
-    }
-
-    /// Plain text in UTF-32 or UTF-16 with a byte-order mark, else UTF-8, else Latin-1, which decodes any bytes.
-    static func decodeText(_ data: Data) -> String {
-        if data.starts(with: [0xFF, 0xFE, 0, 0]) || data.starts(with: [0, 0, 0xFE, 0xFF]),
-           let text = String(data: data, encoding: .utf32) { return text }
-        if data.starts(with: [0xFF, 0xFE]) || data.starts(with: [0xFE, 0xFF]),
-           let text = String(data: data, encoding: .utf16) { return text }
-        if let text = String(data: data, encoding: .utf8) { return text }
-        return String(data: data, encoding: .isoLatin1) ?? ""
-    }
-
-    /// Good enough for search: drops scripts, styles and comments, turns block ends into line breaks, strips the
-    /// remaining tags, and decodes common entities.
-    static func plainText(fromHTML html: String) -> String {
-        var text = html
-        for pattern in [#"(?is)<script\b.*?</script\s*>"#, #"(?is)<style\b.*?</style\s*>"#, #"(?s)<!--.*?-->"#,
-                        #"(?is)<head\b.*?</head\s*>"#] {
-            text = text.replacingOccurrences(of: pattern, with: " ", options: .regularExpression)
-        }
-        text = text.replacingOccurrences(of: #"(?i)<(br|/p|/div|/li|/h[1-6]|/tr|/section|/article)\b[^>]*>"#,
-                                         with: "\n", options: .regularExpression)
-        text = text.replacingOccurrences(of: #"<[^>]+>"#, with: " ", options: .regularExpression)
-        let entities = ["&nbsp;": " ", "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": "\"", "&#39;": "'",
-                        "&apos;": "'", "&mdash;": "—", "&ndash;": "–", "&hellip;": "…"]
-        for (entity, character) in entities { text = text.replacingOccurrences(of: entity, with: character) }
-        text = decodeNumericEntities(text)
-        return text.replacingOccurrences(of: #"[ \t]+"#, with: " ", options: .regularExpression)
-            .replacingOccurrences(of: #"\s*\n\s*"#, with: "\n", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private static func decodeNumericEntities(_ text: String) -> String {
-        guard text.contains("&#"), let pattern = try? NSRegularExpression(pattern: "&#(x[0-9a-fA-F]+|[0-9]+);")
-        else { return text }
-        var result = ""
-        var last = text.startIndex
-        for match in pattern.matches(in: text, range: NSRange(text.startIndex..., in: text)) {
-            guard let range = Range(match.range, in: text), let codeRange = Range(match.range(at: 1), in: text)
-            else { continue }
-            let code = text[codeRange]
-            let value = code.hasPrefix("x") ? UInt32(code.dropFirst(), radix: 16) : UInt32(code)
-            result += text[last..<range.lowerBound]
-            result += value.flatMap(Unicode.Scalar.init).map { String(Character($0)) } ?? " "
-            last = range.upperBound
-        }
-        return result + text[last...]
     }
 
     /// Splits text into ~`size`-character pieces (~450 tokens) that overlap a little, breaking at whitespace. The cut

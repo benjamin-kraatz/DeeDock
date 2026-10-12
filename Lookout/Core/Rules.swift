@@ -31,7 +31,22 @@ nonisolated enum Rules {
     ]
     static let projectBundleExtensions: Set<String> = ["xcodeproj", "xcworkspace"]
 
-    static let docExtensions: Set<String> = ["txt", "text", "md", "markdown", "rtf", "docx", "doc", "odt", "html", "htm"]
+    /// Documents, read as text (`DocExtractor`). Markup formats (reStructuredText, AsciiDoc, Org, Textile, MDX) are
+    /// read as they are written, subtitles without their cue numbers and timings, LaTeX without its commands, and
+    /// Safari web archives and XHTML through the HTML path (`DocumentText`).
+    static let docExtensions: Set<String> = [
+        "txt", "text", "md", "markdown", "rtf", "docx", "doc", "odt", "html", "htm", "rst", "adoc", "asciidoc", "org",
+        "tex", "latex", "textile", "xhtml", "mdx", "srt", "vtt", "webarchive", "rtfd",
+    ]
+
+    /// Documents that are package folders, by extension, and the file inside each one that holds its text. The crawler
+    /// indexes the package as one document, and `QueuedFileGate` reads that one file inside it.
+    static let packageDocuments: [String: String] = ["rtfd": "TXT.rtf"]
+
+    /// The file inside `url` that holds its text when `url` is a package document (`packageDocuments`), else nil.
+    static func packageDocumentEntry(_ url: URL) -> String? {
+        packageDocuments[url.pathExtension.lowercased()]
+    }
 
     /// Source code and data files: skipped (your editor and ripgrep search them better, and they flood an index).
     static let codeExtensions: Set<String> = [
@@ -61,8 +76,14 @@ nonisolated enum Rules {
         guard let type else { return .ignore }
         if type.conforms(to: .sourceCode) || type.conforms(to: .script) { return .skip("code or data file") }
         if type.conforms(to: .pdf) { return .index(.pdf) }
-        if type.conforms(to: .image) { return .index(isScreenshot(url) ? .screenshot : .image) }
-        return .ignore   // audio, video and everything else
+        if isPicture(type) { return .index(isScreenshot(url) ? .screenshot : .image) }
+        return .ignore   // audio, video, SVG and everything else
+    }
+
+    /// Whether files of `type` are pictures Lookout reads: images, but not SVG. macOS types SVG as an image, yet ImageIO
+    /// can't decode it, so it would only ever fail; it's ignored like any other type Lookout doesn't handle.
+    static func isPicture(_ type: UTType) -> Bool {
+        type.conforms(to: .image) && !type.conforms(to: .svg)
     }
 
     /// Keys, certificates, password and credential files: never read, wherever they are.

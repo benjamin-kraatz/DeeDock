@@ -43,9 +43,10 @@ nonisolated enum LookoutPictureDrop: Equatable, Sendable {
         return fromFilesPane && drop == .refused ? nil : drop
     }
 
-    /// A file whose type is a picture, by its extension (the drag hasn't been dropped, so the file isn't read).
+    /// A file whose type is a picture Lookout reads, by its extension (the drag hasn't been dropped, so the file isn't
+    /// read). SVG isn't one (`Rules.isPicture`).
     static func isPictureFile(_ url: URL) -> Bool {
         guard !url.hasDirectoryPath, let type = UTType(filenameExtension: url.pathExtension) else { return false }
-        return type.conforms(to: .image)
+        return Rules.isPicture(type)
     }
 }

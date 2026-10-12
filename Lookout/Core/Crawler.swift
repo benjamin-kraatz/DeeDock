@@ -8,8 +8,13 @@ import UniformTypeIdentifiers
 /// folder for last-used dates (`LastUsedDates`).
 ///
 /// Hidden files and folders and bundle contents are never walked. Symbolic links are never followed: the enumerator
-/// doesn't descend into a linked folder, and a linked file is reported as a "link or special file".
+/// doesn't descend into a linked folder, and a linked file is reported as a "link or special file". A package that is
+/// one document (`Rules.packageDocuments`, an `.rtfd`) is indexed as one file, the package, and its contents are
+/// never walked either.
 nonisolated enum Crawler {
+    /// How many files the walk finds between two `found` reports.
+    static let foundReportInterval = 250
+
     /// - Parameters:
     ///   - roots: The chosen folders. Each is checked again on its real path, the root itself included
     ///     (`Rules.checkRoots`), and a refused one (the whole disk, the home folder, ~/Library, a hidden, bundle or
@@ -17,8 +22,11 @@ nonisolated enum Crawler {
     ///   - readsLastUsed: Whether to ask Spotlight when each file was last used. A count for an estimate doesn't need
     ///     it.
     ///   - home: The home folder, never a root, whose `Library` is never walked (tests pass a folder of their own).
+    ///   - found: Hears how many files to index the walk has found so far, every `foundReportInterval` files, while
+    ///     it walks (the progress's "still counting"). The count is before code projects and datasets are left out.
     static func crawl(_ roots: [URL], options: IndexOptions, readsLastUsed: Bool = true,
-                      home: String = FileManager.default.homeDirectoryForCurrentUser.path) -> CrawlReport {
+                      home: String = FileManager.default.homeDirectoryForCurrentUser.path,
+                      found onFound: ((Int) -> Void)? = nil) -> CrawlReport {
         let fm = FileManager.default
         let keys: [URLResourceKey] = [.isDirectoryKey, .isPackageKey, .contentTypeKey, .isUbiquitousItemKey,
                                       .ubiquitousItemDownloadingStatusKey]
@@ -26,6 +34,10 @@ nonisolated enum Crawler {
         var projectRoots = Set<String>()
         var found: [Candidate] = []
         var foundPaths = Set<String>()   // a folder inside another root would be walked twice
+        func add(_ candidate: Candidate) {
+            found.append(candidate)
+            if found.count.isMultiple(of: foundReportInterval) { onFound?(found.count) }
+        }
         // Checked here too, not only when the configuration arrives: a chosen folder that has become a link to
         // ~/Library resolves there now and is refused. The walk starts at the real path, so it never goes through a
         // link, and it reports real paths (/private/var, where a root says /var).
@@ -47,6 +59,12 @@ nonisolated enum Crawler {
                                              errorHandler: { _, _ in true }) else { continue }
             func visit(_ url: URL) {
                 let values = try? url.resourceValues(forKeys: Set(keys))
+                if values?.isDirectory == true, let entry = Rules.packageDocumentEntry(url) {
+                    // Never walked into, also where macOS doesn't call it a package.
+                    walker.skipDescendants()
+                    visitPackageDocument(url, entry: entry, values: values)
+                    return
+                }
                 if values?.isDirectory == true, values?.isPackage != true {
                     if let reason = Rules.skipReason(forFolder: url, home: home, excluded: skips) {
                         walker.skipDescendants()
@@ -80,9 +98,38 @@ nonisolated enum Crawler {
                     }
                     guard foundPaths.insert(url.path).inserted else { return }
                     let mtime = Double(info.st_mtimespec.tv_sec) + Double(info.st_mtimespec.tv_nsec) / 1e9
-                    found.append(Candidate(path: url.path, kind: kind, size: Int64(info.st_size), mtime: mtime,
-                                           inode: UInt64(info.st_ino), device: UInt64(bitPattern: Int64(info.st_dev))))
+                    add(Candidate(path: url.path, kind: kind, size: Int64(info.st_size), mtime: mtime,
+                                  inode: UInt64(info.st_ino), device: UInt64(bitPattern: Int64(info.st_dev))))
                 }
+            }
+
+            /// A package that is one document: the package itself, never a link, with the file that holds its text
+            /// (`entry`) a regular file inside it. Its identity is the package's inode, so a save that replaces the
+            /// package is a new file; its size and date are the entry's, so an edit in place is seen as a change.
+            func visitPackageDocument(_ url: URL, entry: String, values: URLResourceValues?) {
+                let kind: FileKind
+                switch Rules.classify(url, type: values?.contentType, options: options) {
+                case .index(let indexed): kind = indexed
+                case .skip(let reason): report.skipped[reason, default: 0] += 1; return
+                case .ignore: report.skipped["other type", default: 0] += 1; return
+                }
+                var package = stat(), inner = stat()
+                guard lstat(url.path, &package) == 0, (package.st_mode & S_IFMT) == S_IFDIR,
+                      lstat(url.appendingPathComponent(entry).path, &inner) == 0, (inner.st_mode & S_IFMT) == S_IFREG
+                else {
+                    report.skipped["link or special file", default: 0] += 1
+                    return
+                }
+                let dataless = (package.st_flags | inner.st_flags) & 0x4000_0000 != 0  // SF_DATALESS
+                let inCloud = values?.isUbiquitousItem == true && values?.ubiquitousItemDownloadingStatus != .current
+                if dataless || inCloud {
+                    report.skipped["in the cloud, not downloaded", default: 0] += 1
+                    return
+                }
+                guard foundPaths.insert(url.path).inserted else { return }
+                let mtime = Double(inner.st_mtimespec.tv_sec) + Double(inner.st_mtimespec.tv_nsec) / 1e9
+                add(Candidate(path: url.path, kind: kind, size: Int64(inner.st_size), mtime: mtime,
+                              inode: UInt64(package.st_ino), device: UInt64(bitPattern: Int64(package.st_dev))))
             }
 
             // URL resource values are autoreleased; draining per file keeps a big walk from piling them up (the
