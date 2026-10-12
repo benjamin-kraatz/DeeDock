@@ -3,11 +3,13 @@ import SwiftUI
 /// A search results section's header, the mockup's `.sh`: a glyph, the title, "· source · count" in a quieter tone,
 /// and a hairline to the edge. "Names · Spotlight · 12" and "Lookout · by content · 5".
 struct HubFilesSearchSectionHeader: View {
-    enum Section {
+    enum Section: Equatable {
         /// Spotlight's name results.
         case names
         /// Lookout's content results, in the Lookout accent.
         case lookout
+        /// A group of a search with a picture ("Looks like it · 5"), in the Lookout accent, with no source.
+        case lookoutGroup(String)
     }
 
     let section: Section
@@ -17,10 +19,10 @@ struct HubFilesSearchSectionHeader: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        let tint: AnyShapeStyle = section == .lookout ? AnyShapeStyle(LookoutTheme(scheme).accent) : AnyShapeStyle(.secondary)
+        let tint: AnyShapeStyle = section == .names ? AnyShapeStyle(.secondary) : AnyShapeStyle(LookoutTheme(scheme).accent)
         HStack(spacing: 7) {
             glyph
-            Text(title)
+            Text(verbatim: title)
                 .font(.system(size: 11.5, weight: .semibold))
             Text(verbatim: detail)
                 .font(.system(size: 11.5, weight: .medium))
@@ -46,27 +48,35 @@ struct HubFilesSearchSectionHeader: View {
                 .font(.system(size: 11, weight: .semibold))
                 .frame(width: 15, height: 15)
                 .accessibilityHidden(true)
-        case .lookout:
+        case .lookout, .lookoutGroup:
             LookoutGlyph(size: 15)
         }
     }
 
-    private var title: LocalizedStringResource {
-        section == .names ? .lookoutSectionNames : .lookoutSectionLookout
+    private var title: String {
+        switch section {
+        case .names: String(localized: .lookoutSectionNames)
+        case .lookout: String(localized: .lookoutSectionLookout)
+        case .lookoutGroup(let title): title
+        }
     }
 
-    private var source: String {
-        section == .names ? String(localized: .lookoutSectionSpotlight) : String(localized: .lookoutSectionByContent)
+    private var source: String? {
+        switch section {
+        case .names: String(localized: .lookoutSectionSpotlight)
+        case .lookout: String(localized: .lookoutSectionByContent)
+        case .lookoutGroup: nil
+        }
     }
 
     private var detail: String {
-        var parts = ["", source]
+        var parts = ["", source].compactMap { $0 }
         if let count { parts.append(count.formatted()) }
         return parts.joined(separator: " · ").trimmingCharacters(in: .whitespaces)
     }
 
     private var accessibilityLabel: String {
-        var parts = [String(localized: title), source]
+        var parts = [title, source].compactMap { $0 }
         if let count { parts.append(String(localized: .hubFilesResultCount(count))) }
         return parts.joined(separator: ", ")
     }
@@ -77,6 +87,7 @@ struct HubFilesSearchSectionHeader: View {
         HubFilesSearchSectionHeader(section: .names, count: 9)
         HubFilesSearchSectionHeader(section: .lookout, count: 5)
         HubFilesSearchSectionHeader(section: .lookout, count: nil)
+        HubFilesSearchSectionHeader(section: .lookoutGroup("Looks like it"), count: 4)
     }
     .frame(width: 520)
     .padding()

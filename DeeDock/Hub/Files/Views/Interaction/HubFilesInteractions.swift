@@ -125,6 +125,7 @@ enum HubFilesInteractions {
             model.clickSearchResult(item.url, mode: .replace)
         }
         interaction.doubleClick = { model.openSearchResult(item) }
+        interaction.isSearchResult = true
         interaction.dragURLs = {
             model.searchSelection.contains(item.url) ? model.actionableItems.map(\.url) : [item.url]
         }
@@ -148,6 +149,7 @@ enum HubFilesInteractions {
         var interaction = HubFilesInteraction()
         interaction.mouseDown = { _ in model.clickLookoutResult(hit) }
         interaction.doubleClick = { model.openLookoutResult(hit) }
+        interaction.isSearchResult = true
         interaction.dragURLs = { [url] }
         interaction.dragHold = dragHold(model)
         if hit.isFolder {

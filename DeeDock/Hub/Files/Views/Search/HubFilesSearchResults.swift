@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Search results replacing the panes while the header field has a query, in the mockup's Sections layout
 /// (`docs/mockups/lookout.html`): a scope bar with Lookout's status chip, then "Names · Spotlight" with the name
-/// rows, then "Lookout · by content" (`LookoutSection`).
+/// rows, then "Lookout · by content" (`LookoutSection`). A search with a picture shows its own results instead
+/// (`LookoutPictureResults`, `docs/mockups/lookout-image-search.html`).
 ///
 /// Every row is a direct child of one `LazyVStack`, so the arrow keys' scroll requests reach rows in either section
 /// (`HubFilesSearchResultID`). Spotlight's rows show as soon as they arrive; Lookout fills in beneath them.
@@ -18,9 +19,14 @@ struct HubFilesSearchResults: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        HubFilesNameResultsSection(model: model)
-                        if model.showsLookoutSection {
-                            LookoutSection(model: model)
+                        if model.isPictureSearch {
+                            // A picture has no words: no names, and Lookout's results in two groups.
+                            LookoutPictureResults(model: model)
+                        } else {
+                            HubFilesNameResultsSection(model: model)
+                            if model.showsLookoutSection {
+                                LookoutSection(model: model)
+                            }
                         }
                     }
                     .padding(EdgeInsets(top: 2, leading: 10, bottom: 14, trailing: 10))

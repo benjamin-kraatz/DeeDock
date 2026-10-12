@@ -27,6 +27,9 @@ struct HubFilesInteraction {
     var menu: (() -> NSMenu?)?
     /// Pointer entered (true) or left (false) the region.
     var hoverChanged: ((Bool) -> Void)?
+    /// A search result: dragging it onto the search field runs Find Similar, where a pane's file drag shows no well
+    /// unless it's a picture.
+    var isSearchResult = false
 }
 
 /// Places a `HubFilesInteractionView` over (or behind) SwiftUI content.
@@ -144,6 +147,7 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         }
         sessionHold = interaction.dragHold
         sessionHold?(true)
+        model?.pictureDragBegan(fromSearchResult: interaction.isSearchResult)
         retainedForSession = self
         let session = beginDraggingSession(with: Array(items), event: event, source: self)
         session.animatesToStartingPositionsOnCancelOrFail = true
@@ -158,6 +162,7 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
 
     func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
         model?.dropHighlight = nil
+        model?.pictureDragEnded()
         sessionHold?(false)
         sessionHold = nil
         retainedForSession = nil
@@ -200,7 +205,16 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
                                    sourceMask: info.draggingSourceOperationMask)
     }
 
+    /// This region's key in the Hub's drag tracking (`HubFilesPictureDrag`).
+    private var dragKey: String { "region-\(ObjectIdentifier(self).hashValue)" }
+
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        // The drag is over the Hub here too: the search field's drop well stays open across rows and panes.
+        model?.pictureDragActivity(dragKey, inside: true)
+        return draggingUpdated(sender)
+    }
+
+    override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
         let result = operation(for: sender)
         if let highlight = interaction.dropHighlight {
             if result.isEmpty { model?.clearDropHighlight(highlight) } else { model?.dropHighlight = highlight }
@@ -208,14 +222,14 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         return result
     }
 
-    override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation { draggingEntered(sender) }
-
     override func draggingExited(_ sender: NSDraggingInfo?) {
         if let highlight = interaction.dropHighlight { model?.clearDropHighlight(highlight) }
+        model?.pictureDragActivity(dragKey, inside: false)
     }
 
     override func draggingEnded(_ sender: NSDraggingInfo) {
         if let highlight = interaction.dropHighlight { model?.clearDropHighlight(highlight) }
+        model?.pictureDragEnded()
     }
 
     override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool { !operation(for: sender).isEmpty }

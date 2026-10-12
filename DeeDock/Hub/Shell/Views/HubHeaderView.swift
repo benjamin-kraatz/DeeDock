@@ -20,6 +20,8 @@ struct HubHeaderView: View {
     @Binding var query: String
     let prompt: LocalizedStringResource
     let actions: HubHeaderActions
+    /// The visible tab's additions to the search field (`HubSearchExtras`).
+    var extras: (any HubSearchExtras)?
 
     /// Width the detached window's traffic lights take before the wordmark: three 12-point lights
     /// with 8-point gaps, then the mockup's 4 + 12 points of spacing.
@@ -39,7 +41,7 @@ struct HubHeaderView: View {
             HubTabSwitcher(selection: state.tab, reduceMotion: state.reduceMotion, select: actions.select)
 
             HStack(spacing: 6) {
-                HubSearchField(query: $query, prompt: prompt, state: state)
+                HubSearchField(query: $query, prompt: prompt, state: state, extras: extras)
                 HubHeaderButton(symbol: state.isDetached ? "pin.slash" : "pin",
                                 label: state.isDetached ? .hubAttachHelp : .hubPinHelp,
                                 action: actions.togglePin)

@@ -14,6 +14,9 @@ struct HubRootView<Content: View, Overlay: View>: View {
     @Binding var query: String
     let prompt: LocalizedStringResource
     let actions: HubHeaderActions
+    /// The visible tab's additions to the search field. With them, drags over the whole Hub are watched (never
+    /// taken) so the field can open its drop well (`HubDragObserver`).
+    var extras: (any HubSearchExtras)?
     @ViewBuilder let content: (HubTab) -> Content
     @ViewBuilder var overlay: () -> Overlay
 
@@ -22,13 +25,14 @@ struct HubRootView<Content: View, Overlay: View>: View {
     var body: some View {
         HubGlassContainer(state: state) {
             VStack(spacing: 0) {
-                HubHeaderView(state: state, query: $query, prompt: prompt, actions: actions)
+                HubHeaderView(state: state, query: $query, prompt: prompt, actions: actions, extras: extras)
                 Rectangle()
                     .fill(Color.primary.opacity(colorScheme == .dark ? 0.08 : 0.075))
                     .frame(height: 0.5)
                     .accessibilityHidden(true)
                 HubTabContent(state: state, content: content)
             }
+            .modifier(HubDragObservation(extras: extras))
             .overlay { overlay() }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -62,7 +66,22 @@ extension HubRootView where Overlay == EmptyView {
     /// A Hub with nothing over its content.
     init(state: HubShellState, query: Binding<String>, prompt: LocalizedStringResource, actions: HubHeaderActions,
          @ViewBuilder content: @escaping (HubTab) -> Content) {
-        self.init(state: state, query: query, prompt: prompt, actions: actions, content: content) { EmptyView() }
+        self.init(state: state, query: query, prompt: prompt, actions: actions, extras: nil, content: content) {
+            EmptyView()
+        }
+    }
+}
+
+/// Watches drags over the Hub for a tab with search extras; without them the Hub isn't a drop target at all.
+private struct HubDragObservation: ViewModifier {
+    let extras: (any HubSearchExtras)?
+
+    func body(content: Content) -> some View {
+        if let extras {
+            content.onDrop(of: extras.searchDropTypes, delegate: HubDragObserver(extras: extras))
+        } else {
+            content
+        }
     }
 }
 

@@ -155,6 +155,19 @@ private struct HubFilesPreviewFrame: View {
     HubFilesPreviewFrame(model: LookoutPreviewData.model(status: .notSetUp, phase: .unavailable, query: "taxes"))
 }
 
+#Preview("Search · with a picture") {
+    HubFilesPreviewFrame(model: LookoutPicturePreviewData.model(
+        picture: LookoutPicturePreviewData.dropped, results: LookoutPicturePreviewData.beachResults,
+        wordsBefore: "dog on the beach"))
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Search · Find Similar on a page, light") {
+    HubFilesPreviewFrame(model: LookoutPicturePreviewData.model(
+        picture: LookoutPicturePreviewData.similarLease, results: LookoutPicturePreviewData.leaseResults))
+    .preferredColorScheme(.light)
+}
+
 #Preview("Running transfer") {
     HubFilesPreviewFrame(model: .preview { model in
         model.previewOverrides.transfer = HubFilesTransferStatus(

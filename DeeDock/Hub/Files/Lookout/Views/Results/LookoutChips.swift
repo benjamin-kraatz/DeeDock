@@ -5,11 +5,14 @@ import SwiftUI
 struct LookoutChips: View {
     let kind: LookoutHitKind
     let match: LookoutHit.Match
+    /// Replaces the match chip's text ("Looks alike", "Same subject" in a search with a picture), in the meaning
+    /// style.
+    var matchTitle: String?
 
     var body: some View {
         HStack(spacing: 5) {
             LookoutChip(text: kind.title, style: .neutral)
-            LookoutChip(text: match.title, style: match == .words ? .words : .meaning)
+            LookoutChip(text: matchTitle ?? match.title, style: match == .words && matchTitle == nil ? .words : .meaning)
         }
     }
 }
@@ -53,6 +56,7 @@ struct LookoutChip: View {
         LookoutChips(kind: .screenshot, match: .both)
         LookoutChips(kind: .document, match: .words)
         LookoutChips(kind: .folder(matchingFiles: 6), match: .meaning)
+        LookoutChips(kind: .picture, match: .meaning, matchTitle: "Looks alike")
     }
     .padding(20)
     .background(.regularMaterial)

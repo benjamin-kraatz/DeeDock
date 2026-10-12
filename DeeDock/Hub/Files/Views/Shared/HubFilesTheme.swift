@@ -10,6 +10,9 @@ enum HubFilesMetrics {
     static let rowHeight: CGFloat = 32
     static let previewWidth: CGFloat = 272
     static let previewWellHeight: CGFloat = 250
+    /// The well's height in a search with a picture, so "Why it matched" with its comparison and Find Similar fit
+    /// under it (the mockup's 200 → 160 pt).
+    static let compactPreviewWellHeight: CGFloat = 200
     static let statusBarHeight: CGFloat = 46
     static let tileIconSize: CGFloat = 54
     static let tileMinimumWidth: CGFloat = 96

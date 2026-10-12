@@ -25290,6 +25290,834 @@
         }
       }
     },
+    "lookoutPictureDropHere" : {
+      "comment" : "Files search field: shown inside the field while a picture is dragged over the Hub. Dropping it on the field searches for files like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablegen, um mit diesem Bild zu suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop to search with this picture"
+          }
+        }
+      }
+    },
+    "lookoutPictureDropRefused" : {
+      "comment" : "Files search field: shown inside the field while something that isn't a picture (a ZIP file, a folder) is dragged over the Hub. It can't be dropped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout sucht nur mit Bildern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout searches with pictures only"
+          }
+        }
+      }
+    },
+    "lookoutPicturePrompt" : {
+      "comment" : "Files search field: VoiceOver label of the text field while a picture is being searched with. Typing replaces the picture with a search by words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippen, um nach Wörtern zu suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type to search by words instead"
+          }
+        }
+      }
+    },
+    "lookoutPictureTokenLabel" : {
+      "comment" : "VoiceOver label of the picture chip in the Files search field. The placeholder is the file's name, or “Pasted picture”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture: %@"
+          }
+        }
+      }
+    },
+    "lookoutPictureRemove" : {
+      "comment" : "Button and VoiceOver action on the picture chip in the Files search field: stops searching with the picture and brings back the words searched before.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove picture"
+          }
+        }
+      }
+    },
+    "lookoutPicturePasted" : {
+      "comment" : "Name shown for a picture pasted into the Files search field (it has no file name).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingefügtes Bild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasted picture"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleNew" : {
+      "comment" : "Under the name of a dropped picture above its search results. The placeholder is how long reading it took, such as “0.4 s”. The picture is read in memory and never saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Bild · gelesen in %@ · wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New picture · read in %@ · not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitlePasted" : {
+      "comment" : "Under “Pasted picture” above its search results. The placeholder is how long reading it took, such as “0.4 s”. Starts lowercase, as in the approved design. The picture is read in memory and never saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gelesen in %@ · wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "read in %@ · not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleNewUnread" : {
+      "comment" : "Under the name of a dropped picture while Lookout can't search yet (not set up, or its model is downloading). The picture is never saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Bild · wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New picture · not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitlePastedUnread" : {
+      "comment" : "Under “Pasted picture” while Lookout can't search yet. Starts lowercase, as in the approved design.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleIndex" : {
+      "comment" : "Under the name of a file searched with by Find Similar: Lookout reused what it already knows about the file, so the search was instant.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus deinem Index · sofort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From your index · instant"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleIndexPage" : {
+      "comment" : "Under the name of a PDF searched with by Find Similar, from one page. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus deinem Index · Seite %lld · sofort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From your index · Page %lld · instant"
+          }
+        }
+      }
+    },
+    "lookoutPictureWaking" : {
+      "comment" : "Above search results while Lookout loads the part of its model that reads pictures (the first search with a picture in a while).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookouts Bildleser startet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waking Lookout’s picture reader…"
+          }
+        }
+      }
+    },
+    "lookoutPictureReading" : {
+      "comment" : "Above search results while Lookout reads the picture searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest dein Bild …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading your picture…"
+          }
+        }
+      }
+    },
+    "lookoutPictureBack" : {
+      "comment" : "Link above the results of a search with a picture: goes back to the words searched before. The placeholder is those words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zu „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to “%@”"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupLooksLike" : {
+      "comment" : "Section title in the results of a search with a picture: pictures and screenshots that look like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht so aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looks like it"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupAbout" : {
+      "comment" : "Section title in the results of a search with a picture: documents and PDFs about what the picture shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passend zum Motiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About what it shows"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupSaysSimilar" : {
+      "comment" : "Section title in the results of Find Similar on a document: documents and PDFs that say something similar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sagt Ähnliches"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Says something similar"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupPicturesOf" : {
+      "comment" : "Section title in the results of Find Similar on a document: pictures of what the document is about.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder dazu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures of it"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupEmpty" : {
+      "comment" : "Under a section title in the results of a search with a picture, when nothing in that section clearly fits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier sticht nichts heraus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing stands out here."
+          }
+        }
+      }
+    },
+    "lookoutPictureHonest" : {
+      "comment" : "Results of a search with a picture when nothing clearly fits in any section. Lookout doesn't list weak guesses.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dafür sticht nichts heraus. Lookout zeigt nur Treffer, die eindeutig passen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing stands out for this one. Lookout shows matches only when they clearly fit."
+          }
+        }
+      }
+    },
+    "lookoutPictureUnreadable" : {
+      "comment" : "Results of a search with a picture when the picture couldn't be read (a damaged file, or Lookout's picture reader couldn't start).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout kann dieses Bild nicht lesen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout can’t read this picture."
+          }
+        }
+      }
+    },
+    "lookoutPictureMatchAlike" : {
+      "comment" : "Chip on a result of a search with a picture: this picture looks like the one searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht ähnlich aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looks alike"
+          }
+        }
+      }
+    },
+    "lookoutPictureMatchSame" : {
+      "comment" : "Chip on a result of a search with a picture or Find Similar: it's about the same subject as what was searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gleiches Thema"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same subject"
+          }
+        }
+      }
+    },
+    "lookoutSimilarButton" : {
+      "comment" : "Button in the Files preview column and context-menu item: searches with the selected file for pictures and documents like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ähnliche finden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find Similar"
+          }
+        }
+      }
+    },
+    "lookoutSimilarUnsupported" : {
+      "comment" : "Disabled Find Similar button in the Files preview column, for a kind of file Lookout doesn't index (a ZIP file, code).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest diese Dateiart nicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read this kind of file"
+          }
+        }
+      }
+    },
+    "lookoutSimilarHint" : {
+      "comment" : "VoiceOver hint of the Find Similar button and action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sucht mit dieser Datei nach ähnlichen Bildern und Dokumenten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searches with this file for pictures and documents like it."
+          }
+        }
+      }
+    },
+    "lookoutPictureYours" : {
+      "comment" : "Caption under the picture or page searched with, beside a result's picture, in “Why it matched”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yours"
+          }
+        }
+      }
+    },
+    "lookoutPictureMatch" : {
+      "comment" : "Caption under a result's picture or page, beside the one searched with, in “Why it matched”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treffer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Match"
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyAlike" : {
+      "comment" : "Why a result of a search with a picture matched: the result is a picture that looks like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es sieht aus wie dein Bild."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It looks like your picture."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyAboutPage" : {
+      "comment" : "Why a PDF page matched a search with a picture. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld handelt von dem, was dein Bild zeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld is about what your picture shows."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyAbout" : {
+      "comment" : "Why a document matched a search with a picture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es geht um das, was dein Bild zeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It’s about what your picture shows."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyPictureOf" : {
+      "comment" : "Why a picture matched Find Similar on a document or page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Bild zeigt, worum es auf deiner Seite geht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This picture shows what your page is about."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhySaysPage" : {
+      "comment" : "Why a PDF page matched Find Similar on a document or page. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld sagt Ähnliches wie deine Seite."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld says something similar to your page."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhySays" : {
+      "comment" : "Why a document matched Find Similar on a document or page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier steht Ähnliches wie auf deiner Seite."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It says something similar to your page."
+          }
+        }
+      }
+    },
+    "lookoutPictureVeryClose" : {
+      "comment" : "Closeness meter in “Why it matched”, highest of three steps: the result is very close to what was searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sehr ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Very close"
+          }
+        }
+      }
+    },
+    "lookoutPictureClose" : {
+      "comment" : "Closeness meter in “Why it matched”, middle of three steps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "lookoutPictureSomewhat" : {
+      "comment" : "Closeness meter in “Why it matched”, lowest of three steps: the result is only somewhat like what was searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Somewhat alike"
+          }
+        }
+      }
+    },
+    "lookoutPictureClosenessLabel" : {
+      "comment" : "VoiceOver label of the closeness meter in “Why it matched”. The placeholder is “Very close”, “Close” or “Somewhat alike”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ähnlichkeit: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closeness: %@"
+          }
+        }
+      }
+    },
+    "lookoutPicturePromoTitle" : {
+      "comment" : "Title of the card shown after a picture was dropped while Lookout isn't set up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit einem Bild suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search with a picture"
+          }
+        }
+      }
+    },
+    "lookoutPicturePromoMessage" : {
+      "comment" : "Text of the card shown after a picture was dropped while Lookout isn't set up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richte Lookout ein, um ähnliche Bilder zu finden – und Dokumente zu dem, was es zeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up Lookout to find pictures that look like this one, and documents about what it shows."
+          }
+        }
+      }
+    },
+    "lookoutPictureDownloadMessage" : {
+      "comment" : "Text of the download card shown after a picture was dropped while Lookout's model downloads. “Pictures” is the name of the model part in onboarding.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Suche mit Bildern startet, sobald das Bildmodell geladen ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searching with pictures starts once the Pictures model finishes downloading."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedLowPowerMode" : {
+      "comment" : "Note above the results of a search with a picture while reading files waits because Low Power Mode is on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout pausiert im Stromsparmodus. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is paused for Low Power Mode. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedWarm" : {
+      "comment" : "Note above the results of a search with a picture while reading files waits because the Mac is running warm.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet, bis der Mac abgekühlt ist. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout waits until this Mac cools down. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedOnBattery" : {
+      "comment" : "Note above the results of a search with a picture while reading files waits because the Mac is on battery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet, solange der Mac im Akkubetrieb läuft. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout waits while this Mac is on battery. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedUser" : {
+      "comment" : "Note above the results of a search with a picture after the person paused reading files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast Lookout pausiert. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You paused Lookout. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
     "markupActionsAccessibility" : {
       "comment" : "VoiceOver label for the markup action bar.",
       "extractionState" : "manual",

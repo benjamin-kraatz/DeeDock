@@ -284,6 +284,8 @@ final class HubCoordinator {
     private func clearSearchText() {
         for tab in HubTab.allCases {
             let tabModel = model(for: tab)
+            // A token (Files' picture) is search text too: it goes with the words.
+            if tabModel.searchExtras?.searchToken != nil { tabModel.searchExtras?.clearSearchWithToken() }
             if !tabModel.query.isEmpty { tabModel.query = "" }
         }
     }
@@ -501,7 +503,8 @@ private struct HubCoordinatorView: View {
         HubRootView(state: hub.state,
                     query: Binding(get: { model.query }, set: { model.query = $0 }),
                     prompt: model.searchPrompt,
-                    actions: hub.headerActions) { tab in
+                    actions: hub.headerActions,
+                    extras: hub.lookoutSetup.isPresented ? nil : model.searchExtras) { tab in
             HubTabView(hub: hub, tab: tab)
         } overlay: {
             if hub.lookoutSetup.isPresented {

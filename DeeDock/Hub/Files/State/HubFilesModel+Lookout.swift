@@ -50,8 +50,10 @@ extension HubFilesModel {
     /// Whether search results show a Lookout section: always, except after Lookout was set up and turned off.
     var showsLookoutSection: Bool { lookoutStatus != .off }
 
-    /// Lookout's hits as listed: the strong ones, then the weaker ones while the fold is open.
+    /// Lookout's hits as listed: the strong ones, then the weaker ones while the fold is open. In a search with a
+    /// picture, the hits of both groups (`visiblePictureHits`).
     var visibleLookoutHits: [LookoutHit] {
+        if isPictureSearch { return visiblePictureHits }
         let results = lookoutResults
         return lookoutWeakExpanded ? results.all : results.strong
     }
@@ -64,8 +66,9 @@ extension HubFilesModel {
 
     /// Every selectable result in the order Up and Down walk them.
     var searchOrder: [HubFilesSearchResultID] {
-        HubFilesSearchOrder.flattened(names: searchResults.map(\.url), lookout: lookoutResults,
-                                      weakExpanded: lookoutWeakExpanded)
+        if isPictureSearch { return visiblePictureHits.map { .lookout($0.path) } }
+        return HubFilesSearchOrder.flattened(names: searchResults.map(\.url), lookout: lookoutResults,
+                                             weakExpanded: lookoutWeakExpanded)
     }
 
     /// Where a hit is, as its row and the preview show it: "Desktop › Holiday Sylt 2026", with the sidebar's
@@ -140,7 +143,9 @@ extension HubFilesModel {
     /// file opens in its app and an anchored Hub closes.
     func openLookoutResult(_ hit: LookoutHit) {
         let results = lookoutResults
-        if let index = results.strong.firstIndex(where: { $0.path == hit.path }) {
+        if isPictureSearch {
+            trackPictureResultOpened(hit)
+        } else if let index = results.strong.firstIndex(where: { $0.path == hit.path }) {
             Analytics.track(LookoutAnalytics.opened(hit, section: .strong, rank: index + 1, scope: analyticsSearchScope,
                                                     isLookup: results.isLookup))
         } else if let index = results.weak.firstIndex(where: { $0.path == hit.path }) {

@@ -12,6 +12,8 @@ struct LookoutResultRow: View {
     let hit: LookoutHit
     /// The query's content words, to highlight in an excerpt that carries no markers.
     let terms: [String]
+    /// The match chip's text in place of meaning/words: "Looks alike" or "Same subject" in a search with a picture.
+    var matchTitle: String?
 
     @State private var hovered = false
 
@@ -48,7 +50,7 @@ struct LookoutResultRow: View {
                     LookoutSnippetText(snippet: snippet)
                         .padding(.top, 4)
                 }
-                LookoutChips(kind: kind, match: hit.match)
+                LookoutChips(kind: kind, match: hit.match, matchTitle: matchTitle)
                     .padding(.top, 6)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -78,10 +80,14 @@ struct LookoutResultRow: View {
             if !isSelected { model.clickLookoutResult(hit) }
             model.toggleQuickLook()
         }
+        .accessibilityAction(named: Text(.lookoutSimilarButton)) {
+            if model.similarAvailability(for: item).isAvailable { model.findSimilar(item, segmentID: hit.segmentID) }
+        }
     }
 
     private func accessibilityValue(snippet: LookoutSnippet?) -> String {
-        [kind.title, hit.match.title, location, date, snippet?.text].compactMap { $0 }.joined(separator: ", ")
+        [kind.title, matchTitle ?? hit.match.title, location, date, snippet?.text].compactMap { $0 }
+            .joined(separator: ", ")
     }
 }
 

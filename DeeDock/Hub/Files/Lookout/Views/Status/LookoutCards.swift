@@ -3,15 +3,18 @@ import SwiftUI
 /// The card Lookout shows in place of results before it's set up (the mockup's `.promo`): the spyglass, "Search by
 /// what's inside", one line on what it finds, and "Set up Lookout".
 struct LookoutPromoCard: View {
+    /// "Search by what's inside", or "Search with a picture" after a picture was dropped.
+    var title: LocalizedStringResource = .lookoutPromoTitle
+    var message: LocalizedStringResource = .lookoutPromoMessage
     /// Runs "Set up Lookout" (phase 3 connects it to onboarding).
     let onSetUpLookout: () -> Void
 
     var body: some View {
         LookoutCard {
             VStack(alignment: .leading, spacing: 3) {
-                Text(.lookoutPromoTitle)
+                Text(title)
                     .font(.system(size: 13.5, weight: .semibold))
-                Text(.lookoutPromoMessage)
+                Text(message)
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .lineSpacing(2)
@@ -28,6 +31,8 @@ struct LookoutPromoCard: View {
 struct LookoutDownloadCard: View {
     /// 0…1, or nil when unknown (an indeterminate bar).
     let progress: Double?
+    /// What waits for the download: names work meanwhile, or searching with pictures starts after it.
+    var message: LocalizedStringResource = .lookoutDownloadMessage
 
     var body: some View {
         LookoutCard {
@@ -35,7 +40,7 @@ struct LookoutDownloadCard: View {
                 Text(title)
                     .font(.system(size: 13.5, weight: .semibold))
                     .monospacedDigit()
-                Text(.lookoutDownloadMessage)
+                Text(message)
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .lineSpacing(2)
@@ -157,6 +162,16 @@ private struct LookoutPrimaryButton: View {
         .background(.regularMaterial)
         .preferredColorScheme(.light)
         .environment(\.locale, Locale(identifier: "de"))
+}
+
+#Preview("Picture promo and download") {
+    VStack {
+        LookoutPromoCard(title: .lookoutPicturePromoTitle, message: .lookoutPicturePromoMessage) {}
+        LookoutDownloadCard(progress: 0.42, message: .lookoutPictureDownloadMessage)
+    }
+    .frame(width: 600)
+    .padding()
+    .background(.regularMaterial)
 }
 
 #Preview("Download") {

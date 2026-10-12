@@ -44,6 +44,16 @@ final class HubFilesModel: HubTabModel {
     var errorMessage: String?
     /// Search results scroll request after arrow keys.
     var searchScrollRequest: HubFilesSearchScrollRequest?
+    /// The picture the search field searches with, and the words from before it (`HubFilesModel+Pictures`).
+    var pictureSession = LookoutPictureSession()
+    /// Which groups' "Weaker matches" folds are open in a search with a picture. They close for every new picture.
+    var pictureWeakExpanded: Set<LookoutSimilarResults.GroupKind> = []
+    /// The search field's drop well while something is dragged over the Hub.
+    var pictureDropState: HubSearchDropState = .none
+    /// True while a drag the field takes is right over it.
+    var isPictureDropTargeted = false
+    /// Whether the index holds a vector for a file, by path, as Find Similar checks name results.
+    var similarIndexed: [String: Bool] = [:]
 
     // MARK: Services
 
@@ -72,6 +82,12 @@ final class HubFilesModel: HubTabModel {
     /// The `didUnmountNotification` observer, registered while the tab is visible.
     @ObservationIgnored private var unmountObserver: NSObjectProtocol?
     @ObservationIgnored var dropOperationCache: (key: String, operation: NSDragOperation)?
+    /// Whether a drag is over the Hub, for the drop well.
+    @ObservationIgnored let pictureDrag = HubFilesPictureDrag()
+    /// True while the model itself sets `query` for a picture, so the change isn't taken for typing.
+    @ObservationIgnored var settingQueryForPicture = false
+    /// The picture the picture search last started with, so a scope change or reappearing reuses its vector.
+    @ObservationIgnored var searchedPictureID: UUID?
 
     /// Values that replace live service state in previews.
     @ObservationIgnored var previewOverrides = HubFilesPreviewOverrides()
@@ -119,8 +135,8 @@ final class HubFilesModel: HubTabModel {
 
     var activePane: HubFilesPane { selectedTab.activePane }
 
-    /// True while a non-empty query shows search results instead of panes.
-    var isSearching: Bool { !trimmedQuery.isEmpty }
+    /// True while a non-empty query, or a picture to search with, shows search results instead of panes.
+    var isSearching: Bool { !trimmedQuery.isEmpty || pictureSession.isActive }
 
     var trimmedQuery: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
 
@@ -312,7 +328,17 @@ final class HubFilesModel: HubTabModel {
     // MARK: Search
 
     private func queryDidChange(from oldValue: String) {
-        let wasSearching = !oldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        // The model replacing the words for a picture runs `searchDidChange` itself.
+        guard !settingQueryForPicture else { return }
+        let hadPicture = pictureSession.isActive
+        // Typing replaces the picture with a new search by words.
+        if hadPicture, !query.isEmpty { endPictureSearch() }
+        searchDidChange(wasSearching: hadPicture || !oldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
+
+    /// The search changed (new words, a picture, or neither): switches between panes and results when that changed,
+    /// resets the selection and the folds, and searches again.
+    func searchDidChange(wasSearching: Bool) {
         if wasSearching != isSearching {
             cancelRenames()
             quickLook.close()
@@ -340,7 +366,14 @@ final class HubFilesModel: HubTabModel {
     /// Starts Spotlight's name search and Lookout's content search for the query, side by side: the names never wait
     /// for Lookout. Both stop while the tab is hidden; an empty query also clears Lookout's results.
     private func runSearch() {
-        guard previewOverrides.searchResults == nil else { return }
+        guard previewOverrides.searchResults == nil, previewOverrides.pictureResults == nil else { return }
+        if let picture = pictureSession.picture {
+            // A picture lists no names and runs no search by words.
+            search.stop()
+            lookout.search.search("", scope: resolvedSearchScope)
+            if isVisible { runPictureSearch(picture) }
+            return
+        }
         guard isVisible, isSearching else {
             search.stop()
             if isSearching { lookout.search.stop() } else { lookout.search.search("", scope: resolvedSearchScope) }
@@ -464,6 +497,10 @@ struct HubFilesPreviewOverrides {
     var lookoutStatus: LookoutStatus?
     var lookoutPhase: LookoutSearch.Phase?
     var lookoutResults: LookoutResultSet?
+    /// A search with a picture's phase, results and reading time.
+    var picturePhase: LookoutPictureSearch.Phase?
+    var pictureResults: LookoutSimilarResults?
+    var pictureReadSeconds: Double?
 }
 
 /// Scrolls the search results to a row after arrow keys.

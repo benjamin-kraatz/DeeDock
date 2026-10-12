@@ -304,6 +304,12 @@ final class LookoutEngine {
         try await LookoutDataRemoval.remove(in: paths)
     }
 
+    /// Which of `paths` the index holds a vector for, so Find Similar can reuse it.
+    func indexedPaths(_ paths: [String]) async -> Set<String> {
+        guard isRunning else { return [] }
+        return await reader.indexedPaths(paths)
+    }
+
     /// For each chosen folder, how many of its files are searchable by content, for Settings.
     func searchableFileCounts() async -> [String: Int] {
         await reader.searchableFileCounts(under: settings.folders)

@@ -16,9 +16,11 @@ import os
 /// `LookoutEngine` owns this and sets `isAvailable` and `filter` from the settings. Main actor.
 @MainActor @Observable
 final class LookoutPictureSearch {
-    enum Phase: Equatable, Sendable {
+    nonisolated enum Phase: Equatable, Sendable {
         /// No picture.
         case idle
+        /// Find Similar is reading a file's stored vector from the index (a moment; nothing is encoded).
+        case lookingUp
         /// The picture reader is loading in the query service (the first picture since it started).
         case waking
         /// The picture is being encoded.
@@ -92,7 +94,7 @@ final class LookoutPictureSearch {
         let cold: Bool
         if case .indexed = input {
             cold = false
-            phase = .reading
+            phase = .lookingUp
         } else {
             cold = isReaderCold
             phase = cold ? .waking : .reading
@@ -105,13 +107,17 @@ final class LookoutPictureSearch {
     }
 
     /// Searches the current picture again within a new scope, with the vector it already has.
-    func rescope(_ scope: HubFileSearch.Scope) {
-        guard let current, isAvailable else { return }
+    ///
+    /// - Returns: False when there's no vector yet (the picture was still being read): search again instead.
+    @discardableResult
+    func rescope(_ scope: HubFileSearch.Scope) -> Bool {
+        guard let current, isAvailable else { return false }
         cancelRunning()
         let token = generation
         let request = LookoutSimilarRequest(vector: current.vector, queryIsPicture: current.isPicture,
                                             excluding: current.excluding, scope: scope.lookoutFolder, filter: filter)
         pending = Task { [weak self] in await self?.finish(request, token: token) }
+        return true
     }
 
     /// Ends the search: cancels its work and forgets its vector and results.
@@ -144,7 +150,7 @@ final class LookoutPictureSearch {
     private func run(_ input: LookoutPictureInput, source: AnalyticsLookoutImageSource, folder: String?,
                      token: UUID) async {
         let excluding = Set([input.excludedPath].compactMap { $0 })
-        var toRead: LookoutPictureInput? = input
+        var toRead = input
         if case .indexed(let path, let segmentID, let fallback) = input {
             if let stored = await reader.similarSource(path: path, segmentID: segmentID) {
                 guard isCurrent(token) else { return }
@@ -156,8 +162,8 @@ final class LookoutPictureSearch {
             }
             guard isCurrent(token) else { return }
             // Not in the index (or not read yet): a picture is read like a dropped one; anything else can't be.
-            toRead = fallback.map(LookoutPictureInput.file)
-            guard toRead != nil else { return fail(token) }
+            guard let fallback else { return fail(token) }
+            toRead = .file(fallback)
             let cold = isReaderCold
             phase = cold ? .waking : .reading
             Analytics.track(LookoutAnalytics.imageSearch(source: source, cold: cold))
@@ -166,7 +172,8 @@ final class LookoutPictureSearch {
         let encoder = encoder
         do {
             // Read the picture while the reader wakes; both take a fraction of a second.
-            async let picture = Self.read(toRead!)
+            let reading = toRead
+            async let picture = Self.read(reading)
             if !encoder.isPictureReaderWarm {
                 try await encoder.warmUpPictureReader()
                 guard isCurrent(token) else { return }

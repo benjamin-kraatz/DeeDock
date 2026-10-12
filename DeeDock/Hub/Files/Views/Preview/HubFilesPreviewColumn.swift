@@ -4,7 +4,7 @@ import SwiftUI
 ///
 /// One item: a Quick Look preview in a rounded well, its details, and Open, Quick Look, and
 /// Reveal in Finder. Several: a fanned stack with the count and total size. None: the folder.
-/// A Lookout hit also gets "Why it matched" under its details.
+/// A Lookout hit also gets "Why it matched" under its details, and a search result Find Similar above the actions.
 struct HubFilesPreviewColumn: View {
     let model: HubFilesModel
 
@@ -14,6 +14,9 @@ struct HubFilesPreviewColumn: View {
 
     var body: some View {
         let selection = selection
+        // A search with a picture keeps the preview shorter, so the comparison and Find Similar fit (the mockup's
+        // `.pv.im`).
+        let compact = model.isPictureSearch
         VStack(alignment: .leading, spacing: 10) {
             Text(.hubFilesPreviewTitle)
                 .font(.system(size: 12.5, weight: .semibold))
@@ -21,7 +24,7 @@ struct HubFilesPreviewColumn: View {
                 .accessibilityAddTraits(.isHeader)
             well(selection)
                 .frame(maxWidth: .infinity)
-                .frame(height: HubFilesMetrics.previewWellHeight)
+                .frame(height: compact ? HubFilesMetrics.compactPreviewWellHeight : HubFilesMetrics.previewWellHeight)
                 .background(HubFilesTheme(scheme).well, in: .rect(cornerRadius: 14))
                 .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(HubFilesTheme(scheme).line, lineWidth: 0.5) }
                 .overlay(alignment: .bottomTrailing) {
@@ -37,8 +40,20 @@ struct HubFilesPreviewColumn: View {
                 .transition(.opacity.combined(with: .scale(scale: 0.97)))
             HubFilesPreviewDetails(model: model, selection: selection)
             if let hit = model.selectedLookoutHit {
-                LookoutWhyCard(why: LookoutWhy(hit: hit, isLookup: model.lookoutResults.isLookup))
-                    .transition(.opacity)
+                if model.isPictureSearch {
+                    if !hit.isFolder {
+                        let queryIsPicture = model.pictureResults.queryIsPicture
+                        LookoutPictureWhyCard(why: LookoutPictureWhy(hit: hit, queryIsPicture: queryIsPicture),
+                                              picture: model.pictureQuery, queryIsPicture: queryIsPicture, hit: hit)
+                            .transition(.opacity)
+                    }
+                } else {
+                    LookoutWhyCard(why: LookoutWhy(hit: hit, isLookup: model.lookoutResults.isLookup))
+                        .transition(.opacity)
+                }
+            }
+            if let item = selection.first, selection.count == 1, model.isSearching {
+                HubFilesFindSimilar(model: model, item: item)
             }
             if selection.count == 1 {
                 HubFilesPreviewActions(model: model)
@@ -68,6 +83,27 @@ struct HubFilesPreviewColumn: View {
         } else if let folder = model.isSearching ? nil : model.activePane.folderURL {
             HubFilesFolderIcon(url: folder, size: 128)
         }
+    }
+}
+
+/// Find Similar for the one selected search result: shown when Lookout can search with it, disabled for a kind of
+/// file it doesn't read, and absent for folders. A name result outside the index is checked once, off the main
+/// actor, so a document Lookout hasn't read loses the button.
+private struct HubFilesFindSimilar: View {
+    let model: HubFilesModel
+    let item: HubFileItem
+
+    var body: some View {
+        let availability = model.similarAvailability(for: item)
+        Group {
+            if availability != .hidden {
+                LookoutFindSimilarButton(isAvailable: availability.isAvailable) {
+                    model.findSimilarForSelection()
+                }
+                .transition(.opacity)
+            }
+        }
+        .task(id: item.url) { await model.checkSimilarIndexed(item) }
     }
 }
 
