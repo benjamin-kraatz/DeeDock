@@ -69,6 +69,17 @@ import Testing
         }
     }
 
+    @Test func aDocumentTheIndexDidNotHoldIsAskedAboutAgainOnTheNextDrag() {
+        let model = model()
+        model.similarIndexed[pdf.url.path] = false
+        model.similarIndexed[photo.url.path] = true
+        model.forgetUnreadAnswer(for: pdf.url)
+        model.forgetUnreadAnswer(for: photo.url)
+        model.forgetUnreadAnswer(for: nil)
+        #expect(model.similarIndexed[pdf.url.path] == nil)      // asked again
+        #expect(model.similarIndexed[photo.url.path] == true)   // still known
+    }
+
     @Test func findSimilarOnAFileFromOutsideTheTabSearchesWithIt() async {
         let model = model()
         let url = photo.url

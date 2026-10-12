@@ -334,7 +334,9 @@ extension HubFilesModel: HubSearchExtras {
         guard isVisible, lookoutStatus != .off else { return }
         if inside {
             guard pictureDrag.enter(key) else { return }
-            showDropWell(for: pictureDrag.classify(NSPasteboard(name: .drag)) { classifyDrag($0) })
+            let pasteboard = NSPasteboard(name: .drag)
+            forgetUnreadAnswer(for: Self.draggedFiles(on: pasteboard).first)
+            showDropWell(for: pictureDrag.classify(pasteboard) { classifyDrag($0) })
         } else {
             pictureDrag.exit(key) { [weak self] in self?.closeDropWell() }
         }
@@ -361,9 +363,16 @@ extension HubFilesModel: HubSearchExtras {
         }
     }
 
+    /// A new drag over the Hub asks the index again about a document it didn't hold last time: the backfill may have
+    /// read it since. A file the index holds stays known for the session.
+    func forgetUnreadAnswer(for url: URL?) {
+        guard let path = url?.path, similarIndexed[path] == false else { return }
+        similarIndexed[path] = nil
+    }
+
     /// A dragged document whose place in the index isn't known yet: asks the index (one query, a few milliseconds)
     /// and classifies the drag again with the answer, while it's still the same drag over the Hub. The answer is
-    /// kept, so moving off and on again doesn't ask twice. The lookup is `dragLookup`, cancelled when the well closes.
+    /// kept for that drag; one the index didn't hold is asked again on the next (`forgetUnreadAnswer`). The lookup is `dragLookup`, cancelled when the well closes.
     private func lookUpDraggedDocument() {
         let pasteboard = NSPasteboard(name: .drag)
         guard canSearchPictures, let url = Self.draggedFiles(on: pasteboard).first, similarIndexed[url.path] == nil,
