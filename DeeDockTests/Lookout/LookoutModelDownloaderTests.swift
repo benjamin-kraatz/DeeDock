@@ -156,6 +156,36 @@ struct LookoutModelDownloaderTests {
         downloader.start()
         #expect(downloader.phase == .idle && !downloader.isDownloading)
     }
+
+    // MARK: Installing
+
+    @Test("A cancelled install stops hashing between pieces and keeps the partial file; a verified one moves")
+    func cancelledInstallKeepsThePartialFile() async throws {
+        let contents = Data(repeating: 0x5A, count: (8 << 20) * 2 + 100)   // three 8 MB pieces
+        let file = fakeFile(contents)
+        let partial = partial(file)
+        try FileManager.default.createDirectory(at: partial.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try contents.write(to: partial)
+        var checks = 0
+        #expect(throws: CancellationError.self) {
+            try LookoutModelInstaller.installNow(file, from: partial, into: paths.models) {
+                checks += 1
+                if checks == 2 { throw CancellationError() }   // before the second piece
+            }
+        }
+        #expect(checks == 2)
+        #expect(FileManager.default.fileExists(atPath: partial.path))           // kept for the next run
+        #expect(!FileManager.default.fileExists(atPath: installed(file).path))
+        // A caller cancelled before it starts hashes nothing.
+        let task = Task { try await LookoutModelInstaller.install(file, from: partial, into: paths.models) }
+        task.cancel()
+        await #expect(throws: CancellationError.self) { try await task.value }
+        #expect(FileManager.default.fileExists(atPath: partial.path))
+        // Run through, off the cooperative pool: verified and moved into place.
+        try await LookoutModelInstaller.install(file, from: partial, into: paths.models)
+        #expect(try Data(contentsOf: installed(file)) == contents)
+        #expect(!FileManager.default.fileExists(atPath: partial.path))
+    }
 }
 
 /// A fake Hugging Face for `LookoutModelDownloaderTests`: serves registered bodies by file name, honoring `Range`

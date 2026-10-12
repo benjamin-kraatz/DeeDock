@@ -48,11 +48,14 @@ nonisolated enum ModelFiles {
     /// The SHA-256 of a file as lowercase hex, read in 8 MB pieces (a 555 MB file takes about half a second).
     ///
     /// - Throws: The file can't be opened or read.
-    static func sha256(of url: URL) throws -> String {
+    ///
+    /// - Parameter checkCancellation: Asked before each 8 MB piece; what it throws stops the hashing.
+    static func sha256(of url: URL, checkCancellation: () throws -> Void = {}) throws -> String {
         let handle = try FileHandle(forReadingFrom: url)
         defer { try? handle.close() }
         var hasher = SHA256()
         while true {
+            try checkCancellation()
             let done = try autoreleasepool { () -> Bool in
                 guard let data = try handle.read(upToCount: 8 << 20), !data.isEmpty else { return true }
                 hasher.update(data: data)

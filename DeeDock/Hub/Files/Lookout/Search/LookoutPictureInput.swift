@@ -27,9 +27,8 @@ nonisolated enum LookoutPictureInput: Sendable, Equatable {
 /// written anywhere: the bytes are read once and dropped when the search has its vector.
 ///
 /// The read (blocking `pread`s of up to 512 MB) and the decode and resize (CPU-bound: about 0.15 s in Release, nearly
-/// a second in Debug) run on `queue`, a dispatch queue of their own, never on Swift's cooperative thread pool. That
-/// pool has one thread per core; work that blocks one starves every task and actor waiting for a thread, which is
-/// how parallel tests on a few cores timed out, and how a slow volume would stall the app's other async work.
+/// a second in Debug) run on `queue`, a dispatch queue of their own, never on Swift's cooperative thread pool
+/// (`LookoutBlockingWork`).
 nonisolated enum LookoutPictureReading {
     /// The largest picture file read: the indexer's limit (`QueuedFileGate.maxReadBytes`).
     static let maxBytes = 512 << 20
@@ -42,7 +41,7 @@ nonisolated enum LookoutPictureReading {
     ///
     /// - Throws: `QueryPicture.Failure`, the read's error, or `CancellationError`.
     static func picture(at url: URL) async throws -> QueryPicture {
-        try await onQueue { cancellation in
+        try await LookoutBlockingWork.run(on: queue) { cancellation in
             let data = try bytes(at: url, checkCancellation: cancellation.check)
             try cancellation.check()
             let source = try source(data, typeHint: UTType(filenameExtension: url.pathExtension))
@@ -54,36 +53,6 @@ nonisolated enum LookoutPictureReading {
     /// the next one, at user-initiated QoS, as a search the person is waiting for.
     private static let queue = DispatchQueue(label: "Lookout.PictureReading", qos: .userInitiated,
                                              attributes: .concurrent)
-
-    /// Cancellation for work on `queue`, where `Task.checkCancellation` can't see the caller's task: the caller's
-    /// cancellation handler sets it, and the work checks it between steps.
-    final class Cancellation: @unchecked Sendable {
-        private let lock = NSLock()
-        private var cancelled = false   // guarded by `lock`
-
-        func cancel() { lock.withLock { cancelled = true } }
-
-        /// - Throws: `CancellationError` once `cancel()` was called.
-        func check() throws {
-            if lock.withLock({ cancelled }) { throw CancellationError() }
-        }
-    }
-
-    /// Runs `work` on `queue` and hands back its result. Cancelling the calling task cancels `work` through the
-    /// `Cancellation` it's given; a caller that's cancelled already starts nothing.
-    private static func onQueue<T: Sendable>(_ work: @escaping @Sendable (Cancellation) throws -> T) async throws -> T {
-        try Task.checkCancellation()
-        let cancellation = Cancellation()
-        return try await withTaskCancellationHandler {
-            try await withCheckedThrowingContinuation { continuation in
-                queue.async {
-                    continuation.resume(with: Result { try cancellation.check(); return try work(cancellation) })
-                }
-            }
-        } onCancel: {
-            cancellation.cancel()
-        }
-    }
 
     /// The bytes of the file at `url`, read from one descriptor: it's opened once, `fstat` on that descriptor must
     /// say it's a regular file within `maxBytes`, and the read takes at most that size from the same descriptor in
@@ -111,7 +80,7 @@ nonisolated enum LookoutPictureReading {
     ///
     /// - Throws: `QueryPicture.Failure`, or `CancellationError`.
     static func picture(from data: Data) async throws -> QueryPicture {
-        try await onQueue { _ in
+        try await LookoutBlockingWork.run(on: queue) { _ in
             try QueryPicture.make(from: source(data, typeHint: nil), screenshot: true)
         }
     }
