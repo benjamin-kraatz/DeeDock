@@ -52,7 +52,8 @@ import Testing
         // Hidden until Lookout can search, as in search results.
         #expect(self.model(status: .notSetUp).similarAvailability(for: photo) == .hidden)
         #expect(self.model(status: .waitingForModel).similarAvailability(for: photo) == .hidden)
-        #expect(self.model(status: .paused(.lowPowerMode)).similarAvailability(for: photo) == .available(isPicture: true))
+        #expect(self.model(status: .paused(.lowPowerMode)).similarAvailability(for: photo)
+            == .available(isPicture: true))
     }
 
     @Test func findSimilarOnAFileFromOutsideTheTabSearchesWithIt() async {

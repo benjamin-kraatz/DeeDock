@@ -111,8 +111,8 @@ struct LookoutDocumentTypesTests {
         try folder.write("outside/Other.rtfd/TXT.rtf", Data("hunter2".utf8))
         let package = folder.url.appendingPathComponent("root/Letter.rtfd")
         try FileManager.default.removeItem(at: package)
-        try FileManager.default.createSymbolicLink(at: package,
-                                                   withDestinationURL: folder.url.appendingPathComponent("outside/Other.rtfd"))
+        let other = folder.url.appendingPathComponent("outside/Other.rtfd")
+        try FileManager.default.createSymbolicLink(at: package, withDestinationURL: other)
         guard case .refused(let linkedState, _) = gate.open(file) else {
             Issue.record("read through a linked package")
             return
@@ -166,8 +166,8 @@ struct LookoutDocumentTypesTests {
     }
 
     @Test func aWebArchiveIsReadThroughItsMainResource() throws {
-        let page = Data("<html><head><title>x</title></head><body><p>Caf&eacute; <b>Sylt</b></p><script>x()</script></body></html>"
-            .utf8)
+        let page = Data(("<html><head><title>x</title></head><body><p>Caf&eacute; <b>Sylt</b></p>"
+            + "<script>x()</script></body></html>").utf8)
         let archive: [String: Any] = ["WebMainResource": ["WebResourceData": page, "WebResourceMIMEType": "text/html",
                                                           "WebResourceTextEncodingName": "UTF-8",
                                                           "WebResourceURL": "https://example.com/"],

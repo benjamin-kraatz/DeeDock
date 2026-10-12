@@ -101,7 +101,8 @@ nonisolated enum DocumentText {
     private static func decode(_ data: Data, charset: String) -> String? {
         let encoding = CFStringConvertIANACharSetNameToEncoding(charset as CFString)
         guard encoding != kCFStringEncodingInvalidId else { return nil }
-        return String(data: data, encoding: String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(encoding)))
+        let converted = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(encoding))
+        return String(data: data, encoding: converted)
     }
 
     // MARK: Subtitles
