@@ -237,13 +237,18 @@ nonisolated struct QueuedFileGate: Sendable {
     /// fails on it or reads it; one that grew yields its first `size` bytes. Handing PDFKit or ImageIO a URL, even
     /// `/dev/fd/<n>`, wouldn't avoid this, as they may map a file they open themselves.
     ///
-    /// - Throws: `ReadFailure` when a read fails.
-    static func contents(of descriptor: Int32, size: Int) throws -> Data {
+    /// - Parameter checkCancellation: Asked before the buffer is allocated and before each piece; what it throws
+    ///   stops the read. The app's picture reading passes `Task.checkCancellation`.
+    /// - Throws: `ReadFailure` when a read fails, or what `checkCancellation` throws.
+    static func contents(of descriptor: Int32, size: Int,
+                         checkCancellation: () throws -> Void = {}) throws -> Data {
         guard size > 0 else { return Data() }
+        try checkCancellation()
         var data = Data(count: size)
         var total = 0
         try data.withUnsafeMutableBytes { buffer in
             while total < size {
+                try checkCancellation()
                 let read = pread(descriptor, buffer.baseAddress! + total, min(size - total, 8 << 20), off_t(total))
                 if read < 0, errno == EINTR { continue }
                 guard read >= 0 else { throw ReadFailure(errorText(errno)) }

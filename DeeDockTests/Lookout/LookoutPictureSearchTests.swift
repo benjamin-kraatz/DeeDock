@@ -270,4 +270,32 @@ import Testing
         search.search(.file(file), source: .drop, scope: .thisMac)
         #expect(events.count == 3)
     }
+
+    @Test func aCancelledCallerReadsAndDecodesNothing() async throws {
+        let file = try LookoutTestPictures.file(named: "IMG_1.png", in: folder)
+        let task = Task { try await LookoutPictureReading.picture(at: file) }
+        task.cancel()                                     // before it ran
+        await #expect(throws: CancellationError.self) { try await task.value }
+        let pasted = Task { try await LookoutPictureReading.picture(from: LookoutTestPictures.png()) }
+        pasted.cancel()
+        await #expect(throws: CancellationError.self) { try await pasted.value }
+    }
+
+    @Test func aReadStopsBetweenPiecesWhenItIsCancelled() throws {
+        let file = try folder.write("big.png", Data())
+        let handle = try FileHandle(forWritingTo: file)
+        try handle.truncate(atOffset: 20 << 20)           // sparse, three 8 MB pieces
+        try handle.close()
+        var checks = 0
+        #expect(throws: CancellationError.self) {
+            _ = try LookoutPictureReading.bytes(at: file) {
+                checks += 1
+                if checks == 3 { throw CancellationError() }   // before the second piece
+            }
+        }
+        #expect(checks == 3)
+        var all = 0
+        #expect(try LookoutPictureReading.bytes(at: file) { all += 1 }.count == 20 << 20)
+        #expect(all == 4)                                 // before allocating, and before each of three pieces
+    }
 }
