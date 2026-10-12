@@ -62,13 +62,14 @@ nonisolated enum LookoutProgressFormatting {
         return localized(.lookoutProgressTimeLeft(text), locale)
     }
 
-    /// "finished at 10:41" today, "finished yesterday at 10:41", else "finished Oct 3, 10:41".
+    /// "finished at 10:41" today, "finished yesterday at 10:41", else "finished Oct 3, 10:41". Days and times are
+    /// the calendar's, in its time zone: "today" and "10:41" always agree, whatever zone the process runs in.
     static func finished(_ date: Date, now: Date = .now, calendar: Calendar = .current,
                          locale: Locale = .current) -> String {
         var calendar = calendar
         calendar.locale = locale
         let time = date.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale,
-                                                   calendar: calendar))
+                                                   calendar: calendar, timeZone: calendar.timeZone))
         if calendar.isDate(date, inSameDayAs: now) {
             return localized(.lookoutProgressFinishedToday(time), locale)
         }
@@ -77,7 +78,7 @@ nonisolated enum LookoutProgressFormatting {
             return localized(.lookoutProgressFinishedYesterday(time), locale)
         }
         let day = date.formatted(Date.FormatStyle(date: .abbreviated, time: .shortened, locale: locale,
-                                                  calendar: calendar))
+                                                  calendar: calendar, timeZone: calendar.timeZone))
         return localized(.lookoutProgressFinishedOn(day), locale)
     }
 

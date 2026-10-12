@@ -82,6 +82,10 @@ struct LookoutProgressFormattingTests {
         #expect(plain(F.finished(earlier, now: now, calendar: calendar, locale: english))
                 == "finished Oct 3, 2026 at 10:41 AM")
         #expect(F.finished(today, now: now, calendar: calendar, locale: german) == "fertig um 10:41")
+        // The calendar's zone, not the process's: the same moment in Tokyo is 17:41, still today there.
+        var tokyo = calendar
+        tokyo.timeZone = try #require(TimeZone(identifier: "Asia/Tokyo"))
+        #expect(F.finished(today, now: now, calendar: tokyo, locale: german) == "fertig um 17:41")
     }
 
     // MARK: Copy
