@@ -22920,6 +22920,24 @@
         }
       }
     },
+    "lookoutPreviewPage" : {
+      "comment" : "Badge in the corner of the Files preview for a Lookout result on a PDF page: which page the match is on. %lld is the page number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld"
+          }
+        }
+      }
+    },
     "lookoutPrivacyNote" : {
       "comment" : "How Lookout handles data, beside a lock in onboarding's first step and in Lookout's settings. Neutral and transparent, not a warning. Hugging Face is the site the model comes from; DOKK is the app's name.",
       "extractionState" : "manual",

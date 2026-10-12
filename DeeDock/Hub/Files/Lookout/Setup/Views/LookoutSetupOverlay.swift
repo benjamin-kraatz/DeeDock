@@ -79,14 +79,18 @@ struct LookoutSetupSheet: View {
     }
 }
 
-/// A frosted card over the Hub's glass (the mockup's `--sheet`), opaque under Reduce Transparency.
+/// A frosted card over the Hub's glass (the mockup's `--sheet`), or its opaque color under Reduce Transparency (the
+/// mockup's `.rt` sheet: `#25262e` dark, `#f7f7fa` light).
 private struct LookoutSetupSheetBackground: View {
     let shape: RoundedRectangle
     let opaque: Bool
 
+    @Environment(\.colorScheme) private var scheme
+
     var body: some View {
         if opaque {
-            shape.fill(Color(nsColor: .windowBackgroundColor))
+            shape.fill(scheme == .dark ? Color(red: 37 / 255, green: 38 / 255, blue: 46 / 255)
+                : Color(red: 247 / 255, green: 247 / 255, blue: 250 / 255))
         } else {
             shape.fill(.regularMaterial)
         }

@@ -24,6 +24,14 @@ struct HubFilesPreviewColumn: View {
                 .frame(height: HubFilesMetrics.previewWellHeight)
                 .background(HubFilesTheme(scheme).well, in: .rect(cornerRadius: 14))
                 .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(HubFilesTheme(scheme).line, lineWidth: 0.5) }
+                .overlay(alignment: .bottomTrailing) {
+                    // A Lookout hit on a PDF page says which page, as the mockup's page preview does.
+                    if let hit = model.selectedLookoutHit, case .pdf(let page?) = LookoutHitKind(hit) {
+                        LookoutPageBadge(page: page)
+                            .padding(10)
+                            .transition(.opacity)
+                    }
+                }
                 .clipShape(.rect(cornerRadius: 14))
                 .id(selection.map(\.url))
                 .transition(.opacity.combined(with: .scale(scale: 0.97)))

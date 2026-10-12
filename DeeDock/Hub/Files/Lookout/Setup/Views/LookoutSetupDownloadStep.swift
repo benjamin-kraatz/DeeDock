@@ -127,7 +127,8 @@ private struct LookoutSetupDownloadFailure: View {
     }
 }
 
-/// "Read files on battery too", the switch before its label as in the mockup (`.tog`).
+/// "Read files on battery too", the switch before its label as in the mockup (`.tog`). The small switch is the
+/// mockup's 32 × 19 and the size Lookout's Settings section uses.
 private struct LookoutSetupBatteryToggle: View {
     let isOn: Bool
     let set: (Bool) -> Void
@@ -136,6 +137,7 @@ private struct LookoutSetupBatteryToggle: View {
         HStack(spacing: 10) {
             Toggle(isOn: Binding(get: { isOn }, set: set)) { Text(.lookoutBatteryTitle) }
                 .toggleStyle(.switch)
+                .controlSize(.small)
                 .labelsHidden()
                 .tint(LookoutTheme.ready)
             VStack(alignment: .leading, spacing: 2) {
