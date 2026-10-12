@@ -100,7 +100,7 @@ import Testing
     }
 
     @Test func eachStatusHasItsPhase() {
-        func phase(_ status: LookoutStatus, _ index: LookoutIndexStatus?) -> LookoutProgress.Phase? {
+        func phase(_ status: LookoutStatus, _ index: LookoutIndexStatus?) -> LookoutProgressDisplay.Phase? {
             var tracker = LookoutProgressTracker()
             return tracker.progress(status: status, index: index, now: start)?.phase
         }
@@ -113,11 +113,14 @@ import Testing
         #expect(phase(.ready, index(.idle, done: 9, missing: ["/Volumes/Photos/2024"]))
             == .waitingForDrive(name: "Photos"))
         #expect(phase(.ready, index(.idle, missing: ["/Users/tester/Scans"])) == .waitingForDrive(name: "Scans"))
-        #expect(phase(.paused(.lowPowerMode), index(.idle, pending: 3)) == .paused(.lowPowerMode))
-        #expect(phase(.paused(.user), index(.paused, pending: 3)) == .paused(.user))
-        #expect(phase(.waitingForModel, index(.waitingForModel, pending: 3)) == .waitingForModel)
+        #expect(phase(.paused(.lowPowerMode), index(.idle, pending: 3)) == .paused(reason: .lowPowerMode))
+        #expect(phase(.paused(.warm), index(.idle, pending: 3)) == .paused(reason: .thermal))
+        #expect(phase(.paused(.onBattery), index(.idle, pending: 3)) == .paused(reason: .onBattery))
+        #expect(phase(.paused(.user), index(.paused, pending: 3)) == .paused(reason: .userPaused))
+        // Settings has no card while the model downloads: the Files tab's card and chip show the download.
+        #expect(phase(.waitingForModel, index(.waitingForModel, pending: 3)) == nil)
         let failure = LookoutFailure(kind: .service)
-        #expect(phase(.failed(failure), nil) == .failed(failure))
+        #expect(phase(.failed(failure), nil) == .failed(message: failure.message))
     }
 
     @Test func theFirstWalksTotalGrowsUntilItIsCounted() throws {
@@ -182,7 +185,7 @@ import Testing
     @Test func theTimeLeftComesWithAPaceGoesWhilePausedAndComesBack() throws {
         var tracker = LookoutProgressTracker()
         let reading = LookoutStatus.indexing(remaining: nil, progress: nil)
-        var progress: LookoutProgress?
+        var progress: LookoutProgressDisplay?
         // Two files a second for 20 s.
         for second in 0...20 {
             progress = tracker.progress(status: reading, index: index(.indexing, pending: 1_000 - 2 * second,
@@ -207,7 +210,7 @@ import Testing
     @Test func finishingLongFilesEstimatesByPagesNotFiles() throws {
         var tracker = LookoutProgressTracker()
         let reading = LookoutStatus.indexing(remaining: 2, progress: nil)
-        var progress: LookoutProgress?
+        var progress: LookoutProgressDisplay?
         for second in 0...20 {
             var status = index(.finishingLongFiles, done: 98, partial: 2, unfinished: 2)
             (status.done, status.total) = (10 * second, 600)
@@ -227,7 +230,9 @@ import Testing
         let progressProgress = tracker.progress(status: .ready, index: status, now: start)
         let progress = try #require(progressProgress)
         #expect(progress.skipped == 3 && progress.failed == 1)
-        #expect(progress.problems == [.init(reason: .noText, count: 3), .init(reason: .unreadable, count: 1)])
+        // In the app's language, most first; a reason the app doesn't know is left out.
+        #expect(progress.problems == [.init(reason: String(localized: .lookoutProblemNoText), count: 3),
+                                      .init(reason: String(localized: .lookoutProblemUnreadable), count: 1)])
     }
 
     // MARK: Problems in the index
@@ -285,13 +290,13 @@ import Testing
     }
 
     @Test func everyPreviewSampleIsConsistent() {
-        for (name, sample) in LookoutProgressPreviewData.all {
+        for (name, sample) in LookoutProgressDisplay.Sample.all() {
             if let total = sample.total, sample.totalIsFinal { #expect(sample.done <= total, "\(name)") }
             if let remaining = sample.remaining, let total = sample.total, sample.totalIsFinal {
                 #expect(sample.done + remaining == total, "\(name)")
             }
             #expect(sample.problems.map(\.count).reduce(0, +) == sample.skipped + sample.failed, "\(name)")
         }
-        #expect(LookoutProgressPreviewData.all.count == 8)
+        #expect(LookoutProgressDisplay.Sample.all().count == 9)
     }
 }

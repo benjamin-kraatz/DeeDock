@@ -1,14 +1,21 @@
 import Foundation
 
-/// Turns the engine's status and the index service's into `LookoutProgress`, remembering what a single status can't
-/// say: where the current pass started and how fast it goes. `LookoutEngine` feeds it every status, also the ones it
-/// doesn't publish, so the pace sees every step. Pure, so phases, passes and estimates are testable without the
-/// service.
+/// Turns the engine's status and the index service's into `LookoutProgressDisplay`, remembering what a single status
+/// can't say: where the current pass started and how fast it goes. `LookoutEngine` feeds it every status, also the
+/// ones it doesn't publish, so the pace sees every step. Pure, so phases, passes and estimates are testable without
+/// the service.
 ///
 /// The pass: it starts when files wait while none did, with what the index had settled then as its start, so it
 /// counts only its own files. An index that has never been up to date (`LookoutIndexStatus.upToDateAt` is nil) is
 /// still in its first pass, which counts from the start, also when DOKK relaunched partway. The pass ends when
 /// Lookout is up to date (or waits only for a drive), which also resets the pace.
+///
+/// What the fields mean for each phase:
+/// - Counting: `total` is how many files the walk has found so far (`LookoutIndexStatus.discovered`), else what
+///   the index already knows; it isn't final. `remaining` is nil during the first walk.
+/// - Reading, paused, failed: `done` and `total` are the pass's, and `total` is final.
+/// - Up to date, and waiting for a drive: `done` and `total` are every file the index knows in the folders that are
+///   there. Waiting for a drive, `remaining` is nil: how many files the missing drive holds isn't counted.
 nonisolated struct LookoutProgressTracker: Equatable, Sendable {
     /// Files settled when the pass started; nil between passes.
     private var passStart: Int?
@@ -19,16 +26,21 @@ nonisolated struct LookoutProgressTracker: Equatable, Sendable {
 
     init() {}
 
-    /// The progress for the engine's `status` and the service's latest `index` status at `now`, or nil while Lookout
-    /// isn't set up or is off.
+    /// The progress for the engine's `status` and the service's latest `index` status at `now`.
     ///
     /// - Parameters:
     ///   - status: The engine's status (`LookoutStatus.map`), which already says why reading waits or failed.
     ///   - index: The index service's latest status; nil before the first one arrives.
-    mutating func progress(status: LookoutStatus, index: LookoutIndexStatus?, now: Date) -> LookoutProgress? {
+    /// - Returns: Nil while Lookout isn't set up or is off, and while it waits for the model: Settings' progress card
+    ///   has nothing to track then, and the download shows in the Files tab's card and chip instead.
+    mutating func progress(status: LookoutStatus, index: LookoutIndexStatus?, now: Date) -> LookoutProgressDisplay? {
         switch status {
         case .notSetUp, .off:
             self = LookoutProgressTracker()
+            return nil
+        case .waitingForModel:
+            files.pause()
+            steps.pause()
             return nil
         default:
             break
@@ -49,7 +61,7 @@ nonisolated struct LookoutProgressTracker: Equatable, Sendable {
         if let start = passStart, settled < start { passStart = settled }
 
         // The pace: only reading counts.
-        if case .reading = phase, let index {
+        if phase == .reading, let index {
             if index.activity == .finishingLongFiles {
                 files.pause()
                 steps.record(index.done, at: now)
@@ -65,25 +77,23 @@ nonisolated struct LookoutProgressTracker: Equatable, Sendable {
             steps.pause()
         }
 
+        let passDone = passStart.map { settled - $0 } ?? 0
         let done: Int, total: Int?, totalIsFinal: Bool, remaining: Int?
         switch phase {
-        case .upToDate, .waitingForDrive:
+        case .upToDate:
             (done, total, totalIsFinal, remaining) = (counts.files, counts.files, true, 0)
-        case .counting where counts.files == 0:
-            // The first walk: everything it finds will be read.
-            (done, total, totalIsFinal, remaining) = (0, index?.discovered, false, nil)
+        case .waitingForDrive:
+            (done, total, totalIsFinal, remaining) = (counts.files, counts.files, true, nil)
         case .counting:
-            let passDone = passStart.map { settled - $0 } ?? 0
-            (done, total, totalIsFinal, remaining) = (passDone, passStart == nil ? nil : passDone + waiting, false,
-                                                      waiting)
-        default:
-            let passDone = passStart.map { settled - $0 } ?? 0
+            let found = index?.discovered ?? (counts.files > 0 ? counts.files : nil)
+            (done, total, totalIsFinal, remaining) = (passDone, found, false, counts.files > 0 ? waiting : nil)
+        case .reading, .paused, .failed:
             (done, total, totalIsFinal, remaining) = (passDone, passDone + waiting, true, waiting)
         }
 
         var filesPerSecond: Double?
         var estimate: TimeInterval?
-        if case .reading = phase, let index {
+        if phase == .reading, let index {
             if index.activity == .finishingLongFiles {
                 estimate = steps.timeRemaining(for: max(index.total - index.done, 0))
             } else {
@@ -93,28 +103,28 @@ nonisolated struct LookoutProgressTracker: Equatable, Sendable {
             }
         }
 
-        return LookoutProgress(
+        return LookoutProgressDisplay(
             phase: phase, done: done, total: total, totalIsFinal: totalIsFinal, remaining: remaining,
             filesPerSecond: filesPerSecond, estimatedRemaining: estimate, kinds: Self.kinds(counts),
             lastCompleted: index?.upToDateAt, skipped: counts.skipped, failed: counts.failed,
             problems: Self.problems(counts))
     }
 
-    /// The phase: failures, the model, and pauses as the engine's status says; then walking, reading, and up to date
-    /// (or waiting for a drive) as the service says.
-    static func phase(status: LookoutStatus, index: LookoutIndexStatus?) -> LookoutProgress.Phase {
+    /// The phase: failures and pauses as the engine's status says; then walking, reading, and up to date (or waiting
+    /// for a drive) as the service says. `progress` handles the statuses with no phase (not set up, off, waiting for
+    /// the model) before it asks.
+    static func phase(status: LookoutStatus, index: LookoutIndexStatus?) -> LookoutProgressDisplay.Phase {
         switch status {
-        case .failed(let failure): return .failed(failure)
-        case .waitingForModel: return .waitingForModel
-        case .paused(let reason): return .paused(reason)
+        case .failed(let failure): return .failed(message: failure.message)
+        case .paused(let reason): return .paused(reason: .init(reason))
         case .indexing:
             guard let index, index.activity != .syncing else { return .counting }
             return .reading
         case .ready:
             if let missing = index?.missingRoots.first { return .waitingForDrive(name: driveName(of: missing)) }
             return .upToDate
-        case .notSetUp, .off:
-            return .upToDate
+        case .notSetUp, .off, .waitingForModel:
+            return .counting
         }
     }
 
@@ -125,23 +135,37 @@ nonisolated struct LookoutProgressTracker: Equatable, Sendable {
         return (path as NSString).lastPathComponent
     }
 
-    private static func kinds(_ counts: IndexStore.Counts) -> [FileKind: LookoutProgress.KindCount] {
-        var kinds: [FileKind: LookoutProgress.KindCount] = [:]
+    private static func kinds(_ counts: IndexStore.Counts) -> [FileKind: LookoutProgressDisplay.KindProgress] {
+        var kinds: [FileKind: LookoutProgressDisplay.KindProgress] = [:]
         for (raw, states) in counts.byKindAndState {
             guard let kind = FileKind(rawValue: raw) else { continue }
             let total = states.values.reduce(0, +)
             guard total > 0 else { continue }
             let waiting = (states["pending"] ?? 0) + (states["partial"] ?? 0)
-            kinds[kind] = LookoutProgress.KindCount(done: total - waiting, total: total)
+            kinds[kind] = LookoutProgressDisplay.KindProgress(done: total - waiting, total: total)
         }
         return kinds
     }
 
-    private static func problems(_ counts: IndexStore.Counts) -> [LookoutProgress.Problem] {
-        (counts.problems ?? [:]).compactMap { raw, count in
-            LookoutProblemReason(rawValue: raw).map { LookoutProgress.Problem(reason: $0, count: count) }
+    /// Skipped and failed files by why, most first, with each reason in the app's language.
+    private static func problems(_ counts: IndexStore.Counts) -> [LookoutProgressDisplay.Problem] {
+        let reasons = (counts.problems ?? [:]).compactMap { raw, count -> (LookoutProblemReason, Int)? in
+            guard let reason = LookoutProblemReason(rawValue: raw), count > 0 else { return nil }
+            return (reason, count)
         }
-        .filter { $0.count > 0 }
-        .sorted { $0.count != $1.count ? $0.count > $1.count : $0.reason.rawValue < $1.reason.rawValue }
+        return reasons.sorted { $0.1 != $1.1 ? $0.1 > $1.1 : $0.0.rawValue < $1.0.rawValue }
+            .map { LookoutProgressDisplay.Problem(reason: String(localized: $0.0.title), count: $0.1) }
+    }
+}
+
+extension LookoutProgressDisplay.PauseReason {
+    /// The display's reason for the engine's.
+    nonisolated init(_ reason: LookoutPauseReason) {
+        switch reason {
+        case .lowPowerMode: self = .lowPowerMode
+        case .warm: self = .thermal
+        case .onBattery: self = .onBattery
+        case .user: self = .userPaused
+        }
     }
 }

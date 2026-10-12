@@ -9,6 +9,8 @@ import SwiftUI
 /// A click runs `onSetUpLookout` before setup and `onOpenLookoutSettings` after (phase 3 hooks).
 struct LookoutStatusChip: View {
     let status: LookoutStatus
+    /// Where reading stands (`LookoutEngine.progress`): the wash and the percentage follow its fraction.
+    var progress: LookoutProgressDisplay?
     /// The model download's progress while waiting for the model, when known.
     var downloadProgress: Double?
     var reduceMotion = HubFilesMotion.reduceMotion
@@ -71,11 +73,13 @@ struct LookoutStatusChip: View {
         }
     }
 
-    /// How much of the chip the wash covers: the pass's progress while reading, once the service knows its size.
-    /// Never quite full, so a chip at 99 % still reads as working (`LookoutProgressFormatting.displayFraction`).
+    /// How much of the chip the wash covers: the pass's share read, while the chip says it's reading and the pass's
+    /// total is final (`LookoutProgressDisplay.fraction`, the number Settings' ring shows). Never quite full, so a chip
+    /// at 99 % still reads as working (`LookoutProgressFormatting.displayFraction`).
     private var progressFill: Double? {
-        guard case .indexing(_, let progress?) = status else { return nil }
-        return LookoutProgressFormatting.displayFraction(progress)
+        guard case .indexing = status, let progress, progress.phase == .reading, progress.totalIsFinal,
+              let fraction = progress.fraction else { return nil }
+        return LookoutProgressFormatting.displayFraction(fraction)
     }
 
     /// The second part after " · ", if any: the files left, why reading waits, the download's progress.
@@ -148,8 +152,10 @@ private struct LookoutStatusDot: View {
     VStack(alignment: .trailing, spacing: 10) {
         LookoutStatusChip(status: .notSetUp, onSetUpLookout: {}, onOpenLookoutSettings: {})
         LookoutStatusChip(status: .waitingForModel, downloadProgress: 0.42, onSetUpLookout: {}, onOpenLookoutSettings: {})
-        LookoutStatusChip(status: .indexing(remaining: 1_204, progress: 0.3), onSetUpLookout: {}, onOpenLookoutSettings: {})
-        LookoutStatusChip(status: .indexing(remaining: 1_204, progress: 0.3), reduceMotion: true,
+        LookoutStatusChip(status: .indexing(remaining: 1_992, progress: 0.3), progress: .Sample.readingMid,
+                          onSetUpLookout: {}, onOpenLookoutSettings: {})
+        LookoutStatusChip(status: .indexing(remaining: 1_992, progress: 0.3), progress: .Sample.readingMid,
+                          reduceMotion: true,
                           onSetUpLookout: {}, onOpenLookoutSettings: {})
         LookoutStatusChip(status: .ready, onSetUpLookout: {}, onOpenLookoutSettings: {})
         LookoutStatusChip(status: .paused(.lowPowerMode), onSetUpLookout: {}, onOpenLookoutSettings: {})

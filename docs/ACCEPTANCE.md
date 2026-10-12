@@ -183,6 +183,13 @@ progress model (the pace, the phases, passes, the first walk's growing total, th
 SQL, and the engine's throttle). Nothing was seen on screen, previews were not rendered, and the app
 was not exercised by hand.
 
+The progress card from the separate UI pass is wired to this model: `LookoutProgressTracker`
+produces the card's `LookoutProgressDisplay`, and the Files tab's chip fills to its fraction. With
+it, the DeeDock scheme builds in Debug, and the 270 Lookout tests in 36 suites pass, the 8 progress
+formatting tests included. The card, the Settings pane, and the chip were rendered offscreen from
+states the real tracker produced over a simulated first pass, and from the nine samples, in light
+and dark, English and German, with a temporary harness that isn't committed. The app was not run.
+
 None of these scenarios has been exercised.
 
 - [ ] Drag a file from the Files tab and from Finder onto the search field while it's being edited
@@ -209,11 +216,16 @@ None of these scenarios has been exercised.
   commands. Edit the `.rtfd` in TextEdit and check it's read again.
 - [ ] On an index made before this change: the next sync picks up the new types without reading
   anything else again, and an SVG that failed before leaves the index and its problem count.
-- [ ] Progress in a debugger or a temporary view (none ships yet): the first pass shows
-  `counting` with a total that grows, then `reading` with a final total, a pace after about 10 s,
-  and a time left that settles; Low Power Mode shows `paused(lowPowerMode)` and resuming keeps the
-  pace; unplugging a chosen drive shows `waitingForDrive` with its name; quitting and relaunching
-  partway keeps the first pass counting from the start; `lastCompleted` survives a relaunch.
+- [ ] Settings' progress card during a real first pass: **Looking through your folders…** with a
+  count that grows, then **Reading files** with a final total, a pace after about 10 s, and a time
+  left that settles. Low Power Mode shows **Paused · Low Power Mode**, and resuming keeps the pace.
+  **Pause** and **Resume** stop and continue reading. Unplugging a chosen drive shows **Waiting for
+  “…”** with its name. Quitting and relaunching partway keeps the first pass counting from the
+  start, and **finished at …** survives a relaunch. Skipped and unreadable files list their reasons
+  in English and German.
+- [ ] The Files tab's status chip fills to the same percentage as the Settings ring while reading,
+  shows no wash while counting or paused, and its tooltip adds the percentage.
+- [ ] The **Memory while searching** row wraps cleanly in English and German.
 - [ ] Analytics in the debug log: `lookout_image_search` with `source` `browser`, `hub_tile`, and
   `drop` for a dropped document, and `cold: false` for every stored vector.
 
@@ -221,7 +233,6 @@ None of these scenarios has been exercised.
 
 - A picture dragged out of a browser that also carries its address as plain text may still insert
   the address while the field is being edited, because it's text to the field editor.
-- The progress model has no view yet; a separate design pass builds it.
 - Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending
   with Esi.
 - Audio, video, and code are Planned. Combining a picture with words, and reading the words in a

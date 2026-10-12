@@ -20,6 +20,11 @@ extension HubFilesModel {
         return status == .notSetUp && lookoutDownloadProgress != nil ? .waitingForModel : status
     }
 
+    /// Where reading stands, for the status chip's wash and percentage (`LookoutEngine.progress`).
+    var lookoutProgress: LookoutProgressDisplay? {
+        previewOverrides.lookoutStatus == nil ? lookout.progress : previewOverrides.lookoutProgress
+    }
+
     /// The status chip's click: onboarding before setup, Lookout's Settings section after.
     func openLookoutFromChip(using openWindow: OpenWindowAction) {
         if lookoutStatus == .notSetUp {

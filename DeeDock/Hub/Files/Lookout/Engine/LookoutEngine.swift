@@ -39,8 +39,9 @@ final class LookoutEngine {
     private(set) var settings: LookoutSettings
     /// The index service's latest status, while running: counts, progress, the current file.
     private(set) var indexStatus: LookoutIndexStatus?
-    /// Where reading stands, for Settings (`LookoutProgress`); nil while Lookout isn't set up or is off.
-    private(set) var progress: LookoutProgress?
+    /// Where reading stands, for Settings' progress card and the Files tab's status chip (`LookoutProgressTracker`).
+    /// Nil while Lookout isn't set up, is off, or waits for the model.
+    private(set) var progress: LookoutProgressDisplay?
     /// True between `start()` and `stop()` while Lookout is active.
     private(set) var isRunning = false
     /// Lookout's content search; phase 2's Files UI shows it beside the name search.
@@ -76,7 +77,7 @@ final class LookoutEngine {
     @ObservationIgnored private let now: () -> Date
     /// When `progress` last changed, and the newer progress waiting for `progressInterval` to pass.
     @ObservationIgnored private var progressPublishedAt: ContinuousClock.Instant?
-    @ObservationIgnored private var pendingProgress: LookoutProgress??
+    @ObservationIgnored private var pendingProgress: LookoutProgressDisplay??
     @ObservationIgnored private var progressTask: Task<Void, Never>?
 
     /// - Parameters:
@@ -436,7 +437,7 @@ final class LookoutEngine {
         }
     }
 
-    private func publishProgress(_ new: LookoutProgress?) {
+    private func publishProgress(_ new: LookoutProgressDisplay?) {
         progressTask?.cancel()
         progressTask = nil
         pendingProgress = nil

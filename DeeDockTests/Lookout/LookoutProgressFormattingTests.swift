@@ -109,7 +109,7 @@ struct LookoutProgressFormattingTests {
 
         let drive = LookoutProgressCopy(progress: .Sample.waitingForDrive, locale: english, now: now)
         #expect(drive.title == "Waiting for “Backup Drive”")
-        #expect(drive.detail == "222 files left")
+        #expect(drive.detail == nil)   // the files on a drive that isn't there aren't counted
 
         let done = LookoutProgressCopy(progress: .Sample.upToDate(now: now), locale: english, now: now)
         #expect(done.title == "Up to date")
@@ -118,35 +118,42 @@ struct LookoutProgressFormattingTests {
 
     // MARK: Engine mapping
 
+    /// The engine's statuses through `LookoutProgressTracker`, the one source of the card's progress.
     @Test func engineStatusMapsToPhases() {
         var index = LookoutIndexStatus()
         index.activity = .indexing
         index.counts.byKindAndState = ["image": ["done": 40, "pending": 60, "skipped": 2],
                                        "pdf": ["pending": 10, "failed": 1]]
+        index.counts.problems = ["tooSmall": 2, "unreadable": 1]
+        func display(_ status: LookoutStatus, _ index: LookoutIndexStatus?) -> LookoutProgressDisplay? {
+            var tracker = LookoutProgressTracker()
+            return tracker.progress(status: status, index: index, now: Date(timeIntervalSince1970: 1_791_000_000))
+        }
 
-        let reading = LookoutProgressDisplay(status: .indexing(remaining: 70, progress: 0.4), index: index)
+        let reading = display(.indexing(remaining: 70, progress: 0.4), index)
         #expect(reading?.phase == .reading)
         #expect(reading?.done == 43 && reading?.total == 113 && reading?.remaining == 70)
         #expect(reading?.totalIsFinal == true)
         #expect(reading?.kinds[.image] == .init(done: 42, total: 102))
         #expect(reading?.kinds[.pdf] == .init(done: 1, total: 11))
         #expect(reading?.skipped == 2 && reading?.failed == 1)
-        #expect(reading?.estimatedRemaining == nil && reading?.filesPerSecond == nil)
+        #expect(reading?.problems.map(\.count) == [2, 1])
+        #expect(reading?.estimatedRemaining == nil && reading?.filesPerSecond == nil)   // too early for a pace
 
-        #expect(LookoutProgressDisplay(status: .indexing(remaining: nil, progress: nil), index: nil)?.phase == .counting)
+        #expect(display(.indexing(remaining: nil, progress: nil), nil)?.phase == .counting)
         var syncing = LookoutIndexStatus()
         syncing.activity = .syncing
-        #expect(LookoutProgressDisplay(status: .indexing(remaining: 0, progress: nil), index: syncing)?.phase == .counting)
+        #expect(display(.indexing(remaining: 0, progress: nil), syncing)?.phase == .counting)
         index.activity = .syncing
-        let laterSync = LookoutProgressDisplay(status: .indexing(remaining: 70, progress: nil), index: index)
-        #expect(laterSync?.phase == .reading && laterSync?.totalIsFinal == false)
+        let laterSync = display(.indexing(remaining: 70, progress: nil), index)
+        #expect(laterSync?.phase == .counting && laterSync?.totalIsFinal == false && laterSync?.total == 113)
 
-        #expect(LookoutProgressDisplay(status: .ready, index: index)?.phase == .upToDate)
-        #expect(LookoutProgressDisplay(status: .paused(.warm), index: index)?.phase == .paused(reason: .thermal))
-        #expect(LookoutProgressDisplay(status: .failed(LookoutFailure(kind: .service)), index: index)?.phase
+        #expect(display(.ready, index)?.phase == .upToDate)
+        #expect(display(.paused(.warm), index)?.phase == .paused(reason: .thermal))
+        #expect(display(.failed(LookoutFailure(kind: .service)), index)?.phase
                 == .failed(message: LookoutFailure(kind: .service).message))
-        #expect(LookoutProgressDisplay(status: .notSetUp, index: index) == nil)
-        #expect(LookoutProgressDisplay(status: .off, index: index) == nil)
-        #expect(LookoutProgressDisplay(status: .waitingForModel, index: index) == nil)
+        #expect(display(.notSetUp, index) == nil)
+        #expect(display(.off, index) == nil)
+        #expect(display(.waitingForModel, index) == nil)
     }
 }

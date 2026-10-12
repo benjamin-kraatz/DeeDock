@@ -497,8 +497,10 @@ struct HubFilesPreviewOverrides {
     var volumes: [HubVolumes.Volume]?
     var transfer: HubFilesTransferStatus?
     var finished: HubFilesTransferStatus?
-    /// Lookout's status, phase and results, in place of the (inert) engine's.
+    /// Lookout's status, progress, phase and results, in place of the (inert) engine's. The progress counts only
+    /// with a status.
     var lookoutStatus: LookoutStatus?
+    var lookoutProgress: LookoutProgressDisplay?
     var lookoutPhase: LookoutSearch.Phase?
     var lookoutResults: LookoutResultSet?
     /// A search with a picture's phase, results and reading time.

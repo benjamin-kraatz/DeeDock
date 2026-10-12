@@ -40,9 +40,10 @@ final class LookoutSettingsModel {
     @ObservationIgnored private var previewStatus: LookoutStatus?
     @ObservationIgnored private var previewMissing: [String] = []
     @ObservationIgnored private var previewNotPermitted: [String] = []
-    /// A pinned progress card (previews); `progress` derives it from the engine otherwise.
+    /// The progress card a preview pins; `progress` reads the engine otherwise.
     @ObservationIgnored private(set) var previewProgress: LookoutProgressDisplay?
-    @ObservationIgnored private var isPreview = false
+    /// A preview model, over an inert engine: its status and progress are what `preview(…)` pinned.
+    @ObservationIgnored private(set) var isPreview = false
 
     init(engine: LookoutEngine, setup: LookoutSetupCoordinator?, inspector: any LookoutFolderInspecting,
          picker: any LookoutFolderPicking, home: String = FileManager.default.homeDirectoryForCurrentUser.path) {

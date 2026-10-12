@@ -91,7 +91,8 @@ private struct HubFilesSearchScopeBar: View {
             }
             Spacer(minLength: 8)
             // Always shown, "Lookout off" included, as in the mockup: it's the way to Lookout's settings.
-            LookoutStatusChip(status: model.lookoutDisplayStatus, downloadProgress: model.lookoutDownloadProgress,
+            LookoutStatusChip(status: model.lookoutDisplayStatus, progress: model.lookoutProgress,
+                              downloadProgress: model.lookoutDownloadProgress,
                               onSetUpLookout: { model.onSetUpLookout() },
                               onOpenLookoutSettings: { model.openLookoutFromChip(using: openWindow) })
         }
