@@ -144,4 +144,51 @@ import Testing
         search.warmUp()
         #expect(encoder.pictureWarmUps == 1 && !search.isReaderCold)
     }
+
+    // MARK: Running again
+
+    @Test func aSearchThatCouldNotRunRunsOnceLookoutIsAvailable() async throws {
+        await reader.setResults(someResults())
+        let search = LookoutPictureSearch(reader: reader, encoder: encoder)
+        search.search(.data(LookoutTestPictures.png()), source: .drop, scope: .thisMac)
+        #expect(search.phase == .unavailable)   // dropped before setup
+        search.isAvailable = true                // set up, "Start searching"
+        #expect(await eventually { search.phase == .done })
+        #expect(search.results.groups.first?.strong.count == 1)
+        // Off and on again: the same picture searches again, with the vector it has.
+        search.isAvailable = false
+        #expect(search.phase == .unavailable && search.results.groups.allSatisfy { $0.strong.isEmpty })
+        search.isAvailable = true
+        #expect(await eventually { search.phase == .done && search.results.groups.first?.strong.count == 1 })
+        #expect(encoder.pictures.count == 1)
+    }
+
+    @Test func aNewFilterSearchesAgainWithTheSameVector() async throws {
+        await reader.setResults(someResults())
+        let search = search()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        #expect(await eventually { search.phase == .done })
+        let removed = LookoutSearchFilter(folders: ["/Users/tester/Documents"])
+        search.filter = removed
+        search.refresh()
+        #expect(await eventually { await reader.requests.count == 2 })
+        #expect(await reader.requests.last?.filter == removed)
+        #expect(encoder.pictures.count == 1)     // nothing read again
+        #expect(await eventually { search.phase == .done })
+    }
+
+    @Test func theIndexAppearingRunsASearchThatFoundNoIndex() async throws {
+        await reader.setResults(nil)            // no index yet
+        let search = search()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        #expect(await eventually { search.phase == .unavailable && encoder.pictures.count == 1 })
+        await reader.setResults(someResults())
+        search.refresh()
+        #expect(await eventually { search.phase == .done })
+        #expect(encoder.pictures.count == 1)
+        // A cleared search has nothing to run again.
+        search.clear()
+        search.refresh()
+        #expect(search.phase == .idle)
+    }
 }

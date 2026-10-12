@@ -211,6 +211,8 @@ final class LookoutEngine {
             search.filter = filter()
             pictureSearch.filter = search.filter
             search.refresh()
+            // A search with a picture under the old folders and types would keep showing their files.
+            pictureSearch.refresh()
         }
         updateStatus()
     }
@@ -349,9 +351,10 @@ final class LookoutEngine {
             let reader = reader
             Task { await reader.indexDidChange() }
         }
-        // The index may have just appeared: a search that found none gets another go.
-        if (previous?.counts.files ?? 0) == 0, newStatus.counts.files > 0, search.phase == .unavailable {
-            search.refresh()
+        // The index may have just appeared: a search that found none gets another go, by words or with a picture.
+        if (previous?.counts.files ?? 0) == 0, newStatus.counts.files > 0 {
+            if search.phase == .unavailable { search.refresh() }
+            if pictureSearch.phase == .unavailable { pictureSearch.refresh() }
         }
         updateStatus()
     }

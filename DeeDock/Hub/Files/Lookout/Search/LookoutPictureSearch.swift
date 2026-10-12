@@ -13,6 +13,10 @@ import os
 /// vector is kept in memory while its search is current, so a scope change searches again without reading the
 /// picture again; `clear()` drops it. Nothing is written anywhere.
 ///
+/// The current request is kept until `clear()`, so a search that couldn't run, or ran under old settings, runs
+/// again by itself: when Lookout becomes available (set up, or turned on again), and through `refresh()` when the
+/// settings' filter changes or the index first appears. A refresh reuses the vector when there is one.
+///
 /// `LookoutEngine` owns this and sets `isAvailable` and `filter` from the settings. Main actor.
 @MainActor @Observable
 final class LookoutPictureSearch {
@@ -41,7 +45,8 @@ final class LookoutPictureSearch {
     /// The stored vector searched with, when Find Similar reused one (its page, for "Page 7").
     private(set) var storedSource: LookoutSimilarSource?
 
-    /// Whether Lookout is set up and on. Turning it off cancels the search and clears the results.
+    /// Whether Lookout is set up and on. Turning it off cancels the search and clears the results; turning it on
+    /// runs the current request, which couldn't run meanwhile, again.
     var isAvailable = false {
         didSet {
             guard isAvailable != oldValue else { return }
@@ -49,6 +54,8 @@ final class LookoutPictureSearch {
                 cancelRunning()
                 results = LookoutSimilarResults(queryIsPicture: results.queryIsPicture)
                 phase = .unavailable
+            } else if isAvailable, phase == .unavailable {
+                refresh()
             }
         }
     }
@@ -63,6 +70,11 @@ final class LookoutPictureSearch {
     @ObservationIgnored private var generation = UUID()
     /// The current search's vector and what it excludes, for `rescope`.
     @ObservationIgnored private var current: (vector: [Float], isPicture: Bool, excluding: Set<String>)?
+    /// What was last searched with, until `clear()`, so `refresh()` can run it again.
+    @ObservationIgnored private var request: (input: LookoutPictureInput, source: AnalyticsLookoutImageSource,
+                                              scope: HubFileSearch.Scope)?
+    /// `lookout_image_search` was sent for `request`: a search that runs again doesn't send it twice.
+    @ObservationIgnored private var requestTracked = false
 
     init(reader: any LookoutIndexSearching, encoder: any LookoutQueryEncoding) {
         self.reader = reader
@@ -80,30 +92,60 @@ final class LookoutPictureSearch {
     @discardableResult
     func search(_ input: LookoutPictureInput, source: AnalyticsLookoutImageSource,
                 scope: HubFileSearch.Scope) -> Bool {
+        request = (input, source, scope)
+        requestTracked = false
+        return start()
+    }
+
+    /// Runs `request` from the start.
+    @discardableResult
+    private func start() -> Bool {
         cancelRunning()
         current = nil
         readSeconds = nil
         storedSource = nil
         results = LookoutSimilarResults(queryIsPicture: true)
+        guard let request else { return false }
         guard isAvailable else {
             phase = .unavailable
             return false
         }
         let token = generation
-        let folder = scope.lookoutFolder
+        let folder = request.scope.lookoutFolder
         let cold: Bool
-        if case .indexed = input {
+        if case .indexed = request.input {
             cold = false
             phase = .lookingUp
         } else {
             cold = isReaderCold
             phase = cold ? .waking : .reading
-            Analytics.track(LookoutAnalytics.imageSearch(source: source, cold: cold))
+            track(cold: cold)
         }
+        let input = request.input
         pending = Task { [weak self] in
-            await self?.run(input, source: source, folder: folder, token: token)
+            await self?.run(input, folder: folder, token: token)
         }
         return cold
+    }
+
+    /// The current request again, under the current filter: a refresh with the vector it already has, or, when it
+    /// couldn't run (Lookout wasn't available, or there was no index yet), from the start. A request still reading
+    /// its picture is left alone: its results are built with the filter as it is when they come. The settings'
+    /// filter changing and the index appearing call this.
+    func refresh() {
+        guard isAvailable, let request else { return }
+        if current != nil {
+            rescope(request.scope)
+        } else if phase == .unavailable {
+            start()
+        }
+    }
+
+    /// `lookout_image_search`, once per request.
+    private func track(cold: Bool) {
+        guard !requestTracked, let request else { return }
+        requestTracked = true
+        Analytics.track(LookoutAnalytics.imageSearch(source: request.source, cold: cold))
     }
 
     /// Searches the current picture again within a new scope, with the vector it already has.
@@ -112,6 +154,7 @@ final class LookoutPictureSearch {
     @discardableResult
     func rescope(_ scope: HubFileSearch.Scope) -> Bool {
         guard let current, isAvailable else { return false }
+        request?.scope = scope
         cancelRunning()
         let token = generation
         let request = LookoutSimilarRequest(vector: current.vector, queryIsPicture: current.isPicture,
@@ -123,6 +166,8 @@ final class LookoutPictureSearch {
     /// Ends the search: cancels its work and forgets its vector and results.
     func clear() {
         cancelRunning()
+        request = nil
+        requestTracked = false
         current = nil
         readSeconds = nil
         storedSource = nil
@@ -147,15 +192,14 @@ final class LookoutPictureSearch {
 
     // MARK: Running
 
-    private func run(_ input: LookoutPictureInput, source: AnalyticsLookoutImageSource, folder: String?,
-                     token: UUID) async {
+    private func run(_ input: LookoutPictureInput, folder: String?, token: UUID) async {
         let excluding = Set([input.excludedPath].compactMap { $0 })
         var toRead = input
         if case .indexed(let path, let segmentID, let fallback) = input {
             if let stored = await reader.similarSource(path: path, segmentID: segmentID) {
                 guard isCurrent(token) else { return }
                 // A stored vector reads nothing, so it never waits for the picture reader.
-                Analytics.track(LookoutAnalytics.imageSearch(source: source, cold: false))
+                track(cold: false)
                 storedSource = stored
                 current = (stored.vector, stored.modality == .image, excluding)
                 await finish(LookoutSimilarRequest(vector: stored.vector, queryIsPicture: stored.modality == .image,
@@ -168,7 +212,7 @@ final class LookoutPictureSearch {
             toRead = .file(fallback)
             let cold = isReaderCold
             phase = cold ? .waking : .reading
-            Analytics.track(LookoutAnalytics.imageSearch(source: source, cold: cold))
+            track(cold: cold)
         }
         let started = ContinuousClock.now
         let encoder = encoder
