@@ -6,6 +6,10 @@ import SwiftUI
 /// The URL is handed to `QLPreviewView` after a short pause, so arrowing through a folder does
 /// not start a preview for every item passed over. Previews (`.typeOnly` icon source) show the
 /// type icon instead and never read the file.
+///
+/// Do not give this view a scale transition or a scale animation. Quick Look's text preview
+/// resizes its text view whenever the view is scaled, and that feedback loop crashes AppKit
+/// layout (DEE-127). See `HubFilesPreviewColumn`.
 struct HubFilesQuickLookWell: View {
     let item: HubFileItem
 

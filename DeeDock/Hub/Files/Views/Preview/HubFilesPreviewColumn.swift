@@ -25,7 +25,7 @@ struct HubFilesPreviewColumn: View {
                 .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(HubFilesTheme(scheme).line, lineWidth: 0.5) }
                 .clipShape(.rect(cornerRadius: 14))
                 .id(selection.map(\.url))
-                .transition(.opacity.combined(with: .scale(scale: 0.97)))
+                .transition(wellTransition(selection))
             HubFilesPreviewDetails(model: model, selection: selection)
             if selection.count == 1 {
                 HubFilesPreviewActions(model: model)
@@ -40,6 +40,18 @@ struct HubFilesPreviewColumn: View {
             Rectangle().fill(HubFilesTheme(scheme).line).frame(width: 0.5)
         }
         .animation(HubFilesMotion.animation(.spring(response: 0.35, dampingFraction: 0.85)), value: selection.map(\.url))
+    }
+
+    /// How the well enters and leaves when the selection changes.
+    ///
+    /// A well that hosts a live Quick Look preview (one file) only fades. Scaling it resizes the
+    /// text view inside Quick Look's text preview (Markdown, JSON, source) on every animation
+    /// frame. Each resize invalidates SwiftUI's layout in the middle of AppKit's layout pass, and
+    /// with a few kilobytes of text the loop never settles: AppKit throws and the app crashes
+    /// (DEE-127). Icons, the fanned stack, and the folder still scale in.
+    private func wellTransition(_ selection: [HubFileItem]) -> AnyTransition {
+        let hostsQuickLook = selection.count == 1 && selection.first?.isDirectory == false
+        return hostsQuickLook ? .opacity : .opacity.combined(with: .scale(scale: 0.97))
     }
 
     @ViewBuilder
