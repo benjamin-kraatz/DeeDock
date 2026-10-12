@@ -23587,19 +23587,19 @@
       }
     },
     "lookoutSettingsMemoryValue" : {
-      "comment" : "Lookout settings: memory while searching, and when it's given back. Hub is DOKK's panel; keep the name.",
+      "comment" : "Lookout settings: memory while searching by words, while searching with a picture (the picture reader is loaded), and when it's given back. Hub is DOKK's panel; keep the name.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ca. 250 MB, freigegeben 2 Min. nach dem Schließen des Hubs"
+            "value" : "ca. 250 MB, ca. 900 MB nach einer Suche mit einem Bild; freigegeben 2 Min. nach dem Schließen des Hubs"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "about 250 MB, released 2 min after the Hub closes"
+            "value" : "about 250 MB, about 900 MB after searching with a picture; released 2 min after the Hub closes"
           }
         }
       }
