@@ -45,7 +45,7 @@ struct HubFilesPreviewColumn: View {
                 }
                 .clipShape(.rect(cornerRadius: 14))
                 .id(wellID(selection))
-                .transition(.opacity.combined(with: .scale(scale: 0.97)))
+                .transition(wellTransition(selection))
             HubFilesPreviewDetails(model: model, selection: selection)
             if let hit = model.selectedLookoutHit {
                 if model.isPictureSearch {
@@ -84,6 +84,20 @@ struct HubFilesPreviewColumn: View {
             return [picture.fileURL ?? URL(filePath: "/pasted/\(picture.id.uuidString)")]
         }
         return selection.map(\.url)
+    }
+
+    /// How the well enters and leaves when the selection changes.
+    ///
+    /// A well that hosts a live Quick Look preview (one file) only fades. Scaling it resizes the
+    /// text view inside Quick Look's text preview (Markdown, JSON, source) on every animation
+    /// frame. Each resize invalidates SwiftUI's layout in the middle of AppKit's layout pass, and
+    /// with a few kilobytes of text the loop never settles: AppKit throws and the app crashes
+    /// (DEE-127). The picture searched with also counts when it's a file, because it shows through Quick Look too.
+    /// Icons, the fanned stack, the folder, and a pasted picture's own pixels still scale in.
+    private func wellTransition(_ selection: [HubFileItem]) -> AnyTransition {
+        let hostsQuickLook = selection.count == 1 && selection.first?.isDirectory == false
+        let showsPictureFile = selection.isEmpty && model.pictureQuery.map { $0.image == nil && $0.fileURL != nil } == true
+        return hostsQuickLook || showsPictureFile ? .opacity : .opacity.combined(with: .scale(scale: 0.97))
     }
 
     @ViewBuilder
