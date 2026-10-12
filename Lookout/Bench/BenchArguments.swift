@@ -41,6 +41,11 @@ struct BenchArguments {
         options[name]?.last.map { Self.url($0) }
     }
 
+    /// The file given as `--name`, or nil when it's missing.
+    func file(_ name: String) -> URL? {
+        options[name]?.last.map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath) }
+    }
+
     /// The folder given as `--name`.
     ///
     /// - Throws: `BenchFailure` when the option is missing or isn't a folder.

@@ -5,13 +5,14 @@ import Foundation
 
 let usage = """
     usage: LookoutBench reference --models <folder> --refs <folder>
-           LookoutBench bench --models <folder> [--refs <folder>]
+           LookoutBench bench --models <folder> [--refs <folder>] [--image <file>]
            LookoutBench index --models <folder> --index <folder> --root <folder>... [--exclude <folder>]...
            LookoutBench estimate --root <folder>...
 
       --models   the folder with embeddinggemma-2-Q8_0.gguf and mmproj-embeddinggemma-2-Q8_0.gguf
       --refs     DigUp's Tests/LlamaRuntimeTests/Reference (photo.jpg, screen.png, speech.wav, vectors.json);
                  bench measures images and checks the reference only with it
+      --image    a picture to search with in the picture-search probe (default: macOS's Sonoma wallpaper)
       --index    the folder index.sqlite goes in (created when missing); not the app's unless you pass it
       --root     a folder to index or estimate (repeatable)
       --exclude  a folder to skip inside the roots (repeatable)
@@ -29,9 +30,12 @@ do {
                                     references: arguments.requiredFolder("refs"), reportResults: isChild))
     case "bench":
         let references = arguments.folder("refs") == nil ? nil : try arguments.requiredFolder("refs")
-        exit(try Benchmark.run(models: arguments.requiredFolder("models"), references: references))
+        exit(try Benchmark.run(models: arguments.requiredFolder("models"), references: references,
+                               image: arguments.file("image")))
     case "probe-text":
         try TextProbe.run(models: arguments.requiredFolder("models"))
+    case "probe-image":
+        try ImageProbe.run(models: arguments.requiredFolder("models"), image: arguments.file("image"))
     case "index":
         guard let index = arguments.folder("index") else { throw BenchFailure("missing --index <folder>") }
         try IndexCommand.run(models: arguments.requiredFolder("models"), index: index,

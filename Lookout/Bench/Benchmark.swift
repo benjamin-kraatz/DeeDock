@@ -17,7 +17,7 @@ enum Benchmark {
     /// Returns the exit status: 0 when every gate passes.
     ///
     /// - Throws: A probe couldn't be started.
-    static func run(models: URL, references: URL?) throws -> Int32 {
+    static func run(models: URL, references: URL?, image: URL?) throws -> Int32 {
         print("LookoutBench: llama.cpp \(LlamaEmbedder.buildTag), vectors \(LlamaEmbedder.vectorVersion), "
               + "\(sysctl("machdep.cpu.brand_string")), \(ProcessInfo.processInfo.physicalMemory >> 30) GB, "
               + "macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
@@ -25,11 +25,13 @@ enum Benchmark {
         if let references { arguments += ["--refs", references.path] }
         let text = try child(["probe-text"] + arguments)
         let full = try child(["probe-full"] + arguments)
+        let picture = try child(["probe-image"] + arguments + (image.map { ["--image", $0.path] } ?? []))
         let reference = try references.map { _ in try child(["reference"] + arguments) }
-        guard text.status == 0, full.status == 0 else {
-            throw BenchFailure("a probe failed (text \(text.status), full \(full.status))")
+        guard text.status == 0, full.status == 0, picture.status == 0 else {
+            throw BenchFailure("a probe failed (text \(text.status), full \(full.status), picture \(picture.status))")
         }
-        let r = text.results.merging(full.results) { $1 }.merging(reference?.results ?? [:]) { $1 }
+        let r = text.results.merging(full.results) { $1 }.merging(picture.results) { $1 }
+            .merging(reference?.results ?? [:]) { $1 }
         printMeasurements(r, hasImages: references != nil)
         let gates = gates(r, hasReferences: references != nil)
         print("\nDecision gate")
@@ -67,11 +69,28 @@ enum Benchmark {
             + "\(FullProbe.batchRuns)", "\(ms(median)) (first \(ms(r["full.batch.firstMs"])))")
         row("batch per item", ms(median.map { $0 / max(count, 1) }))
         memoryRows(r, "full.worked", "after images and batches")
+
+        print("\nPicture search (query service: text model, then the image encoder on the first picture)")
+        row("text model start (load + 2 warm-up embeds)", seconds(r["image.textStartSeconds"]))
+        row("app: prepare the picture @280 / @140", "\(ms(r["image.prepare280Ms"])) / \(ms(r["image.prepare140Ms"]))")
+        row("image encoder load (+ mtmd warm-up)", seconds(r["image.attachSeconds"]))
+        row("first picture query @280", ms(r["image.firstQueryMs"]))
+        row("cold picture search (load + first query)", seconds(r["image.coldSeconds"]))
+        for budget in ["280", "140"] {
+            row("warm picture query @\(budget): median / p95 (n=\(ImageProbe.warmRuns)) (first)",
+                "\(ms(r["image.warm\(budget).medianMs"])) / \(ms(r["image.warm\(budget).p95Ms"])) "
+                    + "(\(ms(r["image.warm\(budget).firstMs"])))")
+        }
+        row("text query beside the image encoder", ms(r["image.textAfterMs"]))
+        memoryRows(r, "image.attached", "after the encoder loaded")
+        memoryRows(r, "image.queried", "after picture queries")
     }
 
     private static func gates(_ r: [String: Double], hasReferences: Bool) -> [Gate] {
         let images = ["photo", "screen"].flatMap { key in [280, 140].compactMap { r["full.image.\(key).\($0).medianMs"] } }
         let queryMemory = [r["text.queried.peakFootprintMB"], r["text.loaded.footprintMB"]].compactMap { $0 }.max()
+        let pictureMemory = [r["image.queried.peakFootprintMB"], r["image.attached.footprintMB"]].compactMap { $0 }.max()
+        let warmPicture = [r["image.warm280.p95Ms"], r["image.warm140.p95Ms"]].compactMap { $0 }.max()
         func check(_ value: Double?, _ limit: Double) -> Bool? { value.map { $0 <= limit } }
         return [
             Gate(name: "Warm text query (p95)", measured: "p95 \(ms(r["text.queryP95Ms"])), median \(ms(r["text.queryMedianMs"]))",
@@ -84,6 +103,12 @@ enum Benchmark {
                  passed: images.count == 4 ? check(images.max(), 1500) : nil),
             Gate(name: "Indexer memory (peak)", measured: mb(r["full.worked.peakFootprintMB"]), limit: "≤ 2,000 MB",
                  passed: check(r["full.worked.peakFootprintMB"], 2000)),
+            Gate(name: "Warm picture query (p95)", measured: ms(warmPicture), limit: "≤ 600 ms",
+                 passed: check(warmPicture, 600)),
+            Gate(name: "Cold picture search", measured: seconds(r["image.coldSeconds"]), limit: "≤ 2.5 s",
+                 passed: check(r["image.coldSeconds"], 2.5)),
+            Gate(name: "Query service with pictures", measured: mb(pictureMemory), limit: "≤ 1,000 MB",
+                 passed: check(pictureMemory, 1000)),
             Gate(name: "Every reference cosine", measured: r["reference.lowestCosine"].map { String(format: "lowest %.6f", $0) } ?? "–",
                  limit: "≥ 0.99", passed: hasReferences ? r["reference.passed"].map { $0 == 1 } : nil),
         ]

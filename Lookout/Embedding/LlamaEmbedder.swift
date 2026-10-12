@@ -76,13 +76,7 @@ nonisolated final class LlamaEmbedder: Embedder {
         }
         var media: OpaquePointer?
         if let mediaFile = models.media, !textOnly {
-            var mediaParams = mtmd_context_params_default()
-            mediaParams.use_gpu = true
-            mediaParams.print_timings = false
-            mediaParams.warmup = true
-            mediaParams.image_min_tokens = 1      // never rescale: images arrive at their final size (ImageSizing)
-            mediaParams.image_max_tokens = 1120
-            media = mtmd_init_from_file(mediaFile.path, model, mediaParams)
+            media = mtmd_init_from_file(mediaFile.path, model, Self.mediaParams(maxTokens: 1120))
             if media == nil {
                 llama_free(context)
                 llama_model_free(model)
@@ -115,6 +109,55 @@ nonisolated final class LlamaEmbedder: Embedder {
     }
 
     deinit { close() }
+
+    /// mtmd's settings: on the GPU, warmed up at load, and never rescaling, because images arrive at their final size
+    /// (`ImageSizing`). `maxTokens` is the largest image budget the context will take.
+    private static func mediaParams(maxTokens: Int) -> mtmd_context_params {
+        var params = mtmd_context_params_default()
+        params.use_gpu = true
+        params.print_timings = false
+        params.warmup = true
+        params.image_min_tokens = 1
+        params.image_max_tokens = Int32(maxTokens)
+        return params
+    }
+
+    /// Whether the image and audio encoders are loaded (always for a full embedder; after `attachMedia` for a text-only
+    /// one).
+    var hasMedia: Bool { media != nil }
+
+    /// The largest image budget a text-only embedder takes once `attachMedia` has run: the screenshot budget
+    /// (`IndexOptions.screenshotBudget`). Its soft tokens and the four framing tokens fit the query context's 512.
+    static let queryImageBudget = 280
+
+    /// Loads the image encoder into a text-only embedder: the query service's picture reader, loaded only for the first
+    /// search with a picture, so a search by words never pays for the 555 MB file. It shares the text model already
+    /// loaded; nothing is loaded twice. Does nothing when the encoders are already there.
+    ///
+    /// - Throws: `WorkerError.failed` when mtmd can't load `file`.
+    func attachMedia(_ file: URL) throws {
+        guard media == nil else { return }
+        guard let model, let loaded = mtmd_init_from_file(file.path, model,
+                                                          Self.mediaParams(maxTokens: Self.queryImageBudget))
+        else { throw WorkerError.failed("can't load \(file.path)") }
+        media = loaded
+    }
+
+    /// One picture's vector from its pixels, already sized for its budget (`QueryPicture`): packed RGB, 3 bytes a pixel,
+    /// row by row. The picture never touches the disk, so the service needs no access to where it came from.
+    ///
+    /// - Throws: `WorkerError.failed` without the image encoder, `LlamaError` for pixels that don't fit or don't encode.
+    func embedImage(pixels: [UInt8], width: Int, height: Int) throws -> [Float] {
+        guard media != nil else { throw WorkerError.failed("the image encoder isn't loaded") }
+        guard width > 0, height > 0, pixels.count == width * height * 3 else {
+            throw LlamaError("\(pixels.count) bytes aren't a \(width)×\(height) RGB picture")
+        }
+        guard let bitmap = mtmd_bitmap_init(UInt32(width), UInt32(height), pixels) else {
+            throw LlamaError("can't make a bitmap of the picture")
+        }
+        defer { mtmd_bitmap_free(bitmap) }
+        return try encode(bitmap, label: "the picture")
+    }
 
     func close() {
         if let batch { llama_batch_ext_free(batch) }
@@ -164,6 +207,11 @@ nonisolated final class LlamaEmbedder: Embedder {
     private func embedMedia(_ path: String, image: Bool, budget: Int) throws -> [Float] {
         let bitmap = try load(path, image: image, budget: budget)
         defer { mtmd_bitmap_free(bitmap) }
+        return try encode(bitmap, label: path)
+    }
+
+    /// Runs one bitmap through the encoder and the text model. `label` names the input in errors.
+    private func encode(_ bitmap: OpaquePointer, label path: String) throws -> [Float] {
         let chunks = mtmd_input_chunks_init()
         defer { mtmd_input_chunks_free(chunks) }
         var bitmaps: [OpaquePointer?] = [bitmap]
