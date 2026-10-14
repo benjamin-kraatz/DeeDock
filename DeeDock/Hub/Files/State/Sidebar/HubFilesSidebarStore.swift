@@ -169,7 +169,7 @@ final class HubFilesSidebarStore {
         return Removal(entry: entry, index: index)
     }
 
-    /// Puts a removed row back where it was.
+    /// Puts a removed row back where it was, and re-resolves it if it is a folder.
     ///
     /// If the same row or the same folder is back already (added again before Undo), that row
     /// moves to the old position instead, so the folder never appears twice.
@@ -189,6 +189,9 @@ final class HubFilesSidebarStore {
         }
         entries.insert(removal.entry, at: min(removal.index, entries.count))
         save()
+        // Refreshes skip removed rows, so the kept resolution may be stale (its drive unplugged
+        // since); check again now.
+        if case .folder = removal.entry { refresh(force: true) }
         return removal.entry.id
     }
 
