@@ -154,6 +154,32 @@ enum HubFilesInteractions {
         return interaction
     }
 
+    /// A breadcrumb segment: a click shows its folder in the pane; drops land in that folder, and
+    /// resting on an ancestor segment during a drag opens it, like Finder's path bar.
+    ///
+    /// The current folder's segment takes drops but does not spring-load, since the pane is
+    /// already there. Recents is neither a drop target nor spring-loaded.
+    static func crumb(_ location: HubFilesLocation, isCurrent: Bool, pane: HubFilesPane, paneIndex: Int,
+                      model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
+        var interaction = HubFilesInteraction()
+        interaction.mouseUp = { _ in
+            model.activatePane(paneIndex)
+            pane.navigate(to: location)
+        }
+        if let folder = location.folderURL {
+            interaction.dropDestination = { folder }
+            interaction.dropHighlight = .crumb(pane: pane.id, folder: folder)
+            if !isCurrent {
+                interaction.springLoad = {
+                    model.activatePane(paneIndex)
+                    pane.navigate(to: location)
+                }
+            }
+        }
+        interaction.hoverChanged = hover
+        return interaction
+    }
+
     /// A browser tab: a click selects it; drops land in its active pane's folder; resting on it
     /// during a drag switches to it.
     static func tab(_ tab: HubFilesBrowserTab, model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {

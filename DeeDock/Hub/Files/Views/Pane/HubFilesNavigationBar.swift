@@ -74,41 +74,62 @@ private struct HubFilesBreadcrumbs: View {
                         .foregroundStyle(.tertiary)
                         .accessibilityHidden(true)
                 }
-                HubFilesCrumb(title: model.displayName(for: location), isLast: isLast, isActive: isActive) {
-                    model.activatePane(index)
-                    pane.navigate(to: location)
-                }
-                .layoutPriority(isLast ? 1 : 0)
+                HubFilesCrumb(model: model, pane: pane, index: index, location: location,
+                              isLast: isLast, isActive: isActive)
+                    .layoutPriority(isLast ? 1 : 0)
             }
         }
         .lineLimit(1)
     }
 }
 
-/// One breadcrumb segment.
+/// One breadcrumb segment. A click shows its folder; during a drag it is a drop target, and
+/// resting on an ancestor segment opens it (`HubFilesInteractions.crumb`).
 private struct HubFilesCrumb: View {
-    let title: String
+    let model: HubFilesModel
+    let pane: HubFilesPane
+    let index: Int
+    let location: HubFilesLocation
     let isLast: Bool
     let isActive: Bool
-    let action: () -> Void
 
     @Environment(\.colorScheme) private var scheme
     @State private var hovered = false
 
+    private var title: String { model.displayName(for: location) }
+    private var isDropTarget: Bool {
+        location.folderURL.map { model.dropHighlight == .crumb(pane: pane.id, folder: $0) } ?? false
+    }
+
     var body: some View {
-        Button(action: action) {
-            Text(verbatim: title)
-                .font(.system(size: 13.5, weight: isLast ? (isActive ? .semibold : .medium) : .regular))
-                .foregroundStyle(isLast || hovered ? .primary : .secondary)
-                .truncationMode(.tail)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .frame(minWidth: 24)
-                .background(hovered ? HubFilesTheme(scheme).chip : .clear, in: .rect(cornerRadius: 6))
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .onHover { hovered = $0 }
-        .accessibilityLabel(Text(verbatim: title))
+        let theme = HubFilesTheme(scheme)
+        let shape = RoundedRectangle(cornerRadius: 6)
+        Text(verbatim: title)
+            .font(.system(size: 13.5, weight: isLast ? (isActive ? .semibold : .medium) : .regular))
+            .foregroundStyle(isLast || hovered || isDropTarget ? .primary : .secondary)
+            .truncationMode(.tail)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .frame(minWidth: 24)
+            .background(isDropTarget ? theme.accentSelection : hovered ? theme.chip : .clear, in: shape)
+            .overlay {
+                if isDropTarget { shape.strokeBorder(theme.accentLine, lineWidth: 1) }
+            }
+            // A small lift tells the target apart from plain hover; scaling leaves the bar's layout alone.
+            .scaleEffect(isDropTarget ? 1.06 : 1)
+            .overlay {
+                HubFilesInteractionRegion(
+                    interaction: HubFilesInteractions.crumb(location, isCurrent: isLast, pane: pane, paneIndex: index,
+                                                            model: model) { hovered = $0 },
+                    model: model)
+            }
+            .animation(HubFilesMotion.animation(.spring(response: 0.25, dampingFraction: 0.7)), value: isDropTarget)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: title))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction {
+                model.activatePane(index)
+                pane.navigate(to: location)
+            }
     }
 }

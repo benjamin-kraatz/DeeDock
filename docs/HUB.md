@@ -195,6 +195,7 @@ sorts them, so "File 2" comes before "File 10". Folders stay on top only when so
 sort also applies in Icons and Columns, which have no sort control. Hidden files are never shown.
 
 The breadcrumb bar starts at the nearest sidebar location or volume. Click a segment to go there.
+Segments also accept drops; see [Drag and drop](#drag-and-drop).
 Back and forward, or ⌘[ and ⌘], move through the pane's last 50 folders. ⌘↑ opens the enclosing
 folder and selects the folder you left.
 
@@ -258,15 +259,17 @@ The Files tab has no Copy, Paste, or Duplicate commands. To copy, drag with Opti
 ### Drag and drop
 
 Drag items within the Hub, out to Finder or another app, or in from another app. Folders, empty
-pane space, sidebar places, drives, and browser tabs accept drops. Recents and breadcrumbs do not.
-Dropping items into the folder they are already in does nothing.
+pane space, sidebar places, drives, browser tabs, and breadcrumb segments accept drops. Recents
+does not. Dropping items into the folder they are already in does nothing.
 
 DOKK follows Finder's rule. A drop on the same volume moves the items, and a drop on another volume
 copies them. Hold Option to copy on the same volume. When another app offers only a copy, DOKK
 copies.
 
-Hold a drag over a folder, a sidebar place, or a browser tab to spring-load it. The folder opens,
-or the tab is selected, after the system spring-loading delay.
+Hold a drag over a folder, a sidebar place, a browser tab, or a breadcrumb segment to spring-load
+it. The folder opens, or the tab is selected, after the system spring-loading delay. A breadcrumb
+segment opens that folder in its own pane, so you can climb the path and keep dragging, as with
+Finder's path bar.
 
 Dragging out hands other apps ordinary file URLs. If Finder or another app moves the files, that
 app does the move. A drag from an anchored Hub keeps it open while you are over another app.

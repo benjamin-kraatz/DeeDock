@@ -416,6 +416,8 @@ enum HubFilesDropHighlight: Hashable {
     case tab(UUID)
     /// A column-view column: drops into that column's folder.
     case column(URL)
+    /// A breadcrumb segment in one pane. Keyed by pane because split panes can show the same folder.
+    case crumb(pane: UUID, folder: URL)
 }
 
 /// Service state replaced by previews, which must not touch the file system or Spotlight.
