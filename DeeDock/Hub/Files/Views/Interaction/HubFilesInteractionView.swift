@@ -27,6 +27,11 @@ struct HubFilesInteraction {
     var menu: (() -> NSMenu?)?
     /// Pointer entered (true) or left (false) the region.
     var hoverChanged: ((Bool) -> Void)?
+    /// A Favorites row: dragging it reorders it, or removes it past the sidebar's edge.
+    var sidebarEntry: HubFilesSidebarEntryID?
+    /// Drags over this region go to `HubFilesSidebarModel`, which hit-tests the whole Favorites
+    /// list at once instead of trusting whichever row happens to be under the pointer.
+    var routesDropsToSidebar = false
 }
 
 /// Places a `HubFilesInteractionView` over (or behind) SwiftUI content.
@@ -43,7 +48,7 @@ struct HubFilesInteractionRegion: NSViewRepresentable {
     func updateNSView(_ view: HubFilesInteractionView, context: Context) {
         view.interaction = interaction
         view.model = model
-        if interaction.dropDestination != nil {
+        if interaction.dropDestination != nil || interaction.routesDropsToSidebar {
             view.registerForDraggedTypes([.fileURL])
         } else {
             view.unregisterDraggedTypes()
@@ -123,9 +128,14 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
                 if event.clickCount == 2 { interaction.doubleClick?() }
                 return
             }
-            if let dragURLs = interaction.dragURLs,
-               hypot(next.locationInWindow.x - origin.x, next.locationInWindow.y - origin.y) >= DockDragGeometry.startDistance {
+            let moved = hypot(next.locationInWindow.x - origin.x, next.locationInWindow.y - origin.y)
+            guard moved >= DockDragGeometry.startDistance else { continue }
+            if let dragURLs = interaction.dragURLs {
                 beginDrag(urls: dragURLs(), event: next)
+                return
+            }
+            if let entry = interaction.sidebarEntry, let sidebar = model?.sidebar {
+                trackReorder(entry, sidebar: sidebar, window: window)
                 return
             }
         }
@@ -148,6 +158,35 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         let session = beginDraggingSession(with: Array(items), event: event, source: self)
         session.animatesToStartingPositionsOnCancelOrFail = true
         session.draggingFormation = .pile
+        model?.sidebar.itemDragBegan(sequence: session.draggingSequenceNumber, urls: urls)
+    }
+
+    /// Moves a Favorites row with the pointer until the button comes up (drop or remove) or
+    /// Escape (back where it was).
+    ///
+    /// Runs its own event-tracking loop instead of an `NSDraggingSession`: the row is not a file
+    /// drag, and the loop sees every pointer move, inside the Hub or not, so the lifted row, the
+    /// poof cursor, and the slot all follow. Lifting hides the row, which dismantles this view;
+    /// the loop keeps its own references to the window and the sidebar model for that reason.
+    private func trackReorder(_ id: HubFilesSidebarEntryID, sidebar: HubFilesSidebarModel, window: NSWindow) {
+        guard let rowFrame = screenFrame else { return }
+        sidebar.beginReorder(id, pointer: NSEvent.mouseLocation, rowFrame: rowFrame)
+        sidebar.updateReorder(pointer: NSEvent.mouseLocation)
+        while let next = window.nextEvent(matching: [.leftMouseDragged, .leftMouseUp, .keyDown],
+                                          until: .distantFuture, inMode: .eventTracking, dequeue: true) {
+            switch next.type {
+            case .keyDown where next.keyCode == 53:
+                sidebar.cancelReorder()
+                return
+            case .leftMouseUp:
+                sidebar.endReorder(pointer: NSEvent.mouseLocation)
+                return
+            case .leftMouseDragged:
+                sidebar.updateReorder(pointer: NSEvent.mouseLocation)
+            default:
+                continue
+            }
+        }
     }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
@@ -158,6 +197,7 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
 
     func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
         model?.dropHighlight = nil
+        model?.sidebar.itemDragEnded(sequence: session.draggingSequenceNumber)
         sessionHold?(false)
         sessionHold = nil
         retainedForSession = nil
@@ -201,9 +241,12 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     }
 
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        guard !stopped, let model else { return [] }
+        if interaction.routesDropsToSidebar { return model.sidebar.itemDragUpdated(sender, in: self) }
+        model.sidebar.itemDragEntered(sender)
         let result = operation(for: sender)
         if let highlight = interaction.dropHighlight {
-            if result.isEmpty { model?.clearDropHighlight(highlight) } else { model?.dropHighlight = highlight }
+            if result.isEmpty { model.clearDropHighlight(highlight) } else { model.dropHighlight = highlight }
         }
         return result
     }
@@ -211,6 +254,7 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation { draggingEntered(sender) }
 
     override func draggingExited(_ sender: NSDraggingInfo?) {
+        if interaction.routesDropsToSidebar { model?.sidebar.itemDragExited() }
         if let highlight = interaction.dropHighlight { model?.clearDropHighlight(highlight) }
     }
 
@@ -218,9 +262,13 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         if let highlight = interaction.dropHighlight { model?.clearDropHighlight(highlight) }
     }
 
-    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool { !operation(for: sender).isEmpty }
+    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        if interaction.routesDropsToSidebar, let model { return !model.sidebar.itemDragUpdated(sender, in: self).isEmpty }
+        return !operation(for: sender).isEmpty
+    }
 
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        if interaction.routesDropsToSidebar, let model { return model.sidebar.performItemDrop(sender, in: self) }
         guard let model, let destination = destination(for: sender) else { return false }
         return model.performDrop(sources: sources(sender), destination: destination,
                                  optionHeld: NSEvent.modifierFlags.contains(.option),
@@ -230,7 +278,13 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     // MARK: Spring-loading
 
     func springLoadingEntered(_ draggingInfo: NSDraggingInfo) -> NSSpringLoadingOptions {
-        interaction.springLoad != nil && !operation(for: draggingInfo).isEmpty ? .enabled : []
+        guard interaction.springLoad != nil else { return [] }
+        if interaction.routesDropsToSidebar {
+            // Only while the drop would land in this row's folder, not while it would insert.
+            guard let entry = interaction.sidebarEntry, model?.sidebar.springLoads(entry) == true else { return [] }
+            return .enabled
+        }
+        return !operation(for: draggingInfo).isEmpty ? .enabled : []
     }
 
     func springLoadingUpdated(_ draggingInfo: NSDraggingInfo) -> NSSpringLoadingOptions {

@@ -43,6 +43,8 @@ final class HubFilesModel: HubTabModel {
     let transfers: HubFileTransferQueue
     let volumes: HubVolumes
     let search: HubFileSearch
+    /// The sidebar's Favorites list and its drag, feedback, and Undo state.
+    let sidebar: HubFilesSidebarModel
     @ObservationIgnored let quickLook = HubFilesQuickLook()
     @ObservationIgnored private(set) weak var shell: HubShell?
     @ObservationIgnored private let defaults: UserDefaults
@@ -73,12 +75,16 @@ final class HubFilesModel: HubTabModel {
         self.volumes = volumes
         self.search = search
         let home = dataSource.homeDirectory
+        sidebar = HubFilesSidebarModel(store: HubFilesSidebarStore(
+            defaults: defaults, home: home, resolver: dataSource.makeSidebarResolver(),
+            observesVolumes: dataSource.observesVolumes))
         let snapshot = HubFilesSnapshot.load(from: defaults) ?? .firstRun(home: home)
         showsPreview = snapshot.showsPreview
         selectedTabID = UUID()
         tabs = snapshot.tabs.map(makeTab)
         selectedTabID = tabs[min(max(snapshot.selectedTab, 0), tabs.count - 1)].id
         configureQuickLook()
+        sidebar.files = self
     }
 
     /// Progress of the copy/move queue from 0 to 1, or nil when idle. Drives the DOKK tile ring.
@@ -126,6 +132,8 @@ final class HubFilesModel: HubTabModel {
         observeUnmounts()
         refreshActivation()
         if isSearching { runSearch() }
+        // Folders renamed or moved in Finder since the last look keep their sidebar rows.
+        sidebar.store.refresh()
     }
 
     /// Marks the tab visible without a shell, so panes load (previews and tests).
@@ -139,6 +147,8 @@ final class HubFilesModel: HubTabModel {
         quickLook.close()
         cancelRenames()
         dropHighlight = nil
+        sidebar.endItemDrag()
+        sidebar.problem = nil
         volumes.stop()
         search.stop()
         if let unmountObserver { NSWorkspace.shared.notificationCenter.removeObserver(unmountObserver) }

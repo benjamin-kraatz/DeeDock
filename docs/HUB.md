@@ -157,13 +157,41 @@ status bar.
 
 ### Sidebar and drives
 
-**Favorites** lists Recents, Desktop, Documents, Downloads, your home folder, and Applications.
-Recents comes from Spotlight. **Drives** lists the startup disk and every mounted volume under
+**Favorites** starts with Recents, Desktop, Documents, Downloads, your home folder, and
+Applications. Recents comes from Spotlight. **Drives** lists the startup disk and every mounted volume under
 `/Volumes`, each with its free space. The list updates when volumes mount, unmount, or are renamed.
 
 External disks, disk images, and network volumes have an eject button. The startup disk does not. While it ejects, the row dims and shows a
 spinner. If an app is using the volume, an alert names that app. Panes showing a folder on an
 ejected volume move to your home folder.
+
+### Adding folders to the sidebar
+
+Add a folder to Favorites in any of these ways:
+
+- Drag it to the top or bottom edge of a Favorites row, or below the last one. A slot opens and
+  shows the row the drop will create. Dropping on the middle of a row still moves or copies the
+  items into that folder.
+- While a folder is dragged over the Hub, a dashed **Add folder here** row waits at the end of
+  Favorites.
+- Right-click it and choose **Add to Sidebar**, or select it and press ⌃⌘T. The folder's icon flies
+  into its new row. Right-click empty pane space to add the folder the pane shows.
+
+A label under the pointer names what a drop will do: **Add to Sidebar**, **Move to** a folder, or
+**Copy to** one. Only folders are added; files, packages, app bundles, and drives are not. A
+folder that is already in the sidebar moves to the drop position, or pulses when added again from
+the menu. A removed place comes back as that place when its folder is added.
+
+Drag any Favorites row, built-in or added, to reorder it. Drag it out of the sidebar and release
+to remove it with a poof, or right-click it and choose **Remove from Sidebar**. A toast offers
+**Undo** (⌘Z) for five seconds. **Restore Default Places**, in the Favorites header's context menu
+and in **Settings → DOKK Hub**, brings removed places back in their default positions and keeps
+added folders.
+
+Added folders are saved as bookmarks, so a folder renamed or moved in Finder keeps its row and
+shows its new name. A deleted folder, or one in the Trash, dims and shows a warning; clicking it
+explains and offers to remove it. A folder on an unplugged drive dims, reads "not connected", and
+works again when the drive mounts. Two rows with the same name show their enclosing folder.
 
 ### Browser tabs and split view
 
@@ -224,9 +252,12 @@ and folder results accept drops.
 
 ### Context menu and keyboard
 
-Right-click an item for **Open**, **Quick Look**, **Reveal in Finder**, **Copy Path**, **Rename**,
-**New Folder**, and **Move to Trash**. Right-click empty space for **New Folder**,
-**Reveal in Finder**, and **Copy Path** for the current folder. **Copy Path** copies plain text, one
+Right-click an item for **Open**, **Quick Look**, **Reveal in Finder**, **Copy Path**,
+**Add to Sidebar** (folders only), **Rename**, **New Folder**, and **Move to Trash**. Right-click
+empty space for **New Folder**, **Add to Sidebar**, **Reveal in Finder**, and **Copy Path** for the
+current folder. When the folders are already in the sidebar, the menu offers **Remove from Sidebar**
+instead. Right-click a Favorites row for **Open in New Tab**, **Reveal in Finder**, **Copy Path**,
+and **Remove from Sidebar**. **Copy Path** copies plain text, one
 path per line. **Reveal in Finder** opens Finder with the item selected and closes an anchored Hub.
 
 | Key | Action |
@@ -237,6 +268,8 @@ path per line. **Reveal in Finder** opens Finder with the item selected and clos
 | Space, ⌘Y | Quick Look |
 | ⌥⌘R | Reveal in Finder |
 | ⌥⌘C | Copy Path |
+| ⌃⌘T | Add the selected folders to the sidebar |
+| ⌘Z | Undo removing a sidebar row, while its toast shows |
 | ⇧⌘N | New Folder |
 | ⌘⌫ | Move to Trash |
 | ⌘A | Select all in the active pane |
@@ -259,8 +292,9 @@ The Files tab has no Copy, Paste, or Duplicate commands. To copy, drag with Opti
 ### Drag and drop
 
 Drag items within the Hub, out to Finder or another app, or in from another app. Folders, empty
-pane space, sidebar places, drives, browser tabs, and breadcrumb segments accept drops. Recents
-does not. Dropping items into the folder they are already in does nothing.
+pane space, sidebar rows, drives, browser tabs, and breadcrumb segments accept drops. Recents does
+not. On a Favorites row, the middle takes the drop and the top and bottom edges add the dragged
+folders to the sidebar instead (see [Adding folders to the sidebar](#adding-folders-to-the-sidebar)). Dropping items into the folder they are already in does nothing.
 
 DOKK follows Finder's rule. A drop on the same volume moves the items, and a drop on another volume
 copies them. Hold Option to copy on the same volume. When another app offers only a copy, DOKK
@@ -301,6 +335,9 @@ The first time, the Files tab opens with a split tab showing Documents and Downl
 tab showing Downloads in Icons. A saved folder that no longer exists falls back to your home
 folder.
 
+The Favorites list (its order, removed places, and added folders) is saved separately and shared
+by the Hub on every display.
+
 ## Open in Hub
 
 **Open in Hub** shows a folder in the Files tab's active pane. A closed Hub opens on the display
@@ -318,10 +355,13 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
 
 - The switcher, header buttons, cards, rows, and drives have VoiceOver labels and actions. Window
   cards report Minimized or Hidden as their value. File rows offer Open and Quick Look actions.
-  Drive rows offer Eject. Browser tabs offer Close Tab.
+  Drive rows offer Eject. Browser tabs offer Close Tab. Favorites rows offer Remove from Sidebar,
+  Move Up, and Move Down, and announce their new position after a move.
 - Reduce Motion: the Hub fades in and out without scaling or moving. The tab switch fades without
   sliding, and the selection pill moves without animation. Hover lifts, entrance staggers, and the
-  tile's halo rotation stop.
+  tile's halo rotation stop. In the sidebar, a folder added from the menu appears without flying
+  in, the arrival glow fades without its light sweep, removing a row skips the poof, and slots open
+  without the spring.
 - Reduce Transparency: the Hub draws an opaque background instead of Liquid Glass.
 
 ## Known limitations

@@ -30,6 +30,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     // Features — app-wide capabilities.
     case shelfAndTrash
     case drives
+    case hub
     case capsules
     case badges
     case notificationFeed
@@ -74,7 +75,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
-        case .shelfAndTrash, .drives, .capsules, .badges, .notificationFeed, .windowPeek, .harbor,
+        case .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed, .windowPeek, .harbor,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
              .discovery, .quarantine: .features
@@ -106,6 +107,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .privacy: .settingsPrivacy
         case .shelfAndTrash: .settingsShelfAndTrash
         case .drives: .settingsVolumes
+        case .hub: .settingsHubTitle
         case .capsules: .settingsCapsules
         case .badges: .appBadgesTitle
         case .notificationFeed: .notificationFeedName
@@ -145,6 +147,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .shelfAndTrash: .settingsFeatureShelfSubtitle
         case .drives: .settingsFeatureDrivesSubtitle
+        case .hub: .settingsFeatureHubSubtitle
         case .capsules: .settingsFeatureCapsulesSubtitle
         case .badges: .settingsFeatureBadgesSubtitle
         case .notificationFeed: .settingsFeatureNotificationFeedSubtitle
@@ -186,6 +189,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .privacy: .symbol("hand.raised.fill")
         case .shelfAndTrash: .symbol("tray.full.fill")
         case .drives: .symbol("externaldrive.fill")
+        case .hub: .symbol("sidebar.left")
         case .capsules: .symbol("capsule.portrait.fill")
         case .badges: .symbol("app.badge.fill")
         case .notificationFeed: .symbol("bell.badge.fill")
@@ -225,6 +229,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .privacy: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .shelfAndTrash: Color(red: 0.70, green: 0.50, blue: 0.28)
         case .drives: Color(red: 0.42, green: 0.48, blue: 0.58)
+        case .hub: Color(red: 0.20, green: 0.48, blue: 0.96)
         case .capsules: Color(red: 0.16, green: 0.62, blue: 0.80)
         case .badges: Color(red: 0.88, green: 0.24, blue: 0.28)
         case .notificationFeed: Color(red: 0.86, green: 0.56, blue: 0.10)
@@ -264,6 +269,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .privacy: [Color(red: 0.42, green: 0.78, blue: 1.0), Color(red: 0.10, green: 0.44, blue: 0.92)]
         case .shelfAndTrash: [Color(red: 0.86, green: 0.68, blue: 0.42), Color(red: 0.56, green: 0.38, blue: 0.18)]
         case .drives: [Color(red: 0.66, green: 0.71, blue: 0.79), Color(red: 0.30, green: 0.35, blue: 0.44)]
+        case .hub: [Color(red: 0.42, green: 0.70, blue: 1.0), Color(red: 0.10, green: 0.36, blue: 0.86)]
         case .capsules: [Color(red: 0.40, green: 0.82, blue: 0.96), Color(red: 0.08, green: 0.50, blue: 0.72)]
         case .badges: [Color(red: 1.0, green: 0.44, blue: 0.42), Color(red: 0.80, green: 0.14, blue: 0.20)]
         case .notificationFeed: [Color(red: 1.0, green: 0.80, blue: 0.32), Color(red: 0.90, green: 0.52, blue: 0.06)]
@@ -311,6 +317,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .behavior, .shownApps: .settingsBehaviorKeywords
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .settingsGeneralKeywords
         case .drives: .settingsDrivesKeywords
+        case .hub: .settingsHubKeywords
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
              .focusSessions, .actionTiles, .multipleDisplays, .permissions: .settingsFeaturesKeywords
         }

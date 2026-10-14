@@ -329,6 +329,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `hub_detach_changed` | `detached` (`true` when the pin button made the Hub a window, `false` when it was attached again) |
 | `hub_file_transfer` | `kind` (`copy`, `move`), `item_count`, `cross_volume`, `outcome` (`completed`, `cancelled`, `failed`). Never names or paths. |
 | `hub_files_view_changed` | `view` (`list`, `icons`, `columns`) |
+| `hub_files_sidebar_edited` | `action` (`add`, `remove`, `reorder`, `restore`, `undo`), `method` (`drag`, `drag_out`, `menu`, `shortcut`, `header_menu`, `settings`, `toast`, `popover`, `accessibility`), `item_count`. Never folder names or paths. |
 | `hub_file_search_result_opened` | `scope` (`this_mac`, `folder`), `is_folder`. Never the query or the result. |
 | `hub_window_activated` | `minimized` (the window was minimized before it was brought forward). Never titles or app names. |
 

@@ -180,6 +180,34 @@ enum HubFilesInteractions {
         return interaction
     }
 
+    /// A Favorites row: a click opens it, a drag moves it or (past the sidebar's edge) removes it,
+    /// and drops route through the sidebar model, which picks "insert here" or "into this folder".
+    static func favorite(_ id: HubFilesSidebarEntryID, model: HubFilesModel,
+                         hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
+        var interaction = sidebarDropArea(model: model)
+        interaction.mouseUp = { _ in model.sidebar.open(id) }
+        interaction.sidebarEntry = id
+        interaction.springLoad = { model.sidebar.open(id) }
+        interaction.menu = { HubFilesContextMenu.favorite(id, model: model) }
+        interaction.hoverChanged = hover
+        return interaction
+    }
+
+    /// Anywhere in the sidebar that isn't a row (gaps, slots, the end slot): drops route through
+    /// the sidebar model, so the space between rows inserts too.
+    static func sidebarDropArea(model: HubFilesModel) -> HubFilesInteraction {
+        var interaction = HubFilesInteraction()
+        interaction.routesDropsToSidebar = true
+        return interaction
+    }
+
+    /// The Favorites header: a drop area with the Restore Default Places menu.
+    static func favoritesHeader(model: HubFilesModel) -> HubFilesInteraction {
+        var interaction = sidebarDropArea(model: model)
+        interaction.menu = { HubFilesContextMenu.favoritesHeader(model: model) }
+        return interaction
+    }
+
     /// A browser tab: a click selects it; drops land in its active pane's folder; resting on it
     /// during a drag switches to it.
     static func tab(_ tab: HubFilesBrowserTab, model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
