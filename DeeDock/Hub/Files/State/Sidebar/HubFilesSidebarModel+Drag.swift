@@ -174,10 +174,8 @@ extension HubFilesSidebarModel {
         let removing = sidebar.map { !$0.insetBy(dx: -30, dy: -30).contains(pointer) } ?? false
         var index = drag.sourceIndex
         if let sidebar, sidebar.contains(pointer), let pointerY = layoutY(atScreen: pointer) {
-            let y = min(max(pointerY, drag.layout.top), drag.layout.bottom)
-            if case .insert(let target) = drag.layout.target(at: y, slot: currentSlot(in: drag.layout), mode: .reorder) {
-                index = target == drag.sourceIndex + 1 ? drag.sourceIndex : target
-            }
+            let target = drag.layout.reorderIndex(at: pointerY, slot: currentSlot(in: drag.layout))
+            index = target == drag.sourceIndex + 1 ? drag.sourceIndex : target
         }
         if removing != drag.removing {
             drag.removing = removing

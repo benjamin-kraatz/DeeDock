@@ -63,6 +63,18 @@ nonisolated struct HubFilesSidebarDropLayout: Equatable, Sendable {
         return baseTarget(at: y, mode: mode)
     }
 
+    /// Where a dragged row would go for a pointer anywhere in the sidebar column.
+    ///
+    /// `y` is in drawn coordinates, where the open slot pushes the rows below it down, so the
+    /// clamp to the Favorites area includes the slot's height. Above the area means first, below
+    /// it (over Drives, say) means last.
+    func reorderIndex(at y: CGFloat, slot: Slot?) -> Int {
+        let drawnBottom = bottom + (slot?.height ?? 0)
+        let clamped = min(max(y, top), drawnBottom)
+        if case .insert(let index) = target(at: clamped, slot: slot, mode: .reorder) { return index }
+        return clamped >= drawnBottom ? count : rows.first?.index ?? 0
+    }
+
     /// Where a slot for `index` starts in the base layout.
     func slotTop(for index: Int) -> CGFloat {
         if let row = rows.first(where: { $0.index >= index }) { return row.top }

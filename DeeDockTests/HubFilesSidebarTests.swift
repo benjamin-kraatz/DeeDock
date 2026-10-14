@@ -88,6 +88,16 @@ struct HubFilesSidebarTests {
         #expect(layout.target(at: 110, slot: nil, mode: .reorder) == .insert(3))
     }
 
+    @Test("A dragged row can reach the end: below the list counts the open slot's height")
+    func reorderReachesTheEnd() {
+        // The slot is open where the dragged first row was lifted from.
+        let slot = HubFilesSidebarDropLayout.Slot(index: 0, top: layout.slotTop(for: 0), height: 32)
+        #expect(layout.reorderIndex(at: 400, slot: slot) == 3)
+        #expect(layout.reorderIndex(at: -50, slot: slot) == 0)
+        // Just past the last drawn row (rows below the slot draw 32 pt lower).
+        #expect(layout.reorderIndex(at: 116 + 32 + 4, slot: slot) == 3)
+    }
+
     // MARK: Store
 
     @Test("A first launch shows the built-in places in their default order")
