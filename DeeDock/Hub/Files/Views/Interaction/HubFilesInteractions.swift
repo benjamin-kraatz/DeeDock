@@ -180,11 +180,12 @@ enum HubFilesInteractions {
         return interaction
     }
 
-    /// A browser tab: a click selects it; drops land in its active pane's folder; resting on it
-    /// during a drag switches to it.
+    /// A browser tab: a click selects it and a middle click closes it; drops land in its active
+    /// pane's folder; resting on it during a drag switches to it.
     static func tab(_ tab: HubFilesBrowserTab, model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
         var interaction = HubFilesInteraction()
         interaction.mouseDown = { _ in model.selectTab(tab.id) }
+        interaction.middleClick = { model.closeTab(tab.id) }
         interaction.dropDestination = { model.dropFolder(for: tab) }
         interaction.dropHighlight = .tab(tab.id)
         interaction.springLoad = { model.selectTab(tab.id) }

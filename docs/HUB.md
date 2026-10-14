@@ -169,7 +169,8 @@ ejected volume move to your home folder.
 
 ⌘T or the **+** button opens a new browser tab with the current folder, sort, and view. ⌘W closes
 the current browser tab when there is more than one. With one browser tab, ⌘W closes the Hub.
-Click a tab to select it. A tab's close button appears on hover.
+Click a tab to select it. A tab's close button appears on hover, and middle-clicking a tab closes
+it, as in a web browser. Neither closes the last browser tab.
 
 **Split View** in the status bar, or ⌥⌘S, shows two panes side by side. The second pane starts in
 Downloads and keeps its folder when you turn split off. Each pane has its own folder, sort,
