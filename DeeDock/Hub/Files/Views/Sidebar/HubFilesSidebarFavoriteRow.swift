@@ -96,7 +96,7 @@ struct HubFilesSidebarFavoriteRow: View {
         .accessibilityValue(Text(verbatim: subtitle ?? (status == .missing ? String(localized: .hubFilesSidebarMissingValue) : "")))
         .accessibilityAddTraits(isCurrent ? [.isButton, .isSelected] : .isButton)
         .accessibilityAction { sidebar.open(entry.id) }
-        .accessibilityAction(named: Text(.hubFilesSidebarRemove)) { sidebar.remove(entry.id, method: .accessibility) }
+        .accessibilityAction(named: Text(.hubFilesSidebarRemove)) { sidebar.remove([entry.id], method: .accessibility) }
         .accessibilityAction(named: Text(.hubFilesSidebarMoveUp)) { sidebar.move(entry.id, by: -1) }
         .accessibilityAction(named: Text(.hubFilesSidebarMoveDown)) { sidebar.move(entry.id, by: 1) }
     }

@@ -11,7 +11,7 @@ struct HubFilesSidebarUndoToast: View {
     var body: some View {
         ZStack {
             if let offer = sidebar.undo {
-                HubFilesSidebarUndoToastContent(title: offer.title) { sidebar.undoRemoval() }
+                HubFilesSidebarUndoToastContent(message: Self.message(for: offer)) { sidebar.undoRemoval() }
                     .id(offer.token)
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .offset(y: 10)).combined(with: .scale(scale: 0.98)),
@@ -20,15 +20,21 @@ struct HubFilesSidebarUndoToast: View {
         }
         .animation(HubFilesMotion.animation(.spring(response: 0.34, dampingFraction: 0.82)), value: sidebar.undo?.token)
     }
+
+    /// "Removed “kuki” from the sidebar", or "Removed 3 items from the sidebar".
+    static func message(for offer: HubFilesSidebarModel.UndoOffer) -> LocalizedStringResource {
+        if let title = offer.title { return .hubFilesSidebarRemovedToast(title) }
+        return .hubFilesSidebarRemovedToastCount(offer.removals.count)
+    }
 }
 
 private struct HubFilesSidebarUndoToastContent: View {
-    let title: String
+    let message: LocalizedStringResource
     let undo: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
-            Text(.hubFilesSidebarRemovedToast(title))
+            Text(message)
                 .font(.system(size: 13))
                 .lineLimit(1)
                 .truncationMode(.middle)
@@ -92,12 +98,12 @@ private struct HubFilesToastBackground: ViewModifier {
 }
 
 #Preview("Undo toast") {
-    HubFilesSidebarUndoToastContent(title: "kuki") {}
+    HubFilesSidebarUndoToastContent(message: .hubFilesSidebarRemovedToast("kuki")) {}
         .padding(30)
 }
 
 #Preview("Undo toast · long name, light") {
-    HubFilesSidebarUndoToastContent(title: "Lightroom export 2026-10 (Moodboard, Screenshots and more)") {}
+    HubFilesSidebarUndoToastContent(message: .hubFilesSidebarRemovedToast("Lightroom export 2026-10 (Moodboard, Screenshots and more)")) {}
         .padding(30)
         .frame(width: 520)
         .preferredColorScheme(.light)

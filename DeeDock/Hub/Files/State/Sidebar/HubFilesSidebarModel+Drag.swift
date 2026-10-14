@@ -25,6 +25,8 @@ struct HubFilesSidebarReorder {
     let grabOffset: CGSize
     /// The row's frame when it lifted, in screen coordinates.
     let rowFrame: CGRect
+    /// The same frame in the drop layout's space (the Favorites section, top-down).
+    let layoutFrame: CGRect
     let layout: HubFilesSidebarDropLayout
     var removing = false
 }
@@ -62,8 +64,8 @@ extension HubFilesSidebarModel {
         if drag.layout == nil { drag.layout = makeLayout(lifted: nil, sources: drag.sources) }
         guard let layout = drag.layout else { return [] }
         let point = window.convertPoint(toScreen: info.draggingLocation)
-        let target = layout.target(at: -point.y, slot: currentSlot(in: layout),
-                                   mode: .items(canInsert: !drag.folders.isEmpty))
+        guard let y = layoutY(atScreen: point) else { return [] }
+        let target = layout.target(at: y, slot: currentSlot(in: layout), mode: .items(canInsert: !drag.folders.isEmpty))
         drag.target = target
         drag.serial += 1
         itemDrag = drag
@@ -134,12 +136,16 @@ extension HubFilesSidebarModel {
 
     /// A Favorites row started moving: it lifts into an overlay and its slot stays open under it.
     func beginReorder(_ id: HubFilesSidebarEntryID, pointer: CGPoint, rowFrame: CGRect) {
+        // A row released a moment ago may still be gliding into place: land it first, so its
+        // completion can't clear this drag's state later.
+        finishPendingSettle()
         guard reorder == nil, let index = store.index(of: id), let entry = store.entry(id),
-              let layout = makeLayout(lifted: id, sources: []) else { return }
+              let layout = makeLayout(lifted: id, sources: []),
+              let layoutFrame = rowViews[id]?.view.flatMap(layoutRect(of:)) else { return }
         reorder = HubFilesSidebarReorder(
             id: id, sourceIndex: index,
             grabOffset: CGSize(width: pointer.x - rowFrame.minX, height: pointer.y - rowFrame.minY),
-            rowFrame: rowFrame, layout: layout)
+            rowFrame: rowFrame, layoutFrame: layoutFrame, layout: layout)
         problem = nil
         var transaction = Transaction()
         transaction.disablesAnimations = true
@@ -160,8 +166,8 @@ extension HubFilesSidebarModel {
         let sidebar = sidebarView?.screenFrame
         let removing = sidebar.map { !$0.insetBy(dx: -30, dy: -30).contains(pointer) } ?? false
         var index = drag.sourceIndex
-        if let sidebar, sidebar.contains(pointer) {
-            let y = min(max(-pointer.y, drag.layout.top), drag.layout.bottom)
+        if let sidebar, sidebar.contains(pointer), let pointerY = layoutY(atScreen: pointer) {
+            let y = min(max(pointerY, drag.layout.top), drag.layout.bottom)
             if case .insert(let target) = drag.layout.target(at: y, slot: currentSlot(in: drag.layout), mode: .reorder) {
                 index = target == drag.sourceIndex + 1 ? drag.sourceIndex : target
             }
@@ -192,7 +198,7 @@ extension HubFilesSidebarModel {
                 slotPreview = nil
             }
             // The gap already closed while the row hovered outside.
-            remove(drag.id, method: .dragOut, animated: false)
+            remove([drag.id], method: .dragOut, animated: false)
             return
         }
         settle(drag, at: slotIndex ?? drag.sourceIndex)
@@ -212,8 +218,12 @@ extension HubFilesSidebarModel {
 
     /// Glides the lifted row onto its slot, then swaps it for the real row at that position.
     private func settle(_ drag: HubFilesSidebarReorder, at index: Int) {
+        settleSerial += 1
+        let serial = settleSerial
+        // Runs once: when the glide ends, or earlier if another drag starts first.
         let finish: @MainActor () -> Void = { [weak self] in
-            guard let self else { return }
+            guard let self, self.pendingSettle?.serial == serial else { return }
+            self.pendingSettle = nil
             self.liftWindow.hide()
             var transaction = Transaction()
             transaction.disablesAnimations = true
@@ -227,16 +237,25 @@ extension HubFilesSidebarModel {
                 Analytics.track(.hubFilesSidebarEdited(.reorder, method: .drag, itemCount: 1))
             }
         }
-        guard !HubFilesMotion.reduceMotion else {
+        pendingSettle = (serial, finish)
+        // Aim for where the slot ends up, from the base layout: its view may still be springing
+        // there, so its current frame isn't reliable yet.
+        let target = CGRect(x: drag.layoutFrame.minX, y: drag.layout.slotTop(for: index),
+                            width: drag.layoutFrame.width, height: drag.layoutFrame.height)
+        guard !HubFilesMotion.reduceMotion, let slot = screenRect(fromLayout: target) else {
             finish()
             return
         }
-        // Aim for where the slot ends up, from the base layout: its view may still be springing
-        // there, so its current frame isn't reliable yet.
-        let top = drag.layout.slotTop(for: index)
-        let origin = CGPoint(x: drag.rowFrame.minX, y: -top - drag.rowFrame.height)
-        liftWindow.move(to: Self.liftFrame(rowOrigin: origin, rowSize: drag.rowFrame.size),
+        liftWindow.move(to: Self.liftFrame(rowOrigin: slot.origin, rowSize: drag.rowFrame.size),
                         duration: 0.22, completion: finish)
+    }
+
+    /// Lands a row that is still gliding into its slot right away, on a fresh overlay window so
+    /// the unfinished frame animation can't move the next lifted row.
+    private func finishPendingSettle() {
+        guard let pending = pendingSettle else { return }
+        pending.finish()
+        liftWindow = HubFilesOverlayWindow()
     }
 
     private func startItemDrag(sequence: Int, sources: [URL]) {
@@ -332,16 +351,18 @@ extension HubFilesSidebarModel {
         slotIndex.map { .init(index: $0, top: layout.slotTop(for: $0), height: slotHeight) }
     }
 
-    /// Measures the Favorites rows in screen space, as top-down distances, for hit testing.
+    /// Measures the Favorites rows for hit testing, in the Favorites section's own top-down space.
     ///
-    /// With `lifted`, that row is left out and the rows below it move up by its height: the base
-    /// layout the reorder slot (opened at the lifted row's place) is mapped against.
+    /// The section scrolls with the sidebar, and pointers are converted into the same space on
+    /// every update (`layoutY(atScreen:)`), so the layout stays right if the sidebar scrolls
+    /// during a drag. With `lifted`, that row is left out and the rows below it move up by its
+    /// height: the base layout the reorder slot (opened at the lifted row's place) is mapped against.
     func makeLayout(lifted: HubFilesSidebarEntryID?, sources: [URL]) -> HubFilesSidebarDropLayout? {
-        guard let favorites = favoritesView?.screenFrame else { return nil }
+        guard favoritesView?.window != nil else { return nil }
         var rows: [HubFilesSidebarDropLayout.Row] = []
         var shift: CGFloat = 0
         for (index, entry) in store.entries.enumerated() {
-            guard let frame = rowViews[entry.id]?.view?.screenFrame else { continue }
+            guard let frame = rowViews[entry.id]?.view.flatMap(layoutRect(of:)) else { continue }
             if entry.id == lifted {
                 shift = frame.height
                 continue
@@ -349,13 +370,31 @@ extension HubFilesSidebarModel {
             let accepts = !sources.isEmpty && store.folderURL(for: entry).map {
                 HubFileTransferQueue.isValidDrop(sources: sources, destination: $0)
             } == true
-            rows.append(.init(index: index, top: -frame.maxY - shift, bottom: -frame.minY - shift, acceptsInto: accepts))
+            rows.append(.init(index: index, top: frame.minY - shift, bottom: frame.maxY - shift, acceptsInto: accepts))
         }
-        let top = -favorites.maxY
+        let top: CGFloat = 0
         let last = rows.last?.bottom ?? top + HubFilesSidebarMetrics.endZone
         let tail = endSlot == nil ? HubFilesSidebarMetrics.endZone
             : HubFilesSidebarMetrics.endSlotSpacing + HubFilesMetrics.rowHeight + HubFilesSidebarMetrics.endZone / 2
         return HubFilesSidebarDropLayout(rows: rows, count: store.entries.count, top: top, bottom: last + tail)
+    }
+
+    /// A screen point as a top-down distance in the Favorites section, the drop layout's space.
+    func layoutY(atScreen point: CGPoint) -> CGFloat? {
+        guard let favorites = favoritesView, let window = favorites.window else { return nil }
+        return favorites.convert(window.convertPoint(fromScreen: point), from: nil).y
+    }
+
+    /// A view's frame in the drop layout's space. The Favorites anchor is flipped, so y grows down.
+    private func layoutRect(of view: NSView) -> CGRect? {
+        guard let favorites = favoritesView, view.window != nil, view.window === favorites.window else { return nil }
+        return favorites.convert(view.bounds, from: view)
+    }
+
+    /// A rect in the drop layout's space, in screen coordinates.
+    private func screenRect(fromLayout rect: CGRect) -> CGRect? {
+        guard let favorites = favoritesView, let window = favorites.window else { return nil }
+        return window.convertToScreen(favorites.convert(rect, to: nil))
     }
 
     func preview(for entry: HubFilesSidebarEntry) -> SlotPreview {

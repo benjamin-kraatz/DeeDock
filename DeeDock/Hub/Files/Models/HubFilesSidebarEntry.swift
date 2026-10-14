@@ -90,15 +90,18 @@ nonisolated struct HubFilesSidebarSnapshot: Codable, Equatable {
         }
     }
 
-    /// The entries this snapshot describes, skipping unknown places and duplicates.
+    /// The entries this snapshot describes, skipping unknown places, repeated rows, and a second
+    /// row for a folder path that is already listed.
     var entries: [HubFilesSidebarEntry] {
         var seen = Set<HubFilesSidebarEntryID>()
+        var paths = Set<String>()
         return items.compactMap { item -> HubFilesSidebarEntry? in
             let entry: HubFilesSidebarEntry? = switch item {
             case .place(let raw): HubFilesPlace(rawValue: raw).map(HubFilesSidebarEntry.place)
             case .folder(let folder): .folder(folder)
             }
             guard let entry, seen.insert(entry.id).inserted else { return nil }
+            if case .folder(let folder) = entry, !paths.insert(folder.path).inserted { return nil }
             return entry
         }
     }

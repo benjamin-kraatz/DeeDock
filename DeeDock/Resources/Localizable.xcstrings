@@ -2361,6 +2361,24 @@
         }
       }
     },
+    "hubFilesSidebarRemovedToastCount" : {
+      "comment" : "Files: toast after one command removed several sidebar rows, next to the Undo button. The number is always 2 or more.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Objekte aus der Seitenleiste entfernt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed %lld items from the sidebar"
+          }
+        }
+      }
+    },
     "hubFilesSidebarRemoveNamed" : {
       "comment" : "Files: pane background context menu when the shown folder is already in the sidebar. The argument is the folder's name.",
       "extractionState" : "manual",

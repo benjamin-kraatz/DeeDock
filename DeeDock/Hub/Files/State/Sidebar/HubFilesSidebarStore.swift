@@ -169,11 +169,24 @@ final class HubFilesSidebarStore {
         return Removal(entry: entry, index: index)
     }
 
-    /// Puts a removed row back where it was. Does nothing if it is back already.
-    func restore(_ removal: Removal) {
-        guard index(of: removal.entry.id) == nil else { return }
+    /// Puts a removed row back where it was.
+    ///
+    /// If the same row or the same folder is back already (added again before Undo), that row
+    /// moves to the old position instead, so the folder never appears twice.
+    /// - Returns: The row now at that position.
+    @discardableResult
+    func restore(_ removal: Removal) -> HubFilesSidebarEntryID? {
+        var existing = index(of: removal.entry.id).map { _ in removal.entry.id }
+        if existing == nil, case .folder(let folder) = removal.entry {
+            existing = entryID(for: currentURL(of: folder))
+        }
+        if let existing {
+            move(existing, to: removal.index)
+            return existing
+        }
         entries.insert(removal.entry, at: min(removal.index, entries.count))
         save()
+        return removal.entry.id
     }
 
     /// Puts every removed built-in place back in its default position and keeps added folders.

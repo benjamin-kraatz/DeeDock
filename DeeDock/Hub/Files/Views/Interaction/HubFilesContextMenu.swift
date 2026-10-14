@@ -36,7 +36,7 @@ enum HubFilesContextMenu {
             menu.addItem(.separator())
             let name = model.displayName(for: folder)
             if let id = model.sidebar.store.entryID(for: folder) {
-                menu.add(.hubFilesSidebarRemoveNamed(name)) { model.sidebar.remove(id, method: .menu) }
+                menu.add(.hubFilesSidebarRemoveNamed(name)) { model.sidebar.remove([id], method: .menu) }
             } else {
                 let origin = NSEvent.mouseLocation
                 menu.add(.hubFilesSidebarAddNamed(name)) {
@@ -80,7 +80,7 @@ extension HubFilesContextMenu {
             FilePathCopy.copy([FilePathCopy.path(of: folder)])
         }
         menu.addItem(.separator())
-        menu.add(.hubFilesSidebarRemove) { sidebar.remove(id, method: .menu) }
+        menu.add(.hubFilesSidebarRemove) { sidebar.remove([id], method: .menu) }
         return menu
     }
 
@@ -101,7 +101,7 @@ extension HubFilesContextMenu {
         let ids = folders.compactMap(store.entryID(for:))
         menu.addItem(.separator())
         if ids.count == folders.count {
-            menu.add(.hubFilesSidebarRemove) { ids.forEach { model.sidebar.remove($0, method: .menu) } }
+            menu.add(.hubFilesSidebarRemove) { model.sidebar.remove(ids, method: .menu) }
         } else {
             // The menu opens at the pointer, over the item: the flight starts there.
             let origin = NSEvent.mouseLocation

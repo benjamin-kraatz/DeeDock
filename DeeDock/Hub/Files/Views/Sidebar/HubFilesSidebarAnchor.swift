@@ -42,6 +42,8 @@ final class HubFilesSidebarAnchorView: NSView {
     var role: HubFilesSidebarAnchorRole?
     weak var sidebar: HubFilesSidebarModel?
 
+    /// Top-down, so the Favorites anchor's coordinates are the drop layout's space.
+    override var isFlipped: Bool { true }
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
     override func isAccessibilityElement() -> Bool { false }
 

@@ -35,10 +35,14 @@ final class HubFilesSidebarModel {
         var token: Int
     }
 
-    /// A removal that can still be undone from the toast or with ⌘Z.
+    /// One removal command (one row, or every row a menu command removed) that can still be
+    /// undone from the toast or with ⌘Z.
     struct UndoOffer: Equatable {
-        let removal: HubFilesSidebarStore.Removal
-        let title: String
+        /// In the order they were removed: highest index first, so each index is the row's
+        /// original position. Undo restores them in reverse.
+        let removals: [HubFilesSidebarStore.Removal]
+        /// The row's name when one row was removed; nil for several.
+        let title: String?
         let token: Int
     }
 
@@ -76,6 +80,9 @@ final class HubFilesSidebarModel {
     @ObservationIgnored var reorder: HubFilesSidebarReorder?
     @ObservationIgnored lazy var labelWindow = HubFilesOverlayWindow()
     @ObservationIgnored lazy var liftWindow = HubFilesOverlayWindow()
+    /// The reorder whose lifted row is still gliding into its slot, and how to land it now.
+    @ObservationIgnored var pendingSettle: (serial: Int, finish: @MainActor () -> Void)?
+    @ObservationIgnored var settleSerial = 0
     @ObservationIgnored private var flashSerial = 0
     @ObservationIgnored private var undoTask: Task<Void, Never>?
 
@@ -175,29 +182,31 @@ final class HubFilesSidebarModel {
 
     // MARK: Removing and Undo
 
-    /// Removes a row and offers Undo for five seconds.
-    func remove(_ id: HubFilesSidebarEntryID, method: AnalyticsHubSidebarMethod, animated: Bool = true) {
-        let title = store.entry(id).map(store.title(for:)) ?? ""
-        let removal: HubFilesSidebarStore.Removal?
-        if animated {
-            removal = HubFilesMotion.withLayoutAnimation { store.remove(id) }
-        } else {
-            removal = store.remove(id)
-        }
-        guard let removal else { return }
-        if problem == id { problem = nil }
-        Analytics.track(.hubFilesSidebarEdited(.remove, method: method, itemCount: 1))
-        offerUndo(removal, title: title)
+    /// Removes rows as one command and offers Undo for all of them for five seconds.
+    func remove(_ ids: [HubFilesSidebarEntryID], method: AnalyticsHubSidebarMethod, animated: Bool = true) {
+        let ordered = ids.compactMap { id in store.index(of: id).map { (id, $0) } }
+            .sorted { $0.1 > $1.1 }
+        guard !ordered.isEmpty else { return }
+        let title = ordered.count == 1 ? store.entry(ordered[0].0).map(store.title(for:)) : nil
+        // Highest index first, so removing one row doesn't shift the rows still to go, and each
+        // recorded index is that row's original position.
+        let removeAll = { ordered.compactMap { self.store.remove($0.0) } }
+        let removals = animated ? HubFilesMotion.withLayoutAnimation(removeAll) : removeAll()
+        if let problem, ids.contains(problem) { self.problem = nil }
+        Analytics.track(.hubFilesSidebarEdited(.remove, method: method, itemCount: removals.count))
+        offerUndo(removals, title: title)
     }
 
-    /// Puts the last removed row back. Returns false when there is nothing to undo.
+    /// Puts the last removed rows back where they were. Returns false when there is nothing to undo.
     @discardableResult
     func undoRemoval() -> Bool {
         guard let undo else { return false }
         dismissUndo()
-        HubFilesMotion.withLayoutAnimation { store.restore(undo.removal) }
-        flash([undo.removal.entry.id], .arrival)
-        Analytics.track(.hubFilesSidebarEdited(.undo, method: .toast, itemCount: 1))
+        let restored = HubFilesMotion.withLayoutAnimation {
+            undo.removals.reversed().compactMap { store.restore($0) }
+        }
+        flash(restored, .arrival)
+        Analytics.track(.hubFilesSidebarEdited(.undo, method: .toast, itemCount: restored.count))
         return true
     }
 
@@ -207,9 +216,9 @@ final class HubFilesSidebarModel {
         undo = nil
     }
 
-    private func offerUndo(_ removal: HubFilesSidebarStore.Removal, title: String) {
+    private func offerUndo(_ removals: [HubFilesSidebarStore.Removal], title: String?) {
         flashSerial += 1
-        undo = UndoOffer(removal: removal, title: title, token: flashSerial)
+        undo = UndoOffer(removals: removals, title: title, token: flashSerial)
         undoTask?.cancel()
         undoTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(5))

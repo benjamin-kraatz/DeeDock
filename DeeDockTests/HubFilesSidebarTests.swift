@@ -138,6 +138,40 @@ struct HubFilesSidebarTests {
         #expect(store.index(of: id) == 2)
     }
 
+    @Test("Removing several rows in one command undoes as one, each back in its old place")
+    func batchRemovalUndo() {
+        let sidebar = HubFilesSidebarModel(store: store())
+        let before = paths(sidebar.store)
+        sidebar.remove([.place(.desktop), .place(.home)], method: .menu, animated: false)
+        #expect(paths(sidebar.store) == ["recents", "documents", "downloads", "applications"])
+        #expect(sidebar.undo?.removals.count == 2)
+
+        #expect(sidebar.undoRemoval())
+        #expect(paths(sidebar.store) == before)
+        #expect(!sidebar.undoRemoval())
+    }
+
+    @Test("Undo after the folder was added again moves that row back instead of duplicating it")
+    func undoAfterReAddDoesNotDuplicate() throws {
+        let store = store()
+        store.insert([folder("/Users/tester/Projects/A")], at: 1)
+        let removal = try #require(store.remove(store.entries[1].id))
+        store.insert([folder("/Users/tester/Projects/A")], at: store.entries.count)
+
+        store.restore(removal)
+        #expect(paths(store).filter { $0 == "/Users/tester/Projects/A" }.count == 1)
+        #expect(paths(store)[1] == "/Users/tester/Projects/A")
+    }
+
+    @Test("A stored list never yields two rows for the same folder path")
+    func snapshotDedupesFolderPaths() {
+        let path = "/Users/tester/Projects/A"
+        let snapshot = HubFilesSidebarSnapshot(entries: [
+            .folder(HubFilesSidebarFolder(path: path)), .place(.desktop), .folder(HubFilesSidebarFolder(path: path))
+        ])
+        #expect(snapshot.entries.count == 2)
+    }
+
     @Test("Restore Default Places brings removed places back in order and keeps added folders")
     func restoreDefaultPlaces() {
         let store = store()

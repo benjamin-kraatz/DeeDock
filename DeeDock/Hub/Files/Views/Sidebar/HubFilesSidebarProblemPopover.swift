@@ -38,7 +38,7 @@ struct HubFilesSidebarProblemPopover: View {
                 if status == .missing {
                     Button(.hubFilesSidebarRemove) {
                         model.sidebar.problem = nil
-                        model.sidebar.remove(entryID, method: .popover)
+                        model.sidebar.remove([entryID], method: .popover)
                     }
                 }
                 Button(.hubFilesAlertOK) { model.sidebar.problem = nil }
