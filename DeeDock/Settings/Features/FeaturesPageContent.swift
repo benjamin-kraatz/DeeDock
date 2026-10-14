@@ -32,6 +32,10 @@ struct FeaturesPageContent: View {
                                               visibility: VolumeVisibility(settings: source.value))
                     .disabled(!source.value.showVolumes)
             }
+        case .hub:
+            if let files = context.coordinator?.hub.files {
+                HubFilesSidebarSettingsCard(sidebar: files.sidebar)
+            }
         case .capsules:
             SettingsCard(title: .settingsCapsules, footnote: .settingsCapsulesHelp) {
                 SettingsToggleRow(title: .settingsShowCapsules, isOn: source.binding(\.showSessionCapsules))

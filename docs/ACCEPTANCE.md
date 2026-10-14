@@ -3230,3 +3230,30 @@ The app was not launched. None of the following has been exercised by hand:
 - What `desktopImageURL` returns for dynamic and Aerial wallpapers.
 - Multiple displays, mixed backing scales, and a dock on the left or right edge.
 - Close with an unsaved document, Stage Manager, VoiceOver, Reduce Motion, and Reduce Transparency.
+
+## Hub Files sidebar folders (DEE-128)
+
+People add folders to the Files tab's Favorites by dragging them between rows or with **Add to Sidebar** (⌃⌘T). Built-in places can be reordered and removed too. The look and the choices come from the interactive mockup `docs/mockups/hub-files-sidebar-favorites.html`: preview-row slots, the end slot during folder drags, movable and removable places, one Favorites list, and drag-out removal with a poof and Undo.
+
+### Implemented
+
+- `HubFilesSidebarStore` holds the list under `hub.files.sidebar.v1`. Added folders are stored as bookmarks plus their last path. Resolution runs on `VolumeReads` with `.withoutMounting`: at launch, when the Files tab appears (throttled to every 2 s), after an add, rename, move, or Trash in the Hub, and on mount, unmount, and volume rename. Folders on unplugged `/Volumes` drives read "not connected"; deleted or trashed ones read missing.
+- Every sidebar drop surface (rows, slots, the header, and the gaps) forwards to `HubFilesSidebarModel`. It hit-tests the whole list with `HubFilesSidebarDropLayout` against a base layout measured once per drag, so a slot opening under the pointer can't change the target. The top and bottom quarters of a row insert, and the middle drops into the folder. A drop settles the system drag image into the slot.
+- Reordering and drag-out removal run in the row's own event-tracking loop. The lifted row, the action label, the poof, and the menu-add flight draw in click-through overlay windows above the Hub, so they follow the pointer past its edge. AppKit's poof (`NSShowAnimationEffect`) has been deprecated since macOS 14, so the puffs are drawn; the cursor is `NSCursor.disappearingItem`.
+- Undo toast with ⌘Z for five seconds, a popover for missing and disconnected folders, **Restore Default Places** in the Favorites header menu and in Settings → DOKK Hub, VoiceOver Remove/Move Up/Move Down with a position announcement, and Reduce Motion and Reduce Transparency fallbacks.
+- Count-only analytics: `hub_files_sidebar_edited` (`action`, `method`, `item_count`).
+
+### Validation status
+
+`xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath <scratch> CODE_SIGNING_ALLOWED=NO build-for-testing` returned **TEST BUILD SUCCEEDED**, with no warnings from the new files.
+
+`DeeDockTests/HubFilesSidebarTests.swift` covers drop targets (edges, middles, files-only drags, the end zone, slot mapping, reorder halves), insert dedupe, places coming back as places, move semantics, Undo, Restore Default Places, persistence with an unknown place, and a bookmark following a rename on disk. The tests were compiled but not run, following `AGENTS.md`.
+
+The app was not launched. None of the following has been exercised by hand:
+
+- Dragging folders from the list, icons, columns, search results, and Finder: slot stability while moving slowly across row edges, the end slot appearing and disappearing, and the drag image settling into the slot.
+- Spring-loading on Favorites rows while a drop would land inside them.
+- Reordering and drag-out removal: the lifted row past the Hub's edge, the poof cursor, the poof at release, Escape, and the settle animation on a scrolled sidebar.
+- The menu-add flight from list rows, tiles, and columns, and the arrival glow.
+- A folder renamed or moved in Finder while the Hub is closed, a folder on an unplugged drive, a trashed folder, and network shares that are offline.
+- The missing-folder popover in an anchored Hub (it must not close the Hub), VoiceOver, Reduce Motion, and Reduce Transparency.

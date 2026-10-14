@@ -40,6 +40,13 @@ protocol HubFilesDataSource: AnyObject {
 
     /// Starts watching `folder`; `onChange` runs on the main actor until the watch is stopped.
     func watch(_ folder: URL, onChange: @escaping @MainActor () -> Void) -> HubFilesWatch?
+
+    /// Finds the sidebar's added folders: through bookmarks on disk, or in the in-memory tree.
+    func makeSidebarResolver() -> any HubFilesSidebarResolving
+
+    /// Whether the sidebar re-resolves its folders when volumes mount and unmount. Only the live
+    /// source listens; previews and tests stay off `NSWorkspace`.
+    var observesVolumes: Bool { get }
 }
 
 /// The production data source over `HubDirectoryLister`, `HubDirectoryWatcher`, and `HubRecentFiles`.
@@ -50,6 +57,10 @@ final class HubFilesLiveDataSource: HubFilesDataSource {
     let homeDirectory = HubFilesPath.normalized(FileManager.default.homeDirectoryForCurrentUser)
 
     var recentItems: [HubFileItem] { recents.items }
+
+    let observesVolumes = true
+
+    func makeSidebarResolver() -> any HubFilesSidebarResolving { HubFilesSidebarBookmarkResolver() }
 
     func setRecentsActive(_ active: Bool) {
         if active { recents.start() } else { recents.stop() }

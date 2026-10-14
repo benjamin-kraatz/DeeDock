@@ -80,6 +80,8 @@ extension HubFilesModel {
             let renamed = try HubFileOperations.rename(url, to: draft)
             pane.selectWhenListed([renamed])
             pane.reload()
+            // A renamed sidebar folder shows its new name right away.
+            sidebar.store.refresh(force: true)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -109,6 +111,15 @@ extension HubFilesModel {
         }
     }
 
+    // MARK: Sidebar
+
+    /// ⌃⌘T: adds the selected folders to the end of the sidebar. Ones already there pulse.
+    func addSelectionToSidebar() {
+        let folders = actionableItems.filter(\.isSidebarCandidate).map(\.url)
+        guard !folders.isEmpty else { return }
+        sidebar.addFromCommand(folders, method: .shortcut, flightOrigin: nil)
+    }
+
     // MARK: Trash
 
     /// Moves the selected items to the Trash. The folder watcher removes them from the listing.
@@ -118,6 +129,8 @@ extension HubFilesModel {
         Task { [weak self] in
             do {
                 _ = try await HubFileOperations.moveToTrash(urls)
+                // A sidebar folder that went to the Trash shows as missing.
+                self?.sidebar.store.refresh(force: true)
             } catch {
                 self?.errorMessage = error.localizedDescription
             }
@@ -152,6 +165,8 @@ extension HubFilesModel {
     /// Flashes the arrived items in every pane that shows the job's destination.
     func transferDidFinish() {
         guard let job = transfers.lastFinished, job.state == .finished else { return }
+        // A moved sidebar folder keeps its row; its bookmark finds the new place.
+        if job.kind == .move { sidebar.store.refresh(force: true) }
         let arrived = job.sources.map { job.destination.appending(path: $0.lastPathComponent, directoryHint: .notDirectory) }
         for tab in tabs {
             for pane in tab.panes where pane.folderURL.map({ HubFilesPath.same($0, job.destination) }) ?? false {
