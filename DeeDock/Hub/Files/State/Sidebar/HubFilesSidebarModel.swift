@@ -83,6 +83,8 @@ final class HubFilesSidebarModel {
     /// The reorder whose lifted row is still gliding into its slot, and how to land it now.
     @ObservationIgnored var pendingSettle: (serial: Int, finish: @MainActor () -> Void)?
     @ObservationIgnored var settleSerial = 0
+    /// Changes when a reorder is aborted, so a tracking loop still running for it stops.
+    @ObservationIgnored private(set) var reorderSession = 0
     /// Menu-add flights in progress, owned so a hidden tab can stop them.
     @ObservationIgnored var flightTasks: [Task<Void, Never>] = []
     @ObservationIgnored var flightWindows: [HubFilesOverlayWindow] = []
@@ -177,6 +179,26 @@ final class HubFilesSidebarModel {
             }
             self?.launchFlights(for: added, urls: fresh, from: flightOrigin)
         })
+    }
+
+    /// Drops a reorder in progress without committing it: the row goes back where it was, with no
+    /// animation, and the tracking loop for it ends. Called when the Files tab hides, so a release
+    /// after the Hub closed can't move or remove a row.
+    func abortReorder() {
+        reorderSession += 1
+        finishPendingSettle()
+        guard reorder != nil else { return }
+        reorder = nil
+        NSCursor.arrow.set()
+        files?.shell?.endHold(.drag)
+        liftWindow.hide()
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            liftedID = nil
+            slotIndex = nil
+            slotPreview = nil
+        }
     }
 
     /// Stops every flight and shows the rows they were headed for. Called when the Files tab hides,

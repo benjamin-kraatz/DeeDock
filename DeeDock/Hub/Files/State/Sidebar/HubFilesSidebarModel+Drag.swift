@@ -259,7 +259,7 @@ extension HubFilesSidebarModel {
 
     /// Lands a row that is still gliding into its slot right away, on a fresh overlay window so
     /// the unfinished frame animation can't move the next lifted row.
-    private func finishPendingSettle() {
+    func finishPendingSettle() {
         guard let pending = pendingSettle else { return }
         pending.finish()
         liftWindow = HubFilesOverlayWindow()

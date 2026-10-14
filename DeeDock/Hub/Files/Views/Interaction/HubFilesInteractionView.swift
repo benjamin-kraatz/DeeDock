@@ -169,33 +169,77 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     /// Runs its own event-tracking loop instead of an `NSDraggingSession`: the row is not a file
     /// drag, and the loop sees every pointer move, inside the Hub or not, so the lifted row, the
     /// poof cursor, and the slot all follow. Lifting hides the row, which dismantles this view;
-    /// the loop keeps its own references to the window and the sidebar model for that reason.
+    /// the loop keeps its own references to the window, the sidebar model, and the sidebar's scroll
+    /// view for that reason.
+    ///
+    /// The loop wakes every frame even without events, to scroll the sidebar while the pointer
+    /// rests near its top or bottom edge (a custom tracking loop gets no autoscroll from AppKit).
+    /// It ends as soon as the sidebar aborts the session, for example when the Files tab hides.
     private func trackReorder(_ id: HubFilesSidebarEntryID, sidebar: HubFilesSidebarModel, window: NSWindow) {
+        let session = sidebar.reorderSession
+        let scrollView = enclosingScrollView
         // Starting can wait a frame or two (another row still landing, the list not laid out yet);
         // each move retries until it starts.
         var started = false
         func startIfNeeded() {
-            guard !started, let rowFrame = screenFrame else { return }
+            guard !started, sidebar.reorderSession == session, let rowFrame = screenFrame else { return }
             started = sidebar.beginReorder(id, pointer: NSEvent.mouseLocation, rowFrame: rowFrame)
         }
         startIfNeeded()
         if started { sidebar.updateReorder(pointer: NSEvent.mouseLocation) }
-        while let next = window.nextEvent(matching: [.leftMouseDragged, .leftMouseUp, .keyDown],
-                                          until: .distantFuture, inMode: .eventTracking, dequeue: true) {
-            switch next.type {
-            case .keyDown where next.keyCode == 53:
+        while sidebar.reorderSession == session {
+            let next = window.nextEvent(matching: [.leftMouseDragged, .leftMouseUp, .keyDown],
+                                        until: Date(timeIntervalSinceNow: 1.0 / 60), inMode: .eventTracking, dequeue: true)
+            guard sidebar.reorderSession == session else { return }
+            switch next?.type {
+            case .keyDown? where next?.keyCode == 53:
                 sidebar.cancelReorder()
                 return
-            case .leftMouseUp:
+            case .leftMouseUp?:
                 sidebar.endReorder(pointer: NSEvent.mouseLocation)
                 return
-            case .leftMouseDragged:
+            case .leftMouseDragged?:
                 startIfNeeded()
                 if started { sidebar.updateReorder(pointer: NSEvent.mouseLocation) }
             default:
-                continue
+                // A quiet frame: scroll if the pointer rests at an edge, then retarget the slot.
+                if started, Self.autoscroll(scrollView, toward: NSEvent.mouseLocation) {
+                    sidebar.updateReorder(pointer: NSEvent.mouseLocation)
+                }
             }
         }
+    }
+
+    /// Scrolls `scrollView` one step when `pointer` (screen) is within its top or bottom 28 pt, or
+    /// up to 30 pt beyond it, faster nearer the edge. Returns whether it scrolled.
+    private static func autoscroll(_ scrollView: NSScrollView?, toward pointer: CGPoint) -> Bool {
+        guard let scrollView, let frame = scrollView.screenFrame,
+              pointer.x >= frame.minX, pointer.x <= frame.maxX else { return false }
+        let edge: CGFloat = 28, overshoot: CGFloat = 30
+        let direction: CGFloat
+        let depth: CGFloat
+        if pointer.y > frame.maxY - edge, pointer.y <= frame.maxY + overshoot {
+            direction = -1
+            depth = pointer.y - (frame.maxY - edge)
+        } else if pointer.y < frame.minY + edge, pointer.y >= frame.minY - overshoot {
+            direction = 1
+            depth = (frame.minY + edge) - pointer.y
+        } else {
+            return false
+        }
+        let clip = scrollView.contentView
+        guard let document = scrollView.documentView else { return false }
+        let step = min(2 + depth * 0.35, 14)
+        let maxY = max(0, document.frame.height - clip.bounds.height)
+        var origin = clip.bounds.origin
+        // Toward the end of the list means a larger y in a flipped clip view, a smaller one otherwise.
+        // Either way the origin stays within 0...maxY.
+        let delta = (clip.isFlipped ? direction : -direction) * step
+        origin.y = min(max(origin.y + delta, 0), maxY)
+        guard origin.y != clip.bounds.origin.y else { return false }
+        clip.scroll(to: origin)
+        scrollView.reflectScrolledClipView(clip)
+        return true
     }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {

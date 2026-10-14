@@ -148,6 +148,7 @@ final class HubFilesModel: HubTabModel {
         cancelRenames()
         dropHighlight = nil
         sidebar.endItemDrag()
+        sidebar.abortReorder()
         sidebar.cancelFlights()
         sidebar.problem = nil
         volumes.stop()
