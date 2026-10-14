@@ -145,7 +145,9 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         guard !urls.isEmpty else { return }
         let side = min(bounds.height, 32)
         let start = convert(event.locationInWindow, from: nil)
-        let items = urls.prefix(64).enumerated().map { index, url in
+        // The session carries at most 64 items; the sidebar must act on exactly those.
+        let urls = Array(urls.prefix(64))
+        let items = urls.enumerated().map { index, url in
             let item = NSDraggingItem(pasteboardWriter: url as NSURL)
             let offset = CGFloat(min(index, 4)) * 3
             let frame = CGRect(x: start.x - side / 2 + offset, y: start.y - side / 2 + offset, width: side, height: side)
@@ -169,9 +171,15 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     /// poof cursor, and the slot all follow. Lifting hides the row, which dismantles this view;
     /// the loop keeps its own references to the window and the sidebar model for that reason.
     private func trackReorder(_ id: HubFilesSidebarEntryID, sidebar: HubFilesSidebarModel, window: NSWindow) {
-        guard let rowFrame = screenFrame else { return }
-        sidebar.beginReorder(id, pointer: NSEvent.mouseLocation, rowFrame: rowFrame)
-        sidebar.updateReorder(pointer: NSEvent.mouseLocation)
+        // Starting can wait a frame or two (another row still landing, the list not laid out yet);
+        // each move retries until it starts.
+        var started = false
+        func startIfNeeded() {
+            guard !started, let rowFrame = screenFrame else { return }
+            started = sidebar.beginReorder(id, pointer: NSEvent.mouseLocation, rowFrame: rowFrame)
+        }
+        startIfNeeded()
+        if started { sidebar.updateReorder(pointer: NSEvent.mouseLocation) }
         while let next = window.nextEvent(matching: [.leftMouseDragged, .leftMouseUp, .keyDown],
                                           until: .distantFuture, inMode: .eventTracking, dequeue: true) {
             switch next.type {
@@ -182,7 +190,8 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
                 sidebar.endReorder(pointer: NSEvent.mouseLocation)
                 return
             case .leftMouseDragged:
-                sidebar.updateReorder(pointer: NSEvent.mouseLocation)
+                startIfNeeded()
+                if started { sidebar.updateReorder(pointer: NSEvent.mouseLocation) }
             default:
                 continue
             }

@@ -135,13 +135,19 @@ extension HubFilesSidebarModel {
     // MARK: Reordering
 
     /// A Favorites row started moving: it lifts into an overlay and its slot stays open under it.
-    func beginReorder(_ id: HubFilesSidebarEntryID, pointer: CGPoint, rowFrame: CGRect) {
-        // A row released a moment ago may still be gliding into place: land it first, so its
-        // completion can't clear this drag's state later.
-        finishPendingSettle()
+    ///
+    /// - Returns: False when it can't start yet: a row released a moment ago was still gliding
+    ///   into place (it lands now, and its row reappears on the next layout pass), or some row
+    ///   has no laid-out view to measure. The caller retries on the next pointer move.
+    @discardableResult
+    func beginReorder(_ id: HubFilesSidebarEntryID, pointer: CGPoint, rowFrame: CGRect) -> Bool {
+        if pendingSettle != nil {
+            finishPendingSettle()
+            return false
+        }
         guard reorder == nil, let index = store.index(of: id), let entry = store.entry(id),
               let layout = makeLayout(lifted: id, sources: []),
-              let layoutFrame = rowViews[id]?.view.flatMap(layoutRect(of:)) else { return }
+              let layoutFrame = rowViews[id]?.view.flatMap(layoutRect(of:)) else { return false }
         reorder = HubFilesSidebarReorder(
             id: id, sourceIndex: index,
             grabOffset: CGSize(width: pointer.x - rowFrame.minX, height: pointer.y - rowFrame.minY),
@@ -157,6 +163,7 @@ extension HubFilesSidebarModel {
         }
         showLiftedRow(entry, removing: false, pointer: pointer)
         files?.shell?.beginHold(.drag)
+        return true
     }
 
     /// The lifted row moved. Far enough outside the sidebar it would be removed; just outside, it
@@ -362,7 +369,9 @@ extension HubFilesSidebarModel {
         var rows: [HubFilesSidebarDropLayout.Row] = []
         var shift: CGFloat = 0
         for (index, entry) in store.entries.enumerated() {
-            guard let frame = rowViews[entry.id]?.view.flatMap(layoutRect(of:)) else { continue }
+            // A row without a laid-out view (just restored, or not rebuilt yet) would leave a hole
+            // that reads as "insert at the end"; measure again on the next update instead.
+            guard let frame = rowViews[entry.id]?.view.flatMap(layoutRect(of:)) else { return nil }
             if entry.id == lifted {
                 shift = frame.height
                 continue

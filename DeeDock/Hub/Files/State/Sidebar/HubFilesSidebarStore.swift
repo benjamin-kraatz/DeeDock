@@ -180,8 +180,11 @@ final class HubFilesSidebarStore {
         if existing == nil, case .folder(let folder) = removal.entry {
             existing = entryID(for: currentURL(of: folder))
         }
-        if let existing {
-            move(existing, to: removal.index)
+        if let existing, let current = index(of: existing) {
+            // `removal.index` is an absolute position, unlike `move(_:to:)`'s "before this row".
+            let entry = entries.remove(at: current)
+            entries.insert(entry, at: min(removal.index, entries.count))
+            save()
             return existing
         }
         entries.insert(removal.entry, at: min(removal.index, entries.count))

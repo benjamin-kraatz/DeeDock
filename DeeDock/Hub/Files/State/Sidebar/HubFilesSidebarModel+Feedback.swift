@@ -96,18 +96,25 @@ extension HubFilesSidebarModel {
             // The view's coordinates are top-down from the window's top-left corner.
             let local = { (point: CGPoint) in CGPoint(x: point.x - frame.minX, y: frame.maxY - point.y) }
             let window = HubFilesOverlayWindow()
+            flightWindows.append(window)
             let icon = HubThumbnailCache.shared.icon(for: url)
-            Task { [weak self] in
-                try? await Task.sleep(for: .seconds(delay))
-                window.show(HubFilesFlightView(icon: icon, start: local(origin), end: local(end),
-                                               duration: HubFilesSidebarMetrics.flightDuration),
-                            frame: frame)
-                try? await Task.sleep(for: .seconds(HubFilesSidebarMetrics.flightDuration))
-                self?.flightLanded(on: id)
-                // The icon fades over the glowing row before the window goes.
-                try? await Task.sleep(for: .seconds(HubFilesFlightView.fadeDuration + 0.04))
+            // Cancelled by `cancelFlights()`, which also hides the window and reveals the row.
+            flightTasks.append(Task { [weak self] in
+                do {
+                    try await Task.sleep(for: .seconds(delay))
+                    window.show(HubFilesFlightView(icon: icon, start: local(origin), end: local(end),
+                                                   duration: HubFilesSidebarMetrics.flightDuration),
+                                frame: frame)
+                    try await Task.sleep(for: .seconds(HubFilesSidebarMetrics.flightDuration))
+                    self?.flightLanded(on: id)
+                    // The icon fades over the glowing row before the window goes.
+                    try await Task.sleep(for: .seconds(HubFilesFlightView.fadeDuration + 0.04))
+                } catch {
+                    return
+                }
                 window.hide()
-            }
+                self?.flightWindows.removeAll { $0 === window }
+            })
         }
     }
 }

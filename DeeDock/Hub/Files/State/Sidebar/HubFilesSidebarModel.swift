@@ -83,6 +83,9 @@ final class HubFilesSidebarModel {
     /// The reorder whose lifted row is still gliding into its slot, and how to land it now.
     @ObservationIgnored var pendingSettle: (serial: Int, finish: @MainActor () -> Void)?
     @ObservationIgnored var settleSerial = 0
+    /// Menu-add flights in progress, owned so a hidden tab can stop them.
+    @ObservationIgnored var flightTasks: [Task<Void, Never>] = []
+    @ObservationIgnored var flightWindows: [HubFilesOverlayWindow] = []
     @ObservationIgnored private var flashSerial = 0
     @ObservationIgnored private var undoTask: Task<Void, Never>?
 
@@ -92,6 +95,8 @@ final class HubFilesSidebarModel {
 
     isolated deinit {
         undoTask?.cancel()
+        flightTasks.forEach { $0.cancel() }
+        flightWindows.forEach { $0.hide() }
     }
 
     // MARK: Row state
@@ -163,15 +168,25 @@ final class HubFilesSidebarModel {
             return
         }
         awaitingFlight.formUnion(added)
-        Task { [weak self] in
+        flightTasks.append(Task { [weak self] in
             // The new rows get views and frames on SwiftUI's next update; wait a few frames for them.
             for _ in 0..<6 {
                 guard let self else { return }
                 if added.allSatisfy({ self.rowViews[$0]?.view?.window != nil }) { break }
-                try? await Task.sleep(for: .milliseconds(16))
+                do { try await Task.sleep(for: .milliseconds(16)) } catch { return }
             }
             self?.launchFlights(for: added, urls: fresh, from: flightOrigin)
-        }
+        })
+    }
+
+    /// Stops every flight and shows the rows they were headed for. Called when the Files tab hides,
+    /// so no icon keeps flying over another tab or the desktop.
+    func cancelFlights() {
+        flightTasks.forEach { $0.cancel() }
+        flightTasks.removeAll()
+        flightWindows.forEach { $0.hide() }
+        flightWindows.removeAll()
+        awaitingFlight.removeAll()
     }
 
     /// Ends a flight: shows the row it landed on and plays the arrival glow.

@@ -113,8 +113,8 @@ extension HubFilesContextMenu {
 }
 
 extension HubFileItem {
-    /// A folder that can be a sidebar row: not a file, package, or app bundle.
-    var isSidebarCandidate: Bool { isDirectory && !isPackage }
+    /// A folder that can be a sidebar row: not a file, package, app bundle, or drive.
+    var isSidebarCandidate: Bool { isDirectory && !isPackage && !HubFilesPath.isVolumeRoot(url) }
 }
 
 /// A context menu that runs closures and holds the Hub open while it tracks.

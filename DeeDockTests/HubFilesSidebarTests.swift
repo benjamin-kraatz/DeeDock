@@ -163,6 +163,18 @@ struct HubFilesSidebarTests {
         #expect(paths(store)[1] == "/Users/tester/Projects/A")
     }
 
+    @Test("Undo puts a folder re-added above its old place back at that exact position")
+    func undoAfterReAddAboveOriginalPosition() throws {
+        let store = store()
+        store.insert([folder("/Users/tester/Projects/A")], at: 2)
+        let removal = try #require(store.remove(store.entries[2].id))
+        store.insert([folder("/Users/tester/Projects/A")], at: 0)
+
+        store.restore(removal)
+        #expect(paths(store)[2] == "/Users/tester/Projects/A")
+        #expect(paths(store).filter { $0 == "/Users/tester/Projects/A" }.count == 1)
+    }
+
     @Test("A stored list never yields two rows for the same folder path")
     func snapshotDedupesFolderPaths() {
         let path = "/Users/tester/Projects/A"
