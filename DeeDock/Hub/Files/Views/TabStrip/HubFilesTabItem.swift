@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// One browser tab: folder icon and name, a close button on hover, and an accent underline when
-/// selected. It is also a drop target, and resting on it during a drag switches to it.
+/// selected. A middle click closes it. It is also a drop target, and resting on it during a drag switches to it.
 struct HubFilesTabItem: View {
     let model: HubFilesModel
     let tab: HubFilesBrowserTab

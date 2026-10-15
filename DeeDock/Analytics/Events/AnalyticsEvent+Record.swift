@@ -54,6 +54,7 @@ extension AnalyticsEvent {
         case .hubDetachChanged: "hub_detach_changed"
         case .hubFileTransfer: "hub_file_transfer"
         case .hubFilesViewChanged: "hub_files_view_changed"
+        case .hubFilesSidebarEdited: "hub_files_sidebar_edited"
         case .hubFileSearchResultOpened: "hub_file_search_result_opened"
         case .lookoutResultOpened: "lookout_result_opened"
         case .lookoutImageSearch: "lookout_image_search"
@@ -215,6 +216,8 @@ extension AnalyticsEvent {
              "outcome": .init(outcome)]
         case let .hubFilesViewChanged(view):
             ["view": .init(view)]
+        case let .hubFilesSidebarEdited(action, method, itemCount):
+            ["action": .init(action), "method": .init(method), "item_count": .init(itemCount)]
         case let .hubFileSearchResultOpened(scope, isFolder):
             ["scope": .init(scope), "is_folder": .init(isFolder)]
         case let .lookoutResultOpened(section, rank, kind, match, scope, isLookup, query):

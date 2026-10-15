@@ -86,6 +86,15 @@ extension HubFilesModel {
     /// ⌘ shortcuts shared by panes and results. Returns nil when the event is not one of them.
     private func handleCommand(character: String, key: NSEvent.SpecialKey?, flags: NSEvent.ModifierFlags) -> Bool? {
         let option = flags.contains(.option), shift = flags.contains(.shift)
+        if flags.contains(.control) {
+            // ⌃⌘T adds the selected folders to the sidebar, as in Finder. Checked first: without
+            // Control the same key opens a tab.
+            guard character == "t", !option, !shift else { return nil }
+            addSelectionToSidebar()
+            return true
+        }
+        // ⌘Z undoes a sidebar removal while its toast offers it; otherwise it isn't ours.
+        if character == "z", !option, !shift, sidebar.undoRemoval() { return true }
         switch (character, option, shift) {
         case ("t", false, false):
             newTab(); return true

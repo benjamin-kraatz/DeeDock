@@ -160,19 +160,48 @@ status bar.
 
 ### Sidebar and drives
 
-**Favorites** lists Recents, Desktop, Documents, Downloads, your home folder, and Applications.
-Recents comes from Spotlight. **Drives** lists the startup disk and every mounted volume under
+**Favorites** starts with Recents, Desktop, Documents, Downloads, your home folder, and
+Applications. Recents comes from Spotlight. **Drives** lists the startup disk and every mounted volume under
 `/Volumes`, each with its free space. The list updates when volumes mount, unmount, or are renamed.
 
 External disks, disk images, and network volumes have an eject button. The startup disk does not. While it ejects, the row dims and shows a
 spinner. If an app is using the volume, an alert names that app. Panes showing a folder on an
 ejected volume move to your home folder.
 
+### Adding folders to the sidebar
+
+Add a folder to Favorites in any of these ways:
+
+- Drag it to the top or bottom edge of a Favorites row, or below the last one. A slot opens and
+  shows the row the drop will create. Dropping on the middle of a row still moves or copies the
+  items into that folder.
+- While a folder is dragged over the Hub, a dashed **Add folder here** row waits at the end of
+  Favorites.
+- Right-click it and choose **Add to Sidebar**, or select it and press ⌃⌘T. The folder's icon flies
+  into its new row. Right-click empty pane space to add the folder the pane shows.
+
+A label under the pointer names what a drop will do: **Add to Sidebar**, **Move to** a folder, or
+**Copy to** one. Only folders are added; files, packages, app bundles, and drives are not. A
+folder that is already in the sidebar moves to the drop position, or pulses when added again from
+the menu. A removed place comes back as that place when its folder is added.
+
+Drag any Favorites row, built-in or added, to reorder it. Drag it out of the sidebar and release
+to remove it with a poof, or right-click it and choose **Remove from Sidebar**. A toast offers
+**Undo** (⌘Z) for five seconds. **Restore Default Places**, in the Favorites header's context menu
+and in **Settings → DOKK Hub**, brings removed places back in their default positions and keeps
+added folders.
+
+Added folders are saved as bookmarks, so a folder renamed or moved in Finder keeps its row and
+shows its new name. A deleted folder, or one in the Trash, dims and shows a warning; clicking it
+explains and offers to remove it. A folder on an unplugged drive dims, reads "not connected", and
+works again when the drive mounts. Two rows with the same name show their enclosing folder.
+
 ### Browser tabs and split view
 
 ⌘T or the **+** button opens a new browser tab with the current folder, sort, and view. ⌘W closes
 the current browser tab when there is more than one. With one browser tab, ⌘W closes the Hub.
-Click a tab to select it. A tab's close button appears on hover.
+Click a tab to select it. A tab's close button appears on hover, and middle-clicking a tab closes
+it, as in a web browser. Neither closes the last browser tab.
 
 **Split View** in the status bar, or ⌥⌘S, shows two panes side by side. The second pane starts in
 Downloads and keeps its folder when you turn split off. Each pane has its own folder, sort,
@@ -198,6 +227,7 @@ sorts them, so "File 2" comes before "File 10". Folders stay on top only when so
 sort also applies in Icons and Columns, which have no sort control. Hidden files are never shown.
 
 The breadcrumb bar starts at the nearest sidebar location or volume. Click a segment to go there.
+Segments also accept drops; see [Drag and drop](#drag-and-drop).
 Back and forward, or ⌘[ and ⌘], move through the pane's last 50 folders. ⌘↑ opens the enclosing
 folder and selects the folder you left.
 
@@ -260,10 +290,13 @@ results out of both sections, and folder results accept drops.
 
 ### Context menu and keyboard
 
-Right-click an item for **Open**, **Quick Look**, **Reveal in Finder**, **Copy Path**, **Rename**,
-**New Folder**, and **Move to Trash**. A single file, in search results or in the browser, also
-offers **Find Similar** while Lookout can search. Right-click empty space for **New Folder**,
-**Reveal in Finder**, and **Copy Path** for the current folder. **Copy Path** copies plain text, one
+Right-click an item for **Open**, **Quick Look**, **Reveal in Finder**, **Copy Path**,
+**Add to Sidebar** (folders only), **Rename**, **New Folder**, and **Move to Trash**. A single file,
+in search results or in the browser, also offers **Find Similar** while Lookout can search.
+Right-click empty space for **New Folder**, **Add to Sidebar**, **Reveal in Finder**, and **Copy
+Path** for the current folder. When the folders are already in the sidebar, the menu offers
+**Remove from Sidebar** instead. Right-click a Favorites row for **Open in New Tab**, **Reveal in
+Finder**, **Copy Path**, and **Remove from Sidebar**. **Copy Path** copies plain text, one
 path per line. **Reveal in Finder** opens Finder with the item selected and closes an anchored Hub.
 
 | Key | Action |
@@ -274,6 +307,8 @@ path per line. **Reveal in Finder** opens Finder with the item selected and clos
 | Space, ⌘Y | Quick Look |
 | ⌥⌘R | Reveal in Finder |
 | ⌥⌘C | Copy Path |
+| ⌃⌘T | Add the selected folders to the sidebar |
+| ⌘Z | Undo removing a sidebar row, while its toast shows |
 | ⇧⌘N | New Folder |
 | ⌘⌫ | Move to Trash |
 | ⌘A | Select all in the active pane |
@@ -299,8 +334,9 @@ The Files tab has no Copy, Paste, or Duplicate commands for files. To copy, drag
 ### Drag and drop
 
 Drag items within the Hub, out to Finder or another app, or in from another app. Folders, empty
-pane space, sidebar places, drives, and browser tabs accept drops. Recents and breadcrumbs do not.
-Dropping items into the folder they are already in does nothing.
+pane space, sidebar rows, drives, browser tabs, and breadcrumb segments accept drops. Recents does
+not. On a Favorites row, the middle takes the drop and the top and bottom edges add the dragged
+folders to the sidebar instead (see [Adding folders to the sidebar](#adding-folders-to-the-sidebar)). Dropping items into the folder they are already in does nothing.
 
 DOKK follows Finder's rule. A drop on the same volume moves the items, and a drop on another volume
 copies them. Hold Option to copy on the same volume. When another app offers only a copy, DOKK
@@ -311,8 +347,10 @@ and dragging a search result onto the field runs Find Similar on it (see [Search
 Moving such a file between panes opens the field's drop well too; moving anything else doesn't. The
 field takes no other file, and never inserts a file's path as text. Plain text still drops in.
 
-Hold a drag over a folder, a sidebar place, or a browser tab to spring-load it. The folder opens,
-or the tab is selected, after the system spring-loading delay.
+Hold a drag over a folder, a sidebar place, a browser tab, or a breadcrumb segment to spring-load
+it. The folder opens, or the tab is selected, after the system spring-loading delay. A breadcrumb
+segment opens that folder in its own pane, so you can climb the path and keep dragging, as with
+Finder's path bar.
 
 Dragging out hands other apps ordinary file URLs. If Finder or another app moves the files, that
 app does the move. A drag from an anchored Hub keeps it open while you are over another app.
@@ -344,6 +382,9 @@ The first time, the Files tab opens with a split tab showing Documents and Downl
 tab showing Downloads in Icons. A saved folder that no longer exists falls back to your home
 folder.
 
+The Favorites list (its order, removed places, and added folders) is saved separately and shared
+by the Hub on every display.
+
 ## Open in Hub
 
 **Open in Hub** shows a folder in the Files tab's active pane. A closed Hub opens on the display
@@ -361,11 +402,14 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
 
 - The switcher, header buttons, cards, rows, and drives have VoiceOver labels and actions. Window
   cards report Minimized or Hidden as their value. File rows offer Open and Quick Look actions.
-  Drive rows offer Eject. Browser tabs offer Close Tab.
+  Drive rows offer Eject. Browser tabs offer Close Tab. Favorites rows offer Remove from Sidebar,
+  Move Up, and Move Down, and announce their new position after a move.
 - Reduce Motion: the Hub fades in and out without scaling or moving. The tab switch fades without
   sliding, and the selection pill moves without animation. Hover lifts, entrance staggers, and the
   tile's halo rotation stop. The search field's drop well doesn't pulse, and the picture chip and
-  the results fade in instead of springing.
+  the results fade in instead of springing. In the sidebar, a folder added from the menu appears
+  without flying in, the arrival glow fades without its light sweep, removing a row skips the
+  poof, and slots open without the spring.
 - The picture chip has a VoiceOver label with the picture's name and a Remove action. The results
   bar, Find Similar, and the closeness meter have labels, and Find Similar is a row action.
 - Reduce Transparency: the Hub draws an opaque background instead of Liquid Glass.

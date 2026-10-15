@@ -112,7 +112,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock, .display:
             SettingsPage.dockGroups
         case .extras:
-            [[.shelfAndTrash, .drives, .capsules, .badges, .notificationFeed],
+            [[.shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed],
              [.actionTiles, .soapBubbles],
              [.multipleDisplays]]
         case .windowsFocus:

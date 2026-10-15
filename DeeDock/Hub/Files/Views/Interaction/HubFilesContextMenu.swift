@@ -13,9 +13,19 @@ enum HubFilesContextMenu {
         let items = model.actionableItems
         let single = items.count == 1
         menu.add(.hubFilesMenuOpen, key: "\r", modifiers: []) { model.openSelection() }
+        if single, let folder = items.first, folder.isDirectory && !folder.isPackage {
+            menu.add(.hubFilesSidebarOpenInNewTab) {
+                model.newTab()
+                model.show(.folder(normalizing: folder.url))
+            }
+            menu.add(.hubFilesMenuOpenInRightSplit) {
+                model.openInRightSplit(.folder(normalizing: folder.url))
+            }
+        }
         menu.add(.hubFilesMenuQuickLook, key: " ", modifiers: []) { model.toggleQuickLook() }
         menu.add(.hubFilesMenuReveal, key: "r", modifiers: [.command, .option]) { model.revealSelectionInFinder() }
         menu.add(.hubFilesMenuCopyPath, key: "c", modifiers: [.command, .option]) { model.copySelectionPaths() }
+        addSidebarItem(to: menu, folders: items.filter(\.isSidebarCandidate).map(\.url), model: model)
         // One search result or browser file offers Find Similar: hidden for folders and until Lookout can search,
         // disabled for kinds of file Lookout doesn't read and for documents it hasn't read.
         let similar = model.selectionSimilarAvailability
@@ -34,11 +44,25 @@ enum HubFilesContextMenu {
         return menu
     }
 
-    /// The menu for an empty area of a pane: New Folder and Reveal in Finder for the folder.
+    /// The menu for an empty area of a pane: New Folder, adding the folder to the sidebar (or
+    /// removing it), and Reveal in Finder and Copy Path for the folder.
     static func background(model: HubFilesModel, pane: HubFilesPane) -> NSMenu? {
         guard let folder = pane.folderURL else { return nil }
         let menu = HubFilesMenu(model: model)
         menu.add(.hubFilesMenuNewFolder, key: "n", modifiers: [.command, .shift]) { model.makeNewFolder() }
+        if !HubFilesPath.isVolumeRoot(folder) {
+            menu.addItem(.separator())
+            let name = model.displayName(for: folder)
+            if let id = model.sidebar.store.entryID(for: folder) {
+                menu.add(.hubFilesSidebarRemoveNamed(name)) { model.sidebar.remove([id], method: .menu) }
+            } else {
+                let origin = NSEvent.mouseLocation
+                menu.add(.hubFilesSidebarAddNamed(name)) {
+                    model.sidebar.addFromCommand([folder], method: .menu, flightOrigin: origin)
+                }
+            }
+            menu.addItem(.separator())
+        }
         menu.add(.hubFilesMenuReveal, key: "r", modifiers: [.command, .option]) {
             HubFileOperations.revealInFinder([folder])
             model.shell?.dismissAfterAction()
@@ -48,6 +72,70 @@ enum HubFilesContextMenu {
         }
         return menu
     }
+}
+
+// MARK: - Sidebar
+
+extension HubFilesContextMenu {
+    /// A Favorites row: open it in a new tab or right split, reveal or copy its folder, or remove it.
+    /// Recents has no folder; a missing or disconnected folder can only be removed.
+    static func favorite(_ id: HubFilesSidebarEntryID, model: HubFilesModel) -> NSMenu? {
+        let sidebar = model.sidebar
+        guard let entry = sidebar.store.entry(id) else { return nil }
+        let menu = HubFilesMenu(model: model)
+        let folder = sidebar.store.folderURL(for: entry)
+        menu.add(.hubFilesSidebarOpenInNewTab, enabled: sidebar.store.location(for: entry) != nil) {
+            sidebar.openInNewTab(id)
+        }
+        menu.add(.hubFilesMenuOpenInRightSplit, enabled: sidebar.store.location(for: entry) != nil) {
+            sidebar.openInRightSplit(id)
+        }
+        menu.addItem(.separator())
+        menu.add(.hubFilesMenuReveal, enabled: folder != nil) {
+            guard let folder else { return }
+            HubFileOperations.revealInFinder([folder])
+            model.shell?.dismissAfterAction()
+        }
+        menu.add(.hubFilesMenuCopyPath, enabled: folder != nil) {
+            guard let folder else { return }
+            FilePathCopy.copy([FilePathCopy.path(of: folder)])
+        }
+        menu.addItem(.separator())
+        menu.add(.hubFilesSidebarRemove) { sidebar.remove([id], method: .menu) }
+        return menu
+    }
+
+    /// The Favorites header: brings back built-in places that were removed.
+    static func favoritesHeader(model: HubFilesModel) -> NSMenu {
+        let menu = HubFilesMenu(model: model)
+        menu.add(.hubFilesSidebarRestorePlaces, enabled: !model.sidebar.store.missingPlaces.isEmpty) {
+            model.sidebar.restoreDefaultPlaces(method: .headerMenu)
+        }
+        return menu
+    }
+
+    /// "Add to Sidebar" for the selected folders, or "Remove from Sidebar" when all of them are
+    /// there already. Nothing when the selection has no folders.
+    fileprivate static func addSidebarItem(to menu: HubFilesMenu, folders: [URL], model: HubFilesModel) {
+        guard !folders.isEmpty else { return }
+        let store = model.sidebar.store
+        let ids = folders.compactMap(store.entryID(for:))
+        menu.addItem(.separator())
+        if ids.count == folders.count {
+            menu.add(.hubFilesSidebarRemove) { model.sidebar.remove(ids, method: .menu) }
+        } else {
+            // The menu opens at the pointer, over the item: the flight starts there.
+            let origin = NSEvent.mouseLocation
+            menu.add(.hubFilesSidebarAdd, key: "t", modifiers: [.control, .command]) {
+                model.sidebar.addFromCommand(folders, method: .menu, flightOrigin: origin)
+            }
+        }
+    }
+}
+
+extension HubFileItem {
+    /// A folder that can be a sidebar row: not a file, package, app bundle, or drive.
+    var isSidebarCandidate: Bool { isDirectory && !isPackage && !HubFilesPath.isVolumeRoot(url) }
 }
 
 /// A context menu that runs closures and holds the Hub open while it tracks.

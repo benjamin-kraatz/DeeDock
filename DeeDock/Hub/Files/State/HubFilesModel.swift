@@ -72,6 +72,8 @@ final class HubFilesModel: HubTabModel {
     /// The status chip once Lookout is set up: routes Settings to Lookout's section (`DockCoordinator`). The view
     /// that calls it opens the Settings window (`openLookoutSettings(using:)`).
     @ObservationIgnored var onOpenLookoutSettings: () -> Void = {}
+    /// The sidebar's Favorites list and its drag, feedback, and Undo state.
+    let sidebar: HubFilesSidebarModel
     @ObservationIgnored let quickLook = HubFilesQuickLook()
     @ObservationIgnored private(set) weak var shell: HubShell?
     @ObservationIgnored private let defaults: UserDefaults
@@ -117,12 +119,16 @@ final class HubFilesModel: HubTabModel {
         self.search = search
         self.lookout = lookout ?? .inert()
         let home = dataSource.homeDirectory
+        sidebar = HubFilesSidebarModel(store: HubFilesSidebarStore(
+            defaults: defaults, home: home, resolver: dataSource.makeSidebarResolver(),
+            observesVolumes: dataSource.observesVolumes))
         let snapshot = HubFilesSnapshot.load(from: defaults) ?? .firstRun(home: home)
         showsPreview = snapshot.showsPreview
         selectedTabID = UUID()
         tabs = snapshot.tabs.map(makeTab)
         selectedTabID = tabs[min(max(snapshot.selectedTab, 0), tabs.count - 1)].id
         configureQuickLook()
+        sidebar.files = self
     }
 
     /// Progress of the copy/move queue from 0 to 1, or nil when idle. Drives the DOKK tile ring.
@@ -174,6 +180,8 @@ final class HubFilesModel: HubTabModel {
             runSearch()
         }
         lookout.hubFilesDidAppear()
+        // Folders renamed or moved in Finder since the last look keep their sidebar rows.
+        sidebar.store.refresh()
     }
 
     /// Marks the tab visible without a shell, so panes load (previews and tests).
@@ -187,6 +195,10 @@ final class HubFilesModel: HubTabModel {
         quickLook.close()
         cancelRenames()
         dropHighlight = nil
+        sidebar.endItemDrag()
+        sidebar.abortReorder()
+        sidebar.cancelFlights()
+        sidebar.problem = nil
         volumes.stop()
         endLookoutSearchSession()
         search.stop()
@@ -244,6 +256,22 @@ final class HubFilesModel: HubTabModel {
     }
 
     // MARK: Panes and layout
+
+    /// Shows a location in the right pane, enabling split view and giving it keyboard input.
+    /// Preserves the left pane and reuses the right pane's independent navigation history.
+    /// Clears search and persists the resulting layout, including when split was already on.
+    func openInRightSplit(_ location: HubFilesLocation) {
+        let tab = selectedTab
+        cancelRenames()
+        query = ""
+        tab.ensureSecondPane { makePane(location: location, sort: HubFileSort()) }
+        tab.isSplit = true
+        tab.activePaneIndex = 1
+        tab.panes[1].navigate(to: location)
+        refreshActivation()
+        quickLook.selectionDidChange()
+        persist()
+    }
 
     func toggleSplit() {
         let tab = selectedTab
@@ -497,6 +525,8 @@ enum HubFilesDropHighlight: Hashable {
     case tab(UUID)
     /// A column-view column: drops into that column's folder.
     case column(URL)
+    /// A breadcrumb segment in one pane. Keyed by pane because split panes can show the same folder.
+    case crumb(pane: UUID, folder: URL)
 }
 
 /// Service state replaced by previews, which must not touch the file system or Spotlight.

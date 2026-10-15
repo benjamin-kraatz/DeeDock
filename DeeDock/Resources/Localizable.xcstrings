@@ -2019,6 +2019,582 @@
         }
       }
     },
+    "hubFilesSidebarAdd" : {
+      "comment" : "Files: context-menu command (⌃⌘T) that adds the selected folders to the sidebar, and the label under the pointer while a drag would add them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zur Seitenleiste hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Sidebar"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarAddNamed" : {
+      "comment" : "Files: pane background context menu. The argument is the name of the folder the pane shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ zur Seitenleiste hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add “%@” to Sidebar"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarCopyTo" : {
+      "comment" : "Files sidebar: label under the pointer while dropping would copy the dragged items into a sidebar folder. The argument is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach „%@“ kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy to “%@”"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarDisconnectedMessage" : {
+      "comment" : "Files sidebar: popover text for a folder on an unplugged drive. The first argument is the drive's name, the second the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde „%1$@“, um „%2$@“ zu öffnen. Der Ordner erscheint hier wieder, sobald das Laufwerk verbunden ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect “%1$@” to open “%2$@”. The folder comes back here when the drive is connected."
+          }
+        }
+      }
+    },
+    "hubFilesSidebarDisconnectedTitle" : {
+      "comment" : "Files sidebar: popover title after clicking an added folder on an unplugged drive. The argument is the drive's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist nicht verbunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” isn’t connected"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarDropHere" : {
+      "comment" : "Files sidebar: dashed row at the end of Favorites while a folder is dragged over the Hub. Keep it short: the row is about 140 pt wide.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner hier ablegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add folder here"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarDropHereCount" : {
+      "comment" : "Files sidebar: the dashed end row while two or more folders are dragged. The number is always 2 or more. Keep it short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Ordner hier ablegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add %lld folders here"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarFolderCount" : {
+      "comment" : "Files sidebar: the insertion preview's title while several folders are dragged. The number is always 2 or more.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld folders"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarMissingMessage" : {
+      "comment" : "Files sidebar: popover text under the missing-folder title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ordner wurde möglicherweise gelöscht oder in den Papierkorb gelegt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It may have been deleted or moved to the Trash."
+          }
+        }
+      }
+    },
+    "hubFilesSidebarMissingTitle" : {
+      "comment" : "Files sidebar: popover title after clicking an added folder that no longer exists. The argument is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ wurde nicht gefunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” can’t be found"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarMissingValue" : {
+      "comment" : "Files sidebar: VoiceOver value of an added folder that was deleted or moved to the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht gefunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can’t be found"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarMoveDown" : {
+      "comment" : "Files sidebar: VoiceOver action that moves a row one position down.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach unten bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Down"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarMoveTo" : {
+      "comment" : "Files sidebar: label under the pointer while dropping would move the dragged items into a sidebar folder. The argument is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach „%@“ bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to “%@”"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarMoveUp" : {
+      "comment" : "Files sidebar: VoiceOver action that moves a row one position up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach oben bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Up"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarNotConnected" : {
+      "comment" : "Files sidebar: second line of an added folder whose drive is unplugged. The argument is the drive's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ nicht verbunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ not connected"
+          }
+        }
+      }
+    },
+    "hubFilesMenuOpenInRightSplit" : {
+      "comment" : "Files folder and Favorites context-menu command. Opens the location in the right pane of the current browser tab, enabling split view if needed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In geteilter Ansicht öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Split View on Right"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarOpenInNewTab" : {
+      "comment" : "Files folder and Favorites context-menu command that opens the location in a new browser tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In neuem Tab öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in New Tab"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarPositionAnnouncement" : {
+      "comment" : "Files sidebar: VoiceOver announcement after moving a row. The numbers are the row's new position and the number of rows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position %1$lld von %2$lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarRemove" : {
+      "comment" : "Files sidebar: removes a row. Context-menu command, accessibility action, button in the missing-folder popover, and the label under a row dragged out of the sidebar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus der Seitenleiste entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from Sidebar"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarRemovedToast" : {
+      "comment" : "Files: toast after a sidebar row is removed, next to the Undo button. The argument is the row's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ aus der Seitenleiste entfernt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed “%@” from the sidebar"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarRemovedToastCount" : {
+      "comment" : "Files: toast after one command removed several sidebar rows, next to the Undo button. The number is always 2 or more.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Objekte aus der Seitenleiste entfernt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed %lld items from the sidebar"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarRemoveNamed" : {
+      "comment" : "Files: pane background context menu when the shown folder is already in the sidebar. The argument is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ aus der Seitenleiste entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove “%@” from Sidebar"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarRestorePlaces" : {
+      "comment" : "Files sidebar: brings back removed built-in places (Recents, Desktop, Documents, Downloads, Home, Applications). Favorites header context menu and Settings button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardorte wiederherstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Default Places"
+          }
+        }
+      }
+    },
+    "hubFilesSidebarUndo" : {
+      "comment" : "Files: button in the toast that puts a removed sidebar row back. Also an accessibility action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widerrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "settingsFeatureHubSubtitle" : {
+      "comment" : "Settings: subtitle of the DOKK Hub row in the Extras overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orte in der Seitenleiste von Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Places in the Files sidebar"
+          }
+        }
+      }
+    },
+    "settingsHubKeywords" : {
+      "comment" : "Settings search keywords for the DOKK Hub page, separated by spaces. Translate each word; not shown.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hub dateien seitenleiste orte favoriten ordner wiederherstellen downloads schreibtisch dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hub files sidebar places favorites folders restore downloads desktop documents"
+          }
+        }
+      }
+    },
+    "settingsHubSidebarAllPlacesShown" : {
+      "comment" : "Settings → DOKK Hub: subtitle when no built-in place was removed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle sind in der Seitenleiste."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All are in the sidebar."
+          }
+        }
+      }
+    },
+    "settingsHubSidebarHelp" : {
+      "comment" : "Settings → DOKK Hub: footnote under the Files Sidebar card. “Favorites”/„Orte“ is the sidebar's section title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe Ordner in die Seitenleiste oder klicke mit der rechten Maustaste auf einen Ordner und wähle „Zur Seitenleiste hinzufügen“. Entfernte Orte holst du hier oder über das Menü der Überschrift „Orte“ zurück."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag folders into the sidebar, or right-click a folder and choose Add to Sidebar. Places you removed come back here or from the menu of the Favorites header."
+          }
+        }
+      }
+    },
+    "settingsHubSidebarPlaces" : {
+      "comment" : "Settings → DOKK Hub: row title for Recents, Desktop, Documents, Downloads, Home, and Applications in the sidebar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardorte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Built-in places"
+          }
+        }
+      }
+    },
+    "settingsHubSidebarPlacesRemoved" : {
+      "comment" : "Settings → DOKK Hub: subtitle listing removed built-in places, e.g. “Downloads and Recents”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernt: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed: %@"
+          }
+        }
+      }
+    },
+    "settingsHubSidebarTitle" : {
+      "comment" : "Settings → DOKK Hub: card title for the sidebar of the Hub's Files tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitenleiste in Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files Sidebar"
+          }
+        }
+      }
+    },
+    "settingsHubTitle" : {
+      "comment" : "Settings page title for the DOKK Hub panel. DOKK is the product name; do not translate.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Hub"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Hub"
+          }
+        }
+      }
+    },
     "tooltipBadgeNew" : {
       "comment" : "Shown after an app's name in a Line icon dock's hover label when its badge is new but has no count, such as a dot.",
       "extractionState" : "manual",

@@ -102,6 +102,8 @@ enum AnalyticsEvent {
     case hubFileTransfer(AnalyticsHubTransferKind, itemCount: Int, crossVolume: Bool,
                          outcome: AnalyticsHubTransferOutcome)
     case hubFilesViewChanged(AnalyticsHubFilesView)
+    /// The Files sidebar's Favorites changed. Counts only, never folder names or paths.
+    case hubFilesSidebarEdited(AnalyticsHubSidebarAction, method: AnalyticsHubSidebarMethod, itemCount: Int)
     case hubFileSearchResultOpened(scope: AnalyticsHubSearchScope, isFolder: Bool)
     /// A Files search result opened while Lookout was on: a Spotlight name result or a Lookout hit. `rank` is 1-based
     /// within its section (within its group for a search with a picture); `kind` and `match` are nil for a name

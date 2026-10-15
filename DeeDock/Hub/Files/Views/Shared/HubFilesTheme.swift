@@ -59,6 +59,8 @@ struct HubFilesTheme {
     var accentLine: Color { Color.accentColor.opacity(isDark ? 0.55 : 0.42) }
     /// Hairline separators.
     var line: Color { ink.opacity(isDark ? 0.08 : 0.075) }
+    /// The stronger hairline on floating surfaces and the dashed end slot.
+    var strongLine: Color { ink.opacity(isDark ? 0.15 : 0.12) }
     /// Sidebar backdrop over the panel material.
     var sidebar: Color { isDark ? Color.black.opacity(0.10) : Color.white.opacity(0.22) }
     /// Preview well.

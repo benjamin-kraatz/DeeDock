@@ -36,8 +36,22 @@ enum HubFilesPreviewData {
         source.add("/Users/benn/Downloads/Lightroom export", modified: at(7))
         source.add("/Users/benn/Downloads/Lightroom export/IMG_0412.jpg", kind: .jpeg, size: 8_400_000, modified: at(7))
         source.recentItems = (source.folders["/Users/benn/Downloads"] ?? []).filter { !$0.isDirectory }
+        source.add("/Users/benn/Documents/DOKK/Assets", modified: at(2))
+        source.add("/Users/benn/Pictures/Assets", modified: at(5))
+        source.unmountedVolumes = ["Transfair"]
         return source
     }
+
+    /// Favorites with added folders in every state: one that opens, two that share a name, one on
+    /// a disconnected drive, and one that was deleted. Downloads was removed.
+    static let sidebarEntries: [HubFilesSidebarEntry] = {
+        var entries = HubFilesSidebarEntry.defaults.filter { $0 != .place(.downloads) }
+        for path in ["/Users/benn/Documents/DOKK", "/Users/benn/Documents/DOKK/Assets", "/Users/benn/Pictures/Assets",
+                     "/Volumes/Transfair/Footage", "/Users/benn/Documents/kuki"] {
+            entries.append(.folder(HubFilesSidebarFolder(path: path)))
+        }
+        return entries
+    }()
 
     static let volumes: [HubVolumes.Volume] = [
         HubVolumes.Volume(url: URL(filePath: "/"), name: "Macintosh HD", availableBytes: 412_000_000_000,
@@ -52,6 +66,7 @@ extension HubFilesModel {
     ///
     /// Uses a throwaway defaults suite, so previews never change the user's saved layout.
     static func preview(split: Bool = true, viewMode: HubFilesViewMode = .list, emptyFolders: Bool = false,
+                        sidebarFolders: Bool = false,
                         firstLocation: String = "/Users/benn/Documents/DOKK/Design",
                         configure: (HubFilesModel) -> Void = { _ in }) -> HubFilesModel {
         let suite = "dokk.preview.hub.files"
@@ -67,6 +82,7 @@ extension HubFilesModel {
             ],
             selectedTab: 0, showsPreview: true)
         snapshot.save(to: defaults)
+        if sidebarFolders { HubFilesSidebarSnapshot(entries: HubFilesPreviewData.sidebarEntries).save(to: defaults) }
         let model = HubFilesModel(defaults: defaults, dataSource: HubFilesPreviewData.dataSource(empty: emptyFolders))
         model.previewOverrides.volumes = HubFilesPreviewData.volumes
         model.activateWithoutShell()

@@ -191,6 +191,18 @@ nonisolated enum AnalyticsHubFilesView: String, AnalyticsToken {
     case list, icons, columns
 }
 
+/// What changed in the Files sidebar's Favorites.
+nonisolated enum AnalyticsHubSidebarAction: String, AnalyticsToken {
+    case add, remove, reorder, restore, undo
+}
+
+/// How a Files sidebar change was made.
+nonisolated enum AnalyticsHubSidebarMethod: String, AnalyticsToken {
+    case drag, menu, shortcut, accessibility, toast, popover, settings
+    case dragOut = "drag_out"
+    case headerMenu = "header_menu"
+}
+
 /// Where a Files tab search looked.
 nonisolated enum AnalyticsHubSearchScope: String, AnalyticsToken {
     case thisMac = "this_mac", folder

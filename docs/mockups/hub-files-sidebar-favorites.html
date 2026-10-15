@@ -1,0 +1,1008 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>DOKK Hub — folders in the Files sidebar (DEE-128)</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:18px;font:13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--foreground,#d8d9de);background:var(--background,#16171c)}
+p.lede{margin:0 0 12px;color:var(--muted-foreground,#9a9ca6);line-height:1.55;max-width:1100px}
+p.lede b{color:var(--foreground,#e6e7ea);font-weight:600}
+kbd{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;padding:1px 5px;border-radius:5px;background:var(--muted,#ffffff12);border:1px solid var(--border,#ffffff1c)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:0 0 10px}
+.ctl .grp{display:flex;align-items:center;gap:6px;color:var(--muted-foreground,#9a9ca6);font-size:12px}
+.sg{display:inline-flex;border-radius:8px;background:var(--muted,#ffffff10);padding:2px;gap:2px}
+.sg button,.btn{font:inherit;font-size:12px;border:0;border-radius:6px;padding:4px 9px;background:transparent;color:var(--foreground,#d8d9de);cursor:pointer}
+.sg button.on{background:var(--card,#ffffff22);box-shadow:0 0 0 1px var(--border,#ffffff22)}
+.btn{background:var(--muted,#ffffff10)}
+.btn:hover{background:var(--secondary,#ffffff1c)}
+.ctl .q{font-size:10.5px;font-weight:700;color:#0a84ff;border:1px solid #0a84ff66;border-radius:5px;padding:0 4px}
+.viewport{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px #ffffff14;max-width:1300px}
+.notes{max-width:1100px;margin-top:16px;color:var(--muted-foreground,#9a9ca6);font-size:12.5px;line-height:1.55}
+.notes h3{font-size:13px;color:var(--foreground,#e6e7ea);margin:0 0 6px}
+.notes ol{margin:0;padding-left:20px}
+.notes li{margin:3px 0}
+.notes b{color:var(--foreground,#e6e7ea);font-weight:600}
+
+/* ───────── stage ───────── */
+.stage{position:absolute;left:0;top:0;width:1300px;height:740px;transform-origin:0 0;overflow:hidden;outline:none;cursor:default;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;
+ --spring:cubic-bezier(.3,1.3,.5,1)}
+.stage.dark{--fg:#f5f5f7;--fg2:rgba(235,235,245,.62);--fg3:rgba(235,235,245,.36);--panel:rgba(30,31,38,.74);--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+ --chip:rgba(255,255,255,.07);--chipHi:rgba(255,255,255,.12);--sel:rgba(255,255,255,.09);--accent:#0a84ff;--accentSel:rgba(10,132,255,.30);--accentLine:rgba(64,156,255,.55);
+ --field:rgba(255,255,255,.07);--side:rgba(0,0,0,.10);--well:rgba(0,0,0,.16);--shadow:rgba(0,0,0,.5);--menu:rgba(40,41,50,.84);--warn:#ff9f0a}
+.stage.light{--fg:#1d1d1f;--fg2:rgba(60,60,67,.72);--fg3:rgba(60,60,67,.42);--panel:rgba(248,248,251,.72);--line:rgba(0,0,0,.075);--line2:rgba(0,0,0,.12);
+ --chip:rgba(0,0,0,.05);--chipHi:rgba(0,0,0,.09);--sel:rgba(0,0,0,.065);--accent:#007aff;--accentSel:rgba(0,122,255,.17);--accentLine:rgba(0,122,255,.42);
+ --field:rgba(0,0,0,.05);--side:rgba(255,255,255,.22);--well:rgba(255,255,255,.35);--shadow:rgba(30,30,60,.22);--menu:rgba(250,250,252,.9);--warn:#e08600}
+.stage.rt.dark{--panel:#1e1f25;--menu:#2a2b33}
+.stage.rt.light{--panel:#f4f4f7;--menu:#fafafc}
+.rt #hub,.rt #ctx,.rt #toast,.rt #pop,.rt #ghost .gi,.rt #ghost .grow{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+#wall{position:absolute;inset:0}
+.dark #wall{background:radial-gradient(60% 70% at 18% 20%,#3b2a6b 0,transparent 60%),radial-gradient(55% 60% at 85% 80%,#0f4b73 0,transparent 62%),radial-gradient(50% 50% at 70% 15%,#5b2246 0,transparent 60%),#0d0e16}
+.light #wall{background:radial-gradient(60% 70% at 18% 20%,#d6c9ff 0,transparent 60%),radial-gradient(55% 60% at 85% 80%,#b9e2ff 0,transparent 62%),radial-gradient(50% 50% at 70% 15%,#ffd3e6 0,transparent 60%),#eef0f7}
+
+/* ───────── hub ───────── */
+#hub{position:absolute;left:60px;top:46px;width:1180px;height:640px;border-radius:22px;display:flex;flex-direction:column;overflow:hidden;color:var(--fg);
+ background:var(--panel);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);box-shadow:inset 0 0 0 .5px var(--line2),0 30px 80px var(--shadow)}
+.hh{flex:none;height:58px;display:flex;align-items:center;gap:14px;padding:0 16px 0 20px;border-bottom:.5px solid var(--line)}
+.brand{font-weight:800;font-size:21px;letter-spacing:.06em;width:200px}
+.seg{display:flex;gap:2px;padding:3px;border-radius:12px;background:var(--field);box-shadow:inset 0 0 0 .5px var(--line);margin-left:auto}
+.seg b{display:flex;align-items:center;gap:8px;height:30px;padding:0 18px 0 14px;border-radius:9px;font-weight:500;font-size:13.5px;color:var(--fg2)}
+.seg b.on{background:var(--chipHi);color:var(--fg);box-shadow:inset 0 0 0 .5px var(--line2)}
+.seg svg{width:15px;height:15px}
+.srch{flex:none;width:300px;height:34px;margin-left:12px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:10px;background:var(--field);box-shadow:inset 0 0 0 .5px var(--line);color:var(--fg3);font-size:13.5px}
+.srch svg{width:14px;height:14px}
+.ib{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--fg2)}
+.ib:hover{background:var(--chip);color:var(--fg)}
+.ib svg{width:15px;height:15px}
+.ib.off{opacity:.3;pointer-events:none}
+svg.l{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+.tabs{flex:none;height:40px;display:flex;align-items:flex-end;gap:4px;padding:0 10px;border-bottom:.5px solid var(--line)}
+.tab{position:relative;height:34px;min-width:120px;max-width:200px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:9px 9px 0 0;font-size:13.5px;color:var(--fg2);cursor:pointer}
+.tab:hover{background:var(--chip)}
+.tab.on{background:var(--sel);color:var(--fg)}
+.tab.on::after{content:'';position:absolute;left:12px;right:12px;bottom:0;height:3px;border-radius:2px 2px 0 0;background:var(--accent)}
+.tab .fi{width:18px;height:15px;flex:none}
+.tab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tplus{margin-left:auto;margin-bottom:4px}
+
+.fbody{flex:1;min-height:0;display:flex}
+/* sidebar */
+#side{position:relative;flex:none;width:200px;overflow-y:auto;overflow-x:hidden;background:var(--side);border-right:.5px solid var(--line);scrollbar-width:none}
+#sideIn{position:relative;padding:12px 10px}
+#curfill{position:absolute;left:10px;right:10px;top:0;height:32px;border-radius:9px;background:var(--sel);pointer-events:none;
+ transition:transform .55s var(--spring),height .55s var(--spring),opacity .15s}
+#secs{position:relative}
+.sec h4{margin:10px 10px 6px;font-size:11.5px;font-weight:600;color:var(--fg3);letter-spacing:.02em;white-space:nowrap}
+.sec:first-child h4{margin-top:2px}
+.si{position:relative;display:flex;align-items:center;gap:10px;min-height:32px;padding:0 10px;border-radius:9px;font-size:13.5px;color:var(--fg);cursor:default;transition:background .15s,opacity .2s}
+.si:hover{background:var(--chip)}
+.si.drop-hot{background:var(--accentSel)!important;box-shadow:inset 0 0 0 1px var(--accentLine)}
+.si.blink{animation:blink .32s 2}
+@keyframes blink{50%{background:transparent;box-shadow:none}}
+.si svg.g{width:19px;height:19px;flex:none;color:var(--accent)}
+.si .stack{display:flex;flex-direction:column;line-height:1.2;min-width:0;padding:3px 0}
+.si .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.si .sub{font-size:11px;color:var(--fg3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.si .tr{margin-left:auto;flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;color:var(--fg2)}
+.si .tr.ej:hover{background:var(--chipHi);color:var(--fg)}
+.si .tr svg{width:12px;height:12px}
+.si .tr.warn{color:var(--warn)}
+.si .tr.warn svg{width:14px;height:14px}
+.si.dim .g,.si.dim .nm{opacity:.45}
+.si.lift{display:none}
+.si.pulse{animation:pulse .7s ease}
+@keyframes pulse{0%{background:transparent}25%{background:var(--accentSel);box-shadow:inset 0 0 0 1px var(--accentLine);transform:scale(1.03)}100%{background:transparent;box-shadow:none;transform:none}}
+.si.fresh{overflow:hidden;animation:fresh 1.6s ease-out}
+.si.fresh::after{content:'';position:absolute;inset:0;border-radius:9px;pointer-events:none;
+ background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);background-size:260% 100%;animation:sweep .9s .12s ease-out both}
+.light .si.fresh::after{background-image:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.7) 50%,transparent 65%)}
+.si.fresh svg.g{animation:pop .55s var(--spring)}
+@keyframes fresh{0%,18%{background:var(--accentSel);box-shadow:inset 0 0 0 1px var(--accentLine)}100%{background:transparent;box-shadow:inset 0 0 0 1px transparent}}
+@keyframes sweep{from{background-position:120% 0}to{background-position:-30% 0}}
+@keyframes pop{0%{transform:scale(.5)}55%{transform:scale(1.2)}100%{transform:none}}
+.si .nm.renamed{animation:ren .6s ease}
+@keyframes ren{0%{opacity:0;filter:blur(3px)}100%{opacity:1;filter:none}}
+
+/* insertion slot + discovery hint */
+.slot{position:relative;overflow:hidden;flex:none}
+.slot .sgr{height:32px;display:flex;align-items:center;gap:10px;padding:0 10px;border-radius:9px;color:var(--fg);font-size:13.5px;
+ background:color-mix(in srgb,var(--accent) 12%,transparent);box-shadow:inset 0 0 0 1px var(--accentLine)}
+.slot .sgr svg{width:19px;height:19px;color:var(--accent);flex:none}
+.slot .sgr span{opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.line .ln{position:absolute;left:16px;right:4px;top:3px;height:2px;border-radius:1px;background:var(--accent)}
+.slot.line .ln::before{content:'';position:absolute;left:-8px;top:-3px;width:4px;height:4px;border:2px solid var(--accent);border-radius:50%}
+.hint{height:32px;margin-top:3px;display:flex;align-items:center;gap:10px;padding:0 10px;border-radius:9px;overflow:hidden;
+ border:1px dashed var(--line2);color:var(--fg3);font-size:12.5px;white-space:nowrap;transition:background .18s,border-color .18s,color .18s}
+.hint svg{width:16px;height:16px;flex:none;margin:0 1.5px}
+.hint span{overflow:hidden;text-overflow:ellipsis}
+.hint.on{border-style:solid;border-color:var(--accentLine);background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--fg);font-size:13.5px}
+.hint.on svg{color:var(--accent);width:19px;height:19px;margin:0}
+
+/* panes */
+.pane{position:relative;flex:1;min-width:0;display:flex;flex-direction:column}
+.pnav{flex:none;height:42px;display:flex;align-items:center;gap:2px;padding:0 10px}
+.pnav .ib{width:26px;height:26px}
+.crumbs{display:flex;align-items:center;gap:3px;min-width:0;margin-left:6px;font-size:13.5px;overflow:hidden;white-space:nowrap}
+.crumbs .c{padding:3px 6px;border-radius:6px;color:var(--fg2);cursor:pointer;overflow:hidden;text-overflow:ellipsis}
+.crumbs .c:hover{background:var(--chip);color:var(--fg)}
+.crumbs .c.last{color:var(--fg);font-weight:600}
+.crumbs .chev{color:var(--fg3);display:flex}
+.crumbs .chev svg{width:10px;height:10px}
+.crumbs .fi{width:20px;height:16px;margin-right:2px}
+.lhead{flex:none;height:28px;display:flex;align-items:center;margin:0 10px;padding:0 8px;border-bottom:.5px solid var(--line);font-size:12px;color:var(--fg2)}
+.lhead .c-name{color:var(--fg);font-weight:600}
+.c-name{flex:1;min-width:0}.c-mod{width:150px;flex:none}.c-kind{width:120px;flex:none}.c-size{width:62px;flex:none;text-align:right;padding-right:4px}
+#rows{flex:1;overflow:auto;padding:6px 10px 10px;scrollbar-width:thin}
+.row{display:flex;align-items:center;height:32px;padding:0 8px;border-radius:9px;font-size:13.5px;transition:background .12s}
+.row:hover{background:var(--chip)}
+.row.sel{background:var(--accentSel);box-shadow:inset 0 0 0 .5px var(--accentLine)}
+.row.dragging{opacity:.45}
+.row .c-name{display:flex;align-items:center;gap:10px;overflow:hidden}
+.row .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .c-mod,.row .c-kind,.row .c-size{color:var(--fg2);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .ico{flex:none;width:22px;height:22px;display:grid;place-items:center}
+.ico svg{width:22px;height:22px}
+.row.leaving{animation:leave .3s ease forwards}
+@keyframes leave{to{opacity:0;transform:translateX(-10px)}}
+.empty{padding:40px;text-align:center;color:var(--fg3)}
+/* preview */
+.prev{flex:none;width:272px;border-left:.5px solid var(--line);padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.prev h5{margin:0;font-size:12.5px;font-weight:600;color:var(--fg2)}
+.well{height:250px;border-radius:14px;background:var(--well);box-shadow:inset 0 0 0 .5px var(--line);display:grid;place-items:center}
+.well svg{width:120px;height:100px}
+.prev .pn{font-size:16px;font-weight:700;word-break:break-word}
+.prev .ps{font-size:12.5px;color:var(--fg2);margin-top:2px}
+/* status bar */
+.sbar{flex:none;height:46px;display:flex;align-items:center;padding:0 16px;border-top:.5px solid var(--line);font-size:13px;color:var(--fg2)}
+.sbar .vm{margin-left:auto;display:flex;gap:4px}
+.sbar .vm .ib{width:30px;height:28px}
+.sbar .vm .ib.on{background:var(--chipHi);color:var(--accent)}
+
+/* menu */
+#ctx{position:absolute;z-index:90;display:none;min-width:230px;padding:5px;border-radius:12px;background:var(--menu);color:var(--fg);font-size:13px;
+ box-shadow:inset 0 0 0 .5px var(--line2),0 14px 40px rgba(0,0,0,.35);backdrop-filter:blur(26px) saturate(1.6);-webkit-backdrop-filter:blur(26px) saturate(1.6);animation:ctxIn .14s ease-out;transform-origin:0 0}
+@keyframes ctxIn{from{opacity:0;transform:scale(.97)}}
+#ctx .mi{display:flex;justify-content:space-between;gap:24px;padding:4px 10px;border-radius:7px;white-space:nowrap}
+#ctx .mi:hover{background:var(--accent);color:#fff}
+#ctx .mi .k{color:var(--fg3)}#ctx .mi:hover .k{color:rgba(255,255,255,.8)}
+#ctx .mi.dis{color:var(--fg3);pointer-events:none}
+#ctx hr{border:0;height:.5px;background:var(--line2);margin:4px 8px}
+#ctx .mi.new{position:relative}
+#ctx .mi.new::before{content:'';position:absolute;left:-1px;top:50%;width:3px;height:14px;margin-top:-7px;border-radius:2px;background:var(--accent)}
+#ctx .mi.new:hover::before{background:#fff}
+
+/* drag ghost */
+#ghost{position:absolute;z-index:120;left:0;top:0;pointer-events:none;display:none}
+#ghost .gi{position:relative;display:inline-flex;align-items:center;gap:9px;height:32px;padding:0 12px 0 6px;border-radius:9px;font-size:13.5px;color:var(--fg);
+ background:color-mix(in srgb,var(--menu) 78%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 28px rgba(0,0,0,.32),inset 0 0 0 .5px var(--line2)}
+#ghost .gic{position:relative;width:22px;height:22px}
+#ghost .gic>span{position:absolute;inset:0}
+#ghost .gic svg{width:22px;height:22px}
+#ghost .badge{position:absolute;right:-9px;top:-9px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#ff3b30;color:#fff;font-size:11.5px;font-weight:600;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+#ghost .grow{display:flex;align-items:center;gap:10px;width:180px;height:32px;padding:0 10px;border-radius:9px;font-size:13.5px;color:var(--fg);
+ background:color-mix(in srgb,var(--menu) 85%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 12px 30px rgba(0,0,0,.35),inset 0 0 0 .5px var(--line2);transform:scale(1.03);transition:opacity .2s,transform .2s}
+#ghost .grow svg{width:19px;height:19px;color:var(--accent)}
+#ghost .grow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ghost.out .grow{opacity:.55;transform:scale(.92)}
+#ghost .gi{transition:opacity .18s}
+#ghost.ins .gi,#ghost.ins .grow{opacity:.45}
+#ghost .pill{position:absolute;left:14px;top:40px;display:flex;align-items:center;gap:5px;padding:3px 9px 3px 7px;border-radius:7px;white-space:nowrap;
+ font-size:11.5px;font-weight:600;color:#fff;background:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,.25);opacity:0;transform:translateY(-4px);transition:opacity .14s,transform .14s}
+#ghost .pill svg{width:11px;height:11px}
+#ghost .pill.on{opacity:1;transform:none}
+#ghost .pill.rm{background:#3a3a3c}
+.light #ghost .pill.rm{background:#636366}
+.fly{position:absolute;left:0;top:0;z-index:110;width:22px;height:22px;pointer-events:none;offset-anchor:50% 50%;offset-rotate:0deg}
+.fly svg{width:22px;height:22px;display:block}
+.poof{position:absolute;z-index:130;pointer-events:none;width:0;height:0}
+.poof i{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;
+ background:radial-gradient(circle at 35% 30%,#fff,#dfe1e8 55%,#b9bcc8);animation:puff .6s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes puff{0%{opacity:.95;transform:translate(-50%,-50%) scale(.35)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.6)}}
+
+/* toast + popover */
+#toast{position:absolute;z-index:95;left:50%;bottom:110px;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 14px;border-radius:12px;background:var(--menu);color:var(--fg);font-size:13px;white-space:nowrap;
+ box-shadow:inset 0 0 0 .5px var(--line2),0 10px 30px rgba(0,0,0,.3);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);opacity:0;transform:translate(-50%,10px);transition:opacity .2s,transform .3s var(--spring);pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast button{font:inherit;font-weight:600;border:0;border-radius:7px;padding:4px 10px;background:var(--chipHi);color:var(--accent);cursor:pointer}
+#toast button:hover{background:var(--accentSel)}
+#toast .k{color:var(--fg3);font-size:12px}
+#toast.noundo{padding-right:14px}
+#pop{position:absolute;z-index:96;display:none;width:260px;padding:14px;border-radius:14px;background:var(--menu);color:var(--fg);font-size:12.5px;
+ box-shadow:inset 0 0 0 .5px var(--line2),0 14px 40px rgba(0,0,0,.35);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);animation:ctxIn .16s ease-out;transform-origin:0 20px}
+#pop::before{content:'';position:absolute;left:-6px;top:18px;width:12px;height:12px;background:var(--menu);transform:rotate(45deg);box-shadow:-.5px .5px 0 var(--line2)}
+#pop .pt{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:600;margin-bottom:4px}
+#pop .pt svg{width:16px;height:16px;flex:none;color:var(--warn);margin-top:1px}
+#pop .pb{color:var(--fg2);line-height:1.45;margin-left:24px}
+#pop .pa{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+#pop button{font:inherit;font-size:12.5px;border:0;border-radius:7px;padding:4px 12px;background:var(--chipHi);color:var(--fg);cursor:pointer}
+#pop button.pri{background:var(--accent);color:#fff}
+
+.rm *,.rm *::before,.rm *::after{transition:none!important;animation:none!important}
+</style></head><body>
+
+<p class="lede"><b>DEE-128 — folders in the Hub's Files sidebar.</b>
+<b>Drag</b> any folder from the list into the sidebar. Over the <b>middle of a row</b> it still means "move into". At a row's <b>top or bottom edge</b>, a slot opens and the drop adds the folder there. The dashed <b>end slot</b> appears as soon as you drag a folder.
+<b>Right-click</b> a folder → <b>Add to Sidebar</b>, or select one and press <kbd>⌃⌘T</kbd>. Right-clicking the empty list area adds the folder you're in.
+Drag added rows to <b>reorder</b>. Drag one out of the sidebar to <b>remove</b> it, or right-click it, then <kbd>⌘Z</kbd> or <b>Undo</b>. ⌘- or ⇧-click selects several items. Hold <kbd>⌥</kbd> while dropping to copy. The defaults are the choices locked on 2026-10-14. The <span class="q">?</span> toggles show the alternatives that were considered.</p>
+
+<div class="ctl">
+ <div class="grp">Language <span class="sg" data-k="lang"><button data-v="de">DE</button><button data-v="en">EN</button></span></div>
+ <div class="grp">Appearance <span class="sg" data-k="theme"><button data-v="dark">Dark</button><button data-v="light">Light</button></span></div>
+ <div class="grp">Reduce Motion <span class="sg" data-k="rm"><button data-v="0">Off</button><button data-v="1">On</button></span></div>
+ <div class="grp">Reduce Transparency <span class="sg" data-k="rt"><button data-v="0">Off</button><button data-v="1">On</button></span></div>
+</div>
+<div class="ctl">
+ <div class="grp">Insert indicator <span class="sg" data-k="indicator"><button data-v="ghost">Preview row</button><button data-v="line">Line (Finder)</button></span></div>
+ <div class="grp">End slot while dragging <span class="sg" data-k="hint"><button data-v="1">On</button><button data-v="0">Off</button></span></div>
+ <div class="grp"><span class="q">?1</span> Built-in places <span class="sg" data-k="builtins"><button data-v="fixed">Fixed on top</button><button data-v="movable">Movable + removable</button></span></div>
+ <div class="grp"><span class="q">?2</span> Added folders <span class="sg" data-k="section"><button data-v="same">Same list</button><button data-v="sep">Own section</button></span></div>
+ <div class="grp"><span class="q">?3</span> Drag out removes <span class="sg" data-k="dragOut"><button data-v="1">On</button><button data-v="0">Off</button></span></div>
+</div>
+<div class="ctl">
+ <div class="grp">Scenarios</div>
+ <button class="btn" id="scSample">Load sample folders</button>
+ <button class="btn" id="scKuki">kuki deleted in Finder</button>
+ <button class="btn" id="scRename">Rename DeeDock → DOKK in Finder</button>
+ <button class="btn" id="scEject">Eject Transfair</button>
+ <button class="btn" id="scReset">Reset</button>
+</div>
+
+<div class="viewport" id="vp">
+ <div class="stage dark" id="stage" tabindex="0">
+  <div id="wall"></div>
+  <div id="hub">
+   <header class="hh">
+    <div class="brand">DOKK</div>
+    <div class="seg"><b><svg class="l" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg><span data-t="apps"></span></b><b><svg class="l" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9h18"/></svg><span data-t="windows"></span></b><b class="on"><svg class="l" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M3.5 10h17"/></svg><span data-t="files"></span></b></div>
+    <div class="srch"><svg class="l" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg><span data-t="search"></span></div>
+    <div class="ib"><svg class="l" viewBox="0 0 24 24"><path d="M9 4h6M10 4v6l-3 4h10l-3-4V4M12 14v6"/></svg></div>
+    <div class="ib"><svg class="l" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></div>
+   </header>
+   <div class="tabs" id="tabs"></div>
+   <div class="fbody">
+    <div id="side"><div id="sideIn"><div id="curfill"></div><div id="secs"></div></div></div>
+    <div class="pane" id="pane">
+     <div class="pnav"><div class="ib" id="back"><svg class="l" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6"/></svg></div><div class="ib" id="fwd"><svg class="l" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></div><div class="crumbs" id="crumbs"></div></div>
+     <div class="lhead"><div class="c-name"><span data-t="colName"></span> ▴</div><div class="c-mod" data-t="colMod"></div><div class="c-kind" data-t="colKind"></div><div class="c-size" data-t="colSize"></div></div>
+     <div id="rows"></div>
+    </div>
+    <div class="prev" id="prev"></div>
+   </div>
+   <footer class="sbar"><span id="status"></span>
+    <div class="vm">
+     <div class="ib"><svg class="l" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M12 5v14"/></svg></div>
+     <div class="ib" style="color:var(--accent)"><svg class="l" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M14.5 5v14"/></svg></div>
+     <div class="ib on"><svg class="l" viewBox="0 0 24 24"><path d="M9 7h11M9 12h11M9 17h11"/><circle cx="5" cy="7" r=".6"/><circle cx="5" cy="12" r=".6"/><circle cx="5" cy="17" r=".6"/></svg></div>
+     <div class="ib"><svg class="l" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg></div>
+     <div class="ib"><svg class="l" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M9.2 5v14M14.8 5v14"/></svg></div>
+    </div>
+   </footer>
+  </div>
+  <div id="ctx"></div><div id="ghost"></div><div id="toast"></div><div id="pop"></div>
+ </div>
+</div>
+
+<div class="notes">
+ <h3>What to look at</h3>
+ <ol>
+  <li><b>Drop zones.</b> On a row, the top and bottom quarter insert and the middle half moves into the folder. A drag with only files never inserts. Packages such as <i>DeeDock.xcodeproj</i> and apps are never added.</li>
+  <li><b>Insert indicator.</b> The preview row shows exactly what you'll get. The line is Finder's look. Rows part on the Hub spring in both styles.</li>
+  <li><b>End slot.</b> A dashed "Add folder here" row appears at the end of the list as soon as a folder drag starts. This is how people find the feature. Turn it off to compare.</li>
+  <li><b>Arrival.</b> Added from the menu or <kbd>⌃⌘T</kbd>: the folder icon arcs into its new row. Added by drag: the row settles out of the drag image. Either way it glows once in the accent color. Reduce Motion skips the flight, the glow, and the spring.</li>
+  <li><b>Duplicates.</b> Adding a folder that's already there moves it to the drop position (drag) or pulses the existing row (menu or <kbd>⌃⌘T</kbd>). The menu offers <b>Remove from Sidebar</b> instead of Add.</li>
+  <li><b>States.</b> Try the scenarios. A deleted folder dims and shows ⚠. A folder on an ejected drive reads "Transfair nicht verbunden" and comes back when the drive is mounted again. Renamed folders follow, because rows are stored as bookmarks. Two folders with the same name get their parent folder as a subtitle.</li>
+ </ol>
+</div>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+ <linearGradient id="fBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fb0ee"/><stop offset="1" stop-color="#2a8fd8"/></linearGradient>
+ <linearGradient id="fFront" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8bd5fb"/><stop offset="1" stop-color="#4bb2ef"/></linearGradient>
+ <linearGradient id="pkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6aa8ff"/><stop offset="1" stop-color="#2f6fe0"/></linearGradient>
+</defs></svg>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const stage=$('#stage');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ───── spring: a real damped spring sampled into linear() ───── */
+const SPRING=(()=>{const z=.76,w=2*Math.PI/.42,wd=w*Math.sqrt(1-z*z),N=48,T=.62,v=[];
+ for(let n=0;n<=N;n++){const t=n/N*T;v.push(+(1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))).toFixed(4));}
+ v[N]=1;return `linear(${v.join(',')})`;})();
+const SPRING_MS=620;
+stage.style.setProperty('--spring',SPRING);
+function anim(el,kf,opt={}){ if(S.rm||!el) return null; return el.animate(kf,{duration:SPRING_MS,easing:SPRING,...opt}); }
+
+/* ───── strings ───── */
+const STR={
+ en:{apps:'Apps',windows:'Windows',files:'Files',search:'Search files and folders',favorites:'Favorites',pinned:'Pinned',drives:'Drives',
+  pl_recents:'Recents',pl_desktop:'Desktop',pl_documents:'Documents',pl_downloads:'Downloads',pl_applications:'Applications',
+  free:'{s} free',colName:'Name',colMod:'Date Modified',colKind:'Kind',colSize:'Size',folder:'Folder',preview:'Preview',items:'{n} items',item1:'1 item',
+  status:'{n} items · {s} available',
+  mOpen:'Open',mNewTab:'Open in New Tab',mQL:'Quick Look',mReveal:'Reveal in Finder',mCopyPath:'Copy Path',mAdd:'Add to Sidebar',mRemove:'Remove from Sidebar',
+  mAddNamed:'Add {q} to Sidebar',mRemoveNamed:'Remove {q} from Sidebar',mRename:'Rename',mNewFolder:'New Folder',mTrash:'Move to Trash',mEject:'Eject',
+  hint1:'Add folder here',hintN:'Add {n} folders here',nFolders:'{n} folders',
+  pillAdd:'Add to Sidebar',pillMove:'Move to {q}',pillCopy:'Copy to {q}',pillRemove:'Remove from Sidebar',
+  removed:'Removed {q} from the sidebar',undo:'Undo',moved1:'Moved {q} to {d}',movedN:'Moved {n} items to {d}',copied1:'Copied {q} to {d}',copiedN:'Copied {n} items to {d}',
+  missingT:'{q} can’t be found',missingB:'It may have been deleted or moved to the Trash.',offlineT:'{v} isn’t connected',offlineB:'Connect {v} to open {q}.',ok:'OK',
+  notConnected:'{v} not connected',copied:'Copied path',opened:'Opens {q} in its app',
+  k_md:'Markdown Document',k_pdf:'PDF Document',k_png:'PNG Image',k_txt:'Plain Text',k_mlproj:'MLProject Document',k_dmg:'Disk Image',k_heic:'HEIC Image',k_app:'Application',k_json:'JSON',k_xcodeproj:'Xcode Project',k_swift:'Swift Source'},
+ de:{apps:'Apps',windows:'Fenster',files:'Dateien',search:'Dateien und Ordner suchen',favorites:'Orte',pinned:'Angeheftet',drives:'Laufwerke',
+  pl_recents:'Zuletzt',pl_desktop:'Schreibtisch',pl_documents:'Dokumente',pl_downloads:'Downloads',pl_applications:'Programme',
+  free:'{s} frei',colName:'Name',colMod:'Geändert',colKind:'Art',colSize:'Größe',folder:'Ordner',preview:'Vorschau',items:'{n} Objekte',item1:'1 Objekt',
+  status:'{n} Objekte · {s} verfügbar',
+  mOpen:'Öffnen',mNewTab:'In neuem Tab öffnen',mQL:'Übersicht',mReveal:'Im Finder zeigen',mCopyPath:'Pfad kopieren',mAdd:'Zur Seitenleiste hinzufügen',mRemove:'Aus der Seitenleiste entfernen',
+  mAddNamed:'{q} zur Seitenleiste hinzufügen',mRemoveNamed:'{q} aus der Seitenleiste entfernen',mRename:'Umbenennen',mNewFolder:'Neuer Ordner',mTrash:'In den Papierkorb legen',mEject:'Auswerfen',
+  hint1:'Ordner hier ablegen',hintN:'{n} Ordner hier ablegen',nFolders:'{n} Ordner',
+  pillAdd:'Zur Seitenleiste hinzufügen',pillMove:'Nach {q} bewegen',pillCopy:'Nach {q} kopieren',pillRemove:'Aus der Seitenleiste entfernen',
+  removed:'{q} aus der Seitenleiste entfernt',undo:'Widerrufen',moved1:'{q} nach {d} bewegt',movedN:'{n} Objekte nach {d} bewegt',copied1:'{q} nach {d} kopiert',copiedN:'{n} Objekte nach {d} kopiert',
+  missingT:'{q} wurde nicht gefunden',missingB:'Der Ordner wurde möglicherweise gelöscht oder in den Papierkorb gelegt.',offlineT:'{v} ist nicht verbunden',offlineB:'Verbinde {v}, um {q} zu öffnen.',ok:'OK',
+  notConnected:'{v} nicht verbunden',copied:'Pfad kopiert',opened:'{q} wird in seinem Programm geöffnet',
+  k_md:'Markdown-Dokument',k_pdf:'PDF-Dokument',k_png:'PNG-Bild',k_txt:'Reiner Text',k_mlproj:'MLProject Do…',k_dmg:'Image',k_heic:'HEIC-Bild',k_app:'Programm',k_json:'JSON',k_xcodeproj:'Xcode-Projekt',k_swift:'Swift-Quelltext'}};
+function t(k,v={}){ let s=STR[S.lang][k]??k; for(const [a,b] of Object.entries(v)) s=s.replaceAll('{'+a+'}',b); return s; }
+const q=x=>S.lang==='de'?`„${x}“`:`“${x}”`;
+const num=(x,d=2)=>x.toLocaleString(S.lang==='de'?'de-DE':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+/* ───── glyphs ───── */
+const G={
+ clock:'<circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.2 2"/>',
+ desktop:'<rect x="3" y="4.5" width="18" height="15" rx="2.6"/><path d="M3 8.2h18"/><rect x="7.5" y="15" width="9" height="2.2" rx="1.1"/>',
+ doc:'<path d="M7 3.5h6.5l4.5 4.5v11.5a1.2 1.2 0 0 1-1.2 1.2H7a1.2 1.2 0 0 1-1.2-1.2V4.7A1.2 1.2 0 0 1 7 3.5z"/><path d="M13.3 3.6V8.2H18"/>',
+ down:'<circle cx="12" cy="12" r="8.6"/><path d="M12 7.5v8.2M8.6 12.6 12 16l3.4-3.4"/>',
+ house:'<path d="M3.8 11.2 12 4.2l8.2 7"/><path d="M6.2 9.6v10.1h4.4v-5.3h2.8v5.3h4.4V9.6"/>',
+ apps:'<rect x="4" y="4" width="6.6" height="6.6" rx="1.7"/><rect x="13.4" y="4" width="6.6" height="6.6" rx="1.7"/><rect x="4" y="13.4" width="6.6" height="6.6" rx="1.7"/><rect x="13.4" y="13.4" width="6.6" height="6.6" rx="1.7"/>',
+ folder:'<path d="M3.4 7.4a2 2 0 0 1 2-2h3.9l2.1 2.1h7.2a2 2 0 0 1 2 2v8.1a2 2 0 0 1-2 2h-13.2a2 2 0 0 1-2-2z"/><path d="M3.4 10h17.2"/>',
+ hdd:'<rect x="3" y="7.5" width="18" height="9" rx="2.2"/><circle cx="17" cy="12" r=".9" fill="currentColor"/>',
+ ext:'<rect x="3" y="7.5" width="18" height="9" rx="2.2"/><path d="M6.5 12h5"/>',
+ plus:'<path d="M12 5.5v13M5.5 12h13"/>',
+ warn:'<path d="M12 4.2 2.9 19.6h18.2z"/><path d="M12 10v4.4"/><circle cx="12" cy="17" r=".7" fill="currentColor"/>',
+ chev:'<path d="m9 5 7 7-7 7"/>',
+ sidebar:'<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M9 5v14"/>',
+ poof:'<path d="M7 17a3.5 3.5 0 0 1-.4-7 5 5 0 0 1 9.6-1.3A3.8 3.8 0 1 1 17 17z"/>'
+};
+const glyph=(k,cls='g')=>`<svg class="l ${cls}" viewBox="0 0 24 24">${G[k]}</svg>`;
+const eject='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5 4.5 14h15z"/><rect x="4.5" y="16.5" width="15" height="2.6" rx="1"/></svg>';
+const FOLDER_ICON='<svg viewBox="0 0 64 52"><path d="M3 7a4 4 0 0 1 4-4h15.5l5 5H57a4 4 0 0 1 4 4v33a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" fill="url(#fBack)"/><path d="M3 15.5a4 4 0 0 1 4-4h50a4 4 0 0 1 4 4V45a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" fill="url(#fFront)"/><path d="M4 15h56" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg>';
+const EXTC={md:'#6e6e73',pdf:'#e5483f',png:'#30a46c',txt:'#8e8e93',mlproj:'#14a5a0',dmg:'#8e8e93',heic:'#30a46c',json:'#c58a1c',swift:'#f05138'};
+function fileIcon(e){
+ if(e.kind==='app'){ const c=e.color||'#5856d6'; return `<svg viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="${c}"/><text x="12" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="-apple-system,system-ui">${esc(e.name[0])}</text></svg>`; }
+ if(e.kind==='pkg') return '<svg viewBox="0 0 24 24"><path d="M5.5 2.5h9l4.5 4.5v13a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 4 20V4a1.5 1.5 0 0 1 1.5-1.5z" fill="url(#pkg)"/><path d="m9 15 3-7 3 7M10 13h4" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>';
+ const x=(e.name.split('.').pop()||'').toLowerCase(), c=EXTC[x]||'#8e8e93';
+ return `<svg viewBox="0 0 24 24"><path d="M5.5 2.5h9l4.5 4.5v13a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 4 20V4a1.5 1.5 0 0 1 1.5-1.5z" fill="#f4f4f6" stroke="rgba(0,0,0,.18)" stroke-width=".6"/><path d="M14.5 2.5V7H19" fill="#dcdce0"/><rect x="5.5" y="13.5" width="13" height="5" rx="1.2" fill="${c}"/><text x="12" y="17.4" text-anchor="middle" font-size="3.8" font-weight="700" fill="#fff" font-family="-apple-system,system-ui">${esc(x.slice(0,5).toUpperCase())}</text></svg>`;
+}
+const iconFor=e=>e.kind==='folder'?FOLDER_ICON:fileIcon(e);
+
+/* ───── fake file system ───── */
+const HOME='/Users/benn';
+const F=(name,date)=>({name,kind:'folder',date});
+const Fi=(name,date,size)=>({name,kind:'file',date,size});
+const A=(name,color)=>({name,kind:'app',date:'2026-09-20',color});
+const SEED={
+ '/':[F('Applications','2026-10-01'),F('Library','2026-09-14'),F('System','2026-09-02'),F('Users','2026-08-30')],
+ '/Users':[F('benn','2026-10-14'),F('Shared','2026-06-01')],
+ [HOME]:[F('Desktop','2026-10-14'),F('Documents','2026-10-12'),F('Downloads','2026-10-14'),F('Movies','2026-07-20'),F('Music','2026-05-11'),F('Pictures','2026-09-28'),F('Public','2026-01-03')],
+ [HOME+'/Desktop']:[F('Moodboard','2026-10-09'),Fi('Screenshot 2026-10-14 at 18.02.png','2026-10-14',1840000),Fi('Notizen.txt','2026-10-13',2100)],
+ [HOME+'/Documents']:[F('Projects','2026-10-12'),F('Rechnungen','2026-09-30'),F('Steuer 2025','2026-04-18'),Fi('Lebenslauf.pdf','2026-03-02',412000)],
+ [HOME+'/Documents/Projects']:[F('Archive','2026-02-10'),F('dzwei','2026-10-12'),F('Playground','2026-08-21')],
+ [HOME+'/Documents/Projects/dzwei']:[F('billfamily','2026-10-07'),F('DeeDock','2026-10-12'),F('filia','2026-06-10'),F('greviews','2026-03-18'),F('greviews-plugin-2','2026-09-26'),F('greviewsplugin','2026-09-26'),F('jsearch','2026-03-05'),F('kuki','2026-09-26'),F('kuki_plugin','2026-09-26'),F('Topos','2026-10-06'),Fi('KukiDetection.mlproj','2026-06-26',0)],
+ [HOME+'/Documents/Projects/dzwei/DeeDock']:[F('Assets','2026-10-11'),F('DeeDock','2026-10-12'),F('docs','2026-10-12'),{name:'DeeDock.xcodeproj',kind:'pkg',date:'2026-10-12',size:880000},Fi('AGENTS.md','2026-10-10',9800),Fi('README.md','2026-10-01',4200)],
+ [HOME+'/Documents/Projects/dzwei/Topos']:[F('Assets','2026-10-05'),F('src','2026-10-06'),Fi('package.json','2026-10-06',1300)],
+ [HOME+'/Downloads']:[F('Fonts','2026-09-02'),Fi('Rechnung_Oktober.pdf','2026-10-13',210000),Fi('Sparkle-2.8.dmg','2026-10-11',14800000),Fi('wallpaper.heic','2026-10-08',3100000)],
+ [HOME+'/Pictures']:[F('Photos Library','2026-09-28'),F('Screenshots','2026-10-14')],
+ '/Applications':[A('DOKK','#1c1c22'),A('Figma','#a259ff'),A('Linear','#5e6ad2'),A('Mail','#1e88ff'),A('Notes','#f5c400'),A('Safari','#0a84ff'),A('Xcode','#1575f9')],
+ '/Volumes/Transfair':[F('Backups','2026-08-01'),F('Footage','2026-09-19'),Fi('transfer.log','2026-09-19',5400)],
+ '/Volumes/BENNPortable':[F('Archive','2026-05-02'),F('Photos 2026','2026-09-12')]
+};
+const VOLS=[{name:'Macintosh HD',path:'/',internal:true,free:373.17},{name:'BENNPortable',path:'/Volumes/BENNPortable',free:607.77},{name:'Transfair',path:'/Volumes/Transfair',free:100.25}];
+let FS={};
+const parentOf=p=>{const i=p.lastIndexOf('/');return i<=0?'/':p.slice(0,i);};
+const leaf=p=>p==='/'?'/':p.slice(p.lastIndexOf('/')+1);
+const join=(a,b)=>a==='/'?'/'+b:a+'/'+b;
+function listing(p){
+ if(p==='recents') return RECENTS();
+ if(p==='/Volumes') return VOLS.filter(v=>v.path!=='/'&&S.mounted[v.name]).map(v=>F(v.name,'2026-10-14'));
+ if(!FS[p]) FS[p]=[F('Assets','2026-09-30'),Fi('Notes.md','2026-10-02',2400),Fi('Sketch.png','2026-08-12',820000)];
+ return FS[p];
+}
+function RECENTS(){ return [
+ {...Fi('AGENTS.md','2026-10-10',9800),path:HOME+'/Documents/Projects/dzwei/DeeDock/AGENTS.md'},
+ {...Fi('Rechnung_Oktober.pdf','2026-10-13',210000),path:HOME+'/Downloads/Rechnung_Oktober.pdf'},
+ {...Fi('Screenshot 2026-10-14 at 18.02.png','2026-10-14',1840000),path:HOME+'/Desktop/Screenshot 2026-10-14 at 18.02.png'},
+ {...Fi('Notizen.txt','2026-10-13',2100),path:HOME+'/Desktop/Notizen.txt'}]; }
+function volOf(p){ if(p.startsWith('/Volumes/')) return p.split('/')[2]; return 'Macintosh HD'; }
+function exists(p){
+ if(p==='/') return true;
+ if(p.startsWith('/Volumes/')){ if(!S.mounted[volOf(p)]) return false; if(p.split('/').length===3) return true; }
+ const par=parentOf(p); if(!exists(par)) return false;
+ return listing(par).some(e=>e.name===leaf(p)&&e.kind==='folder');
+}
+const DE_NAMES={[HOME+'/Desktop']:'Schreibtisch',[HOME+'/Documents']:'Dokumente','/Applications':'Programme',[HOME+'/Pictures']:'Bilder',[HOME+'/Movies']:'Filme',[HOME+'/Music']:'Musik',[HOME+'/Public']:'Öffentlich','/Users':'Benutzer'};
+function dispName(p){ if(p==='recents') return t('pl_recents'); if(p==='/') return 'Macintosh HD'; if(p===HOME) return 'benn';
+ if(p==='/Applications') return t('pl_applications'); if(S.lang==='de'&&DE_NAMES[p]) return DE_NAMES[p]; return leaf(p); }
+const entryPath=e=>e.path||join(S.path,e.name);
+function fmtDate(iso){ return new Date(iso+'T12:00:00').toLocaleDateString(S.lang==='de'?'de-DE':'en-US',{day:'numeric',month:'short',year:'numeric'}); }
+function fmtSize(b){ if(b==null) return '—'; if(b<1e6) return num(b/1000,0)+' KB'; if(b<1e9) return num(b/1e6,1)+' MB'; return num(b/1e9,1)+' GB'; }
+function kindOf(e){ if(e.kind==='folder') return t('folder'); if(e.kind==='app') return t('k_app'); const x=e.name.split('.').pop().toLowerCase(); return t('k_'+x)===('k_'+x)?x.toUpperCase():t('k_'+x); }
+
+/* ───── sidebar model ───── */
+const PLACES={recents:{icon:'clock',path:'recents'},desktop:{icon:'desktop',path:HOME+'/Desktop'},documents:{icon:'doc',path:HOME+'/Documents'},
+ downloads:{icon:'down',path:HOME+'/Downloads'},home:{icon:'house',path:HOME},applications:{icon:'apps',path:'/Applications'}};
+const placeTitle=k=>k==='home'?'benn':t('pl_'+k);
+let uidN=0; const uid=()=>'u'+(++uidN);
+const keyOf=it=>it.t==='place'?'p:'+it.k:'f:'+it.id;
+const titleOf=it=>it.t==='place'?placeTitle(it.k):dispName(it.path);
+const pathOf=it=>it.t==='place'?PLACES[it.k].path:it.path;
+const placeCount=()=>S.items.filter(i=>i.t==='place').length;
+function status(it){ if(it.t==='place') return 'ok'; if(!S.mounted[volOf(it.path)]) return 'offline'; return exists(it.path)?'ok':'missing'; }
+const favIndex=p=>S.items.findIndex(i=>i.t==='folder'&&i.path===p);
+function normalize(){ if(S.builtins==='fixed'||S.section==='sep'){ const p=S.items.filter(i=>i.t==='place'),f=S.items.filter(i=>i.t==='folder'); S.items=[...p,...f]; } }
+
+/* ───── state ───── */
+const DEF={lang:'de',theme:'dark',rm:false,rt:false,indicator:'ghost',hint:true,builtins:'movable',section:'same',dragOut:true};
+let S, D=null;
+function freshState(keepPrefs){
+ const prefs=keepPrefs?Object.fromEntries(Object.keys(DEF).map(k=>[k,S[k]])):{...DEF};
+ S={...prefs,items:Object.keys(PLACES).map(k=>({t:'place',k})),tabs:[{path:HOME+'/Documents/Projects/dzwei',back:[],fwd:[]}],tab:0,
+  sel:new Set(['billfamily']),anchor:'billfamily',mounted:{'Macintosh HD':true,BENNPortable:true,Transfair:true},undo:null,kukiGone:false,renamed:false};
+ FS=JSON.parse(JSON.stringify(SEED));
+}
+freshState(false);
+Object.defineProperty(window,'TAB',{get:()=>S.tabs[S.tab]});
+Object.defineProperty(S,'path',{get(){return S.tabs[S.tab].path},set(v){S.tabs[S.tab].path=v},configurable:true});
+function rebindPath(){ Object.defineProperty(S,'path',{get(){return S.tabs[S.tab].path},set(v){S.tabs[S.tab].path=v},configurable:true}); }
+rebindPath();
+
+/* ───── geometry ───── */
+let scale=1;
+function fit(){ const vp=$('#vp'); scale=Math.min(1,vp.clientWidth/1300); stage.style.transform=`scale(${scale})`; vp.style.height=740*scale+'px'; }
+function stageXY(ev){ const r=stage.getBoundingClientRect(); return {x:(ev.clientX-r.left)/scale,y:(ev.clientY-r.top)/scale}; }
+function rectIn(el){ const r=el.getBoundingClientRect(),s=stage.getBoundingClientRect(); return {x:(r.left-s.left)/scale,y:(r.top-s.top)/scale,w:r.width/scale,h:r.height/scale}; }
+
+/* ───── render: sidebar ───── */
+function folderRowsDup(){ const c={}; S.items.forEach(i=>{ if(i.t==='folder'){ const n=titleOf(i).toLowerCase(); c[n]=(c[n]||0)+1; } }); return c; }
+function rowHTML(it,i,dup){
+ const p=pathOf(it), on=S.path===p && !(D&&D.kind==='side'&&D.srcIdx===i);
+ if(it.t==='place'){
+  const P=PLACES[it.k];
+  return `<div class="si${on?' on':''}" data-k="${keyOf(it)}" data-i="${i}" ${P.path!=='recents'?`data-path="${esc(P.path)}"`:''}>${glyph(P.icon)}<span class="nm">${esc(placeTitle(it.k))}</span></div>`;
+ }
+ const st=status(it), name=titleOf(it);
+ let sub=''; if(st==='offline') sub=t('notConnected',{v:volOf(it.path)}); else if(dup[name.toLowerCase()]>1) sub=dispName(parentOf(it.path));
+ const tr=st==='missing'?`<span class="tr warn">${glyph('warn','')}</span>`:'';
+ return `<div class="si${on?' on':''}${st!=='ok'?' dim':''}" data-k="${keyOf(it)}" data-i="${i}" ${st==='ok'?`data-path="${esc(it.path)}"`:''} title="${esc(it.path)}">${glyph('folder')}`+
+  (sub?`<span class="stack"><span class="nm">${esc(name)}</span><span class="sub">${esc(sub)}</span></span>`:`<span class="nm">${esc(name)}</span>`)+tr+`</div>`;
+}
+function hintHTML(){ const n=D.folders.length; return `<div class="hint" data-k="hint">${glyph('plus','')}<span>${esc(n>1?t('hintN',{n}):t('hint1'))}</span></div>`; }
+function folderSec(){ return S.section==='same'?'fav':'pin'; }
+function renderSide(){
+ const dup=folderRowsDup(), showHint=D&&D.kind==='items'&&D.folders.length&&S.hint;
+ const rows=S.items.map((it,i)=>({it,i}));
+ let html='';
+ if(S.section==='same'){
+  html+=`<div class="sec" data-sec="fav"><h4 data-k="h:fav">${esc(t('favorites'))}</h4>${rows.map(r=>rowHTML(r.it,r.i,dup)).join('')}${showHint?hintHTML():''}</div>`;
+ } else {
+  const pl=rows.filter(r=>r.it.t==='place'), fo=rows.filter(r=>r.it.t==='folder');
+  html+=`<div class="sec" data-sec="fav"><h4 data-k="h:fav">${esc(t('favorites'))}</h4>${pl.map(r=>rowHTML(r.it,r.i,dup)).join('')}</div>`;
+  if(fo.length||showHint) html+=`<div class="sec" data-sec="pin"><h4 data-k="h:pin">${esc(t('pinned'))}</h4>${fo.map(r=>rowHTML(r.it,r.i,dup)).join('')}${showHint?hintHTML():''}</div>`;
+ }
+ const vols=VOLS.filter(v=>S.mounted[v.name]);
+ if(vols.length) html+=`<div class="sec" data-sec="drv"><h4 data-k="h:drv">${esc(t('drives'))}</h4>`+vols.map(v=>{
+  const on=S.path===v.path;
+  return `<div class="si${on?' on':''}" data-k="d:${esc(v.name)}" data-path="${esc(v.path)}" data-vol="${esc(v.name)}">${glyph(v.internal?'hdd':'ext')}<span class="stack"><span class="nm">${esc(v.name)}</span><span class="sub">${esc(t('free',{s:num(v.free)+' GB'}))}</span></span>${v.internal?'':`<span class="tr ej">${eject}</span>`}</div>`;
+ }).join('')+`</div>`;
+ $('#secs').innerHTML=html;
+ placeCurfill();
+}
+function placeCurfill(instant){
+ const cf=$('#curfill'), on=$('#secs .si.on');
+ if(!on){ cf.style.opacity=0; return; }
+ const r=on.getBoundingClientRect(), b=$('#sideIn').getBoundingClientRect();
+ if(instant||S.rm) cf.style.transition='none';
+ cf.style.transform=`translateY(${(r.top-b.top)/scale}px)`; cf.style.height=r.height/scale+'px'; cf.style.opacity=1;
+ if(instant||S.rm){ cf.offsetHeight; cf.style.transition=''; }
+}
+
+/* FLIP: run a model change, re-render, and spring every keyed sidebar element from where it was. */
+function commit(mutate,o={}){
+ const before=new Map();
+ $$('#secs [data-k]').forEach(el=>{ if(!el.classList.contains('lift')) before.set(el.dataset.k,el.getBoundingClientRect()); });
+ if(o.fromKey&&o.from) before.set(o.fromKey,o.from);
+ mutate(); normalize(); renderSide();
+ $$('#secs [data-k]').forEach(el=>{
+  const k=el.dataset.k, b=before.get(k);
+  if(o.fresh&&o.fresh.includes(k)&&!S.rm){ el.classList.add('fresh'); el.addEventListener('animationend',e=>{ if(e.target===el&&e.animationName==='fresh') el.classList.remove('fresh'); }); }
+  if(S.rm) return;
+  if(!b){ el.animate([{opacity:0},{opacity:1}],{duration:220,easing:'ease-out'}); return; }
+  const a=el.getBoundingClientRect(), dx=(b.left-a.left)/scale, dy=(b.top-a.top)/scale;
+  if(Math.abs(dx)+Math.abs(dy)>.5) el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:SPRING_MS,easing:SPRING});
+ });
+ placeCurfill();
+}
+
+/* ───── render: pane, tabs, preview ───── */
+function sorted(list){ return [...list].sort((a,b)=>((a.kind==='folder')===(b.kind==='folder')?0:a.kind==='folder'?-1:1)||a.name.localeCompare(b.name,undefined,{sensitivity:'base'})); }
+function renderPane(){
+ const list=sorted(listing(S.path));
+ $('#rows').innerHTML=list.length?list.map(e=>`<div class="row${S.sel.has(e.name)?' sel':''}" data-n="${esc(e.name)}"><div class="c-name"><span class="ico">${iconFor(e)}</span><span class="n">${esc(e.name)}</span></div><div class="c-mod">${fmtDate(e.date)}</div><div class="c-kind">${esc(kindOf(e))}</div><div class="c-size">${e.kind==='folder'?'—':fmtSize(e.size)}</div></div>`).join(''):`<div class="empty">—</div>`;
+ // crumbs, anchored at the deepest place or drive, as in the app
+ const anchors=[...Object.values(PLACES).map(p=>p.path).filter(p=>p!=='recents'),...VOLS.map(v=>v.path)];
+ let anc=S.path==='recents'?'recents':anchors.filter(a=>a==='/'?true:S.path===a||S.path.startsWith(a+'/')).sort((a,b)=>b.length-a.length)[0]||'/';
+ const parts=[anc]; if(anc!=='recents'&&S.path!==anc){ let rest=S.path.slice(anc==='/'?1:anc.length+1).split('/'); let acc=anc; rest.forEach(seg=>{acc=join(acc,seg);parts.push(acc);}); }
+ $('#crumbs').innerHTML=`<span class="fi">${FOLDER_ICON}</span>`+parts.map((p,i)=>(i?`<span class="chev">${glyph('chev','')}</span>`:'')+`<span class="c${i===parts.length-1?' last':''}" data-p="${esc(p)}">${esc(dispName(p))}</span>`).join('');
+ $('#back').classList.toggle('off',!TAB.back.length); $('#fwd').classList.toggle('off',!TAB.fwd.length);
+ const vol=VOLS.find(v=>v.name===volOf(S.path))||VOLS[0];
+ $('#status').textContent=t('status',{n:list.length,s:num(vol.free+.01)+' GB'});
+ renderTabs(); renderPreview();
+}
+function renderTabs(){
+ $('#tabs').innerHTML=S.tabs.map((tb,i)=>`<div class="tab${i===S.tab?' on':''}" data-i="${i}"><span class="fi">${FOLDER_ICON}</span><span>${esc(dispName(tb.path))}</span></div>`).join('')+`<div class="ib tplus" id="tplus">${glyph('plus','')}</div>`;
+}
+function renderPreview(){
+ const list=listing(S.path), sel=list.filter(e=>S.sel.has(e.name));
+ let icon=FOLDER_ICON,name=dispName(S.path),sub=list.length===1?t('item1'):t('items',{n:list.length});
+ if(sel.length===1){ const e=sel[0]; icon=iconFor(e); name=e.name; sub=e.kind==='folder'?(n=>n===1?t('item1'):t('items',{n}))(listing(entryPath(e)).length):kindOf(e)+' · '+fmtSize(e.size); }
+ else if(sel.length>1){ name=t('items',{n:sel.length}); sub=''; }
+ $('#prev').innerHTML=`<h5>${esc(t('preview'))}</h5><div class="well">${icon}</div><div><div class="pn">${esc(name)}</div><div class="ps">${esc(sub)}</div></div>`;
+}
+function renderChrome(){ $$('[data-t]').forEach(el=>el.textContent=t(el.dataset.t)); }
+function renderAll(){ renderChrome(); renderSide(); renderPane(); }
+
+/* ───── navigation ───── */
+function go(p,push=true){
+ if(p===S.path) return;
+ if(push){ TAB.back.push(S.path); TAB.fwd=[]; }
+ S.path=p; S.sel=new Set(); S.anchor=null; renderPane();
+ $$('#secs .si').forEach(el=>el.classList.toggle('on',(el.dataset.path||(el.dataset.k==='p:recents'?'recents':''))===p));
+ placeCurfill();
+}
+$('#back').onclick=()=>{ if(!TAB.back.length) return; TAB.fwd.push(S.path); go(TAB.back.pop(),false); };
+$('#fwd').onclick=()=>{ if(!TAB.fwd.length) return; TAB.back.push(S.path); go(TAB.fwd.pop(),false); };
+$('#crumbs').addEventListener('click',e=>{ const c=e.target.closest('.c'); if(c) go(c.dataset.p); });
+$('#tabs').addEventListener('click',e=>{
+ if(e.target.closest('#tplus')){ S.tabs.push({path:S.path,back:[],fwd:[]}); S.tab=S.tabs.length-1; renderPane(); return; }
+ const tb=e.target.closest('.tab'); if(tb){ S.tab=+tb.dataset.i; S.sel=new Set(); renderPane(); renderSide(); }
+});
+function openInNewTab(p){ S.tabs.push({path:p,back:[],fwd:[]}); S.tab=S.tabs.length-1; S.sel=new Set(); renderPane(); renderSide(); }
+
+/* ───── toast, popover ───── */
+let toastT;
+function toast(msg,undo){
+ const el=$('#toast'); el.classList.toggle('noundo',!undo);
+ el.innerHTML=`<span>${esc(msg)}</span>`+(undo?`<span class="k">⌘Z</span><button>${esc(t('undo'))}</button>`:'');
+ if(undo) el.querySelector('button').onclick=()=>doUndo();
+ el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>{el.classList.remove('on'); if(undo) S.undo=null;},undo?5000:2200);
+}
+function hideToast(){ $('#toast').classList.remove('on'); }
+function popover(rowEl,title,body,buttons){
+ const p=$('#pop'), r=rectIn(rowEl), side=rectIn($('#side'));
+ p.innerHTML=`<div class="pt">${glyph('warn','')}<span>${esc(title)}</span></div><div class="pb">${esc(body)}</div><div class="pa">${buttons.map((b,i)=>`<button class="${b.pri?'pri':''}" data-i="${i}">${esc(b.label)}</button>`).join('')}</div>`;
+ p.style.left=side.x+side.w+10+'px'; p.style.top=r.y-6+'px'; p.style.display='block';
+ p.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{ closePop(); buttons[+btn.dataset.i].act?.(); });
+}
+function closePop(){ $('#pop').style.display='none'; }
+
+/* ───── context menu ───── */
+function openMenu(ev,items){
+ closePop();
+ const m=$('#ctx');
+ m.innerHTML=items.map((it,i)=>it==='-'?'<hr>':`<div class="mi${it.dis?' dis':''}${it.isNew?' new':''}" data-i="${i}"><span>${esc(it.label)}</span><span class="k">${it.key||''}</span></div>`).join('');
+ const {x,y}=stageXY(ev); m.style.display='block'; m.style.left='0px'; m.style.top='0px';
+ const w=m.offsetWidth,h=m.offsetHeight; m.style.left=Math.min(x,1300-w-8)+'px'; m.style.top=Math.min(y,740-h-8)+'px';
+ m.onclick=e=>{ const mi=e.target.closest('.mi'); if(!mi) return; closeMenu(); items[+mi.dataset.i].act?.(); };
+}
+function closeMenu(){ $('#ctx').style.display='none'; }
+function selectedEntries(){ return sorted(listing(S.path)).filter(e=>S.sel.has(e.name)); }
+const addable=e=>e.kind==='folder';
+function itemMenu(ev){
+ const ents=selectedEntries(), folders=ents.filter(addable).map(entryPath), one=ents.length===1?ents[0]:null;
+ const allFav=folders.length&&folders.every(p=>favIndex(p)>=0);
+ const items=[{label:t('mOpen'),key:'↩',act:()=>openEntry(one||ents[0])}];
+ if(one&&addable(one)) items.push({label:t('mNewTab'),act:()=>openInNewTab(entryPath(one))});
+ items.push({label:t('mQL'),key:'␣'},'-',{label:t('mReveal'),key:'⌥⌘R'},{label:t('mCopyPath'),key:'⌥⌘C',act:()=>toast(t('copied'))});
+ if(folders.length){ items.push('-'); items.push(allFav?{label:t('mRemove'),isNew:true,act:()=>folders.forEach(p=>removeAt(favIndex(p),'menu'))}
+  :{label:t('mAdd'),key:'⌃⌘T',isNew:true,act:()=>addViaMenu(folders)}); }
+ items.push('-',{label:t('mRename'),dis:!one},{label:t('mNewFolder'),key:'⇧⌘N'},'-',{label:t('mTrash'),key:'⌘⌫'});
+ openMenu(ev,items);
+}
+function backgroundMenu(ev){
+ if(S.path==='recents'||S.path==='/Applications') return;
+ const p=S.path, fav=favIndex(p)>=0, isPlace=Object.values(PLACES).some(pl=>pl.path===p)||VOLS.some(v=>v.path===p);
+ const items=[{label:t('mNewFolder'),key:'⇧⌘N'}];
+ if(!isPlace) items.push('-',fav?{label:t('mRemoveNamed',{q:q(dispName(p))}),isNew:true,act:()=>removeAt(favIndex(p),'menu')}:{label:t('mAddNamed',{q:q(dispName(p))}),isNew:true,act:()=>addViaMenu([p],null)});
+ items.push('-',{label:t('mReveal'),key:'⌥⌘R'},{label:t('mCopyPath'),key:'⌥⌘C',act:()=>toast(t('copied'))});
+ openMenu(ev,items);
+}
+function sideMenu(ev,el){
+ const k=el.dataset.k;
+ if(k.startsWith('d:')){ const v=el.dataset.vol; openMenu(ev,[{label:t('mNewTab'),act:()=>openInNewTab(el.dataset.path)},{label:t('mReveal')},...(v!=='Macintosh HD'?['-',{label:t('mEject'),act:()=>setMounted(v,false)}]:[])]); return; }
+ const i=+el.dataset.i, it=S.items[i], st=status(it), ok=st==='ok', p=pathOf(it);
+ const items=[{label:t('mNewTab'),dis:!ok,act:()=>openInNewTab(p)},'-',{label:t('mReveal'),dis:!ok||p==='recents'},{label:t('mCopyPath'),dis:!ok||p==='recents',act:()=>toast(t('copied'))}];
+ if(it.t==='folder'||S.builtins==='movable') items.push('-',{label:t('mRemove'),isNew:true,act:()=>removeAt(i,'menu')});
+ openMenu(ev,items);
+}
+
+/* ───── add / remove ───── */
+function addViaMenu(paths,srcEls){
+ const dupes=paths.filter(p=>favIndex(p)>=0), add=paths.filter(p=>favIndex(p)<0);
+ dupes.forEach(p=>pulse(favIndex(p)));
+ if(!add.length) return;
+ const its=add.map(p=>({t:'folder',id:uid(),path:p}));
+ // icon sources: the list rows for these folders, captured before the sidebar changes
+ const src=add.map(p=>{ const r=$$('#rows .row').find(r=>join(S.path,r.dataset.n)===p); return r?rectIn(r.querySelector('.ico')):null; });
+ S.items.push(...its); normalize(); renderSide();
+ if(S.rm) return;
+ its.forEach((it,j)=>{
+  const row=$(`#secs [data-k="${keyOf(it)}"]`); if(!row) return;
+  const h=row.offsetHeight; row.style.opacity=0;
+  row.animate([{height:'0px',minHeight:'0px'},{height:h+'px',minHeight:'0px'}],{duration:SPRING_MS,easing:SPRING,delay:j*70});
+  const g=rectIn(row), to={x:g.x+10+9.5,y:g.y+h/2}, s=src[j];
+  const done=()=>{ row.style.opacity=''; row.classList.add('fresh'); row.addEventListener('animationend',e=>{ if(e.target===row&&e.animationName==='fresh') row.classList.remove('fresh'); }); placeCurfill(); };
+  if(!s){ setTimeout(done,200+j*70); return; }
+  fly({x:s.x+s.w/2,y:s.y+s.h/2},to,j*70).then(done);
+ });
+ setTimeout(placeCurfill,SPRING_MS+200);
+}
+function fly(from,to,delay){
+ const el=document.createElement('div'); el.className='fly'; el.innerHTML=FOLDER_ICON; stage.append(el);
+ const cx=(from.x+to.x)/2, cy=Math.min(from.y,to.y)-90;
+ el.style.offsetPath=`path("M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}")`;
+ const a=el.animate([{offsetDistance:'0%',transform:'scale(1)',opacity:1},{offsetDistance:'55%',transform:'scale(1.35)',opacity:1,offset:.5},{offsetDistance:'100%',transform:'scale(.86)',opacity:.9}],
+  {duration:540,delay,easing:'cubic-bezier(.5,0,.25,1)',fill:'both'});
+ return a.finished.then(()=>{ el.animate([{opacity:.9},{opacity:0}],{duration:160}).finished.then(()=>el.remove()); });
+}
+function pulse(i){ const el=$(`#secs [data-i="${i}"]`); if(!el) return; el.classList.remove('pulse'); el.offsetWidth; el.classList.add('pulse'); }
+function removeAt(i,via){
+ if(i<0) return; const it=S.items[i], el=$(`#secs [data-i="${i}"]`);
+ S.undo={it,idx:i};
+ const finish=()=>commit(()=>S.items.splice(S.items.indexOf(it),1));
+ if(el&&!S.rm&&via==='menu'){ const h=el.offsetHeight; el.animate([{height:h+'px',minHeight:'0px',opacity:1},{height:'0px',minHeight:'0px',opacity:0,transform:'translateX(-12px)'}],{duration:280,easing:'ease-in',fill:'forwards'}).finished.then(finish); }
+ else finish();
+ toast(t('removed',{q:q(titleOf(it))}),true);
+}
+function doUndo(){
+ if(!S.undo) return; const {it,idx}=S.undo; S.undo=null; hideToast();
+ commit(()=>S.items.splice(Math.min(idx,S.items.length),0,it),{fresh:[keyOf(it)]});
+}
+
+/* ───── list interaction ───── */
+let press=null;
+$('#rows').addEventListener('pointerdown',e=>{
+ if(e.button!==0) return; closeMenu(); closePop();
+ const r=e.target.closest('.row');
+ if(!r){ S.sel=new Set(); renderPane(); return; }
+ const n=r.dataset.n;
+ if(e.metaKey){ S.sel.has(n)?S.sel.delete(n):S.sel.add(n); S.anchor=n; renderPane(); return; }
+ if(e.shiftKey&&S.anchor){ const names=sorted(listing(S.path)).map(x=>x.name); const a=names.indexOf(S.anchor),b=names.indexOf(n); S.sel=new Set(names.slice(Math.min(a,b),Math.max(a,b)+1)); renderPane(); return; }
+ const wasSel=S.sel.has(n);
+ if(!wasSel){ S.sel=new Set([n]); S.anchor=n; renderPane(); }
+ press={kind:'items',x:e.clientX,y:e.clientY,name:n,wasSel};
+});
+$('#rows').addEventListener('dblclick',e=>{ const r=e.target.closest('.row'); if(!r) return; openEntry(listing(S.path).find(x=>x.name===r.dataset.n)); });
+$('#rows').addEventListener('contextmenu',e=>{
+ e.preventDefault(); const r=e.target.closest('.row');
+ if(!r){ backgroundMenu(e); return; }
+ if(!S.sel.has(r.dataset.n)){ S.sel=new Set([r.dataset.n]); S.anchor=r.dataset.n; renderPane(); }
+ itemMenu(e);
+});
+function openEntry(e){ if(!e) return; if(e.kind==='folder') go(entryPath(e)); else toast(t('opened',{q:q(e.name)})); }
+
+/* ───── sidebar interaction ───── */
+$('#secs').addEventListener('pointerdown',e=>{
+ if(e.button!==0) return; closeMenu(); closePop();
+ const el=e.target.closest('.si'); if(!el) return;
+ if(e.target.closest('.tr.ej')){ setMounted(el.dataset.vol,false); return; }
+ const i=el.dataset.i!==undefined?+el.dataset.i:-1, it=i>=0?S.items[i]:null;
+ const draggable=it&&(it.t==='folder'||S.builtins==='movable');
+ press={kind:'side',x:e.clientX,y:e.clientY,el,i,draggable};
+});
+$('#secs').addEventListener('contextmenu',e=>{ e.preventDefault(); const el=e.target.closest('.si'); if(el) sideMenu(e,el); });
+function sideClick(el){
+ if(el.dataset.k.startsWith('d:')){ go(el.dataset.path); return; }
+ const it=S.items[+el.dataset.i], st=status(it), name=titleOf(it);
+ if(st==='missing') return popover(el,t('missingT',{q:q(name)}),t('missingB'),[{label:t('mRemove'),act:()=>removeAt(S.items.indexOf(it),'menu')},{label:t('ok'),pri:true}]);
+ if(st==='offline'){ const v=volOf(it.path); return popover(el,t('offlineT',{v:q(v)}),t('offlineB',{v:q(v),q:q(name)}),[{label:t('ok'),pri:true}]); }
+ go(pathOf(it));
+}
+
+window.addEventListener('pointermove',e=>{
+ if(D){ dragMove(e); return; }
+ if(!press) return;
+ if(Math.hypot(e.clientX-press.x,e.clientY-press.y)<4) return;
+ if(press.kind==='items') beginItemsDrag(e);
+ else if(press.draggable) beginSideDrag(e);
+ press=null;
+});
+window.addEventListener('pointerup',e=>{
+ if(D){ endDrag(e); return; }
+ if(press){ if(press.kind==='side') sideClick(press.el); else if(press.wasSel&&!e.metaKey&&!e.shiftKey){ S.sel=new Set([press.name]); S.anchor=press.name; renderPane(); } }
+ press=null;
+});
+
+/* ───── drag: items from the list ───── */
+function setGhost(html,x,y){ const g=$('#ghost'); g.getAnimations().forEach(a=>a.cancel()); g.innerHTML=html+`<div class="pill"></div>`; g.style.display='block'; g.className=''; moveGhostTo(x,y); }
+function moveGhostTo(x,y){ const g=$('#ghost'); g.style.transform=`translate(${x}px,${y}px)`; D&&(D.gx=x,D.gy=y); }
+function beginItemsDrag(e){
+ const ents=selectedEntries(); if(!ents.length) return;
+ const folders=ents.filter(addable).map(entryPath);
+ const row=$$('#rows .row').find(r=>r.dataset.n===press.name), ico=row&&row.querySelector('.ico');
+ const p=stageXY(e), ir=ico?rectIn(ico):{x:p.x-11,y:p.y-11};
+ D={kind:'items',ents,folders,srcPaths:ents.map(entryPath),srcParent:S.path,target:{type:'none'},slot:null,
+  offX:Math.max(6,Math.min(30,p.x-ir.x+6)),offY:Math.max(8,Math.min(24,p.y-ir.y+5)),origin:{x:ir.x-6,y:ir.y-5}};
+ $$('#rows .row.sel').forEach(r=>r.classList.add('dragging'));
+ const stack=ents.slice(0,3).map((x,j)=>`<span style="transform:translate(${j*3}px,${-j*3}px)">${iconFor(x)}</span>`).reverse().join('');
+ const label=ents.length===1?ents[0].name:(folders.length===ents.length?t('nFolders',{n:ents.length}):t('items',{n:ents.length}));
+ setGhost(`<div class="gi"><span class="gic">${stack}</span><span>${esc(label)}</span>${ents.length>1?`<span class="badge">${ents.length}</span>`:''}</div>`,p.x-D.offX,p.y-D.offY);
+ renderSide();
+ D.base=measureBase();
+ const hint=$('#secs .hint');
+ if(hint){ anim(hint,[{height:'0px',marginTop:'0px',opacity:0},{height:'32px',marginTop:'3px',opacity:1}]); }
+ const ph=$('#secs [data-k="h:pin"]'); if(ph&&!S.items.some(i=>i.t==='folder')) ph.animate([{opacity:0},{opacity:1}],{duration:200});
+ dragMove(e);
+}
+/* ───── drag: a sidebar row ───── */
+function beginSideDrag(e){
+ const el=press.el, i=press.i, it=S.items[i], p=stageXY(e), r=rectIn(el);
+ D={kind:'side',srcIdx:i,srcIt:it,srcKey:el.dataset.k,target:{type:'insert',idx:i},slot:null,offX:p.x-r.x,offY:p.y-r.y,origin:{x:r.x,y:r.y}};
+ const st=status(it);
+ setGhost(`<div class="grow"${st!=='ok'?' style="opacity:.7"':''}>${glyph(it.t==='place'?PLACES[it.k].icon:'folder')}<span>${esc(titleOf(it))}</span></div>`,r.x,r.y);
+ el.classList.add('lift');
+ $$('#secs .si.on').forEach(x=>{ if(x===el) $('#curfill').style.opacity=0; });
+ D.base=measureBase();
+ openSlot(i,true);
+ dragMove(e);
+}
+
+/* Base layout: row rectangles with no insertion slot open (the lifted row and the end slot already accounted for).
+   Hit-testing maps the pointer back into this layout, so a slot opening under the pointer can't make the target flicker. */
+function secsTop(){ return $('#secs').getBoundingClientRect().top; }
+function measureBase(){
+ const top=secsTop(), R=el=>{const r=el.getBoundingClientRect();return {top:(r.top-top)/scale,bot:(r.bottom-top)/scale};};
+ const B={rows:[],secEnd:{},secHead:{},hint:null,drvTop:Infinity};
+ $$('#secs .sec').forEach(sec=>{
+  const id=sec.dataset.sec, h=sec.querySelector('h4'), hr=R(h);
+  B.secEnd[id]=hr.bot; B.secHead[id]=hr; if(id==='drv') B.drvTop=hr.top;
+  sec.querySelectorAll('.si').forEach(el=>{ if(el.classList.contains('lift')) return; const r=R(el);
+   B.rows.push({el,k:el.dataset.k,i:el.dataset.i!==undefined?+el.dataset.i:-1,sec:id,path:el.dataset.path||null,top:r.top,bot:r.bot}); B.secEnd[id]=r.bot; });
+  const hint=sec.querySelector('.hint'); if(hint) B.hint={...R(hint),sec:id};
+ });
+ if(B.hint){ B.hint.top=B.secEnd[B.hint.sec]+3; B.hint.bot=B.hint.top+32; }
+ return B;
+}
+function slotH(){ return S.indicator==='line'?8:32; }
+function slotSection(){ if(S.section==='same') return 'fav'; if(D.kind==='side'&&D.srcIt.t==='place') return 'fav'; return 'pin'; }
+function insertRange(){
+ const pc=placeCount(), n=S.items.length;
+ if(D.kind==='side'&&D.srcIt.t==='place') return S.section==='sep'?[0,pc]:[0,n];
+ return [(S.builtins==='fixed'||S.section==='sep')?pc:0,n];
+}
+function baseTopFor(idx){
+ const sec=slotSection(), r=D.base.rows.find(r=>r.sec===sec&&r.i>=idx);
+ if(r) return r.top; if(D.base.hint&&D.base.hint.sec===sec) return D.base.hint.top-3; return D.base.secEnd[sec];
+}
+function ghostLabel(){ if(D.kind==='side') return titleOf(D.srcIt); const f=D.folders; return f.length===1?dispName(f[0]):t('nFolders',{n:f.length}); }
+function ghostGlyph(){ return D.kind==='side'&&D.srcIt.t==='place'?PLACES[D.srcIt.k].icon:'folder'; }
+function openSlot(idx,instant){
+ closeSlot();
+ const el=document.createElement('div'); el.className='slot '+S.indicator; const h=slotH();
+ el.innerHTML=S.indicator==='ghost'?`<div class="sgr">${glyph(ghostGlyph(),'')}<span>${esc(ghostLabel())}</span></div>`:'<i class="ln"></i>';
+ el.style.height=h+'px';
+ const sec=$(`#secs .sec[data-sec="${slotSection()}"]`);
+ const before=$$('.si',sec).find(r=>r.dataset.i!==undefined&&+r.dataset.i>=idx)||$('.hint',sec);
+ before?sec.insertBefore(el,before):sec.appendChild(el);
+ D.slot={idx,h,baseTop:baseTopFor(idx),el};
+ if(!instant) anim(el,[{height:'0px'},{height:h+'px'}]);
+}
+function closeSlot(){
+ if(!D||!D.slot) return; const el=D.slot.el; D.slot=null;
+ if(S.rm){ el.remove(); return; }
+ const h=el.getBoundingClientRect().height/scale; el.style.height='0px';
+ el.animate([{height:h+'px'},{height:'0px'}],{duration:SPRING_MS*.75,easing:SPRING}).finished.then(()=>el.remove());
+}
+function hintOn(on){
+ const h=$('#secs .hint'); if(!h) return; if(h.classList.contains('on')===on) return;
+ h.classList.toggle('on',on);
+ h.innerHTML=on&&S.indicator==='ghost'?`${glyph('folder','')}<span>${esc(ghostLabel())}</span>`:`${glyph('plus','')}<span>${esc(D.folders.length>1?t('hintN',{n:D.folders.length}):t('hint1'))}</span>`;
+}
+
+function classify(e){
+ const p=stageXY(e), side=rectIn($('#side'));
+ const inSide=p.x>=side.x&&p.x<=side.x+side.w&&p.y>=side.y&&p.y<=side.y+side.h;
+ if(!inSide){
+  if(D.kind!=='side') return {type:'none'};
+  const far=p.x>side.x+side.w+30||p.y<side.y-30||p.y>side.y+side.h+30||p.x<side.x-30;
+  return far&&S.dragOut?{type:'outside'}:{type:'insert',idx:D.srcIdx,soft:true};
+ }
+ let y=(e.clientY-secsTop())/scale;
+ if(D.slot&&y>=D.slot.baseTop){ if(y<D.slot.baseTop+D.slot.h) return {type:'insert',idx:D.slot.idx}; y-=D.slot.h; }
+ return classifyBase(y,e);
+}
+function classifyBase(y,e){
+ const B=D.base, side=D.kind==='side', canAdd=side||D.folders.length>0, [lo,hi]=canAdd?insertRange():[1,0];
+ const ok=i=>canAdd&&i>=lo&&i<=hi, ins=idx=>({type:'insert',idx});
+ const clamp=i=>Math.max(lo,Math.min(hi,i));
+ if(B.hint&&y>=B.hint.top-3&&y<=B.hint.bot+4) return ins(S.items.length);
+ for(const r of B.rows){
+  if(y<r.top||y>r.bot) continue;
+  if(r.sec==='drv') return !side&&intoOk(r)?{type:'into',el:r.el,path:r.path,k:r.k}:(side?ins(hi):{type:'none'});
+  const f=(y-r.top)/(r.bot-r.top);
+  if(side){ if(S.section==='sep'&&r.sec!==slotSection()) return ins(r.sec==='fav'?lo:hi); return ins(clamp(f<.5?r.i:r.i+1)); }
+  let cand=null; if(f<.25) cand=r.i; else if(f>.75) cand=r.i+1;
+  if(cand!==null&&ok(cand)) return ins(cand);
+  if(intoOk(r)) return {type:'into',el:r.el,path:r.path,k:r.k};
+  if(ok(r.i)||ok(r.i+1)) return ins(ok(f<.5?r.i:r.i+1)?(f<.5?r.i:r.i+1):(ok(r.i)?r.i:r.i+1));
+  return {type:'none'};
+ }
+ if(!canAdd) return {type:'none'};
+ if(y<B.drvTop||side){
+  const fs=slotSection(), endY=B.secEnd[fs];
+  if(y>=endY) return ins(hi);
+  if(B.secHead[fs]&&y>=B.secHead[fs].top-8&&(fs!=='fav'||lo===0)) return ins(lo);
+  const firstFolder=B.rows.find(r=>r.sec===fs&&r.i>=lo);
+  if(firstFolder&&y<firstFolder.top&&y>firstFolder.top-14) return ins(lo);
+ }
+ return {type:'none'};
+}
+function intoOk(r){
+ if(D.kind!=='items'||!r.path) return false;
+ if(r.path===D.srcParent&&D.srcPaths.every(p=>parentOf(p)===r.path)) return false;
+ return !D.srcPaths.some(s=>r.path===s||r.path.startsWith(s+'/'));
+}
+const same=(a,b)=>a.type===b.type&&a.idx===b.idx&&a.k===b.k&&!!a.soft===!!b.soft;
+function dragMove(e){
+ const p=stageXY(e); moveGhostTo(p.x-D.offX,p.y-D.offY);
+ D.alt=e.altKey;
+ let tg=classify(e);
+ if(D.kind==='side'&&tg.type==='insert'&&tg.idx===D.srcIdx+1) tg={...tg,idx:D.srcIdx};
+ if(!same(tg,D.target)){
+  D.target=tg;
+  $$('#secs .si.drop-hot').forEach(x=>x.classList.remove('drop-hot')); clearTimeout(D.springT);
+  if(tg.type==='into'){ tg.el.classList.add('drop-hot'); D.springT=setTimeout(()=>springLoad(tg),900); }
+  if(tg.type==='insert'){
+   const toHint=D.kind==='items'&&$('#secs .hint')&&tg.idx===S.items.length;
+   if(toHint){ closeSlot(); hintOn(true); } else { hintOn(false); if(!D.slot||D.slot.idx!==tg.idx) openSlot(tg.idx); }
+  } else { hintOn(false); closeSlot(); }
+  $('#ghost').classList.toggle('out',tg.type==='outside');
+  // The slot already previews the result, so the drag image steps back while over it.
+  $('#ghost').classList.toggle('ins',tg.type==='insert'&&!tg.soft&&S.indicator==='ghost');
+ }
+ updatePill();
+}
+function updatePill(){
+ const pill=$('#ghost .pill'); if(!pill) return; const tg=D.target;
+ let txt='',cls='';
+ if(tg.type==='insert'&&D.kind==='items') txt=`${glyph('sidebar','')}<span>${esc(t('pillAdd'))}</span>`;
+ else if(tg.type==='into'){ const copy=D.alt||D.srcPaths.some(s=>volOf(s)!==volOf(tg.path)); txt=`<span>${esc(t(copy?'pillCopy':'pillMove',{q:q(dispName(tg.path))}))}</span>`; }
+ else if(tg.type==='outside'){ txt=`${glyph('poof','')}<span>${esc(t('pillRemove'))}</span>`; cls='rm'; }
+ pill.className='pill'+(txt?' on':'')+(cls?' '+cls:''); if(txt) pill.innerHTML=txt;
+}
+function springLoad(tg){ if(!D||D.target!==tg) return; tg.el.classList.remove('blink'); tg.el.offsetWidth; tg.el.classList.add('blink'); setTimeout(()=>{ if(D&&D.target===tg){ go(tg.path); D.base=measureBase(); } },650); }
+
+function endDrag(e){
+ const d=D, tg=d.target, g=$('#ghost'), gi=g.firstElementChild, from=gi.getBoundingClientRect();
+ clearTimeout(d.springT);
+ $$('#rows .row.dragging').forEach(r=>r.classList.remove('dragging'));
+ const hideGhost=()=>{ g.style.display='none'; g.innerHTML=''; };
+ if(tg.type==='insert'&&!tg.soft&&!(d.kind==='side'&&tg.idx===d.srcIdx)){
+  if(d.kind==='items'){
+   // Folders already in the sidebar move to the drop position instead of duplicating.
+   const its=d.folders.map(p=>{ const j=favIndex(p); return j>=0?S.items[j]:{t:'folder',id:uid(),path:p}; });
+   const fresh=its.map(keyOf);
+   hideGhost(); D=null;
+   commit(()=>{ let idx=tg.idx; its.forEach(it=>{ const j=S.items.indexOf(it); if(j>=0){ S.items.splice(j,1); if(j<idx) idx--; } }); S.items.splice(idx,0,...its); },{fresh,fromKey:fresh.length===1?fresh[0]:null,from});
+  } else {
+   hideGhost(); D=null;
+   commit(()=>{ const it=S.items.splice(d.srcIdx,1)[0]; S.items.splice(tg.idx>d.srcIdx?tg.idx-1:tg.idx,0,it); },{fromKey:d.srcKey,from});
+  }
+  return;
+ }
+ if(tg.type==='into'){
+  tg.el.classList.remove('drop-hot');
+  if(!S.rm) g.animate([{opacity:1,transform:g.style.transform},{opacity:0,transform:g.style.transform+' scale(.4)'}],{duration:200,easing:'ease-in'}).finished.then(hideGhost); else hideGhost();
+  D=null; performTransfer(d,tg.path,e.altKey); commit(()=>{}); return;
+ }
+ if(tg.type==='outside'){
+  const c=rectIn(gi); hideGhost(); D=null; if(!S.rm) poof(c.x+c.w/2,c.y+c.h/2);
+  removeAt(d.srcIdx,'drag'); return;
+ }
+ // nothing accepted the drop: the drag image returns to where it came from
+ D=null;
+ if(d.kind==='side'){ hideGhost(); commit(()=>{},{fromKey:d.srcKey,from}); return; }
+ commit(()=>{});
+ if(S.rm){ hideGhost(); return; }
+ g.animate([{transform:g.style.transform,opacity:1},{transform:`translate(${d.origin.x}px,${d.origin.y}px)`,opacity:0}],{duration:360,easing:SPRING,fill:'forwards'}).finished.then(hideGhost);
+}
+function poof(x,y){
+ const p=document.createElement('div'); p.className='poof'; p.style.left=x+'px'; p.style.top=y+'px';
+ p.innerHTML=Array.from({length:8},(_,i)=>{ const a=i/8*Math.PI*2+.3, d=16+Math.random()*10; return `<i style="--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;animation-delay:${i*12}ms"></i>`; }).join('');
+ stage.append(p); setTimeout(()=>p.remove(),800);
+}
+function performTransfer(d,dest,alt){
+ const copy=alt||d.srcPaths.some(s=>volOf(s)!==volOf(dest)), moved=[];
+ d.ents.forEach(e=>{
+  const src=entryPath(e), par=parentOf(src), np=join(dest,e.name);
+  if(listing(dest).some(x=>x.name===e.name)) return;
+  listing(dest).push({...e,path:undefined});
+  if(!copy){ FS[par]=listing(par).filter(x=>x.name!==e.name); rekey(src,np); }
+  moved.push(e);
+ });
+ if(!moved.length) return;
+ S.sel=new Set(); renderPane();
+ const n=moved.length, dn=q(dispName(dest));
+ toast(n===1?t(copy?'copied1':'moved1',{q:q(moved[0].name),d:dn}):t(copy?'copiedN':'movedN',{n,d:dn}));
+}
+/* A moved or renamed folder keeps its sidebar row: bookmarks follow the folder. */
+function rekey(from,to){
+ Object.keys(FS).forEach(k=>{ if(k===from||k.startsWith(from+'/')){ FS[to+k.slice(from.length)]=FS[k]; delete FS[k]; } });
+ S.items.forEach(i=>{ if(i.t==='folder'&&(i.path===from||i.path.startsWith(from+'/'))) i.path=to+i.path.slice(from.length); });
+ S.tabs.forEach(tb=>{ if(tb.path===from||tb.path.startsWith(from+'/')) tb.path=to+tb.path.slice(from.length); });
+}
+
+/* ───── scenarios ───── */
+const DZ=HOME+'/Documents/Projects/dzwei';
+function setMounted(v,on){
+ S.mounted[v]=on; if(!on&&volOf(S.path)===v) go(HOME);
+ $('#scEject').textContent=S.mounted.Transfair?'Eject Transfair':'Mount Transfair';
+ commit(()=>{}); renderPane();
+}
+$('#scEject').onclick=()=>setMounted('Transfair',!S.mounted.Transfair);
+$('#scSample').onclick=()=>{
+ const want=[DZ+'/DeeDock','/Volumes/Transfair/Footage',DZ+'/DeeDock/Assets',DZ+'/Topos/Assets'].map(p=>S.renamed?p.replace(DZ+'/DeeDock',DZ+'/DOKK'):p).filter(p=>favIndex(p)<0);
+ const its=want.map(p=>({t:'folder',id:uid(),path:p}));
+ commit(()=>S.items.push(...its),{fresh:its.map(keyOf)});
+};
+$('#scKuki').onclick=()=>{
+ const kp=DZ+'/kuki';
+ if(!S.kukiGone){
+  if(favIndex(kp)<0){ const it={t:'folder',id:uid(),path:kp}; commit(()=>S.items.push(it)); }
+  FS[DZ]=listing(DZ).filter(e=>e.name!=='kuki'); S.kukiGone=true; $('#scKuki').textContent='Put kuki back';
+ } else { listing(DZ).push(F('kuki','2026-09-26')); S.kukiGone=false; $('#scKuki').textContent='kuki deleted in Finder'; }
+ if(S.path===kp) go(DZ); renderPane(); commit(()=>{});
+};
+$('#scRename').onclick=()=>{
+ const [a,b]=S.renamed?['DOKK','DeeDock']:['DeeDock','DOKK'];
+ const e=listing(DZ).find(x=>x.name===a); if(!e) return;
+ e.name=b; rekey(DZ+'/'+a,DZ+'/'+b); S.renamed=!S.renamed;
+ if(S.sel.has(a)){ S.sel.delete(a); S.sel.add(b); }
+ $('#scRename').textContent=S.renamed?'Rename DOKK → DeeDock in Finder':'Rename DeeDock → DOKK in Finder';
+ renderSide(); renderPane();
+ S.items.forEach(i=>{ if(i.t==='folder'&&i.path.startsWith(DZ+'/'+b)){ const n=$(`#secs [data-k="${keyOf(i)}"] .nm`); n&&n.classList.add('renamed'); } });
+};
+$('#scReset').onclick=()=>{ freshState(true); rebindPath(); ['scKuki','scRename','scEject'].forEach(id=>$('#'+id).textContent={scKuki:'kuki deleted in Finder',scRename:'Rename DeeDock → DOKK in Finder',scEject:'Eject Transfair'}[id]); hideToast(); renderAll(); };
+
+/* ───── controls ───── */
+function syncControls(){ $$('.ctl .sg').forEach(sg=>{ const k=sg.dataset.k, v=typeof S[k]==='boolean'?(S[k]?'1':'0'):S[k]; sg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }); }
+function applyStage(){ stage.className=`stage ${S.theme}${S.rm?' rm':''}${S.rt?' rt':''}`; document.documentElement.style.colorScheme=S.theme; }
+$$('.ctl .sg').forEach(sg=>sg.addEventListener('click',e=>{
+ const b=e.target.closest('button'); if(!b) return; const k=sg.dataset.k;
+ S[k]=typeof DEF[k]==='boolean'?b.dataset.v==='1':b.dataset.v;
+ normalize(); syncControls(); applyStage(); renderAll();
+}));
+
+/* ───── keyboard ───── */
+stage.addEventListener('pointerdown',()=>stage.focus({preventScroll:true}));
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){ closeMenu(); closePop(); if(D){ D.target={type:'none'}; endDrag(e); } return; }
+ if(D&&e.key==='Alt'){ D.alt=true; updatePill(); }
+ if(e.metaKey&&e.key.toLowerCase()==='z'){ e.preventDefault(); doUndo(); return; }
+ if(e.ctrlKey&&e.metaKey&&e.key.toLowerCase()==='t'){
+  e.preventDefault(); const f=selectedEntries().filter(addable).map(entryPath); if(f.length) addViaMenu(f); return;
+ }
+ if(document.activeElement!==stage) return;
+ const names=sorted(listing(S.path)).map(x=>x.name); if(!names.length) return;
+ if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+  e.preventDefault();
+  if(e.metaKey&&e.key==='ArrowUp'){ if(S.path!=='/'&&S.path!=='recents') go(parentOf(S.path)); return; }
+  if(e.metaKey&&e.key==='ArrowDown'){ openEntry(selectedEntries()[0]); return; }
+  const cur=names.indexOf([...S.sel].pop()), n=e.key==='ArrowDown'?Math.min(names.length-1,cur+1):Math.max(0,cur<0?0:cur-1);
+  S.sel=new Set([names[n]]); S.anchor=names[n]; renderPane();
+  $$('#rows .row')[n]?.scrollIntoView({block:'nearest'});
+ }
+ if(e.key==='Enter'){ openEntry(selectedEntries()[0]); }
+});
+document.addEventListener('keyup',e=>{ if(D&&e.key==='Alt'){ D.alt=false; updatePill(); } });
+document.addEventListener('pointerdown',e=>{ if(!e.target.closest('#ctx')) closeMenu(); if(!e.target.closest('#pop')&&!e.target.closest('#secs')) closePop(); },true);
+window.addEventListener('resize',fit);
+
+syncControls(); applyStage(); fit(); renderAll(); placeCurfill(true);
+</script>
+</body></html>

@@ -38,6 +38,17 @@ final class HubFilesMemoryDataSource: HubFilesDataSource {
 
     func watch(_ folder: URL, onChange: @escaping @MainActor () -> Void) -> HubFilesWatch? { nil }
 
+    let observesVolumes = false
+
+    /// Resolves against the folders in the tree when the store asks; later changes to the tree
+    /// show on the next refresh.
+    func makeSidebarResolver() -> any HubFilesSidebarResolving {
+        HubFilesSidebarStaticResolver(folders: Set(folders.keys), unmountedVolumes: unmountedVolumes)
+    }
+
+    /// Volume names whose folders resolve as "not connected" (previews of a disconnected drive).
+    var unmountedVolumes: Set<String> = []
+
     /// Adds a folder (and an entry for it in its parent) or a file to the tree.
     @discardableResult
     func add(_ path: String, kind: UTType = .folder, size: Int64? = nil, modified: Date? = nil) -> HubFileItem {

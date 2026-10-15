@@ -13,6 +13,9 @@ struct HubFilesInteraction {
     var mouseUp: ((NSEvent) -> Void)?
     /// A second click inside the region.
     var doubleClick: (() -> Void)?
+    /// A middle-button (button 3) click, fired on release inside the region. Nil: middle clicks
+    /// pass up the responder chain.
+    var middleClick: (() -> Void)?
     /// The file URLs to drag, read when the pointer has moved far enough. Nil: not a drag source.
     var dragURLs: (() -> [URL])?
     /// Begins (true) or ends (false) the Hub's `.drag` hold around a drag session.
@@ -30,6 +33,11 @@ struct HubFilesInteraction {
     /// A search result: dragging it onto the search field runs Find Similar, where a pane's file drag shows no well
     /// unless it's a picture.
     var isSearchResult = false
+    /// A Favorites row: dragging it reorders it, or removes it past the sidebar's edge.
+    var sidebarEntry: HubFilesSidebarEntryID?
+    /// Drags over this region go to `HubFilesSidebarModel`, which hit-tests the whole Favorites
+    /// list at once instead of trusting whichever row happens to be under the pointer.
+    var routesDropsToSidebar = false
 }
 
 /// Places a `HubFilesInteractionView` over (or behind) SwiftUI content.
@@ -46,7 +54,7 @@ struct HubFilesInteractionRegion: NSViewRepresentable {
     func updateNSView(_ view: HubFilesInteractionView, context: Context) {
         view.interaction = interaction
         view.model = model
-        if interaction.dropDestination != nil {
+        if interaction.dropDestination != nil || interaction.routesDropsToSidebar {
             view.registerForDraggedTypes([.fileURL])
         } else {
             view.unregisterDraggedTypes()
@@ -68,6 +76,8 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     /// (a moved item disappears from the listing before the session ends).
     private var retainedForSession: HubFilesInteractionView?
     private var sessionHold: ((Bool) -> Void)?
+    /// Set by a middle-button press in this region, so only a press-and-release here counts.
+    private var middleButtonDown = false
     private var cachedSources: (changeCount: Int, urls: [URL])?
 
     override var isFlipped: Bool { true }
@@ -126,19 +136,46 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
                 if event.clickCount == 2 { interaction.doubleClick?() }
                 return
             }
-            if let dragURLs = interaction.dragURLs,
-               hypot(next.locationInWindow.x - origin.x, next.locationInWindow.y - origin.y) >= DockDragGeometry.startDistance {
+            let moved = hypot(next.locationInWindow.x - origin.x, next.locationInWindow.y - origin.y)
+            guard moved >= DockDragGeometry.startDistance else { continue }
+            if let dragURLs = interaction.dragURLs {
                 beginDrag(urls: dragURLs(), event: next)
                 return
             }
+            if let entry = interaction.sidebarEntry, let sidebar = model?.sidebar {
+                trackReorder(entry, sidebar: sidebar, window: window)
+                return
+            }
         }
+    }
+
+    // Middle clicks close tabs, as in browsers. The window delivers the release to the view that
+    // took the press, so the release is checked against the bounds to let a drag off cancel it.
+    override func otherMouseDown(with event: NSEvent) {
+        guard !stopped, event.buttonNumber == 2, interaction.middleClick != nil else {
+            super.otherMouseDown(with: event)
+            return
+        }
+        middleButtonDown = true
+    }
+
+    override func otherMouseUp(with event: NSEvent) {
+        guard middleButtonDown, event.buttonNumber == 2 else {
+            super.otherMouseUp(with: event)
+            return
+        }
+        middleButtonDown = false
+        guard !stopped, bounds.contains(convert(event.locationInWindow, from: nil)) else { return }
+        interaction.middleClick?()
     }
 
     private func beginDrag(urls: [URL], event: NSEvent) {
         guard !urls.isEmpty else { return }
         let side = min(bounds.height, 32)
         let start = convert(event.locationInWindow, from: nil)
-        let items = urls.prefix(64).enumerated().map { index, url in
+        // The session carries at most 64 items; the sidebar must act on exactly those.
+        let urls = Array(urls.prefix(64))
+        let items = urls.enumerated().map { index, url in
             let item = NSDraggingItem(pasteboardWriter: url as NSURL)
             let offset = CGFloat(min(index, 4)) * 3
             let frame = CGRect(x: start.x - side / 2 + offset, y: start.y - side / 2 + offset, width: side, height: side)
@@ -152,6 +189,86 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         let session = beginDraggingSession(with: Array(items), event: event, source: self)
         session.animatesToStartingPositionsOnCancelOrFail = true
         session.draggingFormation = .pile
+        model?.sidebar.itemDragBegan(sequence: session.draggingSequenceNumber, urls: urls)
+    }
+
+    /// Moves a Favorites row with the pointer until the button comes up (drop or remove) or
+    /// Escape (back where it was).
+    ///
+    /// Runs its own event-tracking loop instead of an `NSDraggingSession`: the row is not a file
+    /// drag, and the loop sees every pointer move, inside the Hub or not, so the lifted row, the
+    /// poof cursor, and the slot all follow. Lifting hides the row, which dismantles this view;
+    /// the loop keeps its own references to the window, the sidebar model, and the sidebar's scroll
+    /// view for that reason.
+    ///
+    /// The loop wakes every frame even without events, to scroll the sidebar while the pointer
+    /// rests near its top or bottom edge (a custom tracking loop gets no autoscroll from AppKit).
+    /// It ends as soon as the sidebar aborts the session, for example when the Files tab hides.
+    private func trackReorder(_ id: HubFilesSidebarEntryID, sidebar: HubFilesSidebarModel, window: NSWindow) {
+        let session = sidebar.reorderSession
+        let scrollView = enclosingScrollView
+        // Starting can wait a frame or two (another row still landing, the list not laid out yet);
+        // each move retries until it starts.
+        var started = false
+        func startIfNeeded() {
+            guard !started, sidebar.reorderSession == session, let rowFrame = screenFrame else { return }
+            started = sidebar.beginReorder(id, pointer: NSEvent.mouseLocation, rowFrame: rowFrame)
+        }
+        startIfNeeded()
+        if started { sidebar.updateReorder(pointer: NSEvent.mouseLocation) }
+        while sidebar.reorderSession == session {
+            let next = window.nextEvent(matching: [.leftMouseDragged, .leftMouseUp, .keyDown],
+                                        until: Date(timeIntervalSinceNow: 1.0 / 60), inMode: .eventTracking, dequeue: true)
+            guard sidebar.reorderSession == session else { return }
+            switch next?.type {
+            case .keyDown? where next?.keyCode == 53:
+                sidebar.cancelReorder()
+                return
+            case .leftMouseUp?:
+                sidebar.endReorder(pointer: NSEvent.mouseLocation)
+                return
+            case .leftMouseDragged?:
+                startIfNeeded()
+                if started { sidebar.updateReorder(pointer: NSEvent.mouseLocation) }
+            default:
+                // A quiet frame: scroll if the pointer rests at an edge, then retarget the slot.
+                if started, Self.autoscroll(scrollView, toward: NSEvent.mouseLocation) {
+                    sidebar.updateReorder(pointer: NSEvent.mouseLocation)
+                }
+            }
+        }
+    }
+
+    /// Scrolls `scrollView` one step when `pointer` (screen) is within its top or bottom 28 pt, or
+    /// up to 30 pt beyond it, faster nearer the edge. Returns whether it scrolled.
+    private static func autoscroll(_ scrollView: NSScrollView?, toward pointer: CGPoint) -> Bool {
+        guard let scrollView, let frame = scrollView.screenFrame,
+              pointer.x >= frame.minX, pointer.x <= frame.maxX else { return false }
+        let edge: CGFloat = 28, overshoot: CGFloat = 30
+        let direction: CGFloat
+        let depth: CGFloat
+        if pointer.y > frame.maxY - edge, pointer.y <= frame.maxY + overshoot {
+            direction = -1
+            depth = pointer.y - (frame.maxY - edge)
+        } else if pointer.y < frame.minY + edge, pointer.y >= frame.minY - overshoot {
+            direction = 1
+            depth = (frame.minY + edge) - pointer.y
+        } else {
+            return false
+        }
+        let clip = scrollView.contentView
+        guard let document = scrollView.documentView else { return false }
+        let step = min(2 + depth * 0.35, 14)
+        let maxY = max(0, document.frame.height - clip.bounds.height)
+        var origin = clip.bounds.origin
+        // Toward the end of the list means a larger y in a flipped clip view, a smaller one otherwise.
+        // Either way the origin stays within 0...maxY.
+        let delta = (clip.isFlipped ? direction : -direction) * step
+        origin.y = min(max(origin.y + delta, 0), maxY)
+        guard origin.y != clip.bounds.origin.y else { return false }
+        clip.scroll(to: origin)
+        scrollView.reflectScrolledClipView(clip)
+        return true
     }
 
     func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
@@ -163,6 +280,7 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
         model?.dropHighlight = nil
         model?.pictureDragEnded()
+        model?.sidebar.itemDragEnded(sequence: session.draggingSequenceNumber)
         sessionHold?(false)
         sessionHold = nil
         retainedForSession = nil
@@ -215,14 +333,18 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     }
 
     override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
+        guard !stopped, let model else { return [] }
+        if interaction.routesDropsToSidebar { return model.sidebar.itemDragUpdated(sender, in: self) }
+        model.sidebar.itemDragEntered(sender)
         let result = operation(for: sender)
         if let highlight = interaction.dropHighlight {
-            if result.isEmpty { model?.clearDropHighlight(highlight) } else { model?.dropHighlight = highlight }
+            if result.isEmpty { model.clearDropHighlight(highlight) } else { model.dropHighlight = highlight }
         }
         return result
     }
 
     override func draggingExited(_ sender: NSDraggingInfo?) {
+        if interaction.routesDropsToSidebar { model?.sidebar.itemDragExited() }
         if let highlight = interaction.dropHighlight { model?.clearDropHighlight(highlight) }
         model?.pictureDragActivity(dragKey, inside: false)
     }
@@ -232,9 +354,13 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         model?.pictureDragEnded()
     }
 
-    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool { !operation(for: sender).isEmpty }
+    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        if interaction.routesDropsToSidebar, let model { return !model.sidebar.itemDragUpdated(sender, in: self).isEmpty }
+        return !operation(for: sender).isEmpty
+    }
 
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        if interaction.routesDropsToSidebar, let model { return model.sidebar.performItemDrop(sender, in: self) }
         guard let model, let destination = destination(for: sender) else { return false }
         return model.performDrop(sources: sources(sender), destination: destination,
                                  optionHeld: NSEvent.modifierFlags.contains(.option),
@@ -244,7 +370,13 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     // MARK: Spring-loading
 
     func springLoadingEntered(_ draggingInfo: NSDraggingInfo) -> NSSpringLoadingOptions {
-        interaction.springLoad != nil && !operation(for: draggingInfo).isEmpty ? .enabled : []
+        guard interaction.springLoad != nil else { return [] }
+        if interaction.routesDropsToSidebar {
+            // Only while the drop would land in this row's folder, not while it would insert.
+            guard let entry = interaction.sidebarEntry, model?.sidebar.springLoads(entry) == true else { return [] }
+            return .enabled
+        }
+        return !operation(for: draggingInfo).isEmpty ? .enabled : []
     }
 
     func springLoadingUpdated(_ draggingInfo: NSDraggingInfo) -> NSSpringLoadingOptions {

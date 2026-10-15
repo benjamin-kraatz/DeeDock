@@ -30,6 +30,11 @@ struct HubFilesView: View {
             }
             .frame(maxHeight: .infinity)
             .clipped()
+            .overlay(alignment: .bottom) {
+                // Rests 10 pt above the status bar, as in the mockup.
+                HubFilesSidebarUndoToast(sidebar: model.sidebar)
+                    .padding(.bottom, 10)
+            }
             HubFilesStatusBar(model: model)
         }
         .animation(HubFilesMotion.layout, value: model.showsPreview)
