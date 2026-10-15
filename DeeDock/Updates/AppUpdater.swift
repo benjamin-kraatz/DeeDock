@@ -41,6 +41,13 @@ final class AppUpdater {
         self.updater = updater
         // The custom consent flow does not offer system-profile sharing.
         updater.sendsSystemProfile = false
+        // Before `start`, so the first schedule uses the floor. User defaults override the
+        // Info.plist interval, and enabling checks from a zero interval restores Sparkle's
+        // one-day default. The publisher covers that later change.
+        applyAutomaticCheckInterval()
+        updater.publisher(for: \.updateCheckInterval)
+            .sink { [weak self] _ in self?.applyAutomaticCheckInterval() }
+            .store(in: &observations)
         updater.publisher(for: \.canCheckForUpdates)
             .sink { [weak self] in self?.engineCanCheck = $0 }
             .store(in: &observations)
@@ -55,6 +62,12 @@ final class AppUpdater {
             .store(in: &observations)
         engineDelegate.stage = { [weak self] item, install in
             self?.driver.showStagedUpdate(item, install: install)
+        }
+        engineDelegate.backgroundDiscovery = { [weak self] item in
+            self?.awareness.noteBackgroundDiscovery(identity: item.versionString)
+        }
+        engineDelegate.cancelBackgroundDiscovery = { [weak self] in
+            self?.awareness.discardPendingBackgroundDiscovery()
         }
         driver.requestCheck = { [weak self] in self?.checkForUpdates(source: .checkAgain) }
         do {
@@ -103,6 +116,32 @@ final class AppUpdater {
         analytics.opened(source, target: .whatsNew)
         awareness.acknowledgeInstalled()
         driver.showWhatsNew(since: previous, source: source)
+    }
+
+    /// Sparkle 2.9.6 waits at least this long between automatic checks.
+    ///
+    /// `SPUUpdaterSettings.minimumUpdateCheckInterval` is one hour in a release build. The
+    /// scheduler raises any shorter `updateCheckInterval`, including 30 minutes, to this value
+    /// when it arms the timer. The setter itself does not clamp.
+    nonisolated static let automaticCheckInterval: TimeInterval = 60 * 60
+
+    /// The interval to write when `current` is not already the floor.
+    ///
+    /// Zero is Sparkle's legacy way to turn checks off, so it is left alone. A stored day, or
+    /// any other positive interval, is replaced with ``automaticCheckInterval``.
+    nonisolated static func enforcedUpdateCheckInterval(current: TimeInterval) -> TimeInterval? {
+        guard current > 0, abs(current - automaticCheckInterval) > 0.5 else { return nil }
+        return automaticCheckInterval
+    }
+
+    /// Replaces a persisted interval Sparkle would otherwise keep using.
+    ///
+    /// `SUScheduledCheckInterval` in Info.plist is only the default. User defaults win, so a
+    /// one-day value stored before the plist key existed keeps a new release waiting out the
+    /// rest of that day until this writes the floor.
+    private func applyAutomaticCheckInterval() {
+        guard let updater, let interval = Self.enforcedUpdateCheckInterval(current: updater.updateCheckInterval) else { return }
+        updater.updateCheckInterval = interval
     }
 
     /// Sparkle owns preference persistence and rescheduling.
@@ -207,6 +246,8 @@ final class AppUpdater {
         driver.stop()
         driver.requestCheck = {}
         engineDelegate.stage = { _, _ in }
+        engineDelegate.backgroundDiscovery = { _ in }
+        engineDelegate.cancelBackgroundDiscovery = {}
         engineDelegate.analytics = nil
         observations.removeAll()
     }
