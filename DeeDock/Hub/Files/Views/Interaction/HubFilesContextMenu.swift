@@ -14,6 +14,10 @@ enum HubFilesContextMenu {
         let single = items.count == 1
         menu.add(.hubFilesMenuOpen, key: "\r", modifiers: []) { model.openSelection() }
         if single, let folder = items.first, folder.isDirectory && !folder.isPackage {
+            menu.add(.hubFilesSidebarOpenInNewTab) {
+                model.newTab()
+                model.show(.folder(normalizing: folder.url))
+            }
             menu.add(.hubFilesMenuOpenInRightSplit) {
                 model.openInRightSplit(.folder(normalizing: folder.url))
             }

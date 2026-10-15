@@ -2308,7 +2308,7 @@
       }
     },
     "hubFilesSidebarOpenInNewTab" : {
-      "comment" : "Files sidebar: row context-menu command that opens the row's folder in a new browser tab.",
+      "comment" : "Files folder and Favorites context-menu command that opens the location in a new browser tab.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
