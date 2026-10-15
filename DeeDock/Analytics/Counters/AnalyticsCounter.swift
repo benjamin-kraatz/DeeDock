@@ -31,6 +31,12 @@ enum AnalyticsCounter: Hashable {
     case badgeClearedWhileNew
     /// A Line dock label showed a badge's count, with or without the newest banner under it.
     case badgeDetailShown(banner: Bool)
+    /// A Files search ended (cleared, a result opened, or the tab hid) with Lookout's final results showing hits.
+    case lookoutSearchWithResults
+    /// A Files search ended with Lookout's final results empty: the honest "nothing stands out" state.
+    case lookoutSearchWithoutResults
+    /// The "Weaker matches" fold under Lookout's results was opened.
+    case lookoutWeakMatchesExpanded
 
     /// The property name in `usage_summary`.
     var key: String {
@@ -47,6 +53,9 @@ enum AnalyticsCounter: Hashable {
         case let .badgeAcknowledged(route): "badge_acknowledged_\(route.rawValue)"
         case .badgeClearedWhileNew: "badge_cleared_while_new"
         case let .badgeDetailShown(banner): banner ? "badge_detail_shown_with_banner" : "badge_detail_shown"
+        case .lookoutSearchWithResults: "lookout_search_with_results"
+        case .lookoutSearchWithoutResults: "lookout_search_without_results"
+        case .lookoutWeakMatchesExpanded: "lookout_weak_matches_expanded"
         }
     }
 }

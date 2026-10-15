@@ -20985,6 +20985,24 @@
         }
       }
     },
+    "launcherFile.kindLookout" : {
+      "comment" : "File-action kind shown beside Find Similar in the Apps tab's file actions. Lookout is DOKK's search by content; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        }
+      }
+    },
     "launcherFile.noActions" : {
       "comment" : "Empty file-action list title.",
       "extractionState" : "manual",
@@ -22616,6 +22634,4890 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Couldn’t turn off Launch at Login. %1$(reason)@"
+          }
+        }
+      }
+    },
+    "lookoutBatteryDetail" : {
+      "comment" : "Under the “Read files on battery too” switch: when Lookout waits regardless.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartet im Stromsparmodus oder wenn der Mac warm ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waits in Low Power Mode or when the Mac is warm"
+          }
+        }
+      }
+    },
+    "lookoutBatteryTitle" : {
+      "comment" : "Switch in Lookout onboarding and settings: Lookout may read files while the Mac runs on battery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auch im Akkubetrieb lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read files on battery too"
+          }
+        }
+      }
+    },
+    "lookoutChipSettingsHint" : {
+      "comment" : "VoiceOver hint of the Lookout status chip in Files search: it opens Lookout's settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet die Lookout-Einstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens Lookout settings."
+          }
+        }
+      }
+    },
+    "lookoutChipSetUpHint" : {
+      "comment" : "VoiceOver hint of the Lookout status chip in Files search before Lookout is set up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richtet Lookout ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sets up Lookout."
+          }
+        }
+      }
+    },
+    "lookoutDownloadErrorChecksum" : {
+      "comment" : "Lookout onboarding, step 4: the downloaded file's checksum didn't match, so it was deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die geladene Datei stimmte nicht, darum hat Lookout sie gelöscht. Versuch es erneut, um sie neu zu laden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The downloaded file didn’t match, so Lookout deleted it. Try again to download it fresh."
+          }
+        }
+      }
+    },
+    "lookoutDownloadErrorHost" : {
+      "comment" : "Lookout onboarding, step 4: the download was redirected to a site other than Hugging Face, so Lookout stopped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Download wurde von Hugging Face weg umgeleitet, darum hat Lookout ihn gestoppt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The download was redirected away from Hugging Face, so Lookout stopped it."
+          }
+        }
+      }
+    },
+    "lookoutDownloadErrorIncomplete" : {
+      "comment" : "Lookout onboarding, step 4: the model file arrived with the wrong size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei kam unvollständig an. Versuch es erneut, um den Download fortzusetzen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file arrived incomplete. Try again to continue the download."
+          }
+        }
+      }
+    },
+    "lookoutDownloadErrorNetwork" : {
+      "comment" : "Lookout onboarding, step 4: the connection dropped during the model download.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Download wurde unterbrochen, weil die Verbindung abbrach. Er macht dort weiter, wo er aufgehört hat, wenn du es erneut versuchst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The download stopped because the connection dropped. It picks up where it left off when you try again."
+          }
+        }
+      }
+    },
+    "lookoutDownloadErrorServer" : {
+      "comment" : "Lookout onboarding, step 4: Hugging Face answered with an error. The number is the HTTP status code.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hugging Face hat die Datei nicht gesendet (HTTP %lld). Versuch es in Kürze erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hugging Face didn’t send the file (HTTP %lld). Try again in a little while."
+          }
+        }
+      }
+    },
+    "lookoutDownloadErrorSpace" : {
+      "comment" : "Lookout onboarding, step 4: not enough free space for the model. The placeholders are sizes such as “1 GB”: what's needed, then what's free.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout braucht auf diesem Mac etwa %1$@ freien Speicher, frei sind gerade %2$@. Schaffe etwas Platz und versuch es dann erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout needs about %1$@ free on this Mac, and %2$@ is free now. Make some room, then try again."
+          }
+        }
+      }
+    },
+    "lookoutDownloadErrorWrite" : {
+      "comment" : "Lookout onboarding, step 4: the model file couldn't be saved. The placeholder is macOS's own explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout konnte das Modell nicht sichern: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout couldn’t save the model: %@"
+          }
+        }
+      }
+    },
+    "lookoutDownloadMessage" : {
+      "comment" : "Files search results: the card while Lookout downloads its model. Name search already works.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namen funktionieren schon. Treffer nach Inhalt kommen, sobald der Download fertig ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Names work now. Matches by content start once the download finishes."
+          }
+        }
+      }
+    },
+    "lookoutDownloadTitle" : {
+      "comment" : "Files search results: title of the card while Lookout downloads its language model. A percentage may follow (“· 42 %”).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout lädt sein Modell"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is downloading its model"
+          }
+        }
+      }
+    },
+    "lookoutEmptyHonest" : {
+      "comment" : "Files search results: the Lookout section when nothing in the files clearly matches the query. Lookout deliberately shows no weak guesses.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier sticht nichts heraus. Lookout zeigt nur Treffer, die eindeutig passen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing stands out for this. Lookout shows matches only when they clearly fit."
+          }
+        }
+      }
+    },
+    "lookoutFailedIndex" : {
+      "comment" : "Lookout error: its search index on this Mac can't be opened or created.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout kann seinen Index nicht öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout can't open its index."
+          }
+        }
+      }
+    },
+    "lookoutFailedIndexing" : {
+      "comment" : "Lookout error: reading files failed, for example because the search model couldn't load.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout hat wegen eines Fehlers aufgehört, Dateien zu lesen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout stopped reading files because of an error."
+          }
+        }
+      }
+    },
+    "lookoutFailedService" : {
+      "comment" : "Lookout error: the background helper that reads files can't be started.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dateileser von Lookout ist nicht verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout's file reader isn't available."
+          }
+        }
+      }
+    },
+    "lookoutFolderDesktop" : {
+      "comment" : "Name of the Desktop folder in Lookout's folder lists, as Finder shows it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreibtisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desktop"
+          }
+        }
+      }
+    },
+    "lookoutFolderDocuments" : {
+      "comment" : "Name of the Documents folder in Lookout's folder lists, as Finder shows it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        }
+      }
+    },
+    "lookoutFolderDownloads" : {
+      "comment" : "Name of the Downloads folder in Lookout's folder lists, as Finder shows it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
+          }
+        }
+      }
+    },
+    "lookoutFolderPictures" : {
+      "comment" : "Name of the Pictures folder in Lookout's folder lists, as Finder shows it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures"
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedBundle" : {
+      "comment" : "Shown when the person picks an app, a package or a folder inside one for Lookout: it isn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nicht in Apps oder Paketen. Wähle einen gewöhnlichen Ordner."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read inside apps or packages. Pick an ordinary folder."
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedDisk" : {
+      "comment" : "Shown when the person picks the whole disk as a folder for Lookout: it isn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nicht deinen ganzen Mac. Wähle die Ordner, die es durchsuchen soll."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read your whole Mac. Pick the folders you want it to search."
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedHidden" : {
+      "comment" : "Shown when the person picks a hidden folder (its name, or a parent's, starts with a dot) for Lookout: it isn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest keine versteckten Ordner. Wähle einen Ordner, den der Finder anzeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read hidden folders. Pick a folder that Finder shows."
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedHome" : {
+      "comment" : "Shown when the person picks their home folder for Lookout: it isn't added. ~/Library is a folder name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nicht deinen ganzen Benutzerordner, zu dem auch ~/Library gehört. Wähle stattdessen Ordner darin."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read your whole home folder, which includes ~/Library. Pick folders inside it instead."
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedLibrary" : {
+      "comment" : "Shown when the person picks ~/Library or a folder inside it for Lookout: it isn't added. iCloud Drive and cloud storage folders (Dropbox, Google Drive, OneDrive) inside it can be added. ~/Library and iCloud Drive are names; keep them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest ~/Library nicht, außer iCloud Drive und Cloud-Speicher-Ordnern. Wähle einen Ordner außerhalb davon."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read ~/Library, apart from iCloud Drive and cloud storage folders. Pick a folder outside it."
+          }
+        }
+      }
+    },
+    "lookoutFolderRefusedSystem" : {
+      "comment" : "Shown when the person picks one of macOS's own folders (System, Library, Applications, usr and the like) for Lookout: it isn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nicht die Ordner von macOS selbst. Wähle einen Ordner mit deinen Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read macOS’s own folders. Pick a folder with your files."
+          }
+        }
+      }
+    },
+    "lookoutKindDocument" : {
+      "comment" : "Chip on a Lookout result: the file is a text document (Word, Pages, Markdown, plain text…).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokument"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document"
+          }
+        }
+      }
+    },
+    "lookoutKindFolder" : {
+      "comment" : "Chip on a Lookout folder result: how many of the folder's files match.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ordner · %lld passende Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ordner · %lld passende Dateien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Folder · %lld matching file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Folder · %lld matching files"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutKindPDF" : {
+      "comment" : "Chip on a Lookout result: the file is a PDF.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        }
+      }
+    },
+    "lookoutKindPDFPage" : {
+      "comment" : "Chip on a Lookout result: the file is a PDF and the match is on this page number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF · Seite %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF · Page %lld"
+          }
+        }
+      }
+    },
+    "lookoutKindPicture" : {
+      "comment" : "Chip on a Lookout result: the file is a photo or other picture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture"
+          }
+        }
+      }
+    },
+    "lookoutKindScreenshot" : {
+      "comment" : "Chip on a Lookout result: the file is a screenshot.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmfoto"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot"
+          }
+        }
+      }
+    },
+    "lookoutMatchBoth" : {
+      "comment" : "Chip on a Lookout result: it matched by meaning and contains the exact words typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedeutung + Wörter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meaning + words"
+          }
+        }
+      }
+    },
+    "lookoutMatchMeaning" : {
+      "comment" : "Chip on a Lookout result: it matched by meaning (what the file shows or says), not by the exact words typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedeutung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meaning"
+          }
+        }
+      }
+    },
+    "lookoutMatchWords" : {
+      "comment" : "Chip on a Lookout result: it contains the exact words typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exakte Wörter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exact words"
+          }
+        }
+      }
+    },
+    "lookoutNamesEmpty" : {
+      "comment" : "Files search results: the Names section when Spotlight found no file or folder whose name contains the typed text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Datei- oder Ordnername enthält diesen Text."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No file or folder names contain this."
+          }
+        }
+      }
+    },
+    "lookoutNoteIndexing" : {
+      "comment" : "Files search results: note above Lookout's results while it is still reading files. The number is how many files are left.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Liest noch %lld Datei. Bis dahin können Treffer fehlen."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Liest noch %lld Dateien. Bis dahin können Treffer fehlen."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Still reading %lld file. Some matches may be missing until it finishes."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Still reading %lld files. Some matches may be missing until it finishes."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutNoteIndexingUnknown" : {
+      "comment" : "Files search results: note above Lookout's results while it is still reading files and doesn't know how many are left.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest noch Dateien. Bis dahin können Treffer fehlen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still reading files. Some matches may be missing until it finishes."
+          }
+        }
+      }
+    },
+    "lookoutNotePausedLowPowerMode" : {
+      "comment" : "Files search results: note above Lookout's results while reading files waits because Low Power Mode is on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout pausiert im Stromsparmodus. Es durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout paused for Low Power Mode. It searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutNotePausedOnBattery" : {
+      "comment" : "Files search results: note above Lookout's results while reading files waits because the Mac is on battery (the setting to read on battery is off).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet, solange der Mac im Akkubetrieb läuft. Es durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout waits while this Mac is on battery. It searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutNotePausedUser" : {
+      "comment" : "Files search results: note above Lookout's results after the person paused reading files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast Lookout pausiert. Es durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You paused Lookout. It searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutNotePausedWarm" : {
+      "comment" : "Files search results: note above Lookout's results while reading files waits because the Mac is running warm.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet, bis der Mac abgekühlt ist. Es durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout waits until this Mac cools down. It searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutPauseLowPowerMode" : {
+      "comment" : "Why Lookout's reading waits: the Mac is in Low Power Mode (use macOS's name for the mode).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stromsparmodus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low Power Mode"
+          }
+        }
+      }
+    },
+    "lookoutPauseOnBattery" : {
+      "comment" : "Why Lookout's reading waits: the Mac runs on battery and the setting to read files on battery is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Akkubetrieb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On battery"
+          }
+        }
+      }
+    },
+    "lookoutPauseUser" : {
+      "comment" : "Why Lookout's reading waits: the person paused it themselves.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von dir pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused by you"
+          }
+        }
+      }
+    },
+    "lookoutPauseWarm" : {
+      "comment" : "Why Lookout's reading waits: the Mac is running hot, so it pauses until it cools down.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac ist warm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac is warm"
+          }
+        }
+      }
+    },
+    "lookoutPickerPrompt" : {
+      "comment" : "Confirm button of the open panel where the person picks a folder for Lookout.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose"
+          }
+        }
+      }
+    },
+    "lookoutPickerTitle" : {
+      "comment" : "Title of the open panel where the person picks a folder for Lookout to read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner für Lookout wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a Folder for Lookout"
+          }
+        }
+      }
+    },
+    "lookoutPreviewPage" : {
+      "comment" : "Badge in the corner of the Files preview for a Lookout result on a PDF page: which page the match is on. %lld is the page number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld"
+          }
+        }
+      }
+    },
+    "lookoutPrivacyNote" : {
+      "comment" : "How Lookout handles data, beside a lock in onboarding's first step and in Lookout's settings. Neutral and transparent, not a warning. Hugging Face is the site the model comes from; DOKK is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nur die Ordner, die du auswählst, auf diesem Mac, und speichert seinen Index hier. DOKK lädt das Modell einmal von Hugging Face; dabei wird nichts über deine Dateien gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout reads only the folders you pick, on this Mac, and keeps its index here. DOKK downloads the model once from Hugging Face; that request sends nothing about your files."
+          }
+        }
+      }
+    },
+    "lookoutProblemTooSmall" : {
+      "comment" : "Lookout progress in Settings: why some pictures weren't read, beside how many. They're smaller than Lookout reads (icons, thumbnails).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu klein zum Lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too small to read"
+          }
+        }
+      }
+    },
+    "lookoutProblemTooLarge" : {
+      "comment" : "Lookout progress in Settings: why some files weren't read, beside how many. They're over Lookout's size limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu groß zum Lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too large to read"
+          }
+        }
+      }
+    },
+    "lookoutProblemPasswordProtected" : {
+      "comment" : "Lookout progress in Settings: why some PDFs or documents weren't read, beside how many.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwortgeschützt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password-protected"
+          }
+        }
+      }
+    },
+    "lookoutProblemNoText" : {
+      "comment" : "Lookout progress in Settings: why some PDFs or documents weren't read, beside how many. They have no text or pages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Text zum Lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No text to read"
+          }
+        }
+      }
+    },
+    "lookoutProblemNotDownloaded" : {
+      "comment" : "Lookout progress in Settings: why some iCloud or cloud storage files weren't read, beside how many. Reading them would download them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht aus der Cloud geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not downloaded from the cloud"
+          }
+        }
+      }
+    },
+    "lookoutProblemExcluded" : {
+      "comment" : "Lookout progress in Settings: why some files weren't read, beside how many. A setting or a folder rule left them out after they were found (a skipped type or folder, a key file, a link).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durch eine Regel ausgelassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left out by a rule"
+          }
+        }
+      }
+    },
+    "lookoutProblemUnreadable" : {
+      "comment" : "Lookout progress in Settings: why some files weren't read, beside how many. They couldn't be opened or decoded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht lesbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t be read"
+          }
+        }
+      }
+    },
+    "lookoutProblemOther" : {
+      "comment" : "Lookout progress in Settings: files that weren't read for another reason, beside how many.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anderes Problem"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other problem"
+          }
+        }
+      }
+    },
+    "lookoutPromoMessage" : {
+      "comment" : "Files search results: the card that offers to set up Lookout. Everything happens on this Mac; nothing leaves it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout findet Fotos, Bildschirmfotos, PDFs und Dokumente nach dem, was sie zeigen oder sagen – alles auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout finds photos, screenshots, PDFs and documents by what they show or say, all on this Mac."
+          }
+        }
+      }
+    },
+    "lookoutPromoSetUp" : {
+      "comment" : "Button in the Lookout card in Files search results: starts setting up Lookout.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout einrichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up Lookout"
+          }
+        }
+      }
+    },
+    "lookoutPromoTitle" : {
+      "comment" : "Files search results: title of the card that offers to set up Lookout, which finds files by what is inside them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Inhalt suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search by what’s inside"
+          }
+        }
+      }
+    },
+    "lookoutSearching" : {
+      "comment" : "VoiceOver label for the placeholder rows shown while Lookout's search is still starting up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout sucht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is searching"
+          }
+        }
+      }
+    },
+    "lookoutSectionByContent" : {
+      "comment" : "Files search results: shown after the Lookout section title (“Lookout · by content · 5”): Lookout matches what is inside files, not their names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nach Inhalt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "by content"
+          }
+        }
+      }
+    },
+    "lookoutSectionLookout" : {
+      "comment" : "Files search results: title of the section with Lookout's matches by file content. Lookout is the feature's name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        }
+      }
+    },
+    "lookoutSectionNames" : {
+      "comment" : "Files search results: title of the section with Spotlight's file and folder name matches. Followed by “· Spotlight · 12”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Names"
+          }
+        }
+      }
+    },
+    "lookoutSectionSpotlight" : {
+      "comment" : "Files search results: source of the name matches, shown after the Names section title (“Names · Spotlight · 12”). Spotlight is Apple's search; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        }
+      }
+    },
+    "lookoutSettingsAddNotAllowed" : {
+      "comment" : "Lookout settings: macOS didn't let Lookout read the folder the person added, so it wasn't added.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS hat Lookout diesen Ordner nicht lesen lassen, darum wurde er nicht hinzugefügt. Du kannst ihn in den Systemeinstellungen erlauben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS didn’t let Lookout read that folder, so it wasn’t added. You can allow it in System Settings."
+          }
+        }
+      }
+    },
+    "lookoutSettingsDelete" : {
+      "comment" : "Lookout settings: button (in red) that deletes Lookout's index and model. It asks first.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index und Modell löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete index and model"
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleteCancel" : {
+      "comment" : "Lookout settings: cancel button of the delete alert.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleteConfirm" : {
+      "comment" : "Lookout settings: destructive button of the delete alert.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleteConfirmMessage" : {
+      "comment" : "Lookout settings: what deleting does. The person's own files are untouched.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout stoppt und vergisst, was es gelesen hat. Deine Dateien bleiben, wie sie sind. Wenn du es wieder einrichtest, lädt es das Modell erneut (865 MB)."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout stops and forgets what it has read. Your files stay as they are. Setting it up again downloads the model again (865 MB)."
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleteConfirmTitle" : {
+      "comment" : "Lookout settings: title of the alert that confirms deleting the index and the model.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index und Modell von Lookout löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Lookout’s index and model?"
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleteFailed" : {
+      "comment" : "Lookout settings: deleting the index and model left something behind. The placeholder is macOS's own explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout konnte nicht alles löschen: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout couldn’t delete everything: %@"
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleteIndexBusy" : {
+      "comment" : "Lookout settings: Delete index and model stopped before deleting anything, because Lookout's indexing didn't close its index within 30 seconds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest gerade noch Dateien, deshalb wurde nichts gelöscht. Versuch es gleich noch einmal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is still reading files, so nothing was deleted. Try again in a moment."
+          }
+        }
+      }
+    },
+    "lookoutSettingsDeleting" : {
+      "comment" : "Lookout settings: shown beside a spinner in place of the Delete index and model button while it waits for indexing to stop and deletes the files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird gelöscht …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deleting…"
+          }
+        }
+      }
+    },
+    "lookoutSettingsFolderMissing" : {
+      "comment" : "Lookout settings: the folder isn't there right now (a drive that isn't connected). Lookout keeps what it read from it, but shows no results from it until the drive is connected again, because those files can't be opened meanwhile. “it” is the drive.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verbunden · Treffer kommen zurück, sobald es wieder da ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not connected · results return when it’s back"
+          }
+        }
+      }
+    },
+    "lookoutSettingsFolderNotAllowed" : {
+      "comment" : "Lookout settings: macOS doesn't let Lookout read this folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht erlaubt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not allowed"
+          }
+        }
+      }
+    },
+    "lookoutSettingsFolders" : {
+      "comment" : "Lookout settings: heading of the card listing the folders Lookout reads.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders"
+          }
+        }
+      }
+    },
+    "lookoutSettingsIndexSize" : {
+      "comment" : "Lookout settings: row with the index's size on disk.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index auf dem Volume"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index on disk"
+          }
+        }
+      }
+    },
+    "lookoutSettingsKeywords" : {
+      "comment" : "Settings search terms for Lookout's section, comma-separated. Never shown.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "semantische Suche, Inhalt, Bedeutung, Modell, Index, Fotos, Bildschirmfotos, PDF, EmbeddingGemma"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "semantic search, content, meaning, model, index, photos, screenshots, PDF, EmbeddingGemma"
+          }
+        }
+      }
+    },
+    "lookoutSettingsMemory" : {
+      "comment" : "Lookout settings: row with how much memory Lookout uses while searching.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speicher beim Suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memory while searching"
+          }
+        }
+      }
+    },
+    "lookoutSettingsMemoryValue" : {
+      "comment" : "Lookout settings: memory while searching by words, while searching with a picture (the picture reader is loaded), and when it's given back. Hub is DOKK's panel; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ca. 250 MB, ca. 900 MB nach einer Suche mit einem Bild; freigegeben 2 Min. nach dem Schließen des Hubs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about 250 MB, about 900 MB after searching with a picture; released 2 min after the Hub closes"
+          }
+        }
+      }
+    },
+    "lookoutSettingsModel" : {
+      "comment" : "Lookout settings: row naming the language model.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model"
+          }
+        }
+      }
+    },
+    "lookoutSettingsModelValue" : {
+      "comment" : "Lookout settings: the model, its size and where it comes from. EmbeddingGemma 2 and Hugging Face are names; keep them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EmbeddingGemma 2 · 865 MB · von Hugging Face"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EmbeddingGemma 2 · 865 MB · from Hugging Face"
+          }
+        }
+      }
+    },
+    "lookoutSettingsRebuild" : {
+      "comment" : "Lookout settings: button that makes Lookout read every file again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles neu lesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read everything again"
+          }
+        }
+      }
+    },
+    "lookoutSettingsRebuildHelp" : {
+      "comment" : "Lookout settings: tooltip of “Read everything again”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest jede Datei erneut. Namen bleiben so lange durchsuchbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout reads every file again. Names stay searchable meanwhile."
+          }
+        }
+      }
+    },
+    "lookoutSettingsRemoveFolder" : {
+      "comment" : "Lookout settings: tooltip of the button that removes a folder from Lookout (its files leave the index; the folder itself stays).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "lookoutSettingsRemoveFolderNamed" : {
+      "comment" : "Lookout settings: VoiceOver label of the button that removes a folder from Lookout. The placeholder is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        }
+      }
+    },
+    "lookoutSettingsSearchByContent" : {
+      "comment" : "Lookout settings: the switch that turns Lookout on or off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Inhalt suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search by content"
+          }
+        }
+      }
+    },
+    "lookoutSettingsSearchByContentDetail" : {
+      "comment" : "Lookout settings: under “Search by content”. Spotlight is Apple's search; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treffer nach Bedeutung im Tab „Dateien“, neben den Namenstreffern von Spotlight"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches by meaning in the Files tab, next to Spotlight’s name matches"
+          }
+        }
+      }
+    },
+    "lookoutSettingsSummary" : {
+      "comment" : "Settings: one line under Lookout's sidebar title and in search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien nach ihrem Inhalt durchsuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search files by what’s inside them"
+          }
+        }
+      }
+    },
+    "lookoutSettingsTitle" : {
+      "comment" : "Settings sidebar and page title of Lookout, the Files tab's search by content. Lookout is the feature's name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        }
+      }
+    },
+    "lookoutSetupAboutMinutes" : {
+      "comment" : "Lookout onboarding, step 2: about how many minutes the first pass over a folder takes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ca. %lld Min."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about %lld min"
+          }
+        }
+      }
+    },
+    "lookoutSetupAccessChecking" : {
+      "comment" : "Lookout onboarding, step 3: VoiceOver label while Lookout waits for macOS's answer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff wird geprüft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking access"
+          }
+        }
+      }
+    },
+    "lookoutSetupAccessibilityLabel" : {
+      "comment" : "Lookout onboarding: VoiceOver label of the onboarding card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout einrichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up Lookout"
+          }
+        }
+      }
+    },
+    "lookoutSetupAccessLead" : {
+      "comment" : "Lookout onboarding, step 3: why Lookout asks now. macOS shows its own prompt for each protected folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS fragt für jeden dieser Ordner einmal. Lookout fragt jetzt, damit es dich später nie unterbricht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS asks once for each of these folders. Lookout asks now, so it never interrupts you later."
+          }
+        }
+      }
+    },
+    "lookoutSetupAccessTitle" : {
+      "comment" : "Lookout onboarding, step 3: title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff erlauben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow access"
+          }
+        }
+      }
+    },
+    "lookoutSetupAddFolder" : {
+      "comment" : "Lookout onboarding and settings: opens a panel to add another folder. A plus sign is drawn before it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner hinzufügen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add folder…"
+          }
+        }
+      }
+    },
+    "lookoutSetupAllow" : {
+      "comment" : "Lookout onboarding, step 3: button that asks macOS for access to the folder (macOS then shows its own prompt).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow…"
+          }
+        }
+      }
+    },
+    "lookoutSetupAllowed" : {
+      "comment" : "Lookout onboarding, step 3: macOS allowed Lookout to read the folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaubt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allowed"
+          }
+        }
+      }
+    },
+    "lookoutSetupAlreadyIncluded" : {
+      "comment" : "Lookout: the folder the person picked is inside one already listed, so nothing was added. The placeholder is that folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schon in „%@“ enthalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already included in %@."
+          }
+        }
+      }
+    },
+    "lookoutSetupBack" : {
+      "comment" : "Lookout onboarding: button that goes back one step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "lookoutSetupChecking" : {
+      "comment" : "Lookout onboarding, step 4: the downloaded file's checksum is being verified.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird geprüft …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking…"
+          }
+        }
+      }
+    },
+    "lookoutSetupContinue" : {
+      "comment" : "Lookout onboarding: button that moves to the next step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "lookoutSetupDeniedSkipped" : {
+      "comment" : "Lookout onboarding, step 3: macOS didn't allow access, so Lookout leaves the folder out.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht erlaubt · Übersprungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not allowed · Skipped"
+          }
+        }
+      }
+    },
+    "lookoutSetupDownloadBackground" : {
+      "comment" : "Lookout onboarding, step 4: closing onboarding doesn't stop the download.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst das schließen. Der Download läuft weiter."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can close this. The download continues."
+          }
+        }
+      }
+    },
+    "lookoutSetupDownloadLead" : {
+      "comment" : "Lookout onboarding, step 4: the language model Lookout downloads. EmbeddingGemma 2 is the model's name and Google DeepMind its maker; keep both.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EmbeddingGemma 2 von Google DeepMind, 865 MB, einmalig. Es läuft auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EmbeddingGemma 2 by Google DeepMind, 865 MB, once. It runs on this Mac."
+          }
+        }
+      }
+    },
+    "lookoutSetupDownloadPictures" : {
+      "comment" : "Lookout onboarding, step 4: the model file for images. Followed by its size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures"
+          }
+        }
+      }
+    },
+    "lookoutSetupDownloadPicturesDetail" : {
+      "comment" : "Lookout onboarding, step 4: what the image model file is for.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos, Bildschirmfotos und gescannte Seiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos, screenshots and scanned pages"
+          }
+        }
+      }
+    },
+    "lookoutSetupDownloadTitle" : {
+      "comment" : "Lookout onboarding, step 4: title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell laden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download the model"
+          }
+        }
+      }
+    },
+    "lookoutSetupDownloadWords" : {
+      "comment" : "Lookout onboarding, step 4: the model file for text. Followed by its size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wörter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Words"
+          }
+        }
+      }
+    },
+    "lookoutSetupDownloadWordsDetail" : {
+      "comment" : "Lookout onboarding, step 4: what the text model file is for.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumente, PDFs und deine Suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents, PDFs and your searches"
+          }
+        }
+      }
+    },
+    "lookoutSetupEstimateAfterAccess" : {
+      "comment" : "Lookout onboarding, step 2: a protected folder's estimate waits until macOS allows access in the next step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schätzung nach dem Zugriff"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimate after access"
+          }
+        }
+      }
+    },
+    "lookoutSetupEstimating" : {
+      "comment" : "Lookout onboarding, step 2: the folder's estimate is being worked out.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird geschätzt …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimating…"
+          }
+        }
+      }
+    },
+    "lookoutSetupExamplePageQuery" : {
+      "comment" : "Lookout onboarding, step 1: an example search, in quotation marks, over a drawing of a page with a highlighted passage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Haustiere im Mietvertrag“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“pets in the lease”"
+          }
+        }
+      }
+    },
+    "lookoutSetupExamplePageResult" : {
+      "comment" : "Lookout onboarding, step 1: what the example search finds. In English it finds a German lease; the German copy drops that part.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "findet Seite 7"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finds page 7, even in German"
+          }
+        }
+      }
+    },
+    "lookoutSetupExamplePhotoQuery" : {
+      "comment" : "Lookout onboarding, step 1: an example search someone might type, in quotation marks, over a drawing of a dog on a beach.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„der Hund am Strand“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“the dog on the beach”"
+          }
+        }
+      }
+    },
+    "lookoutSetupExamplePhotoResult" : {
+      "comment" : "Lookout onboarding, step 1: what the example search finds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "findet das Foto"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finds the photo"
+          }
+        }
+      }
+    },
+    "lookoutSetupExampleScreenshotQuery" : {
+      "comment" : "Lookout onboarding, step 1: an example search, in quotation marks, over a drawing of a checkout screenshot with an error.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Zahlung abgelehnt“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“payment declined error”"
+          }
+        }
+      }
+    },
+    "lookoutSetupExampleScreenshotResult" : {
+      "comment" : "Lookout onboarding, step 1: what the example search finds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "findet das Bildschirmfoto"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finds the screenshot"
+          }
+        }
+      }
+    },
+    "lookoutSetupFeedLabel" : {
+      "comment" : "Lookout onboarding, step 5: VoiceOver label of the list of files Lookout is reading right now.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien, die gerade gelesen werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files being read"
+          }
+        }
+      }
+    },
+    "lookoutSetupFiles" : {
+      "comment" : "Lookout: a number of files (to read, or already searchable).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutSetupFinishLater" : {
+      "comment" : "Lookout onboarding, step 5: closes onboarding while Lookout keeps reading.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Hintergrund fertigstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finish in the background"
+          }
+        }
+      }
+    },
+    "lookoutSetupFirstPassCounting" : {
+      "comment" : "Lookout onboarding, step 5: under the progress ring before Lookout has counted the files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht deine Ordner durch …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking through your folders…"
+          }
+        }
+      }
+    },
+    "lookoutSetupFirstPassLead" : {
+      "comment" : "Lookout onboarding, step 5: the order Lookout reads in.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt benutzte Dateien zuerst, damit sie in Minuten durchsuchbar sind."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files you used recently go first, so they’re searchable in minutes."
+          }
+        }
+      }
+    },
+    "lookoutSetupFirstPassProgressLabel" : {
+      "comment" : "Lookout onboarding, step 5: VoiceOver label of the progress ring; its value is the percentage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erster Durchlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First pass"
+          }
+        }
+      }
+    },
+    "lookoutSetupFirstPassTitle" : {
+      "comment" : "Lookout onboarding, step 5: title while Lookout reads the chosen folders for the first time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest deine Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is reading your files"
+          }
+        }
+      }
+    },
+    "lookoutSetupFolderMissing" : {
+      "comment" : "Lookout: the folder isn't there (deleted, or on a drive that isn't connected).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht gefunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not found"
+          }
+        }
+      }
+    },
+    "lookoutSetupFolderOff" : {
+      "comment" : "Lookout onboarding, step 2: VoiceOver value of a folder row that is unchecked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht ausgewählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not included"
+          }
+        }
+      }
+    },
+    "lookoutSetupFolderOn" : {
+      "comment" : "Lookout onboarding, step 2: VoiceOver value of a folder row that is checked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Included"
+          }
+        }
+      }
+    },
+    "lookoutSetupFoldersLead" : {
+      "comment" : "Lookout onboarding, step 2: explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle Ordner, nicht den ganzen Mac. Das lässt sich jederzeit in den Einstellungen ändern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick folders, not your whole Mac. You can change this any time in Settings."
+          }
+        }
+      }
+    },
+    "lookoutSetupFoldersTitle" : {
+      "comment" : "Lookout onboarding, step 2: title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle, wo Lookout sucht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose where Lookout looks"
+          }
+        }
+      }
+    },
+    "lookoutSetupFolderUnreadable" : {
+      "comment" : "Lookout onboarding, step 2: Lookout may not read the folder, so there is no estimate.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht lesbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can’t be read"
+          }
+        }
+      }
+    },
+    "lookoutSetupIndexSize" : {
+      "comment" : "Lookout onboarding, step 2: the index's size on disk in the total line, such as “180 MB index”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Index"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ index"
+          }
+        }
+      }
+    },
+    "lookoutSetupMissingSkipped" : {
+      "comment" : "Lookout onboarding, step 3: the folder isn't there, so Lookout leaves it out.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht gefunden · Übersprungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not found · Skipped"
+          }
+        }
+      }
+    },
+    "lookoutSetupMoreAfterAccess" : {
+      "comment" : "Lookout onboarding, step 2: appended to the total line: this many chosen folders get their estimate once macOS allows access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weiterer Ordner nach dem Zugriff"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weitere Ordner nach dem Zugriff"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld more folder after access"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld more folders after access"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutSetupNeverApps" : {
+      "comment" : "Lookout onboarding, step 2: item of “Lookout never reads”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps und Bundles"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps and bundles"
+          }
+        }
+      }
+    },
+    "lookoutSetupNeverCloud" : {
+      "comment" : "Lookout onboarding, step 2: item of “Lookout never reads”: iCloud Drive files that are only in the cloud.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht geladene iCloud-Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud files that aren’t downloaded"
+          }
+        }
+      }
+    },
+    "lookoutSetupNeverCode" : {
+      "comment" : "Lookout onboarding, step 2: item of “Lookout never reads”: source code projects are skipped, except screenshots saved in them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code-Projekte (außer Bildschirmfotos darin)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code projects (except screenshots in them)"
+          }
+        }
+      }
+    },
+    "lookoutSetupNeverDatasets" : {
+      "comment" : "Lookout onboarding, step 2: item of “Lookout never reads”: folders with hundreds of machine-named images (training data).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner, die wie Datensätze aussehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders that look like datasets"
+          }
+        }
+      }
+    },
+    "lookoutSetupNeverLibrary" : {
+      "comment" : "Lookout onboarding, step 2: item of “Lookout never reads”. ~/Library and ~/.ssh are folder names; keep them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "~/Library, Caches und versteckte Ordner wie ~/.ssh"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "~/Library, caches and hidden folders like ~/.ssh"
+          }
+        }
+      }
+    },
+    "lookoutSetupNeverSecrets" : {
+      "comment" : "Lookout onboarding, step 2: item of “Lookout never reads”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel, Zertifikate und Passwortdateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keys, certificates and password files"
+          }
+        }
+      }
+    },
+    "lookoutSetupNeverTitle" : {
+      "comment" : "Lookout onboarding, step 2: disclosure listing what Lookout never reads.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest nie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout never reads"
+          }
+        }
+      }
+    },
+    "lookoutSetupNotNow" : {
+      "comment" : "Lookout onboarding: button that closes onboarding on its first step.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht jetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        }
+      }
+    },
+    "lookoutSetupOpenSettings" : {
+      "comment" : "Lookout: opens System Settings at Privacy & Security › Files and Folders, where the person can allow access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        }
+      }
+    },
+    "lookoutSetupReady" : {
+      "comment" : "Lookout onboarding, step 4: the model file is downloaded and verified.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready"
+          }
+        }
+      }
+    },
+    "lookoutSetupStartSearching" : {
+      "comment" : "Lookout onboarding, step 5: closes onboarding and puts the caret in the search field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start searching"
+          }
+        }
+      }
+    },
+    "lookoutSetupStepOf" : {
+      "comment" : "Lookout onboarding: VoiceOver label of the progress dots. The numbers are the current step and the number of steps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt %1$lld von %2$lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Step %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "lookoutSetupTotalTitle" : {
+      "comment" : "Lookout onboarding, step 2: label of the total line for the first pass over the chosen folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erster Durchlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First pass"
+          }
+        }
+      }
+    },
+    "lookoutSetupTryAgain" : {
+      "comment" : "Lookout onboarding, step 4: restarts a download that stopped; it continues where it left off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        }
+      }
+    },
+    "lookoutSetupWelcomeLead" : {
+      "comment" : "Lookout onboarding, step 1: what Lookout does.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreib ein Foto, ein Bildschirmfoto oder eine Textstelle in deinen Worten. Lookout findet sie, egal wie die Datei heißt, in über 100 Sprachen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Describe a photo, a screenshot or a passage in your own words. Lookout finds it, whatever the file is called, in any of 100+ languages."
+          }
+        }
+      }
+    },
+    "lookoutSetupWelcomeTitle" : {
+      "comment" : "Lookout onboarding, step 1: title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien nach ihrem Inhalt finden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find files by what’s in them"
+          }
+        }
+      }
+    },
+    "lookoutStatusFailed" : {
+      "comment" : "Lookout status chip after Lookout had to stop because of an error. A second line explains it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout angehalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout stopped"
+          }
+        }
+      }
+    },
+    "lookoutStatusIndexing" : {
+      "comment" : "Lookout status chip while Lookout reads the contents of files in the chosen folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading files"
+          }
+        }
+      }
+    },
+    "lookoutStatusIndexingRemaining" : {
+      "comment" : "Second line of the Lookout status while it reads files: how many files are still waiting to be read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Dateien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file left"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files left"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutStatusNotSetUp" : {
+      "comment" : "Lookout status chip while Lookout, DOKK's content search, hasn't been set up yet; choosing it starts setup.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up"
+          }
+        }
+      }
+    },
+    "lookoutStatusOff" : {
+      "comment" : "Lookout status chip after the person turned Lookout, DOKK's content search, off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout off"
+          }
+        }
+      }
+    },
+    "lookoutStatusPaused" : {
+      "comment" : "Lookout status chip while reading files waits; already indexed files stay searchable. A second line says why.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
+        }
+      }
+    },
+    "lookoutStatusPreparing" : {
+      "comment" : "Lookout status chip before the indexer has reported anything, right after Lookout starts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird vorbereitet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting ready"
+          }
+        }
+      }
+    },
+    "lookoutStatusReady" : {
+      "comment" : "Lookout status chip when every file Lookout may read has been read and search is ready.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout bereit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout ready"
+          }
+        }
+      }
+    },
+    "lookoutStatusWaitingForModel" : {
+      "comment" : "Lookout status chip while the on-device search model is still downloading; file names are searchable meanwhile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell wird geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading model"
+          }
+        }
+      }
+    },
+    "lookoutWeakerMatches" : {
+      "comment" : "Files search results: disclosure under Lookout's results that shows matches which fit less clearly. The number is how many it hides.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Schwächere Treffer (%lld)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Schwächere Treffer (%lld)"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Weaker matches (%lld)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Weaker matches (%lld)"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutWeakerMatchesHidden" : {
+      "comment" : "VoiceOver value of the “Weaker matches” disclosure when it is closed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden"
+          }
+        }
+      }
+    },
+    "lookoutWeakerMatchesHint" : {
+      "comment" : "VoiceOver hint of the “Weaker matches” disclosure under Lookout's results.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blendet Treffer ein oder aus, die weniger eindeutig passen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows or hides matches that fit less clearly."
+          }
+        }
+      }
+    },
+    "lookoutWeakerMatchesShown" : {
+      "comment" : "VoiceOver value of the “Weaker matches” disclosure when it is open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingeblendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shown"
+          }
+        }
+      }
+    },
+    "lookoutWhyFolder" : {
+      "comment" : "Why a Lookout folder result matched: this many of the files directly inside it match.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei darin passt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien darin passen."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file inside matches."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files inside match."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutWhyLookup" : {
+      "comment" : "Added after why a Lookout result matched, when the query was a code or number (an order number, an ID): those carry little meaning, so the exact words weigh more.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codes und Nummern sagen der Bedeutungssuche wenig, darum zählen exakte Wörter hier doppelt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codes and numbers mean little to meaning search, so exact words count double here."
+          }
+        }
+      }
+    },
+    "lookoutWhyPageBoth" : {
+      "comment" : "Why a Lookout result matched: this PDF page matched by meaning and contains the words typed. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld passt der Bedeutung nach und enthält die Wörter, die du eingegeben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld matched by meaning and contains the words you typed."
+          }
+        }
+      }
+    },
+    "lookoutWhyPageMeaning" : {
+      "comment" : "Why a Lookout result matched: this PDF page matched the query by meaning. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld passt der Bedeutung nach."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld matched by meaning."
+          }
+        }
+      }
+    },
+    "lookoutWhyPageWords" : {
+      "comment" : "Why a Lookout result matched: this PDF page contains the words typed. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld enthält die Wörter, die du eingegeben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld contains the words you typed."
+          }
+        }
+      }
+    },
+    "lookoutWhyPassageBoth" : {
+      "comment" : "Why a Lookout result matched: a passage of the document matched by meaning and contains the words typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Textstelle passt der Bedeutung nach und enthält die Wörter, die du eingegeben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A passage matched by meaning and contains the words you typed."
+          }
+        }
+      }
+    },
+    "lookoutWhyPassageMeaning" : {
+      "comment" : "Why a Lookout result matched: a passage of the document matched the query by meaning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Textstelle passt der Bedeutung nach."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A passage matched by meaning."
+          }
+        }
+      }
+    },
+    "lookoutWhyPictureBoth" : {
+      "comment" : "Why a Lookout result matched: the picture matched the description, and text in it contains the words typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bild passt zu dem, was du beschrieben hast, und sein Text enthält die Wörter, die du eingegeben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The picture matched what you described, and its text contains the words you typed."
+          }
+        }
+      }
+    },
+    "lookoutWhyPictureMeaning" : {
+      "comment" : "Why a Lookout result matched: the picture itself matched what the person described.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bild passt zu dem, was du beschrieben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The picture matched what you described."
+          }
+        }
+      }
+    },
+    "lookoutWhyScreenshotBoth" : {
+      "comment" : "Why a Lookout result matched: the screenshot matched the description, and its text contains the words typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bildschirmfoto passt zu dem, was du beschrieben hast, und sein Text enthält die Wörter, die du eingegeben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The screenshot matched what you described, and its text contains the words you typed."
+          }
+        }
+      }
+    },
+    "lookoutWhyScreenshotMeaning" : {
+      "comment" : "Why a Lookout result matched: the screenshot itself matched what the person described.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Bildschirmfoto passt zu dem, was du beschrieben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The screenshot matched what you described."
+          }
+        }
+      }
+    },
+    "lookoutWhyTitle" : {
+      "comment" : "Title of the card in the Files preview column that explains why a Lookout result matched.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warum es passt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Why it matched"
+          }
+        }
+      }
+    },
+    "lookoutWhyWords" : {
+      "comment" : "Why a Lookout result matched: the file's text contains the words typed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Text enthält die Wörter, die du eingegeben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its text contains the words you typed."
+          }
+        }
+      }
+    },
+    "lookoutPictureDropHere" : {
+      "comment" : "Files search field: shown inside the field while a picture is dragged over the Hub. Dropping it on the field searches for files like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablegen, um mit diesem Bild zu suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop to search with this picture"
+          }
+        }
+      }
+    },
+    "lookoutPictureDropRefused" : {
+      "comment" : "Files search field: shown inside the field while something that isn't a picture (a ZIP file, a folder) is dragged over the Hub. It can't be dropped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout sucht nur mit Bildern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout searches with pictures only"
+          }
+        }
+      }
+    },
+    "lookoutPictureDropDocument" : {
+      "comment" : "Files search field: shown inside the field while a document Lookout has read (a PDF, a text file) is dragged over the Hub. Dropping it on the field searches for files like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ablegen, um ähnliche Dateien zu finden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop to find files like this one"
+          }
+        }
+      }
+    },
+    "lookoutPicturePrompt" : {
+      "comment" : "Files search field: VoiceOver label of the text field while a picture is being searched with. Typing replaces the picture with a search by words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippen, um nach Wörtern zu suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type to search by words instead"
+          }
+        }
+      }
+    },
+    "lookoutPictureTokenLabel" : {
+      "comment" : "VoiceOver label of the picture chip in the Files search field. The placeholder is the file's name, or “Pasted picture”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture: %@"
+          }
+        }
+      }
+    },
+    "lookoutPictureRemove" : {
+      "comment" : "Button and VoiceOver action on the picture chip in the Files search field: stops searching with the picture and brings back the words searched before.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove picture"
+          }
+        }
+      }
+    },
+    "lookoutPicturePasted" : {
+      "comment" : "Name shown for a picture pasted into the Files search field (it has no file name).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingefügtes Bild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasted picture"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleNew" : {
+      "comment" : "Under the name of a dropped picture above its search results. The placeholder is how long reading it took, such as “0.4 s”. The picture is read in memory and never saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Bild · gelesen in %@ · wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New picture · read in %@ · not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitlePasted" : {
+      "comment" : "Under “Pasted picture” above its search results. The placeholder is how long reading it took, such as “0.4 s”. Starts lowercase, as in the approved design. The picture is read in memory and never saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gelesen in %@ · wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "read in %@ · not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleNewUnread" : {
+      "comment" : "Under the name of a dropped picture while Lookout can't search yet (not set up, or its model is downloading). The picture is never saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Bild · wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New picture · not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitlePastedUnread" : {
+      "comment" : "Under “Pasted picture” while Lookout can't search yet. Starts lowercase, as in the approved design.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wird nicht gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "not saved"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleIndex" : {
+      "comment" : "Under the name of a file searched with by Find Similar: Lookout reused what it already knows about the file, so the search was instant.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus deinem Index · sofort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From your index · instant"
+          }
+        }
+      }
+    },
+    "lookoutPictureSubtitleIndexPage" : {
+      "comment" : "Under the name of a PDF searched with by Find Similar, from one page. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus deinem Index · Seite %lld · sofort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From your index · Page %lld · instant"
+          }
+        }
+      }
+    },
+    "lookoutPictureWaking" : {
+      "comment" : "Above search results while Lookout loads the part of its model that reads pictures (the first search with a picture in a while).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookouts Bildleser startet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waking Lookout’s picture reader…"
+          }
+        }
+      }
+    },
+    "lookoutPictureReading" : {
+      "comment" : "Above search results while Lookout reads the picture searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest dein Bild …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading your picture…"
+          }
+        }
+      }
+    },
+    "lookoutPictureBack" : {
+      "comment" : "Link above the results of a search with a picture: goes back to the words searched before. The placeholder is those words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zu „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to “%@”"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupLooksLike" : {
+      "comment" : "Section title in the results of a search with a picture: pictures and screenshots that look like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht so aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looks like it"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupAbout" : {
+      "comment" : "Section title in the results of a search with a picture: documents and PDFs about what the picture shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passend zum Motiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About what it shows"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupSaysSimilar" : {
+      "comment" : "Section title in the results of Find Similar on a document: documents and PDFs that say something similar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sagt Ähnliches"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Says something similar"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupPicturesOf" : {
+      "comment" : "Section title in the results of Find Similar on a document: pictures of what the document is about.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder dazu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures of it"
+          }
+        }
+      }
+    },
+    "lookoutPictureGroupEmpty" : {
+      "comment" : "Under a section title in the results of a search with a picture, when nothing in that section clearly fits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier sticht nichts heraus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing stands out here."
+          }
+        }
+      }
+    },
+    "lookoutPictureHonest" : {
+      "comment" : "Results of a search with a picture when nothing clearly fits in any section. Lookout doesn't list weak guesses.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dafür sticht nichts heraus. Lookout zeigt nur Treffer, die eindeutig passen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing stands out for this one. Lookout shows matches only when they clearly fit."
+          }
+        }
+      }
+    },
+    "lookoutPictureUnreadable" : {
+      "comment" : "Results of a search with a picture when the picture couldn't be read (a damaged file, or Lookout's picture reader couldn't start).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout kann dieses Bild nicht lesen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout can’t read this picture."
+          }
+        }
+      }
+    },
+    "lookoutPictureMatchAlike" : {
+      "comment" : "Chip on a result of a search with a picture: this picture looks like the one searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht ähnlich aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looks alike"
+          }
+        }
+      }
+    },
+    "lookoutPictureMatchSame" : {
+      "comment" : "Chip on a result of a search with a picture or Find Similar: it's about the same subject as what was searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gleiches Thema"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same subject"
+          }
+        }
+      }
+    },
+    "lookoutSimilarButton" : {
+      "comment" : "Button in the Files preview column and context-menu item: searches with the selected file for pictures and documents like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ähnliche finden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find Similar"
+          }
+        }
+      }
+    },
+    "lookoutSimilarUnsupported" : {
+      "comment" : "Disabled Find Similar button in the Files preview column, for a kind of file Lookout doesn't index (a ZIP file, code).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest diese Dateiart nicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout doesn’t read this kind of file"
+          }
+        }
+      }
+    },
+    "lookoutSimilarHint" : {
+      "comment" : "VoiceOver hint of the Find Similar button and action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sucht mit dieser Datei nach ähnlichen Bildern und Dokumenten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searches with this file for pictures and documents like it."
+          }
+        }
+      }
+    },
+    "lookoutSimilarNotIndexed" : {
+      "comment" : "Disabled Find Similar button in the Files preview column, and the search field's drop well while such a file is dragged over the Hub: a document of a kind Lookout reads (a PDF, a text file) that it hasn't read, because it's outside the chosen folders or still waiting. Lookout is the feature's name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout hat diese Datei noch nicht gelesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout hasn’t read this file yet"
+          }
+        }
+      }
+    },
+    "lookoutPictureYours" : {
+      "comment" : "Caption under the picture or page searched with, beside a result's picture, in “Why it matched”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yours"
+          }
+        }
+      }
+    },
+    "lookoutPictureMatch" : {
+      "comment" : "Caption under a result's picture or page, beside the one searched with, in “Why it matched”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treffer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Match"
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyAlike" : {
+      "comment" : "Why a result of a search with a picture matched: the result is a picture that looks like it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es sieht aus wie dein Bild."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It looks like your picture."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyAboutPage" : {
+      "comment" : "Why a PDF page matched a search with a picture. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld handelt von dem, was dein Bild zeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld is about what your picture shows."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyAbout" : {
+      "comment" : "Why a document matched a search with a picture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es geht um das, was dein Bild zeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It’s about what your picture shows."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyPictureOf" : {
+      "comment" : "Why a picture matched Find Similar on a document or page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Bild zeigt, worum es auf deiner Seite geht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This picture shows what your page is about."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhySaysPage" : {
+      "comment" : "Why a PDF page matched Find Similar on a document or page. The number is the page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite %lld sagt Ähnliches wie deine Seite."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %lld says something similar to your page."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhySays" : {
+      "comment" : "Why a document matched Find Similar on a document or page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier steht Ähnliches wie auf deiner Seite."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It says something similar to your page."
+          }
+        }
+      }
+    },
+    "lookoutPictureVeryClose" : {
+      "comment" : "Closeness meter in “Why it matched”, highest of three steps: the result is very close to what was searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sehr ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Very close"
+          }
+        }
+      }
+    },
+    "lookoutPictureClose" : {
+      "comment" : "Closeness meter in “Why it matched”, middle of three steps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "lookoutPictureSomewhat" : {
+      "comment" : "Closeness meter in “Why it matched”, lowest of three steps: the result is only somewhat like what was searched with.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Somewhat alike"
+          }
+        }
+      }
+    },
+    "lookoutPictureClosenessLabel" : {
+      "comment" : "VoiceOver label of the closeness meter in “Why it matched”. The placeholder is “Very close”, “Close” or “Somewhat alike”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ähnlichkeit: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closeness: %@"
+          }
+        }
+      }
+    },
+    "lookoutPicturePromoTitle" : {
+      "comment" : "Title of the card shown after a picture was dropped while Lookout isn't set up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit einem Bild suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search with a picture"
+          }
+        }
+      }
+    },
+    "lookoutPicturePromoMessage" : {
+      "comment" : "Text of the card shown after a picture was dropped while Lookout isn't set up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richte Lookout ein, um ähnliche Bilder zu finden – und Dokumente zu dem, was es zeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up Lookout to find pictures that look like this one, and documents about what it shows."
+          }
+        }
+      }
+    },
+    "lookoutPictureDownloadMessage" : {
+      "comment" : "Text of the download card shown after a picture was dropped while Lookout's model downloads. “Pictures” is the name of the model part in onboarding.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Suche mit Bildern startet, sobald das Bildmodell geladen ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searching with pictures starts once the Pictures model finishes downloading."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedLowPowerMode" : {
+      "comment" : "Note above the results of a search with a picture while reading files waits because Low Power Mode is on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout pausiert im Stromsparmodus. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is paused for Low Power Mode. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedWarm" : {
+      "comment" : "Note above the results of a search with a picture while reading files waits because the Mac is running warm.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet, bis der Mac abgekühlt ist. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout waits until this Mac cools down. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedOnBattery" : {
+      "comment" : "Note above the results of a search with a picture while reading files waits because the Mac is on battery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet, solange der Mac im Akkubetrieb läuft. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout waits while this Mac is on battery. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutPictureNotePausedUser" : {
+      "comment" : "Note above the results of a search with a picture after the person paused reading files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast Lookout pausiert. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You paused Lookout. It still reads your picture and searches what it has already read."
+          }
+        }
+      }
+    },
+    "lookoutProgressCounting" : {
+      "comment" : "Lookout settings, progress card title while Lookout walks the chosen folders and counts files, before it reads any.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht deine Ordner durch …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking through your folders…"
+          }
+        }
+      }
+    },
+    "lookoutProgressCountingSoFar" : {
+      "comment" : "Lookout settings, progress card second line while counting: how many files it has found so far; the total still grows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bisher %lld Datei · zählt noch"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bisher %lld Dateien · zählt noch"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file so far · still counting"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files so far · still counting"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutProgressCountingNothingYet" : {
+      "comment" : "Lookout settings, progress card second line while counting, before any file has been found.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nichts gezählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing counted yet"
+          }
+        }
+      }
+    },
+    "lookoutProgressUpToDate" : {
+      "comment" : "Lookout settings, progress card title when every file Lookout may read has been read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dem neuesten Stand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to date"
+          }
+        }
+      }
+    },
+    "lookoutProgressOfFiles" : {
+      "comment" : "Lookout settings, progress card: files read out of all files, both already formatted numbers (“3,210 of 5,202 files”).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ von %2$@ Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ of %2$@ files"
+          }
+        }
+      }
+    },
+    "lookoutProgressRate" : {
+      "comment" : "Lookout settings, progress card: how fast Lookout reads right now; the argument is a formatted number such as “5.4”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Dateien pro Sekunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ files per second"
+          }
+        }
+      }
+    },
+    "lookoutProgressTimeLeft" : {
+      "comment" : "Lookout settings, progress card: the estimated time until reading ends; the argument is a formatted duration such as “6 min” or “1 hr, 25 min”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch etwa %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About %@ left"
+          }
+        }
+      }
+    },
+    "lookoutProgressLessThanMinute" : {
+      "comment" : "Lookout settings, progress card: the estimated time left is under a minute.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weniger als eine Minute"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Less than a minute left"
+          }
+        }
+      }
+    },
+    "lookoutProgressEstimating" : {
+      "comment" : "Lookout settings, progress card: reading just started and the time left can't be estimated yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schätzt die Restzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimating time left"
+          }
+        }
+      }
+    },
+    "lookoutProgressFinishedToday" : {
+      "comment" : "Lookout settings, progress card when up to date: when the last pass finished, earlier today; the argument is a time such as “10:41”. Follows the file count after a middle dot, so it starts lowercase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fertig um %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finished at %@"
+          }
+        }
+      }
+    },
+    "lookoutProgressFinishedYesterday" : {
+      "comment" : "Lookout settings, progress card when up to date: when the last pass finished, yesterday; the argument is a time such as “10:41”. Follows the file count after a middle dot, so it starts lowercase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gestern um %@ fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finished yesterday at %@"
+          }
+        }
+      }
+    },
+    "lookoutProgressFinishedOn" : {
+      "comment" : "Lookout settings, progress card when up to date: when the last pass finished, on an earlier day; the argument is a date and time such as “Oct 3, 10:41”. Follows the file count after a middle dot, so it starts lowercase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fertig am %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finished %@"
+          }
+        }
+      }
+    },
+    "lookoutProgressWaitingForDrive" : {
+      "comment" : "Lookout settings, progress card title when a chosen folder is on a drive that isn't connected; the argument is the drive's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartet auf „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for “%@”"
+          }
+        }
+      }
+    },
+    "lookoutProgressWaitingForDriveDetail" : {
+      "comment" : "Lookout settings, progress card second line when a chosen folder is on a drive that isn't connected. “It” is the drive.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seine Dateien werden gelesen, sobald es wieder verbunden ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its files are read once it’s connected again"
+          }
+        }
+      }
+    },
+    "lookoutProgressPause" : {
+      "comment" : "Lookout settings, progress card button: pauses reading files. What's already read stays searchable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "lookoutProgressResume" : {
+      "comment" : "Lookout settings, progress card button: resumes reading files after the person paused it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        }
+      }
+    },
+    "lookoutProgressSkipped" : {
+      "comment" : "Lookout settings, progress card: how many files Lookout chose not to read (too large, a kind it doesn't read in full).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld übersprungen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld übersprungen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld skipped"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld skipped"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutProgressFailedCount" : {
+      "comment" : "Lookout settings, progress card: how many files Lookout tried to read and couldn't.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nicht lesbar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nicht lesbar"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld couldn’t be read"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld couldn’t be read"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lookoutProgressProblemsLabel" : {
+      "comment" : "Accessibility label of the row that lists why files were skipped or couldn't be read, in Lookout's progress card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersprungene und nicht lesbare Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped and unreadable files"
+          }
+        }
+      }
+    },
+    "lookoutProgressProblemsHint" : {
+      "comment" : "Accessibility hint of the row that lists why files were skipped or couldn't be read: clicking it shows the reasons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt die Gründe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the reasons"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindPictures" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for photos and other pictures (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindScreenshots" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for screenshots (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmfotos"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshots"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindPDFs" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for PDFs (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFs"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindDocuments" : {
+      "comment" : "Lookout settings, progress card: the per-kind breakdown's label for text documents (plural).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindsLabel" : {
+      "comment" : "Accessibility label of the per-kind breakdown in Lookout's progress card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortschritt nach Art"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress by kind"
+          }
+        }
+      }
+    },
+    "lookoutProgressKindValue" : {
+      "comment" : "Accessibility value of one kind in Lookout's progress breakdown: the kind's name, then files read out of all of that kind, both formatted numbers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@ von %3$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@ of %3$@"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenReading" : {
+      "comment" : "Accessibility label of Lookout's progress card while it reads files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout liest Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is reading files"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenCounting" : {
+      "comment" : "Accessibility label of Lookout's progress card while it counts files in the chosen folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout sieht deine Ordner durch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is looking through your folders"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenUpToDate" : {
+      "comment" : "Accessibility label of Lookout's progress card when everything is read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout ist auf dem neuesten Stand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is up to date"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenPaused" : {
+      "comment" : "Accessibility label of Lookout's progress card while reading waits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout ist pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is paused"
+          }
+        }
+      }
+    },
+    "lookoutProgressSpokenWaiting" : {
+      "comment" : "Accessibility label of Lookout's progress card while a chosen folder's drive isn't connected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout wartet auf ein Laufwerk"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout is waiting for a drive"
           }
         }
       }
@@ -32475,6 +37377,78 @@
         }
       }
     },
+    "settingsAcknowledgementsDigUpDescription" : {
+      "comment" : "Acknowledgements row subtitle. Lookout is DOKK's search by content; MIT is the license name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indexierung, Ranking und Durchsuchungsregeln von Lookout sind von DigUp von Abdur Rahim übernommen. MIT-Lizenz."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout’s indexing, ranking and crawl rules are adapted from DigUp by Abdur Rahim. MIT License."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsDigUpTitle" : {
+      "comment" : "Acknowledgements row title. DigUp is an app's name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DigUp"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DigUp"
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsEmbeddingGemmaDescription" : {
+      "comment" : "Acknowledgements row subtitle. Lookout is DOKK's search by content; Google DeepMind is the model's maker; Apache 2.0 is the license name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell, das Lookout lädt, von Google DeepMind. Apache-Lizenz 2.0."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The model Lookout downloads, by Google DeepMind. Apache License 2.0."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsEmbeddingGemmaTitle" : {
+      "comment" : "Acknowledgements row title. EmbeddingGemma 2 is a model's name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EmbeddingGemma 2"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EmbeddingGemma 2"
+          }
+        }
+      }
+    },
     "settingsAcknowledgementsHomebrewDescription" : {
       "comment" : "Acknowledgements row subtitle. Robi is the launcher's on-device app finder; keep the name. Homebrew is a product name.",
       "extractionState" : "manual",
@@ -32507,6 +37481,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App Descriptions from Homebrew"
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsLlamaCppDescription" : {
+      "comment" : "Acknowledgements row subtitle. Lookout is DOKK's search by content; MIT is the license name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Führt das Modell von Lookout auf diesem Mac aus. Von den ggml-Autoren. MIT-Lizenz."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runs Lookout’s model on this Mac. By the ggml authors. MIT License."
+          }
+        }
+      }
+    },
+    "settingsAcknowledgementsLlamaCppTitle" : {
+      "comment" : "Acknowledgements row title. llama.cpp is a project's name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "llama.cpp"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "llama.cpp"
           }
         }
       }
@@ -52112,6 +57122,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sorted descending"
+          }
+        }
+      }
+    },
+    "launcherFile.findSimilarDetail" : {
+      "comment" : "Subtitle of Find Similar in the Apps tab's file actions, for one dropped picture or file Lookout has read. It switches to the Files tab.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sucht im Tab „Dateien“ mit dieser Datei nach ähnlichen Bildern und Dokumenten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search with this file for pictures and documents like it, in the Files tab."
+          }
+        }
+      }
+    },
+    "launcherFile.findSimilarAction" : {
+      "comment" : "Short action label for Find Similar in the Apps tab's file actions: searches with the file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
           }
         }
       }

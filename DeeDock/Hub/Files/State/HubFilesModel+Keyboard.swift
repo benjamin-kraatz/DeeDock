@@ -4,6 +4,7 @@ import AppKit
 extension HubFilesModel {
     private enum Key {
         static let escape: UInt16 = 53
+        static let delete: UInt16 = 51
     }
 
     func handleKeyDown(_ event: NSEvent, fromSearchField: Bool) -> Bool {
@@ -20,10 +21,26 @@ extension HubFilesModel {
             return false
         }
 
-        if fromSearchField { return handleSearchFieldKey(key, shift: shift, flags: flags) }
+        // Searching with a picture: ⌘V pastes one, ⌘⇧L finds files like the selected result or browser file, wherever
+        // the focus is.
+        if flags == .command, character == "v", pastePicture() { return true }
+        if flags == [.command, .shift], character == "l", selectionSimilarAvailability != .hidden {
+            findSimilarForSelection()
+            return true
+        }
+
+        if fromSearchField {
+            if isPictureSearch, flags.isEmpty {
+                // ⌫ in the empty field takes the picture out and brings the words back; Escape clears both.
+                if event.keyCode == Key.delete, query.isEmpty { removePicture(restoringWords: true); return true }
+                if event.keyCode == Key.escape { removePicture(restoringWords: false); return true }
+            }
+            return handleSearchFieldKey(key, shift: shift, flags: flags)
+        }
 
         if event.keyCode == Key.escape {
             if quickLook.isVisible { quickLook.close(); return true }
+            if isPictureSearch { removePicture(restoringWords: false); return true }
             // The shell clears the query or closes the Hub.
             return false
         }
@@ -53,8 +70,8 @@ extension HubFilesModel {
             return true
         case .carriageReturn, .enter:
             guard isSearching else { return false }
-            if searchSelection.isEmpty, let first = searchResults.first {
-                openSearchResult(first)
+            if searchSelection.isEmpty, lookoutSelection == nil {
+                openFirstSearchResult()
             } else {
                 openSelection()
             }
@@ -120,12 +137,26 @@ extension HubFilesModel {
 
     // MARK: Results
 
+    /// ↑/↓ walk both sections, Return opens, Space previews, and → / ← open and close Lookout's "Weaker matches"
+    /// fold, as they expand and collapse a disclosure row in Finder.
     private func handleResultsKey(_ key: NSEvent.SpecialKey?, character: String, shift: Bool,
                                   flags: NSEvent.ModifierFlags, event: NSEvent) -> Bool {
         switch key {
         case .downArrow?: moveSearchSelection(by: 1, extending: shift); return true
         case .upArrow?: moveSearchSelection(by: -1, extending: shift); return true
         case .carriageReturn?, .enter?: openSelection(); return true
+        case .rightArrow? where flags.isEmpty && isPictureSearch:
+            // The selected hit's group's fold.
+            guard let group = selectedPictureGroup, !group.weak.isEmpty, !pictureWeakExpanded.contains(group.kind)
+            else { return true }
+            setPictureWeakExpanded(group.kind, true); return true
+        case .leftArrow? where flags.isEmpty && isPictureSearch:
+            guard let group = selectedPictureGroup, pictureWeakExpanded.contains(group.kind) else { return true }
+            setPictureWeakExpanded(group.kind, false); return true
+        case .rightArrow? where flags.isEmpty && !lookoutWeakExpanded && !lookoutResults.weak.isEmpty:
+            setLookoutWeakExpanded(true); return true
+        case .leftArrow? where flags.isEmpty && lookoutWeakExpanded:
+            setLookoutWeakExpanded(false); return true
         default: break
         }
         if character == " ", flags.isEmpty { toggleQuickLook(); return true }

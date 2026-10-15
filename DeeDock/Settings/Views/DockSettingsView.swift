@@ -88,6 +88,11 @@ struct DockSettingsView: View {
             coordinator?.settingsHarborRequest = false
             select(.windowsFocus, page: .harbor)
         }
+        .onChange(of: coordinator?.settingsLookoutRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsLookoutRequest = false
+            select(.lookout)
+        }
         .onChange(of: coordinator?.settingsFeaturesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false
@@ -130,6 +135,10 @@ struct DockSettingsView: View {
         case .atmosphere:
             if let atmosphere = coordinator?.atmosphere {
                 AtmosphereSettingsPane(store: atmosphere.store)
+            }
+        case .lookout:
+            if let hub = coordinator?.hub {
+                LookoutSettingsPane(model: hub.lookoutSettings)
             }
         case .modes:
             DockModesSettingsPane(store: profiles.modes,

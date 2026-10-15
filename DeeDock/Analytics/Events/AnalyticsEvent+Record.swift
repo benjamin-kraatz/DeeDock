@@ -56,6 +56,13 @@ extension AnalyticsEvent {
         case .hubFilesViewChanged: "hub_files_view_changed"
         case .hubFilesSidebarEdited: "hub_files_sidebar_edited"
         case .hubFileSearchResultOpened: "hub_file_search_result_opened"
+        case .lookoutResultOpened: "lookout_result_opened"
+        case .lookoutImageSearch: "lookout_image_search"
+        case .lookoutSetupStepViewed: "lookout_setup_step_viewed"
+        case .lookoutSetupCompleted: "lookout_setup_completed"
+        case .lookoutSetupAbandoned: "lookout_setup_abandoned"
+        case .lookoutModelDownload: "lookout_model_download"
+        case .lookoutAccessResult: "lookout_access_result"
         case .hubWindowActivated: "hub_window_activated"
         case .modeSwitched: "mode_switched"
         case .modeEdited: "mode_edited"
@@ -213,6 +220,24 @@ extension AnalyticsEvent {
             ["action": .init(action), "method": .init(method), "item_count": .init(itemCount)]
         case let .hubFileSearchResultOpened(scope, isFolder):
             ["scope": .init(scope), "is_folder": .init(isFolder)]
+        case let .lookoutResultOpened(section, rank, kind, match, scope, isLookup, query):
+            ["section": .init(section), "rank": .init(rank), "kind": kind.map(AnalyticsValue.init),
+             "match": match.map(AnalyticsValue.init), "scope": .init(scope), "is_lookup": .init(isLookup),
+             "query": .init(query)]
+        case let .lookoutImageSearch(source, cold):
+            ["source": .init(source), "cold": .init(cold)]
+        case let .lookoutSetupStepViewed(step):
+            ["step": .init(step)]
+        case let .lookoutSetupCompleted(folderCount, allowedCount, skippedCount, estimatedFiles, indexOnBattery):
+            ["folder_count": .init(folderCount), "allowed_count": .init(allowedCount),
+             "skipped_count": .init(skippedCount), "estimated_files": .init(estimatedFiles),
+             "index_on_battery": .init(indexOnBattery)]
+        case let .lookoutSetupAbandoned(lastStep):
+            ["last_step": .init(lastStep)]
+        case let .lookoutModelDownload(outcome, seconds, error):
+            ["outcome": .init(outcome), "seconds": .init(seconds), "error": error.map(AnalyticsValue.init)]
+        case let .lookoutAccessResult(outcome, context):
+            ["outcome": .init(outcome), "context": .init(context)]
         case let .hubWindowActivated(minimized):
             ["minimized": .init(minimized)]
         case let .modeSwitched(source, modeCount):

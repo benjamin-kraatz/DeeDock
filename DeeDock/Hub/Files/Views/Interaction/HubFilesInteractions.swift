@@ -125,6 +125,7 @@ enum HubFilesInteractions {
             model.clickSearchResult(item.url, mode: .replace)
         }
         interaction.doubleClick = { model.openSearchResult(item) }
+        interaction.isSearchResult = true
         interaction.dragURLs = {
             model.searchSelection.contains(item.url) ? model.actionableItems.map(\.url) : [item.url]
         }
@@ -135,6 +136,28 @@ enum HubFilesInteractions {
         }
         interaction.menu = {
             if !model.searchSelection.contains(item.url) { model.clickSearchResult(item.url, mode: .replace) }
+            return HubFilesContextMenu.items(model: model)
+        }
+        interaction.hoverChanged = hover
+        return interaction
+    }
+
+    /// A Lookout result row: a click selects the hit alone (Lookout hits don't extend a selection), a double click
+    /// opens it, it drags out as its file, and a folder hit accepts drops like a folder name result.
+    static func lookoutResult(_ hit: LookoutHit, model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
+        let url = hit.fileItem.url
+        var interaction = HubFilesInteraction()
+        interaction.mouseDown = { _ in model.clickLookoutResult(hit) }
+        interaction.doubleClick = { model.openLookoutResult(hit) }
+        interaction.isSearchResult = true
+        interaction.dragURLs = { [url] }
+        interaction.dragHold = dragHold(model)
+        if hit.isFolder {
+            interaction.dropDestination = { url }
+            interaction.dropHighlight = .item(url)
+        }
+        interaction.menu = {
+            if model.lookoutSelection != hit.path { model.clickLookoutResult(hit) }
             return HubFilesContextMenu.items(model: model)
         }
         interaction.hoverChanged = hover

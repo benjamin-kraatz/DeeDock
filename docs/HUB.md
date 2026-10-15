@@ -17,7 +17,8 @@ Apps and Windows open with focus in the search field. Opening the Hub closes fol
 Shelf and other dock popovers, Window Peek, the Dock Mode picker, drive cards, and Focus Dock.
 
 Drop files on the DOKK tile or on the open Apps tab, or choose **Use in Launcher** from a Shelf
-selection, to open the Apps tab in file-action mode. The Windows tab does not accept drops. **Open in Hub** on a folder stack, the Downloads stack, or a drive opens the
+selection, to open the Apps tab in file-action mode. For one picture, or one file Lookout has read,
+the file actions start with **Find Similar**, which searches with it in the Files tab. The Windows tab does not accept drops. **Open in Hub** on a folder stack, the Downloads stack, or a drive opens the
 Files tab on that folder. See [Open in Hub](#open-in-hub).
 
 ### Anchored and detached
@@ -65,6 +66,7 @@ These keep an anchored Hub open through outside clicks, focus loss, and Escape:
 - An open file chooser, an alert or confirmation dialog, or Quick Look.
 - A context menu or options menu from Hub content.
 - A copy or move in the Files tab.
+- Lookout's onboarding card. It closes when the Hub closes, and opens again where it left off.
 
 Focus moving to a menu, Quick Look, or a sheet or child window of the Hub does not count as focus
 loss.
@@ -96,7 +98,8 @@ while a tab's content has focus moves it into the search field.
 Each press of Escape does the first of these that applies:
 
 1. The visible tab handles it. Apps cancels Robi, then drops the arrow-key selection. Files closes
-   Quick Look or cancels a rename. Windows has no Escape step of its own.
+   Lookout's onboarding card, closes Quick Look, cancels a rename, or clears a search with a picture
+   (the picture and the words). Windows has no Escape step of its own.
 2. The Hub clears the visible tab's search.
 3. An anchored Hub without a hold closes.
 
@@ -241,24 +244,59 @@ while it is open, and the panel follows. Escape or Space closes it.
 ### Search
 
 Type in the header search field, or start typing over the listing. The scope bar offers
-**This Mac** and the active pane's current folder. Search uses Spotlight and matches file and
-folder names, ignoring case and accents. It does not search file contents.
+**This Mac** and the active pane's current folder. Results replace the panes in two sections.
 
-Results replace the panes and show the name, location, date modified, and size. Prefix matches
-come first, then recently used or modified items. Search collects at most 200 Spotlight results
-and does not update while you look at them. Down moves from the search field into the results.
-Return opens the selected result, or the first one when nothing is selected. A folder result opens
-in the active pane and ends the search. A file opens in its default app. You can drag results out,
-and folder results accept drops.
+**Names · Spotlight** comes first. Spotlight matches file and folder names, ignoring case and
+accents. Each row shows the name, location, date modified, and size. Prefix matches come first,
+then recently used or modified items. This section collects at most 200 Spotlight results and does
+not update while you look at them.
+
+**Lookout · by content** follows. [Lookout](LOOKOUT.md) finds photos, screenshots, PDFs, and
+documents in the folders you chose by what they show or say. Each row has a thumbnail, the
+location, an excerpt with the matched words highlighted, a kind chip (with the page for a PDF), and
+a chip that says whether meaning, exact words, or both matched. A folder whose files keep matching
+shows as one row with a stack of thumbnails. Keyword hits appear first, and the meaning results
+replace them a moment later. Weaker matches fold under **Weaker matches (N)**. When nothing clearly
+fits, the section says so instead of listing guesses. Selecting a Lookout row adds a
+**Why it matched** card to the preview column. Lookout searches the same scope as the names.
+
+The scope bar ends with Lookout's status chip, such as **Lookout ready** or
+**Reading files · 1,204 files left**. Before setup it reads **Lookout off · Set up** and opens
+Lookout's onboarding over the Files tab, and the Lookout section shows a **Set up Lookout** card.
+While the model downloads, the section shows a download card with a progress bar, and the names
+already work. After setup, the chip opens **Settings → Lookout**. When Lookout has been set up and
+turned off, the section is hidden. See [Lookout](GUIDE.md#lookout) for setup and settings.
+
+To search with a picture, drop one on the search field, paste one with ⌘V, or use **Find Similar**
+on a result or on a file while browsing: the button in the preview column, the context menu, ⇧⌘L,
+or dragging a result onto the field. A PDF or document Lookout has read can be dropped on the field
+too, and searches with what Lookout stored for it. While something is dragged over the Hub, the
+field widens into a drop well that says "Drop to search with this picture", "Drop to find files
+like this one" for a document Lookout has read, "Lookout hasn't read this file yet" for one it
+hasn't, or "Lookout searches with pictures only" for anything else. A dragged file is never typed
+into the field as its path.
+Only the field takes the drop. Every other drop target behaves as before. The picture shows as a
+chip in the field. The results start with a bar that shows the picture and how it was read. There's
+no names section. Lookout's matches come in two groups, **Looks like it** and **About what it
+shows**, each with its own **Weaker matches** fold. A document gets **Says something similar** and
+**Pictures of it** instead. ⌫ in the empty field or ✕ on the chip removes the picture and brings back the earlier
+words, and typing starts a new search by words. See [Searching with a picture](GUIDE.md#search-with-a-picture).
+
+Down moves from the search field into the results, through the names, then Lookout's hits, then
+the weaker hits while their fold is open. Right and Left open and close the fold. Return opens the
+selected result, or the first one when nothing is selected. Space opens Quick Look. A folder
+result opens in the active pane and ends the search. A file opens in its default app. You can drag
+results out of both sections, and folder results accept drops.
 
 ### Context menu and keyboard
 
 Right-click an item for **Open**, **Quick Look**, **Reveal in Finder**, **Copy Path**,
-**Add to Sidebar** (folders only), **Rename**, **New Folder**, and **Move to Trash**. Right-click
-empty space for **New Folder**, **Add to Sidebar**, **Reveal in Finder**, and **Copy Path** for the
-current folder. When the folders are already in the sidebar, the menu offers **Remove from Sidebar**
-instead. Right-click a Favorites row for **Open in New Tab**, **Reveal in Finder**, **Copy Path**,
-and **Remove from Sidebar**. **Copy Path** copies plain text, one
+**Add to Sidebar** (folders only), **Rename**, **New Folder**, and **Move to Trash**. A single file,
+in search results or in the browser, also offers **Find Similar** while Lookout can search.
+Right-click empty space for **New Folder**, **Add to Sidebar**, **Reveal in Finder**, and **Copy
+Path** for the current folder. When the folders are already in the sidebar, the menu offers
+**Remove from Sidebar** instead. Right-click a Favorites row for **Open in New Tab**, **Reveal in
+Finder**, **Copy Path**, and **Remove from Sidebar**. **Copy Path** copies plain text, one
 path per line. **Reveal in Finder** opens Finder with the item selected and closes an anchored Hub.
 
 | Key | Action |
@@ -278,6 +316,9 @@ path per line. **Reveal in Finder** opens Finder with the item selected and clos
 | ⌥⌘S | Split View |
 | Tab, Shift-Tab | Switch the active pane |
 | Arrow keys | Move the selection. Shift extends it. |
+| ⌘V with a picture copied | Search with the picture (search results and listing alike) |
+| ⇧⌘L | Find Similar on the selected search result or file |
+| ⌫ in the empty search field | Remove the picture searched with and bring back the earlier words |
 
 In Columns, Left opens the parent folder and Right opens the selected folder. Command-click
 toggles an item and Shift-click extends the selection.
@@ -288,7 +329,7 @@ away saves, and Escape cancels. Empty names, names with `/` or `:`, and names al
 an alert. Move to Trash uses the system Trash, so Finder's **Put Back** works. It asks for no
 confirmation and the Files tab has no Undo.
 
-The Files tab has no Copy, Paste, or Duplicate commands. To copy, drag with Option.
+The Files tab has no Copy, Paste, or Duplicate commands for files. To copy, drag with Option.
 
 ### Drag and drop
 
@@ -300,6 +341,11 @@ folders to the sidebar instead (see [Adding folders to the sidebar](#adding-fold
 DOKK follows Finder's rule. A drop on the same volume moves the items, and a drop on another volume
 copies them. Hold Option to copy on the same volume. When another app offers only a copy, DOKK
 copies.
+
+Dropping a picture, or a document Lookout has read, on the header's search field searches with it,
+and dragging a search result onto the field runs Find Similar on it (see [Search](#search)).
+Moving such a file between panes opens the field's drop well too; moving anything else doesn't. The
+field takes no other file, and never inserts a file's path as text. Plain text still drops in.
 
 Hold a drag over a folder, a sidebar place, a browser tab, or a breadcrumb segment to spring-load
 it. The folder opens, or the tab is selected, after the system spring-loading delay. A breadcrumb
@@ -360,15 +406,23 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
   Move Up, and Move Down, and announce their new position after a move.
 - Reduce Motion: the Hub fades in and out without scaling or moving. The tab switch fades without
   sliding, and the selection pill moves without animation. Hover lifts, entrance staggers, and the
-  tile's halo rotation stop. In the sidebar, a folder added from the menu appears without flying
-  in, the arrival glow fades without its light sweep, removing a row skips the poof, and slots open
-  without the spring.
+  tile's halo rotation stop. The search field's drop well doesn't pulse, and the picture chip and
+  the results fade in instead of springing. In the sidebar, a folder added from the menu appears
+  without flying in, the arrival glow fades without its light sweep, removing a row skips the
+  poof, and slots open without the spring.
+- The picture chip has a VoiceOver label with the picture's name and a Remove action. The results
+  bar, Find Similar, and the closeness meter have labels, and Find Similar is a row action.
 - Reduce Transparency: the Hub draws an opaque background instead of Liquid Glass.
 
 ## Known limitations
 
-- File search finds only items in the Spotlight index. Folders excluded from Spotlight, unindexed
+- Name search finds only items in the Spotlight index. Folders excluded from Spotlight, unindexed
   volumes, and some network shares return nothing, and the tab does not say why.
+- Lookout searches only the folders chosen for it, and only documents, PDFs, images, and
+  screenshots. Audio, video, code, and combining a picture with words are Planned. Searching with a
+  picture has not been exercised by hand. Its onboarding, macOS's
+  folder prompts, and the model download have not been exercised by hand. See
+  [Lookout](LOOKOUT.md#known-limitations).
 - The Windows tab sees only the current Space, apart from minimized windows and hidden apps.
 - macOS asks for permission the first time the Files tab reads Desktop, Documents, or Downloads.
 - The Hub has no global keyboard shortcut. Open it from the tile or Focus Dock.

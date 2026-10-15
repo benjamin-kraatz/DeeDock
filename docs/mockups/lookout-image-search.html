@@ -1,0 +1,1200 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Lookout — Hub content search mockup</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;font:13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--foreground,#d8d9de)}
+p.lede{margin:0 0 10px;color:var(--muted-foreground,#9a9ca6);line-height:1.5}
+p.lede b{color:var(--foreground,#e6e7ea);font-weight:600}
+kbd{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;padding:1px 5px;border-radius:5px;background:var(--muted,#ffffff12);border:1px solid var(--border,#ffffff1c)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 12px}
+.ctl .grp{display:flex;align-items:center;gap:6px;color:var(--muted-foreground,#9a9ca6);font-size:12px}
+.sg{display:inline-flex;border-radius:8px;background:var(--muted,#ffffff10);padding:2px;gap:2px}
+.sg button,.btn{font:inherit;font-size:12px;border:0;border-radius:6px;padding:4px 9px;background:transparent;color:var(--foreground,#d8d9de);cursor:pointer}
+.sg button.on{background:var(--card,#ffffff22);box-shadow:0 0 0 1px var(--border,#ffffff22)}
+.btn{background:var(--muted,#ffffff10)}
+.btn:hover{background:var(--secondary,#ffffff1c)}
+.ctl label.ck{display:flex;align-items:center;gap:5px;cursor:pointer}
+.ctl input[type=range]{width:110px}
+.viewport{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #ffffff14}
+.foot{margin-top:10px;color:var(--muted-foreground,#9a9ca6);font-size:12px;line-height:1.5}
+.foot code{font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--foreground,#d8d9de);background:var(--code-background,#ffffff0d);padding:1px 5px;border-radius:5px}
+
+/* ───────── stage ───────── */
+.stage{position:absolute;left:0;top:0;width:1280px;height:800px;transform-origin:0 0;overflow:hidden;outline:none;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+.stage.dark{--fg:#f5f5f7;--fg2:rgba(235,235,245,.62);--fg3:rgba(235,235,245,.36);--panel:rgba(28,29,36,.66);--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+ --chip:rgba(255,255,255,.07);--chipHi:rgba(255,255,255,.12);--sel:rgba(255,255,255,.09);--accent:#0a84ff;--accentSel:rgba(10,132,255,.30);--accentLine:rgba(64,156,255,.55);
+ --field:rgba(255,255,255,.07);--dock:rgba(36,37,46,.42);--glyph:#f2f2f5;--side:rgba(0,0,0,.10);--well:rgba(0,0,0,.16);--card2:rgba(255,255,255,.045);--shadow:rgba(0,0,0,.5);
+ --menu:rgba(40,41,50,.86);--sheet:rgba(34,35,43,.80);--mark:rgba(255,214,10,.28);--markFg:#ffe27a;--look:#64d2ff;--lookSoft:rgba(100,210,255,.14);--paper:#f4f2ee;--ink:#3a3a40;--alert:rgba(48,49,58,.92)}
+.stage.light{--fg:#1d1d1f;--fg2:rgba(60,60,67,.72);--fg3:rgba(60,60,67,.42);--panel:rgba(248,248,251,.72);--line:rgba(0,0,0,.075);--line2:rgba(0,0,0,.12);
+ --chip:rgba(0,0,0,.05);--chipHi:rgba(0,0,0,.09);--sel:rgba(0,0,0,.065);--accent:#007aff;--accentSel:rgba(0,122,255,.17);--accentLine:rgba(0,122,255,.42);
+ --field:rgba(0,0,0,.05);--dock:rgba(255,255,255,.42);--glyph:#26262b;--side:rgba(255,255,255,.22);--well:rgba(255,255,255,.35);--card2:rgba(255,255,255,.5);--shadow:rgba(30,30,60,.22);
+ --menu:rgba(250,250,252,.9);--sheet:rgba(250,250,253,.86);--mark:rgba(255,204,0,.32);--markFg:#6b4e00;--look:#0071a4;--lookSoft:rgba(0,122,180,.10);--paper:#ffffff;--ink:#3a3a40;--alert:rgba(246,246,248,.96)}
+.stage.rt.dark{--panel:#1e1f25;--dock:#2a2b33;--menu:#2a2b33;--sheet:#25262e;--alert:#2c2d35}
+.stage.rt.light{--panel:#f4f4f7;--dock:#e9e9ee;--menu:#fafafc;--sheet:#f7f7fa;--alert:#f6f6f8}
+.stage.rt *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+#wall{position:absolute;inset:0}
+.dark #wall{background:radial-gradient(1200px 700px at 20% 10%,#3b2d6b 0,transparent 60%),radial-gradient(900px 600px at 90% 80%,#0e4a6b 0,transparent 60%),linear-gradient(160deg,#141526,#0b0c14)}
+.light #wall{background:radial-gradient(1200px 700px at 20% 10%,#c9b8ff 0,transparent 60%),radial-gradient(900px 600px at 90% 80%,#9fd8f5 0,transparent 60%),linear-gradient(160deg,#eef0fb,#dfe6f3)}
+#menubar{position:absolute;left:0;right:0;top:0;height:28px;display:flex;align-items:center;gap:20px;padding:0 18px;font-size:13px;color:var(--fg);z-index:5;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.dark #menubar{background:rgba(10,10,16,.3)}.light #menubar{background:rgba(255,255,255,.34)}
+#menubar .r{margin-left:auto;display:flex;gap:16px;align-items:center;color:var(--fg2)}
+
+/* dock */
+#dock{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:10px;padding:9px 12px;border-radius:24px;z-index:40;
+ background:var(--dock);backdrop-filter:blur(26px) saturate(1.7);-webkit-backdrop-filter:blur(26px) saturate(1.7);box-shadow:inset 0 0 0 .5px var(--line2),0 10px 30px rgba(0,0,0,.25)}
+.dt{position:relative;width:48px;height:48px;display:grid;place-items:center}
+.dt svg{width:36px;height:36px;stroke:var(--glyph);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.dt .run{position:absolute;bottom:-6px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:2px;background:var(--fg2)}
+.dokk .face{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(120% 120% at 30% 20%,#2a2b33,#0d0d12);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.18);position:relative;z-index:1;color:#fff;font-weight:800;font-size:12px;letter-spacing:.08em}
+.dokk .halo{position:absolute;inset:-10px;border-radius:18px;filter:blur(9px);background:conic-gradient(from var(--a),#ff4d6d,#ff9f43,#ffd166,#4cc9f0,#4361ee,#b5179e,#ff4d6d);animation:spin 9s linear infinite}
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes spin{to{--a:360deg}}
+.rm .dokk .halo{animation:none}
+.sep{width:1px;height:40px;background:var(--line2);margin:0 2px 4px}
+
+/* hub */
+#hub{position:absolute;left:90px;top:48px;width:1100px;height:640px;z-index:30;color:var(--fg)}
+#hub .shell{position:absolute;inset:0;border-radius:22px;overflow:hidden;background:var(--panel);backdrop-filter:blur(44px) saturate(1.8);-webkit-backdrop-filter:blur(44px) saturate(1.8);
+ box-shadow:inset 0 0 0 .5px var(--line2),0 0 0 .5px rgba(0,0,0,.35),0 30px 90px var(--shadow);display:flex;flex-direction:column}
+#hub .arrow{position:absolute;top:100%;left:220px;width:24px;height:11px;margin-left:-12px;background:var(--panel);clip-path:path('M0 0 H24 L14.3 9.4 Q12 11.4 9.7 9.4 Z')}
+.hdr{flex:none;height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 14px 0 20px;gap:12px}
+.word{font-size:21px;font-weight:800;letter-spacing:.06em}
+.segs{display:flex;padding:3px;border-radius:13px;background:var(--chip);box-shadow:inset 0 0 0 .5px var(--line)}
+.segs span{padding:6px 16px;border-radius:10px;font-size:13px;color:var(--fg2);display:flex;gap:6px;align-items:center}
+.segs span.on{background:var(--chipHi);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.15),inset 0 0 0 .5px var(--line2)}
+.hdr .r{display:flex;justify-content:flex-end}
+.qf{position:relative;width:300px;height:32px;border-radius:10px;background:var(--field);box-shadow:inset 0 0 0 .5px var(--line);display:flex;align-items:center;gap:7px;padding:0 10px;transition:box-shadow .15s}
+.qf:focus-within{box-shadow:inset 0 0 0 .5px var(--line),0 0 0 3px var(--accentSel)}
+.qf svg{width:14px;height:14px;stroke:var(--fg3);fill:none;stroke-width:1.8;flex:none}
+.qf input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--fg);font:13px -apple-system,system-ui;caret-color:var(--accent)}
+.qf input::placeholder{color:var(--fg3)}
+.qf .x{width:16px;height:16px;border-radius:8px;background:var(--fg3);color:var(--panel);display:none;place-items:center;font-size:10px;cursor:pointer;line-height:1}
+.qf.has .x{display:grid}
+
+.scope{flex:none;height:38px;display:flex;align-items:center;gap:8px;padding:0 16px;border-top:.5px solid var(--line);border-bottom:.5px solid var(--line)}
+.pill{font-size:12px;padding:4px 10px;border-radius:8px;color:var(--fg2);cursor:pointer}
+.pill.on{background:var(--chipHi);color:var(--fg);box-shadow:inset 0 0 0 .5px var(--line2)}
+.scope .grow{flex:1}
+.lchip{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--fg2);padding:4px 10px 4px 8px;border-radius:9px;background:var(--chip);cursor:pointer;transition:background .2s}
+.lchip:hover{background:var(--chipHi)}
+.lchip .dot{width:7px;height:7px;border-radius:4px;background:var(--fg3)}
+.lchip.ready .dot{background:#32d74b}.lchip.indexing .dot,.lchip.downloading .dot{background:var(--look);animation:breath 1.6s ease-in-out infinite}.lchip.paused .dot{background:#ff9f0a}
+.rm .lchip .dot{animation:none!important}
+@keyframes breath{50%{opacity:.35}}
+.lchip b{color:var(--fg);font-weight:600}
+.spy{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.body{flex:1;min-height:0;display:flex}
+.res{flex:1;min-width:0;overflow:auto;padding:6px 10px 14px}
+.res::-webkit-scrollbar{width:0}
+.pv{flex:none;width:330px;border-left:.5px solid var(--line);background:var(--side);display:flex;flex-direction:column;align-items:center;padding:22px 20px;gap:12px;overflow:auto}
+
+.sh{display:flex;align-items:center;gap:7px;margin:10px 8px 4px;font-size:11.5px;font-weight:600;color:var(--fg2);letter-spacing:.01em}
+.sh .n{font-weight:500;color:var(--fg3)}
+.sh.look{color:var(--look)}
+.sh .rule{flex:1;height:.5px;background:var(--line)}
+.row{position:relative;display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:10px;cursor:default;transition:background .12s}
+.row:hover{background:var(--card2)}
+.row.sel{background:var(--accentSel);box-shadow:inset 0 0 0 .5px var(--accentLine)}
+.row .ic{flex:none;width:30px;height:30px;display:grid;place-items:center}
+.row .ic>svg{width:28px;height:28px}
+.row .meta{flex:1;min-width:0}
+.row .nm{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .nm mark,.ex mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
+.row .lc{font-size:11.5px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.row .dt2{flex:none;font-size:11.5px;color:var(--fg3);width:92px;text-align:right}
+.row.big{align-items:flex-start;padding:9px 10px}
+.row.big .ic{width:58px;height:58px}
+.thumb{flex:none;width:58px;height:58px;border-radius:9px;overflow:hidden;box-shadow:0 0 0 .5px var(--line2),0 2px 8px rgba(0,0,0,.18);position:relative}
+.thumb svg{width:100%;height:100%;display:block}
+.stack{position:relative;width:58px;height:58px}
+.stack .thumb{position:absolute;width:44px;height:44px}
+.stack .thumb:nth-child(1){left:0;top:10px;transform:rotate(-8deg)}
+.stack .thumb:nth-child(2){left:8px;top:6px;transform:rotate(2deg)}
+.stack .thumb:nth-child(3){left:14px;top:2px;transform:rotate(9deg)}
+.ex{font-size:12px;color:var(--fg2);line-height:1.42;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.chips{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.chip{font-size:10.5px;padding:2px 7px;border-radius:6px;background:var(--chip);color:var(--fg2)}
+.chip.m{background:var(--lookSoft);color:var(--look)}
+.chip.w{background:var(--mark);color:var(--markFg)}
+.badge{flex:none;font-size:10px;padding:2px 6px;border-radius:5px;background:var(--chip);color:var(--fg3);margin-top:2px}
+.badge.c{background:var(--lookSoft);color:var(--look)}
+.sc{font:10.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--fg3);margin-top:5px}
+.sc b{color:var(--fg2);font-weight:500}
+.weak{display:flex;align-items:center;gap:6px;margin:6px 8px;font-size:12px;color:var(--fg2);cursor:pointer;padding:5px 2px}
+.weak svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s}
+.weak.open svg{transform:rotate(90deg)}
+.empty{margin:8px 10px;font-size:12px;color:var(--fg3)}
+.honest{margin:6px 8px;padding:12px 14px;border-radius:12px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line);font-size:12.5px;color:var(--fg2);line-height:1.45}
+.promo{margin:8px 8px;padding:14px 16px;border-radius:14px;display:flex;gap:14px;align-items:center;background:linear-gradient(120deg,var(--lookSoft),transparent 70%),var(--card2);box-shadow:inset 0 0 0 .5px var(--line2)}
+.promo .spybig{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--lookSoft);color:var(--look);flex:none}
+.promo .spybig svg{width:22px;height:22px}
+.promo h4{margin:0 0 3px;font-size:13.5px}
+.promo p{margin:0;font-size:12px;color:var(--fg2);line-height:1.45}
+.promo .grow{flex:1}
+.cta{font:600 12.5px -apple-system,system-ui;border:0;border-radius:8px;padding:6px 13px;background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap}
+.cta:disabled{opacity:.4;cursor:default}
+.cta.ghost{background:var(--chipHi);color:var(--fg)}
+.bar{height:4px;border-radius:2px;background:var(--chipHi);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--look);border-radius:2px;transition:width .3s}
+
+/* skeleton while Lookout's query encoder warms */
+.skel{display:flex;gap:11px;padding:9px 10px}
+.skel .t{width:58px;height:58px;border-radius:9px}
+.skel .l{height:10px;border-radius:5px;margin:6px 0}
+.skel .t,.skel .l{background:linear-gradient(90deg,var(--chip) 0,var(--chipHi) 40%,var(--chip) 80%);background-size:300% 100%;animation:shim 1.1s linear infinite}
+.rm .skel .t,.rm .skel .l{animation:none;background:var(--chip)}
+@keyframes shim{from{background-position:100% 0}to{background-position:-200% 0}}
+.enter{animation:rise .38s cubic-bezier(.2,.9,.25,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rm .enter{animation:fade .2s both}
+@keyframes fade{from{opacity:0}}
+
+/* preview */
+.pv .big{width:270px;height:200px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 .5px var(--line2),0 8px 24px rgba(0,0,0,.25);position:relative;flex:none}
+.pv .big svg{width:100%;height:100%;display:block}
+.pv .page{width:220px;height:290px;border-radius:4px;background:var(--paper);box-shadow:0 0 0 .5px rgba(0,0,0,.15),0 8px 24px rgba(0,0,0,.28);padding:18px 18px;color:var(--ink);font:7.6px/1.55 Georgia,serif;overflow:hidden;flex:none;position:relative}
+.pv .page h5{font:700 9.5px -apple-system,system-ui;margin:0 0 8px}
+.pv .page p{margin:0 0 6px}
+.pv .page .hl{background:rgba(255,204,0,.45);border-radius:2px;box-shadow:0 0 0 2px rgba(255,204,0,.45)}
+.pv .page .pg{position:absolute;bottom:8px;right:12px;font:8px -apple-system;color:#999}
+.pv .ocr{position:absolute;border:2px solid #ffd60a;border-radius:4px;box-shadow:0 0 0 999px rgba(0,0,0,.18),0 0 12px rgba(255,214,10,.6)}
+.pv .tt{font-size:14px;font-weight:600;text-align:center;word-break:break-word}
+.pv .sub{font-size:12px;color:var(--fg2);text-align:center;margin-top:-6px}
+.pv .why{width:100%;border-radius:10px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line);padding:10px 12px;font-size:12px;color:var(--fg2);line-height:1.45}
+.pv .why b{color:var(--fg);font-weight:600}
+.pv .acts{display:flex;gap:6px}
+.pv .acts span{font-size:12px;padding:5px 10px;border-radius:7px;background:var(--chipHi);cursor:pointer}
+.pv .kids{width:100%;display:flex;flex-direction:column;gap:2px}
+.pv .kids div{display:flex;gap:8px;align-items:center;font-size:12px;padding:4px 6px;border-radius:7px;background:var(--card2)}
+.pv .kids .thumb{width:26px;height:26px;border-radius:5px}
+.pv .none{margin:auto;color:var(--fg3);font-size:12.5px;text-align:center;line-height:1.5}
+
+/* idle listing */
+.side{flex:none;width:180px;padding:12px 10px;background:var(--side);border-right:.5px solid var(--line);font-size:12.5px}
+.side h6{margin:10px 8px 4px;font-size:11px;color:var(--fg3);font-weight:600}
+.side div{padding:5px 8px;border-radius:7px;color:var(--fg2);display:flex;gap:7px;align-items:center}
+.side div.on{background:var(--sel);color:var(--fg)}
+.side svg{width:15px;height:15px;stroke:var(--look);fill:none;stroke-width:1.6}
+.list{flex:1;padding:8px 12px;overflow:hidden}
+.suggest{margin:14px 6px 0;padding:14px 16px;border-radius:14px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line)}
+.suggest h4{margin:0 0 8px;font-size:12.5px;color:var(--fg2);font-weight:600;display:flex;gap:7px;align-items:center}
+.suggest .qs{display:flex;flex-wrap:wrap;gap:6px}
+.suggest .qs span{font-size:12px;padding:5px 10px;border-radius:8px;background:var(--chipHi);cursor:pointer;transition:transform .15s}
+.suggest .qs span:hover{transform:translateY(-1px)}
+
+/* onboarding sheet */
+#veil{position:absolute;inset:0;z-index:50;background:rgba(0,0,0,.28);display:none;align-items:flex-start;justify-content:center;padding-top:96px}
+#veil.show{display:flex}
+.sheet{width:640px;min-height:470px;border-radius:20px;background:var(--sheet);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);
+ box-shadow:inset 0 0 0 .5px var(--line2),0 30px 90px rgba(0,0,0,.45);color:var(--fg);display:flex;flex-direction:column;overflow:hidden;animation:pop .32s cubic-bezier(.2,1.1,.3,1) both}
+.rm .sheet{animation:fade .2s both}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(10px)}}
+.sheet .stp{flex:1;padding:28px 34px 10px;animation:slide .32s cubic-bezier(.2,.9,.25,1) both}
+.sheet .stp.back{animation-name:slideb}
+.rm .sheet .stp{animation:fade .18s both}
+@keyframes slide{from{opacity:0;transform:translateX(26px)}}
+@keyframes slideb{from{opacity:0;transform:translateX(-26px)}}
+.sheet h2{margin:0 0 6px;font-size:22px;letter-spacing:-.01em}
+.sheet .lead{margin:0 0 18px;color:var(--fg2);font-size:13px;line-height:1.5}
+.sheet .ft{flex:none;display:flex;align-items:center;gap:10px;padding:14px 22px;border-top:.5px solid var(--line)}
+.dots{display:flex;gap:6px;flex:1}
+.dots i{width:6px;height:6px;border-radius:3px;background:var(--chipHi);transition:all .3s}
+.dots i.on{width:18px;background:var(--look)}
+.hero{display:flex;gap:16px;align-items:center;margin-bottom:16px}
+.hero .spybig{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;color:#fff;flex:none;background:linear-gradient(145deg,#64d2ff,#0a84ff 55%,#5e5ce6);box-shadow:0 8px 24px rgba(10,132,255,.35)}
+.hero .spybig svg{width:34px;height:34px;stroke-width:1.8}
+.ex3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.ex3 div{border-radius:12px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line);padding:10px;font-size:11.5px;color:var(--fg2);line-height:1.4}
+.ex3 .thumb{width:100%;height:70px;margin-bottom:8px;border-radius:8px}
+.ex3 q{color:var(--fg);font-weight:600;quotes:"“" "”"}
+.priv{display:flex;gap:10px;font-size:12px;color:var(--fg2);line-height:1.5;padding:10px 12px;border-radius:10px;background:var(--card2)}
+.priv svg{width:16px;height:16px;flex:none;stroke:var(--fg2);fill:none;stroke-width:1.6;margin-top:1px}
+.fl{display:flex;flex-direction:column;gap:4px}
+.fr{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:10px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line);cursor:pointer;transition:opacity .2s}
+.fr.off{opacity:.55}
+.box{width:16px;height:16px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--line2);display:grid;place-items:center;flex:none;transition:background .15s}
+.fr.on .box{background:var(--accent);box-shadow:none}
+.box svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.4;opacity:0}
+.fr.on .box svg{opacity:1}
+.fr .fi{width:22px;height:22px;flex:none}
+.fr .fn{flex:1;font-size:13px}
+.fr .fn small{display:block;font-size:11px;color:var(--fg3);margin-top:1px}
+.fr .est{font-size:11.5px;color:var(--fg2);text-align:right}
+.add{font-size:12.5px;color:var(--accent);padding:8px 10px;cursor:pointer}
+.never{margin-top:8px;font-size:12px;color:var(--fg2)}
+.never summary{cursor:pointer;color:var(--fg2)}
+.never ul{margin:6px 0 0;padding-left:18px;line-height:1.6;color:var(--fg3)}
+.tot{display:flex;justify-content:space-between;font-size:12px;color:var(--fg2);margin-top:10px;padding:0 4px}
+.tot b{color:var(--fg)}
+.acc{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line);margin-bottom:6px}
+.acc .fn{flex:1;font-size:13px}
+.acc .st{font-size:12px;color:var(--fg2);display:flex;align-items:center;gap:6px}
+.acc .st.ok{color:#32d74b}.acc .st.no{color:#ff9f0a}
+.acc .st svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2}
+.mini{font:12px -apple-system,system-ui;border:0;border-radius:7px;padding:5px 11px;background:var(--chipHi);color:var(--fg);cursor:pointer}
+.dl{padding:12px 14px;border-radius:12px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line);margin-bottom:8px}
+.dl .top{display:flex;justify-content:space-between;font-size:13px}
+.dl .top small{color:var(--fg2);font-size:12px}
+.dl .d{font-size:11.5px;color:var(--fg3);margin-top:3px}
+.tog{display:flex;align-items:center;gap:10px;font-size:12.5px;padding:10px 4px;cursor:pointer}
+.tog .sw{width:32px;height:19px;border-radius:10px;background:var(--chipHi);position:relative;transition:background .2s;flex:none}
+.tog .sw::after{content:'';position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:8px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .22s cubic-bezier(.3,1.4,.5,1)}
+.tog.on .sw{background:#32d74b}
+.tog.on .sw::after{transform:translateX(13px)}
+.tog small{display:block;color:var(--fg3);font-size:11.5px;margin-top:2px}
+.pass{display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:6px}
+.ring{width:120px;height:120px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8;stroke-linecap:round}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;font-weight:700}
+.feed{width:100%;height:118px;overflow:hidden;display:flex;flex-direction:column;gap:4px;mask-image:linear-gradient(#000 60%,transparent);-webkit-mask-image:linear-gradient(#000 60%,transparent)}
+.feed div{display:flex;gap:9px;align-items:center;font-size:12px;color:var(--fg2);padding:4px 8px;border-radius:8px;background:var(--card2)}
+.feed .thumb{width:22px;height:22px;border-radius:5px}
+.feed small{margin-left:auto;color:var(--fg3)}
+
+/* macOS permission alert */
+#alert{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center}
+#alert.show{display:flex}
+.al{width:262px;border-radius:14px;background:var(--alert);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:inset 0 0 0 .5px var(--line2),0 20px 60px rgba(0,0,0,.45);padding:18px 16px 14px;text-align:center;color:var(--fg);animation:pop .22s cubic-bezier(.2,1.1,.3,1) both}
+.al .ai{width:54px;height:54px;margin:0 auto 10px;border-radius:13px;background:radial-gradient(120% 120% at 30% 20%,#2a2b33,#0d0d12);display:grid;place-items:center;color:#fff;font:800 11px -apple-system,system-ui,sans-serif;letter-spacing:.08em}
+.al h3{margin:0 0 6px;font-size:13px;line-height:1.35}
+.al p{margin:0 0 14px;font-size:11px;color:var(--fg2);line-height:1.4}
+.al .b{display:flex;gap:8px}
+.al .b button{flex:1;font:12.5px -apple-system;border:0;border-radius:7px;padding:6px 0;background:var(--chipHi);color:var(--fg);cursor:pointer}
+.al .b button.p{background:var(--accent);color:#fff}
+
+/* settings */
+#settings{position:absolute;left:250px;top:70px;width:780px;height:600px;border-radius:14px;background:var(--sheet);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);box-shadow:inset 0 0 0 .5px var(--line2),0 30px 90px var(--shadow);color:var(--fg);display:none;overflow:hidden;z-index:30}
+#settings.show{display:flex}
+#settings .nav{width:200px;padding:44px 10px 10px;background:var(--side);border-right:.5px solid var(--line);font-size:13px;position:relative}
+#settings .nav .lights{position:absolute;left:14px;top:14px;display:flex;gap:8px}
+#settings .nav .lights i{width:12px;height:12px;border-radius:6px}
+#settings .nav .lights i:nth-child(1){background:#ff5f57}#settings .nav .lights i:nth-child(2){background:#febc2e}#settings .nav .lights i:nth-child(3){background:#28c840}
+#settings .nav div{padding:6px 10px;border-radius:7px;color:var(--fg2)}
+#settings .nav div.on{background:var(--accentSel);color:var(--fg)}
+#settings .pane{flex:1;padding:22px 26px;overflow:auto}
+#settings h3{margin:0 0 14px;font-size:17px}
+.card{border-radius:12px;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--line);margin-bottom:14px}
+.card .ln{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:.5px solid var(--line);font-size:13px}
+.card .ln:last-child{border-bottom:0}
+.card .ln .g{flex:1}
+.card .ln small{display:block;color:var(--fg3);font-size:11.5px;margin-top:2px}
+.card .ln .v{color:var(--fg2);font-size:12.5px}
+.card .ln .rm2{color:var(--fg3);cursor:pointer;font-size:16px;line-height:1}
+.card h5{margin:0;padding:10px 14px 0;font-size:11.5px;color:var(--fg3);font-weight:600}
+.danger{color:#ff453a!important}
+
+/* ───────── search with a picture ───────── */
+/* The field widens into a drop well while a picture is dragged over the Hub. */
+.qf{transition:box-shadow .15s,width .32s cubic-bezier(.2,1.1,.3,1),background .2s}
+.qf .dropmsg{display:none;flex:1;font-size:12.5px;color:var(--look);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qf.drop{width:390px;background:var(--lookSoft);box-shadow:inset 0 0 0 1.5px var(--look),0 0 0 4px var(--lookSoft)}
+.qf.drop.over{box-shadow:inset 0 0 0 2px var(--look),0 0 0 6px var(--lookSoft),0 0 22px var(--lookSoft)}
+.qf.drop{animation:well 1.4s ease-in-out infinite}
+.qf.drop.over{animation:none}
+.rm .qf.drop{animation:none;transition:box-shadow .15s}
+@keyframes well{50%{box-shadow:inset 0 0 0 1.5px var(--look),0 0 0 7px var(--lookSoft)}}
+.qf.drop.bad{background:rgba(255,159,10,.10);box-shadow:inset 0 0 0 1.5px #ff9f0a;animation:none}
+.qf.drop.bad .dropmsg{color:#ff9f0a}
+.qf.drop .dropmsg{display:block}
+.qf.drop input,.qf.drop .tok,.qf.drop .x{display:none!important}
+.qf.drop>svg{stroke:var(--look)}
+.qf.drop.bad>svg{stroke:#ff9f0a}
+.tok{flex:none;display:flex;align-items:center;gap:6px;height:22px;max-width:190px;padding:0 4px 0 2px;border-radius:7px;background:var(--lookSoft);box-shadow:inset 0 0 0 .5px var(--accentLine);font-size:12px;color:var(--fg);animation:tokin .34s cubic-bezier(.2,1.3,.4,1) both}
+.rm .tok{animation:fade .18s both}
+@keyframes tokin{from{opacity:0;transform:scale(.6)}}
+.tok .thumb{width:18px;height:18px;border-radius:4px;box-shadow:0 0 0 .5px var(--line2)}
+.tok span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tok i{font-style:normal;width:14px;height:14px;border-radius:7px;display:grid;place-items:center;font-size:8.5px;color:var(--fg2);cursor:pointer;flex:none}
+.tok i:hover{background:var(--chipHi);color:var(--fg)}
+.qf.has-tok .x{display:grid}
+
+/* desktop pictures to drag from */
+#desk{position:absolute;right:2px;top:74px;width:86px;display:flex;flex-direction:column;align-items:center;gap:16px;z-index:35}
+.dfile{width:86px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:grab;border-radius:8px;padding:4px 2px}
+.dfile:active{cursor:grabbing}
+.dfile .thumb{width:52px;height:52px;border-radius:6px;box-shadow:0 0 0 1.5px #fff,0 3px 10px rgba(0,0,0,.35)}
+.dfile .ic2{width:52px;height:52px}
+.dfile .ic2 svg{width:52px;height:52px}
+.dfile span{font-size:10px;line-height:1.25;text-align:center;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);overflow-wrap:anywhere;max-height:2.5em;overflow:hidden}
+.light .dfile span{color:#1d1d1f;text-shadow:0 0 3px rgba(255,255,255,.9)}
+.dfile.dragging{opacity:.4}
+
+/* the picture you searched with */
+.qbar{display:flex;align-items:center;gap:12px;margin:8px 8px 2px;padding:10px 12px;border-radius:12px;background:linear-gradient(120deg,var(--lookSoft),transparent 75%),var(--card2);box-shadow:inset 0 0 0 .5px var(--line)}
+.qbar .thumb{width:46px;height:46px;border-radius:8px}
+.qbar .pg2{width:46px;height:46px;display:grid;place-items:center}
+.qbar .pg2 svg{width:44px;height:44px}
+.qbar .g{flex:1;min-width:0}
+.qbar .n2{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qbar .s2{font-size:11.5px;color:var(--fg2);margin-top:2px;display:flex;align-items:center;gap:6px}
+.spin{width:11px;height:11px;border-radius:6px;border:1.6px solid var(--lookSoft);border-top-color:var(--look);animation:rot .8s linear infinite;flex:none}
+.rm .spin{animation:none;border-color:var(--look)}
+@keyframes rot{to{transform:rotate(360deg)}}
+.qbar .back{font-size:11.5px;color:var(--accent);cursor:pointer;white-space:nowrap}
+
+/* why it matched, side by side */
+.cmp{display:flex;align-items:center;gap:8px;margin:6px 0 4px}
+.cmp figure{margin:0;flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;color:var(--fg3)}
+.cmp .thumb{width:58px;height:58px;border-radius:7px}
+.cmp .pgm{width:46px;height:58px;border-radius:3px;background:var(--paper);box-shadow:0 0 0 .5px rgba(0,0,0,.15);padding:7px 6px;display:flex;flex-direction:column;gap:3px}
+.cmp .pgm i{display:block;height:2px;border-radius:1px;background:#c7c7cc}
+.cmp .pgm i.h{height:5px;background:rgba(255,204,0,.6)}
+.cmp .eq{font-size:16px;color:var(--look)}
+.meter{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11.5px}
+.meter span{display:flex;gap:3px}
+.meter span i{width:14px;height:4px;border-radius:2px;background:var(--chipHi)}
+.meter span i.on{background:var(--look)}
+
+/* a shorter preview while searching with a picture, so the comparison and Find Similar fit */
+.pv.im{gap:10px;padding-top:18px}
+.pv.im .big{height:160px}
+.pv.im .page{width:150px;height:196px;padding:12px;font-size:5.6px}
+.pv.im .page h5{font-size:7.5px;margin-bottom:5px}
+
+/* Find Similar */
+.simbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;font:600 12.5px -apple-system,system-ui;border:0;border-radius:9px;padding:8px 10px;background:var(--lookSoft);color:var(--look);cursor:pointer;box-shadow:inset 0 0 0 .5px var(--accentLine);transition:background .15s,transform .15s}
+.simbtn:hover{background:var(--accentSel)}
+.simbtn:active{transform:scale(.98)}
+.simbtn kbd{font-size:10.5px;background:transparent;border-color:var(--accentLine);color:var(--look)}
+.simbtn:disabled{opacity:.5;cursor:default;font-weight:500;color:var(--fg2);background:var(--chip);box-shadow:none}
+.simbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* context menu */
+#ctx{position:absolute;z-index:70;min-width:210px;padding:5px;border-radius:10px;background:var(--menu);backdrop-filter:blur(30px) saturate(1.8);-webkit-backdrop-filter:blur(30px) saturate(1.8);box-shadow:inset 0 0 0 .5px var(--line2),0 12px 36px rgba(0,0,0,.35);font-size:13px;color:var(--fg);display:none;animation:fade .12s both}
+#ctx.show{display:block}
+#ctx div{display:flex;justify-content:space-between;gap:18px;padding:4px 10px;border-radius:6px;cursor:default}
+#ctx div:hover:not(.off){background:var(--accent);color:#fff}
+#ctx div:hover:not(.off) small{color:#fff}
+#ctx div.off{color:var(--fg3)}
+#ctx small{color:var(--fg3);font-size:12px}
+#ctx hr{border:0;height:.5px;background:var(--line2);margin:4px 6px}
+
+/* toast */
+#toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);z-index:70;padding:8px 14px;border-radius:10px;background:var(--menu);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:inset 0 0 0 .5px var(--line2),0 10px 30px rgba(0,0,0,.3);font-size:12.5px;color:var(--fg);display:none}
+#toast.show{display:block;animation:rise .3s both}
+.rm #toast.show{animation:fade .2s both}
+</style></head><body>
+
+<p class="lede"><b>Lookout: search with a picture.</b> Drag one of the pictures on the right edge of the desktop onto the Hub. The search field opens up as a drop target, and dropping searches with that picture. The zip file shows what happens with something that isn't a picture. You can also press <b>Copy a picture</b> below and then <kbd>⌘V</kbd> in the search field. For a file already in the index, select it and press <b>Find Similar</b>, right-click it, press <kbd>⌘⇧L</kbd>, or drag the row onto the search field. <kbd>⌫</kbd> on the picture chip goes back to your previous words. Typing starts a new search by words.</p>
+
+<div class="ctl">
+ <div class="grp">View <span class="sg" data-k="view"><button data-v="search">Search</button><button data-v="onboarding">Onboarding</button><button data-v="settings">Settings</button></span></div>
+ <div class="grp">Layout <span class="sg" data-k="layout"><button data-v="sections">Sections</button><button data-v="lookfirst">Lookout first</button><button data-v="merged">Merged</button></span></div>
+ <div class="grp">Lookout <span class="sg" data-k="look"><button data-v="off">Not set up</button><button data-v="downloading">Downloading</button><button data-v="indexing">Indexing</button><button data-v="ready">Ready</button><button data-v="paused">Paused</button></span></div>
+</div>
+<div class="ctl">
+ <div class="grp">Appearance <span class="sg" data-k="theme"><button data-v="dark">Dark</button><button data-v="light">Light</button></span></div>
+ <div class="grp">Language <span class="sg" data-k="lang"><button data-v="en">EN</button><button data-v="de">DE</button></span></div>
+ <label class="grp ck"><input type="checkbox" id="rm"> Reduce Motion</label>
+ <label class="grp ck"><input type="checkbox" id="rt"> Reduce Transparency</label>
+ <label class="grp ck"><input type="checkbox" id="scores"> Show scores</label>
+ <label class="grp">Strong ratio <input type="range" id="ratio" min="0.2" max="0.9" step="0.05" value="0.5"> <span id="ratioV">0.50</span></label>
+ <button class="btn" id="cold">Cold-start encoder again</button>
+</div>
+<div class="ctl">
+ <div class="grp">Search with a picture</div>
+ <button class="btn" id="copyPic">Copy a picture</button>
+ <button class="btn" id="coldImg">Cold-start picture reader again</button>
+</div>
+
+<div class="viewport" id="vp"><div class="stage dark" id="stage" tabindex="0">
+ <div id="wall"></div>
+ <div id="menubar"><b>DOKK</b><span>File</span><span>Edit</span><span>View</span><div class="r"><span>Sat 11 Oct</span><span>10:41</span></div></div>
+ <div id="hub"><div class="shell" id="shell"></div><div class="arrow"></div></div>
+ <div id="settings"></div>
+ <div id="veil"></div>
+ <div id="alert"></div>
+ <div id="desk"></div>
+ <div id="ctx"></div>
+ <div id="toast"></div>
+ <div id="dock"></div>
+</div></div>
+
+<p class="foot"><b>Searching with a picture.</b> The search uses meaning only. There are no words, so the Names section doesn't appear. Lookout already scores pictures and documents on separate scales, so results arrive in two groups, each with its own strong ratio: <em>Looks like it</em> (pictures) and <em>About what it shows</em> (documents). Starting from a document, the groups become <em>Says something similar</em> and <em>Pictures of it</em>. <b>Find Similar</b> on a file already in the index reuses that file's stored vector, so the result is instant. A picture you drop or paste is read in memory only and never saved. The query service loads its picture reader only when you search with a picture: the first time takes about 1.2 s, later searches about 0.35 s, and it unloads 2 minutes after the last search, like the rest of the query service. The file you searched with never appears in its own results. Analytics would add <code>lookout_image_search</code> (source: drop, paste or similar; cold start yes or no) and a <code>query: text | image</code> property on <code>lookout_result_opened</code>. They never include the picture, a name or a path.</p>
+<p class="foot">Ranking math is DigUp's <code>Searcher</code>: meaning is a per-query z-score (gate <code>z ≥ 2.0</code>); words add <code>2 × coverage^1.5</code>; a lookup query (codes and long numbers) flips to <code>0.5 × z + 4 × coverage^1.5</code>; a kind word ("photo", "screenshot") adds 1. Rows below <em>strong ratio</em> × the top score fold under “Weaker matches”. A folder qualifies when three or more of its files match; it scores the average of its three best files plus 0.25 for each further match (up to +1). That folder rule is a DOKK proposal, not DigUp's. All files, scores and timings here are sample data.</p>
+
+<script>
+const $=s=>document.querySelector(s);
+const stage=$('#stage'), vp=$('#vp');
+function fit(){ const s=vp.clientWidth/1280; stage.style.transform=`scale(${s})`; vp.style.height=(800*s)+'px'; }
+addEventListener('resize',fit); fit();
+
+/* ───────── strings ───────── */
+const T={
+ en:{files:'Files',apps:'Apps',windows:'Windows',ph:'Search files and folders',mac:'This Mac',names:'Names',spot:'Spotlight',look:'Lookout',byc:'by content',
+  noNames:'No file or folder names contain this.',weak:'Weaker matches',honest:'Nothing stands out for this. Lookout shows matches only when they clearly fit.',
+  chipOff:'Lookout off',chipSet:'Set up',chipDl:'Downloading model',chipIdx:'Reading files',left:'left',chipReady:'Lookout ready',chipPause:'Paused',lowPower:'Low Power Mode',
+  promoT:'Search by what’s inside',promoP:'Lookout finds photos, screenshots, PDFs and documents by what they show or say, all on this Mac.',setup:'Set up Lookout',
+  dlT:'Lookout is downloading its model',dlP:'Names work now. Matches by content start once the download finishes.',
+  idxNote:'Still reading 1,204 files. Some matches may be missing until it finishes.',pauseNote:'Lookout paused for Low Power Mode. It searches what it has already read.',
+  page:'Page',picture:'Picture',shot:'Screenshot',doc:'Document',folder:'Folder',meaning:'Meaning',words:'Exact words',both:'Meaning + words',matching:'matching files',
+  open:'Open',ql:'Quick Look',reveal:'Reveal in Finder',why:'Why it matched',
+  sugg:'Try Lookout',recents:'Recents',favorites:'Favorites',
+  ob1T:'Find files by what’s in them',ob1P:'Describe a photo, a screenshot or a passage in your own words. Lookout finds it, whatever the file is called, in any of 100+ languages.',
+  ex1:'the dog on the beach',ex1b:'finds the photo',ex2:'payment declined error',ex2b:'finds the screenshot',ex3:'pets in the lease',ex3b:'finds page 7, even in German',
+  priv:'Lookout reads only the folders you pick, on this Mac, and keeps its index here. DOKK downloads the model once from Hugging Face; that request sends nothing about your files.',
+  notNow:'Not now',cont:'Continue',back:'Back',
+  ob2T:'Choose where Lookout looks',ob2P:'Pick folders, not your whole Mac. You can change this any time in Settings.',add:'Add folder…',
+  never:'Lookout never reads',neverL:['~/Library, caches and hidden folders like ~/.ssh','Apps and bundles','Keys, certificates and password files','Code projects (except screenshots in them)','Folders that look like datasets','iCloud files that aren’t downloaded'],
+  total:'First pass',files2:'files',about:'about',min:'min',index:'index',
+  ob3T:'Allow access',ob3P:'macOS asks once for each of these folders. Lookout asks now, so it never interrupts you later.',grant:'Allow…',allowed:'Allowed',denied:'Not allowed',openSet:'Open Settings',skip:'Skipped',
+  ob4T:'Download the model',ob4P:'EmbeddingGemma 2 by Google DeepMind, 865 MB, once. It runs on this Mac.',dlWords:'Words',dlWordsD:'Documents, PDFs and your searches',dlPics:'Pictures',dlPicsD:'Photos, screenshots and scanned pages',
+  verify:'Checking…',ready:'Ready',batt:'Read files on battery too',battD:'Waits in Low Power Mode or when the Mac is warm',bg:'You can close this. The download continues.',
+  ob5T:'Lookout is reading your files',ob5P:'Files you used recently go first, so they’re searchable in minutes.',done:'Start searching',later:'Finish in the background',
+  alertT:'“DOKK” would like to access files in your ',alertP:'Keeping app data separate makes it easier to manage your privacy and security.',dont:'Don’t Allow',allow:'Allow',
+  setT:'Lookout',setOn:'Search by content',setOnD:'Matches by meaning in the Files tab, next to Spotlight’s name matches',folders:'Folders',model:'Model',modelV:'EmbeddingGemma 2 · 865 MB · from Hugging Face',
+  size:'Index on disk',rebuild:'Read everything again',del:'Delete index and model',memory:'Memory while searching',memV:'about 250 MB, released 2 min after the Hub closes',
+  added:'files',
+  imgPh:'Type to search by words instead',dropHere:'Drop to search with this picture',dropBad:'Lookout searches with pictures only',
+  looksLike:'Looks like it',aboutIt:'About what it shows',saysSim:'Says something similar',picsOf:'Pictures of it',noneSec:'Nothing stands out here.',
+  honestImg:'Nothing stands out for this one. Lookout shows matches only when they clearly fit.',
+  newPic:'New picture',pasted:'Pasted picture',fromIdx:'From your index',instant:'instant',readIn:'read in',notSaved:'not saved',
+  waking:'Waking Lookout’s picture reader…',reading:'Reading your picture…',backTo:'Back to',
+  simBtn:'Find Similar',simNo:'Lookout doesn’t read this kind of file',alike:'Looks alike',same:'Same subject',
+  vclose:'Very close',close:'Close',loose:'Somewhat alike',yours:'Yours',match:'Match',
+  imgOffT:'Search with a picture',imgOffP:'Set up Lookout to find pictures that look like this one, and documents about what it shows.',
+  imgDl:'Searching with pictures starts once the Pictures model finishes downloading.',
+  pauseImg:'Lookout is paused for Low Power Mode. It still reads your picture and searches what it has already read.',
+  suggImg:'Or drop a picture on the search field to find ones like it.',clip:'Picture copied. Press ⌘V in the search field.',
+  whyAlike:'It looks like your picture.',whyAbout:p=>p?`Page ${p} is about what your picture shows.`:'It’s about what your picture shows.',
+  whyPicOf:'This picture shows what your page is about.',whySays:p=>p?`Page ${p} says something similar to your page.`:'It says something similar to your page.'},
+ de:{files:'Dateien',apps:'Apps',windows:'Fenster',ph:'Dateien und Ordner suchen',mac:'Dieser Mac',names:'Namen',spot:'Spotlight',look:'Lookout',byc:'nach Inhalt',
+  noNames:'Kein Datei- oder Ordnername enthält diesen Text.',weak:'Schwächere Treffer',honest:'Hier sticht nichts heraus. Lookout zeigt nur Treffer, die eindeutig passen.',
+  chipOff:'Lookout aus',chipSet:'Einrichten',chipDl:'Modell wird geladen',chipIdx:'Liest Dateien',left:'übrig',chipReady:'Lookout bereit',chipPause:'Pausiert',lowPower:'Stromsparmodus',
+  promoT:'Nach Inhalt suchen',promoP:'Lookout findet Fotos, Bildschirmfotos, PDFs und Dokumente nach dem, was sie zeigen oder sagen – alles auf diesem Mac.',setup:'Lookout einrichten',
+  dlT:'Lookout lädt sein Modell',dlP:'Namen funktionieren schon. Treffer nach Inhalt kommen, sobald der Download fertig ist.',
+  idxNote:'Liest noch 1.204 Dateien. Bis dahin können Treffer fehlen.',pauseNote:'Lookout pausiert im Stromsparmodus. Es durchsucht, was es schon gelesen hat.',
+  page:'Seite',picture:'Bild',shot:'Bildschirmfoto',doc:'Dokument',folder:'Ordner',meaning:'Bedeutung',words:'Exakte Wörter',both:'Bedeutung + Wörter',matching:'passende Dateien',
+  open:'Öffnen',ql:'Übersicht',reveal:'Im Finder zeigen',why:'Warum es passt',
+  sugg:'Lookout ausprobieren',recents:'Zuletzt benutzt',favorites:'Orte',
+  ob1T:'Dateien nach ihrem Inhalt finden',ob1P:'Beschreib ein Foto, ein Bildschirmfoto oder eine Textstelle in deinen Worten. Lookout findet sie, egal wie die Datei heißt, in über 100 Sprachen.',
+  ex1:'der Hund am Strand',ex1b:'findet das Foto',ex2:'Zahlung abgelehnt',ex2b:'findet das Bildschirmfoto',ex3:'Haustiere im Mietvertrag',ex3b:'findet Seite 7',
+  priv:'Lookout liest nur die Ordner, die du auswählst, auf diesem Mac, und speichert seinen Index hier. DOKK lädt das Modell einmal von Hugging Face; dabei wird nichts über deine Dateien gesendet.',
+  notNow:'Nicht jetzt',cont:'Weiter',back:'Zurück',
+  ob2T:'Wähle, wo Lookout sucht',ob2P:'Wähle Ordner, nicht den ganzen Mac. Das lässt sich jederzeit in den Einstellungen ändern.',add:'Ordner hinzufügen …',
+  never:'Lookout liest nie',neverL:['~/Library, Caches und versteckte Ordner wie ~/.ssh','Apps und Bundles','Schlüssel, Zertifikate und Passwortdateien','Code-Projekte (außer Bildschirmfotos darin)','Ordner, die wie Datensätze aussehen','Nicht geladene iCloud-Dateien'],
+  total:'Erster Durchlauf',files2:'Dateien',about:'ca.',min:'Min.',index:'Index',
+  ob3T:'Zugriff erlauben',ob3P:'macOS fragt für jeden dieser Ordner einmal. Lookout fragt jetzt, damit es dich später nie unterbricht.',grant:'Erlauben …',allowed:'Erlaubt',denied:'Nicht erlaubt',openSet:'Einstellungen öffnen',skip:'Übersprungen',
+  ob4T:'Modell laden',ob4P:'EmbeddingGemma 2 von Google DeepMind, 865 MB, einmalig. Es läuft auf diesem Mac.',dlWords:'Wörter',dlWordsD:'Dokumente, PDFs und deine Suchen',dlPics:'Bilder',dlPicsD:'Fotos, Bildschirmfotos und gescannte Seiten',
+  verify:'Wird geprüft …',ready:'Bereit',batt:'Auch im Akkubetrieb lesen',battD:'Wartet im Stromsparmodus oder wenn der Mac warm ist',bg:'Du kannst das schließen. Der Download läuft weiter.',
+  ob5T:'Lookout liest deine Dateien',ob5P:'Zuletzt benutzte Dateien zuerst, damit sie in Minuten durchsuchbar sind.',done:'Suche starten',later:'Im Hintergrund fertigstellen',
+  alertT:'„DOKK“ möchte auf Dateien in deinem Ordner zugreifen: ',alertP:'Getrennte App-Daten erleichtern die Verwaltung von Datenschutz und Sicherheit.',dont:'Nicht erlauben',allow:'Erlauben',
+  setT:'Lookout',setOn:'Nach Inhalt suchen',setOnD:'Treffer nach Bedeutung im Tab „Dateien“, neben den Namenstreffern von Spotlight',folders:'Ordner',model:'Modell',modelV:'EmbeddingGemma 2 · 865 MB · von Hugging Face',
+  size:'Index auf dem Volume',rebuild:'Alles neu lesen',del:'Index und Modell löschen',memory:'Speicher beim Suchen',memV:'ca. 250 MB, freigegeben 2 Min. nach dem Schließen des Hubs',
+  added:'Dateien',
+  imgPh:'Tippen, um nach Wörtern zu suchen',dropHere:'Ablegen, um mit diesem Bild zu suchen',dropBad:'Lookout sucht nur mit Bildern',
+  looksLike:'Sieht so aus',aboutIt:'Passend zum Motiv',saysSim:'Sagt Ähnliches',picsOf:'Bilder dazu',noneSec:'Hier sticht nichts heraus.',
+  honestImg:'Dafür sticht nichts heraus. Lookout zeigt nur Treffer, die eindeutig passen.',
+  newPic:'Neues Bild',pasted:'Eingefügtes Bild',fromIdx:'Aus deinem Index',instant:'sofort',readIn:'gelesen in',notSaved:'wird nicht gespeichert',
+  waking:'Lookouts Bildleser startet …',reading:'Liest dein Bild …',backTo:'Zurück zu',
+  simBtn:'Ähnliche finden',simNo:'Lookout liest diese Dateiart nicht',alike:'Sieht ähnlich aus',same:'Gleiches Thema',
+  vclose:'Sehr ähnlich',close:'Ähnlich',loose:'Etwas ähnlich',yours:'Deins',match:'Treffer',
+  imgOffT:'Mit einem Bild suchen',imgOffP:'Richte Lookout ein, um ähnliche Bilder zu finden – und Dokumente zu dem, was es zeigt.',
+  imgDl:'Die Suche mit Bildern startet, sobald das Bildmodell geladen ist.',
+  pauseImg:'Lookout pausiert im Stromsparmodus. Es liest dein Bild trotzdem und durchsucht, was es schon gelesen hat.',
+  suggImg:'Oder zieh ein Bild auf das Suchfeld, um ähnliche zu finden.',clip:'Bild kopiert. Drück ⌘V im Suchfeld.',
+  whyAlike:'Es sieht aus wie dein Bild.',whyAbout:p=>p?`Seite ${p} handelt von dem, was dein Bild zeigt.`:'Es geht um das, was dein Bild zeigt.',
+  whyPicOf:'Dieses Bild zeigt, worum es auf deiner Seite geht.',whySays:p=>p?`Seite ${p} sagt Ähnliches wie deine Seite.`:'Hier steht Ähnliches wie auf deiner Seite.'}
+};
+const t=k=>T[S.lang][k]??T.en[k];
+
+/* ───────── icons & thumbnails ───────── */
+const SPY='<svg class="spy" viewBox="0 0 24 24"><path d="M3.5 14.5 15 6l3 4-11.5 8.5z"/><path d="m15 6 1.6-1.2 3 4L18 10"/><path d="M7.5 16 9 21M9 21h-3M9 21h3"/><circle cx="5" cy="16" r=".6"/></svg>';
+const MAG='<svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.6"/><path d="m10.4 10.4 3.4 3.4"/></svg>';
+const CHECK='<svg viewBox="0 0 12 12"><path d="m2.5 6.2 2.4 2.4 4.6-5"/></svg>';
+function folderIcon(c='#5ab0ff'){return `<svg viewBox="0 0 32 32"><path d="M3 9.5c0-1.4 1.1-2.5 2.5-2.5h6.2l2.6 2.6h12.2c1.4 0 2.5 1.1 2.5 2.5v11.4c0 1.4-1.1 2.5-2.5 2.5h-21C4.1 26 3 24.9 3 23.5z" fill="${c}"/><path d="M3 12.5h26v11c0 1.4-1.1 2.5-2.5 2.5h-21C4.1 26 3 24.9 3 23.5z" fill="${c}" opacity=".85" style="filter:brightness(1.15)"/></svg>`;}
+function docIcon(tag,col){return `<svg viewBox="0 0 32 32"><path d="M8 3.5h11l6 6v18a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 7 27.5v-22A2 2 0 0 1 8 3.5z" fill="#f6f6f8" stroke="rgba(0,0,0,.18)" stroke-width=".6"/><path d="M19 3.5v6h6" fill="#e2e2e8"/><rect x="9.5" y="19" width="13" height="6" rx="1.5" fill="${col}"/><text x="16" y="23.6" font-size="4.6" font-family="-apple-system" font-weight="700" fill="#fff" text-anchor="middle">${tag}</text></svg>`;}
+const TH={
+ beach:()=>`<svg viewBox="0 0 60 60" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sk" x2="0" y2="1"><stop offset="0" stop-color="#7ec8ff"/><stop offset="1" stop-color="#cdeaff"/></linearGradient></defs><rect width="60" height="60" fill="url(#sk)"/><circle cx="46" cy="13" r="6" fill="#fff6c4"/><path d="M0 33 Q15 30 30 33 T60 32 V40 H0z" fill="#3d8fd1"/><path d="M0 38 Q20 35 60 38 V60 H0z" fill="#ecd29a"/><g fill="#6b4423"><ellipse cx="27" cy="44" rx="8" ry="3.6"/><circle cx="35" cy="40.5" r="3"/><path d="M36.5 38.2 39 37l-.6 3z"/><rect x="21" y="45.5" width="1.8" height="5" rx=".8"/><rect x="25" y="46" width="1.8" height="5" rx=".8"/><rect x="29" y="46" width="1.8" height="5" rx=".8"/><rect x="32.5" y="45.5" width="1.8" height="5" rx=".8"/><path d="M19.5 43 Q16 40 17 37" stroke="#6b4423" stroke-width="1.6" fill="none"/></g></svg>`,
+ beach2:()=>`<svg viewBox="0 0 60 60" preserveAspectRatio="xMidYMid slice"><rect width="60" height="60" fill="#f6b97a"/><rect width="60" height="30" fill="#f59e6b"/><circle cx="30" cy="30" r="9" fill="#ffd9a0"/><path d="M0 30 H60 V40 H0z" fill="#6f7fb8"/><path d="M0 40 H60 V60 H0z" fill="#d9b27c"/><g fill="#2b2118"><ellipse cx="18" cy="47" rx="6" ry="2.8"/><circle cx="24" cy="44.5" r="2.4"/><rect x="14" y="48" width="1.4" height="4"/><rect x="20" y="48" width="1.4" height="4"/><circle cx="44" cy="40" r="2.2"/><rect x="43" y="42" width="2.2" height="9" rx="1"/></g></svg>`,
+ dogfood:()=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#fafafa"/><rect x="12" y="8" width="36" height="46" rx="2" fill="#fff" stroke="#ddd"/><g fill="#c7c7cc"><rect x="16" y="14" width="20" height="2.4"/><rect x="16" y="20" width="28" height="1.6"/><rect x="16" y="24" width="24" height="1.6"/><rect x="16" y="28" width="28" height="1.6"/><rect x="16" y="40" width="12" height="2"/></g><rect x="34" y="40" width="10" height="2" fill="#8e8e93"/></svg>`,
+ shot:()=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#e9ecf2"/><rect x="5" y="7" width="50" height="46" rx="4" fill="#fff" stroke="#d1d5de"/><circle cx="10" cy="11.5" r="1.3" fill="#ff5f57"/><circle cx="14" cy="11.5" r="1.3" fill="#febc2e"/><circle cx="18" cy="11.5" r="1.3" fill="#28c840"/><rect x="11" y="19" width="38" height="9" rx="2" fill="#ffe4e4"/><rect x="14" y="22.5" width="22" height="2.2" rx="1" fill="#e5484d"/><g fill="#d6d9e0"><rect x="11" y="33" width="26" height="2"/><rect x="11" y="38" width="32" height="2"/></g><rect x="11" y="44" width="16" height="5" rx="2" fill="#635bff"/></svg>`,
+ code:()=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#1e1f26"/><g fill="#5e5ce6"><rect x="8" y="12" width="14" height="2"/></g><g fill="#8e8e93"><rect x="24" y="12" width="20" height="2"/><rect x="12" y="18" width="30" height="2"/><rect x="12" y="24" width="22" height="2"/></g><rect x="12" y="30" width="34" height="2" fill="#ff6b6b"/><g fill="#8e8e93"><rect x="12" y="36" width="18" height="2"/><rect x="8" y="42" width="8" height="2"/></g></svg>`,
+ pdf:(c='#e5484d')=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#ececf0"/><rect x="13" y="6" width="34" height="48" rx="2" fill="#fff" stroke="#d9d9de"/><g fill="#c7c7cc"><rect x="17" y="12" width="18" height="2.4" fill="#636366"/><rect x="17" y="18" width="26" height="1.5"/><rect x="17" y="22" width="24" height="1.5"/><rect x="17" y="26" width="26" height="1.5"/></g><rect x="16" y="30" width="28" height="5" rx="1" fill="rgba(255,204,0,.55)"/><g fill="#c7c7cc"><rect x="17" y="38" width="22" height="1.5"/><rect x="17" y="42" width="26" height="1.5"/></g><rect x="36" y="47" width="9" height="4" rx="1" fill="${c}"/></svg>`,
+ md:()=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#f4f4f6"/><rect x="10" y="8" width="40" height="44" rx="3" fill="#fff" stroke="#dcdce0"/><rect x="14" y="13" width="16" height="3" fill="#3a3a3c"/><g fill="#c7c7cc"><rect x="14" y="21" width="30" height="1.6"/><rect x="14" y="25" width="26" height="1.6"/></g><rect x="13" y="29" width="32" height="5" rx="1" fill="rgba(255,204,0,.5)"/><g fill="#c7c7cc"><rect x="14" y="38" width="28" height="1.6"/><rect x="14" y="42" width="20" height="1.6"/></g></svg>`,
+ invoice:()=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#ececf0"/><rect x="13" y="6" width="34" height="48" rx="2" fill="#fff" stroke="#d9d9de"/><rect x="17" y="11" width="10" height="4" fill="#0a84ff"/><rect x="31" y="11" width="12" height="4" rx="1" fill="rgba(255,204,0,.6)"/><g fill="#c7c7cc"><rect x="17" y="21" width="26" height="1.5"/><rect x="17" y="25" width="26" height="1.5"/><rect x="17" y="29" width="26" height="1.5"/></g><rect x="29" y="40" width="14" height="3" fill="#3a3a3c"/></svg>`,
+ beach3:()=>`<svg viewBox="0 0 60 60" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sk3" x2="0" y2="1"><stop offset="0" stop-color="#a9d8ff"/><stop offset="1" stop-color="#eaf5ff"/></linearGradient></defs><rect width="60" height="60" fill="url(#sk3)"/><path d="M0 30 Q20 27 40 30 T60 29 V38 H0z" fill="#4a9bd8"/><path d="M0 36 Q25 33 60 37 V60 H0z" fill="#f0dca8"/><path d="M0 37 Q14 35.5 30 37" stroke="#fff" stroke-width="1.2" fill="none" opacity=".8"/><g fill="#8a5a2b"><ellipse cx="22" cy="45" rx="7.5" ry="3.4"/><circle cx="14.5" cy="41.5" r="2.9"/><path d="M13 39.4 10.6 38.4l.8 2.8z"/><rect x="16" y="46.5" width="1.7" height="5" rx=".8"/><rect x="20" y="47" width="1.7" height="5" rx=".8"/><rect x="24" y="47" width="1.7" height="5" rx=".8"/><rect x="27.5" y="46.5" width="1.7" height="5" rx=".8"/><path d="M29.5 44 Q33 41 32 38" stroke="#8a5a2b" stroke-width="1.5" fill="none"/></g><circle cx="40" cy="50" r="3" fill="#ff453a"/></svg>`,
+ shot2:()=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#2a2b33"/><rect x="5" y="7" width="50" height="46" rx="4" fill="#1c1c22" stroke="#3a3b45"/><circle cx="10" cy="11.5" r="1.3" fill="#ff5f57"/><circle cx="14" cy="11.5" r="1.3" fill="#febc2e"/><circle cx="18" cy="11.5" r="1.3" fill="#28c840"/><rect x="11" y="18" width="38" height="10" rx="2" fill="#4a1f24"/><rect x="14" y="21.8" width="24" height="2.2" rx="1" fill="#ff6369"/><g fill="#45464f"><rect x="11" y="33" width="28" height="2"/><rect x="11" y="38" width="22" height="2"/></g><rect x="11" y="44" width="16" height="5" rx="2" fill="#635bff"/></svg>`,
+ receipt:()=>`<svg viewBox="0 0 60 60" preserveAspectRatio="xMidYMid slice"><rect width="60" height="60" fill="#a0724a"/><path d="M0 12 H60 M0 31 H60 M0 49 H60" stroke="#8c6240" stroke-width="1.2"/><g transform="rotate(-9 30 30)"><path d="M19 5 H41 V55 l-2.75-2 -2.75 2 -2.75-2 -2.75 2 -2.75-2 -2.75 2 -2.75-2 -2.75 2z" fill="#fbfaf5"/><rect x="24" y="10" width="12" height="2.4" fill="#3a3a3c"/><g fill="#b9b9be"><rect x="22" y="17" width="16" height="1.4"/><rect x="22" y="21" width="12" height="1.4"/><rect x="22" y="25" width="16" height="1.4"/><rect x="22" y="29" width="10" height="1.4"/><rect x="22" y="33" width="14" height="1.4"/></g><rect x="22" y="40" width="16" height="2.4" fill="#3a3a3c"/></g></svg>`,
+ scan:()=>`<svg viewBox="0 0 60 60"><rect width="60" height="60" fill="#dedee3"/><path d="M18 4 H42 V56 l-3-2 -3 2 -3-2 -3 2 -3-2 -3 2 -3-2 -3 2z" fill="#fff" stroke="#cfcfd4" stroke-width=".5"/><rect x="24" y="9" width="12" height="2.4" fill="#3a3a3c"/><g fill="#c7c7cc"><rect x="21" y="16" width="18" height="1.4"/><rect x="21" y="20" width="13" height="1.4"/><rect x="21" y="24" width="18" height="1.4"/><rect x="21" y="28" width="11" height="1.4"/><rect x="21" y="32" width="15" height="1.4"/></g><rect x="21" y="40" width="18" height="2.4" fill="#3a3a3c"/></svg>`,
+ park:()=>`<svg viewBox="0 0 60 60" preserveAspectRatio="xMidYMid slice"><rect width="60" height="60" fill="#bfe3ff"/><circle cx="12" cy="12" r="5" fill="#fff3b0"/><path d="M0 34 Q30 26 60 34 V60 H0z" fill="#69b85a"/><circle cx="48" cy="24" r="8" fill="#3f8f3a"/><rect x="47" y="28" width="2" height="9" fill="#6b4423"/><g fill="#ff9f0a"><circle cx="20" cy="18" r="3"/><path d="M20 21 v6" stroke="#ff9f0a" stroke-width=".6"/></g><g fill="#2b2b30"><circle cx="30" cy="34" r="2.4"/><rect x="28.6" y="36.5" width="2.8" height="8" rx="1.2"/></g><g fill="#c98a4a"><ellipse cx="40" cy="45" rx="5" ry="2.4"/><circle cx="45" cy="43" r="2"/></g></svg>`,
+ zip:()=>docIcon('ZIP','#8e8e93'),
+};
+const thumb=k=>`<div class="thumb">${TH[k]()}</div>`;
+
+/* ───────── sample data ───────── */
+// Spotlight name matches: a substring of the name (LIKE[cd] *q*), prefix first, then most recently used.
+const NAMES=[
+ {name:'Dog walking schedule.numbers',loc:'Documents',kind:'doc',tag:'NUM',col:'#30b04a',date:'2 Oct 2026',size:'84 KB'},
+ {name:'Beach volleyball signup.pdf',loc:'Downloads',kind:'pdf',tag:'PDF',col:'#e5484d',date:'14 Aug 2026',size:'120 KB'},
+ {name:'Payment terms.docx',loc:'Documents › Work',kind:'doc',tag:'DOC',col:'#2b6cd6',date:'21 Sep 2026',size:'48 KB'},
+ {name:'Lease renewal notes.md',loc:'Documents › Home',kind:'doc',tag:'MD',col:'#636366',date:'3 Oct 2026',size:'6 KB'},
+ {name:'Taxes',loc:'Documents',kind:'folder',date:'30 Sep 2026',size:'—'},
+ {name:'tax-id-letter.pdf',loc:'Downloads',kind:'pdf',tag:'PDF',col:'#e5484d',date:'12 Mar 2026',size:'210 KB'},
+ {name:'Taxes 2024 archive.zip',loc:'Documents › Taxes',kind:'doc',tag:'ZIP',col:'#8e8e93',date:'2 Apr 2025',size:'14 MB'},
+ {name:'Holiday Sylt 2026',loc:'Desktop',kind:'folder',date:'18 Aug 2026',size:'—'},
+ {name:'Screenshots',loc:'Desktop',kind:'folder',date:'10 Oct 2026',size:'—'},
+];
+// Lookout matches: z = how far the best segment stands out for this query; cov = share of query words found.
+const Q=[
+ {test:/dog|beach|hund|strand/i, hint:'image', items:[
+  {name:'IMG_4821.HEIC',loc:'Desktop › Holiday Sylt 2026',kind:'picture',th:'beach',z:4.8,cov:0,hint:1,date:'16 Aug 2026',size:'3.1 MB',why:'The photo itself matched: a dog standing on sand by the sea.'},
+  {name:'IMG_4790.HEIC',loc:'Desktop › Holiday Sylt 2026',kind:'picture',th:'beach2',z:3.9,cov:0,hint:1,date:'15 Aug 2026',size:'2.8 MB',why:'The photo matched: a dog and a person on a beach at sunset.'},
+  {folder:true,name:'Holiday Sylt 2026',loc:'Desktop',kids:[['IMG_4821.HEIC','beach'],['IMG_4790.HEIC','beach2'],['IMG_4802.HEIC','beach'],['IMG_4811.HEIC','beach2']],date:'18 Aug 2026'},
+  {name:'IMG_4802.HEIC',loc:'Desktop › Holiday Sylt 2026',kind:'picture',th:'beach',z:3.1,cov:0,hint:1,date:'15 Aug 2026',size:'2.9 MB',why:'The photo matched: a dog running at the waterline.'},
+  {name:'IMG_4811.HEIC',loc:'Desktop › Holiday Sylt 2026',kind:'picture',th:'beach2',z:2.6,cov:0,hint:1,date:'16 Aug 2026',size:'3.0 MB',why:'The photo matched: dunes with a dog in the distance.'},
+  {name:'Fressnapf receipt.pdf',loc:'Downloads',kind:'pdf',th:'dogfood',z:2.2,cov:.5,page:1,ex:'1× Trockenfutter für <mark>Hunde</mark>, 12 kg … 2× Kauknochen',date:'2 Sep 2026',size:'64 KB',why:'Page 1 is about dog food; “dog” matched the German “Hunde”.'},
+ ]},
+ {test:/payment|declin|zahlung|abgelehnt/i, hint:'shot', items:[
+  {name:'Screenshot 2026-10-02 at 14.12.33.png',loc:'Desktop › Screenshots',kind:'shot',th:'shot',z:4.1,cov:1,hint:0,ex:'Your card was declined. <mark>Payment declined</mark> (card_declined). Try another card.',date:'2 Oct 2026',size:'412 KB',ocr:true,why:'The picture shows a checkout error, and its text reads “Payment declined”.'},
+  {name:'Stripe dispute notes.md',loc:'Documents › Work',kind:'doc',th:'md',z:3.0,cov:.5,ex:'Customer saw “card <mark>declined</mark>” twice before the charge went through …',date:'4 Oct 2026',size:'5 KB',why:'A passage describes a declined card at checkout.'},
+  {name:'retry_payment.swift',loc:'Desktop › Screenshots',kind:'shot',th:'code',z:2.3,cov:0,ex:null,date:'28 Sep 2026',size:'188 KB',why:'A screenshot of code that retries a failed charge.'},
+ ]},
+ {test:/pet|lease|haustier|miet/i, hint:'pdf', items:[
+  {name:'Mietvertrag_Wohnung_Kreuzberg.pdf',loc:'Documents › Home',kind:'pdf',th:'pdf',z:4.4,cov:0,page:7,ex:'§ 12 <mark>Tierhaltung</mark>: Die Haltung von Hunden und Katzen bedarf der vorherigen schriftlichen Zustimmung des Vermieters …',date:'1 Mar 2024',size:'1.8 MB',why:'Page 7 is the pet clause. Your English query matched the German text by meaning.',de:true},
+  {name:'Lease renewal notes.md',loc:'Documents › Home',kind:'doc',th:'md',z:2.9,cov:.5,ex:'Ask landlord whether the cat counts under the <mark>pet</mark> clause before signing.',date:'3 Oct 2026',size:'6 KB',why:'A note about the pet clause in your lease.'},
+  {name:'Hausordnung.pdf',loc:'Documents › Home',kind:'pdf',th:'pdf',z:2.1,cov:0,page:2,ex:'Tiere sind im Treppenhaus an der Leine zu führen.',date:'1 Mar 2024',size:'340 KB',why:'Page 2 mentions animals in the stairwell.'},
+ ]},
+ {test:/tax|steuer/i, hint:null, items:[
+  {folder:true,name:'Steuern 2025',loc:'Documents',kids:[['Lohnsteuerbescheinigung_2025.pdf','pdf'],['Spendenquittung_UNICEF.pdf','pdf'],['Handwerkerrechnung_Bad.pdf','invoice'],['Kita-Beitrag 2025.pdf','pdf'],['Riester Bescheinigung.pdf','pdf'],['Arbeitszimmer.jpg','shot']],date:'30 Sep 2026'},
+  {name:'Lohnsteuerbescheinigung_2025.pdf',loc:'Documents › Steuern 2025',kind:'pdf',th:'pdf',z:4.0,cov:.5,page:1,ex:'Ausdruck der elektronischen <mark>Lohnsteuer</mark>bescheinigung für 2025',date:'28 Feb 2026',size:'92 KB',why:'Page 1 is a 2025 wage tax statement.'},
+  {name:'Spendenquittung_UNICEF.pdf',loc:'Documents › Steuern 2025',kind:'pdf',th:'pdf',z:3.3,cov:.5,page:1,ex:'Bestätigung über Geldzuwendungen … im Jahr <mark>2025</mark>',date:'15 Jan 2026',size:'58 KB',why:'A donation receipt you can deduct for 2025.'},
+  {name:'Handwerkerrechnung_Bad.pdf',loc:'Documents › Steuern 2025',kind:'pdf',th:'invoice',z:2.8,cov:.5,page:1,ex:'Rechnung … Lohnanteil gem. § 35a EStG: 1.240,00 € (<mark>2025</mark>)',date:'9 Nov 2025',size:'130 KB',why:'An invoice that lists the tax-deductible labor share.'},
+  {name:'tax-id-letter.pdf',loc:'Downloads',kind:'pdf',th:'pdf',z:2.4,cov:.5,page:1,ex:'Your <mark>tax</mark> identification number …',date:'12 Mar 2026',size:'210 KB',why:'A letter with your tax ID.'},
+ ]},
+ {test:/k7q2lm/i, hint:null, lookup:true, items:[
+  {name:'Invoice_October.pdf',loc:'Downloads',kind:'pdf',th:'invoice',z:1.2,cov:1,page:1,ex:'Invoice no. <mark>K7Q2LM</mark> · due 31 Oct 2026 · 1,450.00 €',date:'6 Oct 2026',size:'88 KB',why:'The exact code appears on page 1. Codes mean nothing to an embedding, so exact words count double here.'},
+  {name:'Screenshot 2026-10-07 at 09.02.11.png',loc:'Desktop › Screenshots',kind:'shot',th:'shot',z:.4,cov:1,ex:'Order <mark>K7Q2LM</mark> confirmed',date:'7 Oct 2026',size:'300 KB',ocr:true,why:'The screenshot’s text contains the code.'},
+ ]},
+];
+
+/* ───────── searching with a picture: sample data ───────── */
+// Pictures on the desktop to drag in. Only IMG_5012 is new to Lookout: it just arrived by AirDrop, so it isn't in the index.
+const DESK=[
+ {key:'d1',name:'IMG_5012.HEIC',th:'beach3',kind:'picture',set:'beach',size:'3.4 MB'},
+ {key:'d2',name:'Screenshot 2026-10-11 at 18.40.02.png',th:'shot2',kind:'shot',set:'shot',size:'380 KB'},
+ {key:'d3',name:'receipt-photo.jpg',th:'receipt',kind:'picture',set:'receipt',size:'2.2 MB'},
+ {key:'d4',name:'Taxes 2024 archive.zip',zip:true},
+];
+// z is how far a file stands out for this query vector within its own modality; cos is the raw cosine.
+// A search with a picture has no words, so its score is z alone.
+const P=(name,loc,kind,th,z,cos,extra={})=>({name,loc,kind,th,z,cos,date:'Aug 2026',size:'2.9 MB',...extra});
+const SYLT=[['IMG_4821.HEIC','beach'],['IMG_4790.HEIC','beach2'],['IMG_4802.HEIC','beach'],['IMG_4811.HEIC','beach2']];
+const IMGQ={
+ beach:{pics:[
+   P('IMG_4821.HEIC','Desktop › Holiday Sylt 2026','picture','beach',5.1,.84,{date:'16 Aug 2026',size:'3.1 MB'}),
+   P('IMG_4790.HEIC','Desktop › Holiday Sylt 2026','picture','beach2',4.2,.79,{date:'15 Aug 2026',size:'2.8 MB'}),
+   {folder:true,name:'Holiday Sylt 2026',loc:'Desktop',kids:SYLT,date:'18 Aug 2026'},
+   P('IMG_4802.HEIC','Desktop › Holiday Sylt 2026','picture','beach',3.6,.76,{date:'15 Aug 2026'}),
+   P('IMG_4811.HEIC','Desktop › Holiday Sylt 2026','picture','beach2',2.9,.72,{date:'16 Aug 2026',size:'3.0 MB'}),
+   P('Fynn’s birthday.jpg','Documents › Family','picture','park',2.2,.66,{date:'3 Jun 2026',size:'2.4 MB'}),
+  ],docs:[
+   P('Ferienwohnung Dünenblick.pdf','Documents › Home','pdf','pdf',3.0,.31,{page:1,ex:'Ferienwohnung „Dünenblick“, Westerland · 200 m zum Strand · Hunde willkommen',date:'2 May 2026',size:'420 KB'}),
+   P('Dog walking schedule.numbers','Documents','doc','md',2.3,.27,{ex:'Mon–Fri 7:30, beach loop with Bruno · Sat: long walk at the dunes',date:'2 Oct 2026',size:'84 KB'}),
+  ]},
+ shot:{pics:[
+   P('Screenshot 2026-10-02 at 14.12.33.png','Desktop › Screenshots','shot','shot',4.6,.88,{date:'2 Oct 2026',size:'412 KB'}),
+   P('Screenshot 2026-10-07 at 09.02.11.png','Desktop › Screenshots','shot','shot',2.8,.71,{date:'7 Oct 2026',size:'300 KB'}),
+   P('retry_payment.swift','Desktop › Screenshots','shot','code',2.2,.62,{date:'28 Sep 2026',size:'188 KB'}),
+  ],docs:[
+   P('Stripe dispute notes.md','Documents › Work','doc','md',3.2,.34,{ex:'Customer saw “card declined” twice before the charge went through …',date:'4 Oct 2026',size:'5 KB'}),
+   P('Payment terms.docx','Documents › Work','doc','md',2.1,.26,{ex:'Invoices are payable within 14 days. Failed card payments are retried once.',date:'21 Sep 2026',size:'48 KB'}),
+  ]},
+ receipt:{pics:[
+   P('Scan 2026-09-12.jpg','Downloads','picture','scan',4.0,.81,{date:'12 Sep 2026',size:'1.1 MB'}),
+   P('IMG_4655.HEIC','Desktop','picture','receipt',2.7,.70,{date:'30 Jul 2026',size:'2.6 MB'}),
+  ],docs:[
+   P('Fressnapf receipt.pdf','Downloads','pdf','dogfood',3.8,.39,{page:1,ex:'1× Trockenfutter für Hunde, 12 kg … 2× Kauknochen · Summe 54,97 €',date:'2 Sep 2026',size:'64 KB'}),
+   P('Handwerkerrechnung_Bad.pdf','Documents › Steuern 2025','pdf','invoice',3.0,.33,{page:1,ex:'Rechnung … Lohnanteil gem. § 35a EStG: 1.240,00 €',date:'9 Nov 2025',size:'130 KB'}),
+   P('Invoice_October.pdf','Downloads','pdf','invoice',2.6,.30,{page:1,ex:'Invoice no. K7Q2LM · due 31 Oct 2026 · 1,450.00 €',date:'6 Oct 2026',size:'88 KB'}),
+  ]},
+ lease:{docs:[
+   P('Mietvertrag_Wohnung_Kreuzberg.pdf','Documents › Home','pdf','pdf',4.6,.71,{page:7,de:true,ex:'§ 12 Tierhaltung: Die Haltung von Hunden und Katzen bedarf der vorherigen schriftlichen Zustimmung …',date:'1 Mar 2024',size:'1.8 MB'}),
+   P('Hausordnung.pdf','Documents › Home','pdf','pdf',3.4,.63,{page:2,ex:'Tiere sind im Treppenhaus an der Leine zu führen.',date:'1 Mar 2024',size:'340 KB'}),
+   P('Lease renewal notes.md','Documents › Home','doc','md',3.1,.60,{ex:'Ask landlord whether the cat counts under the pet clause before signing.',date:'3 Oct 2026',size:'6 KB'}),
+   P('Haftpflicht Hund Police.pdf','Documents › Insurance','pdf','pdf',2.2,.52,{page:3,ex:'Tierhalterhaftpflicht für einen Hund … Mietsachschäden mitversichert.',date:'14 Jan 2026',size:'510 KB'}),
+  ],pics:[]},
+ receiptDoc:{docs:[
+   P('Fressnapf receipt.pdf','Downloads','pdf','dogfood',3.7,.66,{page:1,ex:'1× Trockenfutter für Hunde, 12 kg … Summe 54,97 €',date:'2 Sep 2026',size:'64 KB'}),
+   P('Invoice_October.pdf','Downloads','pdf','invoice',3.4,.63,{page:1,ex:'Invoice no. K7Q2LM · due 31 Oct 2026 · 1,450.00 €',date:'6 Oct 2026',size:'88 KB'}),
+   P('Handwerkerrechnung_Bad.pdf','Documents › Steuern 2025','pdf','invoice',3.1,.60,{page:1,ex:'Rechnung … Lohnanteil gem. § 35a EStG: 1.240,00 €',date:'9 Nov 2025',size:'130 KB'}),
+   P('Spendenquittung_UNICEF.pdf','Documents › Steuern 2025','pdf','pdf',2.4,.54,{page:1,ex:'Bestätigung über Geldzuwendungen … im Jahr 2025',date:'15 Jan 2026',size:'58 KB'}),
+  ],pics:[
+   P('Scan 2026-09-12.jpg','Downloads','picture','scan',3.3,.36,{date:'12 Sep 2026',size:'1.1 MB'}),
+   P('IMG_4655.HEIC','Desktop','picture','receipt',2.6,.31,{date:'30 Jul 2026',size:'2.6 MB'}),
+  ]},
+ tax:{docs:[
+   P('Lohnsteuerbescheinigung_2025.pdf','Documents › Steuern 2025','pdf','pdf',4.1,.70,{page:1,ex:'Ausdruck der elektronischen Lohnsteuerbescheinigung für 2025',date:'28 Feb 2026',size:'92 KB'}),
+   P('tax-id-letter.pdf','Downloads','pdf','pdf',3.2,.61,{page:1,ex:'Your tax identification number …',date:'12 Mar 2026',size:'210 KB'}),
+   P('Spendenquittung_UNICEF.pdf','Documents › Steuern 2025','pdf','pdf',2.9,.58,{page:1,ex:'Bestätigung über Geldzuwendungen … im Jahr 2025',date:'15 Jan 2026',size:'58 KB'}),
+   P('Handwerkerrechnung_Bad.pdf','Documents › Steuern 2025','pdf','invoice',2.5,.55,{page:1,ex:'Lohnanteil gem. § 35a EStG: 1.240,00 €',date:'9 Nov 2025',size:'130 KB'}),
+  ],pics:[]},
+ beachDoc:{docs:[
+   P('Dog walking schedule.numbers','Documents','doc','md',3.0,.57,{ex:'Mon–Fri 7:30, beach loop with Bruno',date:'2 Oct 2026',size:'84 KB'}),
+   P('Ferienwohnung Dünenblick.pdf','Documents › Home','pdf','pdf',2.8,.55,{page:1,ex:'200 m zum Strand · Hunde willkommen',date:'2 May 2026',size:'420 KB'}),
+  ],pics:[
+   P('IMG_4821.HEIC','Desktop › Holiday Sylt 2026','picture','beach',3.4,.33,{date:'16 Aug 2026',size:'3.1 MB'}),
+   P('IMG_4790.HEIC','Desktop › Holiday Sylt 2026','picture','beach2',3.0,.31,{date:'15 Aug 2026',size:'2.8 MB'}),
+   P('IMG_4802.HEIC','Desktop › Holiday Sylt 2026','picture','beach',2.6,.29,{date:'15 Aug 2026'}),
+  ]},
+ shotDoc:{docs:[
+   P('Stripe dispute notes.md','Documents › Work','doc','md',3.6,.62,{ex:'Customer saw “card declined” twice before the charge went through …',date:'4 Oct 2026',size:'5 KB'}),
+   P('Payment terms.docx','Documents › Work','doc','md',3.1,.58,{ex:'Failed card payments are retried once.',date:'21 Sep 2026',size:'48 KB'}),
+  ],pics:[
+   P('Screenshot 2026-10-02 at 14.12.33.png','Desktop › Screenshots','shot','shot',3.6,.35,{date:'2 Oct 2026',size:'412 KB'}),
+   P('Screenshot 2026-10-07 at 09.02.11.png','Desktop › Screenshots','shot','shot',2.4,.29,{date:'7 Oct 2026',size:'300 KB'}),
+  ]},
+ none:{pics:[],docs:[]},
+};
+// Which sample set Find Similar uses for a file already in the index.
+const SIM={'IMG_4821.HEIC':'beach','IMG_4790.HEIC':'beach','IMG_4802.HEIC':'beach','IMG_4811.HEIC':'beach','Fynn’s birthday.jpg':'beach',
+ 'Screenshot 2026-10-02 at 14.12.33.png':'shot','Screenshot 2026-10-07 at 09.02.11.png':'shot','retry_payment.swift':'shot',
+ 'Scan 2026-09-12.jpg':'receipt','IMG_4655.HEIC':'receipt',
+ 'Mietvertrag_Wohnung_Kreuzberg.pdf':'lease','Lease renewal notes.md':'lease','Hausordnung.pdf':'lease','Haftpflicht Hund Police.pdf':'lease',
+ 'Fressnapf receipt.pdf':'receiptDoc','Invoice_October.pdf':'receiptDoc','Handwerkerrechnung_Bad.pdf':'receiptDoc',
+ 'Lohnsteuerbescheinigung_2025.pdf':'tax','Spendenquittung_UNICEF.pdf':'tax','tax-id-letter.pdf':'tax',
+ 'Stripe dispute notes.md':'shotDoc','Payment terms.docx':'shotDoc','Ferienwohnung Dünenblick.pdf':'beachDoc','Dog walking schedule.numbers':'beachDoc'};
+
+/* ───────── state ───────── */
+const S={view:'search',layout:'sections',look:'ready',theme:'dark',lang:'en',rm:false,rt:false,scores:false,ratio:.5,
+ q:'',phase:'idle',warm:false,sel:0,weakOpen:false,timers:[],
+ img:null,prevQ:'',imgWarm:false,readMs:'',clip:false,wk:[false,false],drag:null,dragDepth:0,
+ ob:{step:0,dir:1,folders:[{n:'Desktop',f:412,m:2,mb:14,on:true},{n:'Documents',f:2860,m:14,mb:96,on:true},{n:'Downloads',f:1930,m:11,mb:70,on:true},{n:'Pictures',f:8240,m:38,mb:180,on:false}],
+  access:{},dl:[0,0],verify:0,battery:true,pass:0,timer:null},
+ setFolders:[{n:'Desktop',f:412},{n:'Documents',f:2860},{n:'Downloads',f:1930}]};
+
+/* ───────── ranking (DigUp Searcher) ───────── */
+function score(it,lookup){
+ const [mw,ww]=lookup?[.5,4]:[1,2];
+ return mw*Math.max(it.z,0)+ww*Math.pow(it.cov||0,1.5)+(it.hint||0);
+}
+function lookResults(q){
+ const set=Q.find(s=>s.test.test(q)); if(!set) return {strong:[],weak:[],lookup:false};
+ const files=set.items.filter(i=>!i.folder).map(i=>({...i,s:score(i,set.lookup)}));
+ // A file qualifies by standing out in meaning (z ≥ 2) or by containing at least half the query's words.
+ const ok=files.filter(i=>i.z>=2||(i.cov||0)>=.5);
+ const folders=set.items.filter(i=>i.folder).map(f=>{
+  const inside=ok.filter(i=>i.loc.endsWith(f.name));
+  // The average of its three best files, plus 0.25 for each further match (up to +1).
+  const top3=inside.map(i=>i.s).sort((a,b)=>b-a).slice(0,3);
+  const base=top3.length?top3.reduce((a,b)=>a+b,0)/top3.length:3.5;
+  const n=Math.max(inside.length,f.kids.length);
+  return {...f,n,s:base+Math.min(.25*Math.max(n-3,0),1)};
+ }).filter(f=>f.n>=3);
+ const all=[...ok,...folders].sort((a,b)=>b.s-a.s);
+ const top=all[0]?.s||0;
+ return {strong:all.filter(i=>i.s>=top*S.ratio),weak:all.filter(i=>i.s<top*S.ratio),lookup:!!set.lookup};
+}
+function nameResults(q){
+ const l=q.toLowerCase();
+ const hit=NAMES.filter(n=>n.name.toLowerCase().includes(l));
+ return hit.sort((a,b)=>(b.name.toLowerCase().startsWith(l))-(a.name.toLowerCase().startsWith(l)));
+}
+
+/* ───────── search flow ───────── */
+function setQuery(q){
+ S.q=q; S.sel=0; S.weakOpen=false;
+ S.timers.forEach(clearTimeout); S.timers=[];
+ if(!q.trim()){ S.phase='idle'; render(); return; }
+ S.phase='typing'; renderBody();
+ // Spotlight runs after the Files tab's 150 ms debounce.
+ S.timers.push(setTimeout(()=>{
+  S.phase='names'; renderBody();
+  if(S.look!=='ready'&&S.look!=='indexing'&&S.look!=='paused') return;
+  const enc=S.warm?40:350;   // the text-only encoder's cold start, then a warm query
+  if(!S.warm){ S.phase='warming'; renderBody(); }
+  S.timers.push(setTimeout(()=>{ S.warm=true; S.phase='done'; renderBody(); },enc));
+ },150));
+}
+
+/* ───────── searching with a picture ───────── */
+const SIMI='<svg viewBox="0 0 16 16"><rect x="1.8" y="2.8" width="8.6" height="8.6" rx="1.8"/><path d="m1.8 9 2.6-2.4 2.2 2 1.4-1.2 2.4 2.2"/><circle cx="10.8" cy="10.8" r="2.7"/><path d="m12.8 12.8 1.7 1.7"/></svg>';
+const isPic=d=>d.kind==='picture'||d.kind==='shot';
+const looksReady=()=>S.look==='ready'||S.look==='indexing'||S.look==='paused';
+
+// Starts a search with a picture: dropped, pasted, or a file already in the index (Find Similar).
+function setImage(img){
+ if(!S.img) S.prevQ=S.q.trim();
+ S.img=img; S.q=''; S.sel=0; S.wk=[false,false]; hideCtx();
+ S.timers.forEach(clearTimeout); S.timers=[];
+ if(!looksReady()||img.src==='similar'){ S.phase='done'; renderHub(); focusField(); return; }
+ // A new picture must be encoded. The picture reader loads on demand and unloads 2 min after the last search.
+ const cold=!S.imgWarm;
+ S.phase=cold?'imgWaking':'imgReading'; S.readMs=cold?'1.2 s':'0.35 s';
+ renderHub(); focusField();
+ if(cold) S.timers.push(setTimeout(()=>{ S.phase='imgReading'; renderBody(); },800));
+ S.timers.push(setTimeout(()=>{ S.imgWarm=true; S.phase='done'; renderBody(); },cold?1200:350));
+}
+// Removes the picture. With restore, the words you searched before come back.
+function clearImage(restore){
+ const p=S.prevQ; S.img=null; S.prevQ='';
+ setQuery(restore?p:''); renderHub(); focusField();
+}
+function focusField(){ const i=$('#q'); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } }
+
+// Find Similar is hidden for folders, unavailable for files Lookout doesn't read, and otherwise reuses the stored vector.
+function simState(d){
+ if(!d||!looksReady()||d.folder||d.kind==='folder') return 'hide';
+ if(/\.zip$/i.test(d.name)) return 'no';
+ return 'ok';
+}
+function findSimilar(e){
+ if(!e||simState(e.d)!=='ok') return;
+ const d=e.d;
+ setImage({src:'similar',name:d.name,th:d.th,tag:d.tag,col:d.col,kind:d.kind,page:d.page,set:SIM[d.name]||'none',isDoc:!isPic(d)});
+}
+function simHTML(d){
+ const s=simState(d);
+ if(s==='hide') return '';
+ if(s==='no') return `<button class="simbtn" disabled>${t('simNo')}</button>`;
+ return `<button class="simbtn" data-act="sim">${SIMI}${t('simBtn')} <kbd>⌘⇧L</kbd></button>`;
+}
+
+// Same ranking as a text search, minus words: pictures and documents rank on separate scales, each with its own strong ratio.
+function rankSection(list,self){
+ const files=list.filter(i=>!i.folder&&i.name!==self&&i.z>=2).map(i=>({...i,s:i.z}));
+ const folders=list.filter(i=>i.folder).map(f=>{
+  const inside=files.filter(i=>i.loc.endsWith(f.name));
+  const top3=inside.map(i=>i.s).sort((a,b)=>b-a).slice(0,3);
+  const base=top3.length?top3.reduce((a,b)=>a+b,0)/top3.length:0;
+  return {...f,kids:f.kids.filter(k=>k[0]!==self),n:inside.length,s:base+Math.min(.25*Math.max(inside.length-3,0),1)};
+ }).filter(f=>f.n>=3);
+ const all=[...files,...folders].sort((a,b)=>b.s-a.s), top=all[0]?.s||0;
+ return {strong:all.filter(i=>i.s>=top*S.ratio),weak:all.filter(i=>i.s<top*S.ratio)};
+}
+function imgSections(){
+ const set=IMGQ[S.img.set]||IMGQ.none, self=S.img.name;
+ const pics={key:'pics',title:S.img.isDoc?t('picsOf'):t('looksLike'),...rankSection(set.pics,self)};
+ const docs={key:'docs',title:S.img.isDoc?t('saysSim'):t('aboutIt'),...rankSection(set.docs,self)};
+ return S.img.isDoc?[docs,pics]:[pics,docs];
+}
+
+function qVis(size){
+ const q=S.img;
+ if(q.th) return thumb(q.th).replace('class="thumb"',`class="thumb" style="width:${size}px;height:${size}px;border-radius:${Math.round(size/5)}px"`);
+ return `<span style="width:${size}px;height:${size}px;display:grid;place-items:center">${docIcon(q.tag||'DOC',q.col||'#636366').replace('<svg',`<svg style="width:${size}px;height:${size}px"`)}</span>`;
+}
+function tokHTML(){ return S.img?`<span class="tok" title="${esc(S.img.name)}">${qVis(18)}<span>${esc(S.img.name)}</span><i data-act="tokX" aria-label="Remove">✕</i></span>`:''; }
+function qbarHTML(){
+ const q=S.img, busy=S.phase==='imgWaking'||S.phase==='imgReading';
+ let sub;
+ if(busy) sub=`<span class="spin"></span>${S.phase==='imgWaking'?t('waking'):t('reading')}`;
+ else if(q.src==='similar') sub=`${t('fromIdx')}${q.page?` · ${t('page')} ${q.page}`:''} · ${t('instant')}`;
+ else sub=`${q.src==='paste'?'':t('newPic')+' · '}${looksReady()?`${t('readIn')} ${S.lang==='de'?S.readMs.replace('.',','):S.readMs} · `:''}${t('notSaved')}`;
+ const back=S.prevQ?`<span class="back" data-act="imgBack">${t('backTo')} “${esc(S.prevQ)}”</span>`:'';
+ return `<div class="qbar enter">${qVis(46)}<div class="g"><div class="n2">${esc(q.name)}</div><div class="s2">${sub}</div></div>${back}</div>`;
+}
+function imgRow(it,idx,sec,delay){
+ const vis=it.folder?`<div class="stack">${it.kids.slice(0,3).map(k=>thumb(k[1])).join('')}</div>`:thumb(it.th);
+ const why=it.folder||(sec.key==='pics'&&!S.img.isDoc)?t('alike'):t('same');
+ const sc=S.scores?`<div class="sc">${it.folder?`avg of 3 best + ${Math.min(.25*Math.max(it.n-3,0),1).toFixed(2)}`:`cos <b>${it.cos.toFixed(2)}</b> · z <b>${it.z.toFixed(2)}</b> · no words`} → score <b>${it.s.toFixed(2)}</b></div>`:'';
+ return `<div class="row big ${S.sel===idx?'sel':''} enter" draggable="true" style="animation-delay:${S.rm?0:delay}ms" data-i="${idx}"><div class="ic">${vis}</div>
+  <div class="meta"><div class="nm">${esc(it.name)}</div><div class="lc">${esc(it.loc)}</div>
+  ${it.ex?`<div class="ex">${esc(it.ex)}</div>`:''}<div class="chips">${kindChip(it)}<span class="chip m">${why}</span></div>${sc}</div><div class="dt2">${it.date}</div></div>`;
+}
+function renderImgBody(){
+ const body=$('#body'); if(!body) return;
+ FLAT=[]; let h=qbarHTML();
+ if(S.look==='off') h+=`<div class="promo enter"><div class="spybig">${SPY}</div><div class="grow"><h4>${t('imgOffT')}</h4><p>${t('imgOffP')}</p></div><button class="cta" data-act="setup">${t('setup')}</button></div>`;
+ else if(S.look==='downloading') h+=`<div class="promo enter"><div class="spybig">${SPY}</div><div class="grow"><h4>${t('dlT')} · 42 %</h4><p>${t('imgDl')}</p><div class="bar"><i style="width:42%"></i></div></div></div>`;
+ else if(S.phase==='imgWaking'||S.phase==='imgReading') h+=skeleton();
+ else {
+  if(S.look==='indexing') h+=`<div class="empty">${t('idxNote')}</div>`;
+  if(S.look==='paused') h+=`<div class="empty">${t('pauseImg')}</div>`;
+  const secs=imgSections();
+  if(!secs.some(s=>s.strong.length)) h+=`<div class="honest enter">${t('honestImg')}</div>`;
+  else secs.forEach((sec,si)=>{
+   const n=sec.strong.length+sec.weak.length;
+   h+=`<div class="sh look">${SPY}${sec.title} <span class="n">· ${n}</span><span class="rule"></span></div>`;
+   if(!n){ h+=`<div class="empty">${t('noneSec')}</div>`; return; }
+   sec.strong.forEach((it,k)=>{ h+=imgRow(it,FLAT.length,sec,k*45); FLAT.push({type:'img',d:it,sec:sec.key}); });
+   if(sec.weak.length){
+    h+=`<div class="weak ${S.wk[si]?'open':''}" data-act="wk" data-v="${si}"><svg viewBox="0 0 10 10"><path d="m3 1.5 3.5 3.5L3 8.5"/></svg>${t('weak')} (${sec.weak.length})</div>`;
+    if(S.wk[si]) sec.weak.forEach((it,k)=>{ h+=imgRow(it,FLAT.length,sec,k*45); FLAT.push({type:'img',d:it,sec:sec.key}); });
+   }
+  });
+ }
+ if(S.sel>=FLAT.length) S.sel=Math.max(0,FLAT.length-1);
+ body.innerHTML=`<div class="res" id="res">${h}</div><div class="pv im">${previewImgHTML()}</div>`;
+}
+const miniPage=()=>`<div class="pgm"><i style="width:60%;height:3px;background:#636366"></i><i></i><i style="width:80%"></i><i class="h"></i><i></i><i style="width:70%"></i><i></i></div>`;
+function bigVis(it){
+ if(it.kind==='pdf'||it.kind==='doc'){
+  const body=it.de
+   ?`<h5>Mietvertrag · § 11–13</h5><p>§ 11 Schönheitsreparaturen. Der Mieter übernimmt die Schönheitsreparaturen in angemessenen Abständen …</p><p><span class="hl">§ 12 Tierhaltung. Die Haltung von Hunden und Katzen bedarf der vorherigen schriftlichen Zustimmung des Vermieters. Kleintiere in Käfigen sind ohne Zustimmung erlaubt.</span></p><p>§ 13 Untervermietung. Eine Untervermietung ist nur mit Erlaubnis des Vermieters zulässig …</p>`
+   :`<h5>${esc(it.name.replace(/\.(pdf|md|docx|numbers)$/,''))}</h5><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p><p><span class="hl">${esc(it.ex||'')}</span></p><p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.</p>`;
+  return `<div class="page">${body}${it.page?`<span class="pg">${t('page')} ${it.page}</span>`:''}</div>`;
+ }
+ return `<div class="big">${TH[it.th]()}</div>`;
+}
+function previewImgHTML(){
+ const e=FLAT[S.sel], q=S.img;
+ if(!e) return q.th?`<div class="big">${TH[q.th]()}</div><div class="tt">${esc(q.name)}</div>`:`<div class="none"></div>`;
+ const it=e.d, acts=`<div class="acts"><span>${t('open')}</span><span>${t('ql')}</span><span>${t('reveal')}</span></div>`;
+ if(it.folder) return `<div style="width:90px;height:90px">${folderIcon().replace('<svg','<svg style="width:90px;height:90px"')}</div><div class="tt">${esc(it.name)}</div><div class="sub">${esc(it.loc)} · ${it.n} ${t('matching')}</div><div class="kids">${it.kids.map(k=>`<div>${thumb(k[1])}<span>${esc(k[0])}</span></div>`).join('')}</div>${acts}`;
+ const pic=isPic(it);
+ const qv=q.th&&!q.isDoc?thumb(q.th):miniPage(), mv=pic?thumb(it.th):miniPage();
+ const why=pic?(q.isDoc?t('whyPicOf'):t('whyAlike')):(q.isDoc?T[S.lang].whySays(it.page):T[S.lang].whyAbout(it.page));
+ const lvl=it.z>=4?3:it.z>=3?2:1;
+ return `${bigVis(it)}<div class="tt">${esc(it.name)}</div><div class="sub">${esc(it.loc)} · ${it.size}</div>
+  <div class="why"><b>${t('why')}</b><div class="cmp"><figure>${qv}${t('yours')}</figure><span class="eq">≈</span><figure>${mv}${t('match')}</figure></div>${why}
+  <div class="meter"><span>${[1,2,3].map(i=>`<i class="${i<=lvl?'on':''}"></i>`).join('')}</span>${[t('loose'),t('close'),t('vclose')][lvl-1]}</div></div>${simHTML(it)}${acts}`;
+}
+
+/* context menu */
+function showCtx(x,y){
+ const e=FLAT[S.sel], s=simState(e?.d);
+ const c=$('#ctx');
+ c.innerHTML=`<div>${t('open')}</div><div>${t('ql')}<small>Space</small></div><div>${t('reveal')}<small>⌘R</small></div><hr><div class="${s==='ok'?'':'off'}" data-act="${s==='ok'?'sim':''}">${t('simBtn')}<small>⌘⇧L</small></div>`;
+ c.style.left=Math.min(x,1280-230)+'px'; c.style.top=Math.min(y,800-150)+'px'; c.classList.add('show');
+}
+function hideCtx(){ $('#ctx')?.classList.remove('show'); }
+let toastT;
+function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2600); }
+
+/* desktop pictures and dragging */
+function renderDesk(){
+ $('#desk').innerHTML=DESK.map(d=>`<div class="dfile" draggable="true" data-k="${d.key}">${d.zip?`<div class="ic2">${docIcon('ZIP','#8e8e93')}</div>`:thumb(d.th)}<span>${esc(d.name)}</span></div>`).join('');
+}
+// What is being dragged: a desktop file, or a result row. Folders and zips can't be searched with.
+function dragTarget(){
+ const g=S.drag; if(!g) return null;
+ if(g.desk){ const d=DESK.find(x=>x.key===g.desk); return d.zip?{bad:true}:{img:{src:'drop',name:d.name,th:d.th,kind:d.kind,set:d.set,isDoc:false}}; }
+ if(g.row!=null){ const e=FLAT[g.row]; return simState(e?.d)==='ok'?{entry:e}:{bad:true}; }
+ return null;
+}
+function beginDrop(){
+ const f=$('.qf'), tg=dragTarget(); if(!f||!tg) return;
+ f.classList.add('drop'); f.classList.toggle('bad',!!tg.bad);
+ f.querySelector('.dropmsg').textContent=tg.bad?t('dropBad'):t('dropHere');
+}
+function endDrop(){ const f=$('.qf'); f?.classList.remove('drop','bad','over'); S.dragDepth=0; }
+
+/* ───────── rendering ───────── */
+function hl(name,q){ const i=name.toLowerCase().indexOf(q.toLowerCase()); if(i<0||!q) return esc(name); return esc(name.slice(0,i))+'<mark>'+esc(name.slice(i,i+q.length))+'</mark>'+esc(name.slice(i+q.length)); }
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function iconFor(n){ return n.kind==='folder'?folderIcon():docIcon(n.tag,n.col); }
+
+function nameRow(n,idx,merged){
+ return `<div class="row ${S.sel===idx?'sel':''} enter" draggable="true" data-i="${idx}"><div class="ic">${iconFor(n)}</div>
+  <div class="meta"><div class="nm">${hl(n.name,S.q.trim())}</div><div class="lc">${esc(n.loc)}</div></div>
+  ${merged?`<span class="badge">${t('names')}</span>`:''}<div class="dt2">${n.date}</div></div>`;
+}
+function kindChip(it){
+ if(it.folder) return `<span class="chip">${t('folder')} · ${it.n} ${t('matching')}</span>`;
+ const k={picture:t('picture'),shot:t('shot'),pdf:'PDF',doc:t('doc')}[it.kind];
+ return `<span class="chip">${k}${it.page?` · ${t('page')} ${it.page}`:''}</span>`;
+}
+function whyChip(it,lookup){
+ if(it.folder) return `<span class="chip m">${t('meaning')}</span>`;
+ const m=it.z>=2, w=(it.cov||0)>=.5;
+ return m&&w?`<span class="chip m">${t('both')}</span>`:w?`<span class="chip w">${t('words')}</span>`:`<span class="chip m">${t('meaning')}</span>`;
+}
+function lookRow(it,idx,lookup,merged,delay){
+ const vis=it.folder?`<div class="stack">${it.kids.slice(0,3).map(k=>thumb(k[1])).join('')}</div>`:thumb(it.th);
+ const sc=S.scores?`<div class="sc">${it.folder?`avg of 3 best + ${Math.min(.25*Math.max(it.n-3,0),1).toFixed(2)}`:`z <b>${it.z.toFixed(2)}</b> · words <b>${(it.cov||0).toFixed(2)}</b>${it.hint?' · kind <b>+1</b>':''}${lookup?' · lookup':''}`} → score <b>${it.s.toFixed(2)}</b></div>`:'';
+ return `<div class="row big ${S.sel===idx?'sel':''} enter" draggable="true" style="animation-delay:${S.rm?0:delay}ms" data-i="${idx}"><div class="ic">${vis}</div>
+  <div class="meta"><div class="nm">${esc(it.name)}</div><div class="lc">${esc(it.loc)}</div>
+  ${it.ex?`<div class="ex">${it.ex}</div>`:''}<div class="chips">${kindChip(it)}${whyChip(it,lookup)}</div>${sc}</div>
+  ${merged?`<span class="badge c">${t('look')}</span>`:''}<div class="dt2">${it.date}</div></div>`;
+}
+function skeleton(){ return [0,1,2].map(()=>`<div class="skel"><div class="t"></div><div style="flex:1"><div class="l" style="width:46%"></div><div class="l" style="width:30%"></div><div class="l" style="width:78%"></div></div></div>`).join(''); }
+
+let FLAT=[];
+function renderBody(){
+ if(S.img){ renderImgBody(); return; }
+ const body=$('#body'); if(!body) return;
+ const q=S.q.trim();
+ if(S.phase==='idle'){ body.innerHTML=idleHTML(); FLAT=[]; return; }
+ const names=S.phase==='typing'?[]:nameResults(q);
+ const lk=S.phase==='done'?lookResults(q):{strong:[],weak:[],lookup:false};
+ FLAT=[]; let html='';
+ const addNames=(merged)=>{
+  if(S.phase==='typing') return '';
+  let h=merged?'':`<div class="sh">${MAGs()}${t('names')} <span class="n">· ${t('spot')} · ${names.length}</span><span class="rule"></span></div>`;
+  if(!names.length&&!merged) h+=`<div class="empty">${t('noNames')}</div>`;
+  names.forEach(n=>{ h+=nameRow(n,FLAT.length,merged); FLAT.push({type:'name',d:n}); });
+  return h;
+ };
+ const addLook=(merged)=>{
+  let h=merged?'':`<div class="sh look">${SPY}${t('look')} <span class="n">· ${t('byc')}${S.phase==='done'?` · ${lk.strong.length+lk.weak.length}`:''}</span><span class="rule"></span></div>`;
+  if(S.look==='off') return h+promo();
+  if(S.look==='downloading') return h+dlCard();
+  if(S.phase==='typing'||S.phase==='names') return S.look==='ready'||S.look==='indexing'||S.look==='paused'?h+(S.warm?'':''):h;
+  if(S.phase==='warming') return h+skeleton();
+  if(S.look==='indexing') h+=`<div class="empty">${t('idxNote')}</div>`;
+  if(S.look==='paused') h+=`<div class="empty">${t('pauseNote')}</div>`;
+  if(!lk.strong.length) return h+`<div class="honest enter">${t('honest')}</div>`;
+  lk.strong.forEach((it,k)=>{ h+=lookRow(it,FLAT.length,lk.lookup,merged,k*45); FLAT.push({type:'look',d:it,lookup:lk.lookup}); });
+  if(lk.weak.length){
+   h+=`<div class="weak ${S.weakOpen?'open':''}" data-act="weak"><svg viewBox="0 0 10 10"><path d="m3 1.5 3.5 3.5L3 8.5"/></svg>${t('weak')} (${lk.weak.length})</div>`;
+   if(S.weakOpen) lk.weak.forEach((it,k)=>{ h+=lookRow(it,FLAT.length,lk.lookup,merged,k*45); FLAT.push({type:'look',d:it,lookup:lk.lookup}); });
+  }
+  return h;
+ };
+ if(S.layout==='sections') html=addNames(false)+addLook(false);
+ else if(S.layout==='lookfirst') html=addLook(false)+addNames(false);
+ else {
+  // Merged: Lookout's strong matches and name matches in one list, ordered by Lookout score with name matches interleaved after the top hit.
+  html=`<div class="sh">${MAGs()}${t('names')} + ${t('look')}<span class="rule"></span></div>`;
+  if(S.look==='off'||S.look==='downloading'){ html+=addNames(true)+(S.look==='off'?promo():dlCard()); }
+  else if(S.phase==='warming'||S.phase==='typing'||S.phase==='names'){ html+=addNames(true)+(S.phase==='warming'?skeleton():''); }
+  else {
+   const lkItems=lk.strong; let k=0;
+   if(lkItems[0]){ html+=lookRow(lkItems[0],FLAT.length,lk.lookup,true,0); FLAT.push({type:'look',d:lkItems[0],lookup:lk.lookup}); }
+   names.forEach(n=>{ html+=nameRow(n,FLAT.length,true); FLAT.push({type:'name',d:n}); });
+   lkItems.slice(1).forEach(it=>{ html+=lookRow(it,FLAT.length,lk.lookup,true,(++k)*45); FLAT.push({type:'look',d:it,lookup:lk.lookup}); });
+   if(!lkItems.length&&!names.length) html+=`<div class="honest">${t('honest')}</div>`;
+  }
+ }
+ if(S.sel>=FLAT.length) S.sel=Math.max(0,FLAT.length-1);
+ body.innerHTML=`<div class="res" id="res">${html}</div><div class="pv">${previewHTML()}</div>`;
+}
+const MAGs=()=>`<svg class="spy" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.6"/><path d="m10.4 10.4 3.4 3.4"/></svg>`;
+function promo(){ return `<div class="promo enter"><div class="spybig">${SPY}</div><div class="grow"><h4>${t('promoT')}</h4><p>${t('promoP')}</p></div><button class="cta" data-act="setup">${t('setup')}</button></div>`; }
+function dlCard(){ return `<div class="promo enter"><div class="spybig">${SPY}</div><div class="grow"><h4>${t('dlT')} · 42 %</h4><p>${t('dlP')}</p><div class="bar"><i style="width:42%"></i></div></div></div>`; }
+
+function previewHTML(){
+ const e=FLAT[S.sel];
+ if(!e) return `<div class="none">${S.phase==='warming'?SPY:''}</div>`;
+ const acts=`<div class="acts"><span>${t('open')}</span><span>${t('ql')}</span><span>${t('reveal')}</span></div>`;
+ if(e.type==='name'){ const n=e.d; return `<div style="width:96px;height:96px">${iconFor(n).replace('<svg','<svg style="width:96px;height:96px"')}</div><div class="tt">${esc(n.name)}</div><div class="sub">${esc(n.loc)} · ${n.size} · ${n.date}</div>${simHTML(n)}${acts}`; }
+ const it=e.d;
+ let vis='';
+ if(it.folder){
+  vis=`<div style="width:90px;height:90px">${folderIcon().replace('<svg','<svg style="width:90px;height:90px"')}</div>`;
+  return `${vis}<div class="tt">${esc(it.name)}</div><div class="sub">${esc(it.loc)} · ${it.n} ${t('matching')}</div><div class="kids">${it.kids.map(k=>`<div>${thumb(k[1])}<span>${esc(k[0])}</span></div>`).join('')}</div>${acts}`;
+ }
+ if(it.kind==='pdf'||it.kind==='doc'){
+  const body=it.de
+   ?`<h5>Mietvertrag · § 11–13</h5><p>§ 11 Schönheitsreparaturen. Der Mieter übernimmt die Schönheitsreparaturen in angemessenen Abständen …</p><p><span class="hl">§ 12 Tierhaltung. Die Haltung von Hunden und Katzen bedarf der vorherigen schriftlichen Zustimmung des Vermieters. Kleintiere in Käfigen sind ohne Zustimmung erlaubt.</span></p><p>§ 13 Untervermietung. Eine Untervermietung ist nur mit Erlaubnis des Vermieters zulässig …</p>`
+   :`<h5>${esc(it.name.replace(/\.(pdf|md)$/,''))}</h5><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p><p><span class="hl">${it.ex||''}</span></p><p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</p>`;
+  vis=`<div class="page">${body}${it.page?`<span class="pg">${t('page')} ${it.page}</span>`:''}</div>`;
+ } else {
+  vis=`<div class="big">${TH[it.th]()}${it.ocr?'<div class="ocr" style="left:46px;top:62px;width:180px;height:38px"></div>':''}</div>`;
+ }
+ return `${vis}<div class="tt">${esc(it.name)}</div><div class="sub">${esc(it.loc)} · ${it.size}</div><div class="why"><b>${t('why')}</b><br>${it.why}</div>${simHTML(it)}${acts}`;
+}
+
+function idleHTML(){
+ const sugg=S.look==='off'?promo():S.look==='downloading'?dlCard():`<div class="suggest"><h4>${SPY}${t('sugg')}</h4><div class="qs">${(S.lang==='de'?['der Hund am Strand','Zahlung abgelehnt','Haustiere im Mietvertrag','Steuern 2025','K7Q2LM']:['dog on the beach','payment declined','pets in the lease','taxes 2025','K7Q2LM']).map(s=>`<span data-act="try" data-v="${s}">${s}</span>`).join('')}</div><div class="empty" style="margin:12px 0 0;display:flex;gap:7px;align-items:center"><span style="width:15px;height:15px;color:var(--look)">${SIMI.replace('<svg','<svg class="spy"')}</span>${t('suggImg')}</div></div>`;
+ const rows=[['Holiday Sylt 2026','folder'],['Screenshots','folder'],['Invoice_October.pdf','pdf'],['Lease renewal notes.md','md'],['IMG_4821.HEIC','beach']];
+ return `<div class="side"><h6>${t('favorites')}</h6><div class="on">${folderSide()}Desktop</div><div>${folderSide()}Documents</div><div>${folderSide()}Downloads</div><div>${folderSide()}${t('recents')}</div></div>
+ <div class="list">${rows.map(r=>`<div class="row"><div class="ic">${r[1]==='folder'?folderIcon():r[1]==='beach'?thumb('beach').replace('class="thumb"','class="thumb" style="width:26px;height:26px;border-radius:5px"'):docIcon(r[1]==='pdf'?'PDF':'MD',r[1]==='pdf'?'#e5484d':'#636366')}</div><div class="meta"><div class="nm">${r[0]}</div></div><div class="dt2">Today</div></div>`).join('')}${sugg}</div>`;
+}
+const folderSide=()=>`<svg viewBox="0 0 16 16"><path d="M1.8 4.2c0-.8.6-1.4 1.4-1.4h3l1.5 1.6h5.1c.8 0 1.4.6 1.4 1.4v6.5c0 .8-.6 1.4-1.4 1.4H3.2c-.8 0-1.4-.6-1.4-1.4z"/></svg>`;
+
+function chipHTML(){
+ const L=S.look;
+ if(L==='off') return `<div class="lchip off" data-act="setup"><span class="dot"></span>${t('chipOff')} · <b>${t('chipSet')}</b></div>`;
+ if(L==='downloading') return `<div class="lchip downloading"><span class="dot"></span>${t('chipDl')} · 42 %</div>`;
+ if(L==='indexing') return `<div class="lchip indexing"><span class="dot"></span>${t('chipIdx')} · 1,204 ${t('left')}</div>`;
+ if(L==='paused') return `<div class="lchip paused"><span class="dot"></span>${t('chipPause')} · ${t('lowPower')}</div>`;
+ return `<div class="lchip ready" data-act="settings"><span class="dot"></span>${t('chipReady')}</div>`;
+}
+
+function renderHub(){
+ const q=S.q;
+ $('#shell').innerHTML=`<div class="hdr"><div class="word">DOKK</div>
+  <div class="segs"><span>${t('apps')}</span><span>${t('windows')}</span><span class="on">${t('files')}</span></div>
+  <div class="r"><div class="qf ${q?'has':''} ${S.img?'has-tok':''}">${MAG}${tokHTML()}<input id="q" placeholder="${S.img?'':t('ph')}" aria-label="${S.img?t('imgPh'):t('ph')}" value="${esc(q)}" autocomplete="off" spellcheck="false"><span class="dropmsg"></span><span class="x" data-act="clear">✕</span></div></div></div>
+  <div class="scope"><span class="pill on">${t('mac')}</span><span class="pill">Desktop</span><span class="grow"></span>${chipHTML()}</div>
+  <div class="body" id="body"></div>`;
+ const inp=$('#q');
+ inp.addEventListener('input',e=>{
+  // Typing replaces the picture with a new search by words.
+  if(S.img){ S.img=null; S.prevQ=''; $('.qf .tok')?.remove(); $('.qf').classList.remove('has-tok'); inp.placeholder=t('ph'); }
+  setQuery(e.target.value); $('.qf').classList.toggle('has',!!e.target.value);
+ });
+ inp.addEventListener('keydown',e=>{
+  if(e.key==='Backspace'&&S.img&&!inp.value){ e.preventDefault(); clearImage(true); return; }
+  if(e.metaKey&&!e.shiftKey&&e.key.toLowerCase()==='v'&&S.clip){ e.preventDefault(); setImage({src:'paste',name:t('pasted'),th:'shot2',kind:'shot',set:'shot',isDoc:false}); return; }
+  if(e.metaKey&&e.shiftKey&&e.key.toLowerCase()==='l'){ e.preventDefault(); findSimilar(FLAT[S.sel]); return; }
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); if(!FLAT.length) return; S.sel=Math.max(0,Math.min(FLAT.length-1,S.sel+(e.key==='ArrowDown'?1:-1))); renderBody(); $(`.row[data-i="${S.sel}"]`)?.scrollIntoView({block:'nearest'}); }
+  if(e.key==='Escape'){ hideCtx(); if(S.img) clearImage(false); else { setQuery(''); renderHub(); } }
+ });
+ // The field becomes a drop target only while a picture is dragged over it.
+ const qf=$('.qf');
+ qf.addEventListener('dragover',e=>{ const tg=dragTarget(); if(!tg) return; e.preventDefault(); e.dataTransfer.dropEffect=tg.bad?'none':'copy'; if(!tg.bad) qf.classList.add('over'); });
+ qf.addEventListener('dragleave',()=>qf.classList.remove('over'));
+ qf.addEventListener('drop',e=>{ e.preventDefault(); const tg=dragTarget(); endDrop(); S.drag=null; if(!tg||tg.bad) return; if(tg.img) setImage(tg.img); else findSimilar(tg.entry); });
+ renderBody();
+}
+
+function renderDock(){
+ const g=p=>`<div class="dt"><svg viewBox="0 0 24 24">${p}</svg><span class="run"></span></div>`;
+ $('#dock').innerHTML=`<div class="dt dokk"><div class="halo"></div><div class="face">DOKK</div></div><div class="sep"></div>`+
+  g('<rect x="3" y="4" width="18" height="14" rx="3"/><path d="M3 9h18"/>')+g('<circle cx="12" cy="12" r="8"/><path d="m15 9-2 4-4 2 2-4z"/>')+g('<path d="M4 6h16v10H8l-4 3z"/>')+g('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9h6v6H9z"/>');
+}
+
+/* ───────── onboarding ───────── */
+function obHTML(){
+ const o=S.ob, st=o.step, dots=`<div class="dots">${[0,1,2,3,4].map(i=>`<i class="${i===st?'on':''}"></i>`).join('')}</div>`;
+ const chosen=o.folders.filter(f=>f.on);
+ let body='', foot='';
+ if(st===0){
+  body=`<div class="hero"><div class="spybig">${SPY}</div><div><h2>${t('ob1T')}</h2></div></div><p class="lead">${t('ob1P')}</p>
+  <div class="ex3"><div>${thumb('beach')}<q>${t('ex1')}</q><br>${t('ex1b')}</div><div>${thumb('shot')}<q>${t('ex2')}</q><br>${t('ex2b')}</div><div>${thumb('pdf')}<q>${t('ex3')}</q><br>${t('ex3b')}</div></div>
+  <div class="priv"><svg viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span>${t('priv')}</span></div>`;
+  foot=`${dots}<button class="cta ghost" data-act="obClose">${t('notNow')}</button><button class="cta" data-act="obNext">${t('cont')}</button>`;
+ } else if(st===1){
+  const tf=chosen.reduce((a,f)=>a+f.f,0), tm=chosen.reduce((a,f)=>a+f.m,0), tmb=chosen.reduce((a,f)=>a+f.mb,0);
+  body=`<h2>${t('ob2T')}</h2><p class="lead">${t('ob2P')}</p><div class="fl">${o.folders.map((f,i)=>`<div class="fr ${f.on?'on':'off'}" data-act="fold" data-v="${i}"><span class="box">${CHECK}</span><span class="fi">${folderIcon()}</span><span class="fn">${f.n}<small>~/${f.n}</small></span><span class="est">${f.f.toLocaleString(S.lang==='de'?'de':'en')} ${t('files2')}<br>${t('about')} ${f.m} ${t('min')} · ${f.mb} MB</span></div>`).join('')}</div>
+  <div class="add" data-act="addFolder">+ ${t('add')}</div>
+  <details class="never"><summary>${t('never')}</summary><ul>${t('neverL').map(x=>`<li>${x}</li>`).join('')}</ul></details>
+  <div class="tot"><span>${t('total')}</span><span><b>${tf.toLocaleString(S.lang==='de'?'de':'en')} ${t('files2')}</b> · ${t('about')} ${tm} ${t('min')} · ${tmb} MB ${t('index')}</span></div>`;
+  foot=`${dots}<button class="cta ghost" data-act="obBack">${t('back')}</button><button class="cta" data-act="obNext" ${chosen.length?'':'disabled'}>${t('cont')}</button>`;
+ } else if(st===2){
+  const all=chosen.every(f=>o.access[f.n]);
+  body=`<h2>${t('ob3T')}</h2><p class="lead">${t('ob3P')}</p>${chosen.map(f=>{
+   const a=o.access[f.n];
+   const st2=a==='ok'?`<span class="st ok">${CHECK}${t('allowed')}</span>`:a==='no'?`<span class="st no">${t('denied')} · ${t('skip')}</span><button class="mini">${t('openSet')}</button>`:`<button class="mini" data-act="grant" data-v="${f.n}">${t('grant')}</button>`;
+   return `<div class="acc"><span class="fi" style="width:22px;height:22px">${folderIcon()}</span><span class="fn">${f.n}</span>${st2}</div>`;}).join('')}`;
+  foot=`${dots}<button class="cta ghost" data-act="obBack">${t('back')}</button><button class="cta" data-act="obNext" ${all?'':'disabled'}>${t('cont')}</button>`;
+ } else if(st===3){
+  const p=o.dl, done=p[1]>=100&&o.verify>=2;
+  const row=(name,d,mb,v,i)=>`<div class="dl"><div class="top"><span>${name} <small>· ${mb} MB</small></span><small>${v>=100?(o.verify>i?`<span style="color:#32d74b">${t('ready')}</span>`:t('verify')):Math.round(v)+' %'}</small></div><div class="d">${d}</div><div class="bar"><i style="width:${v}%"></i></div></div>`;
+  body=`<h2>${t('ob4T')}</h2><p class="lead">${t('ob4P')}</p>${row(t('dlWords'),t('dlWordsD'),310,p[0],0)}${row(t('dlPics'),t('dlPicsD'),555,p[1],1)}
+  <div class="tog ${o.battery?'on':''}" data-act="batt"><span class="sw"></span><span>${t('batt')}<small>${t('battD')}</small></span></div>
+  <div class="empty" style="margin:2px 4px">${t('bg')}</div>`;
+  foot=`${dots}<button class="cta ghost" data-act="obBack">${t('back')}</button><button class="cta" data-act="obNext" ${done?'':'disabled'}>${t('cont')}</button>`;
+ } else {
+  const tf=chosen.filter(f=>o.access[f.n]==='ok').reduce((a,f)=>a+f.f,0)||1;
+  const pct=Math.min(100,o.pass), C=2*Math.PI*52;
+  const feed=[['IMG_4821.HEIC','beach','Desktop'],['Screenshot 2026-10-02…','shot','Desktop'],['Mietvertrag_Wohnung…','pdf','Documents'],['Invoice_October.pdf','invoice','Downloads'],['Stripe dispute notes.md','md','Documents'],['IMG_4790.HEIC','beach2','Desktop']];
+  const shift=Math.floor(pct/9)%feed.length;
+  body=`<h2>${t('ob5T')}</h2><p class="lead">${t('ob5P')}</p><div class="pass"><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="var(--chipHi)"/><circle cx="60" cy="60" r="52" stroke="var(--look)" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}" style="transition:stroke-dashoffset .3s"/></svg><div class="v">${Math.round(pct)} %</div></div>
+  <div style="font-size:12px;color:var(--fg2)">${Math.round(tf*pct/100).toLocaleString(S.lang==='de'?'de':'en')} / ${tf.toLocaleString(S.lang==='de'?'de':'en')} ${t('files2')}</div>
+  <div class="feed">${[...feed.slice(shift),...feed.slice(0,shift)].slice(0,4).map(f=>`<div>${thumb(f[1])}<span>${f[0]}</span><small>${f[2]}</small></div>`).join('')}</div></div>`;
+  foot=`${dots}<button class="cta ghost" data-act="obFinish">${t('later')}</button><button class="cta" data-act="obFinish">${t('done')}</button>`;
+ }
+ return `<div class="sheet"><div class="stp ${o.dir<0?'back':''}">${body}</div><div class="ft">${foot}</div></div>`;
+}
+function renderOb(){ const v=$('#veil'); v.classList.toggle('show',S.view==='onboarding'); if(S.view==='onboarding') v.innerHTML=obHTML(); }
+function obTick(){
+ const o=S.ob; clearInterval(o.timer); o.timer=null;
+ if(S.view!=='onboarding') return;
+ if(o.step===3){
+  o.timer=setInterval(()=>{
+   if(o.dl[0]<100) o.dl[0]=Math.min(100,o.dl[0]+4.2);
+   else if(o.verify<1) o.verify=1;
+   else if(o.dl[1]<100) o.dl[1]=Math.min(100,o.dl[1]+2.6);
+   else if(o.verify<2) o.verify=2;
+   else { clearInterval(o.timer); o.timer=null; }
+   patchOb();
+  },110);
+ }
+ if(o.step===4){ o.timer=setInterval(()=>{ o.pass=Math.min(100,o.pass+.8); patchOb(); if(o.pass>=100){clearInterval(o.timer);o.timer=null;} },60); }
+}
+// Updates the sheet without replaying its step animation.
+function patchOb(){ const stp=$('#veil .stp'); if(!stp) return; const tmp=document.createElement('div'); tmp.innerHTML=obHTML(); stp.innerHTML=tmp.querySelector('.stp').innerHTML; $('#veil .ft').innerHTML=tmp.querySelector('.ft').innerHTML; }
+
+function showAlert(folder){
+ const a=$('#alert'); a.classList.add('show');
+ a.innerHTML=`<div class="al"><div class="ai">DOKK</div><h3>${t('alertT')}${folder}${S.lang==='en'?' folder.':'.'}</h3><p>${t('alertP')}</p><div class="b"><button data-act="deny" data-v="${folder}">${t('dont')}</button><button class="p" data-act="allow" data-v="${folder}">${t('allow')}</button></div></div>`;
+}
+
+/* ───────── settings ───────── */
+function renderSettings(){
+ const el=$('#settings'); el.classList.toggle('show',S.view==='settings'); $('#hub').style.display=S.view==='settings'?'none':'';
+ if(S.view!=='settings') return;
+ const total=S.setFolders.reduce((a,f)=>a+f.f,0);
+ el.innerHTML=`<div class="nav"><div class="lights"><i></i><i></i><i></i></div><div>General</div><div>Dock</div><div>Hub</div><div class="on">${SPY.replace('class="spy"','class="spy" style="vertical-align:-3px;margin-right:6px"')}${t('setT')}</div><div>Radar</div><div>Privacy</div></div>
+ <div class="pane"><h3>${t('setT')}</h3>
+ <div class="card"><div class="tog on ln" style="padding:12px 14px"><span class="g">${t('setOn')}<small>${t('setOnD')}</small></span><span class="sw"></span></div></div>
+ <div class="card"><h5>${t('folders')}</h5>${S.setFolders.map((f,i)=>`<div class="ln"><span style="width:20px;height:20px">${folderIcon()}</span><span class="g">${f.n}<small>~/${f.n}</small></span><span class="v">${f.f.toLocaleString(S.lang==='de'?'de':'en')} ${t('added')}</span><span class="rm2" data-act="rmFolder" data-v="${i}">⊖</span></div>`).join('')}<div class="ln"><span class="add" style="padding:0" data-act="addSet">+ ${t('add')}</span><span class="g"></span><span class="v">${total.toLocaleString(S.lang==='de'?'de':'en')} ${t('added')}</span></div></div>
+ <div class="card"><div class="tog ${S.ob.battery?'on':''} ln" data-act="batt" style="padding:12px 14px"><span class="g">${t('batt')}<small>${t('battD')}</small></span><span class="sw"></span></div></div>
+ <div class="card"><div class="ln"><span class="g">${t('model')}</span><span class="v">${t('modelV')}</span></div><div class="ln"><span class="g">${t('size')}</span><span class="v">180 MB</span></div><div class="ln"><span class="g">${t('memory')}</span><span class="v">${t('memV')}</span></div></div>
+ <div class="card"><div class="ln"><span class="add" style="padding:0">${t('rebuild')}</span></div><div class="ln"><span class="add danger" style="padding:0">${t('del')}</span></div></div>
+ <div class="priv"><svg viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span>${t('priv')}</span></div>
+ </div>`;
+}
+
+/* ───────── wiring ───────── */
+function render(){
+ stage.className=`stage ${S.theme}${S.rm?' rm':''}${S.rt?' rt':''}`;
+ document.querySelectorAll('.sg').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',S[g.dataset.k]===b.dataset.v)));
+ renderHub(); renderSettings(); renderOb();
+}
+document.querySelectorAll('.sg').forEach(g=>g.addEventListener('click',e=>{
+ const b=e.target.closest('button'); if(!b) return; const k=g.dataset.k, v=b.dataset.v;
+ if(k==='view'&&v==='onboarding'){ S.ob.step=0; S.ob.dir=1; S.ob.access={}; S.ob.dl=[0,0]; S.ob.verify=0; S.ob.pass=0; }
+ S[k]=v; render();
+ if(k==='view') obTick();
+ if(k==='look'&&S.img) setImage(S.img); else if(k==='look'&&S.q) setQuery(S.q);
+}));
+$('#rm').onchange=e=>{S.rm=e.target.checked;render();};
+$('#rt').onchange=e=>{S.rt=e.target.checked;render();};
+$('#scores').onchange=e=>{S.scores=e.target.checked;renderBody();};
+$('#ratio').oninput=e=>{S.ratio=+e.target.value;$('#ratioV').textContent=S.ratio.toFixed(2);renderBody();};
+$('#cold').onclick=()=>{S.warm=false; if(S.q) setQuery(S.q);};
+$('#copyPic').onclick=()=>{ S.clip=true; toast(t('clip')); if(S.view==='search') focusField(); };
+$('#coldImg').onclick=()=>{ S.imgWarm=false; if(S.img&&S.img.src!=='similar') setImage(S.img); };
+
+stage.addEventListener('click',e=>{
+ if(!e.target.closest('#ctx')) hideCtx();
+ const a=e.target.closest('[data-act]');
+ const row=e.target.closest('.row[data-i]');
+ if(row&&!a){ S.sel=+row.dataset.i; renderBody(); return; }
+ if(!a) return; const v=a.dataset.v, o=S.ob;
+ switch(a.dataset.act){
+  case 'try': S.img=null; S.prevQ=''; setQuery(v); renderHub(); $('#q').focus(); $('#q').setSelectionRange(v.length,v.length); break;
+  case 'clear': if(S.img) clearImage(false); else { setQuery(''); renderHub(); } break;
+  case 'tokX': clearImage(true); break;
+  case 'imgBack': clearImage(true); break;
+  case 'sim': hideCtx(); findSimilar(FLAT[S.sel]); break;
+  case 'wk': S.wk[+v]=!S.wk[+v]; renderBody(); break;
+  case 'weak': S.weakOpen=!S.weakOpen; renderBody(); break;
+  case 'setup': S.view='onboarding'; o.step=0; o.dir=1; o.access={}; o.dl=[0,0]; o.verify=0; o.pass=0; render(); break;
+  case 'settings': S.view='settings'; render(); break;
+  case 'obClose': S.view='search'; render(); obTick(); break;
+  case 'obNext': o.step++; o.dir=1; renderOb(); obTick(); break;
+  case 'obBack': o.step--; o.dir=-1; renderOb(); obTick(); break;
+  case 'obFinish': S.view='search'; S.look=o.pass>=100?'ready':'indexing'; S.setFolders=o.folders.filter(f=>f.on&&o.access[f.n]==='ok').map(f=>({n:f.n,f:f.f})); render(); obTick(); break;
+  case 'fold': o.folders[+v].on=!o.folders[+v].on; patchOb(); break;
+  case 'addFolder': if(!o.folders.find(f=>f.n==='Projects/Design')) o.folders.push({n:'Projects/Design',f:640,m:4,mb:22,on:true}); patchOb(); break;
+  case 'grant': showAlert(v); break;
+  case 'allow': case 'deny': o.access[v]=a.dataset.act==='allow'?'ok':'no'; $('#alert').classList.remove('show'); patchOb(); break;
+  case 'batt': o.battery=!o.battery; S.view==='settings'?renderSettings():patchOb(); break;
+  case 'rmFolder': S.setFolders.splice(+v,1); renderSettings(); break;
+  case 'addSet': if(!S.setFolders.find(f=>f.n==='Pictures')) S.setFolders.push({n:'Pictures',f:8240}); renderSettings(); break;
+ }
+});
+document.getElementById('alert').addEventListener('click',e=>{
+ const a=e.target.closest('[data-act]'); if(!a) return; e.stopPropagation();
+ S.ob.access[a.dataset.v]=a.dataset.act==='allow'?'ok':'no'; $('#alert').classList.remove('show'); patchOb();
+},true);
+
+// Right-click a result for its context menu.
+stage.addEventListener('contextmenu',e=>{
+ const row=e.target.closest('.row[data-i]'); if(!row){ hideCtx(); return; }
+ e.preventDefault(); S.sel=+row.dataset.i; renderBody();
+ const r=stage.getBoundingClientRect(), s=r.width/1280;
+ showCtx((e.clientX-r.left)/s,(e.clientY-r.top)/s);
+});
+// ⌘⇧L and ⌘V also work when the field isn't focused.
+stage.addEventListener('keydown',e=>{
+ if(e.target.id==='q'||S.view!=='search') return;
+ if(e.metaKey&&e.shiftKey&&e.key.toLowerCase()==='l'){ e.preventDefault(); findSimilar(FLAT[S.sel]); }
+ if(e.metaKey&&!e.shiftKey&&e.key.toLowerCase()==='v'&&S.clip){ e.preventDefault(); setImage({src:'paste',name:t('pasted'),th:'shot2',kind:'shot',set:'shot',isDoc:false}); }
+});
+// Dragging: desktop pictures and result rows can be dropped on the search field.
+stage.addEventListener('dragstart',e=>{
+ const df=e.target.closest('.dfile'), row=e.target.closest('.row[data-i]');
+ if(df){ S.drag={desk:df.dataset.k}; df.classList.add('dragging'); }
+ else if(row){ S.drag={row:+row.dataset.i}; }
+ else return;
+ e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text/plain','lookout'); hideCtx();
+});
+stage.addEventListener('dragend',()=>{ document.querySelectorAll('.dfile.dragging').forEach(d=>d.classList.remove('dragging')); endDrop(); S.drag=null; });
+const hubEl=$('#hub');
+hubEl.addEventListener('dragenter',()=>{ if(!S.drag||S.view!=='search') return; if(S.dragDepth++===0) beginDrop(); });
+hubEl.addEventListener('dragleave',()=>{ if(!S.drag) return; if(--S.dragDepth<=0) endDrop(); });
+
+renderDock(); renderDesk(); render();
+</script>
+</body></html>

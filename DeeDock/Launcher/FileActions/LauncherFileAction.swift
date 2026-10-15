@@ -6,6 +6,17 @@ nonisolated enum LauncherFileActionID: Hashable, Sendable {
     case shortcut(UUID)
     case copyTo(UUID)
     case chooseFolder
+    /// Lookout's Find Similar on the batch's one file, offered by the Hub (`LauncherFileSimilar`).
+    case findSimilar
+}
+
+/// Find Similar for a batch of one file, which the Hub offers in its Apps tab when Lookout can search with that file:
+/// a picture Lookout reads, or a file its index holds. Outside the Hub there's none. Main actor.
+struct LauncherFileSimilar {
+    /// Whether Lookout can search with the file now. May ask the index, so it's asynchronous.
+    let isAvailable: @MainActor (URL) async -> Bool
+    /// Starts the search with the file: the Hub switches to the Files tab.
+    let run: @MainActor (URL) -> Void
 }
 
 /// One suitable or searchable action for the current file batch.

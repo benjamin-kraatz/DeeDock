@@ -224,6 +224,11 @@ destination names are never replaced; a conflicting copy gets a numbered name. S
 destinations are local bookmarks under Settings → Features → Action Tiles. Removing a
 destination deletes the bookmark, not the folder.
 
+**Find Similar** comes first when the batch is one picture, or one file Lookout has read, and
+[Lookout](LOOKOUT.md#ways-in) can search. It isn't a file operation: it ends the batch, switches to
+the Files tab, and searches there for pictures and documents like the file. The Apps / Shortcuts /
+Folders filter hides it.
+
 Clear the batch or choose **Back to Search** to return to ordinary app search. File
 contents are not read to rank actions. Shortcut output is not captured back to Shelf.
 

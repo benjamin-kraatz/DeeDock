@@ -80,4 +80,12 @@ protocol HubTabModel: AnyObject {
     /// `false`. Escape falls back to clearing `query`, then to closing an anchored Hub.
     /// - Returns: `true` when the tab consumed the event.
     func handleKeyDown(_ event: NSEvent, fromSearchField: Bool) -> Bool
+
+    /// What the tab adds to the header search field: a token and a drop well (Files' search with a picture). Nil
+    /// for a plain text field.
+    var searchExtras: (any HubSearchExtras)? { get }
+}
+
+extension HubTabModel {
+    var searchExtras: (any HubSearchExtras)? { nil }
 }

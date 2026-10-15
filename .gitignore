@@ -20,3 +20,6 @@ __pycache__/
 
 # Per-developer build settings (PostHog token)
 Configuration/Local.xcconfig
+
+# Lookout: llama.cpp sources and build (scripts/build-llama.sh) and development model files
+Vendor/

@@ -26,6 +26,15 @@ enum HubFilesContextMenu {
         menu.add(.hubFilesMenuReveal, key: "r", modifiers: [.command, .option]) { model.revealSelectionInFinder() }
         menu.add(.hubFilesMenuCopyPath, key: "c", modifiers: [.command, .option]) { model.copySelectionPaths() }
         addSidebarItem(to: menu, folders: items.filter(\.isSidebarCandidate).map(\.url), model: model)
+        // One search result or browser file offers Find Similar: hidden for folders and until Lookout can search,
+        // disabled for kinds of file Lookout doesn't read and for documents it hasn't read.
+        let similar = model.selectionSimilarAvailability
+        if similar != .hidden {
+            menu.addItem(.separator())
+            menu.add(.lookoutSimilarButton, key: "l", modifiers: [.command, .shift], enabled: similar.isAvailable) {
+                model.findSimilarForSelection()
+            }
+        }
         menu.addItem(.separator())
         menu.add(.hubFilesMenuRename, enabled: single && !model.isSearching) { model.beginRenameSelection() }
         menu.add(.hubFilesMenuNewFolder, key: "n", modifiers: [.command, .shift],

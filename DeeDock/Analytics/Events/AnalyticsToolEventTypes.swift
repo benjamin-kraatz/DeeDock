@@ -123,6 +123,12 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     /// The macOS Dock switch, changed by a click in Settings or the tour. Quit and launch
     /// follow-through is reported by `system_dock_tuck`, not here.
     case systemDockTuck = "system_dock_tuck"
+    /// Lookout's "Search by content" switch in Settings.
+    case lookoutEnabled = "lookout_enabled"
+    /// Lookout's "Read files on battery too" in Settings.
+    case lookoutIndexOnBattery = "lookout_index_on_battery"
+    /// How many folders Lookout reads, after one was added or removed in Settings.
+    case lookoutFolderCount = "lookout_folder_count"
 }
 
 /// Which window permissions Harbor had when it opened.
@@ -163,6 +169,8 @@ nonisolated enum AnalyticsHubTrigger: String, AnalyticsToken {
     case fileDrop = "file_drop"
     /// Open in Hub on a folder stack, the Downloads stack, or a drive.
     case openFolder = "open_folder"
+    /// Lookout's settings asked for its onboarding, which shows over the Hub.
+    case lookoutSetup = "lookout_setup"
 }
 
 /// How a Hub tab was chosen.
@@ -198,4 +206,71 @@ nonisolated enum AnalyticsHubSidebarMethod: String, AnalyticsToken {
 /// Where a Files tab search looked.
 nonisolated enum AnalyticsHubSearchScope: String, AnalyticsToken {
     case thisMac = "this_mac", folder
+}
+
+/// Which part of the Files search results an opened result was in.
+nonisolated enum AnalyticsLookoutSection: String, AnalyticsToken {
+    /// Spotlight's name results.
+    case names
+    /// Lookout's strong hits, shown at once.
+    case strong
+    /// Lookout's weaker hits, inside the "Weaker matches" fold.
+    case weak
+}
+
+/// What a Lookout hit is.
+nonisolated enum AnalyticsLookoutKind: String, AnalyticsToken {
+    case screenshot, image, pdf, doc, folder
+}
+
+/// Why a Lookout hit qualified.
+nonisolated enum AnalyticsLookoutMatch: String, AnalyticsToken {
+    case meaning, words, both
+}
+
+/// What a Files search that opened a result searched with.
+nonisolated enum AnalyticsLookoutQuery: String, AnalyticsToken {
+    /// Typed words.
+    case text
+    /// A picture, or a file's stored vector (Find Similar).
+    case image
+}
+
+/// Where a search with a picture came from.
+nonisolated enum AnalyticsLookoutImageSource: String, AnalyticsToken {
+    /// Dropped on the search field.
+    case drop
+    /// Pasted into the search field.
+    case paste
+    /// Find Similar on a result (the button, the menu, ⌘⇧L, or dragging the row onto the field).
+    case similar
+    /// Find Similar on a file in the Files tab's browser (the button, the menu, or ⌘⇧L).
+    case browser
+    /// Find Similar in the Apps tab's file actions, for a file dropped on the DOKK tile or the Apps tab.
+    case hubTile = "hub_tile"
+}
+
+/// A step of Lookout's onboarding (`LookoutSetupStep`).
+nonisolated enum AnalyticsLookoutSetupStep: String, AnalyticsToken {
+    case welcome, folders, access, download, firstPass = "first_pass"
+}
+
+/// How one run of Lookout's model download ended.
+nonisolated enum AnalyticsLookoutDownloadOutcome: String, AnalyticsToken {
+    case completed, failed, cancelled
+}
+
+/// Why Lookout's model download failed (`LookoutDownloadError`).
+nonisolated enum AnalyticsLookoutDownloadError: String, AnalyticsToken {
+    case network, server, host, checksum, incomplete, write, diskSpace = "disk_space"
+}
+
+/// macOS's answer when Lookout asked to read a folder.
+nonisolated enum AnalyticsLookoutAccessOutcome: String, AnalyticsToken {
+    case allowed, denied
+}
+
+/// Where Lookout asked to read a folder.
+nonisolated enum AnalyticsLookoutAccessContext: String, AnalyticsToken {
+    case onboarding, settings
 }

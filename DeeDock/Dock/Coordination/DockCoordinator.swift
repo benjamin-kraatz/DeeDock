@@ -41,6 +41,8 @@ final class DockCoordinator {
     var settingsNotificationFeedRequest = false
     /// One-shot route to the Harbor page, from Harbor's Accessibility notice.
     var settingsHarborRequest = false
+    /// One-shot route to Lookout's section, from the Files search's Lookout status chip.
+    var settingsLookoutRequest = false
     /// The app-grouped window overview, shared by every display.
     let harbor = HarborCoordinator()
     /// The one DOKK Hub (Apps, Windows, Files), opened from any display's DOKK tile.
@@ -239,6 +241,8 @@ final class DockCoordinator {
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configureHarbor()
         configureHub()
+        // Lookout indexes in the background while the app runs; it does nothing until it's set up and on.
+        hub.lookout.start()
         notificationFeedPopover.keyboardDismissed = { [weak self] displayID in
             guard let self, focusedID == displayID else { return }
             endFocus(restore: false)
@@ -1022,6 +1026,8 @@ final class DockCoordinator {
     /// The launcher used to belong to each dock; the Hub has one for the whole app, so the hooks
     /// that need a dock resolve the display the Hub opened on, falling back to the pointer's.
     private func configureHub() {
+        // The Lookout status chip opens Lookout's section; the view that calls this opens the window itself.
+        hub.files.onOpenLookoutSettings = { [weak self] in self?.settingsLookoutRequest = true }
         let launcher = hub.apps.launcher
         launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
         launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
@@ -1200,6 +1206,8 @@ final class DockCoordinator {
         settingsDrivesRequest = false
         settingsNotificationFeedRequest = false
         settingsHarborRequest = false
+        settingsLookoutRequest = false
+        hub.files.onOpenLookoutSettings = {}
         harbor.stop()
         filePicker.stop()
         dragging.stop()

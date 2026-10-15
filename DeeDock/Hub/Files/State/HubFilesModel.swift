@@ -28,14 +28,33 @@ final class HubFilesModel: HubTabModel {
     var searchScope: HubFilesSearchScope = .thisMac {
         didSet { if searchScope != oldValue { runSearch() } }
     }
-    /// Selection within search results.
+    /// Selection within the Spotlight name results. Empty while a Lookout hit is selected (`lookoutSelection`).
     var searchSelection = HubFilesSelection()
+    /// The selected Lookout hit's path (`LookoutHit.id`), or nil. One selection spans both result sections: selecting
+    /// a Lookout hit clears `searchSelection`, and selecting a name clears this (`HubFilesModel+Lookout`).
+    var lookoutSelection: String?
+    /// Whether the "Weaker matches" fold under Lookout's results is open. It closes again for every new query.
+    var lookoutWeakExpanded = false
+    /// Progress of Lookout's model download, 0…1, for the Lookout section's download card and the status chip; nil
+    /// while nothing downloads. `LookoutModelDownloader` sets it (`HubCoordinator.configureLookout`).
+    var lookoutDownloadProgress: Double?
     /// The drop target under an in-flight drag, for the accent highlight.
     var dropHighlight: HubFilesDropHighlight?
     /// A failed file operation's message, shown as an alert.
     var errorMessage: String?
     /// Search results scroll request after arrow keys.
-    private(set) var searchScrollRequest: HubFilesScrollRequest?
+    var searchScrollRequest: HubFilesSearchScrollRequest?
+    /// The picture the search field searches with, and the words from before it (`HubFilesModel+Pictures`).
+    var pictureSession = LookoutPictureSession()
+    /// Which groups' "Weaker matches" folds are open in a search with a picture. They close for every new picture.
+    var pictureWeakExpanded: Set<LookoutSimilarResults.GroupKind> = []
+    /// The search field's drop well while something is dragged over the Hub.
+    var pictureDropState: HubSearchDropState = .none
+    /// True while a drag the field takes is right over it.
+    var isPictureDropTargeted = false
+    /// Whether the index holds a vector for a file, by path, as Find Similar checks name results, browser files and
+    /// dragged documents.
+    var similarIndexed: [String: Bool] = [:]
 
     // MARK: Services
 
@@ -43,6 +62,16 @@ final class HubFilesModel: HubTabModel {
     let transfers: HubFileTransferQueue
     let volumes: HubVolumes
     let search: HubFileSearch
+    /// Lookout, the content search. Its results show in their own section under `search`'s names, which never wait
+    /// for it. The tab also tells it when it appears and hides, which warms and releases what it keeps in memory
+    /// (inert while Lookout is off).
+    let lookout: LookoutEngine
+    /// "Set up Lookout" in the search results' promo card, and the status chip while Lookout isn't set up: opens
+    /// Lookout's onboarding over the Hub (`HubCoordinator.presentLookoutSetup`).
+    @ObservationIgnored var onSetUpLookout: () -> Void = {}
+    /// The status chip once Lookout is set up: routes Settings to Lookout's section (`DockCoordinator`). The view
+    /// that calls it opens the Settings window (`openLookoutSettings(using:)`).
+    @ObservationIgnored var onOpenLookoutSettings: () -> Void = {}
     /// The sidebar's Favorites list and its drag, feedback, and Undo state.
     let sidebar: HubFilesSidebarModel
     @ObservationIgnored let quickLook = HubFilesQuickLook()
@@ -50,17 +79,30 @@ final class HubFilesModel: HubTabModel {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private(set) var isVisible = false
     @ObservationIgnored private var recentsActive = false
-    @ObservationIgnored private var searchSerial = 0
+    @ObservationIgnored var searchSerial = 0
+    /// The current search session has been counted for analytics (`endLookoutSearchSession`).
+    @ObservationIgnored var lookoutSearchCounted = false
     /// The `didUnmountNotification` observer, registered while the tab is visible.
     @ObservationIgnored private var unmountObserver: NSObjectProtocol?
     @ObservationIgnored var dropOperationCache: (key: String, operation: NSDragOperation)?
+    /// Whether a drag is over the Hub, for the drop well.
+    @ObservationIgnored let pictureDrag = HubFilesPictureDrag()
+    /// Asks the index whether a dragged document is in it, while the drag is over the Hub; cancelled when the drop
+    /// well closes (`HubFilesModel+Pictures`).
+    @ObservationIgnored var dragLookup: Task<Void, Never>?
+    /// True while the model itself sets `query` for a picture, so the change isn't taken for typing.
+    @ObservationIgnored var settingQueryForPicture = false
+    /// The picture the picture search last started with, so a scope change or reappearing reuses its vector.
+    @ObservationIgnored var searchedPictureID: UUID?
 
     /// Values that replace live service state in previews.
     @ObservationIgnored var previewOverrides = HubFilesPreviewOverrides()
 
     /// Creates the model with live services, restoring the last layout from `defaults`.
-    convenience init(defaults: UserDefaults = .standard) {
-        self.init(defaults: defaults, dataSource: HubFilesLiveDataSource())
+    ///
+    /// - Parameter lookout: The app's one Lookout engine; nil makes an inert one (previews and tests).
+    convenience init(defaults: UserDefaults = .standard, lookout: LookoutEngine? = nil) {
+        self.init(defaults: defaults, dataSource: HubFilesLiveDataSource(), lookout: lookout)
     }
 
     /// Creates the model with an injected data source (previews and tests).
@@ -68,12 +110,14 @@ final class HubFilesModel: HubTabModel {
          dataSource: HubFilesDataSource,
          transfers: HubFileTransferQueue = HubFileTransferQueue(),
          volumes: HubVolumes = HubVolumes(),
-         search: HubFileSearch = HubFileSearch()) {
+         search: HubFileSearch = HubFileSearch(),
+         lookout: LookoutEngine? = nil) {
         self.defaults = defaults
         self.dataSource = dataSource
         self.transfers = transfers
         self.volumes = volumes
         self.search = search
+        self.lookout = lookout ?? .inert()
         let home = dataSource.homeDirectory
         sidebar = HubFilesSidebarModel(store: HubFilesSidebarStore(
             defaults: defaults, home: home, resolver: dataSource.makeSidebarResolver(),
@@ -101,8 +145,8 @@ final class HubFilesModel: HubTabModel {
 
     var activePane: HubFilesPane { selectedTab.activePane }
 
-    /// True while a non-empty query shows search results instead of panes.
-    var isSearching: Bool { !trimmedQuery.isEmpty }
+    /// True while a non-empty query, or a picture to search with, shows search results instead of panes.
+    var isSearching: Bool { !trimmedQuery.isEmpty || pictureSession.isActive }
 
     var trimmedQuery: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
 
@@ -110,14 +154,14 @@ final class HubFilesModel: HubTabModel {
 
     /// Shows `folder` in the active pane of the selected tab and clears any search.
     func open(folder: URL) {
-        query = ""
+        endSearch()
         activePane.navigate(to: .folder(normalizing: folder))
         refreshActivation()
     }
 
     /// Opens `url`'s enclosing folder in the active pane and selects it.
     func reveal(_ url: URL) {
-        query = ""
+        endSearch()
         let pane = activePane
         guard let parent = HubFilesPath.parent(of: url) else { return }
         pane.navigate(to: .folder(normalizing: parent))
@@ -131,7 +175,11 @@ final class HubFilesModel: HubTabModel {
         volumes.start()
         observeUnmounts()
         refreshActivation()
-        if isSearching { runSearch() }
+        if isSearching {
+            lookoutSearchCounted = false
+            runSearch()
+        }
+        lookout.hubFilesDidAppear()
         // Folders renamed or moved in Finder since the last look keep their sidebar rows.
         sidebar.store.refresh()
     }
@@ -152,7 +200,10 @@ final class HubFilesModel: HubTabModel {
         sidebar.cancelFlights()
         sidebar.problem = nil
         volumes.stop()
+        endLookoutSearchSession()
         search.stop()
+        lookout.search.stop()
+        lookout.hubDidClose()
         if let unmountObserver { NSWorkspace.shared.notificationCenter.removeObserver(unmountObserver) }
         unmountObserver = nil
         refreshActivation()
@@ -251,7 +302,7 @@ final class HubFilesModel: HubTabModel {
 
     /// Navigates the active pane to a sidebar place and clears any search.
     func show(_ location: HubFilesLocation, in pane: HubFilesPane? = nil) {
-        query = ""
+        endSearch()
         (pane ?? activePane).navigate(to: location)
         refreshActivation()
     }
@@ -308,14 +359,36 @@ final class HubFilesModel: HubTabModel {
 
     // MARK: Search
 
+    /// Ends the search before the panes navigate: the words, and a picture searched with. Clearing the words alone
+    /// leaves a picture search showing over the panes, because its field is already empty (`queryDidChange` never
+    /// runs), so the picture goes first.
+    private func endSearch() {
+        if pictureSession.isActive { removePicture(restoringWords: false) }
+        query = ""
+    }
+
     private func queryDidChange(from oldValue: String) {
-        let wasSearching = !oldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        // The model replacing the words for a picture runs `searchDidChange` itself.
+        guard !settingQueryForPicture else { return }
+        let hadPicture = pictureSession.isActive
+        // Typing replaces the picture with a new search by words.
+        if hadPicture, !query.isEmpty { endPictureSearch() }
+        searchDidChange(wasSearching: hadPicture || !oldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
+
+    /// The search changed (new words, a picture, or neither): switches between panes and results when that changed,
+    /// resets the selection and the folds, and searches again.
+    func searchDidChange(wasSearching: Bool) {
         if wasSearching != isSearching {
             cancelRenames()
             quickLook.close()
             refreshActivation()
+            // Lookout still shows the old query's results here: count the search that ends, before they're cleared.
+            if wasSearching { endLookoutSearchSession() } else { lookoutSearchCounted = false }
         }
         searchSelection.clear()
+        lookoutSelection = nil
+        lookoutWeakExpanded = false
         runSearch()
     }
 
@@ -330,37 +403,45 @@ final class HubFilesModel: HubTabModel {
     /// The folder the "current folder" scope searches: the active pane's, or home for Recents.
     var searchFolder: URL { activePane.folderURL ?? home }
 
+    /// Starts Spotlight's name search and Lookout's content search for the query, side by side: the names never wait
+    /// for Lookout. Both stop while the tab is hidden; an empty query also clears Lookout's results.
     private func runSearch() {
-        guard previewOverrides.searchResults == nil else { return }
+        guard previewOverrides.searchResults == nil, previewOverrides.pictureResults == nil else { return }
+        if let picture = pictureSession.picture {
+            // A picture lists no names and runs no search by words.
+            search.stop()
+            lookout.search.search("", scope: resolvedSearchScope)
+            if isVisible { runPictureSearch(picture) }
+            return
+        }
         guard isVisible, isSearching else {
             search.stop()
+            if isSearching { lookout.search.stop() } else { lookout.search.search("", scope: resolvedSearchScope) }
             return
         }
         search.search(trimmedQuery, scope: resolvedSearchScope)
+        lookout.search.search(trimmedQuery, scope: resolvedSearchScope)
     }
 
     /// Search results in display order.
     var searchResults: [HubFileItem] { previewOverrides.searchResults ?? search.results }
 
-    func moveSearchSelection(by delta: Int, extending: Bool) {
-        if let url = searchSelection.move(by: delta, order: searchResults.map(\.url), extending: extending) {
-            searchSerial += 1
-            searchScrollRequest = HubFilesScrollRequest(url: url, serial: searchSerial)
-            quickLook.selectionDidChange()
-        }
-    }
-
+    /// A click on a name result. Moves the selection out of the Lookout section.
     func clickSearchResult(_ url: URL, mode: HubFilesSelection.ClickMode) {
+        lookoutSelection = nil
         searchSelection.click(url, mode: mode, order: searchResults.map(\.url))
         quickLook.selectionDidChange()
     }
 
     // MARK: Selection context
 
-    /// The items the context menu, preview, and shortcuts act on: search results while
-    /// searching, else the active pane's selection.
+    /// The items the context menu, preview, and shortcuts act on: the selected search results (a name selection or
+    /// one Lookout hit) while searching, else the active pane's selection.
     var actionableItems: [HubFileItem] {
-        if isSearching { return searchResults.filter { searchSelection.contains($0.url) } }
+        if isSearching {
+            if let hit = selectedLookoutHit { return [hit.fileItem] }
+            return searchResults.filter { searchSelection.contains($0.url) }
+        }
         return activePane.selectedItems
     }
 
@@ -454,6 +535,24 @@ struct HubFilesPreviewOverrides {
     var volumes: [HubVolumes.Volume]?
     var transfer: HubFilesTransferStatus?
     var finished: HubFilesTransferStatus?
+    /// Lookout's status, progress, phase and results, in place of the (inert) engine's. The progress counts only
+    /// with a status.
+    var lookoutStatus: LookoutStatus?
+    var lookoutProgress: LookoutProgressDisplay?
+    var lookoutPhase: LookoutSearch.Phase?
+    var lookoutResults: LookoutResultSet?
+    /// A search with a picture's phase, results and reading time.
+    var picturePhase: LookoutPictureSearch.Phase?
+    var pictureResults: LookoutSimilarResults?
+    var pictureReadSeconds: Double?
+    /// The stored vector Find Similar reused, for "From your index · Page 7 · instant".
+    var pictureStoredSource: LookoutSimilarSource?
+}
+
+/// Scrolls the search results to a row after arrow keys.
+struct HubFilesSearchScrollRequest: Equatable {
+    let id: HubFilesSearchResultID
+    let serial: Int
 }
 
 extension HubFilesViewMode {

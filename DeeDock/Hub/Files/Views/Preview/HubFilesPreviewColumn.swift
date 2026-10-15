@@ -4,6 +4,13 @@ import SwiftUI
 ///
 /// One item: a Quick Look preview in a rounded well, its details, and Open, Quick Look, and
 /// Reveal in Finder. Several: a fanned stack with the count and total size. None: the folder.
+/// A Lookout hit also gets "Why it matched" under its details, and one selected file Find Similar above the actions,
+/// in search results and in the browser alike.
+///
+/// In a search with a picture the column is compact (the mockup's `.pv.im`): a shorter well, one line of details,
+/// and, while nothing is selected, the picture searched with. The well is the one part that gives: it shrinks from
+/// its ideal height down to `HubFilesMetrics.previewWellHeights` lower bound before a long name or a two-line
+/// sentence could push Open, Quick Look, and Reveal off the bottom of the 640 pt Hub.
 struct HubFilesPreviewColumn: View {
     let model: HubFilesModel
 
@@ -13,6 +20,8 @@ struct HubFilesPreviewColumn: View {
 
     var body: some View {
         let selection = selection
+        let wellHeights = HubFilesMetrics.previewWellHeights(pictureSearch: model.isPictureSearch,
+                                                             searching: model.isSearching)
         VStack(alignment: .leading, spacing: 10) {
             Text(.hubFilesPreviewTitle)
                 .font(.system(size: 12.5, weight: .semibold))
@@ -20,13 +29,40 @@ struct HubFilesPreviewColumn: View {
                 .accessibilityAddTraits(.isHeader)
             well(selection)
                 .frame(maxWidth: .infinity)
-                .frame(height: HubFilesMetrics.previewWellHeight)
+                .frame(minHeight: wellHeights.lowerBound, idealHeight: wellHeights.upperBound,
+                       maxHeight: wellHeights.upperBound)
+                // Laid out first, with room for the text and cards set aside, so the well gives before they do.
+                .layoutPriority(1)
                 .background(HubFilesTheme(scheme).well, in: .rect(cornerRadius: 14))
                 .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(HubFilesTheme(scheme).line, lineWidth: 0.5) }
+                .overlay(alignment: .bottomTrailing) {
+                    // A Lookout hit on a PDF page says which page, as the mockup's page preview does.
+                    if let hit = model.selectedLookoutHit, case .pdf(let page?) = LookoutHitKind(hit) {
+                        LookoutPageBadge(page: page)
+                            .padding(10)
+                            .transition(.opacity)
+                    }
+                }
                 .clipShape(.rect(cornerRadius: 14))
-                .id(selection.map(\.url))
+                .id(wellID(selection))
                 .transition(wellTransition(selection))
             HubFilesPreviewDetails(model: model, selection: selection)
+            if let hit = model.selectedLookoutHit {
+                if model.isPictureSearch {
+                    if !hit.isFolder {
+                        let queryIsPicture = model.pictureResults.queryIsPicture
+                        LookoutPictureWhyCard(why: LookoutPictureWhy(hit: hit, queryIsPicture: queryIsPicture),
+                                              picture: model.pictureQuery, queryIsPicture: queryIsPicture, hit: hit)
+                            .transition(.opacity)
+                    }
+                } else {
+                    LookoutWhyCard(why: LookoutWhy(hit: hit, isLookup: model.lookoutResults.isLookup))
+                        .transition(.opacity)
+                }
+            }
+            if let item = selection.first, selection.count == 1 {
+                HubFilesFindSimilar(model: model, item: item)
+            }
             if selection.count == 1 {
                 HubFilesPreviewActions(model: model)
             }
@@ -39,7 +75,15 @@ struct HubFilesPreviewColumn: View {
         .overlay(alignment: .leading) {
             Rectangle().fill(HubFilesTheme(scheme).line).frame(width: 0.5)
         }
-        .animation(HubFilesMotion.animation(.spring(response: 0.35, dampingFraction: 0.85)), value: selection.map(\.url))
+        .animation(HubFilesMotion.animation(.spring(response: 0.35, dampingFraction: 0.85)), value: wellID(selection))
+    }
+
+    /// What the well shows, so it cross-fades when that changes: the selection, or the picture searched with.
+    private func wellID(_ selection: [HubFileItem]) -> [URL] {
+        if selection.isEmpty, let picture = model.pictureQuery {
+            return [picture.fileURL ?? URL(filePath: "/pasted/\(picture.id.uuidString)")]
+        }
+        return selection.map(\.url)
     }
 
     /// How the well enters and leaves when the selection changes.
@@ -48,10 +92,12 @@ struct HubFilesPreviewColumn: View {
     /// text view inside Quick Look's text preview (Markdown, JSON, source) on every animation
     /// frame. Each resize invalidates SwiftUI's layout in the middle of AppKit's layout pass, and
     /// with a few kilobytes of text the loop never settles: AppKit throws and the app crashes
-    /// (DEE-127). Icons, the fanned stack, and the folder still scale in.
+    /// (DEE-127). The picture searched with also counts when it's a file, because it shows through Quick Look too.
+    /// Icons, the fanned stack, the folder, and a pasted picture's own pixels still scale in.
     private func wellTransition(_ selection: [HubFileItem]) -> AnyTransition {
         let hostsQuickLook = selection.count == 1 && selection.first?.isDirectory == false
-        return hostsQuickLook ? .opacity : .opacity.combined(with: .scale(scale: 0.97))
+        let showsPictureFile = selection.isEmpty && model.pictureQuery.map { $0.image == nil && $0.fileURL != nil } == true
+        return hostsQuickLook || showsPictureFile ? .opacity : .opacity.combined(with: .scale(scale: 0.97))
     }
 
     @ViewBuilder
@@ -64,9 +110,52 @@ struct HubFilesPreviewColumn: View {
             } else {
                 HubFilesQuickLookWell(item: item)
             }
+        } else if let picture = model.pictureQuery {
+            // Nothing selected in a search with a picture (it's still being read, or nothing stood out): the picture
+            // itself, as the mockup's preview shows it.
+            LookoutPictureQueryWell(picture: picture)
         } else if let folder = model.isSearching ? nil : model.activePane.folderURL {
             HubFilesFolderIcon(url: folder, size: 128)
         }
+    }
+}
+
+/// The picture searched with, filling the well: a pasted picture's own pixels, or the file through Quick Look.
+private struct LookoutPictureQueryWell: View {
+    let picture: LookoutPictureQuery
+
+    var body: some View {
+        if let image = picture.image {
+            Image(nsImage: image)
+                .resizable()
+                .interpolation(.high)
+                .aspectRatio(contentMode: .fit)
+                .padding(8)
+                .accessibilityLabel(Text(verbatim: picture.name))
+        } else if let url = picture.fileURL {
+            HubFilesQuickLookWell(item: .lookout(path: url.path, isFolder: false, size: nil, modified: nil))
+        }
+    }
+}
+
+/// Find Similar for the one selected file, a search result or a file in the browser: shown when Lookout can search
+/// with it, disabled with why for a kind of file it doesn't read or a document it hasn't read, and absent for folders
+/// and until Lookout can search. Whether the index holds a document is asked off the main actor when it's selected.
+private struct HubFilesFindSimilar: View {
+    let model: HubFilesModel
+    let item: HubFileItem
+
+    var body: some View {
+        let availability = model.similarAvailability(for: item)
+        Group {
+            if availability != .hidden {
+                LookoutFindSimilarButton(availability: availability) {
+                    model.findSimilarForSelection()
+                }
+                .transition(.opacity)
+            }
+        }
+        .task(id: item.url) { await model.checkSimilarIndexed(item) }
     }
 }
 
@@ -106,6 +195,7 @@ private struct HubFilesPreviewDetails: View {
                     .font(.system(size: 12.5))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .textSelection(.enabled)
@@ -125,6 +215,8 @@ private struct HubFilesPreviewDetails: View {
     private var title: String {
         if selection.count > 1 { return HubFilesFormatting.itemCount(selection.count) }
         if let item = selection.first { return item.name }
+        // The picture searched with, while nothing is selected.
+        if let picture = model.pictureQuery { return picture.name }
         return model.isSearching ? "" : model.displayName(for: model.activePane.location)
     }
 
@@ -139,8 +231,18 @@ private struct HubFilesPreviewDetails: View {
         }
         let kind = item.isDirectory ? String(localized: .hubFilesKindFolder) : item.kindDescription
         let amount = item.isDirectory ? count : HubFilesFormatting.size(item.byteSize)
-        return [[kind, amount].compactMap { $0 }.joined(separator: " · "),
-                String(localized: .hubFilesPreviewModified(HubFilesFormatting.date(item.modified)))]
+        // A search with a picture keeps to the mockup's one line, "Desktop › Holiday Sylt 2026 · 3.1 MB", so the
+        // comparison card and Find Similar fit under the well; the row already shows the date.
+        if let hit = model.selectedLookoutHit, model.isPictureSearch {
+            return [[model.lookoutLocation(of: hit), amount].compactMap { $0 }.joined(separator: " · ")]
+        }
+        var lines = [[kind, amount].compactMap { $0 }.joined(separator: " · ")]
+        // A Lookout hit's place, as its row shows it; name results show theirs in the row's Where column.
+        if let hit = model.selectedLookoutHit { lines.insert(model.lookoutLocation(of: hit), at: 0) }
+        if !item.isDirectory || item.modified != nil {
+            lines.append(String(localized: .hubFilesPreviewModified(HubFilesFormatting.date(item.modified))))
+        }
+        return lines
     }
 }
 

@@ -5,6 +5,243 @@ see [Acceptance gaps](ACCEPTANCE-GAPS.md). The sections below preserve the evide
 implementation slice. Statements such as "tests were not run" describe that slice's original
 validation, unless a later dated result supersedes them.
 
+## DEE-125 Lookout
+
+Implemented on `feature/dee-125`. Lookout adds search by content to the Hub's Files search: the
+names from Spotlight first, then a **Lookout · by content** section with photos, screenshots, PDF
+pages, documents, and folders that match what was typed. Two XPC services embedded in DOKK.app do
+the work. `LookoutIndexService` indexes the chosen folders into SQLite, and `LookoutQueryService`
+embeds queries with EmbeddingGemma 2 on llama.cpp. Onboarding is five steps over the Hub, and
+**Settings → Lookout** manages folders, power, and the index. The approved reference is
+`docs/mockups/lookout.html`. The design is in [Lookout](LOOKOUT.md), and behavior is in the
+[user guide](GUIDE.md#lookout) and [DOKK Hub](HUB.md#search).
+
+Validation on 2026-10-12: the build succeeds, and the 158 Lookout tests in 25 suites in
+`DeeDockTests/Lookout/` pass. They cover the crawl rules, the index store, the ranking, folder
+grouping, scope, the settings, the engine, the power policy, the search phases, the onboarding
+draft and coordinator, folder choice, the model downloader, data removal, and the analytics
+payloads. Nothing was seen on screen. Previews were not
+rendered, and the app was not exercised by hand. Passing tests do not establish native acceptance.
+
+### Required hands-on acceptance
+
+None of these scenarios has been exercised.
+
+- [ ] Onboarding opens from the status chip, from the **Set up Lookout** card, and from the
+  **Search by content** switch in Settings with the Hub closed. Check that it holds an anchored Hub
+  open through the folder picker and macOS's prompt, and that sleep, a display change, and ⌘W end it.
+- [ ] Welcome: the three examples, the privacy line, **Not now**, and **Continue**.
+- [ ] Choose folders: Desktop, Documents, and Downloads checked, Pictures unchecked, estimates for
+  Pictures and added folders, and **Estimate after access** for the protected ones. No macOS prompt
+  may appear before the access step. **Add folder…** with a plain folder, a folder inside a chosen
+  one, a folder around chosen ones, `/`, the home folder, a folder in `~/Library`, a hidden folder,
+  `/Library`, and a link to a folder in `~/Library`. iCloud Drive, a folder in
+  `~/Library/CloudStorage`, and `~/Dropbox` must be accepted, and `~/Library/CloudStorage` itself
+  refused.
+- [ ] Access, folder allowed: **Allow…** shows macOS's prompt in context, the row turns to
+  **Allowed**, and the Hub takes keyboard focus back.
+- [ ] Access, folder not allowed: the row shows **Not allowed · Skipped** and **Open Settings**.
+  **Continue** stays off until every folder has an answer and one is allowed.
+- [ ] Access, Open Settings and return: the link opens Privacy & Security › Files and Folders.
+  Allow DOKK there, come back, and check that the row turns to **Allowed** without a new prompt.
+- [ ] Access, already allowed: with every chosen folder allowed, **Continue** on the folders step
+  goes straight to the download.
+- [ ] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
+  **Allowed** without a prompt.
+- [ ] Download, fresh: both files download, show **Checking…** and **Ready**, and land in
+  `~/Library/Application Support/DDock/Lookout/Models/` (`Lookout-dev/Models/` for a Debug build,
+  which downloads its own copy). Note the time and the free space before
+  and after.
+- [ ] Download, interrupted and resumed: turn Wi-Fi off mid-file, check the error, turn it on, and
+  click **Try Again**. The file continues from its partial bytes.
+- [ ] Download, relaunch mid-download: quit DOKK during the download, relaunch, walk onboarding to
+  the download step, and check that it resumes from `Partial/`.
+- [ ] Download, checksum failure, if it can be simulated by changing a partial file: the error
+  appears, the partial file is deleted, and **Try Again** downloads it fresh.
+- [ ] Download, low disk space: with less than about 1 GB free, the error names the space needed
+  and the space free.
+- [ ] Download in the background: close the card during the download and check the download card
+  and the chip's percentage in the Files search.
+- [ ] First pass: the ring moves, the feed shows file names, recently used files come first, and
+  **Start searching** and **Finish in the background** both end onboarding while reading goes on.
+  Check the first search after the first pass has no 5-second encoder start.
+- [ ] Status chip in every state it can reach: **Lookout off · Set up**, **Downloading model**,
+  **Getting ready**, **Reading files**, **Lookout ready**, **Paused** for Low Power Mode, warmth,
+  and battery, **Lookout stopped**, and **Lookout off**.
+- [ ] Search for a photo by description, such as "the dog on the beach".
+- [ ] Search for text inside a screenshot, such as an error message.
+- [ ] Search for a PDF page: the result names the page, and **Why it matched** names it too.
+- [ ] Search for a passage inside a long document, including one past the first 40 chunks after the
+  first pass finished.
+- [ ] Search for a code or a long number: the lookup weighting applies and the why card says so.
+- [ ] A folder result: a folder with three or more matching files shows its thumbnail stack and
+  opens in the pane.
+- [ ] Weaker matches: the fold is closed by default, opens and closes by click and by Right and
+  Left, and the selection moves out of it when it closes.
+- [ ] The honest empty state for a query nothing fits, and the notes while reading or paused.
+- [ ] Scope: **This Mac** against the current folder, and a folder search never listing that
+  folder as a result.
+- [ ] Keyboard in search: Down from the field, Up and Down across both sections, Return on a file,
+  a folder, and with nothing selected.
+- [ ] Keyboard in onboarding: Return continues, Escape closes, Tab and Space reach the controls,
+  and ⌘1 to ⌘3 and ⌘F do nothing while the card shows.
+- [ ] Quick Look with Space on a Lookout file, a PDF page hit, and a folder hit.
+- [ ] Drag a Lookout result out to Finder and to another app, and drop files on a folder result.
+- [ ] Reduce Motion: the card, the step slides, the ring, the feed, the result arrivals, and the
+  status dot.
+- [ ] Reduce Transparency: the onboarding card and the result cards draw opaque.
+- [ ] Light and dark appearance for the card, every step, the results, the chips, and Settings.
+- [ ] German copy in every step, the chip, the results, the why card, the errors, and Settings.
+  Check that no text is cut off.
+- [ ] VoiceOver: the chip, the card's steps and buttons, the folder rows, the result rows, the
+  weaker-matches fold, and the Settings rows.
+- [ ] Sleep and wake during the first pass and during the download.
+- [ ] Unplug a drive with a chosen folder: Settings shows **Not connected · results return when
+  it's back**, its files don't appear in results, and they return without being read again when the
+  drive is connected. Lookout then catches up on changes.
+- [ ] Power policy: Low Power Mode, a serious thermal state if one can be reached, and battery with
+  **Read files on battery too** off. Check that a new screenshot indexes at once in each.
+- [ ] New files: save a screenshot and check it is searchable within seconds.
+- [ ] **Read everything again**: names stay searchable while every file is read again.
+- [ ] **Delete index and model**: the confirmation, then `index.sqlite*`, `Models/`, and
+  `Partial/` are gone, `Logs/` and the person's files remain, and Lookout is not set up. Also
+  delete during the first pass: the row shows **Deleting…** until the service answers, and the
+  files go only then.
+- [ ] Turn **Search by content** off and on: the Lookout section hides and returns, the index is
+  kept, and reading resumes.
+- [ ] Memory and lifetime: the index service exits about 60 s after its work ends, the query
+  service 120 s after its last query, and the vectors are released 2 minutes after the Hub closes.
+
+### Searching with a picture
+
+Implemented on `feature/dee-125` from `docs/mockups/lookout-image-search.html`: dropping or pasting
+a picture into the Files search field, Find Similar on results, the picture chip, and the two
+result groups. See [Searching with a picture](LOOKOUT.md#searching-with-a-picture).
+
+Validation on 2026-10-12: `LookoutBench` in Release passed the picture gates on an M4: warm picture
+query p95 568 ms at 280 tokens and 240 ms at 140 (limit 600 ms), cold picture search 0.77 s (limit
+2.5 s; 1.21 s once with the encoder's first shader compile), and 906 MB peak for the query service
+with the encoder (limit 1 GB). Earlier runs measured the 280-token p95 at 553–644 ms, so it sits
+near its limit. The DeeDock scheme builds, and the 231 Lookout tests in 32 suites pass, including
+new suites for the vector-only ranking, Find Similar's vector, the picture search's phases, the
+chip, the drop rules, and the analytics. Nothing was seen on screen, previews were not rendered,
+and no drag, paste, or XPC call was made by hand.
+
+None of these scenarios has been exercised.
+
+- [ ] Drag a photo from Finder over the Hub: the field widens into the well, it pulses until the
+  pointer is over it, then glows. Drop it: the chip appears, the bar shows **Waking Lookout's
+  picture reader…** on the first picture, then **Reading your picture…**, then the two groups.
+- [ ] Drag a ZIP file and a folder over the Hub: the orange **Lookout searches with pictures only**
+  shows, and nothing drops on the field.
+- [ ] Drops elsewhere don't change: files onto a pane, a folder row, a sidebar place, a browser tab,
+  and the Apps tab's file drop. Moving a non-picture between panes shows no well.
+- [ ] Drag a picture out of Safari or Photos. Note what Photos offers; a file promise alone isn't
+  read.
+- [ ] The picture reader is warm by the drop: drag in, wait a second over the Hub, drop, and check
+  the bar goes straight to reading. Check Activity Monitor for the query service at about 900 MB
+  after a picture and about 215 MB in a session with words only, and that it exits 120 s after the
+  last search.
+- [ ] Paste a screenshot copied with ⌃⇧⌘4 with ⌘V in the field and in the listing, then a picture
+  file copied in Finder, then text: only the text pastes as text.
+- [ ] Find Similar from the preview button, the context menu, ⇧⌘L, and by dragging a result onto
+  the field, on a picture, a screenshot, a PDF page hit (the bar names the page), a document, and a
+  name result outside the chosen folders (a picture is read, a document's button is disabled with
+  **Lookout hasn't read this file yet**). Folders have no button, and a ZIP shows **Lookout doesn't
+  read this kind of file**.
+- [ ] Chaining: Find Similar on a result of a picture search, then ⌫ goes back to the first words.
+- [ ] Chip: ⌫ in the empty field and ✕ bring back the earlier words; **Back to “…”** does the
+  same; the clear button and Escape clear everything; typing starts a search by words.
+- [ ] Results: the group order for a picture and for a document, each group's own weaker fold with
+  Right and Left, "Nothing stands out here." for an empty group, the honest message, and the file
+  searched with missing from its results. Scope **This Mac** against the current folder.
+- [ ] Preview: the shorter well, **Why it matched** with Yours ≈ Match, the sentence for each case,
+  and the closeness meter; Open, Quick Look, and Reveal stay visible under them; the picture
+  searched with shows while it's being read and when nothing stood out.
+- [ ] States: not set up (the **Search with a picture** card), downloading (the Pictures model
+  message), reading files, and paused ("It still reads your picture…").
+- [ ] Reduce Motion: no well pulse, and the chip, the bar, and the rows fade. Reduce Transparency,
+  light and dark, German copy without cut-off text, and VoiceOver on the chip, the well, Find
+  Similar, and the meter.
+- [ ] Analytics in the debug log: `lookout_image_search` with each source and `cold`, and
+  `query: image` on `lookout_result_opened`, never a name or a path.
+
+### Find Similar everywhere, more document types, and progress data
+
+Implemented on `feature/dee-125`: Find Similar in the Files browser, dropping documents the index
+holds on the search field, the field no longer inserting a dragged file's path, Find Similar in the
+Apps tab's file actions after a drop on the DOKK tile, the document types `rst`, `adoc`, `asciidoc`,
+`org`, `tex`, `latex`, `textile`, `xhtml`, `mdx`, `srt`, `vtt`, `webarchive`, and `rtfd` with SVG
+ignored, and `LookoutEngine.progress`. See [Lookout](LOOKOUT.md#ways-in),
+[What gets read](LOOKOUT.md#what-gets-read), and [Progress](LOOKOUT.md#progress).
+
+Validation on 2026-10-12: the DeeDock scheme builds with the services, and the 262 Lookout tests in
+35 suites pass, including new suites for the document types (rules, the `.rtfd` crawl and gate,
+subtitles, LaTeX, web archives, and an existing index's next sync), Find Similar's new ways in (the
+browser, the Apps tab's file actions, and the Hub's field editor refusing file drags), and the
+progress model (the pace, the phases, passes, the first walk's growing total, the problem counts in
+SQL, and the engine's throttle). Nothing was seen on screen, previews were not rendered, and the app
+was not exercised by hand.
+
+The progress card from the separate UI pass is wired to this model: `LookoutProgressTracker`
+produces the card's `LookoutProgressDisplay`, and the Files tab's chip fills to its fraction. With
+it, the DeeDock scheme builds in Debug, and the 270 Lookout tests in 36 suites pass, the 8 progress
+formatting tests included. The card, the Settings pane, and the chip were rendered offscreen from
+states the real tracker produced over a simulated first pass, and from the nine samples, in light
+and dark, English and German, with a temporary harness that isn't committed. The app was not run.
+
+None of these scenarios has been exercised.
+
+- [ ] Drag a file from the Files tab and from Finder onto the search field while it's being edited
+  and while it isn't: no path appears in the field. Drag plain text from TextEdit: it still drops in
+  as text. Rename a file in the Files tab and drag a file onto the rename field: no path appears.
+- [ ] Drop on the field a picture in the index (the bar says **From your index · instant**), a
+  picture outside it (it's read), a PDF and a Markdown file in the index (**Drop to find files like
+  this one**, then the document groups), a PDF outside the chosen folders (**Lookout hasn't read
+  this file yet**, refused), and a ZIP (**Lookout searches with pictures only**, refused).
+- [ ] Move an indexed PDF between panes: the well opens and the move still works. Move an
+  unindexed text file: no well. Check the query service's memory doesn't grow for document drags.
+- [ ] Browser Find Similar: select a photo, a screenshot, a PDF, and a document in the list, icons,
+  and columns views, and use the button, the context menu, and ⇧⌘L. The Files tab switches to the
+  picture search with the chip, the bar, and the groups, with no **Back to**. A document outside the
+  index shows the disabled button with its reason; a folder has none; before setup there's none.
+- [ ] The browsing preview column with Find Similar: Open, Quick Look, and Reveal stay visible under
+  a long, three-line name; the well shrinks first.
+- [ ] Drop one photo on the DOKK tile: **Find Similar** is first in the file actions, with the
+  glyph, and choosing it opens the Files tab's picture search. Drop two files, a ZIP, and an
+  unindexed PDF: no Find Similar. Drop with Lookout off: none.
+- [ ] Put a `.rst`, `.adoc`, `.org`, `.tex`, `.textile`, `.xhtml`, `.mdx`, `.srt`, `.vtt`,
+  `.webarchive` (saved from Safari), and `.rtfd` (saved from TextEdit with a picture) in a chosen
+  folder. Each becomes searchable by its words, the subtitles without timings, the LaTeX without
+  commands. Edit the `.rtfd` in TextEdit and check it's read again.
+- [ ] On an index made before this change: the next sync picks up the new types without reading
+  anything else again, and an SVG that failed before leaves the index and its problem count.
+- [ ] Settings' progress card during a real first pass: **Looking through your folders…** with a
+  count that grows, then **Reading files** with a final total, a pace after about 10 s, and a time
+  left that settles. Low Power Mode shows **Paused · Low Power Mode**, and resuming keeps the pace.
+  **Pause** and **Resume** stop and continue reading. Unplugging a chosen drive shows **Waiting for
+  “…”** with its name. Quitting and relaunching partway keeps the first pass counting from the
+  start, and **finished at …** survives a relaunch. Skipped and unreadable files list their reasons
+  in English and German.
+- [ ] The Files tab's status chip fills to the same percentage as the Settings ring while reading,
+  shows no wash while counting or paused, and its tooltip adds the percentage.
+- [ ] The **Memory while searching** row wraps cleanly in English and German.
+- [ ] Analytics in the debug log: `lookout_image_search` with `source` `browser`, `hub_tile`, and
+  `drop` for a dropped document, and `cold: false` for every stored vector.
+
+### Known gaps from code review
+
+- A picture dragged out of a browser that also carries its address as plain text may still insert
+  the address while the field is being edited, because it's text to the field editor.
+- Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending
+  with Esi.
+- Audio, video, and code are Planned. Combining a picture with words, and reading the words in a
+  dropped screenshot, are Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)).
+- The Files tab has no "Try Lookout" card with example searches, so the mockup's idle hint ("Or drop a
+  picture on the search field to find ones like it.") has nowhere to go yet.
+- The engine can pause reading, but no control offers it yet.
+- Settings has no controls for skipped subfolders or file types yet.
+
 ## DEE-121 DOKK Hub
 
 Implemented on `feature/dee-121`. The DOKK tile replaces the App Launcher tile and opens the

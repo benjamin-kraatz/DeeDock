@@ -137,6 +137,42 @@ private struct HubFilesPreviewFrame: View {
     })
 }
 
+#Preview("Search · names and Lookout") {
+    HubFilesPreviewFrame(model: LookoutPreviewData.model(
+        status: .ready, phase: .done, results: LookoutPreviewData.beachResults, query: "re",
+        names: (HubFilesPreviewData.dataSource().folders["/Users/benn/Downloads"] ?? [])
+            .filter { $0.name.localizedCaseInsensitiveContains("re") }) { model in
+        model.lookoutSelection = LookoutPreviewData.beach.path
+    })
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Search · Lookout page hit, light") {
+    HubFilesPreviewFrame(model: LookoutPreviewData.model(
+        status: .indexing(remaining: 1_204, progress: 0.4), phase: .done, results: LookoutPreviewData.leaseResults,
+        query: "pets in the lease") { model in
+        model.lookoutSelection = LookoutPreviewData.lease.path
+    })
+    .preferredColorScheme(.light)
+}
+
+#Preview("Search · Lookout not set up") {
+    HubFilesPreviewFrame(model: LookoutPreviewData.model(status: .notSetUp, phase: .unavailable, query: "taxes"))
+}
+
+#Preview("Search · with a picture") {
+    HubFilesPreviewFrame(model: LookoutPicturePreviewData.model(
+        picture: LookoutPicturePreviewData.dropped, results: LookoutPicturePreviewData.beachResults,
+        wordsBefore: "dog on the beach"))
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Search · Find Similar on a page, light") {
+    HubFilesPreviewFrame(model: LookoutPicturePreviewData.model(
+        picture: LookoutPicturePreviewData.similarLease, results: LookoutPicturePreviewData.leaseResults))
+    .preferredColorScheme(.light)
+}
+
 #Preview("Running transfer") {
     HubFilesPreviewFrame(model: .preview { model in
         model.previewOverrides.transfer = HubFilesTransferStatus(
