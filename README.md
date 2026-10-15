@@ -4,6 +4,7 @@ A native replacement for the macOS Dock. It looks and behaves like the Dock you 
 
 [![Latest release](https://img.shields.io/github/v/release/benjamin-kraatz/DeeDock?label=release)](https://github.com/benjamin-kraatz/DeeDock/releases/latest)
 ![macOS 27](https://img.shields.io/badge/macOS-27-black?logo=apple)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/benjamin-kraatz/DeeDock?utm_source=oss&utm_medium=github&utm_campaign=benjamin-kraatz%2FDeeDock&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 ## Install
 
