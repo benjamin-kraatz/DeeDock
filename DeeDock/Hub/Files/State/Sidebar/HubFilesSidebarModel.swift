@@ -151,6 +151,12 @@ final class HubFilesSidebarModel {
         files.show(location)
     }
 
+    /// Opens an available Favorites row on the right, resolving its current location at use time.
+    func openInRightSplit(_ id: HubFilesSidebarEntryID) {
+        guard let entry = store.entry(id), let location = store.location(for: entry), let files else { return }
+        files.openInRightSplit(location)
+    }
+
     // MARK: Adding
 
     /// Adds folders at the end of Favorites from a context menu or ⌃⌘T. `urls` are folders

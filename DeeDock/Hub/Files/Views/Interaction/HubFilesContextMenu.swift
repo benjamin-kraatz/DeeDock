@@ -13,6 +13,15 @@ enum HubFilesContextMenu {
         let items = model.actionableItems
         let single = items.count == 1
         menu.add(.hubFilesMenuOpen, key: "\r", modifiers: []) { model.openSelection() }
+        if single, let folder = items.first, folder.isDirectory && !folder.isPackage {
+            menu.add(.hubFilesSidebarOpenInNewTab) {
+                model.newTab()
+                model.show(.folder(normalizing: folder.url))
+            }
+            menu.add(.hubFilesMenuOpenInRightSplit) {
+                model.openInRightSplit(.folder(normalizing: folder.url))
+            }
+        }
         menu.add(.hubFilesMenuQuickLook, key: " ", modifiers: []) { model.toggleQuickLook() }
         menu.add(.hubFilesMenuReveal, key: "r", modifiers: [.command, .option]) { model.revealSelectionInFinder() }
         menu.add(.hubFilesMenuCopyPath, key: "c", modifiers: [.command, .option]) { model.copySelectionPaths() }
@@ -59,7 +68,7 @@ enum HubFilesContextMenu {
 // MARK: - Sidebar
 
 extension HubFilesContextMenu {
-    /// A Favorites row: open it in a new tab, reveal or copy its folder, or remove it.
+    /// A Favorites row: open it in a new tab or right split, reveal or copy its folder, or remove it.
     /// Recents has no folder; a missing or disconnected folder can only be removed.
     static func favorite(_ id: HubFilesSidebarEntryID, model: HubFilesModel) -> NSMenu? {
         let sidebar = model.sidebar
@@ -68,6 +77,9 @@ extension HubFilesContextMenu {
         let folder = sidebar.store.folderURL(for: entry)
         menu.add(.hubFilesSidebarOpenInNewTab, enabled: sidebar.store.location(for: entry) != nil) {
             sidebar.openInNewTab(id)
+        }
+        menu.add(.hubFilesMenuOpenInRightSplit, enabled: sidebar.store.location(for: entry) != nil) {
+            sidebar.openInRightSplit(id)
         }
         menu.addItem(.separator())
         menu.add(.hubFilesMenuReveal, enabled: folder != nil) {

@@ -206,6 +206,22 @@ final class HubFilesModel: HubTabModel {
 
     // MARK: Panes and layout
 
+    /// Shows a location in the right pane, enabling split view and giving it keyboard input.
+    /// Preserves the left pane and reuses the right pane's independent navigation history.
+    /// Clears search and persists the resulting layout, including when split was already on.
+    func openInRightSplit(_ location: HubFilesLocation) {
+        let tab = selectedTab
+        cancelRenames()
+        query = ""
+        tab.ensureSecondPane { makePane(location: location, sort: HubFileSort()) }
+        tab.isSplit = true
+        tab.activePaneIndex = 1
+        tab.panes[1].navigate(to: location)
+        refreshActivation()
+        quickLook.selectionDidChange()
+        persist()
+    }
+
     func toggleSplit() {
         let tab = selectedTab
         cancelRenames()
