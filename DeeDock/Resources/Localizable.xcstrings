@@ -2289,6 +2289,24 @@
         }
       }
     },
+    "hubFilesMenuOpenInRightSplit" : {
+      "comment" : "Files folder and Favorites context-menu command. Opens the location in the right pane of the current browser tab, enabling split view if needed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts in geteilter Ansicht öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Split View on Right"
+          }
+        }
+      }
+    },
     "hubFilesSidebarOpenInNewTab" : {
       "comment" : "Files sidebar: row context-menu command that opens the row's folder in a new browser tab.",
       "extractionState" : "manual",
