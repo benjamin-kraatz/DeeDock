@@ -233,7 +233,7 @@ struct DockIslandTests {
         let sizes = Array(repeating: layout.iconSize, count: 4)
         let frames = layout.islandFrames(sizes: sizes)
         #expect(frames.count == 3)
-        #expect(frames[0].width == 2 * 48 + 4 + 20)
+        #expect(abs(frames[0].width - (2 * 48 + 4 + 20)) < 0.001)
         #expect(abs(frames[1].minX - frames[0].maxX - 12) < 0.001)
         #expect(abs(frames[2].minX - frames[1].maxX - 12) < 0.001)
         let union = layout.surfaceFrame(sizes: sizes)
