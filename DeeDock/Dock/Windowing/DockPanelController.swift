@@ -712,8 +712,15 @@ final class DockPanelController {
         let nextSlots = DockRenderSlot.slots(entries: store.entries, proposal: proposal)
         // Moving one preview between boundaries changes slot order, not panel geometry. Avoid
         // synchronously setting the native window frame again from AppKit's drag callback.
-        let layoutChanged = previousSlots.count != nextSlots.count
+        var layoutChanged = previousSlots.count != nextSlots.count
             || previousSlots.filter(\.isPinned).count != nextSlots.filter(\.isPinned).count
+        // A gap or the launcher crossing an island boundary keeps both counts and the window frame,
+        // but moves the island edges; the presentation and centers must follow it.
+        if !layoutChanged, lastSettings?.islands.isEnabled == true {
+            let plan = store.islandPlan, order = store.pins.map(\.id)
+            layoutChanged = DockIslandAssignment.spans(slots: previousSlots, plan: plan, pinOrder: order)
+                != DockIslandAssignment.spans(slots: nextSlots, plan: plan, pinOrder: order)
+        }
         interaction.dragProposal = proposal
         interaction.dragSourceID = source
         interaction.dragActive = source != nil || targeted

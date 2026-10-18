@@ -144,6 +144,12 @@ struct DockIslandTests {
         #expect(!settings.isValid)
         // An override document without the key inherits the shared value.
         #expect(DockSettingsOverrides().resolving(round).islands == round.islands)
+        // A complete document saved before islands existed decodes with islands off.
+        var document = try #require(try JSONSerialization.jsonObject(with: JSONEncoder().encode(DockSettings.defaults)) as? [String: Any])
+        document.removeValue(forKey: "islands")
+        let older = try JSONDecoder().decode(DockSettings.self, from: try JSONSerialization.data(withJSONObject: document))
+        #expect(older.islands == DockIslandSettings.defaults)
+        #expect(!older.islands.isEnabled)
     }
 
     // MARK: Assignment

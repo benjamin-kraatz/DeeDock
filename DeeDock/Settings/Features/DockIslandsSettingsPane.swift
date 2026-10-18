@@ -73,17 +73,27 @@ struct DockIslandListCard: View {
         let pinned = plan.pinnedIslands.enumerated().map { index, island -> DockIslandRowModel in
             let names = pins[start..<min(pins.count, start + island.pinCount)].map(\.name)
             defer { start += island.pinCount }
+            let customIndex = plan.pinnedIslands.prefix(index).filter { $0.kind == .custom }.count
             return DockIslandRowModel(island: island, names: Array(names), pinnedIndex: index,
-                                      firstPin: start, color: DockIslandPalette.color(for: island.tint)
-                                          ?? DockIslandPalette.color(for: island.kind, customIndex: max(0, index - 1)))
+                                      firstPin: start, color: swatch(for: island, customIndex: customIndex))
         }
         return [row(kind: .tile)] + pinned + [row(kind: .running), row(kind: .utilities)]
     }
 
     private func row(kind: DockIslandKind) -> DockIslandRowModel {
         let island = plan.island(for: kind)
-        return DockIslandRowModel(island: island, names: [], pinnedIndex: nil, firstPin: 0,
-                                  color: DockIslandPalette.color(for: island.tint) ?? DockIslandPalette.color(for: kind))
+        return DockIslandRowModel(island: island, names: [], pinnedIndex: nil, firstPin: 0, color: swatch(for: island))
+    }
+
+    /// The row's swatch: the island's own tint, else what the dock-wide colour source would give it.
+    /// Icon-derived colours need the live icons, so that mode previews the kind palette here.
+    private func swatch(for island: DockIsland, customIndex: Int = 0) -> DockIslandColor {
+        if let own = DockIslandPalette.color(for: island.tint) { return own }
+        switch tintMode {
+        case .accent: return .accent
+        case .none: return .untinted
+        case .byKind, .fromIcons: return DockIslandPalette.color(for: island.kind, customIndex: customIndex)
+        }
     }
 
     var body: some View {
