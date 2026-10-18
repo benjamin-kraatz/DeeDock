@@ -184,6 +184,9 @@ struct DockContextMenuBridge: NSViewRepresentable {
             let parent = NSMenuItem(title: String(localized: .islandsMenu), action: nil, keyEquivalent: "")
             parent.image = NSImage(systemSymbolName: "rectangle.split.3x1", accessibilityDescription: nil)
             let submenu = NSMenu()
+            // The root menu already opts out of automatic enabling; a fresh submenu must too, or
+            // AppKit re-enables Split and Merge because their selectors exist on the target.
+            submenu.autoenablesItems = false
             let split = addItem(.islandsSplitHere, symbol: "rectangle.lefthalf.inset.filled.arrow.left", action: #selector(splitIsland), to: submenu)
             split.isEnabled = interaction?.canSplitIsland?(item.id) == true
             let vertical = interaction?.layout.edge.isVertical == true

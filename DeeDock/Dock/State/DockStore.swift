@@ -544,9 +544,11 @@ final class DockStore {
 
     // MARK: Islands
 
-    /// This display's island plan, reconciled to the pins the dock shows. Automatic islands carry
-    /// stable identities, so an edit against this snapshot finds the same island on the next read.
-    var islandPlan: DockIslandPlan { islands.plan(for: displayID).reconciled(pinCount: pins.count) }
+    /// This display's island plan, reconciled to the saved pins. Automatic islands carry stable
+    /// identities, so an edit against this snapshot finds the same island on the next read. The dock
+    /// reconciles again for rendering against the pins it shows, so a history preview never narrows
+    /// the plan that edits start from.
+    var islandPlan: DockIslandPlan { islands.plan(for: displayID).reconciled(pinCount: persistedPins.count) }
 
     /// The pinned island holding `pinID`, or nil for a pin not on this display.
     func island(containingPin pinID: String) -> DockIsland? {
@@ -584,7 +586,7 @@ final class DockStore {
     }
 
     func setIslandTint(_ tint: DockIslandTint, containingPin pinID: String) {
-        guard let island = island(containingPin: pinID) else { return }
+        guard canEditPins, let island = island(containingPin: pinID) else { return }
         saveIslandPlan(islandPlan.tinting(island.id, tint), action: .tint)
     }
 
@@ -614,7 +616,8 @@ final class DockStore {
     }
 
     private func saveIslandPlan(_ plan: DockIslandPlan, action: AnalyticsIslandAction) {
-        guard plan != islands.plan(for: displayID) else { return }
+        // A timeline preview shows other pins; a plan reconciled against them must never be saved.
+        guard canEditPins, plan != islands.plan(for: displayID) else { return }
         guard islands.save(plan, for: displayID) else {
             errorMessage = .islandsSaveFailed
             return

@@ -64,7 +64,6 @@ enum DockIslandAssignment {
             }
         }
         close(at: slots.count)
-        var customIndex = 0
         return result.map { key, range in
             switch key {
             case .tile: return DockIslandSpan(island: plan.island(for: .tile), range: range, customIndex: 0)
@@ -72,8 +71,9 @@ enum DockIslandAssignment {
             case .utilities: return DockIslandSpan(island: plan.island(for: .utilities), range: range, customIndex: 0)
             case .pinned(let group):
                 let island = plan.pinnedIslands.indices.contains(group) ? plan.pinnedIslands[group] : DockIsland.automatic(.pinned)
-                let position = island.kind == .custom ? customIndex : 0
-                if island.kind == .custom { customIndex += 1 }
+                // Counted in the plan, not per span, so an island split by the tile keeps one colour
+                // and hiding an earlier island never recolours the later ones.
+                let position = island.kind == .custom ? plan.pinnedIslands.prefix(group).filter { $0.kind == .custom }.count : 0
                 return DockIslandSpan(island: island, range: range, customIndex: position)
             }
         }

@@ -170,6 +170,16 @@ struct DockIslandTests {
         #expect(around.map(\.island.kind) == [.pinned, .tile, .pinned])
         #expect(around[0].island.id == around[2].island.id)
         #expect(Set(around.map(\.id)).count == 3)
+        // A custom island split by the tile keeps one palette index on both sides.
+        let customAround = DockIslandAssignment.spans(slots: launcherAmong, plan: plan, pinOrder: order)
+        #expect(customAround.map(\.customIndex) == [0, 0, 0])
+        let twoCustom = DockIslandPlan(pinnedIslands: [DockIsland(kind: .pinned, pinCount: 1), DockIsland(kind: .custom, pinCount: 1),
+                                                       DockIsland(kind: .custom, pinCount: 1)])
+        let three: [DockRenderSlot] = [app("a", pinned: true), app("b", pinned: true), app("c", pinned: true)]
+        #expect(DockIslandAssignment.spans(slots: three, plan: twoCustom, pinOrder: order).map(\.customIndex) == [0, 0, 1])
+        // Hiding the first custom island leaves the second its colour.
+        #expect(DockIslandAssignment.spans(slots: [app("a", pinned: true), app("c", pinned: true)], plan: twoCustom, pinOrder: order)
+            .map(\.customIndex) == [0, 1])
         let collapsed: [DockRenderSlot] = [.group(DockGroupControl(group: .pinned, count: 3, expanded: false)), app("c", pinned: false)]
         #expect(DockIslandAssignment.spans(slots: collapsed, plan: plan, pinOrder: order).map(\.island.kind) == [.pinned, .running])
     }

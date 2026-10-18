@@ -53,7 +53,14 @@ struct DockSurfaceView: View {
                     cornerRadius: interaction.idleFade.settings.cornerRadius,
                     idleOpacity: opacity.background,
                     idleAnimation: interaction.idleFade.animation,
-                    reduceTransparency: reduceTransparency
+                    reduceTransparency: reduceTransparency,
+                    reduceMotion: reduceMotion,
+                    breathing: interaction.focusBreathing.map { breathing in
+                        (breathing.isActive(modeID: interaction.dockModes?.activeMode.id,
+                                            sessionRunning: interaction.focusSession?.session?.phase == .running)
+                             && interaction.exposesContent,
+                         breathing.intensity)
+                    }
                 )
             } else if drawsBackground {
                 DockBackgroundView(
