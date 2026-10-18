@@ -265,6 +265,25 @@ struct DockContentView: View {
         DockPreviewContent(items: [])
     }
 
+    #Preview("Islands: automatic") {
+        DockPreviewContent(showsLauncher: true, islands: .automatic)
+            .background(Color(red: 0.05, green: 0.06, blue: 0.12))
+            .preferredColorScheme(.dark)
+    }
+
+    #Preview("Islands: split pins, magnified") {
+        DockPreviewContent(magnified: true, showsLauncher: true,
+                           islands: DockIslandPlan(pinnedIslands: [DockIsland(kind: .pinned, pinCount: 1),
+                                                                   DockIsland(kind: .custom, name: "Chat", tint: .pink, pinCount: 1)]))
+            .background(Color(red: 0.05, green: 0.06, blue: 0.12))
+            .preferredColorScheme(.dark)
+    }
+
+    #Preview("Islands: reduced transparency, light") {
+        DockPreviewContent(reduceMotion: true, reduceTransparency: true, showsLauncher: true, islands: .automatic)
+            .preferredColorScheme(.light)
+    }
+
     #Preview("Launch error") {
         DockPreviewContent(
             errorMessage: .errorOpenApp(

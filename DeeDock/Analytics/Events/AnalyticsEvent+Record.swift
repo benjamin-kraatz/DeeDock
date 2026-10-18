@@ -77,6 +77,7 @@ extension AnalyticsEvent {
         case .drive: "drive"
         case .driveEjected: "drive_ejected"
         case .pinChanged: "pin_changed"
+        case .islandsEdited: "islands_edited"
         case .appMenuAction: "app_menu_action"
         case .documentsOpened: "documents_opened"
         case .shortcutRun: "shortcut_run"
@@ -263,6 +264,8 @@ extension AnalyticsEvent {
              "blocker_count": .init(blockerCount), "trigger": .init(trigger)]
         case let .pinChanged(action, kind, count, source):
             ["action": .init(action), "kind": .init(kind), "count": .init(count), "source": .init(source)]
+        case let .islandsEdited(action, islandCount):
+            ["action": .init(action), "island_count": .init(islandCount)]
         case let .appMenuAction(action, outcome, trigger):
             ["action": .init(action), "outcome": .init(outcome), "trigger": .init(trigger)]
         case let .documentsOpened(source, fileCount, fileType, outcome):

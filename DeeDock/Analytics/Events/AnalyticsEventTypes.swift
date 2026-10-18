@@ -177,6 +177,11 @@ nonisolated enum AnalyticsPinAction: String, AnalyticsToken {
     case pin, unpin, reorder
 }
 
+/// What changed in a display's islands. Never the island's name or which apps it holds.
+nonisolated enum AnalyticsIslandAction: String, AnalyticsToken {
+    case split, merge, rename, tint, reset
+}
+
 nonisolated enum AnalyticsPinKind: String, AnalyticsToken {
     case application, folder, mixed
 }

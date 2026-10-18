@@ -68,6 +68,13 @@ final class DockPanelController {
         interaction.canMovePin = { [weak store] id, distance in store?.canMovePin(id, by: distance) ?? false }
         interaction.copyPin = { [weak store] reference, displayID in store?.copyPin?(reference, displayID) }
         interaction.removePin = { [weak store] id in _ = store?.removePin(id) }
+        interaction.canSplitIsland = { [weak store] id in store?.canSplitIsland(beforePin: id) ?? false }
+        interaction.splitIsland = { [weak store] id in store?.splitIsland(beforePin: id) }
+        interaction.canMergeIsland = { [weak store] id, direction in store?.canMergeIsland(containingPin: id, direction: direction) ?? false }
+        interaction.mergeIsland = { [weak store] id, direction in store?.mergeIsland(containingPin: id, direction: direction) }
+        interaction.islandTint = { [weak store] id in store?.island(containingPin: id)?.tint }
+        interaction.setIslandTint = { [weak store] id, tint in store?.setIslandTint(tint, containingPin: id) }
+        interaction.resetIslands = { [weak store] in store?.resetIslands() }
         interaction.setFolderPresentation = { [weak store] id, value in _ = store?.setFolderPresentation(value, for: id) }
         interaction.openTrash = { [weak store] in store?.openTrash() }
         interaction.emptyTrash = { [weak store] in store?.emptyTrash() }
@@ -157,21 +164,28 @@ final class DockPanelController {
             ? (settings.edge.isVertical ? 260 : 168)
             : nil
         let restingSections = DockLauncherPlacement.sectionCounts(store.entries)
+        let restingIslands = settings.islands.isEnabled
+            ? DockIslandAssignment.layout(spans: DockIslandAssignment.spans(slots: store.entries, plan: store.islandPlan),
+                                          settings: settings.islands)
+            : nil
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: restingSections.favorites,
                                          utilityCount: restingSections.utilities,
                                          leadingUtilityCount: restingSections.leading,
                                          availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
-                                         calloutReserve: timelineCallout)
+                                         calloutReserve: timelineCallout, islands: restingIslands)
         baseRestingFrame = DockGeometry.panelFrame(referenceFrame: reference, layout: baseLayout, settings: settings)
         let slots = DockRenderSlot.slots(entries: store.entries, proposal: interaction.dragProposal)
         let sections = DockLauncherPlacement.sectionCounts(slots)
+        let islands = settings.islands.isEnabled ? islandPresentation(slots: slots, settings: settings.islands) : nil
+        interaction.islands = islands
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: sections.favorites,
                                                  utilityCount: sections.utilities,
                                                  leadingUtilityCount: sections.leading,
                                                  availableLength: settings.edge.length(of: reference.size),
                                          availableDepth: settings.edge.depth(of: reference.size), settings: settings,
-                                         calloutReserve: timelineCallout)
+                                         calloutReserve: timelineCallout,
+                                         islands: islands.map { DockIslandAssignment.layout(spans: $0.spans, settings: settings.islands) })
         let frame = DockGeometry.panelFrame(referenceFrame: reference, layout: interaction.layout, settings: settings)
         let updated = DockPresentationGeometry(screen: display.frame, restingFrame: frame, layout: interaction.layout, settings: settings.behavior)
         let changed = geometry?.windowFrame != updated.windowFrame || geometry?.activation.zone != updated.activation.zone
@@ -200,6 +214,29 @@ final class DockPanelController {
                                : nil,
                            reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
                            reduceTransparency: NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency)
+    }
+
+    /// Sampled icon colours by slot ID, for the `fromIcons` tint mode. Sampling happens here, on
+    /// projection changes, never on pointer moves; entries that leave the dock drop their sample.
+    private var iconColorSamples: [String: DockIslandColor?] = [:]
+
+    /// Groups `slots` into islands and resolves each island's colour.
+    private func islandPresentation(slots: [DockRenderSlot], settings: DockIslandSettings) -> DockIslandPresentation {
+        let spans = DockIslandAssignment.spans(slots: slots, plan: store.islandPlan)
+        if settings.tintMode == .fromIcons {
+            let ids = Set(slots.map(\.id))
+            iconColorSamples = iconColorSamples.filter { ids.contains($0.key) }
+            for slot in slots where iconColorSamples[slot.id] == nil {
+                iconColorSamples[slot.id] = slot.icon.flatMap(DockIconTintSampler.color)
+            }
+        } else if !iconColorSamples.isEmpty {
+            iconColorSamples = [:]
+        }
+        let colors = spans.map { span in
+            let samples = span.range.clamped(to: slots.indices).compactMap { iconColorSamples[slots[$0].id] ?? nil }
+            return DockIslandPalette.resolve(span, mode: settings.tintMode, iconColors: samples)
+        }
+        return DockIslandPresentation(spans: spans, colors: colors, settings: settings)
     }
 
     /// Native events and animation samples share top-left content coordinates after inverse transformation.

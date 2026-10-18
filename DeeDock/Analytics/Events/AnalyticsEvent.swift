@@ -147,6 +147,9 @@ enum AnalyticsEvent {
     case driveEjected(VolumeKind, outcome: AnalyticsEjectOutcome, forced: Bool, blockerCount: Int,
                       trigger: AnalyticsTrigger)
     case pinChanged(AnalyticsPinAction, kind: AnalyticsPinKind, count: Int, source: AnalyticsPinSource)
+    /// A display's islands were split, merged, renamed, retinted, or reset. `islandCount` is the
+    /// number of pinned islands afterwards.
+    case islandsEdited(AnalyticsIslandAction, islandCount: Int)
 
     // App tiles
     case appMenuAction(AnalyticsAppMenuAction, outcome: AnalyticsOutcome, trigger: AnalyticsTrigger)

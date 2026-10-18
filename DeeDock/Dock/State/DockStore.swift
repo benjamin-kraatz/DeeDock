@@ -96,17 +96,20 @@ final class DockStore {
 
     @ObservationIgnored private let history: DockLocalHistoryStore?
     @ObservationIgnored private let pinWeather: PinWeatherStore?
+    /// Island plans shared with Settings and the other docks.
+    @ObservationIgnored let islands: DockIslandPlanStore
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
          trash: TrashController? = nil, shelf: ShelfController? = nil, volumes: VolumeController? = nil,
          capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil,
          focusSession: FocusSessionController? = nil, history: DockLocalHistoryStore? = nil,
-         pinWeather: PinWeatherStore? = nil) {
+         pinWeather: PinWeatherStore? = nil, islands: DockIslandPlanStore? = nil) {
         self.focusSession = focusSession
         self.actions = actions
         self.displayID = displayID
         self.catalog = catalog
         self.profiles = profiles
+        self.islands = islands ?? DockIslandPlanStore()
         self.trash = trash
         self.shelf = shelf
         self.volumes = volumes
@@ -471,6 +474,10 @@ final class DockStore {
             try profiles.savePins(proposed, for: displayID)
             history?.recordPinChange(previous: previous, next: proposed, displayID: displayID)
             reportPinChange(previous: previous, next: proposed)
+            // Islands follow their pins: an unmoved pin keeps its island, a moved or new one joins
+            // its new neighbour's. Saved before the launcher re-anchors, so both see the same order.
+            islands.save(islands.plan(for: displayID).following(previous: previous.map(\.id), next: proposed.map(\.id),
+                                                                relocated: relocated), for: displayID)
             saveLauncherPosition(DockLauncherPlacement.reanchored(launcherPosition, previous: previous.map(\.id),
                                                                    next: proposed.map(\.id), relocated: relocated))
             return true
@@ -533,6 +540,85 @@ final class DockStore {
             visible += 1
         }
         return pins.count
+    }
+
+    // MARK: Islands
+
+    /// This display's island plan, reconciled to the saved pin count.
+    var islandPlan: DockIslandPlan { islands.plan(for: displayID).reconciled(pinCount: persistedPins.count) }
+
+    /// The pinned island holding `pinID`, or nil for a pin not on this display.
+    func island(containingPin pinID: String) -> DockIsland? {
+        guard let index = pinnedIslandIndex(containingPin: pinID) else { return nil }
+        return islandPlan.pinnedIslands[index]
+    }
+
+    private func pinnedIslandIndex(containingPin pinID: String) -> Int? {
+        guard let pinIndex = persistedPins.firstIndex(where: { $0.id == pinID }) else { return nil }
+        return islandPlan.pinnedIslandIndex(forPin: pinIndex, pinCount: persistedPins.count)
+    }
+
+    /// Whether **Start a new island here** applies: the pin must not already open its island.
+    func canSplitIsland(beforePin pinID: String) -> Bool {
+        guard canEditPins, let pinIndex = persistedPins.firstIndex(where: { $0.id == pinID }) else { return false }
+        return !islandPlan.pinnedIslandStarts(pinCount: persistedPins.count).contains(pinIndex)
+    }
+
+    /// Opens a new island at `pinID`; it and the pins after it in the same island move there.
+    func splitIsland(beforePin pinID: String) {
+        guard canSplitIsland(beforePin: pinID), let pinIndex = persistedPins.firstIndex(where: { $0.id == pinID }) else { return }
+        saveIslandPlan(islandPlan.splitting(beforePin: pinIndex, pinCount: persistedPins.count), action: .split)
+    }
+
+    /// Whether the island holding `pinID` has a neighbour in `direction` (-1 before, 1 after).
+    func canMergeIsland(containingPin pinID: String, direction: Int) -> Bool {
+        guard canEditPins, let index = pinnedIslandIndex(containingPin: pinID) else { return false }
+        return islandPlan.pinnedIslands.indices.contains(index + direction)
+    }
+
+    /// Folds the island holding `pinID` into its neighbour, which keeps its name and tint.
+    func mergeIsland(containingPin pinID: String, direction: Int) {
+        guard canMergeIsland(containingPin: pinID, direction: direction), let index = pinnedIslandIndex(containingPin: pinID) else { return }
+        saveIslandPlan(islandPlan.merging(islandAt: index, into: direction, pinCount: persistedPins.count), action: .merge)
+    }
+
+    func setIslandTint(_ tint: DockIslandTint, containingPin pinID: String) {
+        guard let island = island(containingPin: pinID) else { return }
+        saveIslandPlan(islandPlan.tinting(island.id, tint), action: .tint)
+    }
+
+    /// Renames or retints any island of this display, including the tile, running, and utilities ones.
+    func updateIsland(_ id: UUID, name: String?? = nil, tint: DockIslandTint? = nil) {
+        var plan = islandPlan
+        if let name { plan = plan.renaming(id, to: name) }
+        if let tint { plan = plan.tinting(id, tint) }
+        saveIslandPlan(plan, action: name != nil ? .rename : .tint)
+    }
+
+    /// Customises a kind island that has no pins, such as the running apps.
+    func updateIsland(kind: DockIslandKind, name: String?? = nil, tint: DockIslandTint? = nil) {
+        let plan = islandPlan.updating(kind: kind) { island in
+            if let name {
+                let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                island.name = trimmed.isEmpty ? nil : trimmed
+            }
+            if let tint { island.tint = tint }
+        }
+        saveIslandPlan(plan, action: name != nil ? .rename : .tint)
+    }
+
+    /// Returns this display to the automatic islands, dropping names, tints, and splits.
+    func resetIslands() {
+        saveIslandPlan(.automatic, action: .reset)
+    }
+
+    private func saveIslandPlan(_ plan: DockIslandPlan, action: AnalyticsIslandAction) {
+        guard plan != islands.plan(for: displayID) else { return }
+        guard islands.save(plan, for: displayID) else {
+            errorMessage = .islandsSaveFailed
+            return
+        }
+        Analytics.track(.islandsEdited(action, islandCount: plan.reconciled(pinCount: persistedPins.count).pinnedIslands.count))
     }
 
     /// Plays soap-bubble feedback only when the write landed and the pin list actually changed.

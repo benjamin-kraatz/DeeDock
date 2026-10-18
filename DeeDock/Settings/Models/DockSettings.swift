@@ -157,6 +157,9 @@ struct DockSettings: Codable, Equatable {
     var restoreDuration: Double = 0.1
 
     var behavior = DockBehaviorSettings()
+    /// Island glass: whether the dock splits into tinted islands and how they are drawn. App-wide;
+    /// which pins form which island is per display (`DockIslandPlan`).
+    var islands = DockIslandSettings()
 
     static let defaults = DockSettings()
 
@@ -166,7 +169,7 @@ struct DockSettings: Codable, Equatable {
             && (0...30).contains(idleDelay) && (0...2).contains(fadeOutDuration)
             && (0...0.5).contains(restoreDuration)
             && [backgroundOpacity, idleOpacity, idleDelay, fadeOutDuration, restoreDuration].allSatisfy(\.isFinite)
-            && behavior.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
+            && behavior.isValid && islands.isValid && (32...96).contains(iconSize) && (1...2).contains(magnification)
             && (0...24).contains(itemSpacing) && (0...100).contains(cornerRadius)
             && (0.2...1).contains(windowPeekHoverDelay)
             && (-1000...1000).contains(alongEdgeOffset) && (0...300).contains(edgeDistance)
@@ -183,6 +186,7 @@ struct DockSettings: Codable, Equatable {
         result.fadeOutDuration = (fadeOutDuration * 20).rounded() / 20
         result.restoreDuration = (restoreDuration * 20).rounded() / 20
         result.behavior = behavior.normalized!
+        result.islands = islands.normalized!
         result.iconSize = iconSize.rounded()
         result.magnification = (magnification * 20).rounded() / 20
         result.itemSpacing = itemSpacing.rounded()
@@ -207,6 +211,7 @@ extension DockSettings {
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
         case alongEdgeOffset = "horizontalOffset"
         case edgeDistance = "bottomDistance"
+        case islands
     }
 
     /// Keys read once to migrate older documents, never written.
@@ -279,5 +284,6 @@ extension DockSettings {
         edgeDistance = try values.decode(Double.self, forKey: .edgeDistance)
         positionReference = try values.decode(PositionReference.self, forKey: .positionReference)
         behavior = values.contains(.behavior) ? try values.decode(DockBehaviorSettings.self, forKey: .behavior) : DockBehaviorSettings()
+        islands = try values.decodeIfPresent(DockIslandSettings.self, forKey: .islands) ?? DockIslandSettings()
     }
 }

@@ -4,10 +4,11 @@ Discovery suggests unused capabilities using local signals. **Settings → Featu
 
 ## Catalog and scheduling
 
-`DiscoveryProposal.catalog` owns each recipe's signal, threshold, calm interval, localized copy, callout symbol, destination, and snooze interval. Two recipes ship:
+`DiscoveryProposal.catalog` owns each recipe's signal, threshold, calm interval, localized copy, callout symbol, destination, and snooze interval. Three recipes ship:
 
 - Three observed clipboard changes followed by at least five seconds without another observed change suggest Clipboard Museum.
 - A launch announcement for the Notification Feed. Discovery records one `launched` signal when it starts, and the tip becomes eligible 60 seconds later. The first launch of a version with the feed therefore shows it once the native gates allow. **Tomorrow** and the timeout snooze it for 24 hours, and the signal is spent for that process, so it returns on the first launch after the snooze ends. Turning the feed on anywhere, including before the tip appears, records use and suppresses it for good. **Don't show again** does the same. The tip is not limited to updates: a new install sees it after onboarding, because onboarding windows block Discovery.
+- A launch announcement for DOKK Islands (DEE-85), eligible 90 seconds after launch so it queues behind the feed's tip. **Turn On** enables islands in the shared settings and needs no permission. Islands already on, anywhere, record use and suppress it; **Don't show again** does the same.
 
 The queue is FIFO and deduplicated by proposal ID. `advance` presents the first entry that is past its snooze and whose calm interval has elapsed. A snoozed entry stays in the queue and becomes eligible again when the snooze ends. The first presentation can happen as soon as its calm window and native gates permit it. Each actual presentation starts a 69-second cadence. An advance that shows nothing leaves that cadence where it is. Presentation time restarts the cadence, so a late timer keeps the 69-second minimum and does not release a catch-up burst. These intervals are lower bounds, subject to main-run-loop delivery.
 

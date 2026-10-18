@@ -52,8 +52,11 @@ struct DockLauncherButton: View {
                 ZStack {
                     // A resting dock pays nothing per frame: the halo only turns while it has a
                     // reason to (the Hub is open, or the pointer is on the tile) and the dock is shown.
+                    // Inside an island the purple glass carries the resting colour, so the halo
+                    // appears only while the pointer rests on the tile or the Hub is open.
                     DockHubTileHalo(size: size, open: hubOpen,
-                                    turning: !reduceMotion && interaction.exposesContent && (hubOpen || tileHovered))
+                                    turning: !reduceMotion && interaction.exposesContent && (hubOpen || tileHovered),
+                                    resting: interaction.islands != nil && !hubOpen && !tileHovered)
                     LauncherTileArtwork(size: size)
                         .phaseAnimator([1.0, 0.88, 1.0], trigger: interaction.hubTile?.pulse ?? 0) { view, scale in
                             view.scaleEffect(reduceMotion ? 1 : scale)
@@ -94,6 +97,8 @@ private struct DockHubTileHalo: View {
     let open: Bool
     /// Whether the gradient turns right now. The owner folds Reduce Motion and dock visibility in.
     let turning: Bool
+    /// Hidden entirely: an island already colours the tile's surroundings.
+    var resting = false
 
     /// One full turn.
     private static let period: TimeInterval = 9
@@ -137,8 +142,9 @@ private struct DockHubTileHalo: View {
             .frame(width: extent, height: extent)
             .clipShape(shape)
             .blur(radius: face * 0.2)
-            .opacity(open ? 1 : 0.55)
+            .opacity(resting ? 0 : open ? 1 : 0.55)
             .animation(HubStyle.motion, value: open)
+            .animation(.easeOut(duration: 0.25), value: resting)
     }
 }
 

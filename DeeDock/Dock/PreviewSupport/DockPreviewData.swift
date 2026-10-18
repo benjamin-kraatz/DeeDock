@@ -39,7 +39,7 @@ struct DockPreviewContent: View {
     @State private var sections: DockSectionState
 
     init(items: [DockItem]? = nil, errorMessage: LocalizedStringResource? = nil,
-         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults, availableLength: CGFloat = 800, expanded: Bool = false, showsLauncher: Bool = false, openLauncher: @escaping () -> Void = {}) {
+         reduceMotion: Bool = false, reduceTransparency: Bool = false, magnified: Bool = false, dragProposal: DockDragProposal? = nil, dragMessage: LocalizedStringResource? = nil, settings: DockSettings = .defaults, availableLength: CGFloat = 800, expanded: Bool = false, showsLauncher: Bool = false, islands: DockIslandPlan? = nil, openLauncher: @escaping () -> Void = {}) {
         let items = items ?? DockPreviewData.items
         self.items = items
         self.errorMessage = errorMessage
@@ -72,8 +72,17 @@ struct DockPreviewContent: View {
         interaction.iconStyle = settings.iconStyle
         interaction.lineIconMotion = settings.lineIconMotion
         interaction.showAppBadgeCounts = settings.showAppBadgeCounts
+        var islandLayout: DockGeometry.IslandLayout?
+        if let islands {
+            var islandSettings = settings.islands
+            islandSettings.isEnabled = true
+            let spans = DockIslandAssignment.spans(slots: slots, plan: islands)
+            let colors = spans.map { DockIslandPalette.resolve($0, mode: islandSettings.tintMode, iconColors: []) }
+            interaction.islands = DockIslandPresentation(spans: spans, colors: colors, settings: islandSettings)
+            islandLayout = DockIslandAssignment.layout(spans: spans, settings: islandSettings)
+        }
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: slots.filter(\.isPinned).count,
-                                                  availableLength: availableLength, settings: settings)
+                                                  availableLength: availableLength, settings: settings, islands: islandLayout)
         if magnified, let x = interaction.layout.restingCenters.first {
             interaction.pointer = settings.edge.point(CGPoint(x: x, y: interaction.layout.panelDepth - 36), depth: interaction.layout.panelDepth)
         }

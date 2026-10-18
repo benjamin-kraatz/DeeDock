@@ -152,6 +152,9 @@ struct DockContextMenuBridge: NSViewRepresentable {
                     menu.addItem(entry)
                 }
             }
+            if item.isFavorite, interaction?.islands != nil {
+                menu.addItem(islandsMenuItem(for: item))
+            }
             if let destinations = interaction?.pinDestinations, !destinations.isEmpty {
                 let parent = NSMenuItem(title: String(localized: .actionPinOnDisplay), action: nil, keyEquivalent: "")
                 let submenu = NSMenu()
@@ -174,6 +177,38 @@ struct DockContextMenuBridge: NSViewRepresentable {
 
             menu.addItem(.separator())
             addItem(.actionSettings, symbol: "gear", action: #selector(showSettings), to: menu)
+        }
+
+        /// The **Islands** submenu for a pinned app: split, merge, tint, and reset for its island.
+        private func islandsMenuItem(for item: DockItem) -> NSMenuItem {
+            let parent = NSMenuItem(title: String(localized: .islandsMenu), action: nil, keyEquivalent: "")
+            parent.image = NSImage(systemSymbolName: "rectangle.split.3x1", accessibilityDescription: nil)
+            let submenu = NSMenu()
+            let split = addItem(.islandsSplitHere, symbol: "rectangle.lefthalf.inset.filled.arrow.left", action: #selector(splitIsland), to: submenu)
+            split.isEnabled = interaction?.canSplitIsland?(item.id) == true
+            let vertical = interaction?.layout.edge.isVertical == true
+            let previous = addItem(vertical ? .islandsMergeAbove : .islandsMergePrevious, action: #selector(mergeIslandBefore), to: submenu)
+            previous.isEnabled = interaction?.canMergeIsland?(item.id, -1) == true
+            let next = addItem(vertical ? .islandsMergeBelow : .islandsMergeNext, action: #selector(mergeIslandAfter), to: submenu)
+            next.isEnabled = interaction?.canMergeIsland?(item.id, 1) == true
+            submenu.addItem(.separator())
+            let tints = NSMenuItem(title: String(localized: .islandsTint), action: nil, keyEquivalent: "")
+            let tintMenu = NSMenu()
+            let current = interaction?.islandTint?(item.id)
+            for tint in DockIslandTint.allCases {
+                let entry = NSMenuItem(title: String(localized: tint.title), action: #selector(setIslandTint(_:)), keyEquivalent: "")
+                entry.target = self
+                entry.representedObject = tint.rawValue
+                entry.state = tint == current ? .on : .off
+                tintMenu.addItem(entry)
+                if tint == .automatic { tintMenu.addItem(.separator()) }
+            }
+            tints.submenu = tintMenu
+            submenu.addItem(tints)
+            submenu.addItem(.separator())
+            addItem(.islandsReset, symbol: "arrow.counterclockwise", action: #selector(resetIslands), to: submenu)
+            parent.submenu = submenu
+            return parent
         }
 
         private func addWindows(_ state: ApplicationWindowMenuState, to menu: NSMenu) {
@@ -273,6 +308,15 @@ struct DockContextMenuBridge: NSViewRepresentable {
             if let item, let id = sender.representedObject as? String { interaction?.copyPin?(.application(item.reference), id) }
         }
         @objc private func showSettings() { Analytics.performing(.menu) { openSettings?() } }
+
+        @objc private func splitIsland() { if let item { Analytics.performing(.menu) { interaction?.splitIsland?(item.id) } } }
+        @objc private func mergeIslandBefore() { if let item { Analytics.performing(.menu) { interaction?.mergeIsland?(item.id, -1) } } }
+        @objc private func mergeIslandAfter() { if let item { Analytics.performing(.menu) { interaction?.mergeIsland?(item.id, 1) } } }
+        @objc private func setIslandTint(_ sender: NSMenuItem) {
+            guard let item, let raw = sender.representedObject as? String, let tint = DockIslandTint(rawValue: raw) else { return }
+            Analytics.performing(.menu) { interaction?.setIslandTint?(item.id, tint) }
+        }
+        @objc private func resetIslands() { Analytics.performing(.menu) { interaction?.resetIslands?() } }
 
         @objc private func feedSims() { careSims(.feed) }
         @objc private func cheerSims() { careSims(.cheer) }
