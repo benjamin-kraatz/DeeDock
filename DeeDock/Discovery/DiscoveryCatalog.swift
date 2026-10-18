@@ -8,7 +8,7 @@ struct DiscoveryProposal: Identifiable {
         /// it, and again on later launches until it is used, dismissed, or still snoozed.
         case launched
     }
-    enum Destination: String { case clipboardMuseum, notificationFeed }
+    enum Destination: String { case clipboardMuseum, notificationFeed, islands }
     /// What the callout still has to do after its destination handled the click.
     enum FollowUp { case none, openSettings }
     let id: String
@@ -32,5 +32,10 @@ struct DiscoveryProposal: Identifiable {
              title: .discoveryNotificationFeedTitle, message: .discoveryNotificationFeedMessage,
              action: .discoveryNotificationFeedTurnOn, destination: .notificationFeed, snoozeInterval: 86_400,
              symbol: "bell.badge.fill"),
+        // Announces DOKK Islands, which stay opt-in. Queued behind the feed's announcement.
+        Self(id: "islands", signal: .launched, threshold: 1, calmInterval: 90,
+             title: .discoveryIslandsTitle, message: .discoveryIslandsMessage,
+             action: .discoveryIslandsTurnOn, destination: .islands, snoozeInterval: 86_400,
+             symbol: "rectangle.split.3x1.fill"),
     ]
 }

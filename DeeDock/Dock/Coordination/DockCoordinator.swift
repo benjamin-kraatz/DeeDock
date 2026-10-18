@@ -124,6 +124,8 @@ final class DockCoordinator {
     @ObservationIgnored private let shelf = ShelfController()
     /// Mounted drives and their shared arrangement. Settings reads both to manage drive order.
     @ObservationIgnored let volumes = VolumeController()
+    /// Island arrangements per display, edited from docks and Settings.
+    let islandPlans = DockIslandPlanStore()
     @ObservationIgnored private let volumeDock: VolumeDockCoordinator
     @ObservationIgnored private let capsules = SessionCapsuleController()
     @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
@@ -238,6 +240,7 @@ final class DockCoordinator {
         }
         // Someone who already turned the feed on needs no announcement.
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
+        if settings.value.islands.isEnabled { discovery.markUsed(.islands) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configureHarbor()
         configureHub()
@@ -267,6 +270,9 @@ final class DockCoordinator {
                 return .none
             case .notificationFeed:
                 return enableNotificationFeedFromDiscovery()
+            case .islands:
+                settings.update(\.islands.isEnabled, to: true)
+                return .none
             }
         }
         discovery.start()
@@ -397,6 +403,7 @@ final class DockCoordinator {
         catalog.didChange = { [weak self] in self?.occupancy.invalidate(); self?.refreshPanels() }
         trash.didChange = { [weak self] in self?.refreshPanels() }
         volumes.didChange = { [weak self] in self?.refreshPanels() }
+        islandPlans.didChange = { [weak self] in self?.refreshPanels() }
         dragging.ejectVolume = { [weak self] volume, panel in
             self?.volumeDock.requestEject(volume, on: panel, keyboard: false)
         }
@@ -426,6 +433,7 @@ final class DockCoordinator {
         }
         settings.settingsDidChange = { [weak self] in
             if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
+            if self?.settings.value.islands.isEnabled == true { self?.discovery.markUsed(.islands) }
             self?.harbor.configureShortcut(enabled: self?.settings.value.harborShortcutEnabled ?? false)
             self?.configureVolumeReads()
             self?.scheduleShelfSemanticWarmup()
@@ -531,7 +539,8 @@ final class DockCoordinator {
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, volumes: volumes, capsules: capsules, actions: actionTiles,
-                                  focusSession: focusSession, history: localHistory, pinWeather: pinWeather)
+                                  focusSession: focusSession, history: localHistory, pinWeather: pinWeather,
+                                  islands: islandPlans)
             store.appMelt = appMelt
             store.refresh()
             appMelt.changed = { [weak self] in

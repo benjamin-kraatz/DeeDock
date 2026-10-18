@@ -10,6 +10,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Open files and folders in an app](#open-files-and-folders-in-an-app)
 - [Folder stacks](#folder-stacks)
 - [Downloads and utility order](#downloads-and-utility-order)
+- [DOKK Islands](#dokk-islands)
 - [Shelf](#shelf)
 - [Trash](#trash)
 - [External drives](#external-drives)
@@ -128,6 +129,16 @@ Downloads appears to the left of Capsules and Shelf by default. Click it to brow
 Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display, independently of Dock Modes. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
 
 Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
+
+## DOKK Islands
+
+Islands split the dock's one glass surface into separate tinted blocks with a gap between them: the DOKK tile, your pinned apps and folders, running apps that are not pinned, and the extras (Downloads, Capsules, Shelf, the Notification Feed, Radar, drives, and Trash). Pins keep their order and every drag, menu, and keyboard behaviour; only the glass changes. Islands are off by default. Turn them on under **Features → DOKK Islands**, or from the DOKK Discovery callout that announces them.
+
+Each island is a block of ice: a frosted rim, a soft sheen, and a lit edge on the screen side whose light spills into the glass. Running indicators inside an island take its colour. The DOKK tile's rainbow halo shows only while the pointer rests on the tile or the Hub is open; at rest its island is purple. Dark and light appearance follow the system. Reduce Transparency draws solid tinted slabs instead.
+
+**Look** holds the dock-wide choices: the **Ice block**, **Frost**, or **Flat** style; where the **Colour** comes from (**By island** uses a fixed palette, purple for the tile, gold for pinned apps, teal for running apps, graphite for extras; **From icons** averages the icons inside each island; **Accent colour**; or **None**); and sliders for tint strength, glow, the gap between islands, island padding, and the rim width. Icon size, spacing, and magnification come from **Dock → Appearance**. The glass blur is set by macOS and cannot be changed.
+
+**Islands on a display** lists that dock's islands in order. Rename any island, pick its colour, or use the row's menu to **Start a New Island Before…** one of its pins or to merge it with a neighbour. On the dock, a pinned app's context menu has an **Islands** submenu with **Start a New Island Here**, **Merge with Previous/Next Island**, a **Colour** list, and **Reset Islands**. Pins remember their island when you reorder them: a pin dragged into another island joins it, a pin dropped at the end of the row joins the last island, and an island whose last pin leaves disappears. The arrangement is saved per display; switching Dock Modes keeps the names and colours and fits the counts to the mode's pins.
 
 ## Shelf
 

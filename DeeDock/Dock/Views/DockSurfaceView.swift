@@ -45,7 +45,24 @@ struct DockSurfaceView: View {
         let centers = layout.centers(sizes: sizes)
         let menuTarget = interaction.contextMenuTarget
         ZStack(alignment: .topLeading) {
-            if drawsBackground {
+            if drawsBackground, let islands = interaction.islands, layout.islands != nil {
+                DockIslandBackgrounds(
+                    presentation: islands,
+                    layout: layout,
+                    sizes: sizes,
+                    cornerRadius: interaction.idleFade.settings.cornerRadius,
+                    idleOpacity: opacity.background,
+                    idleAnimation: interaction.idleFade.animation,
+                    reduceTransparency: reduceTransparency,
+                    reduceMotion: reduceMotion,
+                    breathing: interaction.focusBreathing.map { breathing in
+                        (breathing.isActive(modeID: interaction.dockModes?.activeMode.id,
+                                            sessionRunning: interaction.focusSession?.session?.phase == .running)
+                             && interaction.exposesContent,
+                         breathing.intensity)
+                    }
+                )
+            } else if drawsBackground {
                 DockBackgroundView(
                     reduceTransparency: reduceTransparency,
                     cornerRadius: min(
@@ -156,6 +173,7 @@ struct DockSurfaceView: View {
                     // A menu owner keeps its line-icon glow after the pointer moves onto the menu.
                     .environment(\.dockTileHovered, slot.target != nil
                         && (hoveredID == slot.target || menuTarget == slot.target))
+                    .environment(\.dockIslandTint, interaction.islands?.color(forSlot: index)?.color(brightness: 0.95))
                     .onHover { inside in
                         if inside {
                             hoveredID = slot.target

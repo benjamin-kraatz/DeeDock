@@ -28,6 +28,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case privacy
 
     // Features — app-wide capabilities.
+    case islands
     case shelfAndTrash
     case drives
     case hub
@@ -75,7 +76,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
-        case .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed, .windowPeek, .harbor,
+        case .islands, .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed, .windowPeek, .harbor,
              .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
              .discovery, .quarantine: .features
@@ -105,6 +106,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .menuBar: .menuBarIconTitle
         case .startup: .settingsStartup
         case .privacy: .settingsPrivacy
+        case .islands: .islandsTitle
         case .shelfAndTrash: .settingsShelfAndTrash
         case .drives: .settingsVolumes
         case .hub: .settingsHubTitle
@@ -145,6 +147,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     /// Brief descriptions on the Features overview, before opening a page.
     var subtitle: LocalizedStringResource? {
         switch self {
+        case .islands: .islandsSubtitle
         case .shelfAndTrash: .settingsFeatureShelfSubtitle
         case .drives: .settingsFeatureDrivesSubtitle
         case .hub: .settingsFeatureHubSubtitle
@@ -187,6 +190,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .menuBar: .symbol("menubar.rectangle")
         case .startup: .symbol("power")
         case .privacy: .symbol("hand.raised.fill")
+        case .islands: .symbol("rectangle.split.3x1.fill")
         case .shelfAndTrash: .symbol("tray.full.fill")
         case .drives: .symbol("externaldrive.fill")
         case .hub: .symbol("sidebar.left")
@@ -227,6 +231,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .softwareUpdate: Color(red: 0.16, green: 0.55, blue: 0.98)
         case .startup: Color(red: 0.20, green: 0.66, blue: 0.32)
         case .privacy: Color(red: 0.16, green: 0.55, blue: 0.98)
+        case .islands: Color(red: 0.24, green: 0.62, blue: 0.70)
         case .shelfAndTrash: Color(red: 0.70, green: 0.50, blue: 0.28)
         case .drives: Color(red: 0.42, green: 0.48, blue: 0.58)
         case .hub: Color(red: 0.20, green: 0.48, blue: 0.96)
@@ -267,6 +272,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .softwareUpdate: [Color(red: 0.42, green: 0.78, blue: 1.0), Color(red: 0.10, green: 0.44, blue: 0.92)]
         case .startup: [Color(red: 0.44, green: 0.84, blue: 0.46), Color(red: 0.10, green: 0.56, blue: 0.24)]
         case .privacy: [Color(red: 0.42, green: 0.78, blue: 1.0), Color(red: 0.10, green: 0.44, blue: 0.92)]
+        case .islands: [Color(red: 0.56, green: 0.90, blue: 0.96), Color(red: 0.16, green: 0.46, blue: 0.68)]
         case .shelfAndTrash: [Color(red: 0.86, green: 0.68, blue: 0.42), Color(red: 0.56, green: 0.38, blue: 0.18)]
         case .drives: [Color(red: 0.66, green: 0.71, blue: 0.79), Color(red: 0.30, green: 0.35, blue: 0.44)]
         case .hub: [Color(red: 0.42, green: 0.70, blue: 1.0), Color(red: 0.10, green: 0.36, blue: 0.86)]
@@ -307,6 +313,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .sims: .simsSettingsKeywords
         case .discovery: .discoverySettingsHelp
         case .notificationFeed: .notificationFeedSettingsKeywords
+        case .islands: .islandsSettingsKeywords
         case .harbor: .harborSettingsKeywords
         case .soapBubbles: .soapBubblesSettingsKeywords
         case .focusBreathing: .focusBreathingHelp

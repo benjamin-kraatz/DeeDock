@@ -42,7 +42,7 @@ struct DockPresentationGeometry {
         contentSize = restingFrame.size
         // Tooltip reservation is click-through and must not prolong auto-hide retention.
         let depth = max(layout.surfaceDepth, layout.iconSize * layout.magnification
-                        + DockGeometry.indicatorAreaDepth + DockGeometry.crossPadding)
+                        + DockGeometry.indicatorAreaDepth + layout.crossInset)
         let artwork = layout.edge.rect(CGRect(x: 0,
             y: layout.panelDepth - DockGeometry.outerMargin - depth,
             width: layout.viewportLength, height: depth + DockGeometry.outerMargin), depth: layout.panelDepth)

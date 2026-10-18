@@ -3494,3 +3494,20 @@ The app was not launched. None of the following has been exercised by hand:
 - The menu-add flight from list rows, tiles, and columns, and the arrival glow.
 - A folder renamed or moved in Finder while the Hub is closed, a folder on an unplugged drive, a trashed folder, and network shares that are offline.
 - The missing-folder popover in an anchored Hub (it must not close the Hub), VoiceOver, Reduce Motion, and Reduce Transparency.
+
+## DOKK Islands (DEE-85)
+
+Implemented on `feature/dee-85-islands` after the interactive mockup `docs/mockups/dokk-islands.html` (wallpapers, Ice block / Frost / Flat, tint modes, edit mode with drag-to-split, light/dark, side dock, Reduce Motion and Transparency). The locked values are corner radius 22, gap 12, rim 4.5, tint strength 0.7×, glow 1.35×; icon size, spacing, and magnification come from the existing Appearance settings. The mockup's 32pt blur has no counterpart: native Liquid Glass sets its own blur, recorded as a limitation.
+
+- `DockIslandPlan` stores, per display under `dock.islands.v1.<displayID>`, consecutive pin counts per island plus names and tints; pin order stays in the pin list. `following(previous:next:relocated:)` runs after every saved pin edit so an unmoved pin keeps its island and a moved or new pin joins its new neighbour's. Plans are per display, not per Dock Mode; a mode switch reconciles counts.
+- `DockIslandAssignment.spans` groups render slots into tile, pinned (split by the plan), running, and utilities islands. The DOKK tile placed among pins splits the pinned run around it; gaps and collapsed section controls join the open island.
+- `DockGeometry.IslandLayout` replaces dividers with per-island padding and gaps and exposes `islandFrames(sizes:)`; the union stays the surface for hit testing, visibility, and the approach ghost. The glass thickness grows to the island padding across the dock.
+- `DockIslandBackgroundView` layers native glass with a light tint, a vertical wash, the light leak and lamp on the screen-edge side, a diagonal sheen, and the frosted rim. Reduce Transparency and the Flat style draw a solid tinted slab. Running indicators (dot, bar, square) take the island colour; the DOKK tile's halo hides at rest inside an island.
+- Settings → Features → DOKK Islands: enable, style, colour source, tint strength, glow, gap, padding, rim, then one card per connected display with rename, colour, split-before-pin, merge, and reset. The pinned app context menu has an **Islands** submenu. A Discovery callout announces the feature 90 seconds after launch while it is off.
+- Analytics: `islands_edited` (`action`, `island_count`); the look settings are reflected like other dock settings.
+
+### Validation status
+
+`xcodebuild … build-for-testing` on the branch: see the PR description for the exact result. `DeeDockTests/DockIslandTests.swift` covers plan reconciliation, split, merge, pin following, naming, Codable, the repository, settings decoding, slot grouping (tile among pins, gaps, collapsed controls), island geometry under magnification, and the icon sampler. Tests were not run.
+
+The app was not launched. Not exercised by hand: the ice material on a real wallpaper in both appearances and on a side or top dock, the lamp with Reduce Transparency, auto-hide and the ten animation styles with several islands, the approach ghost (which still draws the union as one slab), drag insertion gaps at island boundaries, VoiceOver labels on island glass, the Discovery callout timing, and the settings list with two displays.

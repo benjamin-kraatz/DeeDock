@@ -60,6 +60,16 @@ final class DockInteraction {
     var documentTargetID: String?
     /// The tile whose context menu is open, which the surface spotlights; nil while no menu tracks.
     var contextMenuTarget: DockEntryID?
+    /// Island spans, colours, and style while DOKK Islands are on; nil draws one glass surface.
+    var islands: DockIslandPresentation?
+    /// Island edits from the context menu, keyed by the pin the menu was opened on.
+    @ObservationIgnored var canSplitIsland: ((String) -> Bool)?
+    @ObservationIgnored var splitIsland: ((String) -> Void)?
+    @ObservationIgnored var canMergeIsland: ((String, Int) -> Bool)?
+    @ObservationIgnored var mergeIsland: ((String, Int) -> Void)?
+    @ObservationIgnored var islandTint: ((String) -> DockIslandTint?)?
+    @ObservationIgnored var setIslandTint: ((String, DockIslandTint) -> Void)?
+    @ObservationIgnored var resetIslands: (() -> Void)?
     var trashTargeted = false
     var shelfTargeted = false
     /// The volume tile a file drag is over, which highlights to show it will receive the drop.

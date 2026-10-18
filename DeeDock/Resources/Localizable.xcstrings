@@ -2001,6 +2001,60 @@
         }
       }
     },
+    "discoveryIslandsMessage" : {
+      "comment" : "Discovery callout message announcing DOKK Islands.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Islands teilen das Dock in getönte Glasblöcke: DOKK-Kachel, deine Pins, laufende Apps und Extras. Benenne jede Insel um, färbe sie oder beginne eine neue aus dem Menü einer App."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Islands split the dock into tinted glass blocks: the DOKK tile, your pins, running apps, and extras. Rename or recolour any island, or start a new one from an app's menu."
+          }
+        }
+      }
+    },
+    "discoveryIslandsTitle" : {
+      "comment" : "Discovery callout title announcing DOKK Islands.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib deinem Dock Inseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give your dock islands"
+          }
+        }
+      }
+    },
+    "discoveryIslandsTurnOn" : {
+      "comment" : "Discovery callout action that enables DOKK Islands.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einschalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn On"
+          }
+        }
+      }
+    },
     "harborAccessibilityNotice" : {
       "comment" : "Radar notice when Accessibility access is off. DOKK is the product name.",
       "extractionState" : "manual",
@@ -2447,6 +2501,978 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Undo"
+          }
+        }
+      }
+    },
+    "islandsAccessibilityIsland" : {
+      "comment" : "Accessibility label of an island's glass. The placeholder is the island's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insel „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ island"
+          }
+        }
+      }
+    },
+    "islandsAutomaticKind" : {
+      "comment" : "Shown under the DOKK tile, running, and extras islands, which the dock creates itself.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "automatisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "automatic"
+          }
+        }
+      }
+    },
+    "islandsEnable" : {
+      "comment" : "Toggle that turns DOKK Islands on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inseln anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show islands"
+          }
+        }
+      }
+    },
+    "islandsEnableHelp" : {
+      "comment" : "Footnote under the DOKK Islands card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inseln ersetzen die durchgehende Glasfläche des Docks durch getrennte, getönte Blöcke mit Abstand. Die Reihenfolge der Pins bleibt; nur das Glas ändert sich."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Islands replace the dock's single glass surface with separate tinted blocks and a gap between them. Pins keep their order; only the glass changes."
+          }
+        }
+      }
+    },
+    "islandsEnableSubtitle" : {
+      "comment" : "Subtitle under the Show islands toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK-Kachel, angepinnte Apps, laufende Apps und Extras bekommen je einen eigenen Glasblock."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The DOKK tile, pinned apps, running apps, and extras each get their own glass block."
+          }
+        }
+      }
+    },
+    "islandsGap" : {
+      "comment" : "Slider in points.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abstand zwischen Inseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gap between islands"
+          }
+        }
+      }
+    },
+    "islandsGlow" : {
+      "comment" : "Slider: multiplier on the lit edge and ambient glow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leuchten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glow"
+          }
+        }
+      }
+    },
+    "islandsListHelp" : {
+      "comment" : "Footnote under the per-display islands card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inseln in Dock-Reihenfolge. Benenne eine um, wähle ihre Farbe oder beginne bei einem beliebigen Pin eine neue Insel. Beim Umsortieren im Dock bleibt die Aufteilung erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Islands are listed in dock order. Rename one, pick its colour, or start a new island at any pin. Pins keep this arrangement when you reorder them on the dock."
+          }
+        }
+      }
+    },
+    "islandsListTitle" : {
+      "comment" : "Card heading. The placeholder is the display name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inseln auf %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Islands on %@"
+          }
+        }
+      }
+    },
+    "islandsLookHelp" : {
+      "comment" : "Footnote under the Look card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eisblock fügt einen Frostrand und eine leuchtende Kante zur Bildschirmseite hinzu. Symbolgröße, Abstand und Vergrößerung kommen aus Dock › Darstellung. Die Glasunschärfe legt macOS fest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ice block adds a frosted rim and a lit edge on the screen side. Icon size, spacing, and magnification come from Dock › Appearance. The glass blur is set by macOS."
+          }
+        }
+      }
+    },
+    "islandsLookTitle" : {
+      "comment" : "Card heading for island style, tint, and spacing controls.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aussehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look"
+          }
+        }
+      }
+    },
+    "islandsMenu" : {
+      "comment" : "Context-menu submenu on a pinned app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Islands"
+          }
+        }
+      }
+    },
+    "islandsMergeAbove" : {
+      "comment" : "Same as Merge with Previous Island, worded for a vertical dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Insel darüber verbinden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge with Island Above"
+          }
+        }
+      }
+    },
+    "islandsMergeBelow" : {
+      "comment" : "Same as Merge with Next Island, worded for a vertical dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Insel darunter verbinden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge with Island Below"
+          }
+        }
+      }
+    },
+    "islandsMergeNext" : {
+      "comment" : "Action: fold this island into the one after it (right on a horizontal dock).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit nächster Insel verbinden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge with Next Island"
+          }
+        }
+      }
+    },
+    "islandsMergePrevious" : {
+      "comment" : "Action: fold this island into the one before it (left on a horizontal dock).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit vorheriger Insel verbinden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge with Previous Island"
+          }
+        }
+      }
+    },
+    "islandsName" : {
+      "comment" : "Accessibility label and field label for an island's editable name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inselname"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Island name"
+          }
+        }
+      }
+    },
+    "islandsNameCustom" : {
+      "comment" : "Default name of an island the user split off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Island"
+          }
+        }
+      }
+    },
+    "islandsNamePinned" : {
+      "comment" : "Default name of the first island of pinned apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
+    },
+    "islandsNameRunning" : {
+      "comment" : "Default name of the island holding running apps that are not pinned.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running"
+          }
+        }
+      }
+    },
+    "islandsNameTile" : {
+      "comment" : "Default name of the island holding the DOKK tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK"
+          }
+        }
+      }
+    },
+    "islandsNameUtilities" : {
+      "comment" : "Default name of the island holding Downloads, Shelf, drives, Trash, and other tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extras"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extras"
+          }
+        }
+      }
+    },
+    "islandsNoPins" : {
+      "comment" : "Shown under an island that currently holds no pins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Pins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pins"
+          }
+        }
+      }
+    },
+    "islandsPadding" : {
+      "comment" : "Slider in points: inset from the glass edge to the icons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inselrand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Island padding"
+          }
+        }
+      }
+    },
+    "islandsReset" : {
+      "comment" : "Action: return this display to the automatic islands, dropping names, colours, and splits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inseln zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Islands"
+          }
+        }
+      }
+    },
+    "islandsRim" : {
+      "comment" : "Slider in points: width of the frosted rim of the Ice block style.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rim"
+          }
+        }
+      }
+    },
+    "islandsSaveFailed" : {
+      "comment" : "Dock error banner when the island plan cannot be written to preferences.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK konnte die Inselaufteilung nicht sichern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK could not save the island arrangement."
+          }
+        }
+      }
+    },
+    "islandsSettingsKeywords" : {
+      "comment" : "Search synonyms for the DOKK Islands settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inseln, Abschnitte, Gruppen, Tönung, Glas, Dock aufteilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "islands, sections, groups, tint, glass, dock split"
+          }
+        }
+      }
+    },
+    "islandsSplitBefore" : {
+      "comment" : "Settings menu that lists the island's pins; choosing one starts a new island at it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Insel beginnen vor …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a New Island Before…"
+          }
+        }
+      }
+    },
+    "islandsSplitHere" : {
+      "comment" : "Context-menu action: this pin and the pins after it in the same island move to a new island.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier eine neue Insel beginnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a New Island Here"
+          }
+        }
+      }
+    },
+    "islandsStyle" : {
+      "comment" : "Menu row: how island glass is drawn.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stil"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
+          }
+        }
+      }
+    },
+    "islandsStyleFlat" : {
+      "comment" : "Island style: a solid tinted slab without blur.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flach"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flat"
+          }
+        }
+      }
+    },
+    "islandsStyleFrost" : {
+      "comment" : "Island style: today's thin dock material with a light tint.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frost"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frost"
+          }
+        }
+      }
+    },
+    "islandsStyleIce" : {
+      "comment" : "Island style: thick frosted rim, sheen, and a lit edge.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eisblock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ice block"
+          }
+        }
+      }
+    },
+    "islandsSubtitle" : {
+      "comment" : "Features overview subtitle under the DOKK Islands row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Dock in getönte Glas-Inseln aufteilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split the dock into tinted glass islands"
+          }
+        }
+      }
+    },
+    "islandsTint" : {
+      "comment" : "Submenu and picker label for one island's colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colour"
+          }
+        }
+      }
+    },
+    "islandsTintAutomatic" : {
+      "comment" : "Island colour: follow the dock-wide colour setting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic"
+          }
+        }
+      }
+    },
+    "islandsTintBlue" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blau"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blue"
+          }
+        }
+      }
+    },
+    "islandsTintGold" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gold"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gold"
+          }
+        }
+      }
+    },
+    "islandsTintGraphite" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Graphit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Graphite"
+          }
+        }
+      }
+    },
+    "islandsTintGreen" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grün"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Green"
+          }
+        }
+      }
+    },
+    "islandsTintMode" : {
+      "comment" : "Menu row: where each island's colour comes from.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colour"
+          }
+        }
+      }
+    },
+    "islandsTintModeAccent" : {
+      "comment" : "Tint mode: the system accent colour for every island.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akzentfarbe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accent colour"
+          }
+        }
+      }
+    },
+    "islandsTintModeByKind" : {
+      "comment" : "Tint mode: a fixed palette per island kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Insel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By island"
+          }
+        }
+      }
+    },
+    "islandsTintModeFromIcons" : {
+      "comment" : "Tint mode: the dominant colour of the icons inside each island.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Symbolen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From icons"
+          }
+        }
+      }
+    },
+    "islandsTintModeHelp" : {
+      "comment" : "Subtitle under the Colour menu row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jede Insel kann das in ihrem eigenen Menü überschreiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each island can override this from its own menu."
+          }
+        }
+      }
+    },
+    "islandsTintModeNone" : {
+      "comment" : "Tint mode: untinted glass.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
+    "islandsTintNone" : {
+      "comment" : "Island colour: untinted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
+    "islandsTintOrange" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orange"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orange"
+          }
+        }
+      }
+    },
+    "islandsTintPink" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pink"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pink"
+          }
+        }
+      }
+    },
+    "islandsTintPurple" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Violett"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purple"
+          }
+        }
+      }
+    },
+    "islandsTintStrength" : {
+      "comment" : "Slider: multiplier on island tint.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tönungsstärke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tint strength"
+          }
+        }
+      }
+    },
+    "islandsTintTeal" : {
+      "comment" : "Island colour.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Türkis"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teal"
+          }
+        }
+      }
+    },
+    "islandsTitle" : {
+      "comment" : "Feature name and Settings page title. Keep the English name in every language.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Islands"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK Islands"
           }
         }
       }
@@ -3519,9 +4545,7 @@
         }
       }
     },
-    "Arrive" : {
-
-    },
+    "Arrive" : {},
     "atmosphere69" : {
       "comment" : "Atmosphere Settings or corner decoration. 69",
       "extractionState" : "manual",
@@ -11988,9 +13012,7 @@
         }
       }
     },
-    "Downloading" : {
-
-    },
+    "Downloading" : {},
     "downloadsName" : {
       "comment" : "Built-in Downloads folder tile in the trailing dock section.",
       "extractionState" : "manual",
@@ -22329,9 +23351,7 @@
         }
       }
     },
-    "Leave" : {
-
-    },
+    "Leave" : {},
     "loginCancellationError" : {
       "comment" : "Failed withdrawal of pending approval. reason is a localized error description provided by macOS.",
       "extractionState" : "manual",
@@ -35484,9 +36504,7 @@
         }
       }
     },
-    "Ready" : {
-
-    },
+    "Ready" : {},
     "recipeAdd" : {
       "comment" : "Menu that adds a step to a workspace recipe.",
       "extractionState" : "manual",
@@ -48309,9 +49327,7 @@
         }
       }
     },
-    "Up to date" : {
-
-    },
+    "Up to date" : {},
     "updatesAllowChecks" : {
       "comment" : "Custom DOKK update window: Check Automatically",
       "extractionState" : "manual",

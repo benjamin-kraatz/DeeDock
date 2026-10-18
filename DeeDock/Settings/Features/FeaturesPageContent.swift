@@ -11,6 +11,9 @@ struct FeaturesPageContent: View {
 
     var body: some View {
         switch page {
+        case .islands:
+            DockIslandsSettingsPane(source: source, profiles: context.profiles,
+                                    plans: context.coordinator?.islandPlans, locked: locked)
         case .shelfAndTrash:
             SettingsCard(title: .settingsShelf, footnote: .settingsShelfHelp) {
                 SettingsToggleRow(title: .settingsShowShelf, isOn: source.binding(\.showShelf))

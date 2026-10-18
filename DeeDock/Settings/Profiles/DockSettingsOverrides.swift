@@ -157,6 +157,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.windowMarkupFolder = defaults.windowMarkupFolder
         result.soapBubbleEffects = defaults.soapBubbleEffects
         result.showAppBadgeCounts = defaults.showAppBadgeCounts
+        result.islands = defaults.islands
         result.tooltipPreset = tooltipPreset ?? defaults.tooltipPreset
         result.showBackground = showBackground ?? defaults.showBackground
         result.backgroundOpacity = backgroundOpacity ?? defaults.backgroundOpacity

@@ -374,6 +374,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `drive` | `action` (`stack_opened`, `opened_in_hub`, `ejected`; `opened_in_finder` before the DOKK Hub), `kind`, `trigger` |
 | `drive_ejected` | `kind`, `outcome` (`ejected`, `blocked`, `failed`), `forced`, `blocker_count`, `trigger` |
 | `pin_changed` | `action` (`pin`, `unpin`, `reorder`), `kind`, `count`, `source` (`menu`, `voice_over`, `keyboard`, `drag`, `launcher`, `other`). Never which app. |
+| `islands_edited` | `action` (`split`, `merge`, `rename`, `tint`, `reset`), `island_count` (pinned islands afterwards). Never an island's name or which apps it holds. Island look settings (`islands_*`) travel with the reflected settings events. |
 
 ### App tiles and Shortcuts
 
@@ -395,7 +396,7 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 | `patch_bay` | `action`, `cable_count`, `outcome` |
 | `clipboard_museum` | `action`, `kind`, `item_count` |
 | `clipboard_capture_enabled` | none |
-| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
 | `line_icon_coverage` | `installed_app_count`, `installed_line_icon_count`, `installed_coverage` (0 to 1), `pinned_app_count`, `pinned_line_icon_count`, `pinned_coverage` (0 to 1), `missing_public_count`, `missing_unlisted_count`, `missing_bundle_ids` (array), `missing_pinned_bundle_ids` (array). See [Line icon coverage](#line-icon-coverage). |
 | `notification_feed_opened` | `entry_count` (entries in the feed), `unread_count` (entries that arrived since it was last opened), `trigger` |
 | `notification_feed_closed` | `entry_count` (entries left when it closed), `duration`, `cleared` (Clear All was used while it was open) |
