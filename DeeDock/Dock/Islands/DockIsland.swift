@@ -64,6 +64,24 @@ struct DockIsland: Identifiable, Codable, Equatable, Hashable, Sendable {
     /// Consecutive pins in this island, in pin order. Zero for every kind that does not hold pins.
     var pinCount = 0
 
+    /// The identity of the island the dock creates for `kind` before the user customises it.
+    /// Fixed per kind, so an edit made against a reconciled plan finds the same island the next read
+    /// produces, and SwiftUI rows keep their identity across renders.
+    static func automaticID(for kind: DockIslandKind) -> UUID {
+        switch kind {
+        case .tile: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000001")!
+        case .pinned: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000002")!
+        case .running: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000003")!
+        case .utilities: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000004")!
+        case .custom: UUID()
+        }
+    }
+
+    /// The untouched island for `kind`, with its stable automatic identity.
+    static func automatic(_ kind: DockIslandKind) -> DockIsland {
+        DockIsland(id: automaticID(for: kind), kind: kind)
+    }
+
     init(id: UUID = UUID(), kind: DockIslandKind, name: String? = nil, tint: DockIslandTint = .automatic, pinCount: Int = 0) {
         self.id = id
         self.kind = kind
@@ -124,7 +142,7 @@ struct DockIslandPlan: Codable, Equatable, Sendable {
 
     /// The island drawn for a kind that holds no pins.
     func island(for kind: DockIslandKind) -> DockIsland {
-        kindIslands.first { $0.kind == kind } ?? DockIsland(kind: kind)
+        kindIslands.first { $0.kind == kind } ?? .automatic(kind)
     }
 
     /// Every island in the plan, pinned islands first.
@@ -138,7 +156,7 @@ struct DockIslandPlan: Codable, Equatable, Sendable {
     /// survives at zero so its name and tint outlive an empty pin list.
     func reconciled(pinCount: Int) -> DockIslandPlan {
         let pinCount = max(0, pinCount)
-        var islands = pinnedIslands.isEmpty ? [DockIsland(kind: .pinned)] : pinnedIslands
+        var islands = pinnedIslands.isEmpty ? [DockIsland.automatic(.pinned)] : pinnedIslands
         var remaining = pinCount
         for index in islands.indices {
             let count = min(islands[index].pinCount, remaining)
@@ -212,14 +230,20 @@ struct DockIslandPlan: Codable, Equatable, Sendable {
         updating(id) { $0.tint = tint }
     }
 
-    /// Applies `mutation` to the island with `id`, materialising a kind island the first time it is
-    /// customised.
+    /// Applies `mutation` to the island with `id`, materialising an automatic island the first time
+    /// it is customised. Call on a reconciled plan so the automatic pinned island exists.
     func updating(_ id: UUID, mutation: (inout DockIsland) -> Void) -> DockIslandPlan {
         var plan = self
         if let index = plan.pinnedIslands.firstIndex(where: { $0.id == id }) {
             mutation(&plan.pinnedIslands[index])
         } else if let index = plan.kindIslands.firstIndex(where: { $0.id == id }) {
             mutation(&plan.kindIslands[index])
+        } else if let kind = DockIslandKind.allCases.first(where: { !$0.holdsPins && DockIsland.automaticID(for: $0) == id }) {
+            return updating(kind: kind, mutation: mutation)
+        } else if id == DockIsland.automaticID(for: .pinned), plan.pinnedIslands.isEmpty {
+            var island = DockIsland.automatic(.pinned)
+            mutation(&island)
+            plan.pinnedIslands = [island]
         }
         return plan
     }
@@ -231,7 +255,7 @@ struct DockIslandPlan: Codable, Equatable, Sendable {
         if let index = plan.kindIslands.firstIndex(where: { $0.kind == kind }) {
             mutation(&plan.kindIslands[index])
         } else {
-            var island = DockIsland(kind: kind)
+            var island = DockIsland.automatic(kind)
             mutation(&island)
             plan.kindIslands.append(island)
         }

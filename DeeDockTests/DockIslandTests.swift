@@ -151,25 +151,58 @@ struct DockIslandTests {
     @Test("Slots group into tile, pinned, running, and utilities islands in dock order")
     func spans() {
         let slots: [DockRenderSlot] = [.launcher, app("a", pinned: true), app("b", pinned: true), app("c", pinned: false), trash]
-        let spans = DockIslandAssignment.spans(slots: slots, plan: .automatic)
+        let spans = DockIslandAssignment.spans(slots: slots, plan: .automatic, pinOrder: ["a", "b"])
         #expect(spans.map(\.island.kind) == [.tile, .pinned, .running, .utilities])
         #expect(spans.map(\.range) == [0..<1, 1..<3, 3..<4, 4..<5])
-        #expect(DockIslandAssignment.spans(slots: [], plan: .automatic).isEmpty)
+        #expect(DockIslandAssignment.spans(slots: [], plan: .automatic, pinOrder: []).isEmpty)
     }
 
     @Test("Split pins form separate islands, gaps join the open island, and the tile among pins splits the run")
     func pinnedSpans() {
         let plan = DockIslandPlan(pinnedIslands: [DockIsland(kind: .pinned, pinCount: 1), DockIsland(kind: .custom, pinCount: 2)])
         let slots: [DockRenderSlot] = [app("a", pinned: true), .gap("x"), app("b", pinned: true), app("c", pinned: true)]
-        let spans = DockIslandAssignment.spans(slots: slots, plan: plan)
+        let order = ["a", "b", "c"]
+        let spans = DockIslandAssignment.spans(slots: slots, plan: plan, pinOrder: order)
         #expect(spans.map(\.range) == [0..<2, 2..<4])
         #expect(spans.map(\.customIndex) == [0, 0])
         let launcherAmong: [DockRenderSlot] = [app("a", pinned: true), .launcher, app("b", pinned: true), app("c", pinned: true)]
-        let around = DockIslandAssignment.spans(slots: launcherAmong, plan: .automatic)
+        let around = DockIslandAssignment.spans(slots: launcherAmong, plan: .automatic, pinOrder: order)
         #expect(around.map(\.island.kind) == [.pinned, .tile, .pinned])
         #expect(around[0].island.id == around[2].island.id)
+        #expect(Set(around.map(\.id)).count == 3)
         let collapsed: [DockRenderSlot] = [.group(DockGroupControl(group: .pinned, count: 3, expanded: false)), app("c", pinned: false)]
-        #expect(DockIslandAssignment.spans(slots: collapsed, plan: plan).map(\.island.kind) == [.pinned, .running])
+        #expect(DockIslandAssignment.spans(slots: collapsed, plan: plan, pinOrder: order).map(\.island.kind) == [.pinned, .running])
+    }
+
+    @Test("A pin parked off the dock or lifted into a drag leaves the others in their islands")
+    func filteredPins() {
+        let plan = DockIslandPlan(pinnedIslands: [DockIsland(kind: .pinned, pinCount: 2), DockIsland(kind: .custom, pinCount: 2)])
+        let order = ["a", "b", "c", "d"]
+        // "a" parked on a magnetic edge: b stays red, c and d stay blue.
+        let hidden: [DockRenderSlot] = [app("b", pinned: true), app("c", pinned: true), app("d", pinned: true)]
+        let spans = DockIslandAssignment.spans(slots: hidden, plan: plan, pinOrder: order)
+        #expect(spans.map(\.range) == [0..<1, 1..<3])
+        #expect(spans.map(\.island.id) == plan.pinnedIslands.map(\.id))
+        // "a" dragged between c and d: its gap previews inside the island it hovers.
+        let dragged: [DockRenderSlot] = [app("b", pinned: true), app("c", pinned: true), .gap("a"), app("d", pinned: true)]
+        #expect(DockIslandAssignment.spans(slots: dragged, plan: plan, pinOrder: order).map(\.range) == [0..<1, 1..<4])
+        // A pin the saved list does not know counts after the known ones.
+        let extra: [DockRenderSlot] = [app("a", pinned: true), app("x", pinned: true)]
+        #expect(DockIslandAssignment.spans(slots: extra, plan: .automatic, pinOrder: ["a"]).map(\.range) == [0..<2])
+    }
+
+    @Test("Automatic islands keep one identity, so the first rename or tint lands")
+    func stableAutomaticIdentity() {
+        let first = DockIslandPlan.automatic.reconciled(pinCount: 3)
+        let second = DockIslandPlan.automatic.reconciled(pinCount: 3)
+        #expect(first.pinnedIslands[0].id == second.pinnedIslands[0].id)
+        #expect(first.island(for: .running).id == second.island(for: .running).id)
+        let tinted = second.tinting(first.pinnedIslands[0].id, .gold)
+        #expect(tinted.pinnedIslands.first?.tint == .gold)
+        #expect(DockIslandPlan.automatic.tinting(DockIsland.automaticID(for: .pinned), .teal).pinnedIslands.first?.tint == .teal)
+        let running = DockIslandPlan.automatic.renaming(DockIsland.automaticID(for: .running), to: "Open")
+        #expect(running.island(for: .running).name == "Open")
+        #expect(running.island(for: .running).id == DockIsland.automaticID(for: .running))
     }
 
     // MARK: Geometry

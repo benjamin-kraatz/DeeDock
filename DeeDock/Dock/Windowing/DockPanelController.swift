@@ -165,7 +165,8 @@ final class DockPanelController {
             : nil
         let restingSections = DockLauncherPlacement.sectionCounts(store.entries)
         let restingIslands = settings.islands.isEnabled
-            ? DockIslandAssignment.layout(spans: DockIslandAssignment.spans(slots: store.entries, plan: store.islandPlan),
+            ? DockIslandAssignment.layout(spans: DockIslandAssignment.spans(slots: store.entries, plan: store.islandPlan,
+                                                                            pinOrder: store.pins.map(\.id)),
                                           settings: settings.islands)
             : nil
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: restingSections.favorites,
@@ -222,7 +223,7 @@ final class DockPanelController {
 
     /// Groups `slots` into islands and resolves each island's colour.
     private func islandPresentation(slots: [DockRenderSlot], settings: DockIslandSettings) -> DockIslandPresentation {
-        let spans = DockIslandAssignment.spans(slots: slots, plan: store.islandPlan)
+        let spans = DockIslandAssignment.spans(slots: slots, plan: store.islandPlan, pinOrder: store.pins.map(\.id))
         if settings.tintMode == .fromIcons {
             let ids = Set(slots.map(\.id))
             iconColorSamples = iconColorSamples.filter { ids.contains($0.key) }

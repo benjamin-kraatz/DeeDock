@@ -76,7 +76,8 @@ struct DockPreviewContent: View {
         if let islands {
             var islandSettings = settings.islands
             islandSettings.isEnabled = true
-            let spans = DockIslandAssignment.spans(slots: slots, plan: islands)
+            let spans = DockIslandAssignment.spans(slots: slots, plan: islands,
+                                                   pinOrder: items.filter(\.isFavorite).map(\.id))
             let colors = spans.map { DockIslandPalette.resolve($0, mode: islandSettings.tintMode, iconColors: []) }
             interaction.islands = DockIslandPresentation(spans: spans, colors: colors, settings: islandSettings)
             islandLayout = DockIslandAssignment.layout(spans: spans, settings: islandSettings)

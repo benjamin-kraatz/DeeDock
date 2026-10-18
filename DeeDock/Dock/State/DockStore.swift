@@ -544,8 +544,9 @@ final class DockStore {
 
     // MARK: Islands
 
-    /// This display's island plan, reconciled to the saved pin count.
-    var islandPlan: DockIslandPlan { islands.plan(for: displayID).reconciled(pinCount: persistedPins.count) }
+    /// This display's island plan, reconciled to the pins the dock shows. Automatic islands carry
+    /// stable identities, so an edit against this snapshot finds the same island on the next read.
+    var islandPlan: DockIslandPlan { islands.plan(for: displayID).reconciled(pinCount: pins.count) }
 
     /// The pinned island holding `pinID`, or nil for a pin not on this display.
     func island(containingPin pinID: String) -> DockIsland? {

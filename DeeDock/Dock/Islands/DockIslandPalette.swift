@@ -117,9 +117,12 @@ enum DockIconTintSampler {
 
     private static func blend(sums: (x: Double, y: Double, weight: Double)) -> DockIslandColor? {
         guard sums.weight > 0.5 else { return nil }
+        // Hues that cancel out (a red icon beside a cyan one) leave a near-zero vector whose
+        // direction is noise; such an island takes the neutral fallback instead.
+        let agreement = hypot(sums.x, sums.y) / sums.weight
+        guard agreement > 0.2 else { return nil }
         var hue = atan2(sums.y, sums.x) * 180 / .pi
         if hue < 0 { hue += 360 }
-        let agreement = hypot(sums.x, sums.y) / sums.weight
         return DockIslandColor(hue: hue.rounded(), saturation: min(1, 0.30 + 0.55 * agreement))
     }
 }
