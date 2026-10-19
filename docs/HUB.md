@@ -203,6 +203,12 @@ the current browser tab when there is more than one. With one browser tab, ⌘W 
 Click a tab to select it. A tab's close button appears on hover, and middle-clicking a tab closes
 it, as in a web browser. Neither closes the last browser tab.
 
+Middle-click a folder to open it in a new browser tab, as with a link in a web browser. This works
+on folders in every view, on sidebar rows, and on breadcrumb segments. If a browser tab already
+shows the folder in one of its panes, DOKK switches to that tab and makes the pane active instead.
+The new tab uses the current view and sort and starts without back history. Middle-clicking a file,
+a package such as an app, or a search result does nothing.
+
 **Split View** in the status bar, or ⌥⌘S, shows two panes side by side. The second pane starts in
 Downloads and keeps its folder when you turn split off. Each pane has its own folder, sort,
 history, and selection. Both use the browser tab's view. Click a pane, or press Tab or Shift-Tab,

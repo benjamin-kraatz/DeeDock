@@ -149,8 +149,9 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         }
     }
 
-    // Middle clicks close tabs, as in browsers. The window delivers the release to the view that
-    // took the press, so the release is checked against the bounds to let a drag off cancel it.
+    // Middle clicks close tabs and open folders in tabs, as in browsers. The window delivers the
+    // release to the view that took the press, so the release is checked against the bounds to
+    // let a drag off cancel it.
     override func otherMouseDown(with event: NSEvent) {
         guard !stopped, event.buttonNumber == 2, interaction.middleClick != nil else {
             super.otherMouseDown(with: event)

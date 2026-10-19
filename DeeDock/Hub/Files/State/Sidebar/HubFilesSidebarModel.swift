@@ -145,6 +145,17 @@ final class HubFilesSidebarModel {
         }
     }
 
+    /// A middle click on a Favorites row: selects the tab showing its folder or opens one, or
+    /// explains why it can't, as a click does.
+    func showInTab(_ id: HubFilesSidebarEntryID) {
+        guard let entry = store.entry(id), let files else { return }
+        if let location = store.location(for: entry) {
+            files.showInTab(location)
+        } else {
+            problem = id
+        }
+    }
+
     func openInNewTab(_ id: HubFilesSidebarEntryID) {
         guard let entry = store.entry(id), let location = store.location(for: entry), let files else { return }
         files.newTab()

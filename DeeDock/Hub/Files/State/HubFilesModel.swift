@@ -240,6 +240,52 @@ final class HubFilesModel: HubTabModel {
         persist()
     }
 
+    /// A middle click on a folder: selects the browser tab that already shows `location`, or opens
+    /// a new tab showing it, like a link middle-clicked in a web browser. Clears any search.
+    ///
+    /// Any visible pane counts as showing the location. The selected tab is checked first, so a
+    /// split pane next to the click wins over another tab; the matching pane becomes active. A new
+    /// tab copies the active pane's sort and the tab's view mode and starts without back history.
+    func showInTab(_ location: HubFilesLocation) {
+        endSearch()
+        cancelRenames()
+        if let (tab, paneIndex) = tabShowing(location) {
+            selectedTabID = tab.id
+            if tab.isSplit { tab.activePaneIndex = paneIndex }
+        } else {
+            let current = selectedTab
+            let pane = makePane(location: location, sort: current.activePane.sort)
+            let tab = HubFilesBrowserTab(panes: [pane], isSplit: false, activePaneIndex: 0, viewMode: current.viewMode)
+            tabs.append(tab)
+            selectedTabID = tab.id
+        }
+        refreshActivation()
+        quickLook.selectionDidChange()
+        persist()
+    }
+
+    /// The tab and pane index showing `location` in a visible pane, checking the selected tab and
+    /// its active pane first. Folders compare by path, so a listing's trailing slash still matches.
+    private func tabShowing(_ location: HubFilesLocation) -> (HubFilesBrowserTab, Int)? {
+        func shows(_ pane: HubFilesPane) -> Bool {
+            switch (pane.location, location) {
+            case (.recents, .recents): true
+            case (.folder(let shown), .folder(let wanted)): HubFilesPath.same(shown, wanted)
+            default: false
+            }
+        }
+        let selected = selectedTab
+        let ordered = [selected] + tabs.filter { $0.id != selected.id }
+        for tab in ordered {
+            let indices = tab.visiblePanes.indices
+            let active = tab.isSplit ? tab.activePaneIndex : 0
+            if let index = ([active] + indices.filter { $0 != active }).first(where: { shows(tab.panes[$0]) }) {
+                return (tab, index)
+            }
+        }
+        return nil
+    }
+
     /// Closes a tab. The last tab cannot be closed.
     func closeTab(_ id: UUID) {
         guard tabs.count > 1, let index = tabs.firstIndex(where: { $0.id == id }) else { return }

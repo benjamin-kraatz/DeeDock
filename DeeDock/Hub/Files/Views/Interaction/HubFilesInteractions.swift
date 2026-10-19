@@ -33,7 +33,8 @@ enum HubFilesInteractions {
         return interaction
     }
 
-    /// Shared selection, drag, drop, and menu behavior for list rows, tiles, and column items.
+    /// Shared selection, drag, drop, and menu behavior for list rows, tiles, and column items. A
+    /// middle click on a folder shows it in a browser tab and leaves the selection alone.
     private static func selectable(_ item: HubFileItem, pane: HubFilesPane, paneIndex: Int,
                                    model: HubFilesModel) -> HubFilesInteraction {
         var interaction = HubFilesInteraction()
@@ -65,6 +66,7 @@ enum HubFilesInteractions {
                 model.activatePane(paneIndex)
                 pane.navigate(to: .folder(normalizing: item.url))
             }
+            if !item.isPackage { interaction.middleClick = { model.showInTab(.folder(normalizing: item.url)) } }
         } else {
             interaction.dropDestination = { pane.folderURL }
             interaction.dropHighlight = .pane(pane.id)
@@ -164,10 +166,12 @@ enum HubFilesInteractions {
         return interaction
     }
 
-    /// A sidebar place or drive: a click shows it in the active pane; drops land in its folder.
+    /// A sidebar place or drive: a click shows it in the active pane and a middle click in a
+    /// browser tab; drops land in its folder.
     static func sidebar(_ location: HubFilesLocation, model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
         var interaction = HubFilesInteraction()
         interaction.mouseUp = { _ in model.show(location) }
+        interaction.middleClick = { model.showInTab(location) }
         if let folder = location.folderURL {
             interaction.dropDestination = { folder }
             interaction.dropHighlight = .sidebar(folder)
@@ -177,8 +181,9 @@ enum HubFilesInteractions {
         return interaction
     }
 
-    /// A breadcrumb segment: a click shows its folder in the pane; drops land in that folder, and
-    /// resting on an ancestor segment during a drag opens it, like Finder's path bar.
+    /// A breadcrumb segment: a click shows its folder in the pane and a middle click in a browser
+    /// tab; drops land in that folder, and resting on an ancestor segment during a drag opens it,
+    /// like Finder's path bar.
     ///
     /// The current folder's segment takes drops but does not spring-load, since the pane is
     /// already there. Recents is neither a drop target nor spring-loaded.
@@ -189,6 +194,7 @@ enum HubFilesInteractions {
             model.activatePane(paneIndex)
             pane.navigate(to: location)
         }
+        interaction.middleClick = { model.showInTab(location) }
         if let folder = location.folderURL {
             interaction.dropDestination = { folder }
             interaction.dropHighlight = .crumb(pane: pane.id, folder: folder)
@@ -203,12 +209,14 @@ enum HubFilesInteractions {
         return interaction
     }
 
-    /// A Favorites row: a click opens it, a drag moves it or (past the sidebar's edge) removes it,
-    /// and drops route through the sidebar model, which picks "insert here" or "into this folder".
+    /// A Favorites row: a click opens it, a middle click opens it in a browser tab, a drag moves it
+    /// or (past the sidebar's edge) removes it, and drops route through the sidebar model, which
+    /// picks "insert here" or "into this folder".
     static func favorite(_ id: HubFilesSidebarEntryID, model: HubFilesModel,
                          hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
         var interaction = sidebarDropArea(model: model)
         interaction.mouseUp = { _ in model.sidebar.open(id) }
+        interaction.middleClick = { model.sidebar.showInTab(id) }
         interaction.sidebarEntry = id
         interaction.springLoad = { model.sidebar.open(id) }
         interaction.menu = { HubFilesContextMenu.favorite(id, model: model) }
