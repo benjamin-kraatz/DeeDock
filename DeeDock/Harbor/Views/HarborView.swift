@@ -177,7 +177,7 @@ struct HarborView: View {
             }
         }
         .frame(width: content.size.width)
-        .padding(.top, HarborStripMetrics.headerTop(edge: content.stripEdge))
+        .padding(.top, HarborStripMetrics.headerTop(edge: content.stripEdge, showsNames: content.stripShowsNames))
         .opacity(session.showsBackdrop ? 1 : 0)
         .animation(session.showsBackdrop ? .easeOut(duration: 0.25) : HarborStyle.chromeOut, value: session.showsBackdrop)
         .scaleEffect(session.showsBackdrop || session.reduceMotion ? 1 : 0.96)
@@ -199,7 +199,7 @@ struct HarborView: View {
     private func strip(_ content: HarborDisplayContent) -> some View {
         let counts = Dictionary(content.groups.map { ($0.id, $0.count) }, uniquingKeysWith: +)
         return HarborDockStrip(apps: content.stripApps, counts: counts, icons: session.icons, edge: content.stripEdge,
-                               displaySize: content.size, seed: content.dockSeed, filter: session.appFilter,
+                               showsNames: content.stripShowsNames, displaySize: content.size, seed: content.dockSeed, filter: session.appFilter,
                                transformed: session.showsBackdrop, reduceMotion: session.reduceMotion,
                                reduceTransparency: session.reduceTransparency,
                                tap: { appID in intents.stripTapped(appID, displayID: displayID) },

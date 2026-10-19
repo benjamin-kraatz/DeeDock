@@ -69,6 +69,20 @@ struct DockSettingsTests {
         #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(disabled)) == disabled)
     }
 
+    @Test("Settings saved before Radar app names keep the names hidden")
+    func harborAppNamesBackwardDecode() throws {
+        let encoded = try JSONEncoder().encode(DockSettings.defaults)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "harborShowsAppNames")
+        let decoded = try JSONDecoder().decode(DockSettings.self,
+            from: JSONSerialization.data(withJSONObject: object))
+        #expect(!decoded.harborShowsAppNames)
+        var shown = DockSettings.defaults
+        shown.harborShowsAppNames = true
+        #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(shown)) == shown)
+        #expect(DockSettingsOverrides().resolving(shown).harborShowsAppNames)
+    }
+
     @Test("Invalid numeric values cannot reach geometry or persistence")
     func validation() {
         for invalid in [Double.nan, .infinity, -.infinity, 31, 97] {

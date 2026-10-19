@@ -133,6 +133,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.showNotificationFeed = defaults.showNotificationFeed
         result.showHarborTile = defaults.showHarborTile
         result.harborShortcutEnabled = defaults.harborShortcutEnabled
+        result.harborShowsAppNames = defaults.harborShowsAppNames
         result.secondaryDisplayAppsOnly = defaults.secondaryDisplayAppsOnly
         result.showSessionCapsules = defaults.showSessionCapsules
         result.showTrash = defaults.showTrash

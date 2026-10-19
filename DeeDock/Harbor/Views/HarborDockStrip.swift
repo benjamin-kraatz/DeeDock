@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// The dock while Harbor is open: only running apps, each with its name and how many windows it
-/// has on this display, plus the Harbor tile when the dock shows one.
+/// The dock while Harbor is open: only running apps, each with how many windows it has on this
+/// display and, when the setting is on, its name, plus the Harbor tile when the dock shows one.
 ///
 /// When Harbor opens over a visible dock, the strip starts as a copy of that dock
 /// (``HarborDockSeed``): the same glass, the same icons at the same, possibly magnified, frames.
 /// As `transformed` turns on, pins without windows and other tiles shrink away, the survivors
-/// slide together, the glass grows to make room for labels, and window counts pop in. Closing
-/// runs it backwards, so the strip lands on the real dock as the backdrop clears. Without a
-/// seed, or under Reduce Motion, the strip simply fades in at the display edge.
+/// slide together, the glass takes the strip's shape (deeper when it shows names), and window
+/// counts pop in. Closing runs it backwards, so the strip lands on the real dock as the backdrop
+/// clears. Without a seed, or under Reduce Motion, the strip simply fades in at the display edge.
 ///
 /// Clicking an app with windows here shows only its group; clicking it again shows every group.
 /// An app without windows here is brought forward, as the dock would. The Harbor tile closes Harbor.
@@ -17,6 +17,9 @@ struct HarborDockStrip: View {
     let counts: [String: Int]
     let icons: [String: NSImage]
     let edge: DockEdge
+    /// Whether app names show under the icons. Off, the strip is shallower and names stay
+    /// available to VoiceOver.
+    let showsNames: Bool
     let displaySize: CGSize
     let seed: HarborDockSeed?
     let filter: String?
@@ -47,7 +50,7 @@ struct HarborDockStrip: View {
     private var layout: HarborStripLayout {
         var items = apps.map { HarborStripLayout.Item(id: DockEntryID.app($0.id).hitID) }
         if showsHarborTile { items.append(HarborStripLayout.Item(id: DockEntryID.harbor.hitID, gapBefore: true)) }
-        return HarborStripLayout.place(items, edge: edge, displaySize: displaySize)
+        return HarborStripLayout.place(items, edge: edge, displaySize: displaySize, showsNames: showsNames)
     }
 
     /// The strip's own shape, or the dock's while not transformed.
@@ -230,7 +233,17 @@ struct HarborCountBadge: View {
     HarborDockStrip(apps: [HarborStripApp(id: "safari", name: "Safari", processIdentifier: 1),
                            HarborStripApp(id: "preview", name: "Vorschau", processIdentifier: 2),
                            HarborStripApp(id: "mail", name: "Mail", processIdentifier: 3)],
-                    counts: ["safari": 5, "preview": 2], icons: [:], edge: .bottom,
+                    counts: ["safari": 5, "preview": 2], icons: [:], edge: .bottom, showsNames: false,
+                    displaySize: CGSize(width: 640, height: 220), seed: HarborPreviewData.dockSeed, filter: "safari",
+                    transformed: true, reduceMotion: false, reduceTransparency: false, tap: { _ in }, closeHarbor: {})
+        .background(HarborBackdrop(wallpaper: nil, reduceTransparency: false))
+}
+
+#Preview("Strip, transformed, with names") {
+    HarborDockStrip(apps: [HarborStripApp(id: "safari", name: "Safari", processIdentifier: 1),
+                           HarborStripApp(id: "preview", name: "Vorschau", processIdentifier: 2),
+                           HarborStripApp(id: "mail", name: "Mail", processIdentifier: 3)],
+                    counts: ["safari": 5, "preview": 2], icons: [:], edge: .bottom, showsNames: true,
                     displaySize: CGSize(width: 640, height: 220), seed: HarborPreviewData.dockSeed, filter: "safari",
                     transformed: true, reduceMotion: false, reduceTransparency: false, tap: { _ in }, closeHarbor: {})
         .background(HarborBackdrop(wallpaper: nil, reduceTransparency: false))
@@ -240,7 +253,7 @@ struct HarborCountBadge: View {
     HarborDockStrip(apps: [HarborStripApp(id: "safari", name: "Safari", processIdentifier: 1),
                            HarborStripApp(id: "preview", name: "Vorschau", processIdentifier: 2),
                            HarborStripApp(id: "mail", name: "Mail", processIdentifier: 3)],
-                    counts: ["safari": 5, "preview": 2], icons: [:], edge: .bottom,
+                    counts: ["safari": 5, "preview": 2], icons: [:], edge: .bottom, showsNames: false,
                     displaySize: CGSize(width: 640, height: 220), seed: HarborPreviewData.dockSeed, filter: nil,
                     transformed: false, reduceMotion: false, reduceTransparency: false, tap: { _ in }, closeHarbor: {})
         .background(HarborBackdrop(wallpaper: nil, reduceTransparency: false))

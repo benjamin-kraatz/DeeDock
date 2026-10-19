@@ -47,6 +47,9 @@ final class HarborCoordinator: HarborIntents {
     /// The dock as drawn on a display right now, in the coordinates of a Harbor panel with the
     /// given AppKit screen frame. Nil when the dock is hidden; the strip then enters from the edge.
     @ObservationIgnored var dockSeed: (String, CGRect) -> HarborDockSeed? = { _, _ in nil }
+    /// Whether the strip shows app names. Read once per presentation, so the layout cannot change
+    /// while Harbor is open.
+    @ObservationIgnored var showsAppNames: () -> Bool = { false }
     /// Closes the dock's popovers, peeks, and Focus Dock before Harbor covers them.
     @ObservationIgnored var willOpen: () -> Void = {}
     /// The app that was in front before Harbor, for Escape to return to.
@@ -268,6 +271,7 @@ final class HarborCoordinator: HarborIntents {
         let bounds = Dictionary(displays.map { ($0.id, CGDisplayBounds($0.runtimeID)) }, uniquingKeysWith: { first, _ in first })
         let runningIDs = Set(apps.map(\.id))
         var contents: [String: HarborDisplayContent] = [:]
+        let showsAppNames = showsAppNames()
         for display in displays {
             guard let quartz = bounds[display.id] else { continue }
             let ordered = stripOrder(display.id).filter(runningIDs.contains)
@@ -277,7 +281,7 @@ final class HarborCoordinator: HarborIntents {
             let screenFrame = screens.first { $0.0.id == display.id }?.1.frame ?? display.frame
             contents[display.id] = HarborDisplayContent(
                 displayID: display.id, size: display.frame.size, quartzOrigin: quartz.origin,
-                stripEdge: dockEdge(display.id), wallpaper: backdrops[display.id],
+                stripEdge: dockEdge(display.id), stripShowsNames: showsAppNames, wallpaper: backdrops[display.id],
                 groups: HarborGrouping.groups(windows: discovery.windows, apps: apps, displayBounds: bounds,
                                               displayID: display.id),
                 stripApps: strip, dockSeed: dockSeed(display.id, screenFrame))

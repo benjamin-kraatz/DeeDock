@@ -916,6 +916,7 @@ final class DockCoordinator {
         }
         harbor.dockEdge = { [weak self] id in self?.profiles.effectiveSettings(for: id).edge ?? .bottom }
         harbor.dockSeed = { [weak self] id, screenFrame in self?.panels[id]?.harborSeed(in: screenFrame) }
+        harbor.showsAppNames = { [weak self] in self?.settings.value.harborShowsAppNames ?? false }
         harbor.willOpen = { [weak self] in
             guard let self else { return }
             hub.dismissAnchored()

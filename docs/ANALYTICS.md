@@ -177,7 +177,7 @@ Registered with the SDK's `register`, so every event carries them.
 | `dock_show_background`, `dock_fade_when_idle` | |
 | `window_peek_enabled`, `window_peek_layout` | |
 | `show_shelf`, `show_trash`, `show_session_capsules`, `show_notification_feed`, `show_volumes`, `soap_bubble_effects` | |
-| `show_harbor_tile`, `harbor_shortcut_enabled` | |
+| `show_harbor_tile`, `harbor_shortcut_enabled`, `harbor_show_app_names` | |
 
 The marketing version, build number, and macOS version come from the SDK's default properties.
 

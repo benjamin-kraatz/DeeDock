@@ -17489,6 +17489,42 @@
         }
       }
     },
+    "harborShowAppNames" : {
+      "comment" : "Settings switch that shows app names under the icons in Radar's running-apps strip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Namen in der Leiste zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show app names in the strip"
+          }
+        }
+      }
+    },
+    "harborShowAppNamesHelp" : {
+      "comment" : "Subtitle of Radar's app-name switch. The strip is the row of running apps Radar shows at the dock's edge.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardmäßig aus. Zeigt den Namen unter jedem Symbol."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off by default. Shows each app's name under its icon."
+          }
+        }
+      }
+    },
     "harborShowTile" : {
       "comment" : "Settings switch that adds the Radar tile to every dock.",
       "extractionState" : "manual",

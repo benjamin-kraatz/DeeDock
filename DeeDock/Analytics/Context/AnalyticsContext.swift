@@ -160,6 +160,7 @@ enum AnalyticsContext {
          "show_notification_feed": AnalyticsValue(settings.showNotificationFeed),
          "show_harbor_tile": AnalyticsValue(settings.showHarborTile),
          "harbor_shortcut_enabled": AnalyticsValue(settings.harborShortcutEnabled),
+         "harbor_show_app_names": AnalyticsValue(settings.harborShowsAppNames),
          "show_volumes": AnalyticsValue(settings.showVolumes),
          "soap_bubble_effects": AnalyticsValue(settings.soapBubbleEffects)]
     }
