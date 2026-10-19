@@ -193,16 +193,13 @@ private struct HubSearchWellHalo<S: InsettableShape>: View {
     }
 }
 
-/// Makes the field a drop target only for a tab that takes drops on it.
+/// Makes the field a drop target only for a tab that takes drops on it. Like the Hub's drag observer, the modifier
+/// stays attached and registers no types without extras, so switching tabs never rebuilds the field.
 private struct HubSearchFieldDrop: ViewModifier {
     let extras: (any HubSearchExtras)?
 
     func body(content: Content) -> some View {
-        if let extras {
-            content.onDrop(of: extras.searchDropTypes, delegate: HubSearchFieldDropDelegate(extras: extras))
-        } else {
-            content
-        }
+        content.onDrop(of: extras?.searchDropTypes ?? [], delegate: HubSearchFieldDropDelegate(extras: extras))
     }
 }
 
