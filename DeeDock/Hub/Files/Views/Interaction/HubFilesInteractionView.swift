@@ -13,9 +13,10 @@ struct HubFilesInteraction {
     var mouseUp: ((NSEvent) -> Void)?
     /// A second click inside the region.
     var doubleClick: (() -> Void)?
-    /// A middle-button (button 3) click, fired on release inside the region. Nil: middle clicks
-    /// pass up the responder chain.
-    var middleClick: (() -> Void)?
+    /// A middle-button (button 3) click, fired on release inside the region with the release
+    /// event, whose modifier flags tell Shift-middle-click apart. Nil: middle clicks pass up the
+    /// responder chain.
+    var middleClick: ((NSEvent) -> Void)?
     /// The file URLs to drag, read when the pointer has moved far enough. Nil: not a drag source.
     var dragURLs: (() -> [URL])?
     /// Begins (true) or ends (false) the Hub's `.drag` hold around a drag session.
@@ -259,8 +260,9 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         }
     }
 
-    // Middle clicks close tabs, as in browsers. The window delivers the release to the view that
-    // took the press, so the release is checked against the bounds to let a drag off cancel it.
+    // Middle clicks close tabs and open folders in tabs, as in browsers. The window delivers the
+    // release to the view that took the press, so the release is checked against the bounds to
+    // let a drag off cancel it.
     override func otherMouseDown(with event: NSEvent) {
         guard !stopped, event.buttonNumber == 2, interaction.middleClick != nil else {
             super.otherMouseDown(with: event)
@@ -276,7 +278,7 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
         }
         middleButtonDown = false
         guard !stopped, bounds.contains(convert(event.locationInWindow, from: nil)) else { return }
-        interaction.middleClick?()
+        interaction.middleClick?(event)
     }
 
     private func beginDrag(urls: [URL], event: NSEvent) {

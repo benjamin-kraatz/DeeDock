@@ -72,16 +72,17 @@ extension HubRootView where Overlay == EmptyView {
     }
 }
 
-/// Watches drags over the Hub for a tab with search extras; without them the Hub isn't a drop target at all.
+/// Watches drags over the Hub for a tab with search extras; without them it registers no types, so the Hub isn't a
+/// drop target at all.
+///
+/// The drop modifier stays attached for every tab. Adding it only when there are extras would give the whole Hub a
+/// different identity whenever Files (the one tab with extras) comes or goes, and SwiftUI would rebuild the header
+/// and tab content mid-switch, drawing the old and new trees on top of each other.
 private struct HubDragObservation: ViewModifier {
     let extras: (any HubSearchExtras)?
 
     func body(content: Content) -> some View {
-        if let extras {
-            content.onDrop(of: extras.searchDropTypes, delegate: HubDragObserver(extras: extras))
-        } else {
-            content
-        }
+        content.onDrop(of: extras?.searchDropTypes ?? [], delegate: HubDragObserver(extras: extras))
     }
 }
 

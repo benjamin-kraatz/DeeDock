@@ -227,4 +227,71 @@ struct HubFilesModelTests {
         model.closeTab(model.tabs[0].id)
         #expect(model.tabs.count == 1)
     }
+
+    // MARK: Middle click
+
+    @Test("A middle-clicked folder opens in a new selected tab without back history")
+    func showInNewTab() {
+        let model = HubFilesModel(defaults: defaults(), dataSource: source())
+        model.selectTab(model.tabs[1].id)
+        model.selectedTab.viewMode = .icons
+        model.activePane.sort = HubFileSort(key: .modified, ascending: false)
+
+        model.showInTab(.folder(normalizing: URL(filePath: "/Users/tester/Documents/Projects/")))
+
+        #expect(model.tabs.count == 3)
+        let tab = model.selectedTab
+        #expect(tab.id == model.tabs[2].id)
+        #expect(tab.panes.map(\.location) == [folder("/Users/tester/Documents/Projects")])
+        #expect(tab.viewMode == .icons)
+        #expect(tab.activePane.sort == HubFileSort(key: .modified, ascending: false))
+        #expect(!tab.activePane.canGoBack)
+    }
+
+    @Test("A middle-clicked folder already in a tab switches there and activates its pane")
+    func showInExistingTab() {
+        let model = HubFilesModel(defaults: defaults(), dataSource: source())
+        model.selectTab(model.tabs[1].id)
+
+        // The first tab's right pane shows Downloads, but the selected tab's own pane wins.
+        model.showInTab(folder("/Users/tester/Downloads"))
+        #expect(model.tabs.count == 2)
+        #expect(model.selectedTabID == model.tabs[1].id)
+
+        model.showInTab(.folder(normalizing: URL(filePath: "/Users/tester/Documents/")))
+        #expect(model.tabs.count == 2)
+        #expect(model.selectedTabID == model.tabs[0].id)
+        #expect(model.activePane.location == folder("/Users/tester/Documents"))
+
+        model.showInTab(folder("/Users/tester/Downloads"))
+        #expect(model.selectedTabID == model.tabs[0].id)
+        #expect(model.selectedTab.activePaneIndex == 1)
+    }
+
+    @Test("Shift-middle-click adds a background tab and keeps the selected tab")
+    func showInBackgroundTab() {
+        let model = HubFilesModel(defaults: defaults(), dataSource: source())
+        model.selectTab(model.tabs[1].id)
+
+        model.showInTab(folder("/Users/tester/Documents/Projects"), inBackground: true)
+        #expect(model.tabs.count == 3)
+        #expect(model.selectedTabID == model.tabs[1].id)
+        #expect(model.tabs[2].panes.map(\.location) == [folder("/Users/tester/Documents/Projects")])
+
+        // Already open in a tab: nothing opens and the selection stays.
+        model.showInTab(folder("/Users/tester/Documents"), inBackground: true)
+        #expect(model.tabs.count == 3)
+        #expect(model.selectedTabID == model.tabs[1].id)
+    }
+
+    @Test("A folder in a hidden split pane opens a new tab")
+    func hiddenPaneDoesNotMatch() {
+        let model = HubFilesModel(defaults: defaults(), dataSource: source())
+        model.closeTab(model.tabs[1].id)
+        model.toggleSplit()
+
+        model.showInTab(folder("/Users/tester/Downloads"))
+        #expect(model.tabs.count == 2)
+        #expect(model.selectedTabID == model.tabs[1].id)
+    }
 }
