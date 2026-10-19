@@ -58,6 +58,7 @@ struct FeaturesPageContent: View {
         case .harbor:
             HarborSettingsCard(shortcut: source.binding(\.harborShortcutEnabled),
                                tile: source.binding(\.showHarborTile),
+                               appNames: source.binding(\.harborShowsAppNames),
                                shortcutAvailable: context.coordinator?.harbor.shortcutAvailable ?? true,
                                locked: locked)
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess, screenCapture: context.screenCapture,

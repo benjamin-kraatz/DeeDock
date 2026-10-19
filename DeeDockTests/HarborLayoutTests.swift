@@ -95,4 +95,37 @@ struct HarborLayoutTests {
     func empty() {
         #expect(HarborLayout.place([], in: bounds) == HarborLayoutResult())
     }
+
+    @Test("The strip keeps every icon and label on its glass, and drops labels without names",
+          arguments: [DockEdge.bottom, .top, .left, .right], [false, true])
+    func stripTiles(edge: DockEdge, showsNames: Bool) throws {
+        let items = ["a", "b", "c"].map { HarborStripLayout.Item(id: $0) } + [.init(id: "harbor", gapBefore: true)]
+        let strip = HarborStripLayout.place(items, edge: edge, displaySize: CGSize(width: 1280, height: 800),
+                                            showsNames: showsNames)
+        let depth: CGFloat = switch edge { case .left, .right: strip.glass.width; case .top, .bottom: strip.glass.height }
+        #expect(depth == HarborStripMetrics.thickness(showsNames: showsNames))
+        #expect(strip.tiles.count == items.count)
+        for tile in strip.tiles.values {
+            #expect(strip.glass.contains(tile.icon))
+            if showsNames {
+                let label = try #require(tile.label)
+                #expect(strip.glass.contains(label))
+                #expect(!label.intersects(tile.icon))
+            } else {
+                #expect(tile.label == nil)
+            }
+        }
+    }
+
+    @Test("Hiding app names gives the groups the space the labels needed", arguments: [DockEdge.bottom, .top, .left, .right])
+    func stripReserve(edge: DockEdge) {
+        func bounds(_ showsNames: Bool) -> CGRect {
+            HarborDisplayContent(displayID: "d", size: CGSize(width: 1280, height: 800), quartzOrigin: .zero,
+                                 stripEdge: edge, stripShowsNames: showsNames, groups: [], stripApps: [])
+                .layoutBounds(showsSearch: true, showsNotice: false)
+        }
+        let named = bounds(true), bare = bounds(false)
+        #expect(bare.contains(named))
+        #expect(bare.width * bare.height > named.width * named.height)
+    }
 }

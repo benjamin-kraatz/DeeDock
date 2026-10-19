@@ -11,6 +11,8 @@ struct HarborDisplayContent {
     let quartzOrigin: CGPoint
     /// The display's DOKK dock edge. The strip of running apps sits there.
     let stripEdge: DockEdge
+    /// Whether the strip shows app names under its icons, which makes it deeper.
+    var stripShowsNames = false
     /// Blurred wallpaper, or nil for the plain backdrop.
     var wallpaper: CGImage?
     /// Every group on this display, before search and app filtering.
@@ -34,9 +36,10 @@ struct HarborDisplayContent {
     /// The header sits 20 points from the top, or under the strip on a top dock; groups start
     /// 22 points below the search field. The strip's side keeps its usual margin past the strip.
     func layoutBounds(showsSearch: Bool, showsNotice: Bool) -> CGRect {
-        let top = HarborStripMetrics.headerTop(edge: stripEdge) + (showsSearch ? 58 + (showsNotice ? 50 : 0) : 28)
+        let top = HarborStripMetrics.headerTop(edge: stripEdge, showsNames: stripShowsNames)
+            + (showsSearch ? 58 + (showsNotice ? 50 : 0) : 28)
         var rect = CGRect(x: 56, y: top, width: size.width - 112, height: size.height - top - 40)
-        let reserve = HarborStripMetrics.thickness + HarborStripMetrics.edgeInset
+        let reserve = HarborStripMetrics.thickness(showsNames: stripShowsNames) + HarborStripMetrics.edgeInset
         switch stripEdge {
         case .bottom: rect.size.height -= reserve
         case .top: break
@@ -49,14 +52,20 @@ struct HarborDisplayContent {
 
 /// Size of the running-apps strip, shared by its view and the layout reservation.
 nonisolated enum HarborStripMetrics {
-    /// Depth of the strip across its edge, with app names under the icons.
-    static let thickness: CGFloat = 92
     static let edgeInset: CGFloat = 8
 
+    /// Depth of the strip across its edge: room for app names under the icons, or for the icons
+    /// alone with even padding on both sides.
+    static func thickness(showsNames: Bool) -> CGFloat {
+        let metrics = HarborStripLayout.Metrics.self
+        return showsNames ? 92 : metrics.icon + 2 * metrics.leadingDepth
+    }
+
     /// Where the search field starts: near the top, or below the strip when the dock is there.
-    static func headerTop(edge: DockEdge) -> CGFloat {
+    static func headerTop(edge: DockEdge, showsNames: Bool) -> CGFloat {
         if case .top = edge {
-            return HarborStripLayout.Metrics.edgeInset + HarborStripLayout.Metrics.menuBarAllowance + thickness + 16
+            return HarborStripLayout.Metrics.edgeInset + HarborStripLayout.Metrics.menuBarAllowance
+                + thickness(showsNames: showsNames) + 16
         }
         return 20
     }

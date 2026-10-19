@@ -7,10 +7,10 @@ import Foundation
 /// The strip is laid out explicitly rather than with a stack so that every tile has a frame to
 /// animate to from the dock's own geometry (``HarborDockSeed``) and back again.
 nonisolated struct HarborStripLayout: Equatable, Sendable {
-    /// One tile: the icon square and the label slot under it.
+    /// One tile: the icon square and, when the strip shows names, the label slot under it.
     nonisolated struct Tile: Equatable, Sendable {
         let icon: CGRect
-        let label: CGRect
+        let label: CGRect?
     }
 
     /// A tile to place: its stable identifier and whether a gap separates it from the one before.
@@ -37,30 +37,35 @@ nonisolated struct HarborStripLayout: Equatable, Sendable {
         static let edgeInset: CGFloat = 8
         static let menuBarAllowance: CGFloat = 24
         /// Icon-to-icon distance on a vertical strip, where each label sits under its icon.
-        static var verticalPitch: CGFloat { icon + labelGap + labelHeight + 8 }
+        /// Without names it matches the horizontal pitch.
+        static func verticalPitch(showsNames: Bool) -> CGFloat {
+            showsNames ? icon + labelGap + labelHeight + 8 : icon + 2 * margin
+        }
     }
 
     let glass: CGRect
     let cornerRadius: CGFloat
     let tiles: [String: Tile]
 
-    /// Lays the strip along `edge`, centered on the display.
-    static func place(_ items: [Item], edge: DockEdge, displaySize: CGSize) -> HarborStripLayout {
+    /// Lays the strip along `edge`, centered on the display. Without names, tiles get no label
+    /// slot and the strip is only as deep as its icons need.
+    static func place(_ items: [Item], edge: DockEdge, displaySize: CGSize, showsNames: Bool) -> HarborStripLayout {
         let gaps = CGFloat(items.filter(\.gapBefore).count) * Metrics.sectionGap
+        let thickness = HarborStripMetrics.thickness(showsNames: showsNames)
         var tiles: [String: Tile] = [:]
         let vertical: Bool = switch edge { case .left, .right: true; case .top, .bottom: false }
         if vertical {
-            let pitch = Metrics.verticalPitch
+            let pitch = Metrics.verticalPitch(showsNames: showsNames)
             let length = 2 * Metrics.endPadding + CGFloat(items.count) * pitch + gaps
             let left: Bool = if case .left = edge { true } else { false }
-            let glass = CGRect(x: left ? Metrics.edgeInset : displaySize.width - Metrics.edgeInset - HarborStripMetrics.thickness,
+            let glass = CGRect(x: left ? Metrics.edgeInset : displaySize.width - Metrics.edgeInset - thickness,
                                y: (displaySize.height - length) / 2,
-                               width: HarborStripMetrics.thickness, height: length)
+                               width: thickness, height: length)
             var y = glass.minY + Metrics.endPadding
             for item in items {
                 if item.gapBefore { y += Metrics.sectionGap }
                 let icon = CGRect(x: glass.midX - Metrics.icon / 2, y: y + Metrics.margin, width: Metrics.icon, height: Metrics.icon)
-                tiles[item.id] = Tile(icon: icon, label: labelFrame(under: icon))
+                tiles[item.id] = Tile(icon: icon, label: showsNames ? labelFrame(under: icon) : nil)
                 y += pitch
             }
             return HarborStripLayout(glass: glass, cornerRadius: Metrics.cornerRadius, tiles: tiles)
@@ -70,13 +75,13 @@ nonisolated struct HarborStripLayout: Equatable, Sendable {
         let top: Bool = if case .top = edge { true } else { false }
         let inset = Metrics.edgeInset + (top ? Metrics.menuBarAllowance : 0)
         let glass = CGRect(x: (displaySize.width - length) / 2,
-                           y: top ? inset : displaySize.height - inset - HarborStripMetrics.thickness,
-                           width: length, height: HarborStripMetrics.thickness)
+                           y: top ? inset : displaySize.height - inset - thickness,
+                           width: length, height: thickness)
         var x = glass.minX + Metrics.endPadding
         for item in items {
             if item.gapBefore { x += Metrics.sectionGap }
             let icon = CGRect(x: x + Metrics.margin, y: glass.minY + Metrics.leadingDepth, width: Metrics.icon, height: Metrics.icon)
-            tiles[item.id] = Tile(icon: icon, label: labelFrame(under: icon))
+            tiles[item.id] = Tile(icon: icon, label: showsNames ? labelFrame(under: icon) : nil)
             x += pitch
         }
         return HarborStripLayout(glass: glass, cornerRadius: Metrics.cornerRadius, tiles: tiles)
