@@ -29,6 +29,11 @@ struct HubFilesInteraction {
     /// Builds the context menu for a secondary click.
     var menu: (() -> NSMenu?)?
     /// Pointer entered (true) or left (false) the region.
+    ///
+    /// Calls alternate (never two `true` in a row) and follow the pointer's real position, also
+    /// when content scrolls under a pointer that stays put: the view reconciles hover with the
+    /// pointer location instead of relying on tracking-area enter/exit pairs alone. While a mouse
+    /// button is held, scrolling can end hover but never start it.
     var hoverChanged: ((Bool) -> Void)?
     /// A search result: dragging it onto the search field runs Find Similar, where a pane's file drag shows no well
     /// unless it's a picture.
@@ -71,6 +76,10 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
 
     private var trackingArea: NSTrackingArea?
     private var isHovered = false
+    /// The clip view whose bounds changes this view observes for scroll-driven hover updates.
+    /// Weak: the scroll view outlives this row, and `detachScrollObserver()` removes the observer
+    /// by this reference before it changes.
+    private weak var observedClipView: NSClipView?
     private var stopped = false
     /// Retains the view while AppKit owns a drag session that outlives SwiftUI removing the row
     /// (a moved item disappears from the listing before the session ends).
@@ -84,20 +93,39 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
     override func isAccessibilityElement() -> Bool { false }
 
+    /// Ends the region when SwiftUI dismantles it: reports a final hover exit, stops observing
+    /// scrolling, and drops every callback. Later events and notifications are ignored.
     func stop() {
         stopped = true
         unregisterDraggedTypes()
+        detachScrollObserver()
         if isHovered { interaction.hoverChanged?(false) }
         interaction = HubFilesInteraction()
     }
 
     // MARK: Hover
+    //
+    // The tracking area alone cannot keep hover right while content scrolls under a stationary
+    // pointer. AppKit rebuilds tracking areas as the visible rect changes (`updateTrackingAreas`),
+    // and removing an area that contains the pointer never sends `mouseExited`; scrolling sends no
+    // mouse-moved event either. Rows would be entered and never exited, leaving several
+    // highlighted at once (DEE-132). So hover is also reconciled against the pointer's real
+    // position whenever the tracking area is rebuilt and whenever the enclosing clip view scrolls.
 
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
+        reconcileHover()
+        installTrackingArea()
+    }
+
+    /// Replaces the tracking area. When the region is already hovered, the new area assumes the
+    /// pointer is inside, so AppKit sends `mouseExited` when it leaves even though this area never
+    /// delivered the matching `mouseEntered` (hover may have come from `reconcileHover()`).
+    private func installTrackingArea() {
         if let trackingArea { removeTrackingArea(trackingArea) }
-        let area = NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect],
-                                  owner: self, userInfo: nil)
+        var options: NSTrackingArea.Options = [.mouseEnteredAndExited, .activeAlways, .inVisibleRect]
+        if isHovered { options.insert(.assumeInside) }
+        let area = NSTrackingArea(rect: .zero, options: options, owner: self, userInfo: nil)
         addTrackingArea(area)
         trackingArea = area
     }
@@ -105,10 +133,92 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     override func mouseEntered(with event: NSEvent) { setHovered(true) }
     override func mouseExited(with event: NSEvent) { setHovered(false) }
 
-    private func setHovered(_ hovered: Bool) {
-        guard hovered != isHovered, !stopped else { return }
+    /// Sets hover and reports a change. Returns whether the state changed.
+    @discardableResult
+    private func setHovered(_ hovered: Bool) -> Bool {
+        guard hovered != isHovered, !stopped else { return false }
         isHovered = hovered
         interaction.hoverChanged?(hovered)
+        return true
+    }
+
+    /// Sets hover from where the pointer actually is. Returns whether the state changed.
+    ///
+    /// Runs for every visible row on each scroll step, so it stays allocation-free and does the
+    /// cheap geometry test first; only the row under the pointer asks the window server which
+    /// window is topmost there.
+    ///
+    /// Hovered means: not stopped, in a visible window and not hidden, the pointer inside the
+    /// visible rect (the same region the tracking area covers), and this window frontmost at the
+    /// pointer, so a menu, popover, or another app's window over the row doesn't count.
+    ///
+    /// There is deliberately no hit test against SwiftUI content covering the region. The
+    /// tracking area doesn't consider it either, so a hit test would make the two paths disagree:
+    /// a drive row keeps its hover under its overlaid eject button through the tracking area, but
+    /// `contentView.hitTest` there returns SwiftUI's hosting view, so scrolling would drop it. A
+    /// hit test through `NSHostingView` also runs SwiftUI's own hit testing per row per scroll
+    /// step, which is not cheap.
+    ///
+    /// While a mouse button is held (a file drag, a Favorites reorder with autoscroll, a press on a
+    /// row) this only clears hover; it never sets it. That matches the tracking area: without
+    /// `.enabledDuringMouseDrag` it generates no `mouseEntered` while the pointer is dragged. The
+    /// window check uses `windowNumber(at:)`, which skips click-through windows ("would be hit by
+    /// a mouseDown"), so a transparent overlay doesn't block hover.
+    @discardableResult
+    private func reconcileHover() -> Bool {
+        guard interaction.hoverChanged != nil || isHovered else { return false }
+        guard !stopped, let window, window.isVisible, !isHiddenOrHasHiddenAncestor else {
+            return setHovered(false)
+        }
+        let point = convert(window.mouseLocationOutsideOfEventStream, from: nil)
+        guard bounds.contains(point), visibleRect.contains(point) else { return setHovered(false) }
+        let frontmost = NSWindow.windowNumber(at: NSEvent.mouseLocation, belowWindowWithWindowNumber: 0)
+        guard frontmost == window.windowNumber else { return setHovered(false) }
+        guard NSEvent.pressedMouseButtons == 0 else { return false }
+        return setHovered(true)
+    }
+
+    // The scroll observer. One selector-based observer per region, on the nearest enclosing clip
+    // view only (a column's own list, not the column strip around it; a strip scroll still
+    // rebuilds tracking areas). It is attached while the view is in a window and detached when it
+    // leaves the window, moves to another scroll view, or stops. NotificationCenter also drops
+    // selector-based observers when the observer deallocates.
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        attachScrollObserver()
+        if window == nil { reconcileHover() }
+    }
+
+    override func viewDidMoveToSuperview() {
+        super.viewDidMoveToSuperview()
+        attachScrollObserver()
+    }
+
+    /// Observes the enclosing clip view's bounds, which change on every scroll step. Does nothing
+    /// when that clip view is already observed, so repeated lifecycle calls add no duplicates.
+    private func attachScrollObserver() {
+        let clipView = stopped || window == nil ? nil : enclosingScrollView?.contentView
+        guard clipView !== observedClipView else { return }
+        detachScrollObserver()
+        guard let clipView else { return }
+        // Clip views normally post these already (NSScrollView relies on them); setting it is harmless.
+        clipView.postsBoundsChangedNotifications = true
+        NotificationCenter.default.addObserver(self, selector: #selector(clipViewBoundsDidChange(_:)),
+                                               name: NSView.boundsDidChangeNotification, object: clipView)
+        observedClipView = clipView
+    }
+
+    private func detachScrollObserver() {
+        guard let observedClipView else { return }
+        NotificationCenter.default.removeObserver(self, name: NSView.boundsDidChangeNotification, object: observedClipView)
+        self.observedClipView = nil
+    }
+
+    /// Content scrolled under the pointer. When hover changes here, the tracking area is rebuilt
+    /// so its inside/outside assumption matches and the next exit is still delivered.
+    @objc private func clipViewBoundsDidChange(_ notification: Notification) {
+        if reconcileHover() { installTrackingArea() }
     }
 
     // MARK: Clicks and drag source
