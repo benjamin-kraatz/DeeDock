@@ -246,22 +246,39 @@ final class HubFilesModel: HubTabModel {
     /// Any visible pane counts as showing the location. The selected tab is checked first, so a
     /// split pane next to the click wins over another tab; the matching pane becomes active. A new
     /// tab copies the active pane's sort and the tab's view mode and starts without back history.
-    func showInTab(_ location: HubFilesLocation) {
+    ///
+    /// With `inBackground` (Shift-middle-click) nothing on screen changes: the selected tab, its
+    /// panes, and any search stay as they are, a new tab is added at the end of the strip without
+    /// being selected, and a location some tab already shows opens nothing.
+    func showInTab(_ location: HubFilesLocation, inBackground: Bool = false) {
+        let existing = tabShowing(location)
+        if inBackground {
+            guard existing == nil else { return }
+            // The new tab's pane stays inactive (unloaded) until its tab is selected.
+            tabs.append(makeTab(showing: location))
+            persist()
+            return
+        }
         endSearch()
         cancelRenames()
-        if let (tab, paneIndex) = tabShowing(location) {
+        if let (tab, paneIndex) = existing {
             selectedTabID = tab.id
             if tab.isSplit { tab.activePaneIndex = paneIndex }
         } else {
-            let current = selectedTab
-            let pane = makePane(location: location, sort: current.activePane.sort)
-            let tab = HubFilesBrowserTab(panes: [pane], isSplit: false, activePaneIndex: 0, viewMode: current.viewMode)
+            let tab = makeTab(showing: location)
             tabs.append(tab)
             selectedTabID = tab.id
         }
         refreshActivation()
         quickLook.selectionDidChange()
         persist()
+    }
+
+    /// A single-pane tab at `location` with the selected tab's view mode and active pane's sort.
+    private func makeTab(showing location: HubFilesLocation) -> HubFilesBrowserTab {
+        let current = selectedTab
+        let pane = makePane(location: location, sort: current.activePane.sort)
+        return HubFilesBrowserTab(panes: [pane], isSplit: false, activePaneIndex: 0, viewMode: current.viewMode)
     }
 
     /// The tab and pane index showing `location` in a visible pane, checking the selected tab and

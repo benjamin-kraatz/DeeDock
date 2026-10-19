@@ -34,7 +34,8 @@ enum HubFilesInteractions {
     }
 
     /// Shared selection, drag, drop, and menu behavior for list rows, tiles, and column items. A
-    /// middle click on a folder shows it in a browser tab and leaves the selection alone.
+    /// middle click on a folder shows it in a browser tab (Shift: in a background tab) and leaves
+    /// the selection alone.
     private static func selectable(_ item: HubFileItem, pane: HubFilesPane, paneIndex: Int,
                                    model: HubFilesModel) -> HubFilesInteraction {
         var interaction = HubFilesInteraction()
@@ -66,7 +67,11 @@ enum HubFilesInteractions {
                 model.activatePane(paneIndex)
                 pane.navigate(to: .folder(normalizing: item.url))
             }
-            if !item.isPackage { interaction.middleClick = { model.showInTab(.folder(normalizing: item.url)) } }
+            if !item.isPackage {
+                interaction.middleClick = {
+                    model.showInTab(.folder(normalizing: item.url), inBackground: opensInBackground($0))
+                }
+            }
         } else {
             interaction.dropDestination = { pane.folderURL }
             interaction.dropHighlight = .pane(pane.id)
@@ -171,7 +176,7 @@ enum HubFilesInteractions {
     static func sidebar(_ location: HubFilesLocation, model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
         var interaction = HubFilesInteraction()
         interaction.mouseUp = { _ in model.show(location) }
-        interaction.middleClick = { model.showInTab(location) }
+        interaction.middleClick = { model.showInTab(location, inBackground: opensInBackground($0)) }
         if let folder = location.folderURL {
             interaction.dropDestination = { folder }
             interaction.dropHighlight = .sidebar(folder)
@@ -194,7 +199,7 @@ enum HubFilesInteractions {
             model.activatePane(paneIndex)
             pane.navigate(to: location)
         }
-        interaction.middleClick = { model.showInTab(location) }
+        interaction.middleClick = { model.showInTab(location, inBackground: opensInBackground($0)) }
         if let folder = location.folderURL {
             interaction.dropDestination = { folder }
             interaction.dropHighlight = .crumb(pane: pane.id, folder: folder)
@@ -216,7 +221,7 @@ enum HubFilesInteractions {
                          hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
         var interaction = sidebarDropArea(model: model)
         interaction.mouseUp = { _ in model.sidebar.open(id) }
-        interaction.middleClick = { model.sidebar.showInTab(id) }
+        interaction.middleClick = { model.sidebar.showInTab(id, inBackground: opensInBackground($0)) }
         interaction.sidebarEntry = id
         interaction.springLoad = { model.sidebar.open(id) }
         interaction.menu = { HubFilesContextMenu.favorite(id, model: model) }
@@ -244,12 +249,18 @@ enum HubFilesInteractions {
     static func tab(_ tab: HubFilesBrowserTab, model: HubFilesModel, hover: @escaping (Bool) -> Void) -> HubFilesInteraction {
         var interaction = HubFilesInteraction()
         interaction.mouseDown = { _ in model.selectTab(tab.id) }
-        interaction.middleClick = { model.closeTab(tab.id) }
+        interaction.middleClick = { _ in model.closeTab(tab.id) }
         interaction.dropDestination = { model.dropFolder(for: tab) }
         interaction.dropHighlight = .tab(tab.id)
         interaction.springLoad = { model.selectTab(tab.id) }
         interaction.hoverChanged = hover
         return interaction
+    }
+
+    /// True for Shift-middle-click, which opens a folder in a background tab. A plain middle click
+    /// switches to the tab.
+    private static func opensInBackground(_ event: NSEvent) -> Bool {
+        event.modifierFlags.contains(.shift)
     }
 
     /// Begins and ends `.drag` on the shell that was current when the session began, so the

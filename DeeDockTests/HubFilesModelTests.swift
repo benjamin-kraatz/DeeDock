@@ -268,6 +268,22 @@ struct HubFilesModelTests {
         #expect(model.selectedTab.activePaneIndex == 1)
     }
 
+    @Test("Shift-middle-click adds a background tab and keeps the selected tab")
+    func showInBackgroundTab() {
+        let model = HubFilesModel(defaults: defaults(), dataSource: source())
+        model.selectTab(model.tabs[1].id)
+
+        model.showInTab(folder("/Users/tester/Documents/Projects"), inBackground: true)
+        #expect(model.tabs.count == 3)
+        #expect(model.selectedTabID == model.tabs[1].id)
+        #expect(model.tabs[2].panes.map(\.location) == [folder("/Users/tester/Documents/Projects")])
+
+        // Already open in a tab: nothing opens and the selection stays.
+        model.showInTab(folder("/Users/tester/Documents"), inBackground: true)
+        #expect(model.tabs.count == 3)
+        #expect(model.selectedTabID == model.tabs[1].id)
+    }
+
     @Test("A folder in a hidden split pane opens a new tab")
     func hiddenPaneDoesNotMatch() {
         let model = HubFilesModel(defaults: defaults(), dataSource: source())
