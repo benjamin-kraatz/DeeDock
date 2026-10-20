@@ -56,12 +56,20 @@ struct DockIslandSettings: Codable, Equatable, Sendable {
     var padding: Double = 10
     /// Width of the frosted rim, in points. Zero removes it.
     var rim: Double = 4.5
+    /// Whether Ice block islands draw the lit line on the screen-edge side. The ambient glow and
+    /// light leak stay; only the line and its halo go.
+    var showsLamp = true
+    /// Thickness of the lamp line across the dock, 1 to 6 points.
+    var lampThickness: Double = 2
+    /// Opacity of the lamp line and its halo, 0 to 100 percent, applied on top of ``glow``.
+    var lampOpacity: Double = 100
 
     static let defaults = DockIslandSettings()
 
     var isValid: Bool {
         (0...1.5).contains(tintStrength) && (0...2).contains(glow) && (4...48).contains(gap) && (4...28).contains(padding)
-            && (0...8).contains(rim) && [tintStrength, glow, gap, padding, rim].allSatisfy(\.isFinite)
+            && (0...8).contains(rim) && (1...6).contains(lampThickness) && (0...100).contains(lampOpacity)
+            && [tintStrength, glow, gap, padding, rim, lampThickness, lampOpacity].allSatisfy(\.isFinite)
     }
 
     /// Snaps valid values to the controls' precision.
@@ -73,10 +81,14 @@ struct DockIslandSettings: Codable, Equatable, Sendable {
         result.gap = gap.rounded()
         result.padding = padding.rounded()
         result.rim = (rim * 2).rounded() / 2
+        result.lampThickness = (lampThickness * 2).rounded() / 2
+        result.lampOpacity = (lampOpacity / 5).rounded() * 5
         return result
     }
 
-    private enum CodingKeys: String, CodingKey { case isEnabled, style, tintMode, tintStrength, glow, gap, padding, rim }
+    private enum CodingKeys: String, CodingKey {
+        case isEnabled, style, tintMode, tintStrength, glow, gap, padding, rim, showsLamp, lampThickness, lampOpacity
+    }
 
     init() {}
 
@@ -91,5 +103,8 @@ struct DockIslandSettings: Codable, Equatable, Sendable {
         gap = try values.decodeIfPresent(Double.self, forKey: .gap) ?? 12
         padding = try values.decodeIfPresent(Double.self, forKey: .padding) ?? 10
         rim = try values.decodeIfPresent(Double.self, forKey: .rim) ?? 4.5
+        showsLamp = try values.decodeIfPresent(Bool.self, forKey: .showsLamp) ?? true
+        lampThickness = try values.decodeIfPresent(Double.self, forKey: .lampThickness) ?? 2
+        lampOpacity = try values.decodeIfPresent(Double.self, forKey: .lampOpacity) ?? 100
     }
 }

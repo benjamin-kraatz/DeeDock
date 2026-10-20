@@ -45,6 +45,18 @@ struct DockIslandsSettingsPane: View {
                               minimumSymbol: "square", maximumSymbol: "square.inset.filled",
                               defaultValue: DockIslandSettings.defaults.rim)
                 .disabled(settings.style != .ice)
+            SettingsToggleRow(title: .islandsLamp, subtitle: .islandsLampSubtitle, isOn: source.binding(\.islands.showsLamp))
+                .disabled(settings.style != .ice)
+            SettingsSliderRow(title: .islandsLampThickness, unit: .settingsPoints,
+                              value: source.binding(\.islands.lampThickness), range: 1...6, step: 0.5,
+                              minimumSymbol: "minus", maximumSymbol: "rectangle.fill",
+                              defaultValue: DockIslandSettings.defaults.lampThickness)
+                .disabled(settings.style != .ice || !settings.showsLamp)
+            SettingsSliderRow(title: .islandsLampOpacity, unit: .settingsPercent,
+                              value: source.binding(\.islands.lampOpacity), range: 0...100, step: 5,
+                              minimumSymbol: "lightbulb", maximumSymbol: "lightbulb.fill",
+                              defaultValue: DockIslandSettings.defaults.lampOpacity)
+                .disabled(settings.style != .ice || !settings.showsLamp)
         }
         .disabled(locked || !settings.isEnabled)
         if let plans {
