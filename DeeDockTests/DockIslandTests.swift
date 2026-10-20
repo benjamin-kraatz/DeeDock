@@ -132,7 +132,7 @@ struct DockIslandTests {
     @Test("Island settings decode missing keys to defaults and nest inside DockSettings")
     func settings() throws {
         let decoded = try JSONDecoder().decode(DockIslandSettings.self, from: Data(#"{"isEnabled":true}"#.utf8))
-        #expect(decoded.isEnabled && decoded.style == .ice && decoded.gap == 12 && decoded.rim == 4.5)
+        #expect(decoded.isEnabled && decoded.style == .ice && decoded.gap == 12 && decoded.rim == 4.5 && decoded.showsLamp)
         var settings = DockSettings.defaults
         settings.islands.isEnabled = true
         settings.islands.glow = 1.337

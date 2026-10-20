@@ -45,6 +45,8 @@ struct DockIslandsSettingsPane: View {
                               minimumSymbol: "square", maximumSymbol: "square.inset.filled",
                               defaultValue: DockIslandSettings.defaults.rim)
                 .disabled(settings.style != .ice)
+            SettingsToggleRow(title: .islandsLamp, subtitle: .islandsLampSubtitle, isOn: source.binding(\.islands.showsLamp))
+                .disabled(settings.style != .ice)
         }
         .disabled(locked || !settings.isEnabled)
         if let plans {

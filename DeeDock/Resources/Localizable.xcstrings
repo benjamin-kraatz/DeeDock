@@ -2631,6 +2631,42 @@
         }
       }
     },
+    "islandsLamp" : {
+      "comment" : "Toggle: shows the lit line on the screen-edge side of Ice block islands.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lichtleiste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lamp"
+          }
+        }
+      }
+    },
+    "islandsLampSubtitle" : {
+      "comment" : "Subtitle under the Lamp toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die leuchtende Linie an der Bildschirmkante. Das Leuchten im Glas bleibt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lit line along the screen edge. The glow inside the glass stays."
+          }
+        }
+      }
+    },
     "islandsListHelp" : {
       "comment" : "Footnote under the per-display islands card.",
       "extractionState" : "manual",

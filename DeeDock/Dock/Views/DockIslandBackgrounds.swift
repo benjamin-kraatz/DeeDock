@@ -38,6 +38,7 @@ struct DockIslandBackgrounds: View {
                 glow: presentation.settings.glow,
                 edge: layout.edge,
                 reduceTransparency: reduceTransparency,
+                showsLamp: presentation.settings.showsLamp,
                 rimWidth: min(presentation.settings.rim, presentation.settings.padding * 0.6),
                 cornerRadius: min(cornerRadius, min(frame.width, frame.height) / 2),
                 idleOpacity: idleOpacity,

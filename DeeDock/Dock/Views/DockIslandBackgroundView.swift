@@ -17,6 +17,8 @@ struct DockIslandBackgroundView: View, Animatable {
     /// Which screen edge the dock sits on; the lamp sits on that side.
     let edge: DockEdge
     let reduceTransparency: Bool
+    /// Whether the ice style draws the lamp line.
+    var showsLamp = true
     /// Rim width in points, already capped to the island's size by the caller.
     var rimWidth: CGFloat = 4
     var cornerRadius: CGFloat = 22
@@ -89,7 +91,7 @@ struct DockIslandBackgroundView: View, Animatable {
             .overlay(leak)
             .overlay(sheen)
             .overlay(rim)
-            .overlay(lamp)
+            .overlay { if showsLamp { lamp } }
             .clipShape(shape)
             .shadow(color: tint(0.65, 0.32 * glow), radius: 14)
             .shadow(color: .black.opacity(isDark ? 0.40 : 0.18), radius: 16, y: 8)

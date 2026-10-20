@@ -56,6 +56,9 @@ struct DockIslandSettings: Codable, Equatable, Sendable {
     var padding: Double = 10
     /// Width of the frosted rim, in points. Zero removes it.
     var rim: Double = 4.5
+    /// Whether Ice block islands draw the lit line on the screen-edge side. The ambient glow and
+    /// light leak stay; only the line and its halo go.
+    var showsLamp = true
 
     static let defaults = DockIslandSettings()
 
@@ -76,7 +79,7 @@ struct DockIslandSettings: Codable, Equatable, Sendable {
         return result
     }
 
-    private enum CodingKeys: String, CodingKey { case isEnabled, style, tintMode, tintStrength, glow, gap, padding, rim }
+    private enum CodingKeys: String, CodingKey { case isEnabled, style, tintMode, tintStrength, glow, gap, padding, rim, showsLamp }
 
     init() {}
 
@@ -91,5 +94,6 @@ struct DockIslandSettings: Codable, Equatable, Sendable {
         gap = try values.decodeIfPresent(Double.self, forKey: .gap) ?? 12
         padding = try values.decodeIfPresent(Double.self, forKey: .padding) ?? 10
         rim = try values.decodeIfPresent(Double.self, forKey: .rim) ?? 4.5
+        showsLamp = try values.decodeIfPresent(Bool.self, forKey: .showsLamp) ?? true
     }
 }
