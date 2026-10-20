@@ -2649,6 +2649,24 @@
         }
       }
     },
+    "islandsLampOpacity" : {
+      "comment" : "Slider in percent: opacity of the lamp line and its halo.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deckkraft der Lichtleiste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lamp opacity"
+          }
+        }
+      }
+    },
     "islandsLampSubtitle" : {
       "comment" : "Subtitle under the Lamp toggle.",
       "extractionState" : "manual",
@@ -2663,6 +2681,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The lit line along the screen edge. The glow inside the glass stays."
+          }
+        }
+      }
+    },
+    "islandsLampThickness" : {
+      "comment" : "Slider in points: thickness of the lamp line across the dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dicke der Lichtleiste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lamp thickness"
           }
         }
       }

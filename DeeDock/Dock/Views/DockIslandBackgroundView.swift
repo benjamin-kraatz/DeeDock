@@ -19,6 +19,10 @@ struct DockIslandBackgroundView: View, Animatable {
     let reduceTransparency: Bool
     /// Whether the ice style draws the lamp line.
     var showsLamp = true
+    /// Lamp line thickness in points.
+    var lampThickness: CGFloat = 2
+    /// Lamp alpha multiplier, 0 to 1, on top of `glow`.
+    var lampOpacity: Double = 1
     /// Rim width in points, already capped to the island's size by the caller.
     var rimWidth: CGFloat = 4
     var cornerRadius: CGFloat = 22
@@ -143,14 +147,16 @@ struct DockIslandBackgroundView: View, Animatable {
     private var lamp: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            let inset = rimWidth + 1
+            // The line's outer edge stays flush with the rim, so a thicker lamp grows inward.
+            let inset = rimWidth + lampThickness / 2
             let along = edge.isVertical ? size.height : size.width
             let length = max(4, along * 0.80)
+            let strength = glow * lampOpacity
             Capsule()
-                .fill(tint(0.90, 0.85 * glow))
-                .frame(width: edge.isVertical ? 2 : length, height: edge.isVertical ? length : 2)
-                .shadow(color: tint(0.80, 0.90 * glow), radius: 4)
-                .shadow(color: tint(0.75, 0.60 * glow), radius: 12)
+                .fill(tint(0.90, 0.85 * strength))
+                .frame(width: edge.isVertical ? lampThickness : length, height: edge.isVertical ? length : lampThickness)
+                .shadow(color: tint(0.80, 0.90 * strength), radius: 4)
+                .shadow(color: tint(0.75, 0.60 * strength), radius: 12)
                 .position(lampPosition(in: size, inset: inset))
         }
     }
