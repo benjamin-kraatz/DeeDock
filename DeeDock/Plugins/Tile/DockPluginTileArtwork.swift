@@ -19,6 +19,8 @@ struct DockPluginTileArtwork: View {
             .opacity(stopped ? 0.42 : 1)
             .overlay(alignment: .bottomTrailing) {
                 if stopped {
+                    // The chip sits 0.4× the icon wide, hanging just past the icon's bottom-right
+                    // corner (6% right, 4% down), so it reads as a mark on the icon, not a badge.
                     DockPluginRestartChip(diameter: size * 0.4)
                         .offset(x: size * 0.06, y: size * 0.04)
                         .transition(reduceMotion ? .identity : .scale(scale: 0.6).combined(with: .opacity))
@@ -30,6 +32,9 @@ struct DockPluginTileArtwork: View {
 
 /// The small round mark on a stopped plugin's tile. The restart itself lives in the tile's menu
 /// and the panel; the chip only says one is needed.
+///
+/// Drawn on menu-like material with a hairline and a soft shadow, so it stands off the greyed
+/// icon whatever is behind the dock. Reduce Transparency fills it solid.
 struct DockPluginRestartChip: View {
     let diameter: CGFloat
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -43,11 +48,11 @@ struct DockPluginRestartChip: View {
                 if reduceTransparency {
                     Circle().fill(Color(nsColor: .windowBackgroundColor))
                 } else {
-                    Circle().fill(.regularMaterial)
+                    Circle().fill(.thickMaterial)
                 }
             }
             .overlay { Circle().strokeBorder(.separator, lineWidth: 0.5) }
-            .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
+            .shadow(color: .black.opacity(0.35), radius: 2, y: 1)
             .allowsHitTesting(false)
             .accessibilityHidden(true)
     }
@@ -69,5 +74,15 @@ struct DockPluginRestartChip: View {
         .frame(width: 64, height: 64)
         .padding(30)
         .preferredColorScheme(.dark)
+}
+
+#Preview("Stopped, toggling") {
+    @Previewable @State var stopped = true
+    VStack(spacing: 20) {
+        DockPluginTileArtwork(icon: NSWorkspace.shared.icon(for: .applicationBundle), stopped: stopped, size: 64)
+            .frame(width: 64, height: 64)
+        Button(String("Toggle")) { stopped.toggle() }
+    }
+    .padding(30)
 }
 #endif

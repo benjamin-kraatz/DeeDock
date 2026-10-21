@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// The bar DOKK draws above every plugin's content: the app icon, the plugin's name, the app's
 /// name when it differs, and a More button with the tile's menu.
@@ -43,7 +44,8 @@ struct DockPluginPanelHeader<More: View>: View {
 /// The header's More button. It opens the plugin tile's menu right under itself.
 ///
 /// AppKit-backed so the menu is the same `NSMenu` the tile shows, and so the panel can tell its
-/// clicks apart from clicks outside.
+/// clicks apart from clicks outside. Hover lifts the glyph to the primary label colour on a soft
+/// 28 × 28 chip; the chip fades rather than moves, so it stays under Reduce Motion.
 struct DockPluginMoreButton: View {
     let plugin: DockPlugin
     let state: DockPluginPanelState
@@ -51,11 +53,11 @@ struct DockPluginMoreButton: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        DockPluginMoreButtonBridge(plugin: plugin, state: state, openSettingsWindow: { openWindow.openDockSettings() })
+        DockPluginMoreButtonBridge(plugin: plugin, state: state, hovered: hovered,
+                                   openSettingsWindow: { openWindow.openDockSettings() })
             .frame(width: 28, height: 28)
-            .background(hovered ? AnyShapeStyle(.quaternary) : AnyShapeStyle(.clear),
-                        in: .rect(cornerRadius: 8, style: .continuous))
-            .onHover { hovered = $0 }
+            .background(.primary.opacity(hovered ? 0.07 : 0), in: .rect(cornerRadius: 8, style: .continuous))
+            .onHover { inside in withAnimation(.easeOut(duration: 0.12)) { hovered = inside } }
             .help(Text(.pluginPanelMore))
     }
 }
@@ -63,6 +65,7 @@ struct DockPluginMoreButton: View {
 private struct DockPluginMoreButtonBridge: NSViewRepresentable {
     let plugin: DockPlugin
     let state: DockPluginPanelState
+    let hovered: Bool
     let openSettingsWindow: () -> Void
 
     func makeNSView(context: Context) -> MoreButton { MoreButton() }
@@ -70,6 +73,7 @@ private struct DockPluginMoreButtonBridge: NSViewRepresentable {
         view.plugin = plugin
         view.panelState = state
         view.openSettingsWindow = openSettingsWindow
+        view.contentTintColor = hovered ? .labelColor : .secondaryLabelColor
     }
     static func dismantleNSView(_ view: MoreButton, coordinator: ()) { view.stop() }
 
@@ -81,11 +85,14 @@ private struct DockPluginMoreButtonBridge: NSViewRepresentable {
 
         init() {
             super.init(frame: .zero)
+            let label = String(localized: .pluginPanelMore)
             isBordered = false
             imagePosition = .imageOnly
-            image = NSImage(systemSymbolName: "ellipsis", accessibilityDescription: String(localized: .pluginPanelMore))
+            image = NSImage(systemSymbolName: "ellipsis", accessibilityDescription: label)?
+                .withSymbolConfiguration(.init(pointSize: 14, weight: .semibold))
             contentTintColor = .secondaryLabelColor
             setButtonType(.momentaryChange)
+            setAccessibilityLabel(label)
             target = self
             action = #selector(showMenu)
         }
@@ -116,3 +123,23 @@ private struct DockPluginMoreButtonBridge: NSViewRepresentable {
         }
     }
 }
+
+#if DEBUG
+#Preview("Header") {
+    let icon = NSWorkspace.shared.icon(for: .applicationBundle)
+    VStack(spacing: 0) {
+        DockPluginPanelHeader(icon: icon, title: "Build Status", appName: "Pipeline") {
+            Image(systemName: "ellipsis").frame(width: 28, height: 28)
+        }
+        DockPluginPanelHeader(icon: icon, title: "philos", appName: nil) {
+            Image(systemName: "ellipsis").frame(width: 28, height: 28)
+        }
+        DockPluginPanelHeader(icon: icon, title: "A Plugin With an Unusually Long and Descriptive Name",
+                              appName: "Long-Named Productivity Suite Professional") {
+            Image(systemName: "ellipsis").frame(width: 28, height: 28)
+        }
+    }
+    .frame(width: 320)
+    .padding(20)
+}
+#endif

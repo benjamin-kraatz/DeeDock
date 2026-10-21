@@ -74,15 +74,21 @@ struct DockPluginSceneHost: NSViewControllerRepresentable {
 
 /// What the scene shows until the plugin's first frame arrives: a small spinner in the middle.
 ///
-/// Every hugging priority is low so the placeholder never sizes the panel.
+/// The spinner waits a beat before it appears, so a plugin that draws within a few hundred
+/// milliseconds never flashes one. Every hugging priority is low so the placeholder never sizes
+/// the panel.
 private final class DockPluginScenePlaceholder: NSView {
     private let spinner = NSProgressIndicator()
+    /// Pending reveal, cancelled when the placeholder leaves its window first.
+    private var reveal: Task<Void, Never>?
+    private static let revealDelay: Duration = .milliseconds(300)
 
     init() {
         super.init(frame: .zero)
         spinner.style = .spinning
         spinner.controlSize = .small
         spinner.isDisplayedWhenStopped = false
+        spinner.alphaValue = 0
         spinner.translatesAutoresizingMaskIntoConstraints = false
         addSubview(spinner)
         NSLayoutConstraint.activate([
@@ -103,6 +109,23 @@ private final class DockPluginScenePlaceholder: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         // Starts and stops with visibility, so no animation runs behind a hidden placeholder.
-        if window == nil { spinner.stopAnimation(nil) } else { spinner.startAnimation(nil) }
+        reveal?.cancel()
+        reveal = nil
+        guard window != nil else {
+            spinner.stopAnimation(nil)
+            spinner.alphaValue = 0
+            return
+        }
+        spinner.startAnimation(nil)
+        // `@MainActor` spelled out: a `[weak self]` capture stops the task inheriting the view's
+        // isolation on its own.
+        reveal = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: Self.revealDelay)
+            guard !Task.isCancelled, let self, window != nil else { return }
+            NSAnimationContext.beginGrouping()
+            NSAnimationContext.current.duration = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? 0.1 : 0.2
+            spinner.animator().alphaValue = 1
+            NSAnimationContext.endGrouping()
+        }
     }
 }

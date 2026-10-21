@@ -56,7 +56,9 @@ struct DockPluginPanelView<Content: View>: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .dockPopoverChrome(state.chrome, opaque: reduceTransparency)
-        .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: showsStopped)
+        // The notice and the dimming only fade, so Reduce Motion keeps a shorter cross-fade
+        // rather than a cut.
+        .animation(reduceMotion ? .easeInOut(duration: 0.2) : .smooth(duration: 0.3), value: showsStopped)
         .onChange(of: plugin.status) { _, status in
             if status == .running { state.restarting = false }
         }
