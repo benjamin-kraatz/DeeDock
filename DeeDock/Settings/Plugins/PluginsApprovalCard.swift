@@ -8,6 +8,7 @@ struct PluginsApprovalCard: View {
     let waitingCount: Int
     let manage: () -> Void
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var waiting: Bool { waitingCount > 0 }
     private var shape: RoundedRectangle {
@@ -21,10 +22,13 @@ struct PluginsApprovalCard: View {
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 28, height: 28)
                 .background(Color.accentColor.opacity(0.16), in: .rect(cornerRadius: 8, style: .continuous))
+                .contentTransition(reduceMotion ? .opacity : .symbolEffect(.replace))
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(waiting ? .pluginsWaitingTitle(waitingCount) : .pluginsAllApprovedTitle)
+                    .contentTransition(.opacity)
                 Text(waiting ? .pluginsWaitingDetail : .pluginsAllApprovedDetail)
+                    .contentTransition(.opacity)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -40,6 +44,9 @@ struct PluginsApprovalCard: View {
         .overlay(shape.strokeBorder(waiting ? AnyShapeStyle(Color.accentColor.opacity(0.45))
                                     : AnyShapeStyle(.separator.opacity(colorScheme == .dark ? 0.6 : 0.4)),
                                     lineWidth: 0.5))
+        // The accent wash and the glyph swap are colour changes, so they fade under Reduce
+        // Motion too, only quicker.
+        .animation(reduceMotion ? .easeInOut(duration: 0.15) : .smooth(duration: 0.3), value: waiting)
         .accessibilityElement(children: .contain)
     }
 
