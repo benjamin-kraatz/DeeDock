@@ -3511,3 +3511,70 @@ Implemented on `feature/dee-85-islands` after the interactive mockup `docs/mocku
 `xcodebuild … build-for-testing` on the branch: see the PR description for the exact result. `DeeDockTests/DockIslandTests.swift` covers plan reconciliation, split, merge, pin following, naming, Codable, the repository, settings decoding, slot grouping (tile among pins, gaps, collapsed controls), island geometry under magnification, and the icon sampler. Tests were not run.
 
 The app was not launched. Not exercised by hand: the ice material on a real wallpaper in both appearances and on a side or top dock, the lamp with Reduce Transparency, auto-hide and the ten animation styles with several islands, the approach ghost (which still draws the union as one slab), drag insertion gaps at island boundaries, VoiceOver labels on island glass, the Discovery callout timing, and the settings list with two displays.
+
+## DOKK Plugins (DEE-140)
+
+Built on `codex/dee-140-dokk-plugins` after the locked mockup `docs/mockups/dokk-plugins.html`. The ExtensionKit spike (`codex/extensionkit-plugin-spike`, never merged) supplied the evidence. The contract and the plugin author's view are in [PLUGINS.md](PLUGINS.md).
+
+### Implemented
+
+- **Extension point.** One extension point, `de.benjaminkraatz.DeeDock.dev.plugin`, for DOKK and DOKK Dev. It is declared by the static `Configuration/DOKKPluginExtensionPoint.appexpt`, copied into `Contents/Extensions`. See PLUGINS.md for the LaunchServices probes behind that identifier.
+- **Contract.** `DOKKPluginContract/` (version 1) holds tile state, host events, plugin requests, and the XPC protocols. Decoding tolerates missing and unknown fields.
+- **Controller.** `DockPluginController` covers:
+  - discovery: `AppExtensionPoint.Monitor`, recreated when DOKK becomes active and when the Plugins page opens;
+  - pins: app-wide, with auto-pin on first approval;
+  - one `DockPluginConnection` per pinned plugin;
+  - a 15 s reply deadline;
+  - the stopped state and restart;
+  - the approval window.
+- **Dock section.** Plugin tiles render as a `DockRenderSlot.plugin` section between the applications and the utilities, with a divider on each side (`DockGeometry.layout(pluginCount:)`). With Islands on they form a `plugins` island tinted orchid (hue 312, saturation 0.55).
+- **Panel.** `DockPluginPanelCoordinator` hosts `EXHostViewController` in the shared dock popover. It is non-activating and becomes key on click, and Escape closes it. Size is the plugin's content plus a 40 pt header and a 10 pt pointer, clamped to 280 × 220 through 560 × 420. Live resizes animate.
+- **Tile and panel menus.** The same `NSMenu` serves the tile and the panel's More button.
+- **Stopped state.**
+  - Tile: grey, with a restart chip, and the badge hidden.
+  - Panel: "stopped · Restart" in place.
+- **Settings.** A Plugins section with the puzzle-piece symbol, and a waiting count on the sidebar row. Dock Extras moved to `plus.app.fill`.
+- **Housekeeping.** Unpinning, disabling, or uninstalling a plugin ends its session with `willDisconnect` first. Closing the panel ends its scene. The sample plugin exits three seconds after DOKK's last connection closes.
+- **Sample plugin.** The `DOKK Sample Plugin` scheme. It isn't embedded in DOKK, and DOKK doesn't depend on it.
+- **Analytics.** Count-only `plugin_*` and `plugins_*` events, listed in ANALYTICS.md.
+
+### Validation status
+
+Every build went to a scratch `-derivedDataPath`:
+
+- `xcodebuild -scheme DeeDock -configuration Debug build`: **BUILD SUCCEEDED**, no warnings in the plugin files.
+- `xcodebuild -scheme "DOKK Sample Plugin" -configuration Debug build`: **BUILD SUCCEEDED**.
+- `xcodebuild -scheme DeeDock -configuration Debug build-for-testing`: **TEST BUILD SUCCEEDED**.
+
+Checked on build products without launching anything:
+- `lsregister -dump` lists `de.benjaminkraatz.DeeDock.dev.plugin` with DOKK Dev as its parent;
+- `pluginkit -m -v -p de.benjaminkraatz.DeeDock.dev.plugin` lists the sample extension;
+- `codesign --verify --deep --strict` passes on DOKK Dev with the `.appexpt` inside.
+
+`DeeDockTests/DockPluginTests.swift` covers:
+- pins: auto-pin once, unpinned stays unpinned, and persistence;
+- panel sizing and clamping;
+- contract decoding and round trips;
+- badge display rules;
+- the plugin section's dividers and island.
+
+The tests were compiled but not run, following `AGENTS.md`. Release was not built, so a Release build product with DOKK's bundle ID never entered LaunchServices.
+
+The app was not launched. Not exercised:
+- approval in the system window;
+- the tile, badge pushes, and the panel in a real dock;
+- typing in a plugin's text field inside the non-activating panel;
+- crash and restart;
+- live resizing;
+- unpinning ending the plugin process;
+- auto-pin on approval;
+- rescans after installing a plugin while DOKK runs;
+- Islands with a plugin island;
+- side and top docks;
+- VoiceOver, Reduce Motion, and Reduce Transparency;
+- two displays.
+
+Also open:
+- whether DOKK and DOKK Dev, both installed and both declaring the shared point, each see and approve the same plugin;
+- loading a plugin from another team;
+- the App Store question for philos.
