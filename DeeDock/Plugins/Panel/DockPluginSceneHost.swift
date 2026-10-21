@@ -31,6 +31,8 @@ struct DockPluginSceneHost: NSViewControllerRepresentable {
         context.coordinator.failed = failed
         guard context.coordinator.generation != generation else { return }
         context.coordinator.generation = generation
+        // Tearing down the old scene can report its earlier failure again; only the new one counts.
+        context.coordinator.awaitingActivation = true
         controller.configuration = nil
         controller.configuration = configuration
     }
@@ -54,13 +56,17 @@ struct DockPluginSceneHost: NSViewControllerRepresentable {
     final class Coordinator: NSObject, EXHostViewControllerDelegate {
         var failed: () -> Void
         var generation = 0
+        /// True from a reload until the new scene activates.
+        var awaitingActivation = false
 
         init(failed: @escaping () -> Void) { self.failed = failed }
 
-        func hostViewControllerDidActivate(_ viewController: EXHostViewController) {}
+        func hostViewControllerDidActivate(_ viewController: EXHostViewController) {
+            awaitingActivation = false
+        }
 
         func hostViewControllerWillDeactivate(_ viewController: EXHostViewController, error: (any Error)?) {
-            guard error != nil else { return }
+            guard error != nil, !awaitingActivation else { return }
             failed()
         }
     }

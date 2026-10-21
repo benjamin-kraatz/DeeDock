@@ -25,7 +25,12 @@ final class DockPluginConnection {
     private var process: AppExtensionProcess?
     private var connection: NSXPCConnection?
     private var startTask: Task<Void, Never>?
+    /// Ends a session whose plugin never answers, so its tile does not wait forever.
+    private var replyTimeout: Task<Void, Never>?
     private var finished = false
+    /// How long a plugin has to send its first tile state, launch included. The spike measured
+    /// replies within 0.3 seconds of a cold start.
+    private static let replyDeadline: Duration = .seconds(15)
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "DOKK", category: "Plugins")
 
     init(identity: AppExtensionIdentity, onEvent: @escaping (Event) -> Void) {
@@ -40,6 +45,11 @@ final class DockPluginConnection {
         let configuration = AppExtensionProcess.Configuration(appExtensionIdentity: identity) { [weak self] in
             guard let self else { return }
             Task { @MainActor in self.end(unexpected: true, reason: "process interrupted") }
+        }
+        replyTimeout = Task { [weak self] in
+            try? await Task.sleep(for: Self.replyDeadline)
+            guard !Task.isCancelled else { return }
+            self?.end(unexpected: true, reason: "no reply")
         }
         startTask = Task { [weak self] in
             do {
@@ -117,6 +127,8 @@ final class DockPluginConnection {
         finished = true
         startTask?.cancel()
         startTask = nil
+        replyTimeout?.cancel()
+        replyTimeout = nil
         let connection = connection
         let process = process
         self.connection = nil
@@ -133,6 +145,8 @@ final class DockPluginConnection {
 
     private func deliver(_ event: Event) {
         guard !finished else { return }
+        replyTimeout?.cancel()
+        replyTimeout = nil
         onEvent(event)
     }
 
@@ -141,6 +155,8 @@ final class DockPluginConnection {
         finished = true
         Self.logger.info("Plugin session ended: \(reason, privacy: .public)")
         startTask = nil
+        replyTimeout?.cancel()
+        replyTimeout = nil
         connection?.invalidate()
         process?.invalidate()
         connection = nil

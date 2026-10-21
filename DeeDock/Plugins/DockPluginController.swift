@@ -139,9 +139,11 @@ final class DockPluginController {
     }
 
     /// The panel's scene ended with an error: the plugin process is gone or could not show it.
-    /// The background session usually reports the same exit; whichever comes first wins.
+    /// The background session usually reports the same exit; whichever comes first wins. While a
+    /// plugin is starting, only its session decides, so a late error from the scene it replaced
+    /// cannot stop the restart.
     func sceneFailed(_ id: String) {
-        guard let plugin = plugin(id), plugin.status == .running || plugin.status == .starting else { return }
+        guard let plugin = plugin(id), plugin.status == .running else { return }
         markStopped(plugin)
     }
 
@@ -170,7 +172,7 @@ final class DockPluginController {
             guard !next.contains(where: { $0.id == id }) else { continue }
             if let plugin = existing[id] {
                 // A reinstalled or updated plugin gets a new identity; its old session serves the old binary.
-                if plugin.identity != identity {
+                if plugin.identity?.id != identity.id {
                     plugin.update(identity: identity)
                     if sessions[id] != nil {
                         disconnect(id)
