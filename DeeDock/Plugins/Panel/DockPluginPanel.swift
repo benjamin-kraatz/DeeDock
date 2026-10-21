@@ -11,7 +11,9 @@ struct DockPluginPanel: View {
 
     var body: some View {
         DockPluginPanelView(plugin: plugin, state: state) {
-            if let identity = plugin.identity {
+            // A stopped plugin has no scene: hosting one would launch its process behind DOKK's
+            // back. Restart brings the scene back with the session.
+            if let identity = plugin.identity, plugin.status != .stopped {
                 DockPluginSceneHost(identity: identity, generation: plugin.sceneGeneration,
                                     failed: { state.sceneFailed?() })
             }
